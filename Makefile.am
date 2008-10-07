@@ -1,0 +1,41 @@
+NULL =
+
+AUTOMAKE_OPTIONS = subdir-objects
+
+SUBDIRS = \
+	$(NULL)
+
+AM_CPPFLAGS = \
+	$(CONTEXTD_CFLAGS) \
+	-include $(CONFIG_HEADER) \
+	$(NULL)
+
+BUILT_SOURCES = src/contextd.vala.stamp
+
+bin_PROGRAMS = contextd
+
+contextd_VALASOURCES = \
+	src/main.vala \
+	$(NULL)
+
+contextd_SOURCES = \
+	$(contextd_VALASOURCES:.vala=.c) \
+	$(contextd_VALASOURCES:.vala=.h) \
+	$(NULL)
+
+src/contextd.vala.stamp: $(contextd_VALASOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) $^
+	touch $@
+
+contextd_LDADD = \
+	$(CONTEXTD_LIBS) \
+	$(NULL)
+
+EXTRA_DIST = \
+	$(contextd_VALASOURCES) \
+	src/contextd.vala.stamp \
+	$(NULL)
+
+DISTCLEANFILES = \
+	$(NULL)
+
