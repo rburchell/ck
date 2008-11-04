@@ -16,7 +16,6 @@ bin_PROGRAMS = contextd
 
 contextd_VALASOURCES = \
 	src/main.vala \
-	src/sqlitevala.vala \
 	$(NULL)
 
 contextd_SOURCES = \
@@ -25,7 +24,7 @@ contextd_SOURCES = \
 	$(NULL)
 
 src/contextd.vala.stamp: $(contextd_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 $^
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1 $^
 	touch $@
 
 contextd_LDADD = \
