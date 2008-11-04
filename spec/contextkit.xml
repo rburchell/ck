@@ -1,0 +1,87 @@
+DBus interface
+
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<node name="/" xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0">
+  <interface name="org.freedesktop.ContextKit.Manager">
+    <tp:enum name="TYPE" type="u">
+      <tp:docstring></tp:docstring>
+      <tp:enumvalue suffix="STRING" value="0">
+        <tp:docstring>Mode is unknown.</tp:docstring>
+      </tp:enumvalue>
+      <tp:enumvalue suffix="TRUTH" value="1">
+        <tp:docstring></tp:docstring>
+      </tp:enumvalue>
+      <tp:enumvalue suffix="INT" value="2">
+        <tp:docstring></tp:docstring>
+      </tp:enumvalue>
+    </tp:enum>
+
+    <tp:struct name="Typed_Variant">
+      <tp:member type="u" name="Type" tp:type="TYPE" />
+      <tp:member type="v" name="Variant" />
+    </tp:struct>
+
+    <tp:mapping name="Value_Set">
+        <tp:docstring>A mapping from key names to a Typed_Variant</tp:docstring>
+        <tp:member type="s" name="Key"/>
+        <tp:member type="(uv)" name="Value" tp:type="Typed_Variant"/>
+    </tp:mapping>
+
+    <method name="Get">
+      <tp:docstring>
+        Get the values of a set of context keys.
+      </tp:docstring>
+      <arg name="Keys" type="as" direction="in">
+        <tp:docstring>
+          An array of the keys to get.
+        </tp:docstring>
+      </arg>
+      <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" direction="out">
+        <tp:docstring>
+          A Value_Set mapping the requested keys to their values.
+        <tp:docstring>
+      </arg>
+    </method>
+
+    <method name="Subscribe">
+      <tp:docstring>
+        Subscribe to a set of key values
+      </tp:docstring>
+      <arg name="Keys" type="as" direction="in">
+        <tp:docstring>
+          An array of the keys to get.
+        </tp:docstring>
+      </arg>
+      <arg name="SubscriptionObject" type="o" direction="out">
+        <tp:docstring>
+          The object on which signals will be emitted when any keys changes in the requested set.
+        <tp:docstring>
+      </arg>
+      <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" direction="out">
+        <tp:docstring>
+          A Value_Set mapping the requested keys to their values.
+        <tp:docstring>
+      </arg>
+    </method>
+  </interface>
+</node>
+
+
+<node name="/" xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0">
+  <interface name="org.freedesktop.ContextKit.Subscription">
+    <signal name="Changed">
+      <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" direction="out">
+        <tp:docstring>
+          A Value_Set mapping the changed keys to their values.
+        <tp:docstring>
+      </arg>
+    </signal>
+    <method name="Unsubscribe">
+      <tp:docstring>
+        A Value_Set mapping the requested keys to their values.
+      <tp:docstring>
+    </method>  
+  </interface>
+</node>
+
