@@ -17,6 +17,7 @@ bin_PROGRAMS = contextd
 contextd_VALASOURCES = \
 	src/main.vala \
 	src/DBusInterface.vala \
+	src/Manager.vala \
 	$(NULL)
 
 contextd_SOURCES = \

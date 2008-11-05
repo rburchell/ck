@@ -22,18 +22,46 @@
 using GLib;
 using Sqlite;
 
-public class Contextd.Main : Object {
-	public Main () {
-	}
+namespace ContextKit {
+	public class Main : Object {
+		public Main () {
+		}
 
-	public void run () {
-		stdout.printf ("Hello, world!\n");
-	}
+		private static ContextKit.Manager manager;
 
-	static int main (string[] args) {
-		var main = new Main ();
-		main.run ();
-		return 0;
-	}
+		private static bool start_manager () {
+			try {
+				var conn = DBus.Bus.get (DBus.BusType.SESSION);
+				dynamic DBus.Object bus = conn.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
+				// try to register service in session bus
+				uint request_name_result = bus.RequestName ("org.freedesktop.Contextkit", (uint) 0);
 
+				if (request_name_result == DBus.RequestNameReply.PRIMARY_OWNER) {
+					debug ("Creating new Manager D-Bus service");
+					manager = new ContextKit.Manager();
+					conn.register_object ("/org/freedesktop/ContextKit/Manager", manager);
+				} else {
+					debug ("Manager D-Bus service is already running");
+					return false;
+				}
+
+			} catch (Error e) {
+				error ("Oops %s", e.message); return false;
+			}
+
+			return true;
+		}
+
+		public void run () {
+			stdout.printf ("Hello, world!\n");
+			start_manager();
+		}
+
+		static int main (string[] args) {
+			var main = new Main ();
+			main.run ();
+			return 0;
+		}
+
+	}
 }
