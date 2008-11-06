@@ -6,6 +6,7 @@ namespace ContextKit {
 			HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
 			TypedVariant tv;
 			tv.type = ValueType.TRUTH;
+			tv.value.init (typeof(bool));
 			tv.value.set_boolean (true);
 			ret.insert ("something",tv);
 			/*foreach (var key in keys) {

@@ -3,13 +3,13 @@ using DBus;
 
 namespace ContextKit {
 
-	enum ValueType {
+	public enum ValueType {
 		STRING,
 		INTEGER,
 		TRUTH
 	}
 
-	struct TypedVariant {
+	public struct TypedVariant {
 		public ValueType type;
 		public Value value;
 	}

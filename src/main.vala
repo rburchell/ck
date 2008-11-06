@@ -34,7 +34,7 @@ namespace ContextKit {
 				var conn = DBus.Bus.get (DBus.BusType.SESSION);
 				dynamic DBus.Object bus = conn.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 				// try to register service in session bus
-				uint request_name_result = bus.RequestName ("org.freedesktop.Contextkit", (uint) 0);
+				uint request_name_result = bus.RequestName ("org.freedesktop.ContextKit", (uint) 0);
 
 				if (request_name_result == DBus.RequestNameReply.PRIMARY_OWNER) {
 					debug ("Creating new Manager D-Bus service");
@@ -53,8 +53,10 @@ namespace ContextKit {
 		}
 
 		public void run () {
+			var loop = new MainLoop (null, false);
 			stdout.printf ("Hello, world!\n");
 			start_manager();
+			loop.run();
 		}
 
 		static int main (string[] args) {
