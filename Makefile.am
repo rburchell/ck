@@ -39,5 +39,7 @@ EXTRA_DIST = \
 	$(NULL)
 
 DISTCLEANFILES = \
+	$(contextd_SOURCES) \
+	src/contextd.vala.stamp \
 	$(NULL)
 
