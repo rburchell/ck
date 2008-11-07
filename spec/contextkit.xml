@@ -1,5 +1,3 @@
-DBus interface
-
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <node name="/" xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0">
@@ -40,7 +38,7 @@ DBus interface
       <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" direction="out">
         <tp:docstring>
           A Value_Set mapping the requested keys to their values.
-        <tp:docstring>
+        </tp:docstring>
       </arg>
     </method>
 
@@ -50,24 +48,24 @@ DBus interface
       </tp:docstring>
       <arg name="Keys" type="as" direction="in">
         <tp:docstring>
-          An array of the keys to get.
+          An array of the keys to subscribe to.
         </tp:docstring>
       </arg>
       <arg name="SubscriptionObject" type="o" direction="out">
         <tp:docstring>
           The object on which signals will be emitted when any keys changes in the requested set.
-        <tp:docstring>
+        </tp:docstring>
       </arg>
       <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" direction="out">
         <tp:docstring>
           A Value_Set mapping the requested keys to their values.
-        <tp:docstring>
+        </tp:docstring>
       </arg>
     </method>
   </interface>
 </node>
 
-
+<!--
 <node name="/" xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0">
   <interface name="org.freedesktop.ContextKit.Subscription">
     <signal name="Changed">
@@ -84,4 +82,4 @@ DBus interface
     </method>  
   </interface>
 </node>
-
+-->
