@@ -25,6 +25,12 @@ contextd_SOURCES = \
 	$(contextd_VALASOURCES:.vala=.h) \
 	$(NULL)
 
+SPEC_FILES = \
+	spec/generic-types.xml \
+	spec/Manager.xml \
+	spec/Subscription.xml \
+	$(NULL)
+
 src/contextd.vala.stamp: $(contextd_VALASOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1 $^
 	touch $@
@@ -32,11 +38,11 @@ src/contextd.vala.stamp: $(contextd_VALASOURCES)
 spec_gen = spec/introspect.xml doc/contextkit.html
 tools_dir = $(top_srcdir)/tools
 
-spec/introspect.xml: spec/contextkit.xml $(tools_dir)/spec-to-introspect.xsl
-	$(XSLTPROC) $(tools_dir)/spec-to-introspect.xsl $< > $@
+spec/introspect.xml: $(SPEC_FILES) $(tools_dir)/spec-to-introspect.xsl
+	$(XSLTPROC) $(tools_dir)/spec-to-introspect.xsl $(SPEC_FILES) > $@
 
-doc/contextkit.html: spec/contextkit.xml $(tools_dir)/doc-generator.xsl
-	$(XSLTPROC) $(tools_dir)/doc-generator.xsl $< > $@
+doc/contextkit.html: $(SPEC_FILES) $(tools_dir)/doc-generator.xsl
+	$(XSLTPROC) $(tools_dir)/doc-generator.xsl $(SPEC_FILES) > $@
 
 CLEANFILES = $(spec_gen)
 
