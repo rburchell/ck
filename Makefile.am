@@ -1,5 +1,10 @@
 NULL =
 
+XSLTPROC = xsltproc --xinclude --nonet
+DROP_NAMESPACE = perl -pe '$$hash = chr(35); s{xmlns:tp="http://telepathy\.freedesktop\.org/wiki/DbusSpec$${hash}extensions-v0"}{}g'
+RST2HTML = rst2html
+
+
 AUTOMAKE_OPTIONS = subdir-objects
 
 SUBDIRS = \
@@ -31,20 +36,32 @@ SPEC_FILES = \
 	spec/Subscription.xml \
 	$(NULL)
 
+INTROSPECT = $(SPEC_FILES:spec/%.xml=introspect/%.xml)
+ASYNC_INTROSPECT = $(SPEC_FILES:spec/%.xml=introspect/async/%.xml)
+
+
 src/contextd.vala.stamp: $(contextd_VALASOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1 $^
 	touch $@
 
-spec_gen = spec/introspect.xml doc/contextkit.html
+spec_gen = $(INTROSPECT) $(ASYNC_INTROSPECT) doc/contextkit.html
 tools_dir = $(top_srcdir)/tools
 
-spec/introspect.xml: $(SPEC_FILES) $(tools_dir)/spec-to-introspect.xsl
-	$(XSLTPROC) $(tools_dir)/spec-to-introspect.xsl $(SPEC_FILES) > $@
+$(INTROSPECT): introspect/%.xml: $(SPEC_FILES) $(tools_dir)/spec-to-introspect.xsl
+	install -d introspect
+	$(XSLTPROC) $(tools_dir)/spec-to-introspect.xsl $< | $(DROP_NAMESPACE) > $@
 
-doc/contextkit.html: $(SPEC_FILES) $(tools_dir)/doc-generator.xsl
-	$(XSLTPROC) $(tools_dir)/doc-generator.xsl $(SPEC_FILES) > $@
+$(ASYNC_INTROSPECT): introspect/async/%.xml: $(SPEC_FILES) $(tools_dir)/spec-to-introspect.xsl
+	install -d introspect/async
+	$(XSLTPROC) $(tools_dir)/spec-to-introspect.xsl $< | $(DROP_NAMESPACE) > $@
+
+doc/contextkit.html: $(SPEC_FILES) spec/all.xml $(tools_dir)/doc-generator.xsl
+	$(XSLTPROC) $(tools_dir)/doc-generator.xsl $(top_srcdir)/spec/all.xml > $@
 
 CLEANFILES = $(spec_gen)
+clean-local:
+	-rm -rf introspect
+
 
 contextd_LDADD = \
 	$(CONTEXTD_LIBS) \
