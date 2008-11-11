@@ -18,6 +18,12 @@ if test -z "$XSLTPROC"; then
   AC_MSG_ERROR([xsltproc (from the libxslt source package) is required])
 fi
 
+XMLLINT=
+AC_CHECK_PROGS([XMLLINT], [xmllint])
+if test -z "$XMLLINT"; then
+  AC_MSG_ERROR([xmllint (from the libxml2-utils source package) is required])
+fi
+
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
