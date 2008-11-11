@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<root>
+  <node name="Context">
+    <doc> There will be probably one top level node as here, but more can be added. </doc>
+    <node name="Device">
+      <node name="Display">
+        <doc> These are properties related to the built-in display. </doc>
+        <key name="displayLit" type="INT"/>
+        <key name="inHomeScreen" type="STRING">
+          <doc> What this might be? </doc>
+        </key>
+        <key name="brightnessLevel" type="STRING">
+          <doc> these should be one-liner commentst about the property </doc>
+        </key>
+      </node>
+      <node name="Battery">
+        <key name="capacity" type="INT"/>
+        <key name="percentRemaining" type="INT"/>
+        <key name="timeOnBattery" type="INT"/>
+        <key name="timeLeftOnBattery" type="INT">
+          <doc> We store time in the battery  </doc>
+        </key>
+        <key name="isCharging" type="INT"/>
+        <key name="timeToCompleteCharge" type="INT"/>
+      </node>
+      <node name="CurrentProfile"/>
+      <node name="Orientation"/>
+      <node name="Memory">
+        <doc>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </doc>
+        <key name="ramUsed" type="INT"/>
+        <key name="ramTotal" type="INT"/>
+        <key name="swapFree" type="INT"/>
+        <key name="swapUsed" type="INT"/>
+        <key name="swapTotal" type="INT"/>
+        <key name="internalFree" type="INT"/>
+        <key name="internalUsed" type="INT"/>
+        <key name="internalTotal" type="INT"/>
+        <key name="externalFree" type="INT"/>
+        <key name="externalUsed" type="INT"/>
+        <key name="externalTotal" type="INT"/>
+        <key name="isInternalCardCorrupted" type="INT"/>
+      </node>
+    </node>
+  </node>
+</root>
