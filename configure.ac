@@ -1,4 +1,4 @@
-AC_INIT([ContextKit], [0.1.0], [rob.taylor@codethink.co.uk], [contextd])
+AC_INIT([ContextKit], [0.1.0], [rob.taylor@codethink.co.uk], ContextKit)
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([dist-bzip2])

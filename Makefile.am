@@ -30,6 +30,11 @@ contextd_SOURCES = \
 	$(contextd_VALASOURCES:.vala=.h) \
 	$(NULL)
 
+SPEC_TOOLS = \
+	tools/doc-generator.xsl \
+	tools/spec-to-introspect.xsl \
+	$(NULL)
+
 SPEC_FILES = \
 	spec/generic-types.xml \
 	spec/Manager.xml \
@@ -56,6 +61,7 @@ $(ASYNC_INTROSPECT): introspect/async/%.xml: $(SPEC_FILES) $(tools_dir)/spec-to-
 	$(XSLTPROC) $(tools_dir)/spec-to-introspect.xsl $< | $(DROP_NAMESPACE) > $@
 
 doc/contextkit.html: $(SPEC_FILES) spec/all.xml $(tools_dir)/doc-generator.xsl
+	install -d doc
 	$(XSLTPROC) $(tools_dir)/doc-generator.xsl $(top_srcdir)/spec/all.xml > $@
 
 CLEANFILES = $(spec_gen)
@@ -70,6 +76,9 @@ contextd_LDADD = \
 EXTRA_DIST = \
 	$(contextd_VALASOURCES) \
 	src/contextd.vala.stamp \
+	$(SPEC_FILES) \
+	spec/all.xml \
+	$(SPEC_TOOLS) \
 	$(NULL)
 
 DISTCLEANFILES = \
