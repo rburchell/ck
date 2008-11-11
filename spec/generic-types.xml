@@ -1,0 +1,29 @@
+<tp:generic-types
+  xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0">
+
+  <tp:enum name="TYPE" type="u">
+    <tp:docstring></tp:docstring>
+    <tp:enumvalue suffix="STRING" value="0">
+      <tp:docstring>Mode is unknown.</tp:docstring>
+    </tp:enumvalue>
+    <tp:enumvalue suffix="INT" value="2">
+      <tp:docstring></tp:docstring>
+    </tp:enumvalue>
+    <tp:enumvalue suffix="UNDETERMINED" value="2">
+      <tp:docstring></tp:docstring>
+    </tp:enumvalue>
+  </tp:enum>
+
+  <tp:struct name="Typed_Variant">
+    <tp:member type="u" name="Type" tp:type="TYPE" />
+    <tp:member type="v" name="Variant" />
+  </tp:struct>
+
+  <tp:mapping name="Value_Set">
+    <tp:docstring>A mapping from key names to a Typed_Variant</tp:docstring>
+    <tp:member type="s" name="Key"/>
+    <tp:member type="(uv)" name="Value" tp:type="Typed_Variant"/>
+  </tp:mapping>
+</tp:generic-types>
+
+
