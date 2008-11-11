@@ -1,7 +1,7 @@
 using GLib;
 
 namespace ContextKit {
-	public class Manager : GLib.Object, IDBusManager {
+	public class Manager : GLib.Object, DBusManager {
 		public HashTable<string, TypedVariant?> Get (string[] keys) {
 			HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
 			TypedVariant tv;
