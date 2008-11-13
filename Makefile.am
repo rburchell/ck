@@ -78,7 +78,7 @@ context.valid.stamp: spec/context.xsd spec/context.xml
 
 doc/context.html: context.valid.stamp spec/context.xml tools/context2html.pl
 	install -d doc
-	tools/context2html.pl < $(top_srcdir)/spec/context.xml > $@
+	$(top_srcdir)/tools/context2html.pl < $(top_srcdir)/spec/context.xml > $@
 
 CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) $(DOCS) context.valid.stamp
 clean-local:
