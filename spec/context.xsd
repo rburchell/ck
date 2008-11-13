@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="root">
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="node"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="node">
+    <xs:sequence>
+      <xs:element name="node">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" ref="doc"/>
+            <xs:choice>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="node"/>
+              <xs:group minOccurs="0" maxOccurs="unbounded" ref="key"/>
+            </xs:choice>
+          </xs:sequence>
+          <xs:attribute name="name" use="required" type="xs:NCName"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="doc" type="xs:string"/>
+  <xs:group name="key">
+    <xs:sequence>
+      <xs:element name="key">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" ref="doc"/>
+          </xs:sequence>
+          <xs:attribute name="name" use="required" type="xs:NCName"/>
+          <xs:attribute name="type" use="required" type="typetype"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:simpleType name="typetype">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="INT"/>
+      <xs:enumeration value="STRING"/>
+      <xs:enumeration value="THRUTH"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

@@ -3,7 +3,7 @@ NULL =
 XSLTPROC = xsltproc --xinclude --nonet
 DROP_NAMESPACE = perl -pe '$$hash = chr(35); s{xmlns:tp="http://telepathy\.freedesktop\.org/wiki/DbusSpec$${hash}extensions-v0"}{}g'
 RST2HTML = rst2html
-
+XMLLINT = xmllint --noout --schema
 
 AUTOMAKE_OPTIONS = subdir-objects
 
@@ -15,7 +15,13 @@ AM_CPPFLAGS = \
 	-include $(CONFIG_HEADER) \
 	$(NULL)
 
-BUILT_SOURCES = src/contextd.vala.stamp $(spec_gen)
+BUILT_SOURCES = \
+	src/contextd.vala.stamp \
+	$(INTROSPECT) \
+	$(ASYNC_INTROSPECT) \
+	spec/context.valid.stamp \
+	$(DOCS) \
+	$(NULL)
 
 bin_PROGRAMS = contextd
 
@@ -35,6 +41,7 @@ contextd_SOURCES = \
 SPEC_TOOLS = \
 	tools/doc-generator.xsl \
 	tools/spec-to-introspect.xsl \
+	tools/context2html.pl \
 	$(NULL)
 
 SPEC_FILES = \
@@ -45,13 +52,12 @@ SPEC_FILES = \
 
 INTROSPECT = $(SPEC_FILES:spec/%.xml=introspect/%.xml)
 ASYNC_INTROSPECT = $(SPEC_FILES:spec/%.xml=introspect/async/%.xml)
-
+DOCS = doc/contextkit.html doc/context.html
 
 src/contextd.vala.stamp: $(contextd_VALASOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1 $^
 	touch $@
 
-spec_gen = $(INTROSPECT) $(ASYNC_INTROSPECT) doc/contextkit.html
 tools_dir = $(top_srcdir)/tools
 
 $(INTROSPECT): introspect/%.xml: $(SPEC_FILES) $(tools_dir)/spec-to-introspect.xsl
@@ -66,10 +72,17 @@ doc/contextkit.html: $(SPEC_FILES) spec/all.xml $(tools_dir)/doc-generator.xsl
 	install -d doc
 	$(XSLTPROC) $(tools_dir)/doc-generator.xsl $(top_srcdir)/spec/all.xml > $@
 
-CLEANFILES = $(spec_gen)
+spec/context.valid.stamp: $(top_srcdir)/spec/context.xsd $(top_srcdir)/spec/context.xml
+	$(XMLLINT) $^ 
+	touch $@
+
+doc/context.html: spec/context.valid.stamp $(top_srcdir)/spec/context.xml $(tools_dir)/context2html.pl
+	install -d doc
+	tools/context2html.pl < $(top_srcdir)/spec/context.xml > $@
+
+CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) $(DOCS) spec/context.valid.stamp
 clean-local:
 	-rm -rf introspect
-
 
 contextd_LDADD = \
 	$(CONTEXTD_LIBS) \
@@ -80,6 +93,8 @@ EXTRA_DIST = \
 	src/contextd.vala.stamp \
 	$(SPEC_FILES) \
 	spec/all.xml \
+  spec/context.xml \
+  spec/context.xsd \
 	$(SPEC_TOOLS) \
 	$(NULL)
 
