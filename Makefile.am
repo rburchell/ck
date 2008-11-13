@@ -19,7 +19,7 @@ BUILT_SOURCES = \
 	src/contextd.vala.stamp \
 	$(INTROSPECT) \
 	$(ASYNC_INTROSPECT) \
-	spec/context.valid.stamp \
+	context.valid.stamp \
 	$(DOCS) \
 	$(NULL)
 
@@ -72,15 +72,15 @@ doc/contextkit.html: $(SPEC_FILES) spec/all.xml $(tools_dir)/doc-generator.xsl
 	install -d doc
 	$(XSLTPROC) $(tools_dir)/doc-generator.xsl $(top_srcdir)/spec/all.xml > $@
 
-spec/context.valid.stamp: $(top_srcdir)/spec/context.xsd $(top_srcdir)/spec/context.xml
+context.valid.stamp: spec/context.xsd spec/context.xml
 	$(XMLLINT) $^ 
 	touch $@
 
-doc/context.html: spec/context.valid.stamp $(top_srcdir)/spec/context.xml $(tools_dir)/context2html.pl
+doc/context.html: context.valid.stamp spec/context.xml tools/context2html.pl
 	install -d doc
 	tools/context2html.pl < $(top_srcdir)/spec/context.xml > $@
 
-CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) $(DOCS) spec/context.valid.stamp
+CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) $(DOCS) context.valid.stamp
 clean-local:
 	-rm -rf introspect
 
@@ -93,8 +93,8 @@ EXTRA_DIST = \
 	src/contextd.vala.stamp \
 	$(SPEC_FILES) \
 	spec/all.xml \
-  spec/context.xml \
-  spec/context.xsd \
+	spec/context.xml \
+	spec/context.xsd \
 	$(SPEC_TOOLS) \
 	$(NULL)
 
