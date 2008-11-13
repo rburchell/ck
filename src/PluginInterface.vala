@@ -11,7 +11,7 @@ namespace ContextKit {
 	}
 
 	public interface Plugin : GLib.Object {
-		public abstract HashTable<string, TypedVariant?> Get (string[] keys);
+		public abstract void Get (string[] keys, HashTable<string, TypedVariant?> ret);
 		public abstract PluginSubscription Subscribe (string[] keys, out HashTable<string, TypedVariant?> values);
 		public abstract Key[] Keys();
 	}

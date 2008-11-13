@@ -23,6 +23,8 @@ contextd_VALASOURCES = \
 	src/main.vala \
 	src/DBusInterface.vala \
 	src/Manager.vala \
+	src/MCE.vala \
+	src/PluginInterface.vala \
 	$(NULL)
 
 contextd_SOURCES = \

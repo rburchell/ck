@@ -2,6 +2,8 @@ using GLib;
 
 namespace ContextKit {
 	public class Manager : GLib.Object, DBusManager {
+		MCE.Plugin mce_plugin;
+
 		public HashTable<string, TypedVariant?> Get (string[] keys) {
 			HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
 			TypedVariant tv;
@@ -9,9 +11,7 @@ namespace ContextKit {
 			tv.value.init (typeof(bool));
 			tv.value.set_boolean (true);
 			ret.insert ("something",tv);
-			/*foreach (var key in keys) {
-				ret
-			}*/
+			mce_plugin.Get (keys, ret);
 			return ret;
 		}
 
