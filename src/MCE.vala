@@ -20,13 +20,25 @@ namespace ContextKit {
 			dynamic DBus.Object mce_request;
 			dynamic DBus.Object mce_signal;
 
-			const string[] keys = {
-					"Context.Device.Orientation.displayFacingUp",
-					"Context.Device.Orientation.displayFacingDown",
-					"Context.Device.Orientation.inLandscape",
-					"Context.Device.Orientation.inPortrait"
-			};
-	
+			const Key[] keys = {
+					{
+						"Context.Device.Orientation.displayFacingUp",
+						ValueType.TRUTH
+					},
+					{
+						"Context.Device.Orientation.displayFacingDown",
+						ValueType.TRUTH
+					},
+					{
+						"Context.Device.Orientation.inLandscape",
+						ValueType.TRUTH
+					},
+					{
+						"Context.Device.Orientation.inPortrait",
+						ValueType.TRUTH
+					}
+				};
+
 			public Plugin () {
 				conn = DBus.Bus.get (DBus.BusType.SYSTEM);
 				mce_request = conn.get_object ("com.nokia.mce", "/com/nokia/mce/request", "com.nokia.mce.request");
@@ -92,8 +104,8 @@ namespace ContextKit {
 				return new Subscription();
 			}
 
-			public string[] Keys() {
-			return keys;
+			public Key[] Keys() {
+				return keys;
 			}
 		}
 	}

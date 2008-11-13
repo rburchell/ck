@@ -1,8 +1,8 @@
 namespace ContextKit {
 
 	public struct Key {
-		string name;
-		ValueType type;
+		public string name;
+		public ValueType type;
 	}
 
 	public interface PluginSubscription : GLib.Object {

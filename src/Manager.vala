@@ -2,7 +2,7 @@ using GLib;
 
 namespace ContextKit {
 	public class Manager : GLib.Object, DBusManager {
-		MCE.Plugin mce_plugin;
+		MCE.Plugin mce_plugin = new MCE.Plugin();
 
 		public HashTable<string, TypedVariant?> Get (string[] keys) {
 			HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
