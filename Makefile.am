@@ -55,7 +55,7 @@ ASYNC_INTROSPECT = $(SPEC_FILES:spec/%.xml=introspect/async/%.xml)
 DOCS = doc/contextkit.html doc/context.html
 
 src/contextd.vala.stamp: $(contextd_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1 $^
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1  --disable-dbus-transformation $^
 	touch $@
 
 tools_dir = $(top_srcdir)/tools
