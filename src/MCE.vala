@@ -48,13 +48,17 @@ namespace ContextKit {
 			public void Get (string[] keys, HashTable<string, TypedVariant?> ret) {
 				DeviceOrientation orientation;
 				try {
-					mce_request.get_device_orientation(out orientation);
+					mce_request.get_device_orientation(out orientation.rotation, out orientation.stand, out orientation.facing, out orientation.x, out orientation.y, out orientation.z);
 				} catch (GLib.Error ex) {
 					stdout.printf("MCE Plugin Error: %s\n", ex.message);
 					return;
 				}
 
+				stdout.printf("got orientation %s %s %s (%d,%d,%d)", orientation.rotation,  orientation.stand,  orientation.facing,  orientation.x,  orientation.y,  orientation.z);
+
 				foreach (string key in keys) {
+					stdout.printf("checking key %s", key);
+
 					switch (key) {
 						case "Context.Device.Orientation.displayFacingUp" :
 							if ( orientation.facing == "face_up" ) {
