@@ -6,6 +6,7 @@ RST2HTML = rst2html
 XMLLINT = xmllint --noout --schema
 
 AUTOMAKE_OPTIONS = subdir-objects
+ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
 	$(NULL)
@@ -20,8 +21,11 @@ BUILT_SOURCES = \
 	$(INTROSPECT) \
 	$(ASYNC_INTROSPECT) \
 	context.valid.stamp \
-	$(DOCS) \
 	$(NULL)
+
+if CONTEXTKIT_BUILD_DOCS
+BUILT_SOURCES += $(DOCS)
+endif
 
 bin_PROGRAMS = contextd
 
