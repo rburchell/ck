@@ -37,7 +37,7 @@ AC_PROG_PERL_MODULES([XML::LibXML::Reader], [],
   build_docs=no
 ])
 
-AM_CONDITIONAL(CONTEXTKIT_BUILD_DOCS, test x$build_docs= xyes)
+AM_CONDITIONAL(CONTEXTKIT_BUILD_DOCS, test x$build_docs = xyes)
 
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
