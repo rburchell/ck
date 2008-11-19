@@ -6,7 +6,7 @@ namespace ContextKit {
 
 		public HashTable<string, TypedVariant?> Get (string[] keys) {
 			HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
-			TypedVariant tv;
+			TypedVariant tv = TypedVariant ();
 			tv.type = ValueType.TRUTH;
 			tv.value.init (typeof(bool));
 			tv.value.set_boolean (true);

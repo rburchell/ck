@@ -20,6 +20,7 @@ namespace ContextKit {
 			dynamic DBus.Object mce_request;
 			dynamic DBus.Object mce_signal;
 
+			delegate void TruthFunction (void* data);
 			const Key[] keys = {
 					{
 						"Context.Device.Orientation.displayFacingUp",
@@ -46,7 +47,7 @@ namespace ContextKit {
 			}
 
 			public void Get (string[] keys, HashTable<string, TypedVariant?> ret) {
-				DeviceOrientation orientation;
+				DeviceOrientation orientation = DeviceOrientation ();
 				try {
 					mce_request.get_device_orientation(out orientation.rotation, out orientation.stand, out orientation.facing, out orientation.x, out orientation.y, out orientation.z);
 				} catch (GLib.Error ex) {
@@ -61,40 +62,24 @@ namespace ContextKit {
 
 					switch (key) {
 						case "Context.Device.Orientation.displayFacingUp" :
-							if ( orientation.facing == "face_up" ) {
-								/* TODO: clean this code when vala bug 528436 lands */
-								Value truth;
-								truth.init (typeof(bool));
-								truth.set_boolean (true);
-								TypedVariant tv = TypedVariant () {type = ValueType.TRUTH, value = truth};
-								ret.insert (key, tv);
-							}
+						//	boolkey <DeviceOrientation> (orientation, key, ret,  ()=>);
 						break;
 						case "Context.Device.Orientation.displayFacingDown" :
-							if ( orientation.facing == "face_down" ) {
+						//	facing (orientation, key, ret, true);
+						break;
+						case "Context.Device.Orientation.inPortrait" :
+							if ( orientation.rotation == "portrait" ) {
 								/* TODO: clean this code when vala bug 528436 lands */
-								Value truth;
-								truth.init (typeof(bool));
+								Value truth = Value (typeof(bool));
 								truth.set_boolean (true);
 								TypedVariant tv = TypedVariant () {type = ValueType.TRUTH, value = truth};
 								ret.insert (key, tv);
 							}
 						break;
-						case "Context.Device.Orientation.inPortrait" :
+						case "Context.Device.Orientation.inLandscape" :
 							if ( orientation.rotation == "portrait" ) {
 								/* TODO: clean this code when vala bug 528436 lands */
-								Value truth;
-								truth.init (typeof(bool));
-								truth.set_boolean (true);
-								TypedVariant tv = TypedVariant () {type = ValueType.TRUTH, value = truth};
-								ret.insert (key, tv);
-							}
-						break;
-						case "Context.Device.Orientation.inPortrait" :
-							if ( orientation.rotation == "portrait" ) {
-								/* TODO: clean this code when vala bug 528436 lands */
-								Value truth;
-								truth.init (typeof(bool));
+								Value truth = Value (typeof(bool));
 								truth.set_boolean (true);
 								TypedVariant tv = TypedVariant () {type = ValueType.TRUTH, value = truth};
 								ret.insert (key, tv);
@@ -111,6 +96,22 @@ namespace ContextKit {
 			public Key[] Keys() {
 				return keys;
 			}
+/*
+			private void boolkey (void *data, string key, HashTable<string, TypedVariant?> ret, TrueFunction is_true, TrueFunction is_false) {
+				Value truth = Value (typeof(bool));
+
+				if (is_true(data) ) {
+					truth.set_boolean (true);
+				} else if ( is_false (data)) {
+					truth.set_boolean (false);
+				} else {
+					TypedVariant tv = TypedVariant () {type = ValueType.UNDETERMINED, value = truth};
+					ret.insert (key, tv);
+				}
+				TypedVariant tv = TypedVariant () {type = ValueType.TRUTH, value = truth};
+				ret.insert (key, tv);
+			}
+*/
 		}
 	}
 }
