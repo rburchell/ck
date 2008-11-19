@@ -1,3 +1,5 @@
+include Makefile.decl
+
 NULL =
 
 XSLTPROC = xsltproc --xinclude --nonet
@@ -37,9 +39,15 @@ contextd_VALASOURCES = \
 	src/PluginInterface.vala \
 	$(NULL)
 
-contextd_SOURCES = \
+contextd_GENERATED_SOURCES = \
 	$(contextd_VALASOURCES:.vala=.c) \
 	$(contextd_VALASOURCES:.vala=.h) \
+	$(NULL)
+
+contextd_SOURCES = \
+	$(contextd_GENERATED_SOURCES) \
+	src/intset.c \
+	src/intset.h \
 	$(NULL)
 
 SPEC_TOOLS = \
@@ -59,7 +67,7 @@ ASYNC_INTROSPECT = $(SPEC_FILES:spec/%.xml=introspect/async/%.xml)
 DOCS = doc/contextkit.html doc/context.html
 
 src/contextd.vala.stamp: $(contextd_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1  --disable-dbus-transformation $^
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1  --pkg intset --disable-dbus-transformation $^
 	touch $@
 
 tools_dir = $(top_srcdir)/tools
@@ -92,7 +100,7 @@ contextd_LDADD = \
 	$(CONTEXTD_LIBS) \
 	$(NULL)
 
-EXTRA_DIST = \
+EXTRA_DIST += \
 	$(contextd_VALASOURCES) \
 	src/contextd.vala.stamp \
 	$(SPEC_FILES) \
@@ -103,7 +111,8 @@ EXTRA_DIST = \
 	$(NULL)
 
 DISTCLEANFILES = \
-	$(contextd_SOURCES) \
+	$(contextd_GENERATED_SOURCES) \
 	src/contextd.vala.stamp \
 	$(NULL)
 
+include tests/Makefile.fragment
