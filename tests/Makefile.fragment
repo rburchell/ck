@@ -1,2 +1,27 @@
-TEST_PROGS +=
-noinst_PROGRAMS = 
+TEST_PROGS += tests/intset
+
+noinst_PROGRAMS = $(TEST_PROGS)
+
+BUILT_SOURCES += \
+	tests/test_intset.vala.stamp			\
+	$(NULL)
+
+tests_intset_VALASOURCES = \
+	src/intset.vapi 				\
+	tests/intset.vala				\
+	$(NULL)
+
+tests_intset_SOURCES = \
+	$(tests_intset_VALASOURCES:.vala=.c)		\
+	$(tests_intset_VALASOURCES:.vala=.h)		\
+	src/intset.c					\
+	src/intset.h					\
+	$(NULL)
+
+tests/intset.vala.stamp: $(tests_intset_VALASOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) $^
+	touch $@
+
+tests_intset_CFLAGS = -I$(top_srcdir)/src $(CONTEXTD_CFLAGS)
+tests_intset_LDADD = $(CONTEXTD_LIBS)
+

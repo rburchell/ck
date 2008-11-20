@@ -37,6 +37,7 @@ contextd_VALASOURCES = \
 	src/Manager.vala \
 	src/MCE.vala \
 	src/PluginInterface.vala \
+	src/intset.vapi \
 	$(NULL)
 
 contextd_GENERATED_SOURCES = \

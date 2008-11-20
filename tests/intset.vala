@@ -31,14 +31,14 @@ enum TestValues {
 
 void test_intset_add () {
 	ContextKit.IntSet intset = new ContextKit.IntSet();
-	intset.add (A);
-	intset.add (B);
-	intset.is_member (A);
-	intset.is_member (B);
+	intset.add (TestValues.A);
+	intset.add (TestValues.B);
+	intset.is_member (TestValues.A);
+	intset.is_member (TestValues.B);
 }
 
 public static void main (string[] args) {
 	Test.init (ref args);
-	Test.add_func("/contextkit/intset/intset_add", test_store_new);
+	Test.add_func("/contextkit/intset/intset_add", test_intset_add);
 	Test.run ();
 }
