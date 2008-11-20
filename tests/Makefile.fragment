@@ -3,7 +3,7 @@ TEST_PROGS += tests/intset
 noinst_PROGRAMS = $(TEST_PROGS)
 
 BUILT_SOURCES += \
-	tests/test_intset.vala.stamp			\
+	tests/intset.vala.stamp			\
 	$(NULL)
 
 tests_intset_VALASOURCES = \

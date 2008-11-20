@@ -44,3 +44,7 @@ src/contextd.vala.stamp
 src/main.c
 src/main.h
 stamp-h1
+tests/intset
+tests/intset.c
+tests/intset.h
+tests/intset.vala.stamp

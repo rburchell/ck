@@ -37,6 +37,9 @@ contextd_VALASOURCES = \
 	src/Manager.vala \
 	src/MCE.vala \
 	src/PluginInterface.vala \
+	$(NULL)
+
+contextd_VAPISOURCES = \
 	src/intset.vapi \
 	$(NULL)
 
@@ -67,8 +70,8 @@ INTROSPECT = $(SPEC_FILES:spec/%.xml=introspect/%.xml)
 ASYNC_INTROSPECT = $(SPEC_FILES:spec/%.xml=introspect/async/%.xml)
 DOCS = doc/contextkit.html doc/context.html
 
-src/contextd.vala.stamp: $(contextd_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1  --pkg intset --disable-dbus-transformation $^
+src/contextd.vala.stamp: $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1  --disable-dbus-transformation $^
 	touch $@
 
 tools_dir = $(top_srcdir)/tools
