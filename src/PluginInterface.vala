@@ -2,14 +2,6 @@ using GLib;
 
 namespace ContextKit {
 
-	public TypedVariant make_typed_variant (ValueType type, Value value) {
-		TypedVariant tv = TypedVariant();
-		tv.type = type;
-		tv.value.init (value.type());
-		value.copy (ref tv.value);
-		return tv;
-	}
-
 	public struct Key {
 		public string name;
 		public ValueType type;

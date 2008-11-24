@@ -50,12 +50,11 @@ namespace ContextKit {
 				} else if ( input == false_value) {
 					truth.set_boolean (false);
 				} else {
-					TypedVariant tv = TypedVariant () {type = ValueType.UNDETERMINED, value = truth};
-					ret.insert (key, tv);
+					truth.set_boolean (false);
+					ret.insert (key, TypedVariant (ValueType.UNDETERMINED, truth));
 					return;
 				}
-				TypedVariant tv = TypedVariant () {type = ValueType.TRUTH, value = truth};
-				ret.insert (key, tv);
+				ret.insert (key, TypedVariant (ValueType.TRUTH, truth));
 			}
 
 			void error_for_subset (StringSet keys, HashTable<string, TypedVariant?> ret, StringSet intersect_with) {
@@ -63,7 +62,7 @@ namespace ContextKit {
 				foreach (var key in intersection.to_array()) {
 					Value nonsense = Value (typeof (bool));
 					nonsense.set_boolean (false);
-					ret.insert (key, make_typed_variant(ValueType.UNDETERMINED, nonsense));
+					ret.insert (key, TypedVariant (ValueType.UNDETERMINED, nonsense));
 				}
 
 			}

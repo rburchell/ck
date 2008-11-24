@@ -11,6 +11,11 @@ namespace ContextKit {
 	}
 
 	public struct TypedVariant {
+		public TypedVariant (ValueType type, Value value) {
+			this.type = type;
+			this.value.init (value.type());
+			value.copy (ref this.value);
+		}
 		public ValueType type;
 		public Value value;
 	}
