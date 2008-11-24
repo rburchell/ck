@@ -95,6 +95,7 @@ void test_stringset_to_array () {
 	stringset.add ("E");
 
 	Gee.ArrayList<string> array = stringset.to_array();
+	assert (array.size == 5);
 	assert (array.get(0) == "A");
 	assert (array.get(1) == "B");
 	assert (array.get(2) == "C");
