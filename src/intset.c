@@ -193,6 +193,7 @@ _context_kit_intset_is_member (const ContextKitIntSet *set, guint element)
     return (set->bits[offset] & (1 << (element & 0x1f))) != 0;
 }
 
+
 /**
  * context_kit_intset_is_member:
  * @set: set
@@ -209,6 +210,57 @@ context_kit_intset_is_member (const ContextKitIntSet *set, guint element)
 
   return _context_kit_intset_is_member (set, element);
 }
+
+/**
+ * context_kit_intset_is_subset:
+ * @left: set
+ * @right: set
+ *
+ * Tests if @right is a subset of @left
+ *
+ * Returns: %TRUE if @right is a subset of @left
+ */
+gboolean
+context_kit_intset_is_subset (const ContextKitIntSet *left, const ContextKitIntSet *right)
+{
+  guint offset;
+  gboolean ret = TRUE;
+
+  if (right->size > left->size) {
+    return FALSE;
+  } else {
+    for (offset = 0; offset < right->size; offset++) {
+      ret = ret && (left->bits[offset] & right->bits[offset]) == right->bits[offset];
+
+      if (!ret)
+        break;
+    }
+  }
+  return ret;
+}
+
+/**
+ * context_kit_intset_is_disjoint:
+ * @left: set
+ * @right: set
+ *
+ * Tests if @right is disjoint with @left
+ *
+ * Returns: %TRUE if @right is disjoint with @left
+ */
+gboolean
+context_kit_intset_is_disjoint (const ContextKitIntSet *left, const ContextKitIntSet *right)
+{
+  guint i;
+  gboolean ret = TRUE;
+
+  for (i = 0; i < MIN (right->size, left->size); i++) {
+    ret = ret && (right->bits[i] & left->bits[i]) == 0;
+  }
+
+  return ret;
+}
+
 
 /**
  * context_kit_intset_foreach:

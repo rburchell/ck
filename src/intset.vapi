@@ -5,40 +5,43 @@ namespace ContextKit {
 	[Compact]
 	[CCode (copy_function = "context_kit_intset_copy", free_function = "context_kit_intset_destroy", cheader_filename = "intset.h")]
 	public class IntSet {
+		[CCode (cname = "context_kit_intset_new", has_construct_function = false)]
+		public IntSet ();
+		[CCode (cname = "context_kit_intset_sized_new")]
+		public IntSet.sized (uint size);
+		[CCode (cname = "context_kit_intset_from_array")]
+		public IntSet.from_array (GLib.Array array);
+		[CCode (cname = "context_kit_intset_intersection")]
+		public IntSet.intersection (ContextKit.IntSet left, ContextKit.IntSet right);
+		[CCode (cname = "context_kit_intset_symmetric_difference")]
+		public IntSet.symmetric_difference (ContextKit.IntSet left, ContextKit.IntSet right);
+		[CCode (cname = "context_kit_intset_difference")]
+		public IntSet.difference (ContextKit.IntSet left, ContextKit.IntSet right);
+		[CCode (cname = "context_kit_intset_union")]
+		public IntSet.union (ContextKit.IntSet left, ContextKit.IntSet right);
+
 		[CCode (cname = "context_kit_intset_add")]
 		public void add (uint element);
 		[CCode (cname = "context_kit_intset_clear")]
 		public void clear ();
-		[CCode (cname = "context_kit_intset_copy")]
-		public weak ContextKit.IntSet copy ();
-		[CCode (cname = "context_kit_intset_difference")]
-		public weak ContextKit.IntSet difference (ContextKit.IntSet right);
 		[CCode (cname = "context_kit_intset_dump")]
 		public weak string dump ();
 		[CCode (cname = "context_kit_intset_foreach")]
 		public void @foreach (ContextKit.IntFunc func, void* userdata);
-		[CCode (cname = "context_kit_intset_from_array")]
-		public static weak ContextKit.IntSet from_array (GLib.Array array);
-		[CCode (cname = "context_kit_intset_intersection")]
-		public weak ContextKit.IntSet intersection (ContextKit.IntSet right);
 		[CCode (cname = "context_kit_intset_is_equal")]
 		public bool is_equal (ContextKit.IntSet right);
 		[CCode (cname = "context_kit_intset_is_member")]
 		public bool is_member (uint element);
-		[CCode (cname = "context_kit_intset_new", has_construct_function = false)]
-		public IntSet ();
-		[CCode (cname = "context_kit_intset_sized_new")]
-		public IntSet.Sized (uint size);
+		[CCode (cname = "context_kit_intset_is_subset")]
+		public bool is_subset (ContextKit.IntSet right);
+		[CCode (cname = "context_kit_intset_is_disjoint")]
+		public bool is_disjoint (ContextKit.IntSet right);
 		[CCode (cname = "context_kit_intset_remove")]
 		public bool remove (uint element);
 		[CCode (cname = "context_kit_intset_size")]
 		public uint size ();
-		[CCode (cname = "context_kit_intset_symmetric_difference")]
-		public weak ContextKit.IntSet symmetric_difference (ContextKit.IntSet right);
 		[CCode (cname = "context_kit_intset_to_array")]
 		public weak GLib.Array to_array ();
-		[CCode (cname = "context_kit_intset_union")]
-		public weak ContextKit.IntSet union (ContextKit.IntSet right);
 	}
 	[Compact]
 	[CCode (cheader_filename = "intset.h")]

@@ -52,6 +52,9 @@ void context_kit_intset_add (ContextKitIntSet *set, guint element);
 gboolean context_kit_intset_remove (ContextKitIntSet *set, guint element);
 gboolean context_kit_intset_is_member (const ContextKitIntSet *set, guint element);
 
+gboolean context_kit_intset_is_subset (const ContextKitIntSet *left, const ContextKitIntSet *right);
+gboolean context_kit_intset_is_disjoint (const ContextKitIntSet *left, const ContextKitIntSet *right);
+
 void context_kit_intset_foreach (const ContextKitIntSet *set, ContextKitIntFunc func,
     gpointer userdata);
 GArray *context_kit_intset_to_array (const ContextKitIntSet *set);

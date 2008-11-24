@@ -20,6 +20,7 @@
  */
 
 using GLib;
+using ContextKit;
 
 enum TestValues {
 	A = 1,
@@ -29,16 +30,68 @@ enum TestValues {
 	E = 10001
 }
 
-void test_intset_add () {
-	ContextKit.IntSet intset = new ContextKit.IntSet();
-	intset.add (TestValues.A);
-	intset.add (TestValues.B);
-	intset.is_member (TestValues.A);
-	intset.is_member (TestValues.B);
+void test_intset_new () {
+	IntSet intset = new IntSet();
+	assert (intset.dump() == "");
 }
 
+void test_intset_add () {
+	IntSet intset = new IntSet();
+	intset.add (TestValues.A);
+	intset.add (TestValues.B);
+	intset.add (TestValues.C);
+	intset.add (TestValues.D);
+	intset.add (TestValues.E);
+	assert (intset.is_member (TestValues.A));
+	assert (intset.is_member (TestValues.B));
+	assert (intset.is_member (TestValues.C));
+	assert (intset.is_member (TestValues.D));
+	assert (intset.is_member (TestValues.E));
+}
+
+void test_intset_intersect () {
+	IntSet i1 = new IntSet();
+	IntSet i2 = new IntSet();
+	i1.add (TestValues.A);
+	i1.add (TestValues.B);
+	i1.add (TestValues.C);
+	i2.add (TestValues.C);
+	i2.add (TestValues.D);
+	i2.add (TestValues.E);
+
+	IntSet i3 = new IntSet.intersection (i1, i2);
+
+	assert (i3.is_member (TestValues.C));
+	assert (!i3.is_member (TestValues.A));
+	assert (!i3.is_member (TestValues.B));
+	assert (!i3.is_member (TestValues.D));
+	assert (!i3.is_member (TestValues.E));
+}
+
+void test_intset_disjoint () {
+	IntSet i1 = new IntSet();
+	IntSet i2 = new IntSet();
+	i1.add (TestValues.A);
+	i1.add (TestValues.B);
+	i1.add (TestValues.C);
+	i2.add (TestValues.C);
+	i2.add (TestValues.D);
+	i2.add (TestValues.E);
+
+	assert (!i1.is_disjoint (i2));
+
+	i1.remove (TestValues.C);
+	assert (i1.is_disjoint (i2));
+}
+
+
+
 public static void main (string[] args) {
+
 	Test.init (ref args);
-	Test.add_func("/contextkit/intset/intset_add", test_intset_add);
+	Test.add_func("/contextkit/intset/new", test_intset_new);
+	Test.add_func("/contextkit/intset/add", test_intset_add);
+	Test.add_func("/contextkit/intset/intersect", test_intset_intersect);
+	Test.add_func("/contextkit/intset/disjoint", test_intset_disjoint);
 	Test.run ();
 }
