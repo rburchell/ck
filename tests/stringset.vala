@@ -86,6 +86,22 @@ void test_stringset_disjoint () {
 	assert (i1.is_disjoint (i2));
 }
 
+void test_stringset_to_array () {
+	StringSet stringset = new StringSet();
+	stringset.add ("A");
+	stringset.add ("B");
+	stringset.add ("C");
+	stringset.add ("D");
+	stringset.add ("E");
+
+	Gee.ArrayList<string> array = stringset.to_array();
+	assert (array.get(0) == "A");
+	assert (array.get(1) == "B");
+	assert (array.get(2) == "C");
+	assert (array.get(3) == "D");
+	assert (array.get(4) == "E");
+}
+
 
 
 public static void main (string[] args) {
@@ -96,5 +112,6 @@ public static void main (string[] args) {
 	Test.add_func("/contextkit/stringset/add", test_stringset_add);
 	Test.add_func("/contextkit/stringset/intersect", test_stringset_intersect);
 	Test.add_func("/contextkit/stringset/disjoint", test_stringset_disjoint);
+	Test.add_func("/contextkit/stringset/to_array", test_stringset_to_array);
 	Test.run ();
 }

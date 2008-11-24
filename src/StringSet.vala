@@ -1,5 +1,6 @@
 namespace ContextKit {
 
+
 	/* TODO:
 	   we should have a way of statically initialising any keys that may be used in a stringset
 	   so keys outside of this set are rejected
@@ -88,6 +89,19 @@ namespace ContextKit {
 
 		public uint size () {
 			return intset.size();
+		}
+
+		public Gee.ArrayList<string> to_array () {
+
+			IntFunc iter = (i, data) => {
+				weak Gee.ArrayList<string> ret = (Gee.ArrayList<string>) data;
+				ret.add (((Quark)i).to_string());
+			};
+
+			Gee.ArrayList<string> ret = new Gee.ArrayList<string>();
+			intset.foreach (iter, ret);
+
+			return ret;
 		}
 	}
 }

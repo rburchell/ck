@@ -43,7 +43,7 @@ tests_stringset_SOURCES = \
 	$(NULL)
 
 tests/stringset.vala.stamp: $(tests_stringset_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) $^
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
 	touch $@
 
 tests_stringset_CFLAGS = -I$(top_srcdir)/src $(CONTEXTD_CFLAGS)
