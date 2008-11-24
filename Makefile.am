@@ -16,6 +16,7 @@ SUBDIRS = \
 AM_CPPFLAGS = \
 	$(CONTEXTD_CFLAGS) \
 	-include $(CONFIG_HEADER) \
+	-I$(top_srcdir)/src \
 	$(NULL)
 
 BUILT_SOURCES = \
@@ -37,6 +38,7 @@ contextd_VALASOURCES = \
 	src/Manager.vala \
 	src/MCE.vala \
 	src/PluginInterface.vala \
+	src/StringSet.vala \
 	$(NULL)
 
 contextd_VAPISOURCES = \
