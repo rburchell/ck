@@ -58,6 +58,16 @@ namespace ContextKit {
 				ret.insert (key, tv);
 			}
 
+			void error_for_subset (StringSet keys, HashTable<string, TypedVariant?> ret, StringSet intersect_with) {
+				StringSet intersection = new StringSet.intersection (keys, intersect_with);
+				foreach (var key in intersection.to_array()) {
+					Value nonsense = Value (typeof (bool));
+					nonsense.set_boolean (false);
+					ret.insert (key, make_typed_variant(ValueType.UNDETERMINED, nonsense));
+				}
+
+			}
+
 			void check_orientation (StringSet keys, HashTable<string, TypedVariant?> ret) {
 
 				if (keys.is_disjoint (orientation_keys)) {
@@ -69,7 +79,7 @@ namespace ContextKit {
 					mce_request.get_device_orientation(out orientation.rotation, out orientation.stand, out orientation.facing, out orientation.x, out orientation.y, out orientation.z);
 				} catch (GLib.Error ex) {
 					stdout.printf("MCE Plugin Error: %s\n", ex.message);
-					
+					error_for_subset (keys, ret, orientation_keys);
 					return;
 				}
 
