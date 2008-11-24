@@ -24,6 +24,17 @@ using ContextKit;
 
 void test_stringset_new () {
 	StringSet stringset = new StringSet();
+	assert (!stringset.is_member ("A"));
+}
+
+void test_stringset_new_from_array () {
+	string [] vals  = { "A","B","C","D" };
+	StringSet stringset = new StringSet.from_array(vals);
+	assert (stringset.is_member ("A"));
+	assert (stringset.is_member ("B"));
+	assert (stringset.is_member ("C"));
+	assert (stringset.is_member ("D"));
+	assert (!stringset.is_member ("E"));
 }
 
 void test_stringset_add () {
@@ -81,6 +92,7 @@ public static void main (string[] args) {
 
 	Test.init (ref args);
 	Test.add_func("/contextkit/stringset/new", test_stringset_new);
+	Test.add_func("/contextkit/stringset/new_from_array", test_stringset_new_from_array);
 	Test.add_func("/contextkit/stringset/add", test_stringset_add);
 	Test.add_func("/contextkit/stringset/intersect", test_stringset_intersect);
 	Test.add_func("/contextkit/stringset/disjoint", test_stringset_disjoint);

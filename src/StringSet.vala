@@ -25,6 +25,7 @@ namespace ContextKit {
 		}
 
 		public StringSet.from_array (string[] array) {
+			intset = new IntSet();
 			foreach (var s in array) {
 				add (s);
 			}
