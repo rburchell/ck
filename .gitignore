@@ -48,3 +48,10 @@ tests/intset
 tests/intset.c
 tests/intset.h
 tests/intset.vala.stamp
+src/StringSet.c
+src/StringSet.h
+tests.stringset
+tests/stringset
+tests/stringset.c
+tests/stringset.h
+tests/stringset.vala.stamp
