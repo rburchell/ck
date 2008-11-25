@@ -49,3 +49,10 @@ tests/stringset.vala.stamp: $(tests_stringset_VALASOURCES)
 tests_stringset_CFLAGS = -I$(top_srcdir)/src $(CONTEXTD_CFLAGS)
 tests_stringset_LDADD = $(CONTEXTD_LIBS)
 
+EXTRA_DIST += \
+	$(tests_intset_VALASOURCES)			\
+	tests/intset.vala.stamp				\
+	$(tests_stringset_VALASOURCES)			\
+	tests/stringset.vala.stamp			\
+	$(NULL)
+	
