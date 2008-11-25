@@ -19,7 +19,7 @@ namespace ContextKit {
 		public ValueType type;
 		public Value value;
 	}
-
+/*
 	[DBus (name = "org.freedesktop.ContextKit.Manager")]
 	public interface DBusManager : GLib.Object {
 		public abstract HashTable<string, TypedVariant?> Get (string[] keys);
@@ -31,4 +31,5 @@ namespace ContextKit {
 		public abstract void Unsubscribe ();
 		public signal void Changed (HashTable<string, TypedVariant?> values);
 	}
+	*/
 }

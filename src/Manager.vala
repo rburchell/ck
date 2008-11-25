@@ -1,7 +1,9 @@
 using GLib;
 
 namespace ContextKit {
-	public class Manager : GLib.Object, DBusManager {
+
+	[DBus (name = "org.freedesktop.ContextKit.Manager")]
+	public class Manager : GLib.Object /*, DBusManager */{
 		MCE.Plugin mce_plugin = new MCE.Plugin();
 
 		public Manager() {
