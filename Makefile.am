@@ -62,14 +62,20 @@ SPEC_TOOLS = \
 	tools/context2html.pl \
 	$(NULL)
 
-SPEC_FILES = \
-	spec/generic-types.xml \
+
+INTERFACES = \
 	spec/Manager.xml \
 	spec/Subscription.xml \
 	$(NULL)
 
-INTROSPECT = $(SPEC_FILES:spec/%.xml=introspect/%.xml)
-ASYNC_INTROSPECT = $(SPEC_FILES:spec/%.xml=introspect/async/%.xml)
+
+SPEC_FILES = \
+	$(INTERFACES) \
+	spec/generic-types.xml \
+	$(NULL)
+
+INTROSPECT = $(INTERFACES:spec/%.xml=introspect/%.xml)
+ASYNC_INTROSPECT = $(INTERFACES:spec/%.xml=introspect/async/%.xml)
 DOCS = doc/contextkit.html doc/context.html
 
 src/contextd.vala.stamp: $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
@@ -78,7 +84,7 @@ src/contextd.vala.stamp: $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
 
 tools_dir = $(top_srcdir)/tools
 
-$(INTROSPECT): introspect/%.xml: $(SPEC_FILES) $(tools_dir)/spec-to-introspect.xsl
+$(INTROSPECT): introspect/%.xml: spec/%.xml $(tools_dir)/spec-to-introspect.xsl
 	install -d introspect
 	$(XSLTPROC) $(tools_dir)/spec-to-introspect.xsl $< | $(DROP_NAMESPACE) > $@
 
