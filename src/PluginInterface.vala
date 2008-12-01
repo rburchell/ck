@@ -9,7 +9,7 @@ namespace ContextKit {
 
 	public interface Plugin : GLib.Object {
 		public abstract void Get (StringSet keys, HashTable<string, TypedVariant?> ret);
-		public abstract PluginSubscription Subscribe (StringSet keys, Subscription s);
+		public abstract void Subscribe (StringSet keys, ContextKit.Subscription s);
 		public abstract Key[] Keys();
 	}
 
