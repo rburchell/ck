@@ -15,9 +15,13 @@ tests_intset_VALASOURCES = \
 	tests/intset.vala				\
 	$(NULL)
 
-tests_intset_SOURCES = \
+tests_intset_GENERATED_SOURCES = \
 	$(tests_intset_VALASOURCES:.vala=.c)		\
 	$(tests_intset_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests_intset_SOURCES = \
+	$(tests_intset_GENERATED_SOURCES)		\
 	src/intset.c					\
 	src/intset.h					\
 	$(NULL)
@@ -30,14 +34,18 @@ tests_intset_CFLAGS = -I$(top_srcdir)/src $(CONTEXTD_CFLAGS)
 tests_intset_LDADD = $(CONTEXTD_LIBS)
 
 tests_stringset_VALASOURCES = \
-	src/intset.vapi 				\
-	src/StringSet.vala 				\
+	src/intset.vapi				\
+	src/StringSet.vala				\
 	tests/stringset.vala				\
 	$(NULL)
 
-tests_stringset_SOURCES = \
+tests_stringset_GENERATED_SOURCES = \
 	$(tests_stringset_VALASOURCES:.vala=.c)		\
 	$(tests_stringset_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests_stringset_SOURCES = \
+	$(tests_stringset_GENERATED_SOURCES)		\
 	src/intset.c					\
 	src/intset.h					\
 	$(NULL)
@@ -55,4 +63,12 @@ EXTRA_DIST += \
 	$(tests_stringset_VALASOURCES)			\
 	tests/stringset.vala.stamp			\
 	$(NULL)
-	
+
+DISTCLEANFILES += \
+	$(tests_intset_VALASOURCES)			\
+	tests/intset.vala.stamp				\
+	$(tests_stringset_VALASOURCES)			\
+	tests/stringset.vala.stamp			\
+	$(NULL)
+
+
