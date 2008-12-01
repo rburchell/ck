@@ -10,12 +10,8 @@ namespace ContextKit {
 			public int z;
 		}
 
-		public class Subscription: GLib.Object, ContextKit.PluginSubscription {
-			public void Unsubscribe () {
-			}
-		}
-
 		public class Plugin : GLib.Object, ContextKit.Plugin {
+			PluginMixins.SubscriptionList <Plugin> list;
 			DBus.Connection conn;
 			dynamic DBus.Object mce_request;
 			dynamic DBus.Object mce_signal;
@@ -102,7 +98,12 @@ namespace ContextKit {
 
 			}
 
+			void subscription_removed (Subscription s) {
+			}
+
 			public Plugin () {
+				list = new PluginMixins.SubscriptionList <Plugin> (this, subscription_removed);
+
 				conn = DBus.Bus.get (DBus.BusType.SYSTEM);
 				mce_request = conn.get_object ("com.nokia.mce", "/com/nokia/mce/request", "com.nokia.mce.request");
 				mce_signal = conn.get_object ("com.nokia.mce", "/com/nokia/mce/signal", "com.nokia.mce.signal");
@@ -118,8 +119,7 @@ namespace ContextKit {
 				check_orientation (keys, ret);
 			}
 
-			public PluginSubscription Subscribe (StringSet keys, out HashTable<string, TypedVariant?> values) {
-				return new Subscription();
+			public void Subscribe (StringSet keys, ContextKit.Subscription s) {
 			}
 
 			public Key[] Keys() {
