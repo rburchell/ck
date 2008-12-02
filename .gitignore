@@ -55,3 +55,4 @@ tests/stringset
 tests/stringset.c
 tests/stringset.h
 tests/stringset.vala.stamp
+_package
