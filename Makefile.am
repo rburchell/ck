@@ -127,4 +127,9 @@ DISTCLEANFILES = \
 	src/contextd.vala.stamp \
 	$(NULL)
 
+version:
+	@echo @VERSION@
+
+.PHONEY: version
+
 include tests/Makefile.fragment
