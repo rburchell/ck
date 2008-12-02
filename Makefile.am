@@ -65,7 +65,7 @@ SPEC_TOOLS = \
 
 INTERFACES = \
 	spec/Manager.xml \
-	spec/Subscription.xml \
+	spec/Subscriber.xml \
 	$(NULL)
 
 

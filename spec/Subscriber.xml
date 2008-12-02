@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<node name="/" xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0">
+  <interface name="org.freedesktop.ContextKit.Subscriber" >
+    <method name="Subscribe">
+      <tp:docstring>
+        Subscribe to a one or more keys
+      </tp:docstring>
+
+      <arg name="Keys" type="as" direction="in">
+        <tp:docstring>
+          An array of the keys to subscribe to.
+        </tp:docstring>
+      </arg>
+
+      <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" direction="out">
+        <tp:docstring>
+          A Value_Set mapping the requested keys to their current values.
+        </tp:docstring>
+      </arg>
+    </method>
+
+    <signal name="Changed" >
+      <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" >
+        <tp:docstring >
+          A Value_Set mapping the changed keys to their values.
+        </tp:docstring>
+      </arg>
+    </signal>
+
+    <method name="Unsubscribe" >
+      <tp:docstring >
+        A Value_Set mapping the requested keys to their values.
+      </tp:docstring>
+
+      <arg name="Keys" type="as" direction="in">
+        <tp:docstring>
+          An array of the keys to unsubscribe from.
+        </tp:docstring>
+      </arg>
+    </method>
+
+  </interface>
+</node>

@@ -18,23 +18,13 @@
       </arg>
     </method>
 
-    <method name="Subscribe">
+    <method name="GetSubscriber">
       <tp:docstring>
-        Subscribe to a set of key values
+        Get the Subscriber object for making subscriptions.
       </tp:docstring>
-      <arg name="Keys" type="as" direction="in">
-        <tp:docstring>
-          An array of the keys to subscribe to.
-        </tp:docstring>
-      </arg>
       <arg name="SubscriptionObject" type="o" direction="out">
         <tp:docstring>
-          The object on which signals will be emitted when any keys changes in the requested set.
-        </tp:docstring>
-      </arg>
-      <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" direction="out">
-        <tp:docstring>
-          A Value_Set mapping the requested keys to their values.
+          The object on which to subscribe, unsubscribe keys and listen to key value changes.
         </tp:docstring>
       </arg>
     </method>
