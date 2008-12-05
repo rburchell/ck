@@ -11,7 +11,7 @@ namespace ContextKit {
 		}
 
 		public class Plugin : GLib.Object, ContextKit.Plugin {
-			PluginMixins.SubscriptionList <Plugin> list;
+			PluginMixins.SubscriberList <Plugin> list;
 			DBus.Connection conn;
 			dynamic DBus.Object mce_request;
 			dynamic DBus.Object mce_signal;
@@ -63,7 +63,7 @@ namespace ContextKit {
 
 			}
 
-			void check_orientation (StringSet keys, HashTable<string, TypedVariant?> ret) {
+			void check_orientation_get (StringSet keys, HashTable<string, TypedVariant?> ret) {
 
 				if (keys.is_disjoint (orientation_keys)) {
 					return;
@@ -98,15 +98,24 @@ namespace ContextKit {
 
 			}
 
-			void subscription_removed (Subscription s) {
+			void check_orientation_subscribe (StringSet keys, Subscriber s) {
+
+				if (keys.is_disjoint (orientation_keys)) {
+					return;
+			 	}
+
+				mce_signal = conn.get_object ("com.nokia.mce", "/com/nokia/mce/signal", "com.nokia.mce.signal");
+
+			}
+
+			void subscription_removed (Subscriber s) {
 			}
 
 			public Plugin () {
-				list = new PluginMixins.SubscriptionList <Plugin> (this, subscription_removed);
+				list = new PluginMixins.SubscriberList <Plugin> (this, subscription_removed);
 
 				conn = DBus.Bus.get (DBus.BusType.SYSTEM);
 				mce_request = conn.get_object ("com.nokia.mce", "/com/nokia/mce/request", "com.nokia.mce.request");
-				mce_signal = conn.get_object ("com.nokia.mce", "/com/nokia/mce/signal", "com.nokia.mce.signal");
 				orientation_keys = new StringSet.from_array (new string[] {
 						"Context.Device.Orientation.displayFacingUp",
 						"Context.Device.Orientation.displayFacingDown",
@@ -116,10 +125,11 @@ namespace ContextKit {
 
 
 			public void Get (StringSet keys, HashTable<string, TypedVariant?> ret) {
-				check_orientation (keys, ret);
+				check_orientation_get (keys, ret);
 			}
 
-			public void Subscribe (StringSet keys, ContextKit.Subscription s) {
+			public void Subscribe (StringSet keys, ContextKit.Subscriber s) {
+				check_orientation_subscribe (keys, s);
 			}
 
 			public Key[] Keys() {

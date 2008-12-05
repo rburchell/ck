@@ -23,6 +23,7 @@ using GLib;
 using Sqlite;
 
 namespace ContextKit {
+
 	public class Main : Object {
 		public Main () {
 		}
