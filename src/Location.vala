@@ -106,7 +106,7 @@ namespace ContextKit {
 		    static void CB_Changed(Location.GPSDevice? device) {
                 stdout.printf("Changed %f %f %f", device.fix.latitude, device.fix.longitude, device.fix.altitude);
                 
-                if (!isnull(device) && !isnull(device.fix)) { 
+                /*if (!isnull(device) && !isnull(device.fix)) { 
                 
                     if (device.fix.fields & LOCATION_GPS_DEVICE_LATLONG_SET) {
                         current_location.latitude = device.fix.latitude;
@@ -119,7 +119,7 @@ namespace ContextKit {
                     //current_location.fields = device->fix->fields;
                     
                     // How to invalidate the data?              
-                }
+                }*/
                 
                 // If we got the data and if there are no subscribers, 
                 // indicate to liblocation that we are no longer intrested in 
@@ -175,7 +175,7 @@ namespace ContextKit {
 			}
 
 			public void Subscribe (StringSet keys, ContextKit.Subscription s) {
-			    // TODO: Start the gps here? Does it work if we create the "device" before it?
+			    // TODO: Start the gps here?
 			}
 
 			public Key[] Keys() {
