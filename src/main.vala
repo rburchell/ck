@@ -32,15 +32,15 @@ namespace ContextKit {
 
 		private static bool start_manager () {
 			try {
-				var conn = DBus.Bus.get (DBus.BusType.SESSION);
-				dynamic DBus.Object bus = conn.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
+				var connection = DBus.Bus.get (DBus.BusType.SESSION);
+				dynamic DBus.Object bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 				// try to register service in session bus
 				uint request_name_result = bus.RequestName ("org.freedesktop.ContextKit", (uint) 0);
 
 				if (request_name_result == DBus.RequestNameReply.PRIMARY_OWNER) {
 					debug ("Creating new Manager D-Bus service");
 					manager = new ContextKit.Manager();
-					conn.register_object ("/org/freedesktop/ContextKit/Manager", manager);
+					connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 				} else {
 					debug ("Manager D-Bus service is already running");
 					return false;

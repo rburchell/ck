@@ -14,7 +14,7 @@ namespace ContextKit {
 			PluginMixins.SubscriberList <Plugin> list;
 			DBus.Connection conn;
 			dynamic DBus.Object mce_request;
-			dynamic DBus.Object mce_signal;
+			dynamic DBus.Object? mce_signal;
 
 			delegate void TruthFunction (void* data);
 			const Key[] keys = {
@@ -98,14 +98,19 @@ namespace ContextKit {
 
 			}
 
+			void orientation_changed (string rotation, string stand, string facing) {
+				stdout.printf ("orientation changed: %s, %s, %s", rotation, stand, facing);
+			}
+
 			void check_orientation_subscribe (StringSet keys, Subscriber s) {
 
 				if (keys.is_disjoint (orientation_keys)) {
 					return;
 			 	}
 
-				mce_signal = conn.get_object ("com.nokia.mce", "/com/nokia/mce/signal", "com.nokia.mce.signal");
-
+				if (mce_signal == null)
+					mce_signal = conn.get_object ("com.nokia.mce", "/com/nokia/mce/signal", "com.nokia.mce.signal");
+				mce_signal.sig_device_orientation_ind += orientation_changed;
 			}
 
 			void subscription_removed (Subscriber s) {

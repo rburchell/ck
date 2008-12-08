@@ -10,7 +10,7 @@ namespace ContextKit {
 		StringSet subscribed_keys;
 
 		Subscriber (Manager manager, int id) {
-			string path = "/org/freedesktop/ContextKit/subscribers/%d".printf (id);
+			string path = "/org/freedesktop/ContextKit/Subscribers/%d".printf (id);
 			this.object_path = new DBus.ObjectPath (path);
 			this.manager = manager;
 			this.subscribed_keys = new StringSet();
@@ -36,6 +36,7 @@ namespace ContextKit {
 	[DBus (name = "org.freedesktop.ContextKit.Manager")]
 	public class Manager : GLib.Object /*, DBusManager */{
 		int subscriber_count = 0;
+		Gee.ArrayList<Subscriber> subscribers = new Gee.ArrayList<Subscriber>();
 		internal Gee.ArrayList<Plugin> plugins;
 
 		public Manager() {
@@ -58,12 +59,13 @@ namespace ContextKit {
 			//todo, check requesting bus name. the subscription object should be a singleton
 			//for each bus name.
 
-			var conn = DBus.Bus.get (DBus.BusType.SESSION);
+			var connection = DBus.Bus.get (DBus.BusType.SESSION);
 
 			Subscriber s = new Subscriber(this, subscriber_count);
-			subscriber_count++;
+			subscriber_count++; //keep a count rather than use subscribers.length for immutability
+			subscribers.add (s);
 
-			conn.register_object ((string) s.object_path, s);
+			connection.register_object ((string) s.object_path, s);
 			return s.object_path;
 		}
 	}
