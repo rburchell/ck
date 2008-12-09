@@ -143,7 +143,7 @@ namespace ContextKit {
 				}
 
 				orientation_subscribed.add (s);
-				subscribed_keys = StringSet.union (subscribed_keys, keys);
+				subscribed_keys = new StringSet.union (subscribed_keys, keys);
 			}
 
 			void subscription_removed (PluginMixins.SubscriberList l, Subscriber s) {
