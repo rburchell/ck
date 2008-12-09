@@ -48,7 +48,7 @@ namespace ContextKit {
 				removed (s);
 			}
 
-			Gee.ArrayList<weak Subscriber> list;
+			Gee.ArrayList<weak Subscriber> list = new Gee.ArrayList<weak Subscriber>();
 		}
 	}
 }

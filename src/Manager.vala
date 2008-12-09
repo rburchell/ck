@@ -17,7 +17,20 @@ namespace ContextKit {
 		}
 
 		internal void emit_changed (HashTable<string, TypedVariant?> values) {
-			Changed (values);
+			HashTable<string, ValueArray> new_values = new HashTable<string, ValueArray>(str_hash, str_equal);
+			List <weak string> keys = values.get_keys();
+			foreach (var k in keys) {
+				weak TypedVariant? v = values.lookup (k);
+				ValueArray va = new ValueArray(2);
+				Value type = Value(typeof(int));
+				type.set_int (v.type);
+				va.append(type);
+				Value value = Value(typeof(Value));
+				value.set_boxed(&v.value);
+				va.append(value);
+				new_values.insert (k, #va);
+			}
+			Changed (new_values);
 		}
 
 		public HashTable<string, TypedVariant?> Subscribe (string[] keys) {
@@ -36,7 +49,7 @@ namespace ContextKit {
 
 		public void Unsubscribe (string[] keys) {
 		}
-		public signal void Changed (HashTable<string, TypedVariant?> values);
+		public signal void Changed (HashTable<string,TypedVariant?> values);
 	}
 
 	[DBus (name = "org.freedesktop.ContextKit.Manager")]
