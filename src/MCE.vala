@@ -11,10 +11,11 @@ namespace ContextKit {
 		}
 
 		public class Plugin : GLib.Object, ContextKit.Plugin {
-			PluginMixins.SubscriberList <Plugin> list;
+			PluginMixins.SubscriberList orientation_subscribed;
 			DBus.Connection conn;
 			dynamic DBus.Object mce_request;
 			dynamic DBus.Object? mce_signal;
+			StringSet subscribed_keys = new StringSet();
 
 			delegate void TruthFunction (void* data);
 			const Key[] keys = {
@@ -98,26 +99,57 @@ namespace ContextKit {
 
 			}
 
-			void orientation_changed (string rotation, string stand, string facing) {
-				stdout.printf ("orientation changed: %s, %s, %s", rotation, stand, facing);
+			void orientation_changed (DBus.Object sender, string rotation, string stand, string facing, int32 x, int32 y, int32 z) {
+				message ("orientation changed: %s, %s, %s", rotation, stand, facing);
+
+				DeviceOrientation orientation = DeviceOrientation () {rotation=rotation, stand=stand, facing=facing, x=x, y=y, z=z};
+				HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
+				
+
+				if (subscribed_keys.is_member ("Context.Device.Orientation.displayFacingUp")) {
+					boolkey ("Context.Device.Orientation.displayFacingUp", ret, orientation.facing, "face_up", "face_down");
+				}
+
+				if (subscribed_keys.is_member ("Context.Device.Orientation.displayFacingDown")) {
+					boolkey ("Context.Device.Orientation.displayFacingDown", ret, orientation.facing, "face_down", "face_up");
+				}
+
+				if (subscribed_keys.is_member ("Context.Device.Orientation.inPortrait")) {
+					boolkey ("Context.Device.Orientation.inPortrait", ret, orientation.rotation, "portrait", "landscape");
+				}
+
+				if (subscribed_keys.is_member ("Context.Device.Orientation.inLandscape")) {
+					boolkey ("Context.Device.Orientation.inLandscape", ret, orientation.rotation, "landscape", "portrait");
+				}
+
+				for (int i=0; i < orientation_subscribed.size; i++) {
+					weak Subscriber s =orientation_subscribed.get(i);
+					s.emit_changed(ret);
+				}
 			}
 
 			void check_orientation_subscribe (StringSet keys, Subscriber s) {
+				
+				message ("check_orientation_subscribe: %s, %s", keys.debug(), s.object_path);
 
 				if (keys.is_disjoint (orientation_keys)) {
 					return;
 			 	}
 
-				if (mce_signal == null)
-					mce_signal = conn.get_object ("com.nokia.mce", "/com/nokia/mce/signal", "com.nokia.mce.signal");
-				mce_signal.sig_device_orientation_ind += orientation_changed;
+				if (orientation_subscribed.size == 0) {
+					if (mce_signal == null)
+						mce_signal = conn.get_object ("com.nokia.mce", "/com/nokia/mce/signal", "com.nokia.mce.signal");
+					mce_signal.sig_device_orientation_ind += orientation_changed;
+				}
+
+				orientation_subscribed.add (s);
+				subscribed_keys = StringSet.union (subscribed_keys, keys);
 			}
 
-			void subscription_removed (Subscriber s) {
+			void subscription_removed (PluginMixins.SubscriberList l, Subscriber s) {
 			}
 
 			public Plugin () {
-				list = new PluginMixins.SubscriberList <Plugin> (this, subscription_removed);
 
 				conn = DBus.Bus.get (DBus.BusType.SYSTEM);
 				mce_request = conn.get_object ("com.nokia.mce", "/com/nokia/mce/request", "com.nokia.mce.request");
@@ -126,6 +158,9 @@ namespace ContextKit {
 						"Context.Device.Orientation.displayFacingDown",
 						"Context.Device.Orientation.inLandscape",
 						"Context.Device.Orientation.inPortrait"});
+
+				orientation_subscribed = new PluginMixins.SubscriberList();
+				orientation_subscribed.removed += subscription_removed;
 			}
 
 
