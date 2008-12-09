@@ -18,6 +18,7 @@ import getopt
 SYSTEM = 6
 SESSION = 5
 
+
 def parse (pattern, string):
     result = re.match(pattern, string)
     if result != None:
@@ -26,11 +27,11 @@ def parse (pattern, string):
         raise Exception(pattern+" not found in "+string+" quit dbus emulator")
         sys.exit(1)
 
-def createBus(type):
+def createBus(type,configPath):
     output = None
     if ((os.getenv("DBUS_SYSTEM_BUS_ADDRESS") == None and type == SYSTEM) or 
-            (os.getenv("DBUS_SESSION_BUS_ADDRESS") == None and type == SESSION)):
-        output = os.popen("dbus-launch").readlines()
+            type == SESSION):
+        output = os.popen("dbus-launch --config-file=" + configPath + os.pathsep + "session.conf").readlines()
         if len(output) == 2:
             result = parse("(DBUS_SESSION_BUS_ADDRESS)=(.*)",output[0]) , parse("(DBUS_SESSION_BUS_PID)=(.*)",output[1])
             if type == SESSION:
