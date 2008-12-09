@@ -9,17 +9,23 @@ namespace ContextKit {
 		internal DBus.ObjectPath object_path {get; set;}
 		StringSet subscribed_keys;
 
-		Subscriber (Manager manager, int id) {
+		internal Subscriber (Manager manager, int id) {
 			string path = "/org/freedesktop/ContextKit/Subscribers/%d".printf (id);
 			this.object_path = new DBus.ObjectPath (path);
 			this.manager = manager;
 			this.subscribed_keys = new StringSet();
 		}
 
+		internal void emit_changed (HashTable<string, TypedVariant?> values) {
+			Changed (values);
+		}
+
 		public HashTable<string, TypedVariant?> Subscribe (string[] keys) {
 			HashTable<string, TypedVariant?> values = new HashTable<string, TypedVariant?> (str_hash,str_equal);
 			StringSet keyset = new StringSet.from_array (keys);
+			message ("Subscribe: requested %s", keyset.debug());
 			StringSet new_keys = new StringSet.difference (keyset, subscribed_keys);
+			message ("Subscribe: new keys %s", new_keys.debug());
 
 			foreach (var plugin in manager.plugins) {
 				plugin.Subscribe (new_keys, this);

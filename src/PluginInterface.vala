@@ -15,14 +15,8 @@ namespace ContextKit {
 
 	namespace PluginMixins {
 
-		public class SubscriberList <T> : GLib.Object {
-			T parent;
-			public delegate void Removed (T parent, Subscriber s);
-
-			public SubscriberList (T parent, Removed callback) {
-				this.parent = parent;
-				this.callback = callback;
-			}
+		/*TODO: a generalisation of this should probably be submitted for libgee*/
+		public class SubscriberList : GLib.Object {
 
 			public void add (Subscriber s) {
 				s.weak_ref ((WeakNotify)weak_notify, this);
@@ -37,14 +31,24 @@ namespace ContextKit {
 			public bool contains (Subscriber s) {
 				return list.contains (s);
 			}
+	
+			public int size {
+				get { return list.size; }
+			}
+
+			public weak Subscriber get (int i) {
+				return list[i];
+			}
+
+			public signal void removed (Subscriber s);
 
 			void weak_notify (Object obj) {
 				weak Subscriber s = (Subscriber) obj;
 				list.remove (s);
-				callback (parent, s);
+				removed (s);
 			}
+
 			Gee.ArrayList<weak Subscriber> list;
-			Removed callback;
 		}
 	}
 }
