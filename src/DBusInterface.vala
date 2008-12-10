@@ -6,6 +6,7 @@ namespace ContextKit {
 	public enum ValueType {
 		STRING,
 		INTEGER,
+		DOUBLE,
 		TRUTH,
 		UNDETERMINED
 	}
