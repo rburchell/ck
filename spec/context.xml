@@ -25,7 +25,12 @@
       </node>
       <node name="CurrentProfile"/>
       <node name="Orientation">
-         <key name="facingUp" type="INT"/>
+         <key name="facingUp" type="TRUTH">
+           <doc>A boolean , true if the device is face up, false if face down </doc>
+         </key>
+         <key name="edgeUp" type="INT">
+           <doc> The screen edge that is currently pointing upwards. Enum: 0- Undefined, 1 - Top Edge, 2 -Left Edge, 3 - Right edge, 4- Bottom edge </doc>
+         </key>
       </node>
       <node name="Memory">
         <doc>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </doc>
