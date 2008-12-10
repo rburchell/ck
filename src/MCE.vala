@@ -20,40 +20,13 @@ namespace ContextKit {
 			delegate void TruthFunction (void* data);
 			const Key[] keys = {
 					{
-						"Context.Device.Orientation.displayFacingUp",
-						ValueType.TRUTH
-					},
-					{
-						"Context.Device.Orientation.displayFacingDown",
-						ValueType.TRUTH
-					},
-					{
-						"Context.Device.Orientation.inLandscape",
-						ValueType.TRUTH
-					},
-					{
-						"Context.Device.Orientation.inPortrait",
-						ValueType.TRUTH
+						"Context.Device.orientation",
+						ValueType.INTEGER
 					}
 				};
 
 			StringSet orientation_keys;
 			
-			void boolkey (string key, HashTable<string, TypedVariant?> ret, string input, string true_value, string false_value) {
-				Value truth = Value (typeof(bool));
-
-				if (input == true_value) {
-					truth.set_boolean (true);
-				} else if ( input == false_value) {
-					truth.set_boolean (false);
-				} else {
-					truth.set_boolean (false);
-					ret.insert (key, TypedVariant (ValueType.UNDETERMINED, truth));
-					return;
-				}
-				ret.insert (key, TypedVariant (ValueType.TRUTH, truth));
-			}
-
 			void error_for_subset (StringSet keys, HashTable<string, TypedVariant?> ret, StringSet intersect_with) {
 				StringSet intersection = new StringSet.intersection (keys, intersect_with);
 				foreach (var key in intersection.to_array()) {
@@ -63,7 +36,49 @@ namespace ContextKit {
 				}
 
 			}
-
+			
+			int abs(int n) {
+				if (n > 0) {
+					return n;
+				}
+				return -n;
+			}
+			
+			int calculate_orientation(int x, int y, int z) {
+				if (abs(x) > abs(y) && abs(x) > abs(z)) {
+					if (x > 0) {
+						// right side up
+						return 3;
+					}
+					else {
+						// left side up
+						return 2;
+					}
+				}
+				else if (abs(y) > abs(x) && abs(y) > abs(z)) {
+					if (y > 0) {
+						// bottom side up
+						return 4;
+					}
+					else {
+						// top side up
+						return 1;
+					}
+				}
+				else if (abs(z) > abs(x) && abs(z) > abs(y)) {
+					if (z > 0) {
+						// back side up
+						return 6;
+					}
+					else {
+						// front side up
+						return 5;
+					}
+				}
+				// Undefined
+				return 0;
+			}
+			
 			void check_orientation_get (StringSet keys, HashTable<string, TypedVariant?> ret) {
 
 				if (keys.is_disjoint (orientation_keys)) {
@@ -80,23 +95,13 @@ namespace ContextKit {
 				}
 
 				stdout.printf("got orientation %s %s %s (%d,%d,%d)", orientation.rotation,  orientation.stand,  orientation.facing,  orientation.x,  orientation.y,  orientation.z);
-
-				if (keys.is_member ("Context.Device.Orientation.displayFacingUp")) {
-					boolkey ("Context.Device.Orientation.displayFacingUp", ret, orientation.facing, "face_up", "face_down");
+					
+				if (keys.is_member ("Context.Device.orientation")) {
+					Value v = Value (typeof(int));
+					v.set_int(calculate_orientation(orientation.x, orientation.y, orientation.z));
+					ret.insert ("Context.Device.orientation", TypedVariant (ValueType.INTEGER, v));
 				}
-
-				if (keys.is_member ("Context.Device.Orientation.displayFacingDown")) {
-					boolkey ("Context.Device.Orientation.displayFacingDown", ret, orientation.facing, "face_down", "face_up");
-				}
-
-				if (keys.is_member ("Context.Device.Orientation.inPortrait")) {
-					boolkey ("Context.Device.Orientation.inPortrait", ret, orientation.rotation, "portrait", "landscape");
-				}
-
-				if (keys.is_member ("Context.Device.Orientation.inLandscape")) {
-					boolkey ("Context.Device.Orientation.inLandscape", ret, orientation.rotation, "landscape", "portrait");
-				}
-
+				
 			}
 
 			void orientation_changed (DBus.Object sender, string rotation, string stand, string facing, int32 x, int32 y, int32 z) {
@@ -105,21 +110,10 @@ namespace ContextKit {
 				DeviceOrientation orientation = DeviceOrientation () {rotation=rotation, stand=stand, facing=facing, x=x, y=y, z=z};
 				HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
 				
-
-				if (subscribed_keys.is_member ("Context.Device.Orientation.displayFacingUp")) {
-					boolkey ("Context.Device.Orientation.displayFacingUp", ret, orientation.facing, "face_up", "face_down");
-				}
-
-				if (subscribed_keys.is_member ("Context.Device.Orientation.displayFacingDown")) {
-					boolkey ("Context.Device.Orientation.displayFacingDown", ret, orientation.facing, "face_down", "face_up");
-				}
-
-				if (subscribed_keys.is_member ("Context.Device.Orientation.inPortrait")) {
-					boolkey ("Context.Device.Orientation.inPortrait", ret, orientation.rotation, "portrait", "landscape");
-				}
-
-				if (subscribed_keys.is_member ("Context.Device.Orientation.inLandscape")) {
-					boolkey ("Context.Device.Orientation.inLandscape", ret, orientation.rotation, "landscape", "portrait");
+				if (subscribed_keys.is_member ("Context.Device.orientation")) {
+					Value v = Value (typeof(int));
+					v.set_int(calculate_orientation(orientation.x, orientation.y, orientation.z));
+					ret.insert ("Context.Device.orientation", TypedVariant (ValueType.INTEGER, v));
 				}
 
 				for (int i=0; i < orientation_subscribed.size; i++) {
@@ -154,10 +148,7 @@ namespace ContextKit {
 				conn = DBus.Bus.get (DBus.BusType.SYSTEM);
 				mce_request = conn.get_object ("com.nokia.mce", "/com/nokia/mce/request", "com.nokia.mce.request");
 				orientation_keys = new StringSet.from_array (new string[] {
-						"Context.Device.Orientation.displayFacingUp",
-						"Context.Device.Orientation.displayFacingDown",
-						"Context.Device.Orientation.inLandscape",
-						"Context.Device.Orientation.inPortrait"});
+						"Context.Device.orientation"});
 
 				orientation_subscribed = new PluginMixins.SubscriberList();
 				orientation_subscribed.removed += subscription_removed;
