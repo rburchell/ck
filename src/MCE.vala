@@ -135,11 +135,11 @@ namespace ContextKit {
 					Value v = Value (typeof(bool));
 					if (orientation.z > 0) {
 						// back side up
-						v.set_boolean(true);
+						v.set_boolean(false);
 					}
 					else {
 						// front side up
-						v.set_boolean(false);
+						v.set_boolean(true);
 					}
 					ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.TRUTH, v));
 				}
@@ -162,11 +162,11 @@ namespace ContextKit {
 					Value v = Value (typeof(bool));
 					if (orientation.z > 0) {
 						// back side up
-						v.set_boolean(true);
+						v.set_boolean(false);
 					}
 					else {
 						// front side up
-						v.set_boolean(false);
+						v.set_boolean(true);
 					}
 					ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.TRUTH, v));
 				}
