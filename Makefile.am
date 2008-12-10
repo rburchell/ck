@@ -152,4 +152,4 @@ version:
 
 .PHONEY: version
 
-include tests/Makefile.fragment
+include tests/unit_tests/Makefile.fragment
