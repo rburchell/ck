@@ -18,7 +18,7 @@ namespace ContextKit {
 		}
 
 		public class Plugin : GLib.Object, ContextKit.Plugin {
-			PluginMixins.SubscriptionList <Plugin> list;
+			PluginMixins.SubscriberList subscribed;
 
 			// contextd keys this plugin takes care of
 			const Key[] keys = {
@@ -38,19 +38,19 @@ namespace ContextKit {
 
 			StringSet location_keys;
 			
+			StringSet subscribed_keys = new StringSet();
+			
 			// Stores the last known location
 			static LocationData current_location;
 			
 			// Device for using liblocation
 			Location.GPSDevice device;
 			
-
-			void subscription_removed (Subscription s) {
+			void subscription_removed (PluginMixins.SubscriberList l, Subscriber s) {
 				// TODO: Check here whether the connection to the loc service should be closed? 
 				
 				// FIXME: Do we have to remove it from the subscription list manually? Should the subscription list be part of the superclass?
 			}
-			
 			
 			/* Constructor
 			Connect the liblocation signals to correct functions.
@@ -59,7 +59,8 @@ namespace ContextKit {
 			public Plugin () {
 			
 				// Create plugin-related data structures
-				list = new PluginMixins.SubscriptionList <Plugin> (this, subscription_removed);
+				subscribed = new PluginMixins.SubscriberList();
+				subscribed.removed += subscription_removed;
 
 				location_keys = new StringSet.from_array (new string[] {
 						"Context.Environment.Location.latitude",
@@ -98,54 +99,94 @@ namespace ContextKit {
 							
 				// FIXME: Do we need to unref control? Or does Vala handle it automatically?
 				
+				// FIXME: Since starting the device doesn't do anything (in Fremantle), do we need the device at all?
 				
 			}
+			
+			/*
+			// Destructor
+			public ~Plugin() {
+				// TODO: Deleting / freeing / ... the device? How?
+			}*/
 			
 			// Handling signals from GPS control
 			static void CB_Error(Location.GPSDControl? control) {
-				stdout.printf("Error");
+				debug("Error");
 			}
 			
 			static void CB_Running(Location.GPSDControl? control) {
-				stdout.printf("Running");
+				debug("Running");
 			}
 			
 			static void CB_Stopped(Location.GPSDControl? control) {
-				stdout.printf("Stopped");
+				debug("Stopped");
 			}
 			
 			// Handling signals from GPS device
-			static void CB_Changed(Location.GPSDevice? device) {
-				stdout.printf("Changed %f %f %f", device.fix.latitude, device.fix.longitude, device.fix.altitude);
+			void CB_Changed(Location.GPSDevice? device) {
 				
+				bool values_changed = false;
 				if (device != null && device.fix != null) { 
-				
+					debug("Changed %f %f %f", device.fix.latitude, device.fix.longitude, device.fix.altitude);
 					if ((device.fix.fields & Location.GPS_DEVICE_LATLONG_SET) != 0) {
+						
+						if (current_location.latitude != device.fix.latitude) {
+							values_changed = true;
+						}
+						if (current_location.longitude != device.fix.longitude) {
+							values_changed = true;
+						}
 						current_location.latitude = device.fix.latitude;
 						current_location.longitude = device.fix.longitude;
 						current_location.latlong_valid = true;
 					}
 					
 					if ((device.fix.fields & Location.GPS_DEVICE_ALTITUDE_SET) != 0) {
+						if (current_location.altitude != device.fix.altitude) {
+							values_changed = true;
+						}
+						
 						current_location.altitude = device.fix.altitude;
 						current_location.altitude_valid = true;
-					} 
+					}	  
+				}
+				
+				HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
+				
+				if (subscribed_keys.is_member ("Context.Environment.Location.latitude")) {
+					insert_double_key("Context.Environment.Location.latitude", ret, current_location.latitude, current_location.latlong_valid);
+				}
 					
-					// TODO: Replace the valid / non-valid boolean with a time stamp		  
+				if (subscribed_keys.is_member ("Context.Environment.Location.longitude")) {
+					insert_double_key("Context.Environment.Location.longitude", ret, current_location.longitude, current_location.latlong_valid);
+				}
+					
+				if (subscribed_keys.is_member ("Context.Environment.Location.altitude")) {
+					insert_double_key("Context.Environment.Location.altitude", ret, current_location.altitude, current_location.altitude_valid);					
 				}
 				
 				// TODO: Should we check whether we need the location service any more?
 				// If we stop the connecton, we won't be able to answer future Get:s accurately.
 				
-				// TODO: How is the "Changed" signal sent?
+				/* Note: We always emit the same kind of changed signal, not depending on which values have
+				actually changed. */
+				
+				if (values_changed) {
+					// Emit the "Changed" signal
+					for (int i=0; i < subscribed.size; i++) {
+						weak Subscriber s = subscribed.get(i);
+						s.emit_changed(ret);
+					}
+					// TODO: Emit only for those who are intrested in the changed keys?
+				}
 			}
 			
 			static void CB_Connected(Location.GPSDevice device) {
-				stdout.printf("Connected");
+				debug("Connected");
 			}
 			
 			static void CB_Disconnected(Location.GPSDevice device) {
-				stdout.printf("Disconnected");
+				debug("Disconnected");
 			}
 			
 			
@@ -186,8 +227,11 @@ namespace ContextKit {
 				}
 			}
 
-			public void Subscribe (StringSet keys, ContextKit.Subscription s) {
-				
+			public void Subscribe (StringSet keys, ContextKit.Subscriber s) {
+				// FIXME: These are common to all plugins --> move to some upper level
+				subscribed.add (s);
+				subscribed_keys = new StringSet.union (subscribed_keys, keys);
+				// FIXME: Also an intersection is needed.
 			}
 
 			public Key[] Keys() {
