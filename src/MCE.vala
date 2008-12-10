@@ -20,8 +20,12 @@ namespace ContextKit {
 			delegate void TruthFunction (void* data);
 			const Key[] keys = {
 					{
-						"Context.Device.orientation",
+						"Context.Device.Orientation.edgeUp", // values: top bottom left right  undefined = 0
 						ValueType.INTEGER
+					},
+					{
+						"Context.Device.Orientation.facingUp",
+						ValueType.TRUTH
 					}
 				};
 
@@ -44,7 +48,7 @@ namespace ContextKit {
 				return -n;
 			}
 			
-			int calculate_orientation(int x, int y, int z) {
+			/*int calculate_orientation(int x, int y, int z) {
 				if (abs(x) > abs(y) && abs(x) > abs(z)) {
 					if (x > 0) {
 						// right side up
@@ -77,6 +81,31 @@ namespace ContextKit {
 				}
 				// Undefined
 				return 0;
+			}*/
+			
+			int calculate_orientation(int x, int y) {
+				if (abs(x) > abs(y)) {
+					if (x > 0) {
+						// right side up
+						return 3;
+					}
+					else {
+						// left side up
+						return 2;
+					}
+				}
+				else if (abs(y) > abs(x)) {
+					if (y > 0) {
+						// bottom side up
+						return 4;
+					}
+					else {
+						// top side up
+						return 1;
+					}
+				}
+				// Undefined
+				return 0;
 			}
 			
 			void check_orientation_get (StringSet keys, HashTable<string, TypedVariant?> ret) {
@@ -96,10 +125,23 @@ namespace ContextKit {
 
 				stdout.printf("got orientation %s %s %s (%d,%d,%d)", orientation.rotation,  orientation.stand,  orientation.facing,  orientation.x,  orientation.y,  orientation.z);
 					
-				if (keys.is_member ("Context.Device.orientation")) {
+				if (keys.is_member ("Context.Device.Orientation.edgeUp")) {
 					Value v = Value (typeof(int));
-					v.set_int(calculate_orientation(orientation.x, orientation.y, orientation.z));
-					ret.insert ("Context.Device.orientation", TypedVariant (ValueType.INTEGER, v));
+					v.set_int(calculate_orientation(orientation.x, orientation.y));
+					ret.insert ("Context.Device.Orientation.edgeUp", TypedVariant (ValueType.INTEGER, v));
+				}
+				
+				if (keys.is_member ("Context.Device.Orientation.facingUp")) {
+					Value v = Value (typeof(bool));
+					if (orientation.z > 0) {
+						// back side up
+						v.set_boolean(true);
+					}
+					else {
+						// front side up
+						v.set_boolean(false);
+					}
+					ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.TRUTH, v));
 				}
 				
 			}
@@ -110,10 +152,23 @@ namespace ContextKit {
 				DeviceOrientation orientation = DeviceOrientation () {rotation=rotation, stand=stand, facing=facing, x=x, y=y, z=z};
 				HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
 				
-				if (subscribed_keys.is_member ("Context.Device.orientation")) {
+				if (subscribed_keys.is_member ("Context.Device.Orientation.edgeUp")) {
 					Value v = Value (typeof(int));
-					v.set_int(calculate_orientation(orientation.x, orientation.y, orientation.z));
-					ret.insert ("Context.Device.orientation", TypedVariant (ValueType.INTEGER, v));
+					v.set_int(calculate_orientation(orientation.x, orientation.y));
+					ret.insert ("Context.Device.Orientation.edgeUp", TypedVariant (ValueType.INTEGER, v));
+				}
+				
+				if (subscribed_keys.is_member ("Context.Device.Orientation.facingUp")) {
+					Value v = Value (typeof(bool));
+					if (orientation.z > 0) {
+						// back side up
+						v.set_boolean(true);
+					}
+					else {
+						// front side up
+						v.set_boolean(false);
+					}
+					ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.TRUTH, v));
 				}
 
 				for (int i=0; i < orientation_subscribed.size; i++) {
@@ -148,7 +203,8 @@ namespace ContextKit {
 				conn = DBus.Bus.get (DBus.BusType.SYSTEM);
 				mce_request = conn.get_object ("com.nokia.mce", "/com/nokia/mce/request", "com.nokia.mce.request");
 				orientation_keys = new StringSet.from_array (new string[] {
-						"Context.Device.orientation"});
+						"Context.Device.Orientation.edgeUp", 
+						"Context.Device.Orientation.facingUp"});
 
 				orientation_subscribed = new PluginMixins.SubscriberList();
 				orientation_subscribed.removed += subscription_removed;
