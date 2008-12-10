@@ -39,7 +39,7 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="INT"/>
       <xs:enumeration value="STRING"/>
-      <xs:enumeration value="THRUTH"/>
+      <xs:enumeration value="TRUTH"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>
