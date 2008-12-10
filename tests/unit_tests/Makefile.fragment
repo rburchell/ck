@@ -1,0 +1,74 @@
+TEST_PROGS += \
+	tests/unit_tests/intset					\
+	tests/unit_tests/stringset					\
+	$(NULL)
+
+noinst_PROGRAMS = $(TEST_PROGS)
+
+BUILT_SOURCES += \
+	tests/unit_tests/intset.vala.stamp				\
+	tests/unit_tests/stringset.vala.stamp			\
+	$(NULL)
+
+tests_unit_tests_intset_VALASOURCES = \
+	src/intset.vapi 				\
+	tests/unit_tests/intset.vala				\
+	$(NULL)
+
+tests_unit_tests_intset_GENERATED_SOURCES = \
+	$(tests_unit_tests_intset_VALASOURCES:.vala=.c)		\
+	$(tests_unit_tests_intset_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests_unit_tests_intset_SOURCES = \
+	$(tests_unit_tests_intset_GENERATED_SOURCES)		\
+	src/intset.c					\
+	src/intset.h					\
+	$(NULL)
+
+tests/unit_tests/intset.vala.stamp: $(tests_unit_tests_intset_VALASOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) $^
+	touch $@
+
+tests_unit_tests_intset_CFLAGS = -I$(top_srcdir)/src $(CONTEXTD_CFLAGS)
+tests_unit_tests_intset_LDADD = $(CONTEXTD_LIBS)
+
+tests_unit_tests_stringset_VALASOURCES = \
+	src/intset.vapi				\
+	src/StringSet.vala				\
+	tests/unit_tests/stringset.vala				\
+	$(NULL)
+
+tests_unit_tests_stringset_GENERATED_SOURCES = \
+	$(tests_unit_tests_stringset_VALASOURCES:.vala=.c)		\
+	$(tests_unit_tests_stringset_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests_unit_tests_stringset_SOURCES = \
+	$(tests_unit_tests_stringset_GENERATED_SOURCES)		\
+	src/intset.c					\
+	src/intset.h					\
+	$(NULL)
+
+tests/unit_tests/stringset.vala.stamp: $(tests_unit_tests_stringset_VALASOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
+	touch $@
+
+tests_unit_tests_stringset_CFLAGS = -I$(top_srcdir)/src $(CONTEXTD_CFLAGS)
+tests_unit_tests_stringset_LDADD = $(CONTEXTD_LIBS)
+
+EXTRA_DIST += \
+	$(tests_unit_tests_intset_VALASOURCES)			\
+	tests/unit_tests/intset.vala.stamp				\
+	$(tests_unit_tests_stringset_VALASOURCES)			\
+	tests/unit_tests/stringset.vala.stamp			\
+	$(NULL)
+
+DISTCLEANFILES += \
+	$(tests_unit_tests_intset_VALASOURCES)			\
+	tests/unit_tests/intset.vala.stamp				\
+	$(tests_unit_tests_stringset_VALASOURCES)			\
+	tests/unit_tests/stringset.vala.stamp			\
+	$(NULL)
+
+
