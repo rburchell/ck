@@ -32,7 +32,7 @@ endif
 
 bin_PROGRAMS = contextd
 
-contextd_VALASOURCES = \
+contextd_core_VALASOURCES = \
 	src/main.vala \
 	src/DBusInterface.vala \
 	src/Manager.vala \
@@ -41,20 +41,39 @@ contextd_VALASOURCES = \
 	src/StringSet.vala \
 	$(NULL)
 
-contextd_VAPISOURCES = \
-	src/intset.vapi \
+contextd_liblocation_VALASOURCES = \
+	src/Location.vala \
 	$(NULL)
 
-contextd_GENERATED_SOURCES = \
+contextd_VALASOURCES = \
+	$(contextd_core_VALASOURCES) \
+	$(contextd_liblocation_VALASOURCES) \
+	$(NULL)
+
+contextd_VAPISOURCES = \
+	src/intset.vapi \
+	src/liblocation.vapi
+	$(NULL)
+
+contextd_GENERATEDSOURCES = \
 	$(contextd_VALASOURCES:.vala=.c) \
 	$(contextd_VALASOURCES:.vala=.h) \
 	$(NULL)
 
 contextd_SOURCES = \
-	$(contextd_GENERATED_SOURCES) \
+	$(contextd_core_VALASOURCES:.vala=.c) \
+	$(contextd_core_VALASOURCES:.vala=.h) \
 	src/intset.c \
 	src/intset.h \
 	$(NULL)
+
+if HAVE_LOCATION
+contextd_SOURCES += \
+	$(contextd_liblocation_VALASOURCES:.vala=.c) \
+	$(contextd_liblocation_VALASOURCES:.vala=.h) \
+	$(NULL)
+endif
+
 
 SPEC_TOOLS = \
 	tools/doc-generator.xsl \
@@ -78,7 +97,7 @@ INTROSPECT = $(INTERFACES:spec/%.xml=introspect/%.xml)
 ASYNC_INTROSPECT = $(INTERFACES:spec/%.xml=introspect/async/%.xml)
 DOCS = doc/contextkit.html doc/context.html
 
-src/contextd.vala.stamp: $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
+src/contextd.vala.stamp $(contextd_GENERATEDSOURCES): $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
 	touch $@
 
@@ -113,6 +132,7 @@ contextd_LDADD = \
 	$(NULL)
 
 EXTRA_DIST += \
+	$(contextd_GENERATEDSOURCES) \
 	$(contextd_VALASOURCES) \
 	src/contextd.vala.stamp \
 	$(SPEC_FILES) \
@@ -123,7 +143,7 @@ EXTRA_DIST += \
 	$(NULL)
 
 DISTCLEANFILES = \
-	$(contextd_GENERATED_SOURCES) \
+	$(contextd_GENERATEDSOURCES) \
 	src/contextd.vala.stamp \
 	$(NULL)
 

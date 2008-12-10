@@ -50,6 +50,13 @@ PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQU
 AC_SUBST(CONTEXTD_CFLAGS)
 AC_SUBST(CONTEXTD_LIBS)
 
+have_location=no
+PKG_CHECK_MODULES(LOCATION, liblocation, [have_location=yes], [have_location=no])
+AC_SUBST(LOCATION_CFLAGS)
+AC_SUBST(LOCATION_LIBS)
+
+AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
+
 AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
