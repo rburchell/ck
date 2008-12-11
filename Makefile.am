@@ -127,9 +127,16 @@ CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) $(DOCS) context.valid.stamp
 clean-local:
 	-rm -rf introspect
 
+if HAVE_LOCATION
+contextd_LDADD = \
+	$(CONTEXTD_LIBS) \
+	$(LOCATION_LIBS) \
+	$(NULL)
+else
 contextd_LDADD = \
 	$(CONTEXTD_LIBS) \
 	$(NULL)
+endif
 
 EXTRA_DIST += \
 	$(contextd_GENERATEDSOURCES) \
@@ -152,4 +159,4 @@ version:
 
 .PHONEY: version
 
-include tests/Makefile.fragment
+include tests/unit_tests/Makefile.fragment
