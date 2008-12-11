@@ -58,8 +58,10 @@ tests_unit_tests_stringset_CFLAGS = -I$(top_srcdir)/src $(CONTEXTD_CFLAGS)
 tests_unit_tests_stringset_LDADD = $(CONTEXTD_LIBS)
 
 EXTRA_DIST += \
+	$(tests_unit_tests_intset_VALASOURCES)				\
 	$(tests_unit_tests_intset_GENERATEDSOURCES)			\
 	tests/unit_tests/intset.vala.stamp				\
+	$(tests_unit_tests_stringset_VALASOURCES)			\
 	$(tests_unit_tests_stringset_GENERATEDSOURCES)			\
 	tests/unit_tests/stringset.vala.stamp			\
 	$(NULL)

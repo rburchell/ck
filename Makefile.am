@@ -141,6 +141,7 @@ endif
 EXTRA_DIST += \
 	$(contextd_GENERATEDSOURCES) \
 	$(contextd_VALASOURCES) \
+	$(contextd_VAPISOURCES) \
 	src/contextd.vala.stamp \
 	$(SPEC_FILES) \
 	spec/all.xml \
