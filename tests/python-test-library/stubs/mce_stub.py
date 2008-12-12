@@ -67,7 +67,7 @@ class MCE(dbus.service.Object):
   def __init__(self, main_loop):
     # Here the object path
     dbus.service.Object.__init__(self,
-                                 dbus.service.BusName("com.nokia.mce.request", bus=dbus.SystemBus()),
+                                 dbus.service.BusName("com.nokia.mce", bus=dbus.SystemBus()),
                                  "/com/nokia/mce/request")
 
     self.main_loop = main_loop
@@ -148,6 +148,12 @@ class MCE(dbus.service.Object):
                        in_signature='', out_signature='s')
   def get_display_status(self):
     return "on"
+
+  @dbus.service.method(dbus_interface='com.nokia.mce.request',
+                         in_signature='', out_signature='')
+  def Exit(self):
+        loop.quit()
+    
 
 # Main stuff
 if __name__ == "__main__":
