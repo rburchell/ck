@@ -9,15 +9,15 @@
 ## Requires python2.5-gobject and python2.5-dbus
 ##
 ##
-
+import signal
 import sys
 import os
 import re
 import getopt
+from time import sleep
 
 SYSTEM = 6
 SESSION = 5
-
 
 def parse (pattern, string):
     result = re.match(pattern, string)
@@ -29,9 +29,11 @@ def parse (pattern, string):
 
 def createBus(type,configPath):
     output = None
-    if ((os.getenv("DBUS_SYSTEM_BUS_ADDRESS") == None and type == SYSTEM) or 
-            type == SESSION):
-        output = os.popen("dbus-launch --config-file=" + configPath + os.pathsep + "session.conf").readlines()
+    if ((os.getenv("DBUS_SYSTEM_BUS_ADDRESS") == None and type == SYSTEM) or type == SESSION):
+        if os.path.isdir(configPath):
+            output = os.popen("dbus-launch --config-file=" + configPath + os.pathsep + "session.conf").readlines()
+        else:
+            output = os.popen("dbus-launch").readlines()
         if len(output) == 2:
             result = parse("(DBUS_SESSION_BUS_ADDRESS)=(.*)",output[0]) , parse("(DBUS_SESSION_BUS_PID)=(.*)",output[1])
             if type == SESSION:
@@ -46,7 +48,12 @@ def createBus(type,configPath):
             print "Instance of system bus already exists"
         else:
             print "Instance of session bus already exists"
-        sys.exit(0)
+       
+def deleteBus(type):
+    if type == SYSTEM:
+        os.kill(int(os.getenv("DBUS_SYSTEM_BUS_PID")),15)
+    elif type == SESSION:
+        os.kill(int(os.getenv("DBUS_SESSION_BUS_PID")),15)
     
 def usage(prog="dbus_emulator"):
     print """
@@ -65,6 +72,7 @@ def usage(prog="dbus_emulator"):
     
 # Main stuff
 def main():
+
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hSs")
     except getopt.GetoptError, err:
@@ -75,9 +83,9 @@ def main():
 
     for o, a in opts:
         if o == "-S":
-            createBus(SYSTEM)
+            createBus(SYSTEM,"")
         elif o == "-s":
-            createBus(SESSION)
+            createBus(SESSION,"")
         elif o == "-h":
             usage();
             sys.exit(0)
