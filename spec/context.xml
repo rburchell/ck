@@ -3,6 +3,7 @@
   <node name="Context">
     <doc> There will be probably one top level node as here, but more can be added. </doc>
     <node name="Device">
+<!--
       <node name="Display">
         <doc> These are properties related to the built-in display. </doc>
         <key name="displayLit" type="INT"/>
@@ -24,6 +25,7 @@
         <key name="timeToCompleteCharge" type="INT"/>
       </node>
       <node name="CurrentProfile"/>
+-->
       <node name="Orientation">
          <key name="facingUp" type="TRUTH">
            <doc>A boolean , true if the device is face up, false if face down </doc>
@@ -32,8 +34,9 @@
            <doc> The screen edge that is currently pointing upwards. Enum: 0- Undefined, 1 - Top Edge, 2 -Left Edge, 3 - Right edge, 4- Bottom edge </doc>
          </key>
       </node>
+<!--
       <node name="Memory">
-        <doc>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </doc>
+        <doc>These are coming from /proc/meminfo, right?</doc>
         <key name="ramUsed" type="INT"/>
         <key name="ramTotal" type="INT"/>
         <key name="swapFree" type="INT"/>
@@ -47,6 +50,7 @@
         <key name="externalTotal" type="INT"/>
         <key name="isInternalCardCorrupted" type="INT"/>
       </node>
+-->
     </node>
   </node>
 </root>
