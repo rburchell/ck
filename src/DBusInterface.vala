@@ -4,11 +4,11 @@ using DBus;
 namespace ContextKit {
 
 	public enum ValueType {
+    UNDETERMINED,
 		STRING,
 		INTEGER,
 		DOUBLE,
-		TRUTH,
-		UNDETERMINED
+		TRUTH
 	}
 
 	public struct TypedVariant {

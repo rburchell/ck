@@ -3,13 +3,19 @@
 
   <tp:enum name="TYPE" type="u">
     <tp:docstring></tp:docstring>
-    <tp:enumvalue suffix="STRING" value="0">
+    <tp:enumvalue suffix="UNDETERMINED" value="0">
+      <tp:docstring></tp:docstring>
+    </tp:enumvalue>
+    <tp:enumvalue suffix="STRING" value="1">
       <tp:docstring>Mode is unknown.</tp:docstring>
     </tp:enumvalue>
     <tp:enumvalue suffix="INT" value="2">
       <tp:docstring></tp:docstring>
     </tp:enumvalue>
-    <tp:enumvalue suffix="UNDETERMINED" value="2">
+    <tp:enumvalue suffix="DOUBLE" value="3">
+      <tp:docstring></tp:docstring>
+    </tp:enumvalue>
+    <tp:enumvalue suffix="TRUTH" value="4">
       <tp:docstring></tp:docstring>
     </tp:enumvalue>
   </tp:enum>
