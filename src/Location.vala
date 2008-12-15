@@ -44,7 +44,7 @@ namespace ContextKit {
 			static LocationData current_location;
 			
 			// Device for using liblocation
-			Location.GPSDevice device;
+			Location.GPSDevice m_device;
 			
 			void subscription_removed (PluginMixins.SubscriberList l, Subscriber s) {
 				// TODO: Check here whether the connection to the loc service should be closed? 
@@ -88,26 +88,24 @@ namespace ContextKit {
 				control.start(); // FIXME: This is only for testing.
 				
 				// Create a LocationGPSDevice
-				device = new Location.GPSDevice();
+				m_device = new Location.GPSDevice();
 	
 				// Connect signals from device
-				device.changed += CB_Changed;
-				device.connected += CB_Connected;
-				device.disconnected += CB_Disconnected;
+				m_device.changed += CB_Changed;
+				m_device.connected += CB_Connected;
+				m_device.disconnected += CB_Disconnected;
 				
-				device.start(); // FIXME: This is only for testing
+				m_device.start(); // FIXME: This is only for testing
 							
 				// FIXME: Do we need to unref control? Or does Vala handle it automatically?
-				
-				// FIXME: Since starting the device doesn't do anything (in Fremantle), do we need the device at all?
-				
+								
 			}
 			
-			/*
+			
 			// Destructor
-			public ~Plugin() {
-				// TODO: Deleting / freeing / ... the device? How?
-			}*/
+			~Plugin() {
+				// FIXME: Deleting / freeing / ... the device? How? Or does Vala handle it automatically?
+			}
 			
 			// Handling signals from GPS control
 			static void CB_Error(Location.GPSDControl? control) {
@@ -148,7 +146,8 @@ namespace ContextKit {
 						
 						current_location.altitude = device.fix.altitude;
 						current_location.altitude_valid = true;
-					}	  
+					}	
+					// TODO: Tresholds? If the values change only a little, ignore the change?  
 				}
 				
 				HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
