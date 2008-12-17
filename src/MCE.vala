@@ -48,41 +48,6 @@ namespace ContextKit {
 				return -n;
 			}
 			
-			/*int calculate_orientation(int x, int y, int z) {
-				if (abs(x) > abs(y) && abs(x) > abs(z)) {
-					if (x > 0) {
-						// right side up
-						return 3;
-					}
-					else {
-						// left side up
-						return 2;
-					}
-				}
-				else if (abs(y) > abs(x) && abs(y) > abs(z)) {
-					if (y > 0) {
-						// bottom side up
-						return 4;
-					}
-					else {
-						// top side up
-						return 1;
-					}
-				}
-				else if (abs(z) > abs(x) && abs(z) > abs(y)) {
-					if (z > 0) {
-						// back side up
-						return 6;
-					}
-					else {
-						// front side up
-						return 5;
-					}
-				}
-				// Undefined
-				return 0;
-			}*/
-			
 			int calculate_orientation(int x, int y) {
 				if (abs(x) > abs(y)) {
 					if (x > 0) {
