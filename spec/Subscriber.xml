@@ -7,23 +7,34 @@
         Subscribe to a one or more keys
       </tp:docstring>
 
-      <arg name="Keys" type="as" direction="in">
+      <arg name="keys" type="as" direction="in">
         <tp:docstring>
           An array of the keys to subscribe to.
         </tp:docstring>
       </arg>
 
-      <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" direction="out">
+      <arg name="values" type="a{sv}" tp:type="Value_Set" direction="out">
         <tp:docstring>
           A Value_Set mapping the requested keys to their current values.
         </tp:docstring>
       </arg>
+      <arg name="undeterminable_keys" type="as"  direction="out">
+        <tp:docstring>
+          An array of keys which we couldn't determine the values for.
+        </tp:docstring>
+      </arg>
+
     </method>
 
     <signal name="Changed" >
-      <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" >
+      <arg name="values" type="a{sv}" tp:type="Value_Set" >
         <tp:docstring >
           A Value_Set mapping the changed keys to their values.
+        </tp:docstring>
+      </arg>
+      <arg name="undeterminable_keys" type="as" >
+        <tp:docstring>
+          An array of keys which we can no longer determine the values for.
         </tp:docstring>
       </arg>
     </signal>
@@ -33,7 +44,7 @@
         A Value_Set mapping the requested keys to their values.
       </tp:docstring>
 
-      <arg name="Keys" type="as" direction="in">
+      <arg name="keys" type="as" direction="in">
         <tp:docstring>
           An array of the keys to unsubscribe from.
         </tp:docstring>
