@@ -11,25 +11,53 @@ namespace ContextKit {
 		}
 
 		public class Plugin : GLib.Object, ContextKit.Plugin {
+			
+			// Sets of subscribers
 			PluginMixins.SubscriberList orientation_subscribed;
+			PluginMixins.SubscriberList display_status_subscribed;
+			
+			// Objects for connecting to MCE
 			DBus.Connection conn;
 			dynamic DBus.Object mce_request;
 			dynamic DBus.Object? mce_signal;
+			
+			// List of keys to which someone is subscibed
+			// FIXME: This approach fails to deal with unsubscriptions successfully!
 			StringSet subscribed_keys = new StringSet();
 
 			delegate void TruthFunction (void* data);
+			
+			// Key strings
+			string key_edge_up = "Context.Device.Orientation.edgeUp";
+			string key_facing_up = "Context.Device.Orientation.facingUp";
+			string key_display_state = "Context.Device.Display.displayState";
+			
+			// Information about keys provided by this plug-in
 			const Key[] keys = {
 					{
-						"Context.Device.Orientation.edgeUp", // values: top bottom left right  undefined = 0
+						 "Context.Device.Orientation.edgeUp",
+						//key_edge_up, // FIXME: Fails
 						ValueType.INTEGER
+						// values: Undefined (0), top (1), left (2), right (3), bottom (4)
 					},
 					{
 						"Context.Device.Orientation.facingUp",
-						ValueType.TRUTH
+						//key_facing_up, 
+						ValueType.INTEGER
+						// Values: Undefined (0), face up (1), back side up (2)
+					},
+					{
+						"Context.Device.Display.displayState",
+						//key_display_state,
+						ValueType.INTEGER
+						// Values: Off (0), on (1), dimmed (2)
 					}
+					
 				};
-
+			
+			// Keys divided into sets based on how they are got from MCE
 			StringSet orientation_keys;
+			StringSet display_status_keys;
 			
 			void error_for_subset (StringSet keys, HashTable<string, TypedVariant?> ret, StringSet intersect_with) {
 				StringSet intersection = new StringSet.intersection (keys, intersect_with);
@@ -88,51 +116,33 @@ namespace ContextKit {
 					return;
 				}
 
-				stdout.printf("got orientation %s %s %s (%d,%d,%d)", orientation.rotation,  orientation.stand,  orientation.facing,  orientation.x,  orientation.y,  orientation.z);
+				stdout.printf("Got orientation %s %s %s (%d,%d,%d)", orientation.rotation,  orientation.stand,  orientation.facing,  orientation.x,  orientation.y,  orientation.z);
 					
-				if (keys.is_member ("Context.Device.Orientation.edgeUp")) {
-					Value v = Value (typeof(int));
-					v.set_int(calculate_orientation(orientation.x, orientation.y));
-					ret.insert ("Context.Device.Orientation.edgeUp", TypedVariant (ValueType.INTEGER, v));
-				}
-				
-				if (keys.is_member ("Context.Device.Orientation.facingUp")) {
-					Value v = Value (typeof(int));
-					if (orientation.facing == "face_up") {
-						v.set_int(1);
-					}
-					else if (orientation.facing == "face_down") {
-						v.set_int(2);
-					}
-					else
-						v.set_int(0);
-					
-					//if (orientation.z > 0) {
-						// back side up
-					//	v.set_boolean(false);
-					//}
-					//else {
-						// front side up
-					//	v.set_boolean(true);
-					//}
-					ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.INTEGER, v));
-				}
+				insert_orientation_to_map(keys, orientation, ret);
 				
 			}
-
+			
+			/*
+			Is called when a sig_device_orientation_ind signal is received from the MCE.
+			*/	
 			void orientation_changed (DBus.Object sender, string rotation, string stand, string facing, int32 x, int32 y, int32 z) {
-				message ("orientation changed: %s, %s, %s", rotation, stand, facing);
+				debug ("orientation changed: %s, %s, %s", rotation, stand, facing);
 
 				DeviceOrientation orientation = DeviceOrientation () {rotation=rotation, stand=stand, facing=facing, x=x, y=y, z=z};
 				HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
 				
-				if (subscribed_keys.is_member ("Context.Device.Orientation.edgeUp")) {
+				insert_orientation_to_map(subscribed_keys, orientation, ret);
+				send_result_to_listeners(orientation_subscribed, ret);
+			}
+			
+			void insert_orientation_to_map(StringSet keys, DeviceOrientation orientation, HashTable<string, TypedVariant?> ret) {
+			if (keys.is_member (key_edge_up)) {
 					Value v = Value (typeof(int));
 					v.set_int(calculate_orientation(orientation.x, orientation.y));
-					ret.insert ("Context.Device.Orientation.edgeUp", TypedVariant (ValueType.INTEGER, v));
+					ret.insert (key_edge_up, TypedVariant (ValueType.INTEGER, v));
 				}
 				
-				if (subscribed_keys.is_member ("Context.Device.Orientation.facingUp")) {
+				if (keys.is_member (key_facing_up)) {
 					Value v = Value (typeof(int));
 					if (orientation.facing == "face_up") {
 						v.set_int(1);
@@ -143,29 +153,47 @@ namespace ContextKit {
 					else
 						v.set_int(0);
 					
-					//Value v = Value (typeof(int));
-					//if (orientation.facing > 0) {
-						// back side up
-					//	v.set_boolean(false);
-					//}
-					//else {
-						// front side up
-					//	v.set_boolean(true);
-					//}
-					//ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.TRUTH, v));
-					ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.INTEGER, v));
-				
+					ret.insert (key_facing_up, TypedVariant (ValueType.INTEGER, v));
 				}
-
-				for (int i=0; i < orientation_subscribed.size; i++) {
-					weak Subscriber s =orientation_subscribed.get(i);
+			}
+			
+			void display_status_changed(DBus.Object sender, string display_status) {
+				debug ("MCE plugin: Display status changed: %s", display_status);
+				
+				HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
+				
+				if (subscribed_keys.is_member ("Context.Device.Display.displayState")) {
+					Value v = Value (typeof(int));
+					
+					if (display_status == "off") {
+						v.set_int(0);
+					}
+					else if (display_status == "on") {
+						v.set_int(1);
+					}
+					else if (display_status == "dimmed") {
+						v.set_int(2);
+					}
+					else {
+						debug ("MCE plugin: Unknown display status %s", display_status);
+						return;
+					}
+										
+					ret.insert ("Context.Device.Display.displayState", TypedVariant (ValueType.INTEGER, v));
+				}
+				send_result_to_listeners(display_status_subscribed, ret);				
+			}
+			
+			void send_result_to_listeners(PluginMixins.SubscriberList subscribers, HashTable<string, TypedVariant?> ret) {
+				for (int i=0; i < subscribers.size; i++) {
+					weak Subscriber s = subscribers.get(i);
 					s.emit_changed(ret);
 				}
 			}
 
-			void check_orientation_subscribe (StringSet keys, Subscriber s) {
+			void subscribe_to_orientation (StringSet keys, Subscriber s) {
 				
-				message ("check_orientation_subscribe: %s, %s", keys.debug(), s.object_path);
+				message ("subscribe_to_orientation: %s, %s", keys.debug(), s.object_path);
 
 				if (keys.is_disjoint (orientation_keys)) {
 					return;
@@ -174,35 +202,77 @@ namespace ContextKit {
 				if (orientation_subscribed.size == 0) {
 					if (mce_signal == null)
 						mce_signal = conn.get_object ("com.nokia.mce", "/com/nokia/mce/signal", "com.nokia.mce.signal");
+					// Connect the corresponding MCE signal to its handler
 					mce_signal.sig_device_orientation_ind += orientation_changed;
 				}
 
 				orientation_subscribed.add (s);
+				add_keys(new StringSet.intersection (orientation_keys, keys));
+			}
+			
+			void subscribe_to_display_status (StringSet keys, Subscriber s) {
+				
+				message ("subscribe_to_display_status: %s, %s", keys.debug(), s.object_path);
+
+				if (keys.is_disjoint (display_status_keys)) {
+					return;
+			 	}
+
+				if (display_status_subscribed.size == 0) {
+					if (mce_signal == null)
+						mce_signal = conn.get_object ("com.nokia.mce", "/com/nokia/mce/signal", "com.nokia.mce.signal");
+					// Connect the corresponding MCE signal to its handler
+					mce_signal.display_status_ind += display_status_changed;
+				}
+
+				display_status_subscribed.add (s);
+				add_keys(new StringSet.intersection (display_status_keys, keys));
+			}
+			
+			void add_keys(StringSet keys) {
 				subscribed_keys = new StringSet.union (subscribed_keys, keys);
 			}
+			
 
 			void subscription_removed (PluginMixins.SubscriberList l, Subscriber s) {
+				// FIXME: The subscribed_keys has to be updated in a clever way...
+				// How do we know which keys are unsubscribed?
 			}
 
 			public Plugin () {
 
 				conn = DBus.Bus.get (DBus.BusType.SYSTEM);
 				mce_request = conn.get_object ("com.nokia.mce", "/com/nokia/mce/request", "com.nokia.mce.request");
-				orientation_keys = new StringSet.from_array (new string[] {
-						"Context.Device.Orientation.edgeUp", 
-						"Context.Device.Orientation.facingUp"});
 
+				// Data structures related to orientation
+				orientation_keys = new StringSet.from_array (new string[] {
+						key_edge_up, 
+						key_facing_up});
+				
 				orientation_subscribed = new PluginMixins.SubscriberList();
 				orientation_subscribed.removed += subscription_removed;
+				
+				// Data structures related to display status
+				display_status_keys = new StringSet.from_array (new string[] {
+						key_display_state});
+				
+				
+				display_status_subscribed = new PluginMixins.SubscriberList();
+				display_status_subscribed.removed += subscription_removed;
 			}
 
 
 			public void Get (StringSet keys, HashTable<string, TypedVariant?> ret) {
 				check_orientation_get (keys, ret);
+				// FIXME: Getting the displays status is not implemented yet.
+				// Implementation:
+				// - There is no getter method in MCE -> have to use interal storage
+				// - Listen to the signal from the start and change the internal data
 			}
 
 			public void Subscribe (StringSet keys, ContextKit.Subscriber s) {
-				check_orientation_subscribe (keys, s);
+				subscribe_to_orientation (keys, s);
+				subscribe_to_display_status (keys, s);
 			}
 
 			public Key[] Keys() {
