@@ -52,11 +52,25 @@ class MCESignal(dbus.service.Object):
         #print "sig_device_mode_ind(%s)" % (mode)
         pass
 
+    @dbus.service.signal(dbus_interface='com.nokia.mce.signal',
+                       signature='s')
+    def display_status_ind(self, status):
+        #print "display_status_ind(%s)" % (status)
+        pass
+
     @dbus.service.signal(dbus_interface='com.nokia.mce.signal', signature='sssiii')
     def sig_device_orientation_ind(self, rotation, stand, facing, x, y, z):
         #print "sig_device_orientation_ind(%s %s %s %d %d %d)" % (rotation, stand, facing, x, y, z)
         pass
+
+    @dbus.service.signal(dbus_interface='com.nokia.mce.signal', signature='ss')
+    def sig_call_state_ind (self, state, type):
+        #print "sig_call_state_ind(%s %s)" % (state,type)
+        pass
     
+
+
+
 # Manager stuff
 class MCE(dbus.service.Object):
 
@@ -68,6 +82,9 @@ class MCE(dbus.service.Object):
     device_x= 0
     device_y= 0
     device_z= 0
+    display_state = "on"
+    call_state = "cellular"
+    call_type = "normal"
 
     def __init__(self, main_loop):
     # Here the object path
@@ -92,6 +109,14 @@ class MCE(dbus.service.Object):
         return self.device_mode
 
     @dbus.service.method(dbus_interface='com.nokia.mce.request',
+                       in_signature='', out_signature='ss')
+    def get_call_state(self):
+        if self.error:
+            raise MCEException(self.error)
+
+        return self.call_state, self.call_type
+
+    @dbus.service.method(dbus_interface='com.nokia.mce.request',
                        in_signature='', out_signature='sssiii')
     def get_device_orientation(self):
         if self.error:
@@ -99,6 +124,11 @@ class MCE(dbus.service.Object):
 
         return self.device_rotation, self.device_stand, self.device_facing, \
                             self.device_x, self.device_y, self.device_z
+    
+    @dbus.service.method(dbus_interface='com.nokia.mce.request',
+                       in_signature='', out_signature='s')
+    def get_display_status(self):
+        return self.display_state
 
     @dbus.service.method(dbus_interface='com.nokia.mce.request',
                        in_signature='s', out_signature='')
@@ -170,9 +200,34 @@ class MCE(dbus.service.Object):
                   self.device_stand, self.device_facing, x, y, z)
 
     @dbus.service.method(dbus_interface='com.nokia.mce.request',
-                       in_signature='', out_signature='s')
-    def get_display_status(self):
-        return "on"
+                       in_signature='', out_signature='')
+    def req_display_state_on(self):
+        self.display_state = "on" 
+        self.display_status_ind(self.display_state)
+
+    @dbus.service.method(dbus_interface='com.nokia.mce.request',
+                       in_signature='', out_signature='')
+    def req_display_state_dim(self):
+       self.display_state = "dimmed"
+       self.display_status_ind(self.display_state) 
+
+    @dbus.service.method(dbus_interface='com.nokia.mce.request',
+                       in_signature='', out_signature='')
+    def req_display_state_off (self):
+        self.display_state = "off"
+        self.display_status_ind(self.display_state)
+
+    @dbus.service.method(dbus_interface='com.nokia.mce.request',
+                       in_signature='ss', out_signature='')
+    def req_call_state_change(self, new_state, new_type):
+        if new_state not in ("cellular", "voip", "video", "none"):
+            raise MCEException("org.freedesktop.DBus.Error.InvalidArgs")
+        if new_type not in ("emergency", "normal"):
+            raise MCEException("org.freedesktop.DBus.Error.InvalidArgs")
+
+        self.call_state = new_state
+	self.call_type = new_type
+
 
     @dbus.service.method(dbus_interface='com.nokia.mce.request',
                          in_signature='', out_signature='')
