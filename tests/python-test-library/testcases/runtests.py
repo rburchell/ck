@@ -12,7 +12,9 @@
 ## Implements also some testing API:
 ##
 ## 
-
+import sys
+sys.path.append("../testcases")
+sys.path.append("../stubs")
 import os
 from time import sleep
 import dbus
