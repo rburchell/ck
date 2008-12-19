@@ -48,41 +48,6 @@ namespace ContextKit {
 				return -n;
 			}
 			
-			/*int calculate_orientation(int x, int y, int z) {
-				if (abs(x) > abs(y) && abs(x) > abs(z)) {
-					if (x > 0) {
-						// right side up
-						return 3;
-					}
-					else {
-						// left side up
-						return 2;
-					}
-				}
-				else if (abs(y) > abs(x) && abs(y) > abs(z)) {
-					if (y > 0) {
-						// bottom side up
-						return 4;
-					}
-					else {
-						// top side up
-						return 1;
-					}
-				}
-				else if (abs(z) > abs(x) && abs(z) > abs(y)) {
-					if (z > 0) {
-						// back side up
-						return 6;
-					}
-					else {
-						// front side up
-						return 5;
-					}
-				}
-				// Undefined
-				return 0;
-			}*/
-			
 			int calculate_orientation(int x, int y) {
 				if (abs(x) > abs(y)) {
 					if (x > 0) {
@@ -132,16 +97,25 @@ namespace ContextKit {
 				}
 				
 				if (keys.is_member ("Context.Device.Orientation.facingUp")) {
-					Value v = Value (typeof(bool));
-					if (orientation.z > 0) {
+					Value v = Value (typeof(int));
+					if (orientation.facing == "face_up") {
+						v.set_int(1);
+					}
+					else if (orientation.facing == "face_down") {
+						v.set_int(2);
+					}
+					else
+						v.set_int(0);
+					
+					//if (orientation.z > 0) {
 						// back side up
-						v.set_boolean(false);
-					}
-					else {
+					//	v.set_boolean(false);
+					//}
+					//else {
 						// front side up
-						v.set_boolean(true);
-					}
-					ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.TRUTH, v));
+					//	v.set_boolean(true);
+					//}
+					ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.INTEGER, v));
 				}
 				
 			}
@@ -159,16 +133,28 @@ namespace ContextKit {
 				}
 				
 				if (subscribed_keys.is_member ("Context.Device.Orientation.facingUp")) {
-					Value v = Value (typeof(bool));
-					if (orientation.z > 0) {
+					Value v = Value (typeof(int));
+					if (orientation.facing == "face_up") {
+						v.set_int(1);
+					}
+					else if (orientation.facing == "face_down") {
+						v.set_int(2);
+					}
+					else
+						v.set_int(0);
+					
+					//Value v = Value (typeof(int));
+					//if (orientation.facing > 0) {
 						// back side up
-						v.set_boolean(false);
-					}
-					else {
+					//	v.set_boolean(false);
+					//}
+					//else {
 						// front side up
-						v.set_boolean(true);
-					}
-					ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.TRUTH, v));
+					//	v.set_boolean(true);
+					//}
+					//ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.TRUTH, v));
+					ret.insert ("Context.Device.Orientation.facingUp", TypedVariant (ValueType.INTEGER, v));
+				
 				}
 
 				for (int i=0; i < orientation_subscribed.size; i++) {
