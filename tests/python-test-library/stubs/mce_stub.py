@@ -203,19 +203,19 @@ class MCE(dbus.service.Object):
                        in_signature='', out_signature='')
     def req_display_state_on(self):
         self.display_state = "on" 
-        self.display_status_ind(self.display_state)
+        self.signal_object.display_status_ind(self.display_state)
 
     @dbus.service.method(dbus_interface='com.nokia.mce.request',
                        in_signature='', out_signature='')
     def req_display_state_dim(self):
        self.display_state = "dimmed"
-       self.display_status_ind(self.display_state) 
+       self.signal_object.display_status_ind(self.display_state) 
 
     @dbus.service.method(dbus_interface='com.nokia.mce.request',
                        in_signature='', out_signature='')
     def req_display_state_off (self):
         self.display_state = "off"
-        self.display_status_ind(self.display_state)
+        self.signal_object.display_status_ind(self.display_state)
 
     @dbus.service.method(dbus_interface='com.nokia.mce.request',
                        in_signature='ss', out_signature='')
