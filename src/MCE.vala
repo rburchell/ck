@@ -101,7 +101,7 @@ namespace ContextKit {
 				return 0;
 			}
 			
-			void check_orientation_get (StringSet keys, HashTable<string, TypedVariant?> ret) {
+			void get_orientation (StringSet keys, HashTable<string, TypedVariant?> ret) {
 
 				if (keys.is_disjoint (orientation_keys)) {
 					return;
@@ -122,6 +122,27 @@ namespace ContextKit {
 				
 			}
 			
+			void get_display_status (StringSet keys, HashTable<string, TypedVariant?> ret) {
+
+				if (keys.is_disjoint (display_status_keys)) {
+					return;
+			 	}
+
+				string display_status;
+				try {
+					mce_request.get_display_status(out display_status);
+				} catch (GLib.Error ex) {
+					stdout.printf("MCE Plugin Error: %s\n", ex.message);
+					error_for_subset (keys, ret, display_status_keys);
+					return;
+				}
+
+				stdout.printf("Got display status %s", display_status);
+					
+				insert_display_status_to_map(keys, display_status, ret);
+				
+			}
+			
 			/*
 			Is called when a sig_device_orientation_ind signal is received from the MCE.
 			*/	
@@ -135,6 +156,9 @@ namespace ContextKit {
 				send_result_to_listeners(orientation_subscribed, ret);
 			}
 			
+			/*
+			Inserts the orientation properties to the map according to the data given.
+			*/
 			void insert_orientation_to_map(StringSet keys, DeviceOrientation orientation, HashTable<string, TypedVariant?> ret) {
 			if (keys.is_member (key_edge_up)) {
 					Value v = Value (typeof(int));
@@ -157,12 +181,11 @@ namespace ContextKit {
 				}
 			}
 			
-			void display_status_changed(DBus.Object sender, string display_status) {
-				debug ("MCE plugin: Display status changed: %s", display_status);
-				
-				HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
-				
-				if (subscribed_keys.is_member ("Context.Device.Display.displayState")) {
+			/*
+			Inserts the display state properties to the map according to the data given.
+			*/
+			void insert_display_status_to_map(StringSet keys, string display_status, HashTable<string, TypedVariant?> ret) {
+				if (keys.is_member ("Context.Device.Display.displayState")) {
 					Value v = Value (typeof(int));
 					
 					if (display_status == "off") {
@@ -179,11 +202,25 @@ namespace ContextKit {
 						return;
 					}
 										
-					ret.insert ("Context.Device.Display.displayState", TypedVariant (ValueType.INTEGER, v));
+					ret.insert (key_display_state, TypedVariant (ValueType.INTEGER, v));
 				}
+			}
+			
+			/*
+			Is called when a display_status_ind signal is received from the MCE.
+			*/
+			void display_status_changed(DBus.Object sender, string display_status) {
+				debug ("MCE plugin: Display status changed: %s", display_status);
+				
+				HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
+				
+				insert_display_status_to_map(subscribed_keys, display_status, ret);
 				send_result_to_listeners(display_status_subscribed, ret);				
 			}
 			
+			/*
+			Sends the properties to the listeners intrested in them.
+			*/
 			void send_result_to_listeners(PluginMixins.SubscriberList subscribers, HashTable<string, TypedVariant?> ret) {
 				for (int i=0; i < subscribers.size; i++) {
 					weak Subscriber s = subscribers.get(i);
@@ -231,12 +268,14 @@ namespace ContextKit {
 			
 			void add_keys(StringSet keys) {
 				subscribed_keys = new StringSet.union (subscribed_keys, keys);
+				// FIXME: Unsubscription.
 			}
 			
 
 			void subscription_removed (PluginMixins.SubscriberList l, Subscriber s) {
 				// FIXME: The subscribed_keys has to be updated in a clever way...
 				// How do we know which keys are unsubscribed?
+				// How do we know if someone else is anyway intrested in them?
 			}
 
 			public Plugin () {
@@ -261,13 +300,9 @@ namespace ContextKit {
 				display_status_subscribed.removed += subscription_removed;
 			}
 
-
 			public void Get (StringSet keys, HashTable<string, TypedVariant?> ret) {
-				check_orientation_get (keys, ret);
-				// FIXME: Getting the displays status is not implemented yet.
-				// Implementation:
-				// - There is no getter method in MCE -> have to use interal storage
-				// - Listen to the signal from the start and change the internal data
+				get_orientation (keys, ret);
+				get_display_status(keys, ret);
 			}
 
 			public void Subscribe (StringSet keys, ContextKit.Subscriber s) {
