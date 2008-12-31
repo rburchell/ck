@@ -329,7 +329,7 @@ namespace ContextKit {
 					if (state == "none") {
 						v.set_boolean(false);
 					}
-					else if (state == "cellular" ||state == "voip" ||state == "video" ||state == "none") {
+					else if (state == "cellular" || state == "voip" || state == "video" || state == "none") {
 						if (type == "normal") {
 							v.set_boolean(false);
 						}
@@ -415,7 +415,7 @@ namespace ContextKit {
 			Is called when a system_call_state_ind signal is received from MCE.
 			*/
 			void inactivity_status_changed(DBus.Object sender, bool status) {
-				debug ("MCE plugin: Inactivity state changed: %b", status);
+				debug ("MCE plugin: Inactivity state changed: %s", (status ? "true" : "false"));
 				
 				HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
 				
