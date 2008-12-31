@@ -6,14 +6,19 @@
       <tp:docstring>
         Get the values of a set of context keys.
       </tp:docstring>
-      <arg name="Keys" type="as" direction="in">
+      <arg name="keys" type="as" direction="in">
         <tp:docstring>
           An array of the keys to get.
         </tp:docstring>
       </arg>
-      <arg name="Values" type="a{s(uv)}" tp:type="Value_Set" direction="out">
+      <arg name="values" type="a{sv}" tp:type="Value_Set" direction="out">
         <tp:docstring>
           A Value_Set mapping the requested keys to their values.
+        </tp:docstring>
+      </arg>
+      <arg name="undeterminable_keys" type="as"  direction="out">
+        <tp:docstring>
+          An array of keys which we couldn't determine the values for.
         </tp:docstring>
       </arg>
     </method>
@@ -22,7 +27,7 @@
       <tp:docstring>
         Get the Subscriber object for making subscriptions.
       </tp:docstring>
-      <arg name="SubscriptionObject" type="o" direction="out">
+      <arg name="subscription_object" type="o" direction="out">
         <tp:docstring>
           The object on which to subscribe, unsubscribe keys and listen to key value changes.
         </tp:docstring>
