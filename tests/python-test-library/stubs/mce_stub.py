@@ -224,10 +224,10 @@ class MCE(dbus.service.Object):
             raise MCEException("org.freedesktop.DBus.Error.InvalidArgs")
         if new_type not in ("emergency", "normal"):
             raise MCEException("org.freedesktop.DBus.Error.InvalidArgs")
-
+        
         self.call_state = new_state
-	self.call_type = new_type
-
+        self.call_type = new_type
+        self.signal_object.sig_call_state_ind(self.call_state,self.call_type)
 
     @dbus.service.method(dbus_interface='com.nokia.mce.request',
                          in_signature='', out_signature='')
