@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-  <xs:element name="root">
+  <xs:element name="provider">
     <xs:complexType>
-      <xs:group maxOccurs="unbounded" ref="node"/>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="doc"/>
+        <xs:element name="root">
+          <xs:complexType>
+            <xs:group maxOccurs="unbounded" ref="node"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="service" use="required" type="xs:NCName"/>
+      <xs:attribute name="path" use="required" type="xs:normalizedString"/>
     </xs:complexType>
   </xs:element>
   <xs:group name="node">
@@ -38,6 +47,7 @@
   <xs:simpleType name="typetype">
     <xs:restriction base="xs:string">
       <xs:enumeration value="INT"/>
+      <xs:enumeration value="DOUBLE"/>
       <xs:enumeration value="STRING"/>
       <xs:enumeration value="TRUTH"/>
     </xs:restriction>
