@@ -6,4 +6,6 @@ test -z "$srcdir" && srcdir=.
 
 PKG_NAME="contextd"
 
+REQUIRED_AUTOMAKE_VERSION=1.9
+
 . gnome-autogen.sh
