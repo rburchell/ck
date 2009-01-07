@@ -1,0 +1,42 @@
+Source: dui-contextkit
+Section: misc
+Priority: optional
+Maintainer: Marius Vollmer <marius.vollmer@nokia.com>
+Build-Depends: debhelper (>= 5),
+               automake1.9,
+	       gnome-common,
+               libglib2.0-dev (>= 2.12.0),
+               libsqlite3-dev,
+               libdbus-glib-1-dev,
+               libgee-dev (>= 0.1.3),
+	       python,
+	       xsltproc
+Standards-Version: 3.8.0
+
+Package: dui-contextkit
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: ContextKit daemon
+ ContextKit is a system for providing real-time context awareness to
+ applications.
+ .
+ This package provides the session-activated dbus daemon.
+
+Package: dui-contextkit-dbg
+Priority: extra
+Architecture: any
+Depends: contextkit (= ${binary:Version})
+Description: ContextKit daemon debug symbols
+ ContextKit is a system for providing real-time context awareness to
+ applications.
+ .
+ This package contains the debug symbols for the daemon.
+
+Package: dui-contextkit-doc
+Section: doc
+Architecture: all
+Description: ContextKit daemon documentation
+ ContextKit is a system for providing real-time context awareness to
+ applications.
+ .
+ This package contains the D-Bus interface documentation.
