@@ -22,7 +22,7 @@
  *  Emmanuele Bassi
  */
 
-namespace POSIX
+namespace Posix
 {
 	[CCode (cname = "assert", cheader_filename = "assert.h")]
 	public static void assert (string expresion);
