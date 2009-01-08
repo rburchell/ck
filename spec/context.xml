@@ -1,5 +1,11 @@
 <?xml version="1.0"?>
-<root>
+<provider service="org.freedesktop.ContextKit" path="/org/freedesktop/ContextKit/Manager">
+ <doc>
+    Contextd daemon provides the below specified read only properties.
+    This file is the ultimate source of information about the properties provided
+    by contextd. As such it should be kept closely synchronized with contextd.
+ </doc>
+ <root>
   <node name="Context">
     <doc> There will be probably one top level node as here, but more can be added. </doc>
     <node name="Device">
@@ -53,4 +59,5 @@
 -->
     </node>
   </node>
-</root>
+ </root>
+</provider>
