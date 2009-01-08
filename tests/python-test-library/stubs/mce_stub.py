@@ -68,6 +68,10 @@ class MCESignal(dbus.service.Object):
         #print "sig_call_state_ind(%s %s)" % (state,type)
         pass
     
+    @dbus.service.signal(dbus_interface='com.nokia.mce.signal', signature='b')
+    def system_inactivity_ind (self, status):
+        print "system_inactivity_ind(", status, ")"
+        pass
 
 
 
@@ -85,6 +89,7 @@ class MCE(dbus.service.Object):
     display_state = "on"
     call_state = "cellular"
     call_type = "normal"
+    inactive = False
 
     def __init__(self, main_loop):
     # Here the object path
@@ -129,6 +134,11 @@ class MCE(dbus.service.Object):
                        in_signature='', out_signature='s')
     def get_display_status(self):
         return self.display_state
+    
+    @dbus.service.method(dbus_interface='com.nokia.mce.request',
+                       in_signature='', out_signature='b')
+    def get_inactivity_status(self):
+        return self.inactive
 
     @dbus.service.method(dbus_interface='com.nokia.mce.request',
                        in_signature='s', out_signature='')
@@ -228,6 +238,18 @@ class MCE(dbus.service.Object):
         self.call_state = new_state
         self.call_type = new_type
         self.signal_object.sig_call_state_ind(self.call_state,self.call_type)
+    
+    @dbus.service.method(dbus_interface='com.nokia.mce.request',
+                       in_signature='', out_signature='')
+    def req_inactivity_status_inactive(self):
+        self.inactive = True
+        self.signal_object.system_inactivity_ind(self.inactive)
+
+    @dbus.service.method(dbus_interface='com.nokia.mce.request',
+                       in_signature='', out_signature='')
+    def req_inactivity_status_active(self):
+        self.inactive = False
+        self.signal_object.system_inactivity_ind(self.inactive)
 
     @dbus.service.method(dbus_interface='com.nokia.mce.request',
                          in_signature='', out_signature='')
