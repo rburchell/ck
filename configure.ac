@@ -1,7 +1,7 @@
 AC_INIT([ContextKit], [0.1.1], [rob.taylor@codethink.co.uk], ContextKit)
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
-AM_INIT_AUTOMAKE([dist-bzip2])
+AM_INIT_AUTOMAKE([-Wall -Werror dist-bzip2])
 AM_MAINTAINER_MODE
 
 # Honor aclocal flags
@@ -56,6 +56,22 @@ AC_SUBST(LOCATION_CFLAGS)
 AC_SUBST(LOCATION_LIBS)
 
 AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
+
+######################
+# Coverage
+######################
+
+AC_ARG_ENABLE(gcov,
+			AS_HELP_STRING([--enable-gcov=@<:@no/yes/auto@:>@],
+					[compile with coverage profiling (gcc only)]),
+					enable_gcov=$enableval,enable_gcov=no)
+
+if test "x$enable_gcov" != "xno"; then
+	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage"
+	CONTEXTD_LIBS="$CONTEXTD_LIBS -lgcov"
+fi
+
+AC_SUBST(CONTEXTD_CFLAGS)
 
 AC_CONFIG_FILES([Makefile])
 
