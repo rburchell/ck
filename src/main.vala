@@ -21,10 +21,14 @@
 
 using GLib;
 using Sqlite;
+using Posix.Signal;
 
 namespace ContextKit {
 
-	public class Main : Object {
+		public class Main : Object {
+		
+		static GLib.MainLoop loop;
+		
 		public Main () {
 		}
 
@@ -53,10 +57,16 @@ namespace ContextKit {
 			return true;
 		}
 
+		static void exit (int sig){
+			stdout.printf("Exit contextd");
+			loop.quit();
+		}
+
 		public void run () {
-			var loop = new MainLoop (null, false);
+			loop = new MainLoop (null, false);
 			stdout.printf ("Hello, world!\n");
 			start_manager();
+			Posix.Signal.set_handler(Posix.Signal.QUIT,exit);
 			loop.run();
 		}
 

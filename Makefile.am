@@ -98,7 +98,7 @@ ASYNC_INTROSPECT = $(INTERFACES:spec/%.xml=introspect/async/%.xml)
 DOCS = doc/contextkit.html doc/context.html
 
 src/contextd.vala.stamp $(contextd_GENERATEDSOURCES): $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg sqlite3 --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg posix --pkg sqlite3 --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
 	touch $@
 
 tools_dir = $(top_srcdir)/tools
@@ -154,6 +154,11 @@ DISTCLEANFILES = \
 	$(contextd_GENERATEDSOURCES) \
 	src/contextd.vala.stamp \
 	$(NULL)
+
+clean-gcov:
+	find -name "*.gcov" | xargs rm -f || true
+	find -name "*.gcno" | xargs rm -f || true
+	find -name "*.gcda" | xargs rm -f || true
 
 version:
 	@echo @VERSION@
