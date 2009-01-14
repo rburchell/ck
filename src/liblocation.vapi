@@ -74,8 +74,8 @@ namespace Location {
 	public enum GPSDeviceMode {
 		NOT_SEEN,
 		NO_FIX,
-		2D,
-		3D
+		_2D,
+		_3D
 	}
 	[CCode (cprefix = "LOCATION_GPS_DEVICE_STATUS_", has_type_id = "0", cheader_filename = "location/location-gps-device.h")]
 	public enum GPSDeviceStatus {

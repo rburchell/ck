@@ -16,25 +16,12 @@ namespace ContextKit {
 			this.subscribed_keys = new StringSet();
 		}
 
-		internal void emit_changed (HashTable<string, TypedVariant?> values) {
-			HashTable<string, ValueArray> new_values = new HashTable<string, ValueArray>(str_hash, str_equal);
-			List <weak string> keys = values.get_keys();
-			foreach (var k in keys) {
-				weak TypedVariant? v = values.lookup (k);
-				ValueArray va = new ValueArray(2);
-				Value type = Value(typeof(int));
-				type.set_int (v.type);
-				va.append(type);
-				Value value = Value(typeof(Value));
-				value.set_boxed(&v.value);
-				va.append(value);
-				new_values.insert (k, #va);
-			}
-			Changed (new_values);
+		internal void emit_changed (HashTable<string, Value> values) {
+			Changed (values);
 		}
 
-		public HashTable<string, TypedVariant?> Subscribe (string[] keys) {
-			HashTable<string, TypedVariant?> values = new HashTable<string, TypedVariant?> (str_hash,str_equal);
+		public HashTable<string, Value> Subscribe (string[] keys, out string[] unavailable_keys) {
+			HashTable<string, Value> values = new HashTable<string, Value> (str_hash,str_equal);
 			StringSet keyset = new StringSet.from_array (keys);
 			message ("Subscribe: requested %s", keyset.debug());
 			StringSet new_keys = new StringSet.difference (keyset, subscribed_keys);
@@ -42,14 +29,14 @@ namespace ContextKit {
 
 			foreach (var plugin in manager.plugins) {
 				plugin.Subscribe (new_keys, this);
-				plugin.Get (keyset, values);
+				plugin.Get (keyset, values, unavailable_keys);
 			}
 			return values;
 		}
 
 		public void Unsubscribe (string[] keys) {
 		}
-		public signal void Changed (HashTable<string,TypedVariant?> values);
+		public signal void Changed (HashTable<string, Value> values);
 	}
 
 	[DBus (name = "org.freedesktop.ContextKit.Manager")]
@@ -63,13 +50,14 @@ namespace ContextKit {
 			plugins.add(new MCE.Plugin());
 		}
 
-		public HashTable<string, TypedVariant?> Get (string[] keys) {
-			HashTable<string, TypedVariant?> ret = new HashTable<string, TypedVariant?> (str_hash,str_equal);
+		public HashTable<string, Value> Get (string[] keys, out string[] unavailable_keys) {
+			HashTable<string, Value > ret = new HashTable<string, Value> (str_hash,str_equal);
 			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
 			  leaving a possible DOS or at least random memory leaks */
 			StringSet keyset = new StringSet.from_array (keys);
+
 			foreach (var plugin in plugins) {
-				plugin.Get (keyset, ret);
+				plugin.Get (keyset, ret, unavailable_keys);
 			}
 			return ret;
 		}
