@@ -42,7 +42,6 @@ contextd_core_VALASOURCES = \
 	$(NULL)
 
 contextd_liblocation_VALASOURCES = \
-	src/Location.vala \
 	$(NULL)
 
 contextd_VALASOURCES = \
@@ -52,7 +51,6 @@ contextd_VALASOURCES = \
 
 contextd_VAPISOURCES = \
 	src/intset.vapi \
-	src/liblocation.vapi
 	$(NULL)
 
 contextd_GENERATEDSOURCES = \
