@@ -39,10 +39,12 @@ namespace ContextKit {
 				plugin.Get (keyset, values, unavail_l);
 			}
 
+			string [] unavail = {};
 			foreach (string str in unavail_l) {
-				unavailable_keys += str;
+				unavail += str;
 			}
 
+			unavailable_keys = unavail;
 			return values;
 		}
 
@@ -66,7 +68,7 @@ namespace ContextKit {
 		}
 
 		public HashTable<string, Value?> Get (string[] keys, out string[] unavailable_keys) {
-			HashTable<string, Value > ret = new HashTable<string, Value?> (str_hash,str_equal);
+			HashTable<string, Value?> ret = new HashTable<string, Value?> (str_hash,str_equal);
 			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
 			  leaving a possible DOS or at least random memory leaks */
 			StringSet keyset = new StringSet.from_array (keys);
@@ -76,9 +78,12 @@ namespace ContextKit {
 				plugin.Get (keyset, ret, unavail_key_list);
 			}
 
+			string[] unavail = {};
 			foreach (string str in unavail_key_list) {
-				unavailable_keys += str;
+				unavail += str;
 			}
+			unavailable_keys = unavail;
+
 			return ret;
 		}
 
