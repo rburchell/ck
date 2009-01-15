@@ -53,8 +53,7 @@ namespace ContextKit {
 		public signal void Changed (HashTable<string, Value?> values, string[] unavailable);
 	}
 
-	[DBus (name = "org.freedesktop.ContextKit.Manager")]
-	public class Manager : GLib.Object /*, DBusManager */{
+	public class Manager : GLib.Object, DBusManager {
 		int subscriber_count = 0;
 		Gee.ArrayList<Subscriber> subscribers = new Gee.ArrayList<Subscriber>();
 		// Mapping client dbus names into subscription objects related to those clients.
@@ -67,24 +66,22 @@ namespace ContextKit {
 			//plugins.add(new Location2.Plugin());
 		}
 
-		public HashTable<string, Value?> Get (string[] keys, out string[] unavailable_keys) {
-			HashTable<string, Value?> ret = new HashTable<string, Value?> (str_hash,str_equal);
+		public void Get (string[] keys, out HashTable<string, Value?> values, out string[] undeterminable_keys) {
+			values = new HashTable<string, Value?> (str_hash,str_equal);
 			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
 			  leaving a possible DOS or at least random memory leaks */
 			StringSet keyset = new StringSet.from_array (keys);
 			List<string> unavail_key_list = new List<string>();
 
 			foreach (var plugin in plugins) {
-				plugin.Get (keyset, ret, unavail_key_list);
+				plugin.Get (keyset, values, unavail_key_list);
 			}
 
 			string[] unavail = {};
 			foreach (string str in unavail_key_list) {
 				unavail += str;
 			}
-			unavailable_keys = unavail;
-
-			return ret;
+			undeterminable_keys = unavail;
 		}
 
 		public DBus.ObjectPath GetSubscriber (DBus.BusName name) throws DBus.Error {
