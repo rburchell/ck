@@ -56,7 +56,7 @@ namespace ContextKit {
 		int subscriber_count = 0;
 		Gee.ArrayList<Subscriber> subscribers = new Gee.ArrayList<Subscriber>();
 		// Mapping client dbus names into subscription objects related to those clients.
-		Gee.HashMap<int64, Subscriber> subscriber_addresses = new Gee.HashMap<int, Subscriber>(); // FIXME: This ok? weak?
+		Gee.HashMap<string, Subscriber> subscriber_addresses = new Gee.HashMap<string, Subscriber>(str_hash, str_equal); // FIXME: This ok? weak?
 		internal Gee.ArrayList<Plugin> plugins;
 
 		public Manager() {
@@ -97,7 +97,7 @@ namespace ContextKit {
 			
 			// Store information about this newly created subscription object
 			subscribers.add (s);
-			subscriber_addresses.set (dbus_address_to_int(name), s); // Track the dbus address
+			subscriber_addresses.set (name, s); // Track the dbus address
 			// Return the object path of the subscription object to the client
 			connection.register_object ((string) s.object_path, s);
 			return s.object_path;
@@ -111,29 +111,14 @@ namespace ContextKit {
 			debug(name);
 			debug(old_owner);
 			debug(new_owner);
-			
-			int64 temp = dbus_address_to_int(name);
-			if (subscriber_addresses.contains (temp) && new_owner == "") {
+
+			if (subscriber_addresses.contains (name) && new_owner == "") {
 				debug ("Client died");
-				
+
 				// FIXME: Tell the corresponding subscriber to destroy itself
-				subscriber_addresses.remove (temp);
+				subscriber_addresses.remove (name);
 			}
 		}
-		
-		/*
-		Convert a dbus address to a corresponding integer (for storing the addresses as ints).
-		E.g., :1.56 -> 156.
-		
-		Not using Quark because not wanting to introduce addition of a string-to-remember for each subscriber.
-		*/
-		private int64 dbus_address_to_int(string name) {
-			int64 result = 0;
-			string name2 = name.replace(":", "");
-			name2 = name2.replace(".", "");
-			result = name2.to_int64();
-			//debug ("name %s is int %d", name2, (int)result);
-			return result;
-		}
+
 	}
 }
