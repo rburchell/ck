@@ -8,7 +8,7 @@ namespace ContextKit {
 	}
 
 	public interface Plugin : GLib.Object {
-		public abstract void Get (StringSet keys, HashTable<string, TypedVariant?> ret);
+		public abstract void Get (StringSet keys, HashTable<string, Value?> ret, List<string> unavailable_keys);
 		public abstract void Subscribe (StringSet keys, ContextKit.Subscriber s);
 		public abstract Key[] Keys();
 	}

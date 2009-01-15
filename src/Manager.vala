@@ -16,27 +16,39 @@ namespace ContextKit {
 			this.subscribed_keys = new StringSet();
 		}
 
-		internal void emit_changed (HashTable<string, Value> values) {
-			Changed (values);
+		internal void emit_changed (HashTable<string, Value?> values, List<string> unavail_l) {
+			string[] unavail = {};
+
+			foreach (string str in unavail_l) {
+				unavail += str;
+			}
+
+			Changed (values, unavail);
 		}
 
-		public HashTable<string, Value> Subscribe (string[] keys, out string[] unavailable_keys) {
-			HashTable<string, Value> values = new HashTable<string, Value> (str_hash,str_equal);
+		public HashTable<string, Value?> Subscribe (string[] keys, out string[] unavailable_keys) {
+			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash,str_equal);
 			StringSet keyset = new StringSet.from_array (keys);
 			message ("Subscribe: requested %s", keyset.debug());
 			StringSet new_keys = new StringSet.difference (keyset, subscribed_keys);
 			message ("Subscribe: new keys %s", new_keys.debug());
 
+			List<string> unavail_l = new List<string>();
 			foreach (var plugin in manager.plugins) {
 				plugin.Subscribe (new_keys, this);
-				plugin.Get (keyset, values, unavailable_keys);
+				plugin.Get (keyset, values, unavail_l);
 			}
+
+			foreach (string str in unavail_l) {
+				unavailable_keys += str;
+			}
+
 			return values;
 		}
 
 		public void Unsubscribe (string[] keys) {
 		}
-		public signal void Changed (HashTable<string, Value> values);
+		public signal void Changed (HashTable<string, Value?> values, string[] unavailable);
 	}
 
 	[DBus (name = "org.freedesktop.ContextKit.Manager")]
@@ -44,7 +56,7 @@ namespace ContextKit {
 		int subscriber_count = 0;
 		Gee.ArrayList<Subscriber> subscribers = new Gee.ArrayList<Subscriber>();
 		// Mapping client dbus names into subscription objects related to those clients.
-		Gee.HashMap<int, Subscriber> subscriber_addresses = new Gee.HashMap<int, Subscriber>(); // FIXME: This ok? weak?
+		Gee.HashMap<int64, Subscriber> subscriber_addresses = new Gee.HashMap<int, Subscriber>(); // FIXME: This ok? weak?
 		internal Gee.ArrayList<Plugin> plugins;
 
 		public Manager() {
@@ -53,14 +65,19 @@ namespace ContextKit {
 			//plugins.add(new Location2.Plugin());
 		}
 
-		public HashTable<string, Value> Get (string[] keys, out string[] unavailable_keys) {
-			HashTable<string, Value > ret = new HashTable<string, Value> (str_hash,str_equal);
+		public HashTable<string, Value?> Get (string[] keys, out string[] unavailable_keys) {
+			HashTable<string, Value > ret = new HashTable<string, Value?> (str_hash,str_equal);
 			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
 			  leaving a possible DOS or at least random memory leaks */
 			StringSet keyset = new StringSet.from_array (keys);
+			List<string> unavail_key_list = new List<string>();
 
 			foreach (var plugin in plugins) {
-				plugin.Get (keyset, ret, unavailable_keys);
+				plugin.Get (keyset, ret, unavail_key_list);
+			}
+
+			foreach (string str in unavail_key_list) {
+				unavailable_keys += str;
 			}
 			return ret;
 		}
@@ -90,12 +107,12 @@ namespace ContextKit {
 		Listen to subscribers exiting.
 		*/
 		internal void on_name_owner_changed (DBus.Object sender, string name, string old_owner, string new_owner) {
-			//debug("Got a NameOwnerChanged signal");
-			//debug(name);
-			//debug(old_owner);
-			//debug(new_owner);
+			debug("Got a NameOwnerChanged signal");
+			debug(name);
+			debug(old_owner);
+			debug(new_owner);
 			
-			int temp = dbus_address_to_int(name);
+			int64 temp = dbus_address_to_int(name);
 			if (subscriber_addresses.contains (temp) && new_owner == "") {
 				debug ("Client died");
 				
@@ -110,13 +127,13 @@ namespace ContextKit {
 		
 		Not using Quark because not wanting to introduce addition of a string-to-remember for each subscriber.
 		*/
-		private int dbus_address_to_int(string name) {
+		private int64 dbus_address_to_int(string name) {
 			int64 result = 0;
 			string name2 = name.replace(":", "");
 			name2 = name2.replace(".", "");
 			result = name2.to_int64();
 			//debug ("name %s is int %d", name2, (int)result);
-			return (int)result;
+			return result;
 		}
 	}
 }
