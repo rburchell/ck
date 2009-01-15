@@ -2,9 +2,7 @@ using GLib;
 
 namespace ContextKit {
 
-	/*TODO: use an interface so all the methods aren't bus-accessible...*/
-	[DBus (name = "org.freedesktop.ContextKit.Subscriber")]
-	public class Subscriber : GLib.Object {
+	public class Subscriber : GLib.Object, DBusSubscriber {
 		Manager manager;
 		internal DBus.ObjectPath object_path {get; set;}
 		StringSet subscribed_keys;
@@ -26,8 +24,8 @@ namespace ContextKit {
 			Changed (values, unavail);
 		}
 
-		public HashTable<string, Value?> Subscribe (string[] keys, out string[] unavailable_keys) {
-			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash,str_equal);
+		public void Subscribe (string[] keys, out HashTable<string, Value?> values, out string[] undeterminable_keys) {
+			values = new HashTable<string, Value?> (str_hash,str_equal);
 			StringSet keyset = new StringSet.from_array (keys);
 			message ("Subscribe: requested %s", keyset.debug());
 			StringSet new_keys = new StringSet.difference (keyset, subscribed_keys);
@@ -44,13 +42,13 @@ namespace ContextKit {
 				unavail += str;
 			}
 
-			unavailable_keys = unavail;
-			return values;
+			undeterminable_keys = unavail;
 		}
+
 
 		public void Unsubscribe (string[] keys) {
 		}
-		public signal void Changed (HashTable<string, Value?> values, string[] unavailable);
+
 	}
 
 	public class Manager : GLib.Object, DBusManager {

@@ -43,38 +43,31 @@ namespace ContextKit {
 			// Information about keys provided by this plug-in
 			const Key[] keys = {
 					{
-						key_edge_up,
-						ValueType.INTEGER
+						key_edge_up
 						// Values: Undefined (0), top (1), left (2), right (3), bottom (4)
 					},
 					{
-						key_facing_up,
-						ValueType.INTEGER
+						key_facing_up
 						// Values: Undefined (0), face up (1), back side up (2)
 					},
 					{
-						key_display_state,
-						ValueType.INTEGER
+						key_display_state
 						// Values: Off (0), on (1), dimmed (2)
 					},
 					{
-						key_profile_name,
-						ValueType.STRING
+						key_profile_name
 						// Values:
 					},
 					{
-						key_is_flight_mode,
-						ValueType.TRUTH
+						key_is_flight_mode
 						// Values: TRUE (flight mode), FALSE (normal mode)
 					},
 					{
-						key_is_emergency_mode,
-						ValueType.TRUTH
+						key_is_emergency_mode
 						// Values: TRUE (emergency call in progress), FALSE (otherwise)
 					},
 					{
-						key_in_active_use,
-						ValueType.TRUTH
+						key_in_active_use
 						// Values: TRUE (device active), FALSE (device inactive)
 					}
 				};

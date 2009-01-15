@@ -4,7 +4,6 @@ namespace ContextKit {
 
 	public struct Key {
 		public string name;
-		public ValueType type;
 	}
 
 	public interface Plugin : GLib.Object {
