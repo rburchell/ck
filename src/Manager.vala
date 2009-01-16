@@ -5,13 +5,30 @@ namespace ContextKit {
 	public class Subscriber : GLib.Object, DBusSubscriber {
 		Manager manager;
 		internal DBus.ObjectPath object_path {get; set;}
+		
+		// Keys subscribed to by this subscriber
 		StringSet subscribed_keys;
+		
+		// The number of subscribers for each key (over all subscriber objects)
+		static Gee.HashMap<string, int> no_of_subcribers;
 
 		internal Subscriber (Manager manager, int id) {
 			string path = "/org/freedesktop/ContextKit/Subscribers/%d".printf (id);
 			this.object_path = new DBus.ObjectPath (path);
 			this.manager = manager;
 			this.subscribed_keys = new StringSet();
+		}
+		
+		~Subscriber () {
+			debug("Subscriber %s destroying itself", object_path);
+			
+			// Unsubscribe all the keys currently subscribed to
+			
+			/* Decrease the (global) subscriber count for the keys */
+			decrease_subscriber_count (subscribed_keys);
+			
+			subscribed_keys.clear();
+			
 		}
 
 		internal void emit_changed (HashTable<string, Value?> values, List<string> unavail_l) {
@@ -30,6 +47,10 @@ namespace ContextKit {
 			message ("Subscribe: requested %s", keyset.debug());
 			StringSet new_keys = new StringSet.difference (keyset, subscribed_keys);
 			message ("Subscribe: new keys %s", new_keys.debug());
+			
+			/* Track the subscriber count of the keys. Ignore the keys which are
+			already subscribed to. */
+			increase_subscriber_count(new_keys);
 
 			List<string> unavail_l = new List<string>();
 			foreach (var plugin in manager.plugins) {
@@ -41,22 +62,83 @@ namespace ContextKit {
 			foreach (string str in unavail_l) {
 				unavail += str;
 			}
-
+			
 			undeterminable_keys = unavail;
 		}
 
 
 		public void Unsubscribe (string[] keys) {
+		
+			/* Ignore keys which are not subscribed to*/
+			StringSet keyset = new StringSet.from_array (keys);
+			StringSet decreasing_keys = new StringSet.intersection (keyset, subscribed_keys);
+			
+			/* Decrease the (global) subscriber count for the keys */
+			decrease_subscriber_count (decreasing_keys);
+			
+			/* Track the keys which are currently subscribed to (with this subscriber) */
+			subscribed_keys = new StringSet.difference (subscribed_keys, decreasing_keys);
+			
+			// FIXME: Other actions needed?
 		}
 
+		//public signal void Changed (HashTable<string, Value?> values, string[] unavailable);
+		
+		
+		/* Record the subscriber count for each key. */
+		private static void increase_subscriber_count(StringSet keys) {
+			// FIXME: Mutex?
+			/*foreach (var key in keys) {
+				if (no_of_subscribers.contains (key)) {
+					int old_value = no_of_subscribers.get (key);
+					no_of_subscribers.set (key, old_value + 1);
+					
+					if (old_value == 0) {
+						// FIXME: Emit the firstSubscriber signal / call the callback
+					}
+				}
+				else {
+					no_of_subscribers.set (key, 1);
+					// FIXME: Emit the firstSubscriber signal / call the callback
+				}
+			}*/
+			// FIXME: Iterating a StringSet doesn't yet work?
+			// FIXME: Do we need to care about which keys are subscribed to? What if the keys are something not provided by this provider?
+		}
+		
+		private static void decrease_subscriber_count(StringSet keys) {
+			// FIXME: Mutex?
+			/*foreach (var key in keys) {
+				if (no_of_subscribers.contains (key)) {
+					int old_value = no_of_subscribers.get (key);
+					
+					if (old_value >= 1) {
+						// Do not store negative values
+						no_of_subscribers.set (key, old_value - 1);
+					}
+					
+					if (old_value <= 1) {
+						// FIXME: Emit the lastSubscriber signal / call the callback
+					}
+				}
+				else {
+					// This should not happen
+				}
+			}*/
+			// FIXME: Iterating a StringSet doesn't yet work?
+		}
 	}
 
 	public class Manager : GLib.Object, DBusManager {
 		int subscriber_count = 0;
-		Gee.ArrayList<Subscriber> subscribers = new Gee.ArrayList<Subscriber>();
+
+		// Stored subscriber objects
+		Gee.HashSet<Subscriber> subscribers = new Gee.HashSet<Subscriber>();
+		
 		// Mapping client dbus names into subscription objects related to those clients.
 		Gee.HashMap<string, Subscriber> subscriber_addresses = new Gee.HashMap<string, Subscriber>(str_hash, str_equal); // FIXME: This ok? weak?
 		internal Gee.ArrayList<Plugin> plugins;
+		
 
 		public Manager() {
 			plugins = new Gee.ArrayList<Plugin>();
@@ -83,8 +165,17 @@ namespace ContextKit {
 		}
 
 		public DBus.ObjectPath GetSubscriber (DBus.BusName name) throws DBus.Error {
-			//todo, check requesting bus name. the subscription object should be a singleton
-			//for each bus name.
+			
+			/* First check if the same client has already requested a subscriber object.
+			If so, return its object path. */
+			
+			if (subscriber_addresses. contains(name)) {
+				Subscriber s = subscriber_addresses.get (name);
+				return s.object_path;
+			}
+			
+			/* Else, create a new subscriber and return its object path.
+			*/
 
 			var connection = DBus.Bus.get (DBus.BusType.SESSION);
 
@@ -98,6 +189,7 @@ namespace ContextKit {
 			// Store information about this newly created subscription object
 			subscribers.add (s);
 			subscriber_addresses.set (name, s); // Track the dbus address
+			
 			// Return the object path of the subscription object to the client
 			connection.register_object ((string) s.object_path, s);
 			return s.object_path;
@@ -115,8 +207,13 @@ namespace ContextKit {
 			if (subscriber_addresses.contains (name) && new_owner == "") {
 				debug ("Client died");
 
-				// FIXME: Tell the corresponding subscriber to destroy itself
+				// Remove the subscriber
+				Subscriber s = subscriber_addresses.get (name);
+				subscribers. remove(s);
+				
 				subscriber_addresses.remove (name);
+				
+				// Now nobody holds a pointer to the subscriber so it should be destroyed automatically.
 			}
 		}
 
