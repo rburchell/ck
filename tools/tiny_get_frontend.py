@@ -7,10 +7,19 @@ def execute_get(property_names):
 	try:
 		object  = bus.get_object("org.freedesktop.ContextKit","/org/freedesktop/ContextKit/Manager")
 		iface = dbus.Interface(object,"org.freedesktop.ContextKit.Manager")
+		
 		ret = iface.Get(property_names)
-		print "The keys are:", ret.keys()
-		for name in ret.keys(): 
-			print "Property:", name, ", value:", ret[name]
+		print "Returned:", ret
+		
+		properties = ret[0]
+		undetermined = ret[1]
+		
+		print "Properties and their values:"
+		for name in properties.keys(): 
+			print "Property:", name, ", value:", properties[name]
+		
+		print "Undetermined properties:"
+		print undetermined
 	except dbus.DBusException:
 		print "Caught an exception"
 		traceback.print_exc()
