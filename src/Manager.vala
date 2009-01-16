@@ -133,7 +133,7 @@ namespace ContextKit {
 		/* Is called when the value of a property changes */
 		internal void on_value_changed(HashTable<string, Value?> properties) {
 			HashTable<string, Value?> values_to_send = new HashTable<string, Value?>(str_hash, str_equal);
-			GLib.List<string> undetermined_to_send = new GLib.List<string>();
+			GLib.List<string> undeterminable_keys = new GLib.List<string>();
 		
 			GLib.List<string> keys = properties.get_keys ();
 			foreach (var key in keys) {
@@ -142,7 +142,7 @@ namespace ContextKit {
 					Value? v = properties.lookup (key);
 					
 					if (v == null) {
-						undetermined_to_send.append (key);
+						undeterminable_keys.append (key);
 					}
 					else {
 						values_to_send.insert (key, v);
@@ -151,8 +151,8 @@ namespace ContextKit {
 			}
 		
 			// Check if we have something to send to the client
-			if (values_to_send.size () > 0 || undetermined_to_send.length () > 0) {
-				emit_changed (values_to_send, undetermined_to_send);
+			if (values_to_send.size () > 0 || undeterminable_keys.length () > 0) {
+				emit_changed (values_to_send, undeterminable_keys);
 			}
 		}
 	}
@@ -179,15 +179,37 @@ namespace ContextKit {
 			//plugins.add(new Location2.Plugin());
 		}
 
-		public void Get (string[] keys, out HashTable<string, Value?> values, out string[] undeterminable_keys) {
-			values = new HashTable<string, Value?> (str_hash,str_equal);
+		public void Get (string[] keys, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
+			values_to_send = new HashTable<string, Value?> (str_hash,str_equal);
+			string [] undeterminable_keys_temp = {}; // Note: Vala doesn't support += for parameters yet
 			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
 			  leaving a possible DOS or at least random memory leaks */
 			
+			// FIXME: Note: this is a draft of the new functionality
+			
+			/*
 			// Give the provider an opportunity to update the values
 			// FIXME: Call the callback (& update the value table)
+			HashTable<string, Value?> properties = new HashTable<string, Value?>(str_hash,str_equal);
+			//get_properties_cb(properties);
+			property_values_changed(properties); // Updates the value table
 			
-			// FIXME: Then read the values from the value table
+			
+			// Then read the values from the value table
+			foreach (var key in keys) {
+				Value? v = values.lookup (key);
+
+				if (v == null) {
+					undeterminable_keys_temp += key;
+				}
+				else {
+					values_to_send.insert (key, v);
+				}
+			}
+			undeterminable_keys = undeterminable_keys_temp;
+			*/
+			
+			// Here is the old, plugin-type functionality:
 			
 			StringSet keyset = new StringSet.from_array (keys);
 			List<string> unavail_key_list = new List<string>();
