@@ -81,9 +81,6 @@ namespace ContextKit {
 			
 			// FIXME: Other actions needed?
 		}
-
-		//public signal void Changed (HashTable<string, Value?> values, string[] unavailable);
-		
 		
 		/* Record the subscriber count for each key. */
 		private static void increase_subscriber_count(StringSet keys) {
