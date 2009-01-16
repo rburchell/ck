@@ -8,9 +8,9 @@ namespace ContextKit {
 		
 		// Keys subscribed to by this subscriber
 		StringSet subscribed_keys;
-		
+
 		// The number of subscribers for each key (over all subscriber objects)
-		static Gee.HashMap<string, int> no_of_subcribers;
+		static Gee.HashMap<string, int> no_of_subscribers = new Gee.HashMap<string, int>(str_hash, str_equal);
 
 		internal Subscriber (Manager manager, int id) {
 			string path = "/org/freedesktop/ContextKit/Subscribers/%d".printf (id);
@@ -25,7 +25,7 @@ namespace ContextKit {
 			// Unsubscribe all the keys currently subscribed to
 			
 			/* Decrease the (global) subscriber count for the keys */
-			decrease_subscriber_count (subscribed_keys);
+			decrease_subscriber_count (subscribed_keys.to_array());
 			
 			subscribed_keys.clear();
 			
@@ -50,7 +50,9 @@ namespace ContextKit {
 			
 			/* Track the subscriber count of the keys. Ignore the keys which are
 			already subscribed to. */
-			increase_subscriber_count(new_keys);
+			increase_subscriber_count(new_keys.to_array());
+			
+			subscribed_keys = new StringSet.union(subscribed_keys, new_keys);
 
 			List<string> unavail_l = new List<string>();
 			foreach (var plugin in manager.plugins) {
@@ -74,7 +76,7 @@ namespace ContextKit {
 			StringSet decreasing_keys = new StringSet.intersection (keyset, subscribed_keys);
 			
 			/* Decrease the (global) subscriber count for the keys */
-			decrease_subscriber_count (decreasing_keys);
+			decrease_subscriber_count (decreasing_keys.to_array());
 			
 			/* Track the keys which are currently subscribed to (with this subscriber) */
 			subscribed_keys = new StringSet.difference (subscribed_keys, decreasing_keys);
@@ -83,9 +85,9 @@ namespace ContextKit {
 		}
 		
 		/* Record the subscriber count for each key. */
-		private static void increase_subscriber_count(StringSet keys) {
+		private static void increase_subscriber_count(Gee.ArrayList<string> keys) {
 			// FIXME: Mutex?
-			/*foreach (var key in keys) {
+			foreach (var key in keys) {
 				if (no_of_subscribers.contains (key)) {
 					int old_value = no_of_subscribers.get (key);
 					no_of_subscribers.set (key, old_value + 1);
@@ -93,19 +95,22 @@ namespace ContextKit {
 					if (old_value == 0) {
 						// FIXME: Emit the firstSubscriber signal / call the callback
 					}
+					
+					debug ("Subscriber count of %s is now %d", key, old_value + 1);
 				}
 				else {
 					no_of_subscribers.set (key, 1);
 					// FIXME: Emit the firstSubscriber signal / call the callback
+					
+					debug ("Subscriber count of %s is now %d", key, 1);
 				}
-			}*/
-			// FIXME: Iterating a StringSet doesn't yet work?
+			}
 			// FIXME: Do we need to care about which keys are subscribed to? What if the keys are something not provided by this provider?
 		}
 		
-		private static void decrease_subscriber_count(StringSet keys) {
+		private static void decrease_subscriber_count(Gee.ArrayList<string> keys) {
 			// FIXME: Mutex?
-			/*foreach (var key in keys) {
+			foreach (var key in keys) {
 				if (no_of_subscribers.contains (key)) {
 					int old_value = no_of_subscribers.get (key);
 					
@@ -117,12 +122,13 @@ namespace ContextKit {
 					if (old_value <= 1) {
 						// FIXME: Emit the lastSubscriber signal / call the callback
 					}
+					debug ("Subscriber count of %s is now %d", key, old_value - 1);
 				}
 				else {
 					// This should not happen
+					debug ("Error: decreasing the subscriber count of an unknown key.");
 				}
-			}*/
-			// FIXME: Iterating a StringSet doesn't yet work?
+			}
 		}
 	}
 
@@ -210,7 +216,7 @@ namespace ContextKit {
 				
 				subscriber_addresses.remove (name);
 				
-				// Now nobody holds a pointer to the subscriber so it should be destroyed automatically.
+				// Now nobody holds a pointer to the subscriber so it is destroyed automatically.
 			}
 		}
 
