@@ -11,7 +11,7 @@ namespace ContextKit {
 
 		// The number of subscribers for each key (over all subscriber objects)
 		static Gee.HashMap<string, int> no_of_subscribers = new Gee.HashMap<string, int>(str_hash, str_equal);
-
+		
 		internal Subscriber (Manager manager, int id) {
 			string path = "/org/freedesktop/ContextKit/Subscribers/%d".printf (id);
 			this.object_path = new DBus.ObjectPath (path);
@@ -20,11 +20,11 @@ namespace ContextKit {
 		}
 		
 		~Subscriber () {
-			debug("Subscriber %s destroying itself", object_path);
+			debug ("Subscriber %s destroying itself", object_path);
 			
 			// Unsubscribe all the keys currently subscribed to
 			
-			/* Decrease the (global) subscriber count for the keys */
+			// Decrease the (global) subscriber count for the keys
 			decrease_subscriber_count (subscribed_keys.to_array());
 			
 			subscribed_keys.clear();
@@ -67,7 +67,6 @@ namespace ContextKit {
 			
 			undeterminable_keys = unavail;
 		}
-
 
 		public void Unsubscribe (string[] keys) {
 		
@@ -130,6 +129,32 @@ namespace ContextKit {
 				}
 			}
 		}
+		
+		/* Is called when the value of a property changes */
+		internal void on_value_changed(HashTable<string, Value?> properties) {
+			HashTable<string, Value?> values_to_send = new HashTable<string, Value?>(str_hash, str_equal);
+			GLib.List<string> undetermined_to_send = new GLib.List<string>();
+		
+			GLib.List<string> keys = properties.get_keys ();
+			foreach (var key in keys) {
+				if (subscribed_keys.is_member (key)) {
+					// The client of this subscriber is interested in the key
+					Value? v = properties.lookup (key);
+					
+					if (v == null) {
+						undetermined_to_send.append (key);
+					}
+					else {
+						values_to_send.insert (key, v);
+					}
+				}
+			}
+		
+			// Check if we have something to send to the client
+			if (values_to_send.size () > 0 || undetermined_to_send.length () > 0) {
+				emit_changed (values_to_send, undetermined_to_send);
+			}
+		}
 	}
 
 	public class Manager : GLib.Object, DBusManager {
@@ -139,7 +164,12 @@ namespace ContextKit {
 		Gee.HashSet<Subscriber> subscribers = new Gee.HashSet<Subscriber>();
 		
 		// Mapping client dbus names into subscription objects related to those clients.
-		Gee.HashMap<string, Subscriber> subscriber_addresses = new Gee.HashMap<string, Subscriber>(str_hash, str_equal); // FIXME: This ok? weak?
+		Gee.HashMap<string, Subscriber> subscriber_addresses = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
+		
+		// The value table holding the values of the keys
+		// NULL value means undetermined
+		static HashTable<string, Value?> values = new HashTable<string, Value?>(str_hash, str_equal);
+		
 		internal Gee.ArrayList<Plugin> plugins;
 		
 
@@ -153,6 +183,12 @@ namespace ContextKit {
 			values = new HashTable<string, Value?> (str_hash,str_equal);
 			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
 			  leaving a possible DOS or at least random memory leaks */
+			
+			// Give the provider an opportunity to update the values
+			// FIXME: Call the callback (& update the value table)
+			
+			// FIXME: Then read the values from the value table
+			
 			StringSet keyset = new StringSet.from_array (keys);
 			List<string> unavail_key_list = new List<string>();
 
@@ -192,6 +228,7 @@ namespace ContextKit {
 			// Store information about this newly created subscription object
 			subscribers.add (s);
 			subscriber_addresses.set (name, s); // Track the dbus address
+			// FIXME: Connect the on_property_changed signal
 			
 			// Return the object path of the subscription object to the client
 			connection.register_object ((string) s.object_path, s);
@@ -217,6 +254,23 @@ namespace ContextKit {
 				subscriber_addresses.remove (name);
 				
 				// Now nobody holds a pointer to the subscriber so it is destroyed automatically.
+			}
+		}
+		
+		/* Is called by the provider to set new values to context properties */
+		public void property_values_changed(HashTable<string, Value?> properties) {
+			// Update the value table
+			GLib.List<string> keys = properties.get_keys ();
+			foreach (var key in keys) {
+				// Overwrite the value in the value table.
+				// Do not care whether it was already there or not.
+				
+				values.insert (key, properties.lookup (key));
+			}
+			
+			// Inform the subscribers of the change
+			foreach (var s in subscribers) {
+				s.on_value_changed(properties);
 			}
 		}
 
