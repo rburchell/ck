@@ -66,7 +66,7 @@ namespace ContextKit {
 			manager.Get (keys, out values, out undeterminable_keys);
 
 			// Here is the old plugin-type implementation
-			values = new HashTable<string, Value?> (str_hash,str_equal);
+			/*values = new HashTable<string, Value?> (str_hash,str_equal);
 			List<string> unavail_l = new List<string>();
 			foreach (var plugin in manager.plugins) {
 				plugin.Subscribe (new_keys, this);
@@ -78,7 +78,8 @@ namespace ContextKit {
 				unavail += str;
 			}
 
-			undeterminable_keys = unavail;
+			undeterminable_keys = unavail;*/
+			//debug ("Subscribe done");
 		}
 
 		public void Unsubscribe (string[] keys) {
@@ -218,34 +219,34 @@ namespace ContextKit {
 		}
 
 		public void Get (string[] keys, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
-			values_to_send = new HashTable<string, Value?> (str_hash,str_equal);
+			debug ("Manager.Get");
+			//values_to_send = new HashTable<string, Value?> (str_hash,str_equal);
+			//undeterminable_keys = {};
 
 			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
 			  leaving a possible DOS or at least random memory leaks */
 
 			// FIXME: Note: this is a draft of the new functionality
 
-			/*
-			// Give the provider an opportunity to update the values
-			// FIXME: Call the callback
-			HashTable<string, Value?> properties = new HashTable<string, Value?>(str_hash,str_equal);
-
-			foreach (plugin in plugin_pointers) {
-				HashTable<string, Value?> values = new HashTable<string, Value?>();
-				string[] undeterminable_keys = {};
+			
+			// Give the providers / plugins an opportunity to update the values
+			foreach (var plugin in plugin_pointers) {
+				HashTable<string, Value?> values_temp = new HashTable<string, Value?>(str_hash, str_equal);
+				string[] undeterminable_keys_temp = {};
 				// Give the plugin an opportunity to update the Get'ted values
 				// ... and other values, if wanted
-				plugin.get_cb (properties, values, undeterminable_keys);
+				debug("Calling the cb function");
+				plugin.get_cb (keys, ref values_temp, ref undeterminable_keys_temp);
 				// Update the value table
-				insert_to_value_table (values, undeterminable_keys);
+				insert_to_value_table (values_temp, undeterminable_keys_temp);
 			}
 
 			// Then read the values from the value table
-			read_from_value_table(keys, values_to_send, undeterminable_keys);
-			*/
+			read_from_value_table(keys, out values_to_send, out undeterminable_keys);
+			
 
 			// Here is the old, plugin-type functionality:
-
+/*
 			StringSet keyset = new StringSet.from_array (keys);
 			List<string> unavail_key_list = new List<string>();
 
@@ -257,7 +258,7 @@ namespace ContextKit {
 			foreach (string str in unavail_key_list) {
 				unavail += str;
 			}
-			undeterminable_keys = unavail;
+			undeterminable_keys = unavail;*/
 		}
 
 		public DBus.ObjectPath GetSubscriber (DBus.BusName name) throws DBus.Error {
@@ -298,7 +299,7 @@ namespace ContextKit {
 		
 		internal void last_unsubscribed(string[] keys) {
 			foreach (var plugin in plugin_pointers) {
-				plugin.first_subscribed_cb (keys);
+				plugin.last_unsubscribed_cb (keys);
 			}
 		}
 
@@ -327,22 +328,29 @@ namespace ContextKit {
 		/*
 		Update the value table with new values.
 		*/
-		public void insert_to_value_table(HashTable<string, Value?> properties) {
+		public void insert_to_value_table(HashTable<string, Value?> properties, string[] undeterminable_keys) {
+			//debug ("insert_to_value_table");
 			GLib.List<string> keys = properties.get_keys ();
 			foreach (var key in keys) {
 				// Overwrite the value in the value table.
 				// Do not care whether it was already there or not.
 				values.insert (key, properties.lookup (key));
 			}
+			foreach (var key in undeterminable_keys) {
+				values.insert (key, null);
+			}
 		}
 
 		/*
 		Read the values of the specified keys from the value table.
 		*/
-		public void read_from_value_table(string[] keys, ref HashTable<string, Value?> properties, ref string[] undeterminable_keys) {
+		public void read_from_value_table(string[] keys, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
+			debug ("read_from_value_table");
 			// Note: Vala doesn't support += for parameters yet; using a temp array
-			string [] undeterminable_keys_temp = {}; 
+			properties = new HashTable<string, Value?>(str_hash, str_equal);
+			string[] undeterminable_keys_temp = {}; 
 			foreach (var key in keys) {
+				//debug ("reading value for key %s", key);
 				Value? v = values.lookup (key);
 
 				if (v == null) {
@@ -353,12 +361,13 @@ namespace ContextKit {
 				}
 			}
 			undeterminable_keys = undeterminable_keys_temp;
+			debug ("read_from_value_table done");
 		}
 
 		/* Is called when the provider sets new values to context properties */
 		public void property_values_changed(HashTable<string, Value?> properties) {
 			// Update the value table
-			insert_to_value_table(properties);
+			insert_to_value_table(properties, {});
 
 			// Inform the subscribers of the change
 			foreach (var s in subscribers) {
