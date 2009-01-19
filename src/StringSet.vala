@@ -1,5 +1,23 @@
 namespace ContextKit {
 
+	public class StringSetIter {
+		StringSet parent;
+		IntSetIter iter;
+
+		internal StringSetIter (StringSet parent) {
+			this.parent = parent;
+			this.iter = new IntSetIter();
+			this.iter.element = -1;
+			this.iter.set = parent.intset;
+		}
+		public bool next() {
+			return iter.next();
+		}
+		public string get() {
+			return ((Quark) iter.element).to_string();
+		}
+
+	}
 
 	/* TODO:
 	   we should have a way of statically initialising any keys that may be used in a stringset
@@ -11,7 +29,7 @@ namespace ContextKit {
 	  as intersection and union.
 	 */
 	public class StringSet {
-		IntSet intset;
+		internal IntSet intset;
 
 		StringSet.from_intset (IntSet #i) {
 			intset = #i;
@@ -89,6 +107,11 @@ namespace ContextKit {
 
 		public uint size () {
 			return intset.size();
+		}
+
+		public StringSetIter iterator () {
+			StringSetIter iter = new StringSetIter(this);
+			return iter;
 		}
 
 		public Gee.ArrayList<string> to_array () {
