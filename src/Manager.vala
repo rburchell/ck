@@ -181,7 +181,7 @@ namespace ContextKit {
 
 		public void Get (string[] keys, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
 			values_to_send = new HashTable<string, Value?> (str_hash,str_equal);
-			string [] undeterminable_keys_temp = {}; // Note: Vala doesn't support += for parameters yet
+			
 			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
 			  leaving a possible DOS or at least random memory leaks */
 			
@@ -192,21 +192,12 @@ namespace ContextKit {
 			// FIXME: Call the callback (& update the value table)
 			HashTable<string, Value?> properties = new HashTable<string, Value?>(str_hash,str_equal);
 			//get_properties_cb(properties);
-			property_values_changed(properties); // Updates the value table
 			
+			// Update the value table
+			insert_to_value_table(properties);
 			
 			// Then read the values from the value table
-			foreach (var key in keys) {
-				Value? v = values.lookup (key);
-
-				if (v == null) {
-					undeterminable_keys_temp += key;
-				}
-				else {
-					values_to_send.insert (key, v);
-				}
-			}
-			undeterminable_keys = undeterminable_keys_temp;
+			read_from_value_table(keys, values_to_send, undeterminable_keys);
 			*/
 			
 			// Here is the old, plugin-type functionality:
@@ -253,7 +244,8 @@ namespace ContextKit {
 			// FIXME: Connect the on_property_changed signal
 			
 			// Return the object path of the subscription object to the client
-			connection.register_object ((string) s.object_path, s);
+			connection.register_object ((string) s.object_path, s);			
+			
 			return s.object_path;
 		}
 		
@@ -279,9 +271,10 @@ namespace ContextKit {
 			}
 		}
 		
-		/* Is called by the provider to set new values to context properties */
-		public void property_values_changed(HashTable<string, Value?> properties) {
-			// Update the value table
+		/*
+		Update the value table with new values.
+		*/
+		public void insert_to_value_table(HashTable<string, Value?> properties) {
 			GLib.List<string> keys = properties.get_keys ();
 			foreach (var key in keys) {
 				// Overwrite the value in the value table.
@@ -289,12 +282,36 @@ namespace ContextKit {
 				
 				values.insert (key, properties.lookup (key));
 			}
+		}
+		
+		/*
+		Read the values of the specified keys from the value table.
+		*/
+		public void read_from_value_table(string[] keys, ref HashTable<string, Value?> properties, ref string[] undeterminable_keys) {
+			string [] undeterminable_keys_temp = {}; // Note: Vala doesn't support += for parameters yet
+			
+			foreach (var key in keys) {
+				Value? v = values.lookup (key);
+
+				if (v == null) {
+					undeterminable_keys_temp += key;
+				}
+				else {
+					properties.insert (key, v);
+				}
+			}
+			undeterminable_keys = undeterminable_keys_temp;
+		}
+		
+		/* Is called when the provider sets new values to context properties */
+		public void property_values_changed(HashTable<string, Value?> properties) {
+			// Update the value table
+			insert_to_value_table(properties);
 			
 			// Inform the subscribers of the change
 			foreach (var s in subscribers) {
 				s.on_value_changed(properties);
 			}
 		}
-
 	}
 }
