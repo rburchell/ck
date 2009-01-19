@@ -10,14 +10,14 @@ namespace ContextKit {
 			public int z;
 		}
 
-		public class Plugin : GLib.Object, ContextKit.Plugin {
+		public class Provider : GLib.Object, ContextKit.Provider {
 
 			// Sets of subscribers
-			PluginMixins.SubscriberList orientation_subscribed;
-			PluginMixins.SubscriberList display_status_subscribed;
-			PluginMixins.SubscriberList device_mode_subscribed;
-			PluginMixins.SubscriberList call_state_subscribed;
-			PluginMixins.SubscriberList inactivity_status_subscribed;
+			ProviderMixins.SubscriberList orientation_subscribed;
+			ProviderMixins.SubscriberList display_status_subscribed;
+			ProviderMixins.SubscriberList device_mode_subscribed;
+			ProviderMixins.SubscriberList call_state_subscribed;
+			ProviderMixins.SubscriberList inactivity_status_subscribed;
 
 			// Objects for connecting to MCE
 			DBus.Connection conn;
@@ -113,7 +113,7 @@ namespace ContextKit {
 				try {
 					mce_request.get_device_orientation(out orientation.rotation, out orientation.stand, out orientation.facing, out orientation.x, out orientation.y, out orientation.z);
 				} catch (GLib.Error ex) {
-					stdout.printf("MCE Plugin Error: %s\n", ex.message);
+					stdout.printf("MCE Provider Error: %s\n", ex.message);
 					error_for_subset (keys, ret, ref unavail, orientation_keys);
 					return;
 				}
@@ -137,7 +137,7 @@ namespace ContextKit {
 				try {
 					mce_request.get_display_status(out display_status);
 				} catch (GLib.Error ex) {
-					stdout.printf("MCE Plugin Error: %s\n", ex.message);
+					stdout.printf("MCE Provider Error: %s\n", ex.message);
 					error_for_subset (keys, ret, ref unavail, display_status_keys);
 					return;
 				}
@@ -161,7 +161,7 @@ namespace ContextKit {
 				try {
 					mce_request.get_device_mode(out device_mode);
 				} catch (GLib.Error ex) {
-					stdout.printf("MCE Plugin Error: %s\n", ex.message);
+					stdout.printf("MCE Provider Error: %s\n", ex.message);
 					error_for_subset (keys, ret, ref unavail, device_mode_keys);
 					return;
 				}
@@ -185,7 +185,7 @@ namespace ContextKit {
 				try {
 					mce_request.get_call_state(out state, out type);
 				} catch (GLib.Error ex) {
-					stdout.printf("MCE Plugin Error: %s\n", ex.message);
+					stdout.printf("MCE Provider Error: %s\n", ex.message);
 					error_for_subset (keys, ret, ref unavail, call_state_keys);
 					return;
 				}
@@ -208,7 +208,7 @@ namespace ContextKit {
 				try {
 					mce_request.get_inactivity_status(out status);
 				} catch (GLib.Error ex) {
-					stdout.printf("MCE Plugin Error: %s\n", ex.message);
+					stdout.printf("MCE Provider Error: %s\n", ex.message);
 					error_for_subset (keys, ret, ref unavail, call_state_keys);
 					return;
 				}
@@ -403,7 +403,7 @@ namespace ContextKit {
 			/*
 			Sends the properties to the listeners intrested in them.
 			*/
-			void send_result_to_listeners(PluginMixins.SubscriberList subscribers, HashTable<string, Value?> ret, ref List<string> unavail) {
+			void send_result_to_listeners(ProviderMixins.SubscriberList subscribers, HashTable<string, Value?> ret, ref List<string> unavail) {
 				for (int i=0; i < subscribers.size; i++) {
 					weak Subscriber s = subscribers.get(i);
 					s.emit_changed(ret, unavail);
@@ -511,13 +511,13 @@ namespace ContextKit {
 			}
 
 
-			void subscription_removed (PluginMixins.SubscriberList l, Subscriber s) {
+			void subscription_removed (ProviderMixins.SubscriberList l, Subscriber s) {
 				// FIXME: The subscribed_keys has to be updated in a clever way...
 				// How do we know which keys are unsubscribed?
 				// How do we know if someone else is anyway intrested in them?
 			}
 
-			public Plugin () {
+			public Provider () {
 
 				conn = DBus.Bus.get (DBus.BusType.SYSTEM);
 				mce_request = conn.get_object ("com.nokia.mce", "/com/nokia/mce/request", "com.nokia.mce.request");
@@ -527,35 +527,35 @@ namespace ContextKit {
 						key_edge_up,
 						key_facing_up});
 
-				orientation_subscribed = new PluginMixins.SubscriberList();
+				orientation_subscribed = new ProviderMixins.SubscriberList();
 				orientation_subscribed.removed += subscription_removed;
 
 				// Data structures related to display status
 				display_status_keys = new StringSet.from_array (new string[] {
 						key_display_state});
 
-				display_status_subscribed = new PluginMixins.SubscriberList();
+				display_status_subscribed = new ProviderMixins.SubscriberList();
 				display_status_subscribed.removed += subscription_removed;
 
 				// Data structures related to device mode (normal / flight)
 				device_mode_keys = new StringSet.from_array (new string[] {
 						key_is_flight_mode});
 
-				device_mode_subscribed = new PluginMixins.SubscriberList();
+				device_mode_subscribed = new ProviderMixins.SubscriberList();
 				device_mode_subscribed.removed += subscription_removed;
 
 				// Data structures related to call state (emergency / no emergency)
 				call_state_keys = new StringSet.from_array (new string[] {
 						key_is_emergency_mode});
 
-				call_state_subscribed = new PluginMixins.SubscriberList();
+				call_state_subscribed = new ProviderMixins.SubscriberList();
 				call_state_subscribed.removed += subscription_removed;
 
 				// Data structures related to inactivity status
 				inactivity_status_keys = new StringSet.from_array (new string[] {
 						key_in_active_use});
 
-				inactivity_status_subscribed = new PluginMixins.SubscriberList();
+				inactivity_status_subscribed = new ProviderMixins.SubscriberList();
 				inactivity_status_subscribed.removed += subscription_removed;
 			}
 

@@ -6,13 +6,13 @@ namespace ContextKit {
 		public string name;
 	}
 
-	public interface Plugin : GLib.Object {
+	public interface Provider : GLib.Object {
 		public abstract void Get (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavailable_keys);
 		public abstract void KeysSubscribed (StringSet keys);
 		public abstract void KeysUnsubscribed (StringSet keys);
 	}
 
-	namespace PluginMixins {
+	namespace ProviderMixins {
 
 		/*TODO: a generalisation of this should probably be submitted for libgee*/
 		public class SubscriberList : GLib.Object {

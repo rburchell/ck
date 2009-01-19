@@ -4,12 +4,12 @@ namespace ContextKit {
 
 	public class Providers {
 		// List of providers
-		Gee.ArrayList<Plugin> providers = new Gee.ArrayList<Plugin> ();
+		Gee.ArrayList<Provider> providers = new Gee.ArrayList<Provider> ();
 
 		// Valid keys provided by all providers
 		public StringSet valid_keys = new StringSet();
 
-		public void register_provider(string[] keys, Plugin provider) {
+		public void register_provider(string[] keys, Provider provider) {
 			providers.add (provider);
 			valid_keys = new StringSet.union (valid_keys, new StringSet.from_array (keys));
 		}

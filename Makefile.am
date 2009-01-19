@@ -37,7 +37,7 @@ contextd_core_VALASOURCES = \
 	src/DBusInterface.vala \
 	src/Manager.vala \
 	src/MCE.vala \
-	src/PluginInterface.vala \
+	src/ProviderInterface.vala \
 	src/StringSet.vala \
 	$(NULL)
 

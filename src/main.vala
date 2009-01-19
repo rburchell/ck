@@ -46,7 +46,7 @@ namespace ContextKit {
 					debug ("Creating new Manager D-Bus service");
 
 					Providers providers = new Providers();
-					providers.register_provider (MCE.Plugin.keys, new MCE.Plugin());
+					providers.register_provider (MCE.Provider.keys, new MCE.Provider());
 
 					manager = new ContextKit.Manager(providers);
 					connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
