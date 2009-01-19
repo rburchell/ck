@@ -44,7 +44,11 @@ namespace ContextKit {
 
 				if (request_name_result == DBus.RequestNameReply.PRIMARY_OWNER) {
 					debug ("Creating new Manager D-Bus service");
-					manager = new ContextKit.Manager();
+
+					Providers providers = new Providers();
+					providers.register_provider (MCE.Plugin.keys, new MCE.Plugin());
+
+					manager = new ContextKit.Manager(providers);
 					connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 					// Make manager listen to the NameOwnerChanged
 					bus.NameOwnerChanged += manager.on_name_owner_changed;

@@ -31,45 +31,24 @@ namespace ContextKit {
 			delegate void TruthFunction (void* data);
 
 			// Key strings
-			const string key_edge_up = "Context.Device.Orientation.edgeUp";
-			const string key_facing_up = "Context.Device.Orientation.facingUp";
-			const string key_display_state = "Context.Device.Display.displayState";
-			const string key_profile_name = "Context.Device.???.profileName"; // FIXME: key name
+			public const string key_edge_up = "Context.Device.Orientation.edgeUp";
+			public const string key_facing_up = "Context.Device.Orientation.facingUp";
+			public const string key_display_state = "Context.Device.Display.displayState";
+			public const string key_profile_name = "Context.Device.???.profileName"; // FIXME: key name
 			// FIXME: implementation? I guess we get this from Profile Daemon, not MCE, so move this out of this plugin?
-			const string key_is_flight_mode = "Context.Environment.Connection.CurrentData.isFlightMode";
-			const string key_is_emergency_mode = "Context.Environment.Connection.CurrentData.isEmergencyMode";
-			const string key_in_active_use = "Context.Device.Usage.inActiveUse";
+			public const string key_is_flight_mode = "Context.Environment.Connection.CurrentData.isFlightMode";
+			public const string key_is_emergency_mode = "Context.Environment.Connection.CurrentData.isEmergencyMode";
+			public const string key_in_active_use = "Context.Device.Usage.inActiveUse";
 
 			// Information about keys provided by this plug-in
-			const Key[] keys = {
-					{
-						key_edge_up
-						// Values: Undefined (0), top (1), left (2), right (3), bottom (4)
-					},
-					{
-						key_facing_up
-						// Values: Undefined (0), face up (1), back side up (2)
-					},
-					{
-						key_display_state
-						// Values: Off (0), on (1), dimmed (2)
-					},
-					{
-						key_profile_name
-						// Values:
-					},
-					{
-						key_is_flight_mode
-						// Values: TRUE (flight mode), FALSE (normal mode)
-					},
-					{
-						key_is_emergency_mode
-						// Values: TRUE (emergency call in progress), FALSE (otherwise)
-					},
-					{
-						key_in_active_use
-						// Values: TRUE (device active), FALSE (device inactive)
-					}
+			public const string[] keys = {
+					key_edge_up,
+					key_facing_up, // Values: Undefined (0), face up (1), back side up (2)
+					key_display_state, // Values: Off (0), on (1), dimmed (2)
+					key_profile_name,
+					key_is_flight_mode, // Values: TRUE (flight mode), FALSE (normal mode)
+					key_is_emergency_mode, // Values: TRUE (emergency call in progress), FALSE (otherwise)
+					key_in_active_use // Values: TRUE (device active), FALSE (device inactive)
 				};
 
 			// Keys divided into sets based on how they are got from MCE
@@ -79,7 +58,7 @@ namespace ContextKit {
 			StringSet call_state_keys;
 			StringSet inactivity_status_keys;
 
-			void error_for_subset (StringSet keys, HashTable<string, Value?> ret, List<string> unavailable_keys, StringSet intersect_with) {
+			void error_for_subset (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavailable_keys, StringSet intersect_with) {
 				StringSet intersection = new StringSet.intersection (keys, intersect_with);
 				foreach (var key in intersection.to_array()) {
 					Value nonsense = Value (typeof (bool));
@@ -124,7 +103,7 @@ namespace ContextKit {
 			/*
 			Fetches orientation information from MCE.
 			*/
-			void get_orientation (StringSet keys, HashTable<string, Value?> ret, List<string> unavail) {
+			void get_orientation (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavail) {
 
 				if (keys.is_disjoint (orientation_keys)) {
 					return;
@@ -135,20 +114,20 @@ namespace ContextKit {
 					mce_request.get_device_orientation(out orientation.rotation, out orientation.stand, out orientation.facing, out orientation.x, out orientation.y, out orientation.z);
 				} catch (GLib.Error ex) {
 					stdout.printf("MCE Plugin Error: %s\n", ex.message);
-					error_for_subset (keys, ret, unavail, orientation_keys);
+					error_for_subset (keys, ret, ref unavail, orientation_keys);
 					return;
 				}
 
 				debug("Got orientation %s %s %s (%d,%d,%d)", orientation.rotation,  orientation.stand,  orientation.facing,  orientation.x,  orientation.y,  orientation.z);
 
-				insert_orientation_to_map(keys, orientation, ret, unavail);
+				insert_orientation_to_map(keys, orientation, ret, ref unavail);
 
 			}
 
 			/*
 			Fetches display status information from MCE.
 			*/
-			void get_display_status (StringSet keys, HashTable<string, Value?> ret, List<string> unavail) {
+			void get_display_status (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavail) {
 
 				if (keys.is_disjoint (display_status_keys)) {
 					return;
@@ -159,20 +138,20 @@ namespace ContextKit {
 					mce_request.get_display_status(out display_status);
 				} catch (GLib.Error ex) {
 					stdout.printf("MCE Plugin Error: %s\n", ex.message);
-					error_for_subset (keys, ret, unavail, display_status_keys);
+					error_for_subset (keys, ret, ref unavail, display_status_keys);
 					return;
 				}
 
 				debug("Got display status %s", display_status);
 
-				insert_display_status_to_map(keys, display_status, ret, unavail);
+				insert_display_status_to_map(keys, display_status, ret, ref unavail);
 
 			}
 
 			/*
 			Fetches device mode information from MCE.
 			*/
-			void get_device_mode(StringSet keys, HashTable<string, Value?> ret, List<string> unavail) {
+			void get_device_mode(StringSet keys, HashTable<string, Value?> ret, ref List<string> unavail) {
 
 				if (keys.is_disjoint (device_mode_keys)) {
 					return;
@@ -183,19 +162,19 @@ namespace ContextKit {
 					mce_request.get_device_mode(out device_mode);
 				} catch (GLib.Error ex) {
 					stdout.printf("MCE Plugin Error: %s\n", ex.message);
-					error_for_subset (keys, ret, unavail, device_mode_keys);
+					error_for_subset (keys, ret, ref unavail, device_mode_keys);
 					return;
 				}
 
 				debug("Got device mode %s", device_mode);
 
-				insert_device_mode_to_map(keys, device_mode, ret, unavail);
+				insert_device_mode_to_map(keys, device_mode, ret, ref unavail);
 			}
 
 			/*
 			Fetches call state information from MCE.
 			*/
-			void get_call_state(StringSet keys, HashTable<string, Value?> ret, List<string> unavail) {
+			void get_call_state(StringSet keys, HashTable<string, Value?> ret, ref List<string> unavail) {
 
 				if (keys.is_disjoint (call_state_keys)) {
 					return;
@@ -207,19 +186,19 @@ namespace ContextKit {
 					mce_request.get_call_state(out state, out type);
 				} catch (GLib.Error ex) {
 					stdout.printf("MCE Plugin Error: %s\n", ex.message);
-					error_for_subset (keys, ret, unavail, call_state_keys);
+					error_for_subset (keys, ret, ref unavail, call_state_keys);
 					return;
 				}
 
 				debug("Got call state %s %s", state, type);
 
-				insert_call_state_to_map(keys, state, type, ret, unavail);
+				insert_call_state_to_map(keys, state, type, ret, ref unavail);
 			}
 
 			/*
 			Fetches inactivity status information from MCE.
 			*/
-			void get_inactivity_status(StringSet keys, HashTable<string, Value?> ret, List<string> unavail) {
+			void get_inactivity_status(StringSet keys, HashTable<string, Value?> ret, ref List<string> unavail) {
 
 				if (keys.is_disjoint (inactivity_status_keys)) {
 					return;
@@ -230,20 +209,20 @@ namespace ContextKit {
 					mce_request.get_inactivity_status(out status);
 				} catch (GLib.Error ex) {
 					stdout.printf("MCE Plugin Error: %s\n", ex.message);
-					error_for_subset (keys, ret, unavail, call_state_keys);
+					error_for_subset (keys, ret, ref unavail, call_state_keys);
 					return;
 				}
 
 				debug("Got inactivity status %s", (status ? "true" : "false"));
 
-				insert_inactivity_status_to_map(keys, status, ret, unavail);
+				insert_inactivity_status_to_map(keys, status, ret, ref unavail);
 			}
 
 
 			/*
 			Inserts the orientation properties to the map according to the data given. Used by both Get and Subscribe.
 			*/
-			void insert_orientation_to_map(StringSet keys, DeviceOrientation orientation, HashTable<string, Value?> ret, List<string> unavail) {
+			void insert_orientation_to_map(StringSet keys, DeviceOrientation orientation, HashTable<string, Value?> ret, ref List<string> unavail) {
 				if (keys.is_member (key_edge_up)) {
 					Value v = Value (typeof(int));
 					v.set_int(calculate_orientation(orientation.x, orientation.y));
@@ -268,7 +247,7 @@ namespace ContextKit {
 			/*
 			Inserts the display state properties to the map according to the data given. Used by both Get and Subscribe.
 			*/
-			void insert_display_status_to_map(StringSet keys, string display_status, HashTable<string, Value?> ret, List<string> unavail) {
+			void insert_display_status_to_map(StringSet keys, string display_status, HashTable<string, Value?> ret, ref List<string> unavail) {
 				if (keys.is_member (key_display_state)) {
 					Value v = Value (typeof(int));
 
@@ -293,7 +272,7 @@ namespace ContextKit {
 			/*
 			Inserts the device mode properties to the map according to the data given. Used by both Get and Subscribe.
 			*/
-			void insert_device_mode_to_map(StringSet keys, string device_mode, HashTable<string, Value?> ret, List <string> unavail) {
+			void insert_device_mode_to_map(StringSet keys, string device_mode, HashTable<string, Value?> ret, ref List <string> unavail) {
 				if (keys.is_member (key_is_flight_mode)) {
 					Value v = Value (typeof(bool));
 
@@ -315,7 +294,7 @@ namespace ContextKit {
 			/*
 			Inserts the call state properties to the map according to the data given. Used by both Get and Subscribe.
 			*/
-			void insert_call_state_to_map(StringSet keys, string state, string type, HashTable<string, Value?> ret, List<string> unavail) {
+			void insert_call_state_to_map(StringSet keys, string state, string type, HashTable<string, Value?> ret, ref List<string> unavail) {
 				if (keys.is_member (key_is_emergency_mode)) {
 					Value v = Value (typeof(bool));
 
@@ -346,7 +325,7 @@ namespace ContextKit {
 			/*
 			Inserts the inactivity status properties to the map according to the data given. Used by both Get and Subscribe.
 			*/
-			void insert_inactivity_status_to_map(StringSet keys, bool status, HashTable<string, Value?> ret, List<string> unavail) {
+			void insert_inactivity_status_to_map(StringSet keys, bool status, HashTable<string, Value?> ret, ref List<string> unavail) {
 				if (keys.is_member (key_in_active_use)) {
 					Value v = Value (typeof(bool));
 					v.set_boolean(!status);	// Note the negation
@@ -365,8 +344,8 @@ namespace ContextKit {
 				HashTable<string, Value?> ret = new HashTable<string, Value?> (str_hash,str_equal);
 				List<string> unavail = new List<string>();
 
-				insert_orientation_to_map(subscribed_keys, orientation, ret, unavail);
-				send_result_to_listeners(orientation_subscribed, ret, unavail);
+				insert_orientation_to_map(subscribed_keys, orientation, ret, ref unavail);
+				send_result_to_listeners(orientation_subscribed, ret, ref unavail);
 			}
 
 			/*
@@ -378,8 +357,8 @@ namespace ContextKit {
 				HashTable<string, Value?> ret = new HashTable<string, Value?> (str_hash,str_equal);
 				List<string> unavail = new List<string>();
 
-				insert_display_status_to_map(subscribed_keys, display_status, ret, unavail);
-				send_result_to_listeners(display_status_subscribed, ret, unavail);
+				insert_display_status_to_map(subscribed_keys, display_status, ret, ref unavail);
+				send_result_to_listeners(display_status_subscribed, ret, ref unavail);
 			}
 
 			/*
@@ -391,8 +370,8 @@ namespace ContextKit {
 				HashTable<string, Value?> ret = new HashTable<string, Value?> (str_hash,str_equal);
 				List<string> unavail = new List<string>();
 
-				insert_device_mode_to_map(subscribed_keys, device_mode, ret, unavail);
-				send_result_to_listeners(device_mode_subscribed, ret, unavail);
+				insert_device_mode_to_map(subscribed_keys, device_mode, ret, ref unavail);
+				send_result_to_listeners(device_mode_subscribed, ret, ref unavail);
 			}
 
 			/*
@@ -404,8 +383,8 @@ namespace ContextKit {
 				HashTable<string, Value?> ret = new HashTable<string, Value?> (str_hash,str_equal);
 				List<string> unavail = new List<string>();
 
-				insert_call_state_to_map(subscribed_keys, state, type, ret, unavail);
-				send_result_to_listeners(call_state_subscribed, ret, unavail);
+				insert_call_state_to_map(subscribed_keys, state, type, ret, ref unavail);
+				send_result_to_listeners(call_state_subscribed, ret, ref unavail);
 			}
 
 			/*
@@ -417,14 +396,14 @@ namespace ContextKit {
 				HashTable<string, Value?> ret = new HashTable<string, Value?> (str_hash,str_equal);
 				List<string> unavail = new List<string>();
 
-				insert_inactivity_status_to_map(subscribed_keys, status, ret, unavail);
-				send_result_to_listeners(inactivity_status_subscribed, ret, unavail);
+				insert_inactivity_status_to_map(subscribed_keys, status, ret, ref unavail);
+				send_result_to_listeners(inactivity_status_subscribed, ret, ref unavail);
 			}
 
 			/*
 			Sends the properties to the listeners intrested in them.
 			*/
-			void send_result_to_listeners(PluginMixins.SubscriberList subscribers, HashTable<string, Value?> ret, List<string> unavail) {
+			void send_result_to_listeners(PluginMixins.SubscriberList subscribers, HashTable<string, Value?> ret, ref List<string> unavail) {
 				for (int i=0; i < subscribers.size; i++) {
 					weak Subscriber s = subscribers.get(i);
 					s.emit_changed(ret, unavail);
@@ -580,24 +559,27 @@ namespace ContextKit {
 				inactivity_status_subscribed.removed += subscription_removed;
 			}
 
-			public void Get (StringSet keys, HashTable<string, Value?> ret, List<string> unavail) {
-				get_orientation (keys, ret, unavail);
-				get_display_status (keys, ret, unavail);
-				get_device_mode (keys, ret, unavail);
-				get_call_state (keys, ret, unavail);
-				get_inactivity_status (keys, ret, unavail);
+			public void Get (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavail) {
+				get_orientation (keys, ret, ref unavail);
+				get_display_status (keys, ret, ref unavail);
+				get_device_mode (keys, ret, ref unavail);
+				get_call_state (keys, ret, ref unavail);
+				get_inactivity_status (keys, ret, ref unavail);
 			}
 
+
+			/* FIXME: replace Subscribe with below with: */
+
+			public void KeysSubscribed (StringSet keys) {
+			}
+			public void KeysUnsubscribed (StringSet keys) {
+			}
 			public void Subscribe (StringSet keys, ContextKit.Subscriber s) {
 				subscribe_to_orientation (keys, s);
 				subscribe_to_display_status (keys, s);
 				subscribe_to_device_mode (keys, s);
 				subscribe_to_call_state (keys, s);
 				subscribe_to_inactivity_status (keys, s);
-			}
-
-			public Key[] Keys() {
-				return keys;
 			}
 		}
 	}
