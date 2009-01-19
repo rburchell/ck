@@ -26,10 +26,10 @@ using Posix.Signal;
 namespace ContextKit {
 
 		public class Main : Object {
-		
+
 		static GLib.MainLoop loop;
 		static dynamic DBus.Object bus; // Needs to be stored so that we get the NameOwnerChanged
-		
+
 		public Main () {
 		}
 

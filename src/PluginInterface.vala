@@ -30,7 +30,7 @@ namespace ContextKit {
 			public bool contains (Subscriber s) {
 				return list.contains (s);
 			}
-	
+
 			public int size {
 				get { return list.size; }
 			}
