@@ -6,9 +6,7 @@ namespace ContextKit {
 
 		internal StringSetIter (StringSet parent) {
 			this.parent = parent;
-			this.iter = new IntSetIter();
-			this.iter.element = -1;
-			this.iter.set = parent.intset;
+			this.iter = IntSetIter (parent.intset);
 		}
 		public bool next() {
 			return iter.next();
