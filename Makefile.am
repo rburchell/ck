@@ -36,6 +36,9 @@ contextd_core_VALASOURCES = \
 	src/main.vala \
 	src/DBusInterface.vala \
 	src/Manager.vala \
+	src/Providers.vala \
+	src/KeyUsageCounter.vala \
+	src/Subscriber.vala \
 	src/MCE.vala \
 	src/ProviderInterface.vala \
 	src/StringSet.vala \
