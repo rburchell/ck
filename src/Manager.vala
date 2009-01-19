@@ -2,21 +2,23 @@ using GLib;
 
 namespace ContextKit {
 	public class Manager : GLib.Object, DBusManager {
-		int subscriber_count = 0;
-
 		// Mapping client dbus names into subscription objects
-
-		Gee.HashMap<string, Subscriber> subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
+		Gee.HashMap<string, Subscriber> subscribers;
 
 		Providers providers;
 		KeyUsageCounter key_counter;
 
 		// NULL value means undetermined
-		static HashTable<string, Value?> values = new HashTable<string, Value?>(str_hash, str_equal);
+		static HashTable<string, Value?> values;
 
+		int subscriber_count = 0;
 
 		public Manager(Providers providers) {
 			this.providers = providers;
+			/*TODO, should manager own the key counter? */
+			this.key_counter = new KeyUsageCounter(providers);
+			this.subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
+			this.values = new HashTable<string, Value?>(str_hash, str_equal);
 		}
 
 		public void Get (string[] keys, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
