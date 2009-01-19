@@ -28,7 +28,7 @@ if __name__ == "__main__":
 	# You can write the properties of intrest directly here
 	#execute_get(["Context.Device.Orientation.displayFacingUp", "Context.Environment.Location.latitude", "Context.Environment.Location.longitude", "Context.Environment.Location.altitude"])
 	
-	# Or use the command line parameters
+	# Or use the parameters from command line
 	print "Executing Get with the properties", sys.argv[1:]
 	execute_get(sys.argv[1:])
 
