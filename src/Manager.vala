@@ -57,12 +57,12 @@ namespace ContextKit {
 			// Ignore keys which are not recognized as valid keys
 			new_keys = new StringSet.intersection (new_keys, manager.valid_keys);
 
-			// Increase the subscriber count of the new keys. 
+			// Increase the subscriber count of the new keys.
 			increase_subscriber_count(new_keys.to_array());
 
 			subscribed_keys = new StringSet.union(subscribed_keys, new_keys);
 
-			// Read the values from the central value table and return them	
+			// Read the values from the central value table and return them
 			manager.Get (keys, out values, out undeterminable_keys);
 
 			// Here is the old plugin-type implementation
@@ -316,7 +316,7 @@ namespace ContextKit {
 
 				// Remove the subscriber
 				Subscriber s = subscriber_addresses.get (name);
-				subscribers. remove(s);
+				subscribers.remove(s);
 
 				subscriber_addresses.remove (name);
 
