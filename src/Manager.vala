@@ -4,12 +4,9 @@ namespace ContextKit {
 	public class Manager : GLib.Object, DBusManager {
 		int subscriber_count = 0;
 
-		// Stored subscriber objects
-		Gee.HashSet<Subscriber> subscribers = new Gee.HashSet<Subscriber>();
-
 		// Mapping client dbus names into subscription objects
 
-		Gee.HashMap<string, Subscriber> subscriber_addresses = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
+		Gee.HashMap<string, Subscriber> subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 
 		Providers providers;
 		KeyUsageCounter key_counter;
@@ -41,8 +38,8 @@ namespace ContextKit {
 			/* First check if the same client has already requested a subscriber object.
 			If so, return its object path. */
 
-			if (subscriber_addresses. contains(name)) {
-				Subscriber s = subscriber_addresses.get (name);
+			if (subscribers.contains(name)) {
+				Subscriber s = subscribers.get (name);
 				return s.object_path;
 			}
 
@@ -57,8 +54,7 @@ namespace ContextKit {
 			// FIXME: Potential overflow? Do we need to worry?
 
 			// Store information about this newly created subscription object
-			subscribers.add (s);
-			subscriber_addresses.set (name, s); // Track the dbus address
+			subscribers.set (name, s); // Track the dbus address
 
 			// Return the object path of the subscription object to the client
 			connection.register_object ((string) s.object_path, s);
@@ -74,14 +70,11 @@ namespace ContextKit {
 			debug(old_owner);
 			debug(new_owner);
 
-			if (subscriber_addresses.contains (name) && new_owner == "") {
+			if (subscribers.contains (name) && new_owner == "") {
 				debug ("Client died");
 
 				// Remove the subscriber
-				Subscriber s = subscriber_addresses.get (name);
-				subscribers.remove(s);
-
-				subscriber_addresses.remove (name);
+				subscribers.remove (name);
 
 				// Now nobody holds a pointer to the subscriber so it is destroyed automatically.
 			}
@@ -132,7 +125,7 @@ namespace ContextKit {
 			insert_to_value_table(properties, null);
 
 			// Inform the subscribers of the change
-			foreach (var s in subscribers) {
+			foreach (var s in subscribers.get_values()) {
 				s.on_value_changed(properties);
 			}
 		}
