@@ -6,17 +6,28 @@ namespace ContextKit {
 		Manager manager;
 		internal DBus.ObjectPath object_path {get; set;}
 		
+		// Declaration of the callback function used to signal subscription changes to the provider
+		
+		// Note: Callbacks disabled temporarily
+		/*
+		public delegate void subscribe_cb(GLib.List<string> keys);
+		private static subscribe_cb first_subscribed_cb; // A new key was subscribed to for the first time
+		private static subscribe_cb last_unsubscribed_cb; // A key is not anymore subscribed to by anyone
+		*/
+		
 		// Keys subscribed to by this subscriber
 		StringSet subscribed_keys;
 
 		// The number of subscribers for each key (over all subscriber objects)
 		static Gee.HashMap<string, int> no_of_subscribers = new Gee.HashMap<string, int>(str_hash, str_equal);
 		
-		internal Subscriber (Manager manager, int id) {
+		internal Subscriber (Manager manager, int id/*, subscribe_cb first, subscribe_cb last*/) {
 			string path = "/org/freedesktop/ContextKit/Subscribers/%d".printf (id);
 			this.object_path = new DBus.ObjectPath (path);
 			this.manager = manager;
-			this.subscribed_keys = new StringSet();
+			/*first_subscribed_cb = first;
+			last_unsubscribed_cb = last;*/
+			subscribed_keys = new StringSet();
 		}
 		
 		~Subscriber () {
@@ -42,18 +53,23 @@ namespace ContextKit {
 		}
 
 		public void Subscribe (string[] keys, out HashTable<string, Value?> values, out string[] undeterminable_keys) {
-			values = new HashTable<string, Value?> (str_hash,str_equal);
 			StringSet keyset = new StringSet.from_array (keys);
 			message ("Subscribe: requested %s", keyset.debug());
+			
+			// Ignore keys which are already subscribed to
 			StringSet new_keys = new StringSet.difference (keyset, subscribed_keys);
 			message ("Subscribe: new keys %s", new_keys.debug());
 			
-			/* Track the subscriber count of the keys. Ignore the keys which are
-			already subscribed to. */
+			// Increase the subscriber count of the new keys. 
 			increase_subscriber_count(new_keys.to_array());
 			
 			subscribed_keys = new StringSet.union(subscribed_keys, new_keys);
-
+			
+			// Read the values from the central value table and return them	
+			manager.Get (keys, out values, out undeterminable_keys);
+			
+			// Here is the old plugin-type implementation
+			values = new HashTable<string, Value?> (str_hash,str_equal);
 			List<string> unavail_l = new List<string>();
 			foreach (var plugin in manager.plugins) {
 				plugin.Subscribe (new_keys, this);
@@ -86,29 +102,38 @@ namespace ContextKit {
 		/* Record the subscriber count for each key. */
 		private static void increase_subscriber_count(Gee.ArrayList<string> keys) {
 			// FIXME: Mutex?
+			GLib.List<string> first_subscribed_keys = new GLib.List<string>();
 			foreach (var key in keys) {
 				if (no_of_subscribers.contains (key)) {
 					int old_value = no_of_subscribers.get (key);
 					no_of_subscribers.set (key, old_value + 1);
 					
 					if (old_value == 0) {
-						// FIXME: Emit the firstSubscriber signal / call the callback
+						// This is the first subscribed to the key
+						first_subscribed_keys.append (key);
 					}
 					
 					debug ("Subscriber count of %s is now %d", key, old_value + 1);
 				}
-				else {
+				else { // Key name not present in the key table
 					no_of_subscribers.set (key, 1);
-					// FIXME: Emit the firstSubscriber signal / call the callback
+					first_subscribed_keys.append (key);
 					
 					debug ("Subscriber count of %s is now %d", key, 1);
 				}
 			}
+			
+			if (first_subscribed_keys.length() > 0) {
+				// FIXME: Call the callback to signal that some new keys were subscribed to
+				//first_subscribed_cb(first_subscribed_keys);
+			}
+			
 			// FIXME: Do we need to care about which keys are subscribed to? What if the keys are something not provided by this provider?
 		}
 		
 		private static void decrease_subscriber_count(Gee.ArrayList<string> keys) {
 			// FIXME: Mutex?
+			GLib.List<string> last_unsubscribed_keys = new GLib.List<string>();
 			foreach (var key in keys) {
 				if (no_of_subscribers.contains (key)) {
 					int old_value = no_of_subscribers.get (key);
@@ -119,7 +144,8 @@ namespace ContextKit {
 					}
 					
 					if (old_value <= 1) {
-						// FIXME: Emit the lastSubscriber signal / call the callback
+						// The last subscriber for this key unsubscribed
+						last_unsubscribed_keys.append (key);
 					}
 					debug ("Subscriber count of %s is now %d", key, old_value - 1);
 				}
@@ -127,6 +153,11 @@ namespace ContextKit {
 					// This should not happen
 					debug ("Error: decreasing the subscriber count of an unknown key.");
 				}
+			}
+			
+			if (last_unsubscribed_keys.length() > 0) {
+				// FIXME: Call the callback to signal that some keys are not subscribed to anymore
+				//last_unsubscribed_cb(last_unsubscribed_keys);
 			}
 		}
 		
@@ -189,7 +220,7 @@ namespace ContextKit {
 			
 			/*
 			// Give the provider an opportunity to update the values
-			// FIXME: Call the callback (& update the value table)
+			// FIXME: Call the callback
 			HashTable<string, Value?> properties = new HashTable<string, Value?>(str_hash,str_equal);
 			//get_properties_cb(properties);
 			
@@ -241,7 +272,6 @@ namespace ContextKit {
 			// Store information about this newly created subscription object
 			subscribers.add (s);
 			subscriber_addresses.set (name, s); // Track the dbus address
-			// FIXME: Connect the on_property_changed signal
 			
 			// Return the object path of the subscription object to the client
 			connection.register_object ((string) s.object_path, s);			
@@ -279,7 +309,6 @@ namespace ContextKit {
 			foreach (var key in keys) {
 				// Overwrite the value in the value table.
 				// Do not care whether it was already there or not.
-				
 				values.insert (key, properties.lookup (key));
 			}
 		}
