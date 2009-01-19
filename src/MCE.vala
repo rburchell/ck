@@ -548,6 +548,7 @@ namespace ContextKit {
 						key_edge_up,
 						key_facing_up});
 
+				orientation_subscribed = new PluginMixins.SubscriberList();
 				orientation_subscribed.removed += subscription_removed;
 
 				// Data structures related to display status
