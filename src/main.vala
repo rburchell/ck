@@ -21,10 +21,15 @@
 
 using GLib;
 using Sqlite;
+using Posix.Signal;
 
 namespace ContextKit {
 
-	public class Main : Object {
+		public class Main : Object {
+
+		static GLib.MainLoop loop;
+		static dynamic DBus.Object bus; // Needs to be stored so that we get the NameOwnerChanged
+
 		public Main () {
 		}
 
@@ -33,7 +38,7 @@ namespace ContextKit {
 		private static bool start_manager () {
 			try {
 				var connection = DBus.Bus.get (DBus.BusType.SESSION);
-				dynamic DBus.Object bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
+				bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 				// try to register service in session bus
 				uint request_name_result = bus.RequestName ("org.freedesktop.ContextKit", (uint) 0);
 
@@ -41,6 +46,8 @@ namespace ContextKit {
 					debug ("Creating new Manager D-Bus service");
 					manager = new ContextKit.Manager();
 					connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
+					// Make manager listen to the NameOwnerChanged
+					bus.NameOwnerChanged += manager.on_name_owner_changed;
 				} else {
 					debug ("Manager D-Bus service is already running");
 					return false;
@@ -53,10 +60,16 @@ namespace ContextKit {
 			return true;
 		}
 
+		static void exit (int sig){
+			stdout.printf("Exit contextd");
+			loop.quit();
+		}
+
 		public void run () {
-			var loop = new MainLoop (null, false);
+			loop = new MainLoop (null, false);
 			stdout.printf ("Hello, world!\n");
 			start_manager();
+			Posix.Signal.set_handler(Posix.Signal.QUIT,exit);
 			loop.run();
 		}
 

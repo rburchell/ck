@@ -4,13 +4,22 @@ namespace ContextKit {
 
 	public struct Key {
 		public string name;
-		public ValueType type;
+	}
+
+	public class PluginStruct : GLib.Object {
+		// A new key was subscribed to for the first time
+		public subscribe_callback first_subscribed_cb;
+		// A key is not anymore subscribed to by anyone
+		public subscribe_callback last_unsubscribed_cb;
+		// A Get request is executed
+		public get_callback get_cb;
 	}
 
 	public interface Plugin : GLib.Object {
-		public abstract void Get (StringSet keys, HashTable<string, TypedVariant?> ret);
+		public abstract void Get (StringSet keys, HashTable<string, Value?> ret, List<string> unavailable_keys);
 		public abstract void Subscribe (StringSet keys, ContextKit.Subscriber s);
 		public abstract Key[] Keys();
+		
 	}
 
 	namespace PluginMixins {
@@ -31,7 +40,7 @@ namespace ContextKit {
 			public bool contains (Subscriber s) {
 				return list.contains (s);
 			}
-	
+
 			public int size {
 				get { return list.size; }
 			}

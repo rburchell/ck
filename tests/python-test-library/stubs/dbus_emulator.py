@@ -31,10 +31,10 @@ def createBus(type,configPath):
     output = None
     if ((os.getenv("DBUS_SYSTEM_BUS_ADDRESS") == None and type == SYSTEM) or type == SESSION):
         if os.path.isdir(configPath):
-            output = os.popen("dbus-launch --config-file=" + configPath + os.pathsep + "session.conf").readlines()
+            output = os.popen("dbus-launch --config-file=" + configPath + os.path.sep + "session.conf").readlines()
         else:
             output = os.popen("dbus-launch").readlines()
-        if len(output) == 2:
+        if len(output) >= 2:
             result = parse("(DBUS_SESSION_BUS_ADDRESS)=(.*)",output[0]) , parse("(DBUS_SESSION_BUS_PID)=(.*)",output[1])
             if type == SESSION:
                 os.environ['DBUS_SESSION_BUS_ADDRESS'] = result[0].group(2)

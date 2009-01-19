@@ -3,34 +3,17 @@ using DBus;
 
 namespace ContextKit {
 
-	public enum ValueType {
-    UNDETERMINED,
-		STRING,
-		INTEGER,
-		DOUBLE,
-		TRUTH
-	}
-
-	public struct TypedVariant {
-		public TypedVariant (ValueType type, Value value) {
-			this.type = type;
-			this.value.init (value.type());
-			value.copy (ref this.value);
-		}
-		public ValueType type;
-		public Value value;
-	}
-/*
 	[DBus (name = "org.freedesktop.ContextKit.Manager")]
 	public interface DBusManager : GLib.Object {
-		public abstract HashTable<string, TypedVariant?> Get (string[] keys);
-		public abstract ObjectPath Subscribe (string[] keys, out HashTable<string, TypedVariant?> values);
+		public abstract void Get (string[] keys, out HashTable<string, Value?> values, out string[] undeterminable_keys);
+		public abstract DBus.ObjectPath GetSubscriber (DBus.BusName name) throws DBus.Error;
 	}
 
-	[DBus (name = "org.freedesktop.ContextKit.Subscription")]
-	public interface DBusSubscription : GLib.Object {
-		public abstract void Unsubscribe ();
-		public signal void Changed (HashTable<string, TypedVariant?> values);
+	[DBus (name = "org.freedesktop.ContextKit.Subscriber")]
+	public interface DBusSubscriber: GLib.Object {
+		public abstract void Subscribe (string[] keys, out HashTable<string, Value?> values, out string[] undeterminable_keys);
+
+		public abstract void Unsubscribe (string[] keys);
+		public signal void Changed (HashTable<string, Value?> values, string[] undeterminable_keys);
 	}
-	*/
 }
