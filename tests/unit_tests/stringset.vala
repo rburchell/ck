@@ -103,6 +103,21 @@ void test_stringset_to_array () {
 	assert (array.get(4) == "E");
 }
 
+void test_stringset_iterate () {
+	string [] vals = {"A", "B", "C", "D", "E"};
+
+	StringSet stringset = new StringSet.from_array(vals);
+
+	foreach (var s in stringset) {
+		//debug(s);
+		bool found = false;
+		foreach (var v in vals) {
+			if (s == v) found = true;
+		}
+		assert (found);
+	}
+}
+
 
 
 public static void main (string[] args) {
@@ -114,5 +129,6 @@ public static void main (string[] args) {
 	Test.add_func("/contextkit/stringset/intersect", test_stringset_intersect);
 	Test.add_func("/contextkit/stringset/disjoint", test_stringset_disjoint);
 	Test.add_func("/contextkit/stringset/to_array", test_stringset_to_array);
+	Test.add_func("/contextkit/stringset/iterate", test_stringset_iterate);
 	Test.run ();
 }
