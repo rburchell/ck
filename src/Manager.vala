@@ -1,6 +1,7 @@
 using GLib;
 
 namespace ContextKit {
+
 	public class Manager : GLib.Object, DBusManager {
 		// Mapping client dbus names into subscription objects
 		Gee.HashMap<string, Subscriber> subscribers;
@@ -9,7 +10,8 @@ namespace ContextKit {
 		KeyUsageCounter key_counter;
 
 		// NULL value means undetermined
-		static HashTable<string, Value?> values;
+		HashTable<string, Value?> values;
+		static dynamic DBus.Object bus; // Needs to be stored so that we get the NameOwnerChanged
 
 		int subscriber_count = 0;
 
@@ -19,6 +21,10 @@ namespace ContextKit {
 			this.key_counter = new KeyUsageCounter(providers);
 			this.subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			this.values = new HashTable<string, Value?>(str_hash, str_equal);
+
+			var connection = DBus.Bus.get (DBus.BusType.SESSION);
+			bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
+			bus.NameOwnerChanged += this.on_name_owner_changed;
 		}
 
 		public void Get (string[] keys, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
