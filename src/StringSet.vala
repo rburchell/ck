@@ -129,6 +129,10 @@ namespace ContextKit {
 
 		public string debug () {
 			Gee.ArrayList<string> strings = to_array();
+			if (strings.size < 1) {
+				return "";
+			}
+
 			string ret = strings[0];
 			for (int i=1; i<strings.size; i++) {
 				ret = ret + ", " + strings[i];
