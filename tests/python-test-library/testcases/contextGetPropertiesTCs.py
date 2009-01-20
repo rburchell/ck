@@ -26,8 +26,8 @@ import conf
 class ContextHelpers(unittest.TestCase):
 
     def setUp(self):
-        #print os.environ['DBUS_SYSTEM_BUS_ADDRESS']
-        #print os.environ['DBUS_SESSION_BUS_ADDRESS']
+        print os.environ['DBUS_SYSTEM_BUS_ADDRESS']
+        print os.environ['DBUS_SESSION_BUS_ADDRESS']
         
         self.sysBus = dbus.SystemBus()
         try:
@@ -74,60 +74,71 @@ class ContextHelpers(unittest.TestCase):
         try:
             object  = bus.get_object("org.freedesktop.ContextKit","/org/freedesktop/ContextKit/Manager")
             iface = dbus.Interface(object,"org.freedesktop.ContextKit.Manager")
-            ret = iface.Get(properties)
+            returnedProp, underterminedProp = iface.Get(properties)
         except dbus.DBusException, ex:
             raise 
-        return ret
+        return returnedProp, underterminedProp
     
 class DeviceOrientation(ContextHelpers):
 
     def test_faceup(self):
         self.setFacing("face_up")
         prop = ['Context.Device.Orientation.facingUp']
-        struct = self.getProp(prop)
-        self.assert_(struct['Context.Device.Orientation.facingUp'][1],True)
+        returnedProp, undeterminedProp = self.getProp(prop)
+        self.assert_(returnedProp['Context.Device.Orientation.facingUp'],True)
 
     def test_facedown(self):
         self.setFacing("face_down")
         prop = ['Context.Device.Orientation.facingUp']
-        struct = self.getProp(prop)
-        self.assert_(struct['Context.Device.Orientation.facingUp'][1],False)
+        returnedProp, undeterminedProp = self.getProp(prop)
+        self.assert_(returnedProp['Context.Device.Orientation.facingUp'],False)
         
     def test_orientationEdgeLeft(self):
         self.setFacing("face_up")
         self.setRotation("portrait")
         self.setCoord(-1000, 20, -10)
         prop = ['Context.Device.Orientation.facingUp','Context.Device.Orientation.edgeUp']
-        struct = self.getProp(prop)
-        self.assert_(struct['Context.Device.Orientation.facingUp'][1],True)
-        self.assert_(struct['Context.Device.Orientation.edgeUp'][1],"2")
+        returnedProp, undeterminedProp = self.getProp(prop)
+        self.assert_(returnedProp['Context.Device.Orientation.facingUp'],True)
+        self.assert_(returnedProp['Context.Device.Orientation.edgeUp'],"2")
     
     def test_orientationEdgeRight(self):
         self.setFacing("face_up")
         self.setRotation("portrait")
         self.setCoord(1000, 20, -10)
         prop = ['Context.Device.Orientation.facingUp','Context.Device.Orientation.edgeUp']
-        struct = self.getProp(prop)
-        self.assert_(struct['Context.Device.Orientation.facingUp'][1],True)
-        self.assert_(struct['Context.Device.Orientation.edgeUp'][1],"3")
+        returnedProp, undeterminedProp = self.getProp(prop)
+        self.assert_(returnedProp['Context.Device.Orientation.facingUp'],True)
+        self.assert_(returnedProp['Context.Device.Orientation.edgeUp'],"3")
         
     def test_orientationEdgeUp(self):
         self.setFacing("face_down")
         self.setCoord(20, -1000, 10)
         self.setRotation("landscape")
         prop = ['Context.Device.Orientation.facingUp','Context.Device.Orientation.edgeUp']
-        struct = self.getProp(prop)
-        self.assert_(struct['Context.Device.Orientation.facingUp'][1],False)
-        self.assert_(struct['Context.Device.Orientation.edgeUp'][1],"1")
+        returnedProp, undeterminedProp = self.getProp(prop)
+        self.assert_(returnedProp['Context.Device.Orientation.facingUp'],False)
+        self.assert_(returnedProp['Context.Device.Orientation.edgeUp'],"1")
     
     def test_orientationEdgeDown(self):
         self.setFacing("face_down")
         self.setCoord(20, 1000, 10)
         self.setRotation("landscape")
         prop = ['Context.Device.Orientation.facingUp','Context.Device.Orientation.edgeUp']
-        struct = self.getProp(prop)
-        self.assert_(struct['Context.Device.Orientation.facingUp'][1],False)
-        self.assert_(struct['Context.Device.Orientation.edgeUp'][1],"4")
+        returnedProp, undeterminedProp = self.getProp(prop)
+        self.assert_(returnedProp['Context.Device.Orientation.facingUp'],False)
+        self.assert_(returnedProp['Context.Device.Orientation.edgeUp'],"4")
+    
+    def test_orientationEdgeUndefined(self):
+        self.setFacing("unknown")
+        self.setCoord(0, 0, 0)
+        self.setRotation("unknown")
+        prop = ['Context.Device.Orientation.facingUp','Context.Device.Orientation.edgeUp']
+        returnedProp, undeterminedProp = self.getProp(prop)
+        self.assert_(returnedProp['Context.Device.Orientation.facingUp'],False)
+        self.assert_(returnedProp['Context.Device.Orientation.edgeUp'],"0")
+
+class coreFunctions(ContextHelpers):
     
     def test_inexistentProperties(self):
         prop = ['Context.Device.Something']
