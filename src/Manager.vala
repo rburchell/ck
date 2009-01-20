@@ -34,10 +34,11 @@ namespace ContextKit {
 			  leaving a possible DOS or at least random memory leaks */
 			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash, str_equal);
 			StringSet keyset = new StringSet.from_array (keys);
+			// Let providers update the central value table
 			List<string> undeterminable_key_list = providers.get (keyset, values);
+			insert_to_value_table (values, undeterminable_key_list);
 
 			// Then read the values from the value table
-			insert_to_value_table (values, undeterminable_key_list);
 			read_from_value_table(keys, out values_to_send, out undeterminable_keys);
 		}
 
