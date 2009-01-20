@@ -14,6 +14,7 @@ namespace ContextKit {
 			string path = "/org/freedesktop/ContextKit/Subscribers/%d".printf (id);
 			this.object_path = new DBus.ObjectPath (path);
 			this.manager = manager;
+			this.key_counter = key_counter;
 			subscribed_keys = new StringSet();
 		}
 
