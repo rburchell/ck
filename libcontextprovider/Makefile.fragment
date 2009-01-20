@@ -1,0 +1,45 @@
+BUILT_SOURCES += libcontextprovider/libcontextprovider.vala.stamp
+
+lib_LTLIBRARIES = libcontextprovider.la
+
+libcontextprovider_VALASOURCES = \
+	libcontextprovider/DBusInterface.vala \
+	libcontextprovider/Manager.vala \
+	libcontextprovider/Providers.vala \
+	libcontextprovider/KeyUsageCounter.vala \
+	libcontextprovider/Subscriber.vala \
+	libcontextprovider/ProviderInterface.vala \
+	libcontextprovider/StringSet.vala \
+	$(NULL)
+
+libcontextprovider_VAPISOURCES = \
+	libcontextprovider/intset.vapi \
+	$(NULL)
+
+libcontextprovider_GENERATEDSOURCES = \
+	$(libcontextprovider_VALASOURCES:.vala=.c) \
+	$(libcontextprovider_VALASOURCES:.vala=.h) \
+	$(NULL)
+
+libcontextprovider_la_SOURCES = \
+	$(libcontextprovider_VALASOURCES:.vala=.c) \
+	$(libcontextprovider_VALASOURCES:.vala=.h) \
+	libcontextprovider/intset.c \
+	libcontextprovider/intset.h \
+	$(NULL)
+
+libcontextprovider/libcontextprovider.vala.stamp $(libcontextprovider_GENERATEDSOURCES): $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation --library contextprovider $^
+
+EXTRA_DIST += \
+	$(libcontextprovider_GENERATEDSOURCES) \
+	$(libcontextprovider_VALASOURCES) \
+	$(libcontextprovider_VAPISOURCES) \
+	libcontextprovider/libcontextprovider.vala.stamp \
+	$(NULL)
+
+DISTCLEANFILES += \
+	$(libcontextprovider_GENERATEDSOURCES) \
+	libcontextprovider/libcontextprovider.vala.stamp \
+	$(NULL)
+

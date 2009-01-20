@@ -17,6 +17,7 @@ AM_CPPFLAGS = \
 	$(CONTEXTD_CFLAGS) \
 	-include $(CONFIG_HEADER) \
 	-I$(top_srcdir)/src \
+	-I$(top_srcdir)/libcontextprovider \
 	$(NULL)
 
 BUILT_SOURCES = \
@@ -34,14 +35,7 @@ bin_PROGRAMS = contextd
 
 contextd_core_VALASOURCES = \
 	src/main.vala \
-	src/DBusInterface.vala \
-	src/Manager.vala \
-	src/Providers.vala \
-	src/KeyUsageCounter.vala \
-	src/Subscriber.vala \
 	src/MCE.vala \
-	src/ProviderInterface.vala \
-	src/StringSet.vala \
 	$(NULL)
 
 contextd_liblocation_VALASOURCES = \
@@ -52,10 +46,6 @@ contextd_VALASOURCES = \
 	$(contextd_liblocation_VALASOURCES) \
 	$(NULL)
 
-contextd_VAPISOURCES = \
-	src/intset.vapi \
-	$(NULL)
-
 contextd_GENERATEDSOURCES = \
 	$(contextd_VALASOURCES:.vala=.c) \
 	$(contextd_VALASOURCES:.vala=.h) \
@@ -64,8 +54,6 @@ contextd_GENERATEDSOURCES = \
 contextd_SOURCES = \
 	$(contextd_core_VALASOURCES:.vala=.c) \
 	$(contextd_core_VALASOURCES:.vala=.h) \
-	src/intset.c \
-	src/intset.h \
 	$(NULL)
 
 if HAVE_LOCATION
@@ -99,7 +87,7 @@ ASYNC_INTROSPECT = $(INTERFACES:spec/%.xml=introspect/async/%.xml)
 DOCS = doc/contextkit.html doc/context.html
 
 src/contextd.vala.stamp $(contextd_GENERATEDSOURCES): $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg posix --pkg sqlite3 --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg posix --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation contextprovider.vapi $^
 	touch $@
 
 tools_dir = $(top_srcdir)/tools
@@ -167,3 +155,4 @@ version:
 .PHONEY: version
 
 include tests/unit_tests/Makefile.fragment
+include libcontextprovider/Makefile.fragment
