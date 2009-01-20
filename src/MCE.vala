@@ -338,7 +338,7 @@ namespace ContextKit {
 				insert_orientation_to_map(orientation_keys, orientation, ret, ref unavail);
 
 				// Update the central value table with the new property values
-				Main.the_manager.property_values_changed(ret, unavail);
+				Manager.get_instance().property_values_changed(ret, unavail);
 				// FIXME: Is this how it should be done? 
 			}
 
@@ -354,7 +354,7 @@ namespace ContextKit {
 				insert_display_status_to_map(display_status_keys, display_status, ret, ref unavail);
 
 				// Update the central value table with the new property values
-				// FIXME
+				Manager.get_instance().property_values_changed(ret, unavail);
 			}
 
 			/*
@@ -369,7 +369,7 @@ namespace ContextKit {
 				insert_device_mode_to_map(device_mode_keys, device_mode, ret, ref unavail);
 
 				// Update the central value table with the new property values
-				// FIXME
+				Manager.get_instance().property_values_changed(ret, unavail);
 			}
 
 			/*
@@ -384,7 +384,7 @@ namespace ContextKit {
 				insert_call_state_to_map(call_state_keys, state, type, ret, ref unavail);
 
 				// Update the central value table with the new property values
-				// FIXME
+				Manager.get_instance().property_values_changed(ret, unavail);
 			}
 
 			/*
@@ -399,7 +399,7 @@ namespace ContextKit {
 				insert_inactivity_status_to_map(inactivity_status_keys, status, ret, ref unavail);
 
 				// Update the central value table with the new property values
-				// FIXME
+				Manager.get_instance().property_values_changed(ret, unavail);
 			}
 
 			public Provider () {
@@ -444,8 +444,6 @@ namespace ContextKit {
 				}
 			}
 
-			/* FIXME: replace Subscribe with below with: */
-
 			public void KeysSubscribed (StringSet keys) {
 
 				debug ("MCE plugin: KeysSubscribed %s", keys.debug());
@@ -486,7 +484,7 @@ namespace ContextKit {
 					// FIXME: How to implement?
 					int no_of_subscribers = 0;
 					foreach (var key in orientation_keys) {
-						//no_of_subscribers += Main.the_manager.key_counter.number_of_subscribers(key);
+						no_of_subscribers += Manager.get_instance().key_counter.number_of_subscribers(key);
 					}
 					
 					if (no_of_subscribers == 0) {

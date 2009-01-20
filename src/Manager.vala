@@ -6,8 +6,8 @@ namespace ContextKit {
 		// Mapping client dbus names into subscription objects
 		Gee.HashMap<string, Subscriber> subscribers;
 
-		Providers providers;
-		KeyUsageCounter key_counter;
+		internal Providers providers {get; private set;}
+		internal KeyUsageCounter key_counter {get; private set;}
 
 		// NULL value means undetermined
 		HashTable<string, Value?> values;
@@ -15,10 +15,19 @@ namespace ContextKit {
 
 		int subscriber_count = 0;
 
-		public Manager(Providers providers) {
-			this.providers = providers;
+		// Singleton implementation
+		private static Manager? instance;
+		public static Manager? get_instance() {
+			if (instance == null) {
+				instance = new Manager();
+			}
+			return instance;
+		}
+
+		private Manager() {
 			/*TODO, should manager own the key counter? */
-			this.key_counter = new KeyUsageCounter(providers);
+			this.providers = new Providers();
+			this.key_counter = new KeyUsageCounter();
 			this.subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			this.values = new HashTable<string, Value?>(str_hash, str_equal);
 

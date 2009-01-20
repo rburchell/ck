@@ -30,8 +30,6 @@ namespace ContextKit {
 		static GLib.MainLoop loop;
 		static dynamic DBus.Object bus; // Needs to be stored so that we get the NameOwnerChanged
 
-		public static ContextKit.Manager the_manager;
-
 		public Main () {
 		}
 
@@ -45,12 +43,14 @@ namespace ContextKit {
 				if (request_name_result == DBus.RequestNameReply.PRIMARY_OWNER) {
 					debug ("Creating new Manager D-Bus service");
 
-					Providers providers = new Providers();
-					providers.register_provider (MCE.Provider.keys, new MCE.Provider());
+					//Providers providers = new Providers();
+					//providers.register (MCE.Provider.keys, new MCE.Provider());
+					
+					Manager? manager = Manager.get_instance ();
+					manager.providers.register (MCE.Provider.keys, new MCE.Provider());
+					
+					connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 
-					the_manager = new ContextKit.Manager(providers);
-					connection.register_object ("/org/freedesktop/ContextKit/Manager", the_manager);
-					// Make manager listen to the NameOwnerChanged
 				} else {
 					debug ("Manager D-Bus service is already running");
 					return false;

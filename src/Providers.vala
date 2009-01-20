@@ -9,7 +9,7 @@ namespace ContextKit {
 		// Valid keys provided by all providers
 		public StringSet valid_keys = new StringSet();
 
-		public void register_provider(string[] keys, Provider provider) {
+		public void register (string[] keys, Provider provider) {
 			providers.add (provider);
 			valid_keys = new StringSet.union (valid_keys, new StringSet.from_array (keys));
 		}
