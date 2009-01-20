@@ -73,22 +73,33 @@ namespace ContextKit {
 		}
 
 		/* Is called when the value of a property changes */
-		internal void on_value_changed(HashTable<string, Value?> properties) {
+		internal void on_value_changed(HashTable<string, Value?> changed_properties, List<string>? changed_undeterminable) {
 			HashTable<string, Value?> values_to_send = new HashTable<string, Value?>(str_hash, str_equal);
-			GLib.List<string> undeterminable_keys = new GLib.List<string>();
+			List<string> undeterminable_keys = new GLib.List<string>();
 
-			GLib.List<string> keys = properties.get_keys ();
+			// Loop through the properties we got and
+			// check if the client is interested in them.
+			List<string> keys = changed_properties.get_keys ();
 			foreach (var key in keys) {
 				if (subscribed_keys.is_member (key)) {
 					// The client of this subscriber is interested in the key
-					Value? v = properties.lookup (key);
+					Value? v = changed_properties.lookup (key);
 
-					if (v == null) {
+					if (v == null) { // FIXME: Is this needed?
 						undeterminable_keys.append (key);
 					}
 					else {
 						values_to_send.insert (key, v);
 					}
+				}
+			}
+			
+			// Loop through the undetermined properties we got and
+			// check if the client is interested in them.
+			foreach (var key in changed_undeterminable) {
+				if (subscribed_keys.is_member (key)) {
+					// The client of this subscriber is interested in the key
+					undeterminable_keys.append (key);
 				}
 			}
 
