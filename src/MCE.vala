@@ -120,7 +120,7 @@ namespace ContextKit {
 					return;
 				}
 
-				string display_status; // FIXME: Check: Does Vala handle memory management correctly?
+				string display_status;
 				try {
 					mce_request.get_display_status(out display_status);
 				} catch (GLib.Error ex) {
@@ -338,7 +338,8 @@ namespace ContextKit {
 				insert_orientation_to_map(orientation_keys, orientation, ret, ref unavail);
 
 				// Update the central value table with the new property values
-				Main.the_manager.property_values_changed(ret); // FIXME: unavail should be added?
+				Main.the_manager.property_values_changed(ret, unavail);
+				// FIXME: Is this how it should be done? 
 			}
 
 			/*
@@ -447,6 +448,7 @@ namespace ContextKit {
 
 			public void KeysSubscribed (StringSet keys) {
 
+				debug ("MCE plugin: KeysSubscribed %s", keys.debug());
 				ensure_mce_signal_exists();
 
 				// Connect the corresponding MCE signal to its handler
@@ -476,6 +478,7 @@ namespace ContextKit {
 
 			public void KeysUnsubscribed (StringSet keys) {
 				
+				debug ("MCE plugin: KeysUnsubscribed %s", keys.debug());
 				// Disconnect the corresponding MCE signal from its handler
 				if (keys.is_disjoint (orientation_keys) == false) {
 					// Note: orientation_keys contains two keys
@@ -483,7 +486,7 @@ namespace ContextKit {
 					// FIXME: How to implement?
 					int no_of_subscribers = 0;
 					foreach (var key in orientation_keys) {
-						//no_of_subscribers += Something.get_no_of_subscribers(key);
+						//no_of_subscribers += Main.the_manager.key_counter.number_of_subscribers(key);
 					}
 					
 					if (no_of_subscribers == 0) {
