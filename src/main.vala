@@ -20,7 +20,6 @@
  */
 
 using GLib;
-using Sqlite;
 using Posix.Signal;
 
 namespace ContextKit {
