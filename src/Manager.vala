@@ -129,13 +129,13 @@ namespace ContextKit {
 		}
 
 		/* Is called when the provider sets new values to context properties */
-		public void property_values_changed(HashTable<string, Value?> properties) {
+		public void property_values_changed(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
 			// Update the value table
-			insert_to_value_table(properties, null);
+			insert_to_value_table(properties, undeterminable_keys);
 
 			// Inform the subscribers of the change
 			foreach (var s in subscribers.get_values()) {
-				s.on_value_changed(properties);
+				s.on_value_changed(properties, undeterminable_keys);
 			}
 		}
 	}
