@@ -28,7 +28,7 @@ libcontextprovider_la_SOURCES = \
 	libcontextprovider/intset.h \
 	$(NULL)
 
-libcontextprovider/libcontextprovider.vala.stamp $(libcontextprovider_GENERATEDSOURCES): $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
+libcontextprovider/libcontextprovider.vala.stamp $(libcontextprovider_GENERATEDSOURCES) contextprovider.vapi: $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation --library contextprovider $^
 
 EXTRA_DIST += \

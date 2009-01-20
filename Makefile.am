@@ -86,8 +86,8 @@ INTROSPECT = $(INTERFACES:spec/%.xml=introspect/%.xml)
 ASYNC_INTROSPECT = $(INTERFACES:spec/%.xml=introspect/async/%.xml)
 DOCS = doc/contextkit.html doc/context.html
 
-src/contextd.vala.stamp $(contextd_GENERATEDSOURCES): $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg posix --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation contextprovider.vapi $^
+src/contextd.vala.stamp $(contextd_GENERATEDSOURCES): contextprovider.vapi $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg posix --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
 	touch $@
 
 tools_dir = $(top_srcdir)/tools
@@ -120,10 +120,12 @@ if HAVE_LOCATION
 contextd_LDADD = \
 	$(CONTEXTD_LIBS) \
 	$(LOCATION_LIBS) \
+	libcontextprovider.la \
 	$(NULL)
 else
 contextd_LDADD = \
 	$(CONTEXTD_LIBS) \
+	libcontextprovider.la \
 	$(NULL)
 endif
 

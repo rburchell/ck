@@ -6,8 +6,8 @@ namespace ContextKit {
 		// Mapping client dbus names into subscription objects
 		Gee.HashMap<string, Subscriber> subscribers;
 
-		internal Providers providers {get; private set;}
-		internal KeyUsageCounter key_counter {get; private set;}
+		public Providers providers {get; private set;}
+		public KeyUsageCounter key_counter {get; private set;}
 
 		// NULL value means undetermined
 		HashTable<string, Value?> values;
