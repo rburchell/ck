@@ -39,16 +39,26 @@ namespace ContextKit {
 		public void Get (string[] keys, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
 			debug ("Manager.Get");
 
+			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash, str_equal);
+
+			// Check input against valid keys
+			// Do not create a StringSet from the parameter "keys" as that would be add Quarks
+			string[] checked_keys = check_keys(keys);
+
+			StringSet keyset = new StringSet.from_array (checked_keys);
+
 			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
 			  leaving a possible DOS or at least random memory leaks */
-			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash, str_equal);
-			StringSet keyset = new StringSet.from_array (keys);
+
+			// Ignore keys which are not recognized as valid
+			keyset = new StringSet.intersection (keyset, providers.valid_keys);
+
 			// Let providers update the central value table
 			List<string> undeterminable_key_list = providers.get (keyset, values);
 			insert_to_value_table (values, undeterminable_key_list);
 
 			// Then read the values from the value table
-			read_from_value_table(keys, out values_to_send, out undeterminable_keys);
+			read_from_value_table(checked_keys, out values_to_send, out undeterminable_keys);
 		}
 
 		public DBus.ObjectPath GetSubscriber (DBus.BusName name) throws DBus.Error {
@@ -96,6 +106,20 @@ namespace ContextKit {
 
 				// Now nobody holds a pointer to the subscriber so it is destroyed automatically.
 			}
+		}
+
+		/*
+		Checks which keys are valid and returns them.
+		*/
+		public string[] check_keys(string[] keys) {
+			// Do not create a StringSet from the parameter "keys" as that would be add Quarks
+			string[] checked_keys = {};
+			foreach (var key in keys) {
+				if (providers.valid_keys.is_member(key)) {
+					checked_keys += key;
+				}
+			}
+			return checked_keys;
 		}
 
 		/*
