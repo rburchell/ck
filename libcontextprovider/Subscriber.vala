@@ -79,7 +79,10 @@ namespace ContextKit {
 
 			// Loop through the properties we got and
 			// check if the client is interested in them.
-			List<string> keys = changed_properties.get_keys ();
+			var keys = changed_properties.get_keys ();
+			// Note: get_keys returns a list of unowned strings. We shouldn't assign it to
+			// a list of owned strings. At the moment, the Vala compiler doesn't prevent us
+			// from doing so. 
 			foreach (var key in keys) {
 				if (subscribed_keys.is_member (key)) {
 					// The client of this subscriber is interested in the key
