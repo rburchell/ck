@@ -103,7 +103,10 @@ namespace ContextKit {
 		*/
 		public void insert_to_value_table(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
 			//debug ("insert_to_value_table");
-			GLib.List<string> keys = properties.get_keys ();
+			var keys = properties.get_keys ();
+			// Note: get_keys returns a list of unowned strings. We shouldn't assign it to
+			// a list of owned strings. At the moment, the Vala compiler doesn't prevent us
+			// from doing so. 
 			foreach (var key in keys) {
 				// Overwrite the value in the value table.
 				// Do not care whether it was already there or not.

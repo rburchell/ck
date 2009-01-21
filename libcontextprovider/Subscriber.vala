@@ -27,7 +27,9 @@ namespace ContextKit {
 		}
 
 		// Emit the Changed signal over DBus
-		internal void emit_changed (HashTable<string, Value?> values, List<string> unavail_l) {
+		internal void emit_changed (HashTable<string, Value?> values, List<string>? unavail_l) {
+			// Note: The unavail_l is never going to be NULL but it can be an empty list.
+			// An empty GList is NULL and Vala doesn't know about that feature.
 			string[] unavail = {};
 
 			foreach (string str in unavail_l) {
@@ -79,7 +81,10 @@ namespace ContextKit {
 
 			// Loop through the properties we got and
 			// check if the client is interested in them.
-			List<string> keys = changed_properties.get_keys ();
+			var keys = changed_properties.get_keys ();
+			// Note: get_keys returns a list of unowned strings. We shouldn't assign it to
+			// a list of owned strings. At the moment, the Vala compiler doesn't prevent us
+			// from doing so. 
 			foreach (var key in keys) {
 				if (subscribed_keys.is_member (key)) {
 					// The client of this subscriber is interested in the key
