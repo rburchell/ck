@@ -45,8 +45,9 @@ AC_SUBST(LDFLAGS)
 
 GLIB_REQUIRED=2.12.0
 GEE_REQUIRED=0.1.3
+PYTHON_REQUIRED=2.5
 
-PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED sqlite3 dbus-glib-1 gee-1.0 >=  $GEE_REQUIRED)
+PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED sqlite3 dbus-glib-1 gee-1.0 >=  $GEE_REQUIRED python >= $PYTHON_REQUIRED)
 AC_SUBST(CONTEXTD_CFLAGS)
 AC_SUBST(CONTEXTD_LIBS)
 
@@ -66,7 +67,7 @@ AC_ARG_ENABLE(gcov,
 					[compile with coverage profiling (gcc only)]),
 					enable_gcov=$enableval,enable_gcov=no)
 
-if test "x$enable_gcov" != "xno"; then
+if test "x$enable_gcov" != "xno"; then   	
 	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage"
 	CONTEXTD_LIBS="$CONTEXTD_LIBS -lgcov"
 fi
@@ -76,3 +77,4 @@ AC_SUBST(CONTEXTD_CFLAGS)
 AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
+
