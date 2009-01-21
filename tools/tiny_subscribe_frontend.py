@@ -5,9 +5,10 @@ import gobject
 
 from dbus.mainloop.glib import DBusGMainLoop
 
-def handle_signal(changed):
-    print "Got signal"
-    print changed
+def handle_signal(changed, undet):
+	print "Got signal"
+	print changed
+	print undet
 
 def execute_subscribe(property_names):
 	bus = dbus.SessionBus()
