@@ -158,3 +158,4 @@ version:
 
 include tests/unit_tests/Makefile.fragment
 include libcontextprovider/Makefile.fragment
+include tests/python-test-library/Makefile.fragment
