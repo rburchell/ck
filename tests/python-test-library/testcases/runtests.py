@@ -22,9 +22,8 @@ import commands
 import dbus_emulator
 import conf
 import contextGetPropertiesTCs
-#import contextSubscribePropertiesTCs
-import test
-
+import contextSubscriberHandler
+from signal import *
 
 def module_setUp():
     print "Creating buses"
@@ -37,15 +36,23 @@ def module_setUp():
     print "Starting contextd"
     os.system(conf.contextSrcPath + os.path.sep + "contextd &")
     sleep (5)
+    #print "Starting subscriber handler"
+    #os.system(conf.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/contextSubscriberHandler.py &")
+    #sleep (5)
+    
     #os.system(conf.contextSrcPath + os.sep + "tests/python-test-library/testcases/test.py &")
     #sleep (5)
     
 
 def module_tearDown():
-    os.kill(int(commands.getoutput('pidof contextd')),15)
+    
     dbus_emulator.deleteBus(dbus_emulator.SYSTEM)
     dbus_emulator.deleteBus(dbus_emulator.SESSION)
-
+    for pid in commands.getoutput("ps -ef | egrep -i contextd | awk '{print $2}'").split() :
+        try:
+            os.kill(int(pid), SIGQUIT)
+        except OSError, e:
+            if not e.errno == 3 : raise e
 
 # Main stuff
 if __name__ == "__main__":
@@ -56,3 +63,4 @@ if __name__ == "__main__":
     #contextSubscribePropertiesTCs.testRun()
     print "Tearing down tests"
     module_tearDown()
+
