@@ -45,10 +45,46 @@ AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
+######################
+# Coverage option
+######################
+
+AC_ARG_ENABLE(debuggcov,
+	AS_HELP_STRING([--enable-debuggcov=@<:@no/yes/auto@:>@],
+	[compile with coverage profiling and debug (gcc only)]),
+	enable_debuggcov=$enableval,enable_debuggcov=no)
+
+######################
+# Debug option
+######################
+
+AC_ARG_ENABLE(debug,
+	AS_HELP_STRING([--enable-debug=@<:@no/yes/auto@:>@],
+	[compile with debug profiling]),
+	enable_debug=$enableval,enable_debug=no)
+
 GLIB_REQUIRED=2.12.0
 GEE_REQUIRED=0.1.3
 
 PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED sqlite3 dbus-glib-1 gee-1.0 >=  $GEE_REQUIRED)
+
+##################################
+# Flags for coverage measurement
+##################################
+
+if test "x$enable_debuggcov" != "xno"; then   	
+	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage -g -Wall"
+	CONTEXTD_LIBS="$CONTEXTD_LIBS -lgcov"
+fi
+
+##################################
+# Flags for debugging
+##################################
+
+if test "x$enable_debug" != "xno" ; then
+   	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -g -Wall -Werror"
+fi 
+
 AC_SUBST(CONTEXTD_CFLAGS)
 AC_SUBST(CONTEXTD_LIBS)
 
@@ -58,22 +94,6 @@ AC_SUBST(LOCATION_CFLAGS)
 AC_SUBST(LOCATION_LIBS)
 
 AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
-
-######################
-# Coverage
-######################
-
-AC_ARG_ENABLE(gcov,
-			AS_HELP_STRING([--enable-gcov=@<:@no/yes/auto@:>@],
-					[compile with coverage profiling (gcc only)]),
-					enable_gcov=$enableval,enable_gcov=no)
-
-if test "x$enable_gcov" != "xno"; then   	
-	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage"
-	CONTEXTD_LIBS="$CONTEXTD_LIBS -lgcov"
-fi
-
-AC_SUBST(CONTEXTD_CFLAGS)
 
 AC_CONFIG_FILES([Makefile])
 
