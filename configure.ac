@@ -11,7 +11,10 @@ AC_CONFIG_MACRO_DIR(m4)
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_DISABLE_STATIC
+
 AC_PROG_LIBTOOL
+
+GTK_DOC_CHECK([1.9])
 
 AC_PATH_PROG(VALAC, valac, valac)
 AC_SUBST(VALAC)
@@ -96,6 +99,10 @@ AC_SUBST(LOCATION_LIBS)
 AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
 
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([doc/Makefile])
+AC_CONFIG_FILES([doc/reference/Makefile])
+AC_CONFIG_FILES([doc/reference/libcontextprovider/Makefile])
+
 
 AC_OUTPUT
 

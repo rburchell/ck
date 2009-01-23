@@ -2,15 +2,18 @@ include Makefile.decl
 
 NULL =
 
+DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
+
 XSLTPROC = xsltproc --xinclude --nonet
 DROP_NAMESPACE = perl -pe '$$hash = chr(35); s{xmlns:tp="http://telepathy\.freedesktop\.org/wiki/DbusSpec$${hash}extensions-v0"}{}g'
 RST2HTML = rst2html
 XMLLINT = xmllint --noout --schema
 
+
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = \
+SUBDIRS = doc \
 	$(NULL)
 
 AM_CPPFLAGS = \
