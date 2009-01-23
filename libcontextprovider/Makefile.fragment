@@ -18,7 +18,6 @@ libcontextprovider_VAPISOURCES = \
 
 libcontextprovider_GENERATEDSOURCES = \
 	$(libcontextprovider_VALASOURCES:.vala=.c) \
-	$(libcontextprovider_VALASOURCES:.vala=.h) \
 	$(NULL)
 
 libcontextprovider_la_SOURCES = \
@@ -31,6 +30,14 @@ libcontextprovider_la_SOURCES = \
 libcontextprovider/libcontextprovider.vala.stamp $(libcontextprovider_GENERATEDSOURCES) contextprovider.vapi: $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation --library contextprovider $^
 
+libcontextprovider_la_CFLAGS = \
+			     $(CONTEXTD_CFLAGS) \
+			     $(NULL)
+
+libcontextprovider_la_LIBADD = \
+			  $(CONTEXTD_LIBS) \
+			  $(NULL)
+
 EXTRA_DIST += \
 	$(libcontextprovider_GENERATEDSOURCES) \
 	$(libcontextprovider_VALASOURCES) \
@@ -40,6 +47,10 @@ EXTRA_DIST += \
 
 DISTCLEANFILES += \
 	$(libcontextprovider_GENERATEDSOURCES) \
+	$(libcontextprovider_VALASOURCES:.vala=.c) \
+	$(libcontextprovider_VALASOURCES:.vala=.h) \
 	libcontextprovider/libcontextprovider.vala.stamp \
+	libcontextprovider/*.gcno \
+	libcontextprovider/*.gcda \
 	$(NULL)
 
