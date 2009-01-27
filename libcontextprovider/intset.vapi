@@ -43,11 +43,12 @@ namespace ContextKit {
 		[CCode (cname = "context_kit_intset_to_array")]
 		public weak GLib.Array to_array ();
 	}
-	[Compact]
-	[CCode (cheader_filename = "intset.h", free_function = "g_free")]
-	public class IntSetIter {
-		public uint element;
+	[CCode (cheader_filename = "intset.h", is_value_type="1")]
+	public struct IntSetIter {
+		[CCode (cname = "context_kit_intset_iter_init")]
+		public IntSetIter (IntSet? set);
 		public weak ContextKit.IntSet? set;
+		public uint element;
 		[CCode (cname = "context_kit_intset_iter_next")]
 		public bool next ();
 	}

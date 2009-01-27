@@ -6,6 +6,7 @@ GTESTER_REPORT = gtester-report
 # initialize variables for unconditional += appending
 EXTRA_DIST =
 TEST_PROGS =
+PYTHON_TEST_PROGS =
 
 ### testing rules
 
@@ -65,7 +66,7 @@ test-massif:  ${TEST_PROGS}
 	  done
 
 test-valgrind:  ${TEST_PROGS}
-	@test -z "${TEST_PROGS}" || for test in ${TEST_PROGS} ; do \
+	@test -z"${TEST_PROGS}" || for test in ${TEST_PROGS} ; do \
 	   G_SLICE=always-malloc G_DEBUG=gc-friendly GLIBCPP_FORCE_NEW=1 GLIBCXX_FORCE_NEW=1 \
 	   libtool --mode=execute valgrind --tool=memcheck ./$$test ; \
 	  done
@@ -74,6 +75,12 @@ test-valgrind:  ${TEST_PROGS}
 	    ( cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@ ) || exit $? ; \
 	  done
 
-.PHONY: test test-report perf-report full-report test-massif test-valgrind
+test-python: ${PYTHON_TEST_PROGS}
+	@test -z "${PYTHON_TEST_PROGS}" || for test in ${PYTHON_TEST_PROGS} ; do \
+	   python ./$$test ; \
+	   done    
+
+
+.PHONY: test test-report perf-report full-report test-massif test-valgrind test-python
 # run make test as part of make check
-check-local: test
+check-local: test test-python

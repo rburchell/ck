@@ -1,0 +1,10 @@
+PYTHON_TEST_PROGS += \
+	tests/python-test-library/testcases/runtests.py					\
+	$(NULL)
+
+DISTCLEANFILES += \
+	tests/python-test-library/testcases/*.pyc		\
+	tests/python-test-library/stubs/*.pyc			\
+	$(NULL)
+
+

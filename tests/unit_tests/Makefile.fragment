@@ -11,7 +11,7 @@ BUILT_SOURCES += \
 	$(NULL)
 
 tests_unit_tests_intset_VAPISOURCES = \
-	src/intset.vapi               \
+	libcontextprovider/intset.vapi               \
 	$(NULL)
 
 tests_unit_tests_intset_VALASOURCES = \
@@ -25,23 +25,23 @@ tests_unit_tests_intset_GENERATEDSOURCES = \
 
 tests_unit_tests_intset_SOURCES = \
 	$(tests_unit_tests_intset_GENERATEDSOURCES)		\
-	src/intset.c					\
-	src/intset.h					\
+	libcontextprovider/intset.c					\
+	libcontextprovider/intset.h					\
 	$(NULL)
 
 tests/unit_tests/intset.vala.stamp: $(tests_unit_tests_intset_VALASOURCES) $(tests_unit_tests_intset_VAPISOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) $^
 	touch $@
 
-tests_unit_tests_intset_CFLAGS = -I$(top_srcdir)/src $(CONTEXTD_CFLAGS)
+tests_unit_tests_intset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
 tests_unit_tests_intset_LDADD = $(CONTEXTD_LIBS)
 
 tests_unit_tests_stringset_VAPISOURCES = \
-	src/intset.vapi				\
+	libcontextprovider/intset.vapi				\
 	$(NULL)
 
 tests_unit_tests_stringset_VALASOURCES = \
-	src/StringSet.vala				\
+	libcontextprovider/StringSet.vala				\
 	tests/unit_tests/stringset.vala				\
 	$(NULL)
 
@@ -52,15 +52,15 @@ tests_unit_tests_stringset_GENERATEDSOURCES = \
 
 tests_unit_tests_stringset_SOURCES = \
 	$(tests_unit_tests_stringset_GENERATEDSOURCES)		\
-	src/intset.c					\
-	src/intset.h					\
+	libcontextprovider/intset.c					\
+	libcontextprovider/intset.h					\
 	$(NULL)
 
 tests/unit_tests/stringset.vala.stamp: $(tests_unit_tests_stringset_VALASOURCES) $(tests_unit_tests_stringset_VAPISOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
 	touch $@
 
-tests_unit_tests_stringset_CFLAGS = -I$(top_srcdir)/src $(CONTEXTD_CFLAGS)
+tests_unit_tests_stringset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
 tests_unit_tests_stringset_LDADD = $(CONTEXTD_LIBS)
 
 EXTRA_DIST += \

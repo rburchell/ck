@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<provider service="org.freedesktop.ContextKit" path="/org/freedesktop/ContextKit/Manager">
+<provider service="org.freedesktop.ContextKit">
  <doc>
     Contextd daemon provides the below specified read only properties.
     This file is the ultimate source of information about the properties provided
@@ -36,8 +36,12 @@
          <key name="facingUp" type="TRUTH">
            <doc>A boolean , true if the device is face up, false if face down </doc>
          </key>
-         <key name="edgeUp" type="INT">
-           <doc> The screen edge that is currently pointing upwards. Enum: 0- Undefined, 1 - Top Edge, 2 -Left Edge, 3 - Right edge, 4- Bottom edge </doc>
+         <key name="edgeUp" type="ENUM">
+            <doc> The screen edge that is currently pointing upwards.</doc>
+            <enumerator name="Top" value="1"/>
+            <enumerator name="Left" value="2"/>
+            <enumerator name="Right" value="3"/>
+            <enumerator name="Bottom" value="4"/>
          </key>
       </node>
 <!--

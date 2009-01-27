@@ -2,21 +2,25 @@ include Makefile.decl
 
 NULL =
 
+DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
+
 XSLTPROC = xsltproc --xinclude --nonet
 DROP_NAMESPACE = perl -pe '$$hash = chr(35); s{xmlns:tp="http://telepathy\.freedesktop\.org/wiki/DbusSpec$${hash}extensions-v0"}{}g'
 RST2HTML = rst2html
 XMLLINT = xmllint --noout --schema
 
+
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = \
+SUBDIRS = doc \
 	$(NULL)
 
 AM_CPPFLAGS = \
 	$(CONTEXTD_CFLAGS) \
 	-include $(CONFIG_HEADER) \
 	-I$(top_srcdir)/src \
+	-I$(top_srcdir)/libcontextprovider \
 	$(NULL)
 
 BUILT_SOURCES = \
@@ -34,11 +38,7 @@ bin_PROGRAMS = contextd
 
 contextd_core_VALASOURCES = \
 	src/main.vala \
-	src/DBusInterface.vala \
-	src/Manager.vala \
 	src/MCE.vala \
-	src/PluginInterface.vala \
-	src/StringSet.vala \
 	$(NULL)
 
 contextd_liblocation_VALASOURCES = \
@@ -49,10 +49,6 @@ contextd_VALASOURCES = \
 	$(contextd_liblocation_VALASOURCES) \
 	$(NULL)
 
-contextd_VAPISOURCES = \
-	src/intset.vapi \
-	$(NULL)
-
 contextd_GENERATEDSOURCES = \
 	$(contextd_VALASOURCES:.vala=.c) \
 	$(contextd_VALASOURCES:.vala=.h) \
@@ -61,8 +57,6 @@ contextd_GENERATEDSOURCES = \
 contextd_SOURCES = \
 	$(contextd_core_VALASOURCES:.vala=.c) \
 	$(contextd_core_VALASOURCES:.vala=.h) \
-	src/intset.c \
-	src/intset.h \
 	$(NULL)
 
 if HAVE_LOCATION
@@ -95,8 +89,8 @@ INTROSPECT = $(INTERFACES:spec/%.xml=introspect/%.xml)
 ASYNC_INTROSPECT = $(INTERFACES:spec/%.xml=introspect/async/%.xml)
 DOCS = doc/contextkit.html doc/context.html
 
-src/contextd.vala.stamp $(contextd_GENERATEDSOURCES): $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg posix --pkg sqlite3 --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
+src/contextd.vala.stamp $(contextd_GENERATEDSOURCES): contextprovider.vapi $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg posix --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
 	touch $@
 
 tools_dir = $(top_srcdir)/tools
@@ -129,10 +123,12 @@ if HAVE_LOCATION
 contextd_LDADD = \
 	$(CONTEXTD_LIBS) \
 	$(LOCATION_LIBS) \
+	libcontextprovider.la \
 	$(NULL)
 else
 contextd_LDADD = \
 	$(CONTEXTD_LIBS) \
+	libcontextprovider.la \
 	$(NULL)
 endif
 
@@ -150,7 +146,11 @@ EXTRA_DIST += \
 
 DISTCLEANFILES = \
 	$(contextd_GENERATEDSOURCES) \
+	$(contextd_SOURCES)	\
 	src/contextd.vala.stamp \
+	src/*.gcov \
+	src/*.gcno \
+	src/*.gcda \
 	$(NULL)
 
 clean-gcov:
@@ -164,3 +164,5 @@ version:
 .PHONEY: version
 
 include tests/unit_tests/Makefile.fragment
+include libcontextprovider/Makefile.fragment
+include tests/python-test-library/Makefile.fragment

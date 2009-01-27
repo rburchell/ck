@@ -20,7 +20,6 @@
  */
 
 using GLib;
-using Sqlite;
 using Posix.Signal;
 
 namespace ContextKit {
@@ -33,8 +32,6 @@ namespace ContextKit {
 		public Main () {
 		}
 
-		private static ContextKit.Manager manager;
-
 		private static bool start_manager () {
 			try {
 				var connection = DBus.Bus.get (DBus.BusType.SESSION);
@@ -44,10 +41,15 @@ namespace ContextKit {
 
 				if (request_name_result == DBus.RequestNameReply.PRIMARY_OWNER) {
 					debug ("Creating new Manager D-Bus service");
-					manager = new ContextKit.Manager();
+
+					//Providers providers = new Providers();
+					//providers.register (MCE.Provider.keys, new MCE.Provider());
+					
+					Manager? manager = Manager.get_instance ();
+					manager.providers.register (MCE.Provider.keys, new MCE.Provider());
+					
 					connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
-					// Make manager listen to the NameOwnerChanged
-					bus.NameOwnerChanged += manager.on_name_owner_changed;
+
 				} else {
 					debug ("Manager D-Bus service is already running");
 					return false;

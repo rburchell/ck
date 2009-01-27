@@ -6,9 +6,7 @@ namespace ContextKit {
 
 		internal StringSetIter (StringSet parent) {
 			this.parent = parent;
-			this.iter = new IntSetIter();
-			this.iter.element = -1;
-			this.iter.set = parent.intset;
+			this.iter = IntSetIter (parent.intset);
 		}
 		public bool next() {
 			return iter.next();
@@ -129,6 +127,10 @@ namespace ContextKit {
 
 		public string debug () {
 			Gee.ArrayList<string> strings = to_array();
+			if (strings.size < 1) {
+				return "";
+			}
+
 			string ret = strings[0];
 			for (int i=1; i<strings.size; i++) {
 				ret = ret + ", " + strings[i];

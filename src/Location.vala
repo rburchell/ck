@@ -17,8 +17,8 @@ namespace ContextKit {
 			public bool altitude_valid;
 		}
 
-		public class Plugin : GLib.Object, ContextKit.Plugin {
-			PluginMixins.SubscriberList subscribed;
+		public class Provider : GLib.Object, ContextKit.Provider {
+			ProviderMixins.SubscriberList subscribed;
 
 			// contextd keys this plugin takes care of
 			const Key[] keys = {
@@ -46,7 +46,7 @@ namespace ContextKit {
 			// Device for using liblocation
 			Location.GPSDevice m_device;
 
-			void subscription_removed (PluginMixins.SubscriberList l, Subscriber s) {
+			void subscription_removed (ProviderMixins.SubscriberList l, Subscriber s) {
 				// TODO: Check here whether the connection to the loc service should be closed? 
 
 				// FIXME: Do we have to remove it from the subscription list manually? Should the subscription list be part of the superclass?
@@ -56,10 +56,10 @@ namespace ContextKit {
 			Connect the liblocation signals to correct functions.
 			Possibly: Indicate to liblocation that we're intrested in location data and start listening.
 			*/
-			public Plugin () {
+			public Provider () {
 
 				// Create plugin-related data structures
-				subscribed = new PluginMixins.SubscriberList();
+				subscribed = new ProviderMixins.SubscriberList();
 				subscribed.removed += subscription_removed;
 
 				location_keys = new StringSet.from_array (new string[] {
@@ -101,7 +101,7 @@ namespace ContextKit {
 			}
 
 			// Destructor
-			~Plugin() {
+			~Provider() {
 				// FIXME: Deleting / freeing / ... the device? How? Or does Vala handle it automatically?
 			}
 
