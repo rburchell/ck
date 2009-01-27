@@ -36,6 +36,7 @@ Description: ContextKit daemon debug symbols
 Package: contextkit-doc
 Section: doc
 Architecture: all
+Provides: org-freedesktop-contextkit-doc
 Description: ContextKit daemon documentation
  ContextKit is a system for providing real-time context awareness to
  applications.
