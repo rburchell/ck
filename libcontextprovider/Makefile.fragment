@@ -25,6 +25,8 @@ libcontextprovider_la_SOURCES = \
 	$(libcontextprovider_VALASOURCES:.vala=.h) \
 	libcontextprovider/intset.c \
 	libcontextprovider/intset.h \
+	libcontextprovider/contextprovider.c \
+	libcontextprovider/contextprovider.h \
 	$(NULL)
 
 libcontextprovider/libcontextprovider.vala.stamp $(libcontextprovider_GENERATEDSOURCES) contextprovider.vapi: $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
