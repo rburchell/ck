@@ -3,7 +3,7 @@
 
 #export DH_VERBOSE=1
 
-docdir=/usr/share/doc/contextkit/api/
+docdir=/usr/share/maemo-doc/org.freedesktop.ContextKit
 
 configure: autogen.sh
 	NOCONFIGURE=yes ./autogen.sh
@@ -33,7 +33,7 @@ install: build
 	dh_installdirs
 	$(MAKE) DESTDIR=`pwd`/debian/tmp/ install
 	mkdir -p `pwd`/debian/tmp/$(docdir)/
-	cp -a doc/* `pwd`/debian/tmp/$(docdir)/
+	cp -a doc/contextkit.html `pwd`/debian/tmp/$(docdir)/index.html
 	dh_install --sourcedir=`pwd`/debian/tmp/
 
 binary-indep: build install
