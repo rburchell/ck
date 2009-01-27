@@ -11,7 +11,8 @@ Build-Depends: debhelper (>= 5),
                libgee-dev (>= 0.1.3),
 	       python,
 	       xsltproc,
-	       valac (>= 0.5.6)
+	       valac (>= 0.5.6),
+	       gtk-doc-tools
 Standards-Version: 3.8.0
 
 Package: contextkit
@@ -42,3 +43,46 @@ Description: ContextKit daemon documentation
  applications.
  .
  This package contains the D-Bus interface documentation.
+
+Package: libcontextprovider0
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Helper library for providers of context properties
+ The libcontextprovider library implements the provider side of the
+ org.freedesktop.ContextKit D-Bus interface.
+
+Package: libcontextprovider0-dbg
+Priority: extra
+Architecture: any
+Depends: libcontextprovider0 (= ${binary:Version}), contextkit-dbg (= ${binary:Version})
+Description: Helper library for providers of context properties
+ The libcontextprovider library implements the provider side of the
+ org.freedesktop.ContextKit D-Bus interface.
+ .
+ This package contains the debug symbols.
+
+Package: libcontextprovider-dev
+Section: libdevel
+Architecture: any
+Depends: libcontextprovider (= ${binary:Version})
+Description: Helper library for providers of context properties
+ The libcontextprovider library implements the provider side of the
+ org.freedesktop.ContextKit D-Bus interface.
+ .
+ This package contains the development files.
+
+Package: libcontextprovider-doc
+Section: doc
+Architecture: all
+Description: Helper library for providers of context properties
+ The libcontextprovider library implements the provider side of the
+ org.freedesktop.ContextKit D-Bus interface.
+ .
+ This package contains the documentation.
+
+Package: context-properties-doc
+Section: doc
+Architecture: all
+Description: Documentation of all context properties
+ This package contains the documentation of all context properties
+ of the Maemo platform.
