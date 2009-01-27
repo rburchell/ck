@@ -1,4 +1,4 @@
-Source: dui-contextkit
+Source: contextkit
 Section: misc
 Priority: optional
 Maintainer: Marius Vollmer <marius.vollmer@nokia.com>
@@ -13,7 +13,7 @@ Build-Depends: debhelper (>= 5),
 	       xsltproc
 Standards-Version: 3.8.0
 
-Package: dui-contextkit
+Package: contextkit
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: ContextKit daemon
@@ -22,7 +22,7 @@ Description: ContextKit daemon
  .
  This package provides the session-activated dbus daemon.
 
-Package: dui-contextkit-dbg
+Package: contextkit-dbg
 Priority: extra
 Architecture: any
 Depends: contextkit (= ${binary:Version})
@@ -32,7 +32,7 @@ Description: ContextKit daemon debug symbols
  .
  This package contains the debug symbols for the daemon.
 
-Package: dui-contextkit-doc
+Package: contextkit-doc
 Section: doc
 Architecture: all
 Description: ContextKit daemon documentation

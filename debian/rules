@@ -59,7 +59,7 @@ binary-arch: build install
 	dh_installexamples -a
 	dh_installmenu -a
 	dh_installman -a
-	dh_strip -a --dbg-package="dui-contextkit-dbg"
+	dh_strip -a --dbg-package="contextkit-dbg"
 	dh_link -a
 	dh_compress -a
 	dh_fixperms -a
