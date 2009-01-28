@@ -150,13 +150,16 @@ namespace ContextProvider {
 			properties = new HashTable<string, Value?>(str_hash, str_equal);
 			string[] undeterminable_keys_temp = {}; 
 			foreach (var key in keys) {
+				debug ("  %s", key);
 				//debug ("reading value for key %s", key);
 				Value? v = values.lookup (key);
 
 				if (v == null) {
+					debug ("    - undeterminable");
 					undeterminable_keys_temp += key;
 				}
 				else {
+					debug ("    - %s", v.strdup_contents());
 					properties.insert (key, v);
 				}
 			}
