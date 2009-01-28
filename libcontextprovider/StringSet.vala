@@ -1,4 +1,4 @@
-namespace ContextKit {
+namespace ContextProvider {
 
 	public class StringSetIter {
 		StringSet parent;
@@ -48,19 +48,19 @@ namespace ContextKit {
 			}
 		}
 
-		public StringSet.intersection (ContextKit.StringSet left, ContextKit.StringSet right) {
+		public StringSet.intersection (StringSet left, StringSet right) {
 			this.from_intset (new IntSet.intersection (left.intset, right.intset));
 		}
 
-		public StringSet.symmetric_difference (ContextKit.StringSet left, ContextKit.StringSet right) {
+		public StringSet.symmetric_difference (StringSet left, StringSet right) {
 			this.from_intset (new IntSet.symmetric_difference (left.intset, right.intset));
 		}
 
-		public StringSet.difference (ContextKit.StringSet left, ContextKit.StringSet right) {
+		public StringSet.difference (StringSet left, StringSet right) {
 			this.from_intset (new IntSet.difference (left.intset, right.intset));
 		}
 
-		public StringSet.union (ContextKit.StringSet left, ContextKit.StringSet right) {
+		public StringSet.union (StringSet left, StringSet right) {
 			this.from_intset (new IntSet.union (left.intset, right.intset));
 		}
 
@@ -72,7 +72,7 @@ namespace ContextKit {
 			intset.clear ();
 		}
 		/* TODO, not sure how @foreach functions actually work :/
-		public void @foreach (ContextKit.IntFunc func, void* userdata) {
+		public void @foreach (IntFunc func, void* userdata) {
 		}
 		*/
 		public bool is_member (string element) {
@@ -83,15 +83,15 @@ namespace ContextKit {
 				return false;
 		}
 
-		public bool is_equal (ContextKit.StringSet right) {
+		public bool is_equal (StringSet right) {
 			return intset.is_equal (right.intset);
 		}
 
-		public bool is_subset (ContextKit.StringSet right) {
+		public bool is_subset (StringSet right) {
 			return intset.is_subset (right.intset);
 		}
 
-		public bool is_disjoint (ContextKit.StringSet right) {
+		public bool is_disjoint (StringSet right) {
 			return intset.is_disjoint (right.intset);
 		}
 

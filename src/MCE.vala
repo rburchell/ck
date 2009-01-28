@@ -1,3 +1,5 @@
+using ContextProvider;
+
 namespace ContextKit {
 
 	namespace MCE {
@@ -10,7 +12,7 @@ namespace ContextKit {
 			public int z;
 		}
 
-		public class Provider : GLib.Object, ContextKit.Provider {
+		public class Provider : GLib.Object, ContextProvider.Provider {
 
 			// Objects for connecting to MCE
 			DBus.Connection conn;

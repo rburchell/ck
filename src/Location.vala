@@ -2,7 +2,7 @@
 FIXME: Remember to unref the needed things!
 
 */
-
+using ContextProvider;
 
 namespace ContextKit {
 
@@ -17,7 +17,7 @@ namespace ContextKit {
 			public bool altitude_valid;
 		}
 
-		public class Provider : GLib.Object, ContextKit.Provider {
+		public class Provider : GLib.Object, ContextProvider.Provider {
 			ProviderMixins.SubscriberList subscribed;
 
 			// contextd keys this plugin takes care of
@@ -223,7 +223,7 @@ namespace ContextKit {
 				}
 			}
 
-			public void Subscribe (StringSet keys, ContextKit.Subscriber s) {
+			public void Subscribe (StringSet keys, ContextProvider.Subscriber s) {
 				// FIXME: These are common to all plugins --> move to some upper level
 				subscribed.add (s);
 				subscribed_keys = new StringSet.union (subscribed_keys, keys);

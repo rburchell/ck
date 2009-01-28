@@ -20,103 +20,103 @@
  *
  */
 
-#ifndef __CONTEXT_KIT_INTSET_H__
-#define __CONTEXT_KIT_INTSET_H__
+#ifndef __CONTEXT_PROVIDER_INTSET_H__
+#define __CONTEXT_PROVIDER_INTSET_H__
 
 #include <glib-object.h>
 
 G_BEGIN_DECLS
 
 /**
- * ContextKitIntSet:
+ * ContextProviderIntSet:
  *
  * Opaque type representing a set of unsigned integers.
  */
-typedef struct _ContextKitIntSet ContextKitIntSet;
+typedef struct _ContextProviderIntSet ContextProviderIntSet;
 
 /**
- * ContextKitIntFunc:
+ * ContextProviderIntFunc:
  * @i: The relevant integer
  * @userdata: Opaque user data
  *
  * A callback function acting on unsigned integers.
  */
-typedef void (*ContextKitIntFunc) (guint i, gpointer userdata);
+typedef void (*ContextProviderIntFunc) (guint i, gpointer userdata);
 
-ContextKitIntSet *context_kit_intset_new (void);
-ContextKitIntSet *context_kit_intset_sized_new (guint size);
-void context_kit_intset_destroy (ContextKitIntSet *set);
-void context_kit_intset_clear (ContextKitIntSet *set);
+ContextProviderIntSet *context_provider_intset_new (void);
+ContextProviderIntSet *context_provider_intset_sized_new (guint size);
+void context_provider_intset_destroy (ContextProviderIntSet *set);
+void context_provider_intset_clear (ContextProviderIntSet *set);
 
-void context_kit_intset_add (ContextKitIntSet *set, guint element);
-gboolean context_kit_intset_remove (ContextKitIntSet *set, guint element);
-gboolean context_kit_intset_is_member (const ContextKitIntSet *set, guint element);
+void context_provider_intset_add (ContextProviderIntSet *set, guint element);
+gboolean context_provider_intset_remove (ContextProviderIntSet *set, guint element);
+gboolean context_provider_intset_is_member (const ContextProviderIntSet *set, guint element);
 
-gboolean context_kit_intset_is_subset (const ContextKitIntSet *left, const ContextKitIntSet *right);
-gboolean context_kit_intset_is_disjoint (const ContextKitIntSet *left, const ContextKitIntSet *right);
+gboolean context_provider_intset_is_subset (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
+gboolean context_provider_intset_is_disjoint (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
 
-void context_kit_intset_foreach (const ContextKitIntSet *set, ContextKitIntFunc func,
+void context_provider_intset_foreach (const ContextProviderIntSet *set, ContextProviderIntFunc func,
     gpointer userdata);
-GArray *context_kit_intset_to_array (const ContextKitIntSet *set);
-ContextKitIntSet *context_kit_intset_from_array (const GArray *array);
+GArray *context_provider_intset_to_array (const ContextProviderIntSet *set);
+ContextProviderIntSet *context_provider_intset_from_array (const GArray *array);
 
-guint context_kit_intset_size (const ContextKitIntSet *set);
+guint context_provider_intset_size (const ContextProviderIntSet *set);
 
-gboolean context_kit_intset_is_equal (const ContextKitIntSet *left, const ContextKitIntSet *right);
+gboolean context_provider_intset_is_equal (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
 
-ContextKitIntSet *context_kit_intset_copy (const ContextKitIntSet *orig);
-ContextKitIntSet *context_kit_intset_intersection (const ContextKitIntSet *left, const ContextKitIntSet *right);
-ContextKitIntSet *context_kit_intset_union (const ContextKitIntSet *left, const ContextKitIntSet *right);
-ContextKitIntSet *context_kit_intset_difference (const ContextKitIntSet *left, const ContextKitIntSet *right);
-ContextKitIntSet *context_kit_intset_symmetric_difference (const ContextKitIntSet *left,
-    const ContextKitIntSet *right);
+ContextProviderIntSet *context_provider_intset_copy (const ContextProviderIntSet *orig);
+ContextProviderIntSet *context_provider_intset_intersection (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
+ContextProviderIntSet *context_provider_intset_union (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
+ContextProviderIntSet *context_provider_intset_difference (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
+ContextProviderIntSet *context_provider_intset_symmetric_difference (const ContextProviderIntSet *left,
+    const ContextProviderIntSet *right);
 
-gchar *context_kit_intset_dump (const ContextKitIntSet *set);
+gchar *context_provider_intset_dump (const ContextProviderIntSet *set);
 
-typedef struct _ContextKitIntSetIter ContextKitIntSetIter;
+typedef struct _ContextProviderIntSetIter ContextProviderIntSetIter;
 
 /**
- * ContextKitIntSetIter:
+ * ContextProviderIntSetIter:
  * @set: The set iterated over.
  * @element: Must be (guint)(-1) before iteration starts. Set to the next
- *  element in the set by context_kit_intset_iter_next(); undefined after
- *  context_kit_intset_iter_next() returns %FALSE.
+ *  element in the set by context_provider_intset_iter_next(); undefined after
+ *  context_provider_intset_iter_next() returns %FALSE.
  *
  * A structure representing iteration over a set of integers. Must be
- * initialized with either CONTEXT_KIT_INTSET_ITER_INIT() or context_kit_intset_iter_init().
+ * initialized with either CONTEXT_PROVIDER_INTSET_ITER_INIT() or context_provider_intset_iter_init().
  */
-struct _ContextKitIntSetIter
+struct _ContextProviderIntSetIter
 {
-    const ContextKitIntSet *set;
+    const ContextProviderIntSet *set;
     guint element;
 };
 
 /**
- * CONTEXT_KIT_INTSET_ITER_INIT:
+ * CONTEXT_PROVIDER_INTSET_ITER_INIT:
  * @set: A set of integers
  *
- * A suitable static initializer for a #ContextKitIntSetIter, to be used as follows:
+ * A suitable static initializer for a #ContextProviderIntSetIter, to be used as follows:
  *
  * <informalexample><programlisting>
  * void
- * do_something (const ContextKitIntSet *intset)
+ * do_something (const ContextProviderIntSet *intset)
  * {
- *   ContextKitIntSetIter iter = CONTEXT_KIT_INTSET_ITER_INIT (intset);
+ *   ContextProviderIntSetIter iter = CONTEXT_PROVIDER_INTSET_ITER_INIT (intset);
  *   /<!-- -->* ... do something with iter ... *<!-- -->/
  * }
  * </programlisting></informalexample>
  */
-#define CONTEXT_KIT_INTSET_ITER_INIT(set) { (set), (guint)(-1) }
+#define CONTEXT_PROVIDER_INTSET_ITER_INIT(set) { (set), (guint)(-1) }
 
 /**
- * context_kit_intset_iter_init:
+ * context_provider_intset_iter_init:
  * @iter: An integer set iterator to be initialized.
  * @set: An integer set to be used by that iterator
  *
  * Reset the iterator @iter to the beginning and make it iterate over @set.
  */
 static inline void
-context_kit_intset_iter_init (ContextKitIntSetIter *iter, const ContextKitIntSet *set)
+context_provider_intset_iter_init (ContextProviderIntSetIter *iter, const ContextProviderIntSet *set)
 {
   g_return_if_fail (iter != NULL);
   iter->set = set;
@@ -124,22 +124,22 @@ context_kit_intset_iter_init (ContextKitIntSetIter *iter, const ContextKitIntSet
 }
 
 /**
- * context_kit_intset_iter_init:
+ * context_provider_intset_iter_init:
  * @iter: An integer set iterator to be reset.
  *
  * Reset the iterator @iter to the beginning. It must already be associated
  * with a set.
  */
 static inline void
-context_kit_intset_iter_reset (ContextKitIntSetIter *iter)
+context_provider_intset_iter_reset (ContextProviderIntSetIter *iter)
 {
   g_return_if_fail (iter != NULL);
   g_return_if_fail (iter->set != NULL);
   iter->element = (guint)(-1);
 }
 
-gboolean context_kit_intset_iter_next (ContextKitIntSetIter *iter);
+gboolean context_provider_intset_iter_next (ContextProviderIntSetIter *iter);
 
 G_END_DECLS
 
-#endif /*__CONTEXT_KIT_INTSET_H__*/
+#endif /*__CONTEXT_PROVIDER_INTSET_H__*/

@@ -1,6 +1,6 @@
 using GLib;
 
-namespace ContextKit {
+namespace ContextProvider {
 	public interface Provider : GLib.Object {
 		public abstract void Get (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavailable_keys);
 		public abstract void KeysSubscribed (StringSet keys);

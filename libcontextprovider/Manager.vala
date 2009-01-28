@@ -1,6 +1,6 @@
 using GLib;
 
-namespace ContextKit {
+namespace ContextProvider {
 
 	public class Manager : GLib.Object, DBusManager {
 		// Mapping client dbus names into subscription objects
@@ -39,26 +39,26 @@ namespace ContextKit {
 		public void Get (string[] keys, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
 			debug ("Manager.Get");
 
-			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash, str_equal);
-
 			// Check input against valid keys
 			// Do not create a StringSet from the parameter "keys" as that would be add Quarks
-			string[] checked_keys = check_keys(keys);
+			StringSet keyset = check_keys(keys);
+			get_internal (keyset, out values_to_send, out undeterminable_keys);
+		}
 
-			StringSet keyset = new StringSet.from_array (checked_keys);
-
+		internal void get_internal (StringSet keyset, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
+			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash, str_equal);
 			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
 			  leaving a possible DOS or at least random memory leaks */
 
 			// Ignore keys which are not recognized as valid
-			keyset = new StringSet.intersection (keyset, providers.valid_keys);
+			StringSet valid_keyset = new StringSet.intersection (keyset, providers.valid_keys);
 
 			// Let providers update the central value table
-			List<string> undeterminable_key_list = providers.get (keyset, values);
+			List<string> undeterminable_key_list = providers.get (valid_keyset, values);
 			insert_to_value_table (values, undeterminable_key_list);
 
 			// Then read the values from the value table
-			read_from_value_table(checked_keys, out values_to_send, out undeterminable_keys);
+			read_from_value_table(valid_keyset, out values_to_send, out undeterminable_keys);
 		}
 
 		public DBus.ObjectPath GetSubscriber (DBus.BusName name) throws DBus.Error {
@@ -92,7 +92,7 @@ namespace ContextKit {
 		/*
 		Listen to subscribers exiting.
 		*/
-		internal void on_name_owner_changed (DBus.Object sender, string name, string old_owner, string new_owner) {
+		private void on_name_owner_changed (DBus.Object sender, string name, string old_owner, string new_owner) {
 			debug("Got a NameOwnerChanged signal");
 			debug(name);
 			debug(old_owner);
@@ -111,12 +111,12 @@ namespace ContextKit {
 		/*
 		Checks which keys are valid and returns them.
 		*/
-		public string[] check_keys(string[] keys) {
+		internal StringSet check_keys(string[] keys) {
 			// Do not create a StringSet from the parameter "keys" as that would be add Quarks
-			string[] checked_keys = {};
+			StringSet checked_keys = new StringSet();
 			foreach (var key in keys) {
 				if (providers.valid_keys.is_member(key)) {
-					checked_keys += key;
+					checked_keys.add(key);
 				}
 			}
 			return checked_keys;
@@ -125,7 +125,7 @@ namespace ContextKit {
 		/*
 		Update the value table with new values.
 		*/
-		public void insert_to_value_table(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
+		private void insert_to_value_table(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
 			//debug ("insert_to_value_table");
 			var keys = properties.get_keys ();
 			// Note: get_keys returns a list of unowned strings. We shouldn't assign it to
@@ -144,7 +144,7 @@ namespace ContextKit {
 		/*
 		Read the values of the specified keys from the value table.
 		*/
-		public void read_from_value_table(string[] keys, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
+		private void read_from_value_table(StringSet keys, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
 			debug ("read_from_value_table");
 			// Note: Vala doesn't support += for parameters yet; using a temp array
 			properties = new HashTable<string, Value?>(str_hash, str_equal);

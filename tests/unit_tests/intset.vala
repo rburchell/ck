@@ -20,7 +20,7 @@
  */
 
 using GLib;
-using ContextKit;
+using ContextProvider;
 
 enum TestValues {
 	A = 1,

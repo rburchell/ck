@@ -21,6 +21,7 @@
 
 using GLib;
 using Posix.Signal;
+using ContextProvider;
 
 namespace ContextKit {
 
@@ -44,10 +45,10 @@ namespace ContextKit {
 
 					//Providers providers = new Providers();
 					//providers.register (MCE.Provider.keys, new MCE.Provider());
-					
+
 					Manager? manager = Manager.get_instance ();
 					manager.providers.register (MCE.Provider.keys, new MCE.Provider());
-					
+
 					connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 
 				} else {
