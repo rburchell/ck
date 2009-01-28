@@ -3,15 +3,15 @@ BUILT_SOURCES += libcontextprovider/libcontextprovider.vala.stamp
 lib_LTLIBRARIES = libcontextprovider.la
 
 libcontextprovider_VALASOURCES = \
-	libcontextprovider/DBusInterface.vala \
-	libcontextprovider/Manager.vala \
-	libcontextprovider/Providers.vala \
-	libcontextprovider/KeyUsageCounter.vala \
-	libcontextprovider/Subscriber.vala \
-	libcontextprovider/ProviderInterface.vala \
-	libcontextprovider/CProvider.vala \
-	libcontextprovider/ContextProvider.vala \
-	libcontextprovider/StringSet.vala \
+	libcontextprovider/dbus_interface.vala \
+	libcontextprovider/manager.vala \
+	libcontextprovider/providers.vala \
+	libcontextprovider/key_usage_counter.vala \
+	libcontextprovider/subscriber.vala \
+	libcontextprovider/provider_interface.vala \
+	libcontextprovider/cprovider.vala \
+	libcontextprovider/context_provider.vala \
+	libcontextprovider/string_set.vala \
 	$(NULL)
 
 libcontextprovider_VAPISOURCES = \
