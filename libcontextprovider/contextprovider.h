@@ -3,17 +3,17 @@ typedef void* ChangesetHandle;
 /* 
 Callback function type for "first subscriber subscribed" and "last subscriber unsubscribed" notifications.
 */
-typedef void (*SubscriberCallback)(const char** keys);
+typedef void (*SubscribeCallback)(int keys_count, const char** keys);
 
 /* 
 Callback function type for "Get is now executed" notifications.
 */
-typedef void (*GetCallback)(const char** keys, ChangesetHandle h);
+typedef void (*GetCallback)(int keys_count, const char** keys, ChangesetHandle h);
 
 /*
 Initialize the contextd.
 */
-int context_init(int keys_count, char** provided_keys, const char** dbus_service_name, SubscriberCallback first_subscriber, SubscriberCallback last_subscriber, GetCallback get);
+int context_init(int keys_count, char** provided_keys, const char** dbus_service_name, GetCallback get, SubscribeCallback first_subscriber, SubscribeCallback last_subscriber);
 
 /*
 Create a set of changed values

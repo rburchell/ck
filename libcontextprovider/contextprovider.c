@@ -3,6 +3,7 @@
 
 /* ContextKit header files */
 #include "Manager.h"
+/*#include "CProvider.h"*/
 
 #include <glib.h>
 #include <glib-object.h>
@@ -16,16 +17,89 @@ struct Changeset{
 	GList* undeterminable_keys;
 };
 
+/* Pointer to a Manager object */
 static ContextKitManager* manager = NULL;
 
-int context_init(int keys_count, char** provided_keys, const char** dbus_service_name, SubscriberCallback first_subscriber, SubscriberCallback last_subscriber, GetCallback get) {
+/* Function pointers to callback functions */
+static GetCallback get_cb = NULL;
+static SubscribeCallback first_cb = NULL;
+static SubscribeCallback last_cb = NULL;
+
+/* Helper functions for conversions */
+void convert_keys(GList* keys, int* keys_count, char*** keys_array);
+void free_keys_array (int keys_count, char** keys_array);
+
+/* Functions for converting parameters and calling the supplied callbacks. */
+void call_get_cb (GList* keys, GHashTable* ret, GList** unavail, void* user_data) {
+	int keys_count = 0;
+	char** keys_array = 0;
+	struct Changeset set;
+	
+	convert_keys(keys, &keys_count, &keys_array);
+
+	set.properties = ret;
+	set.undeterminable_keys = *unavail; // FIXME: Ownership?
+
+	/* Call the callback provided by the provider (libcontextprovider user) */
+	get_cb(keys_count, keys_array, &set);
+
+	free_keys_array(keys_count, keys_array);
+}
+
+void call_first_cb (GList* keys, void* user_data) {
+	int keys_count = 0;
+	char** keys_array = 0;
+	convert_keys(keys, &keys_count, &keys_array);
+
+	/* Call the callback provided by the provider (libcontextprovider user) */
+	first_cb (keys_count, keys_array);
+
+	free_keys_array (keys_count, keys_array);
+}
+
+void call_last_cb (GList* keys, void* user_data) {
+	int keys_count = 0;
+	char** keys_array = 0;
+	convert_keys(keys, &keys_count, &keys_array);
+
+	/* Call the callback provided by the provider (libcontextprovider user) */
+	last_cb (keys_count, keys_array);
+
+	free_keys_array (keys_count, keys_array);
+}
+
+void convert_keys (GList* keys, int* keys_count, char*** keys_array) {
+	int i;
+	GList* list = keys;
+
+	*keys_count = g_list_length(keys); /* Note: Iterates through the list */
+	*keys_array = malloc((*keys_count) * sizeof(char *));
+
+	for (i = 0; i < *keys_count; ++i) {
+		(*keys_array)[i] = strdup((char*)list->data);
+		list = g_list_next(list);
+	}
+}
+
+void free_keys_array (int keys_count, char** keys_array) {
+	int i;
+	for (i = 0; i < keys_count; ++i) {
+		free (keys_array[i]);
+	}
+	free (keys_array);
+}
+
+int context_init(int keys_count, char** provided_keys, const char** dbus_service_name, GetCallback get, SubscribeCallback first_subscriber, SubscribeCallback last_subscriber) {
 
 	g_type_init();
 
 	// Initialize the needed ContextKit objects
 	manager = context_kit_manager_get_instance();
 
-	// TODO: Set the callbacks
+	get_cb = get;
+	first_cb = first_subscriber;
+	last_cb = last_subscriber;
+	
 	// TODO: Start providing services over dbus
 	
 	
