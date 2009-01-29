@@ -2,41 +2,6 @@ using GLib;
 
 namespace ContextProvider {
 
-	internal class ChangeSet {
-		internal HashTable<string, Value?> properties;
-		internal List<string> undeterminable_keys;
-
-		internal ChangeSet () {
-			properties = new HashTable<string, Value?>(str_hash, str_equal);
-			undeterminable_keys = new List<string>();
-		}
-
-		public int add_int (string key, int val) {
-			Value v = Value (typeof(int));
-			v.set_int (val);
-			properties.insert (key, v);
-			return 0;
-		}
-
-		public int add_double (string key, double val) {
-			Value v = Value (typeof(double));
-			v.set_double (val);
-			properties.insert (key, v);
-			return 0;
-		}
-
-		public int add_undetermined_key (string key) {
-			undeterminable_keys.prepend (key);
-			return 0;
-		}
-
-		public int send_notification () {
-			ContextProvider.Manager manager = ContextProvider.Manager.get_instance ();
-			manager.property_values_changed(properties, undeterminable_keys);
-			return 0;
-		}
-	}
-
 	internal class CProvider : GLib.Object, ContextProvider.Provider {
 
 		// Stored callbacks
@@ -52,9 +17,10 @@ namespace ContextProvider {
 
 		// Implementation of the Provider interface by using callbacks
 
-		public void Get (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavail) {
-			ChangeSet changeSet = new ChangeSet();
-			get_cb (keys, changeSet);
+		public void Get (StringSet keys, HashTable<string, Value?> ret, ref GLib.List<string> unavail) {
+			ChangeSet change_set = ChangeSet.create();
+			get_cb (keys, change_set);
+			ChangeSet.commit (change_set);
 		}
 
 		public void KeysSubscribed (StringSet keys) {
