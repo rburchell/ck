@@ -1,14 +1,37 @@
 using GLib;
+using Gee;
 
 namespace ContextProvider {
 
-	internal class ChangeSet {
+	public class ChangeSet {
 		internal HashTable<string, Value?> properties;
-		internal List<string> undeterminable_keys;
+		internal GLib.List<string> undeterminable_keys;
+
+		/* TODO. some proper thinking needs to be done to make this
+		   whole lib thread safe
+		   */
+//		static private Mutex changeset_holder_mutex;
+		private static HashSet<ChangeSet> changeset_holder;
+
+		public static ChangeSet create () {
+			ChangeSet s = new ChangeSet();
+//			changeset_holder_mutex.lock();
+			changeset_holder.add(s);
+//			changeset_holder_mutex.unlock();
+			return #s;
+		}
+
+		public static void commit (ChangeSet #s) {
+			ContextProvider.Manager manager = ContextProvider.Manager.get_instance ();
+			manager.property_values_changed(s.properties, s.undeterminable_keys);
+//			changeset_holder_mutex.lock();
+			changeset_holder.remove (s);
+//			changeset_holder_mutex.unlock();
+		}
 
 		internal ChangeSet () {
 			properties = new HashTable<string, Value?>(str_hash, str_equal);
-			undeterminable_keys = new List<string>();
+			undeterminable_keys = new GLib.List<string>();
 		}
 
 		public int add_int (string key, int val) {
@@ -29,12 +52,6 @@ namespace ContextProvider {
 			undeterminable_keys.prepend (key);
 			return 0;
 		}
-
-		public int send_notification () {
-			ContextProvider.Manager manager = ContextProvider.Manager.get_instance ();
-			manager.property_values_changed(properties, undeterminable_keys);
-			return 0;
-		}
 	}
 
 	internal class CProvider : GLib.Object, ContextProvider.Provider {
@@ -52,9 +69,9 @@ namespace ContextProvider {
 
 		// Implementation of the Provider interface by using callbacks
 
-		public void Get (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavail) {
-			ChangeSet changeSet = new ChangeSet();
-			get_cb (keys, changeSet);
+		public void Get (StringSet keys, HashTable<string, Value?> ret, ref GLib.List<string> unavail) {
+			ChangeSet change_set = new ChangeSet();
+			get_cb (keys, change_set);
 		}
 
 		public void KeysSubscribed (StringSet keys) {
