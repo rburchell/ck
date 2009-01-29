@@ -34,11 +34,14 @@ class Startup(LibraryTestCase):
         provider_iface.Start()
         
         # Get the log from the listener
+        log = listener_iface.GetLog()
         
         # Stop the listener
         listener_iface.Exit()
         # Stop the provider
         provider_iface.Exit()
+        
+        self.assert_(log == "(TargetAppeared)")
         
 
 class ChangeSets(LibraryTestCase):

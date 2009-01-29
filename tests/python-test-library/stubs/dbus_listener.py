@@ -52,7 +52,12 @@ class Listener (dbus.service.Object):
                 if new == "":
                     self.log += ("(TargetDisappeared)")
         
-        print "Listener:", self.log
+        print "Listener: log is", self.log
+    
+    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Listener',
+                       in_signature='', out_signature='s')
+    def GetLog(self):
+        return self.log
     
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Listener',
                        in_signature='', out_signature='')
