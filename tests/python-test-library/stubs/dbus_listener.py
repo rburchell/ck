@@ -48,15 +48,16 @@ class Listener (dbus.service.Object):
         if name == self.nameToCheck:
             if old == "":
                 self.log += ("(TargetAppeared)")
-            else if new == "":
-                self.log += ("(TargetDisappeared)")
+            else:
+                if new == "":
+                    self.log += ("(TargetDisappeared)")
         
         print "Listener:", self.log
     
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Listener',
                        in_signature='', out_signature='')
     def Exit(self):
-        print "Listener: Exiting"
+        #print "Listener: Exiting"
         self.main_loop.quit()
         
         

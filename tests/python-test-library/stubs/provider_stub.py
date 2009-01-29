@@ -35,15 +35,14 @@ class Provider (dbus.service.Object):
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='', out_signature='')
     def Start (self):
-        #print "Provider: Starting"
-        keyCount = c_int(3)
+        print "Provider: Starting"
         key1 = c_char_p("Context.Test.keyInt")
         key2 = c_char_p("Context.Test.keyDouble")
         key3 = c_char_p("Context.Test.keyString")
-        keyListType = c_char_p * 3
-        keyList = keyListType(key1, key2, key3)
-        
-        self.libc.context_init(keyCount, keyList, None, None, None)
+        keyListType = c_char_p * 4
+        keyList = keyListType(key1, key2, key3, None)
+        print "Provider: initing"
+        self.libc.context_provider_init(keyList, None, None, None, None, None, None)
    
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='', out_signature='')
@@ -56,4 +55,4 @@ if __name__ == "__main__":
     loop = gobject.MainLoop()
     fakeProvider = Provider(loop)
     loop.run()
-    #print "Provider: Returned from run"
+    print "Provider: Returned from run"
