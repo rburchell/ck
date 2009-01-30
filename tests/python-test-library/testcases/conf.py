@@ -12,6 +12,13 @@
 ## Implements also some testing API:
 ##
 ## 
-contextSrcPath="."
+contextSrcPath="/home/lamadon/workspace/ContextKit"
 sessionConfigPath="tests/python-test-library/stubs"
 
+ctxBusName = "org.freedesktop.ContextKit"
+ctxMgrPath = "/org/freedesktop/ContextKit/Manager"
+ctxMgrIfce = "org.freedesktop.ContextKit.Manager"
+
+scriberOnePath = "/org/freedesktop/ContextKit/Subscribers/0"
+scriberTwoPath = "/org/freedesktop/ContextKit/Subscribers/1"
+scriberThirdPath = "/org/freedesktop/ContextKit/Subscribers/2"
