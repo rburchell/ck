@@ -93,11 +93,22 @@ namespace ContextProvider {
 	public delegate void GetCallback(StringSet #keys, ChangeSet #change_set);
 	public delegate void SubscribeCallback(StringSet keys);
 
-	public void init ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, GetCallback get_cb, SubscribeCallback first_cb, SubscribeCallback last_cb) {
+	public bool init ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, GetCallback? get_cb, SubscribeCallback? first_cb, SubscribeCallback? last_cb) {
 		Manager manager = Manager.get_instance ();
 
 		CProvider provider = new CProvider(get_cb, first_cb, last_cb);
 		manager.providers.register (provided_keys, provider);
+
+		try {
+			debug ("Registering new Manager D-Bus service");
+			var connection = DBus.Bus.get (DBus.BusType.SESSION);
+
+			connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
+		} catch (DBus.Error e) {
+			debug ("Registration failed: %s", e.message);
+			return false;
+		}
+		return true;
 	}
 
 	public int no_of_subscribers (string key) {
