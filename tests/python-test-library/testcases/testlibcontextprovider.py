@@ -9,8 +9,13 @@ from time import sleep
 
 class LibraryTestCase(unittest.TestCase):
     def setUp(self):
-        self.libc = CDLL("libcontextprovider.so.0.0.0")
-
+        self.libc = CDLL("libcontextprovider.la")
+        self.STRING_ARRAY = POINTER(c_char_p)
+        self.STRING_SET = c_void_p
+        self.CHANGE_SET = c_void_p
+        self.GET_CALLBACK = CFUNCTYPE(self.STRING_SET, self.CHANGE_SET, c_void_p)
+        self.SUBSCRIBE_CALLBACK = CFUNCTYPE(self.STRING_SET, c_void_p)
+        self.libc.context_provider_init.argtypes = [self.STRING_ARRAY, self.GET_CALLBACK, c_void_p, self.SUBSCRIBE_CALLBACK, c_void_p, self.SUBSCRIBE_CALLBACK, c_void_p]
     def tearDown(self):
         pass
 
@@ -47,7 +52,8 @@ class Startup(LibraryTestCase):
 class ChangeSets(LibraryTestCase):
     def test_createChangeSet(self):
         # FIXME: This functionality is missing from the lib!
-        ret = self.libc.context_provider_chang_eset_create()
+        self.libc.context_provider_init (['Context.Test.keyInt'], None, None, None, None, None, None)
+        changeset = self.libc.context_provider_change_set_create()
         self.assert_(ret != None)
         ret = self.libc.context_provider_change_set_add_int(ret, "Context.Test.keyInt", 5)
         self.assert_(ret == 0) # Success return value
