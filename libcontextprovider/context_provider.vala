@@ -3,8 +3,9 @@ using Gee;
 namespace ContextProvider {
 
 	public class ChangeSet {
-		private HashTable<string, Value?> properties;
-		private GLib.List<string> undeterminable_keys;
+		HashTable<string, Value?> properties;
+		/*shouldn't be public, but lists suck, see cprovider.vala*/
+		public GLib.List<string> undeterminable_keys;
 
 		/* TODO. some proper thinking needs to be done to make this
 		   whole lib thread safe
@@ -12,6 +13,12 @@ namespace ContextProvider {
 //		static private Mutex changeset_holder_mutex;
 		private static HashSet<ChangeSet> changeset_holder;
 
+		/**
+		 * context_provider_change_set_create:
+		 *
+		 * Create a new change set to emit key changes
+		 * Returns: a new #ChangeSet
+		 */
 		public static ChangeSet create () {
 			ChangeSet s = new ChangeSet();
 //			changeset_holder_mutex.lock();
@@ -21,18 +28,45 @@ namespace ContextProvider {
 			return s;
 		}
 
-		public static void commit (ChangeSet #s /*take back ownership */) {
+		/**
+		 * context_provider_change_set_commit:
+		 * @change_set: a #ChangeSet to commit
+		 *
+		 * Emits the contents of the changeset to all
+		 * listeners interested in the properties that have changed.
+		 */
+		public static void commit (ChangeSet #change_set /*take back ownership */) {
 			ContextProvider.Manager manager = ContextProvider.Manager.get_instance ();
-			manager.property_values_changed(s.properties, s.undeterminable_keys);
+			manager.property_values_changed(change_set.properties, change_set.undeterminable_keys);
 //			changeset_holder_mutex.lock();
 			//removing it from the changeset_holder causes refcount to go to zero.
-			changeset_holder.remove (s);
+			changeset_holder.remove (change_set);
 //			changeset_holder_mutex.unlock();
 		}
+
+		/**
+		 * context_provider_change_set_cancel:
+		 * @change_set: a #ChangeSet to cancel
+		 *
+		 * Cancels a changeset, cleaning up without emitting the contents.
+		 */
+		public static void cancel (ChangeSet #change_set /*take back ownership */) {
+//			changeset_holder_mutex.lock();
+			//removing it from the changeset_holder causes refcount to go to zero.
+			changeset_holder.remove (change_set);
+//			changeset_holder_mutex.unlock();
+		}
+
 
 		private ChangeSet () {
 			properties = new HashTable<string, Value?>(str_hash, str_equal);
 			undeterminable_keys = new GLib.List<string>();
+		}
+
+		internal ChangeSet.from_get (HashTable<string, Value?> properties)
+		{
+			this.properties = properties;
+			this.undeterminable_keys = new GLib.List<string>();
 		}
 
 		public int add_int (string key, int val) {
