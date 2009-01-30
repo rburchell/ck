@@ -13,7 +13,7 @@
 ##
 ## 
 import sys
-sys.path.append("/home/lamadon/workspace/ContextKit/tests/python-test-library/stubs")
+sys.path.append("./tests/python-test-library/stubs")
 import conf as cfg
 import os
 from time import sleep
