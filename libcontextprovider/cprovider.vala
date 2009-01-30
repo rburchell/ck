@@ -18,20 +18,26 @@ namespace ContextProvider {
 		// Implementation of the Provider interface by using callbacks
 
 		public void Get (StringSet keys, HashTable<string, Value?> ret, ref GLib.List<string> unavail) {
-			ChangeSet change_set = new ChangeSet.from_get(ret);
-			get_cb (keys, change_set);
-			/*UGLY UGLY UGLY. GList sucks in vala. must write Gee.LinkedList*/
-			foreach (var s in change_set.undeterminable_keys) {
-				unavail.prepend(s);
+			if (get_cb != null) {
+				ChangeSet change_set = new ChangeSet.from_get(ret);
+				get_cb (keys, change_set);
+				/*UGLY UGLY UGLY. GList sucks in vala. must write Gee.LinkedList*/
+				foreach (var s in change_set.undeterminable_keys) {
+					unavail.prepend(s);
+				}
 			}
 		}
 
 		public void KeysSubscribed (StringSet keys) {
-			first_cb (keys);
+			if (first_cb != null) {
+				first_cb (keys);
+			}
 		}
 
 		public void KeysUnsubscribed (StringSet keys) {
-			last_cb (keys);
+			if (last_cb != null) {
+				last_cb (keys);
+			}
 		}
 	}
 }
