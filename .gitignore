@@ -83,6 +83,7 @@ doc/reference/libcontextprovider/libcontextprovider.signals
 doc/reference/libcontextprovider/*.stamp
 doc/reference/libcontextprovider/tmpl
 doc/reference/libcontextprovider/xml
+doc/reference/libcontextprovider/libcontextprovider.types
 gtk-doc.make
 libcontextprovider/dbus_interface.c
 libcontextprovider/dbus_interface.h

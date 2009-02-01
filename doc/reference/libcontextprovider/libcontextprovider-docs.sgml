@@ -12,7 +12,8 @@
   </bookinfo>
 
   <chapter>
-    <title>[Insert title here]</title>
+    <title>Libcontextprovider Plain C Interface</title>
+    <xi:include href="xml/c_interface.xml"/>
     <xi:include href="xml/context_provider.xml"/>
     <xi:include href="xml/string_set.xml"/>
   </chapter>

@@ -1,10 +1,15 @@
 <SECTION>
-<FILE>context_provider</FILE>
+<FILE>c_interface</FILE>
 ContextProviderGetCallback
 ContextProviderSubscribeCallback
 <TITLE>Context Provider Plain C Interface</TITLE>
 context_provider_init
 context_provider_no_of_subscribers
+</SECTION>
+
+<SECTION>
+<FILE>context_provider</FILE>
+<TITLE>ContextProviderChangeSet</TITLE>
 ContextProviderChangeSet
 context_provider_change_set_create
 context_provider_change_set_commit
@@ -22,6 +27,7 @@ CONTEXT_PROVIDER_CHANGE_SET_CLASS
 CONTEXT_PROVIDER_IS_CHANGE_SET_CLASS
 CONTEXT_PROVIDER_CHANGE_SET_GET_CLASS
 </SECTION>
+
 
 <SECTION>
 <FILE>string_set</FILE>
