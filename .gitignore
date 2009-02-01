@@ -71,7 +71,6 @@ contextprovider.vapi
 doc/reference/libcontextprovider/html
 doc/reference/libcontextprovider/libcontextprovider-decl-list.txt
 doc/reference/libcontextprovider/libcontextprovider-decl.txt
-doc/reference/libcontextprovider/libcontextprovider-docs.sgml
 doc/reference/libcontextprovider/libcontextprovider-overrides.txt
 doc/reference/libcontextprovider/libcontextprovider-undeclared.txt
 doc/reference/libcontextprovider/libcontextprovider-undocumented.txt
@@ -99,4 +98,8 @@ libcontextprovider/string_set.c
 libcontextprovider/string_set.h
 libcontextprovider/subscriber.c
 libcontextprovider/subscriber.h
+libcontextprovider/context_provider.c
+libcontextprovider/context_provider.h
+libcontextprovider/cprovider.h
+libcontextprovider/cprovider.c
 m4/gtk-doc.m4
