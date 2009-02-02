@@ -2,7 +2,8 @@ include Makefile.decl
 
 NULL =
 
-DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
+# disable this for now. gtk-doc and non-recursive make don't play well together.
+#DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
 
 XSLTPROC = xsltproc --xinclude --nonet
 DROP_NAMESPACE = perl -pe '$$hash = chr(35); s{xmlns:tp="http://telepathy\.freedesktop\.org/wiki/DbusSpec$${hash}extensions-v0"}{}g'
@@ -13,7 +14,9 @@ XMLLINT = xmllint --noout --schema
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = doc \
+SUBDIRS = \
+	.\
+	doc \
 	$(NULL)
 
 AM_CPPFLAGS = \
