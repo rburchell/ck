@@ -15,6 +15,10 @@ libcontextprovider_VALASOURCES_PUB = \
 	libcontextprovider/string_set.vala \
 	$(NULL)
 
+libcontextprovider_VALASOURCES = \
+	$(libcontextprovider_VALASOURCES_PRIV) \
+	$(libcontextprovider_VALASOURCES_PUB) \
+	$(NULL)
 
 libcontextprovider_VAPISOURCES = \
 	libcontextprovider/intset.vapi \
@@ -28,6 +32,11 @@ libcontextprovider_GENERATEDSOURCES_PRIV = \
 
 libcontextprovider_GENERATEDSOURCES_PUB = \
 	$(libcontextprovider_VALASOURCES_PUB:.vala=.h) \
+	$(NULL)
+
+libcontextprovider_GENERATEDSOURCES = \
+	$(libcontextprovider_GENERATEDSOURCES_PUB) \
+	$(libcontextprovider_GENERATEDSOURCES_PRIV) \
 	$(NULL)
 
 libcontextprovider_la_SOURCES = \
