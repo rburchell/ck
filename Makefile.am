@@ -19,6 +19,9 @@ SUBDIRS = \
 	doc \
 	$(NULL)
 
+pkgconfigdir = ${libdir}/pkgconfig
+pkgconfig_DATA = contextprovider-1.0.pc
+
 AM_CPPFLAGS = \
 	$(CONTEXTD_CFLAGS) \
 	-include $(CONFIG_HEADER) \
