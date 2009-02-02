@@ -82,7 +82,9 @@ namespace ContextProvider {
 			/* Else, create a new subscriber and return its object path.
 			*/
 
-			var connection = DBus.Bus.get (DBus.BusType.SESSION);
+			// Note: Use session / system bus according to the configuration
+			// (which can be changed via setBusType).
+			var connection = DBus.Bus.get (busType);
 
 			// Create a subscription object
 			Subscriber s = new Subscriber(this, key_counter, subscriber_count);
