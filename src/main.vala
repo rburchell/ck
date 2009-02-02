@@ -43,9 +43,6 @@ namespace ContextKit {
 				if (request_name_result == DBus.RequestNameReply.PRIMARY_OWNER) {
 					debug ("Creating new Manager D-Bus service");
 
-					//Providers providers = new Providers();
-					//providers.register (MCE.Provider.keys, new MCE.Provider());
-
 					Manager? manager = Manager.get_instance ();
 					manager.providers.register (MCE.Provider.keys, new MCE.Provider());
 
