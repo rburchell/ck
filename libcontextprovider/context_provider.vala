@@ -11,7 +11,7 @@ namespace ContextProvider {
 		   whole lib thread safe
 		   */
 //		static private Mutex changeset_holder_mutex;
-		private static HashSet<ChangeSet> changeset_holder;
+		private static HashSet<ChangeSet> changeset_holder = new HashSet<ChangeSet>();
 
 		/**
 		 * context_provider_change_set_create:
@@ -116,4 +116,3 @@ namespace ContextProvider {
 		return manager.key_counter.number_of_subscribers (key);
 	}
 }
-
