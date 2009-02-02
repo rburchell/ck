@@ -15,6 +15,9 @@ namespace ContextProvider {
 
 		int subscriber_count = 0;
 
+		// Session / system bus option
+		static DBus.BusType busType;
+
 		// Singleton implementation
 		private static Manager? instance;
 		public static Manager? get_instance() {
@@ -30,10 +33,15 @@ namespace ContextProvider {
 			this.key_counter = new KeyUsageCounter();
 			this.subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			this.values = new HashTable<string, Value?>(str_hash, str_equal);
-
-			var connection = DBus.Bus.get (DBus.BusType.SESSION);
+			// Note: Use session / system bus according to the configuration
+			// (which can be changed via setBusType).
+			var connection = DBus.Bus.get (busType);
 			bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 			bus.NameOwnerChanged += this.on_name_owner_changed;
+		}
+
+		public static void setBusType(DBus.BusType b) {
+			busType = b;
 		}
 
 		public void Get (string[] keys, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
@@ -130,7 +138,7 @@ namespace ContextProvider {
 			var keys = properties.get_keys ();
 			// Note: get_keys returns a list of unowned strings. We shouldn't assign it to
 			// a list of owned strings. At the moment, the Vala compiler doesn't prevent us
-			// from doing so. 
+			// from doing so.
 			foreach (var key in keys) {
 				// Overwrite the value in the value table.
 				// Do not care whether it was already there or not.
@@ -148,7 +156,7 @@ namespace ContextProvider {
 			debug ("read_from_value_table");
 			// Note: Vala doesn't support += for parameters yet; using a temp array
 			properties = new HashTable<string, Value?>(str_hash, str_equal);
-			string[] undeterminable_keys_temp = {}; 
+			string[] undeterminable_keys_temp = {};
 			foreach (var key in keys) {
 				debug ("  %s", key);
 				//debug ("reading value for key %s", key);

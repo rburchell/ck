@@ -93,7 +93,14 @@ namespace ContextProvider {
 	public delegate void GetCallback(StringSet #keys, ChangeSet #change_set);
 	public delegate void SubscribeCallback(StringSet keys);
 
-	public bool init ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, GetCallback? get_cb, SubscribeCallback? first_cb, SubscribeCallback? last_cb) {
+	public bool init ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, bool useSessionBus, GetCallback? get_cb, SubscribeCallback? first_cb, SubscribeCallback? last_cb) {
+
+		DBus.BusType busType = DBus.BusType.SESSION;
+		if (useSessionBus == false) {
+			busType = DBus.BusType.SYSTEM;
+		}
+		Manager.setBusType (busType);
+
 		Manager manager = Manager.get_instance ();
 
 		CProvider provider = new CProvider(get_cb, first_cb, last_cb);
@@ -101,7 +108,7 @@ namespace ContextProvider {
 
 		try {
 			debug ("Registering new Manager D-Bus service");
-			var connection = DBus.Bus.get (DBus.BusType.SESSION);
+			var connection = DBus.Bus.get (busType);
 
 			connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 		} catch (DBus.Error e) {
