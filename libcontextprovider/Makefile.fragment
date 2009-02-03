@@ -50,7 +50,7 @@ libcontextproviderdir=$(includedir)/contextprovider
 libcontextprovider_HEADERS = $(libcontextprovider_GENERATEDSOURCES_PUB)
 
 libcontextprovider/libcontextprovider.vala.stamp $(libcontextprovider_GENERATEDSOURCES) contextprovider.vapi: $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation --library contextprovider $^
+	$(VALAC) -C --basedir $(top_srcdir)/libcontextprovider --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation --library contextprovider $^
 	touch libcontextprovider/libcontextprovider.vala.stamp
 
 libcontextprovider_la_CFLAGS = \

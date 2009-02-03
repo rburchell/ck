@@ -1,22 +1,5 @@
 namespace ContextProvider {
 
-	public class StringSetIter {
-		StringSet parent;
-		IntSetIter iter;
-
-		internal StringSetIter (StringSet parent) {
-			this.parent = parent;
-			this.iter = IntSetIter (parent.intset);
-		}
-		public bool next() {
-			return iter.next();
-		}
-		public string get() {
-			return ((Quark) iter.element).to_string();
-		}
-
-	}
-
 	/* TODO:
 	   we should have a way of statically initialising any keys that may be used in a stringset
 	   so keys outside of this set are rejected
@@ -27,7 +10,7 @@ namespace ContextProvider {
 	  as intersection and union.
 	 */
 	public class StringSet {
-		internal IntSet intset;
+		private IntSet intset;
 
 		StringSet.from_intset (IntSet #i) {
 			intset = #i;
@@ -107,8 +90,26 @@ namespace ContextProvider {
 			return intset.size();
 		}
 
-		public StringSetIter iterator () {
-			StringSetIter iter = new StringSetIter(this);
+		public class Iter {
+			StringSet parent;
+			IntSetIter iter;
+
+			private Iter (StringSet parent) {
+				this.parent = parent;
+				this.iter = IntSetIter (parent.intset);
+			}
+			public bool next() {
+				return iter.next();
+			}
+			public string get() {
+				return ((Quark) iter.element).to_string();
+			}
+
+		}
+
+
+		public StringSet.Iter iterator () {
+			StringSet.Iter iter = new StringSet.Iter(this);
 			return iter;
 		}
 
