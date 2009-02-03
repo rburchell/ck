@@ -16,7 +16,7 @@ namespace ContextProvider {
 		int subscriber_count = 0;
 
 		// Session / system bus option
-		static DBus.BusType busType;
+		static DBus.BusType busType = DBus.BusType.SESSION;
 
 		// Singleton implementation
 		private static Manager? instance;
@@ -179,6 +179,15 @@ namespace ContextProvider {
 
 		/* Is called when the provider sets new values to context properties */
 		public void property_values_changed(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
+			// Check that all the keys are valid
+			var keys = properties.get_keys ();
+			foreach (var key in keys) {
+				if (providers.valid_keys.is_member (key) == false) {
+					error ("Key %s is not valid", key);
+					// FIXME: What to do?
+				}
+			}
+
 			// Update the value table
 			insert_to_value_table(properties, undeterminable_keys);
 
