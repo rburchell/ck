@@ -23,11 +23,11 @@
 
 /**
  * SECTION:intset
- * @title: ContextKitIntSet
+ * @title: ContextProviderIntSet
  * @short_description: a set of unsigned integers
- * @see_also: #ContextKitHandleSet
+ * @see_also: #ContextProviderHandleSet
  *
- * A #ContextKitIntSet is a set of unsigned integers, implemented as a
+ * A #ContextProviderIntSet is a set of unsigned integers, implemented as a
  * dynamically-allocated bitfield.
  */
 
@@ -40,23 +40,23 @@
 #define DEFAULT_INCREMENT 8
 #define DEFAULT_INCREMENT_LOG2 3
 
-struct _ContextKitIntSet
+struct _ContextProviderIntSet
 {
   guint32 *bits;
   guint size;
 };
 
-static ContextKitIntSet *
-_context_kit_intset_new_with_size (guint size)
+static ContextProviderIntSet *
+_context_provider_intset_new_with_size (guint size)
 {
-  ContextKitIntSet *set = g_slice_new (ContextKitIntSet);
+  ContextProviderIntSet *set = g_slice_new (ContextProviderIntSet);
   set->size = MAX (size, DEFAULT_SIZE);
   set->bits = g_new0 (guint32, set->size);
   return set;
 }
 
 /**
- * context_kit_intset_sized_new:
+ * context_provider_intset_sized_new:
  * @size: 1 more than the largest integer you expect to store
  *
  * Allocate an integer set just large enough to store the given number of bits,
@@ -66,10 +66,10 @@ _context_kit_intset_new_with_size (guint size)
  * this is just an optimization to avoid wasting memory (if the set is too
  * large) or time (if the set is too small and needs reallocation).
  *
- * Returns: a new, empty integer set to be destroyed with context_kit_intset_destroy()
+ * Returns: a new, empty integer set to be destroyed with context_provider_intset_destroy()
  */
-ContextKitIntSet *
-context_kit_intset_sized_new (guint size)
+ContextProviderIntSet *
+context_provider_intset_sized_new (guint size)
 {
   /* convert from a size in bits to a size in 32-bit words */
   if (G_UNLIKELY (size == 0))
@@ -77,45 +77,45 @@ context_kit_intset_sized_new (guint size)
   else
     size = ((size - 1) >> 5) + 1;
 
-  return _context_kit_intset_new_with_size (size);
+  return _context_provider_intset_new_with_size (size);
 }
 
 /**
- * context_kit_intset_new:
+ * context_provider_intset_new:
  *
  * Allocate a new integer set with a default memory allocation.
  *
- * Returns: a new, empty integer set to be destroyed with context_kit_intset_destroy()
+ * Returns: a new, empty integer set to be destroyed with context_provider_intset_destroy()
  */
-ContextKitIntSet *
-context_kit_intset_new ()
+ContextProviderIntSet *
+context_provider_intset_new ()
 {
-  return _context_kit_intset_new_with_size (DEFAULT_SIZE);
+  return _context_provider_intset_new_with_size (DEFAULT_SIZE);
 }
 
 /**
- * context_kit_intset_destroy:
+ * context_provider_intset_destroy:
  * @set: set
  *
  * Free all memory used by the set.
  */
 void
-context_kit_intset_destroy (ContextKitIntSet *set)
+context_provider_intset_destroy (ContextProviderIntSet *set)
 {
   g_return_if_fail (set != NULL);
 
   g_free (set->bits);
-  g_slice_free (ContextKitIntSet, set);
+  g_slice_free (ContextProviderIntSet, set);
 }
 
 /**
- * context_kit_intset_clear:
+ * context_provider_intset_clear:
  * @set: set
  *
  * Unset every integer in the set.
  */
 void
-context_kit_intset_clear (ContextKitIntSet *set)
+context_provider_intset_clear (ContextProviderIntSet *set)
 {
   g_return_if_fail (set != NULL);
 
@@ -123,14 +123,14 @@ context_kit_intset_clear (ContextKitIntSet *set)
 }
 
 /**
- * context_kit_intset_add:
+ * context_provider_intset_add:
  * @set: set
  * @element: integer to add
  *
- * Add an integer into a ContextKitIntSet.
+ * Add an integer into a ContextProviderIntSet.
  */
 void
-context_kit_intset_add (ContextKitIntSet *set, guint element)
+context_provider_intset_add (ContextProviderIntSet *set, guint element)
 {
   guint offset;
   guint newsize;
@@ -152,16 +152,16 @@ context_kit_intset_add (ContextKitIntSet *set, guint element)
 }
 
 /**
- * context_kit_intset_remove:
+ * context_provider_intset_remove:
  * @set: set
  * @element: integer to add
  *
- * Remove an integer from a ContextKitIntSet
+ * Remove an integer from a ContextProviderIntSet
  *
  * Returns: %TRUE if @element was previously in @set
  */
 gboolean
-context_kit_intset_remove (ContextKitIntSet *set, guint element)
+context_provider_intset_remove (ContextProviderIntSet *set, guint element)
 {
   guint offset;
   guint mask;
@@ -182,7 +182,7 @@ context_kit_intset_remove (ContextKitIntSet *set, guint element)
 }
 
 static inline gboolean
-_context_kit_intset_is_member (const ContextKitIntSet *set, guint element)
+_context_provider_intset_is_member (const ContextProviderIntSet *set, guint element)
 {
   guint offset;
 
@@ -195,7 +195,7 @@ _context_kit_intset_is_member (const ContextKitIntSet *set, guint element)
 
 
 /**
- * context_kit_intset_is_member:
+ * context_provider_intset_is_member:
  * @set: set
  * @element: integer to test
  *
@@ -204,15 +204,15 @@ _context_kit_intset_is_member (const ContextKitIntSet *set, guint element)
  * Returns: %TRUE if @element is in @set
  */
 gboolean
-context_kit_intset_is_member (const ContextKitIntSet *set, guint element)
+context_provider_intset_is_member (const ContextProviderIntSet *set, guint element)
 {
   g_return_val_if_fail (set != NULL, FALSE);
 
-  return _context_kit_intset_is_member (set, element);
+  return _context_provider_intset_is_member (set, element);
 }
 
 /**
- * context_kit_intset_is_subset:
+ * context_provider_intset_is_subset:
  * @left: set
  * @right: set
  *
@@ -221,7 +221,7 @@ context_kit_intset_is_member (const ContextKitIntSet *set, guint element)
  * Returns: %TRUE if @right is a subset of @left
  */
 gboolean
-context_kit_intset_is_subset (const ContextKitIntSet *left, const ContextKitIntSet *right)
+context_provider_intset_is_subset (const ContextProviderIntSet *left, const ContextProviderIntSet *right)
 {
   guint offset;
   gboolean ret = TRUE;
@@ -240,7 +240,7 @@ context_kit_intset_is_subset (const ContextKitIntSet *left, const ContextKitIntS
 }
 
 /**
- * context_kit_intset_is_disjoint:
+ * context_provider_intset_is_disjoint:
  * @left: set
  * @right: set
  *
@@ -249,7 +249,7 @@ context_kit_intset_is_subset (const ContextKitIntSet *left, const ContextKitIntS
  * Returns: %TRUE if @right is disjoint with @left
  */
 gboolean
-context_kit_intset_is_disjoint (const ContextKitIntSet *left, const ContextKitIntSet *right)
+context_provider_intset_is_disjoint (const ContextProviderIntSet *left, const ContextProviderIntSet *right)
 {
   guint i;
   gboolean ret = TRUE;
@@ -263,16 +263,16 @@ context_kit_intset_is_disjoint (const ContextKitIntSet *left, const ContextKitIn
 
 
 /**
- * context_kit_intset_foreach:
+ * context_provider_intset_foreach:
  * @set: set
- * @func: @ContextKitIntFunc to use to iterate the set
+ * @func: @ContextProviderIntFunc to use to iterate the set
  * @userdata: user data to pass to each call of @func
  *
  * Call @func(element, @userdata) for each element of @set.
  */
 
 void
-context_kit_intset_foreach (const ContextKitIntSet *set, ContextKitIntFunc func, gpointer userdata)
+context_provider_intset_foreach (const ContextProviderIntSet *set, ContextProviderIntFunc func, gpointer userdata)
 {
   guint i, j;
 
@@ -299,7 +299,7 @@ addint (guint i, gpointer data)
 }
 
 /**
- * context_kit_intset_to_array:
+ * context_provider_intset_to_array:
  * @set: set to convert
  *
  * <!--Returns: says it all-->
@@ -308,7 +308,7 @@ addint (guint i, gpointer data)
  * the same integers as @set.
  */
 GArray *
-context_kit_intset_to_array (const ContextKitIntSet *set)
+context_provider_intset_to_array (const ContextProviderIntSet *set)
 {
   GArray *array;
 
@@ -316,14 +316,14 @@ context_kit_intset_to_array (const ContextKitIntSet *set)
 
   array = g_array_new (FALSE, TRUE, sizeof (guint));
 
-  context_kit_intset_foreach (set, addint, array);
+  context_provider_intset_foreach (set, addint, array);
 
   return array;
 }
 
 
 /**
- * context_kit_intset_from_array:
+ * context_provider_intset_from_array:
  * @array: An array of guint
  *
  * <!--Returns: says it all-->
@@ -331,10 +331,10 @@ context_kit_intset_to_array (const ContextKitIntSet *set)
  * Returns: A set containing the same integers as @array.
  */
 
-ContextKitIntSet *
-context_kit_intset_from_array (const GArray *array)
+ContextProviderIntSet *
+context_provider_intset_from_array (const GArray *array)
 {
-  ContextKitIntSet *set;
+  ContextProviderIntSet *set;
   guint max, i;
 
   g_return_val_if_fail (array != NULL, NULL);
@@ -348,11 +348,11 @@ context_kit_intset_from_array (const GArray *array)
     max = MAX (max, g_array_index (array, guint, array->len - 1));
   if (array->len > 2)
     max = MAX (max, g_array_index (array, guint, (array->len - 1) >> 1));
-  set = _context_kit_intset_new_with_size (1 + (max >> 5));
+  set = _context_provider_intset_new_with_size (1 + (max >> 5));
 
   for (i = 0; i < array->len; i++)
     {
-      context_kit_intset_add (set, g_array_index (array, guint, i));
+      context_provider_intset_add (set, g_array_index (array, guint, i));
     }
 
   return set;
@@ -360,7 +360,7 @@ context_kit_intset_from_array (const GArray *array)
 
 
 /**
- * context_kit_intset_size:
+ * context_provider_intset_size:
  * @set: A set of integers
  *
  * <!--Returns: says it all-->
@@ -369,7 +369,7 @@ context_kit_intset_from_array (const GArray *array)
  */
 
 guint
-context_kit_intset_size (const ContextKitIntSet *set)
+context_provider_intset_size (const ContextProviderIntSet *set)
 {
   guint i, count = 0;
   guint32 n;
@@ -388,7 +388,7 @@ context_kit_intset_size (const ContextKitIntSet *set)
 
 
 /**
- * context_kit_intset_is_equal:
+ * context_provider_intset_is_equal:
  * @left: A set of integers
  * @right: A set of integers
  *
@@ -398,9 +398,9 @@ context_kit_intset_size (const ContextKitIntSet *set)
  */
 
 gboolean
-context_kit_intset_is_equal (const ContextKitIntSet *left, const ContextKitIntSet *right)
+context_provider_intset_is_equal (const ContextProviderIntSet *left, const ContextProviderIntSet *right)
 {
-  const ContextKitIntSet *large, *small;
+  const ContextProviderIntSet *large, *small;
   guint i;
 
   g_return_val_if_fail (left != NULL, FALSE);
@@ -434,23 +434,23 @@ context_kit_intset_is_equal (const ContextKitIntSet *left, const ContextKitIntSe
 
 
 /**
- * context_kit_intset_copy:
+ * context_provider_intset_copy:
  * @orig: A set of integers
  *
  * <!--Returns: says it all-->
  *
  * Returns: A set containing the same integers as @orig, to be freed with
- * context_kit_intset_destroy() by the caller
+ * context_provider_intset_destroy() by the caller
  */
 
-ContextKitIntSet *
-context_kit_intset_copy (const ContextKitIntSet *orig)
+ContextProviderIntSet *
+context_provider_intset_copy (const ContextProviderIntSet *orig)
 {
-  ContextKitIntSet *ret;
+  ContextProviderIntSet *ret;
 
   g_return_val_if_fail (orig != NULL, NULL);
 
-  ret = _context_kit_intset_new_with_size (orig->size);
+  ret = _context_provider_intset_new_with_size (orig->size);
   memcpy (ret->bits, orig->bits, (ret->size * sizeof (guint32)));
 
   return ret;
@@ -458,7 +458,7 @@ context_kit_intset_copy (const ContextKitIntSet *orig)
 
 
 /**
- * context_kit_intset_intersection:
+ * context_provider_intset_intersection:
  * @left: The left operand
  * @right: The right operand
  *
@@ -466,14 +466,14 @@ context_kit_intset_copy (const ContextKitIntSet *orig)
  *
  * Returns: The set of those integers which are in both @left and @right
  * (analogous to the bitwise operation left & right), to be freed with
- * context_kit_intset_destroy() by the caller
+ * context_provider_intset_destroy() by the caller
  */
 
-ContextKitIntSet *
-context_kit_intset_intersection (const ContextKitIntSet *left, const ContextKitIntSet *right)
+ContextProviderIntSet *
+context_provider_intset_intersection (const ContextProviderIntSet *left, const ContextProviderIntSet *right)
 {
-  const ContextKitIntSet *large, *small;
-  ContextKitIntSet *ret;
+  const ContextProviderIntSet *large, *small;
+  ContextProviderIntSet *ret;
   guint i;
 
   g_return_val_if_fail (left != NULL, NULL);
@@ -490,7 +490,7 @@ context_kit_intset_intersection (const ContextKitIntSet *left, const ContextKitI
       small = left;
     }
 
-  ret = context_kit_intset_copy (small);
+  ret = context_provider_intset_copy (small);
 
   for (i = 0; i < ret->size; i++)
     {
@@ -502,7 +502,7 @@ context_kit_intset_intersection (const ContextKitIntSet *left, const ContextKitI
 
 
 /**
- * context_kit_intset_union:
+ * context_provider_intset_union:
  * @left: The left operand
  * @right: The right operand
  *
@@ -510,14 +510,14 @@ context_kit_intset_intersection (const ContextKitIntSet *left, const ContextKitI
  *
  * Returns: The set of those integers which are in either @left or @right
  * (analogous to the bitwise operation left | right), to be freed with
- * context_kit_intset_destroy() by the caller
+ * context_provider_intset_destroy() by the caller
  */
 
-ContextKitIntSet *
-context_kit_intset_union (const ContextKitIntSet *left, const ContextKitIntSet *right)
+ContextProviderIntSet *
+context_provider_intset_union (const ContextProviderIntSet *left, const ContextProviderIntSet *right)
 {
-  const ContextKitIntSet *large, *small;
-  ContextKitIntSet *ret;
+  const ContextProviderIntSet *large, *small;
+  ContextProviderIntSet *ret;
   guint i;
 
   g_return_val_if_fail (left != NULL, NULL);
@@ -534,7 +534,7 @@ context_kit_intset_union (const ContextKitIntSet *left, const ContextKitIntSet *
       small = left;
     }
 
-  ret = context_kit_intset_copy (large);
+  ret = context_provider_intset_copy (large);
 
   for (i = 0; i < small->size; i++)
     {
@@ -546,7 +546,7 @@ context_kit_intset_union (const ContextKitIntSet *left, const ContextKitIntSet *
 
 
 /**
- * context_kit_intset_difference:
+ * context_provider_intset_difference:
  * @left: The left operand
  * @right: The right operand
  *
@@ -554,19 +554,19 @@ context_kit_intset_union (const ContextKitIntSet *left, const ContextKitIntSet *
  *
  * Returns: The set of those integers which are in @left and not in @right
  * (analogous to the bitwise operation left & (~right)), to be freed with
- * context_kit_intset_destroy() by the caller
+ * context_provider_intset_destroy() by the caller
  */
 
-ContextKitIntSet *
-context_kit_intset_difference (const ContextKitIntSet *left, const ContextKitIntSet *right)
+ContextProviderIntSet *
+context_provider_intset_difference (const ContextProviderIntSet *left, const ContextProviderIntSet *right)
 {
-  ContextKitIntSet *ret;
+  ContextProviderIntSet *ret;
   guint i;
 
   g_return_val_if_fail (left != NULL, NULL);
   g_return_val_if_fail (right != NULL, NULL);
 
-  ret = context_kit_intset_copy (left);
+  ret = context_provider_intset_copy (left);
 
   for (i = 0; i < MIN (right->size, left->size); i++)
     {
@@ -578,7 +578,7 @@ context_kit_intset_difference (const ContextKitIntSet *left, const ContextKitInt
 
 
 /**
- * context_kit_intset_symmetric_difference:
+ * context_provider_intset_symmetric_difference:
  * @left: The left operand
  * @right: The right operand
  *
@@ -586,14 +586,14 @@ context_kit_intset_difference (const ContextKitIntSet *left, const ContextKitInt
  *
  * Returns: The set of those integers which are in either @left or @right
  * but not both (analogous to the bitwise operation left ^ right), to be freed
- * with context_kit_intset_destroy() by the caller
+ * with context_provider_intset_destroy() by the caller
  */
 
-ContextKitIntSet *
-context_kit_intset_symmetric_difference (const ContextKitIntSet *left, const ContextKitIntSet *right)
+ContextProviderIntSet *
+context_provider_intset_symmetric_difference (const ContextProviderIntSet *left, const ContextProviderIntSet *right)
 {
-  const ContextKitIntSet *large, *small;
-  ContextKitIntSet *ret;
+  const ContextProviderIntSet *large, *small;
+  ContextProviderIntSet *ret;
   guint i;
 
   g_return_val_if_fail (left != NULL, NULL);
@@ -610,7 +610,7 @@ context_kit_intset_symmetric_difference (const ContextKitIntSet *left, const Con
       small = left;
     }
 
-  ret = context_kit_intset_copy (large);
+  ret = context_provider_intset_copy (large);
 
   for (i = 0; i < small->size; i++)
     {
@@ -632,7 +632,7 @@ _dump_foreach (guint i, gpointer data)
 }
 
 /**
- * context_kit_intset_dump:
+ * context_provider_intset_dump:
  * @set: An integer set
  *
  * <!--Returns: says it all-->
@@ -641,17 +641,17 @@ _dump_foreach (guint i, gpointer data)
  * numbers in @set in a human-readable format
  */
 gchar *
-context_kit_intset_dump (const ContextKitIntSet *set)
+context_provider_intset_dump (const ContextProviderIntSet *set)
 {
   GString *tmp = g_string_new ("");
 
-  context_kit_intset_foreach (set, _dump_foreach, tmp);
+  context_provider_intset_foreach (set, _dump_foreach, tmp);
   return g_string_free (tmp, FALSE);
 }
 
 /**
- * context_kit_intset_iter_next:
- * @iter: An iterator originally initialized with CONTEXT_KIT_INTSET_INIT(set)
+ * context_provider_intset_iter_next:
+ * @iter: An iterator originally initialized with CONTEXT_PROVIDER_INTSET_INIT(set)
  *
  * If there are integers in (@iter->set) higher than (@iter->element), set
  * (iter->element) to the next one and return %TRUE. Otherwise return %FALSE.
@@ -659,8 +659,8 @@ context_kit_intset_dump (const ContextKitIntSet *set)
  * Usage:
  *
  * <informalexample><programlisting>
- * ContextKitIntSetIter iter = CONTEXT_KIT_INTSET_INIT (intset);
- * while (context_kit_intset_iter_next (&amp;iter))
+ * ContextProviderIntSetIter iter = CONTEXT_PROVIDER_INTSET_INIT (intset);
+ * while (context_provider_intset_iter_next (&amp;iter))
  * {
  *   printf ("%u is in the intset\n", iter.element);
  * }
@@ -669,7 +669,7 @@ context_kit_intset_dump (const ContextKitIntSet *set)
  * Returns: %TRUE if (@iter->element) has been advanced
  */
 gboolean
-context_kit_intset_iter_next (ContextKitIntSetIter *iter)
+context_provider_intset_iter_next (ContextProviderIntSetIter *iter)
 {
   g_return_val_if_fail (iter != NULL, FALSE);
   g_return_val_if_fail (iter->set != NULL, FALSE);
@@ -686,7 +686,7 @@ context_kit_intset_iter_next (ContextKitIntSetIter *iter)
           ++iter->element;
         }
 
-      if (_context_kit_intset_is_member (iter->set, iter->element))
+      if (_context_provider_intset_is_member (iter->set, iter->element))
         {
           return TRUE;
         }

@@ -20,7 +20,7 @@
  */
 
 using GLib;
-using ContextKit;
+using ContextProvider;
 
 void test_stringset_new () {
 	StringSet stringset = new StringSet();

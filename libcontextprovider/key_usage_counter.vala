@@ -1,6 +1,6 @@
 using GLib;
 
-namespace ContextKit {
+namespace ContextProvider {
 
 	public class KeyUsageCounter {
 		// The number of subscribers for each key (over all subscriber objects)

@@ -14,8 +14,8 @@ PYTHON_TEST_PROGS =
 test:	${TEST_PROGS}
 	@test -z "${TEST_PROGS}" || ${GTESTER} --verbose ${TEST_PROGS}
 	@ for subdir in $(SUBDIRS) . ; do \
-	    test "$$subdir" = "." -o "$$subdir" = "po" || \
-	    ( cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@ ) || exit $? ; \
+	  test "$$subdir" = "." -o "$$subdir" = "po" -o "$$subdir" = "doc" || \
+	  ( cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@ ) || exit $? ; \
 	  done
 # test-report: run tests in subdirs and generate report
 # perf-report: run tests in subdirs with -m perf and generate report
@@ -39,7 +39,7 @@ test-report perf-report full-report:	${TEST_PROGS}
 	    ignore_logdir=false ; \
 	  fi ; \
 	  for subdir in $(SUBDIRS) . ; do \
-	    test "$$subdir" = "." -o "$$subdir" = "po" || \
+	    test "$$subdir" = "." -o "$$subdir" = "po" -o "$$subdir" = "doc" || \
 	    ( cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@ ) || exit $? ; \
 	  done ; \
 	  $$ignore_logdir || { \
@@ -61,7 +61,7 @@ test-massif:  ${TEST_PROGS}
 	   ms_print $$test-massif.log --threshold=5 > $$test-massif.output; \
 	  done
 	@ for subdir in $(SUBDIRS) . ; do \
-	    test "$$subdir" = "." -o "$$subdir" = "po" || \
+	    test "$$subdir" = "." -o "$$subdir" = "po" -o "$$subdir" = "doc" || \
 	    ( cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@ ) || exit $? ; \
 	  done
 
@@ -71,7 +71,7 @@ test-valgrind:  ${TEST_PROGS}
 	   libtool --mode=execute valgrind --tool=memcheck ./$$test ; \
 	  done
 	@ for subdir in $(SUBDIRS) . ; do \
-	    test "$$subdir" = "." -o "$$subdir" = "po" || \
+	    test "$$subdir" = "." -o "$$subdir" = "po" -o "$$subdir" = "doc" || \
 	    ( cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@ ) || exit $? ; \
 	  done
 

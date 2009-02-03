@@ -1,6 +1,6 @@
 using GLib;
 
-namespace ContextKit {
+namespace ContextProvider {
 
 	public class Subscriber : GLib.Object, DBusSubscriber {
 		static Manager manager;
@@ -41,9 +41,8 @@ namespace ContextKit {
 
 		public void Subscribe (string[] keys, out HashTable<string, Value?> values, out string[] undeterminable_keys) {
 			// Check input against valid keys
-			string[] checked_keys = manager.check_keys(keys);
+			StringSet keyset = manager.check_keys(keys);
 
-			StringSet keyset = new StringSet.from_array (checked_keys);
 			message ("Subscribe: requested valid keys %s", keyset.debug());
 
 			// Ignore keys which are already subscribed to
@@ -57,17 +56,16 @@ namespace ContextKit {
 
 			// Read the values from the central value table and return them
 			// Note: Use also those keys which were already subscribed to (and are subscribed to again)
-			manager.Get (checked_keys, out values, out undeterminable_keys);
+			manager.get_internal (keyset, out values, out undeterminable_keys);
 
 			debug ("Subscribe done");
 		}
 
 		public void Unsubscribe (string[] keys) {
 			// Check input against valid keys
-			string[] checked_keys = manager.check_keys(keys);
+			StringSet keyset = manager.check_keys(keys);
 
 			// Ignore keys which are not subscribed to
-			StringSet keyset = new StringSet.from_array (checked_keys);
 			StringSet decreasing_keys = new StringSet.intersection (keyset, subscribed_keys);
 
 			// Decrease the (global) subscriber count for the keys 

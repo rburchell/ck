@@ -1,7 +1,7 @@
 using GLib;
 using DBus;
 
-namespace ContextKit {
+namespace ContextProvider {
 
 	[DBus (name = "org.freedesktop.ContextKit.Manager")]
 	public interface DBusManager : GLib.Object {

@@ -12,16 +12,106 @@
 ## Implements also some testing API:
 ##
 ## 
-
-import os
 import sys
+sys.path.append("./tests/python-test-library/stubs")
+import conf as cfg
+import os
 from time import sleep
 import unittest
 import traceback
 import dbus
 import dbus_emulator
-import conf
+import ConfigParser
+import commands
+from signal import *
 
+class Subscriber():
+    
+    def __init__(self):
+        self.bus = dbus.SessionBus()
+        try:
+            self.mgr = self.bus.get_object(cfg.ctxBusName, cfg.ctxMgrPath)
+            self.ifceMgr = dbus.Interface(self.mgr, cfg.ctxMgrIfce)
+        except dbus.DBusException:
+            traceback.print_exc()
+            sys.exit(1)
+
+        self.scrberPath = self.ifceMgr.GetSubscriber()
+                
+    def getObjPath(self):
+        return self.scrberPath
+    
+    def __del__(self):
+        try:
+            self.bus.close()
+        except dbus.DBusException:
+            traceback.print_exc()
+            
+class TestSubscriber (unittest.TestCase):
+    
+    def setUp(self):
+        #dbus_emulator.createBus(dbus_emulator.SESSION,cfg.sessionConfigPath)
+        #sleep (4)
+        #os.system(cfg.contextSrcPath + os.path.sep + "contextd &")
+        #sleep (4)
+        #print os.environ['DBUS_SESSION_BUS_ADDRESS']
+
+        config = ConfigParser.RawConfigParser()
+        config.read("/tmp/dbus")
+        sections = config.sections()
+        for section in sections:
+            for item in config.items(section):
+                if item[0] == 'dbus_system_bus_address':
+                    os.environ['DBUS_SYSTEM_BUS_ADDRESS'] = item[1] 
+                elif item[0] == 'dbus_session_bus_address':
+                    os.environ['DBUS_SESSION_BUS_ADDRESS'] = item[1]
+        
+    
+    def tearDown(self):
+        #for pid in commands.getoutput("ps -Af | egrep -i contextd | awk '{print $2}'").split() :
+        #    try:
+        #        os.kill(int(pid), SIGQUIT)
+        #    except OSError, e:
+        #        if not e.errno == 3 : raise e
+        #dbus_emulator.deleteBus(dbus_emulator.SESSION)
+        pass
+        #config = ConfigParser.RawConfigParser()
+        #config.read("/tmp/dbus")
+        #sections = config.sections()
+        #for section in sections:
+        #    for item in config.items(section):
+        #        if item[0] == 'dbus_system_bus_pid' or item[0] == 'dbus_session_bus_pid':
+        #            os.kill(int(item[1]),15)
+    
+    def testAddSubscriber(self):
+        self.subscriber = Subscriber()
+        self.assert_ ( str(self.subscriber.getObjPath()) == cfg.scriberOnePath, 
+                     "First subscriber id is incorrect")
+    # 
+    #def testSubscriberCounter(self):
+    #    for i in range(2147483648):
+    #        self.subscriber = Subscriber()
+    #        self.subscriber = None
+    #    self.assertRaises(dbus.DBusException,Subscriber)
+    
+    def testCounter(self):
+        self.subscriber1 = Subscriber()
+        self.assert_ ( str(self.subscriber1.getObjPath()) == cfg.scriberOnePath, 
+                     "First subscriber id is incorrect")
+        self.subscriber1 = None
+        self.subscriber2 = Subscriber()
+        self.subscriber2 = None
+        self.subscriber3 = Subscriber()
+        self.assert_ ( str(self.subscriber3.getObjPath()) == cfg.scriberThirdPath, 
+                     "Third subscriber id is incorrect")
+    
+    def testDeleteSubscriber(self):
+        self.subscriber = Subscriber()
+        path = self.subscriber.getObjPath()
+        self.subscriber = None
+        bus = dbus.SessionBus()
+        self.subscriber = Subscriber()
+        #self.assertRaises(dbus.DBusException,bus.get_object,cfg.ctxBusName,path)
 
 class ContextHelpers(unittest.TestCase):
 
@@ -195,32 +285,12 @@ class Environment(ContextHelpers):
         returnedProp, undeterminedProp = self.getProp(prop)
         self.assertEqual(returnedProp['Context.Environment.Connection.CurrentData.isEmergencyMode'],False)
 
-class Core(ContextHelpers):
-    
-    def test_inexistentPropertiesRaiseError(self):
-        """Getting invalid properties should raise an error """
-        prop = ['Context.Device.Something']
-        returnedProp, undeterminedProp = self.getProp(prop)
-        self.assertRaises(dbus.DBusException,self.getProp,prop)
         
-    def test_inexistentPropertiesUndetermined(self):
-        """Getting invalid properties should list the property as undetermined """
-        prop = ['Context.Device.Something']
-        returnedProp, undeterminedProp = self.getProp(prop)
-        self.assertEqual(undeterminedProp.count(prop),1)
-        
-    def test_undeterminedProperties (self):
-        """Sensor provide undetermined value to contextd"""
-        prop = ['Context.Device.Display.displayState']
-        self.ifceMCE.req_display_state_rogue()
-        sleep(2)
-        returnedProp, undeterminedProp = self.getProp(prop)
-        self.assertEqual(undeterminedProp.count('Context.Device.Display.displayState'),1)
-
 def testRun():
+    suiteCore = unittest.TestLoader().loadTestsFromTestCase(TestSubscriber)
     suiteDevice = unittest.TestLoader().loadTestsFromTestCase(Device)
     suiteEnv = unittest.TestLoader().loadTestsFromTestCase(Environment)
-    suiteCore = unittest.TestLoader().loadTestsFromTestCase(Core)
+    unittest.TextTestRunner(verbosity=2).run(suiteCore)
     unittest.TextTestRunner(verbosity=2).run(suiteDevice)
     unittest.TextTestRunner(verbosity=2).run(suiteEnv)
-    unittest.TextTestRunner(verbosity=2).run(suiteCore)
+    

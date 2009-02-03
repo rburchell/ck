@@ -41,7 +41,7 @@ tests_unit_tests_stringset_VAPISOURCES = \
 	$(NULL)
 
 tests_unit_tests_stringset_VALASOURCES = \
-	libcontextprovider/StringSet.vala				\
+	libcontextprovider/string_set.vala				\
 	tests/unit_tests/stringset.vala				\
 	$(NULL)
 

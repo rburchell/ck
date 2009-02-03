@@ -1,13 +1,17 @@
 using GLib;
 
-namespace ContextKit {
+namespace ContextProvider {
 
 	public class Providers {
 		// List of providers
 		Gee.ArrayList<Provider> providers = new Gee.ArrayList<Provider> ();
 
 		// Valid keys provided by all providers
-		public StringSet valid_keys = new StringSet();
+		public StringSet valid_keys {get; private set;}
+
+		internal Providers () {
+			valid_keys = new StringSet();
+		}
 
 		public void register (string[] keys, Provider provider) {
 			providers.add (provider);
