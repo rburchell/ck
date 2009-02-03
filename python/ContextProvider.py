@@ -1,3 +1,5 @@
+import gobject
+
 from ctypes import *
 from CTypesHelpers import *
 
@@ -16,8 +18,8 @@ class ContextProvider:
     def define_types(self):
         self.dll = CDLL("libcontextprovider.so")
         self.STRING_ARRAY = POINTER(c_char_p)
-        self.GET_CALLBACK = CFUNCTYPE(STRING_SET, CHANGE_SET, c_void_p)
-        self.SUBSCRIBE_CALLBACK = CFUNCTYPE(STRING_SET, c_void_p)
+        self.GET_CALLBACK = POINTER(CFUNCTYPE(STRING_SET, CHANGE_SET, c_void_p))
+        self.SUBSCRIBE_CALLBACK = POINTER(CFUNCTYPE(STRING_SET, c_void_p))
 
     def define_functions(self):
         self.init = cfunc('context_provider_init', self.dll, None,
@@ -38,3 +40,4 @@ class ContextProvider:
 
 if __name__ == "__main__":
     cp = ContextProvider()
+    cp.init(["foo.bar", "foo.baz"], 1, None, None, None, None, None, None)
