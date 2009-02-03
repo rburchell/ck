@@ -19,7 +19,7 @@ import sys
 from time import sleep
 import unittest
 import traceback
-import conf
+import conf as cfg
 import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
@@ -30,8 +30,8 @@ class ContextDbusClient (dbus.service.Object):
     def __init__(self, main_loop):
         # Here the object path
         dbus.service.Object.__init__(self,
-                 dbus.service.BusName("com.nokia.test", bus=dbus.SessionBus()),
-                 "/com/nokia/test/request")
+                 dbus.service.BusName(cfg.testBusName, bus=dbus.SessionBus()),
+                 cfg.testRqstPath)
 
         self.main_loop = main_loop
         self.stopped = False
@@ -41,46 +41,48 @@ class ContextDbusClient (dbus.service.Object):
     # DBUS methods
     #
 
-    @dbus.service.method(dbus_interface='com.nokia.test.request',
+    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
                        in_signature='', out_signature='a{sv}as')
-    def get_returnedProp(self):
-        return self.cdBusServer.getretProp()
+    def getChangedProp(self):
+        return self.cdBusServer.getChangedProp()
     
-    @dbus.service.method(dbus_interface='com.nokia.test.request',
-                       in_signature='', out_signature='')
-    def addSubscriber(self):
-        self.cdBusServer.addSubscriber()
+    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
+                       in_signature='', out_signature='s')
+    def getSubscriber(self):
+        return self.cdBusServer.getSubscriber()
     
-    @dbus.service.method(dbus_interface='com.nokia.test.request',
+    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
                        in_signature='', out_signature='')
     def removeSubscriber(self):
         self.cdBusServer.removeSubscriber()
         
-    @dbus.service.method(dbus_interface='com.nokia.test.request',
+    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
                        in_signature='as', out_signature='')
     def setProperties(self, properties):
         self.cdBusServer.addProp(properties)
         
-    @dbus.service.method(dbus_interface='com.nokia.test.request',
+    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
                        in_signature='as', out_signature='')
     def removeProperties(self, properties):
         self.cdBusServer.removeProp(properties)
         
-    @dbus.service.method(dbus_interface='com.nokia.test.request',
+    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
+                       in_signature='as', out_signature='a{sv}as')
+    def subscribe(self, properties):
+        return self.cdBusServer.subscribe(properties)
+        
+    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
                        in_signature='', out_signature='')
-    def subscribe(self):
-        self.cdBusServer.subscribe()
+    def unsubscribe(self):
+        self.cdBusServer.unsubscribe()
         
-    @dbus.service.method(dbus_interface='com.nokia.test.request',
-                       in_signature='', out_signature='so')
-    def get_Subscriber(self):
-        return self.cdBusServer.get_Subscriber()     
-    
-    @dbus.service.method(dbus_interface='com.nokia.test.request',
-                       in_signature='o', out_signature='')
-    def rm_Subscriber(self, subscriberBus):
-        pass
-        
+    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
+                       in_signature='', out_signature='')
+    def loopQuit(self):
+        print "quit"
+        self.main_loop.quit()
+
+
     #
     # Public class methods
     #
@@ -96,42 +98,57 @@ class ContextDbusServer():
         self.me = self
         self.client.setServer(self.me)
         self.propList = []
-        self.retProp = None
-        self.undetProp = None
-        self.execute_subscribe()
+        self.changedRetProp = None
+        self.changedUndetProp = None
+        self.bus = None
+        self.subscribers = []
+        #self.execute_subscribe()
     
-    def get_Subscriber (self):
-        bus = dbus.SessionBus()
-        proxy_object_manager = bus.get_object("org.freedesktop.ContextKit","/org/freedesktop/ContextKit/Manager")
-        iface_manager = dbus.Interface(proxy_object_manager, "org.freedesktop.ContextKit.Manager")
-        #print "Requesting the subscriber object"
-        # Get the subscriber object
-        new_object_path = iface_manager.GetSubscriber()
+    def getSubscriber (self):
+        self.bus = dbus.SessionBus()
+        proxy_object_manager = self.bus.get_object(cfg.ctxBusName,
+                                        cfg.ctxMgrPath)
+        iface_manager = dbus.Interface(proxy_object_manager, 
+                                       cfg.ctxMgrIfce)
+        subscriber_object_path = iface_manager.GetSubscriber()
         
-        return new_object_path, bus
+        proxy_object_subscriber = self.bus.get_object(cfg.ctxBusName, 
+                                                 subscriber_object_path)
+        
+        #self.subscribers.append(proxy_object_subscriber)
+        
+        self.iface_subscriber = dbus.Interface(proxy_object_subscriber,
+                                               cfg.ctxScriberIfce)
+        
+        self.iface_subscriber.connect_to_signal("Changed", self.handle_signal)
+        
+        return str(subscriber_object_path)
     
-    def rm_Subscriber (self, bus):
-        bus.close()
+    def subscribe (self, properties):
+        returnedProp, undetermined = self.iface_subscriber.Subscribe(properties)
+        return returnedProp, undetermined
+    
+    def unsubscribe(self, properties):
+        self.iface_subscriber.Unsubscribe(properties)
+        
+    
+    
+    def rm_Subscriber (self):
+        self.main_loop.quit()
+        #self.bus.close()
         
     def handle_signal(self, prop, undeterminedProp):
-        print "Got signal"
-        self.retProp = prop
-        self.undetProp = undeterminedProp
-        print self.retProp
-        print undeterminedProp
+        self.changedRetProp = prop
+        self.changedUndetProp = undeterminedProp
+        #print self.retProp
+        #print undeterminedProp
         #struct1 = changed[edge_key]
         #struct2 = changed[facing_key]
         #print "Orientation:", struct1[1], struct2[1]
         #self.client.setProp(struct1)
     
-    def getretProp (self):
-        return self.retProp, self.undetProp
-    
-    def subscribe (self):
-        self.iface_subscriber.Subscribe(self.propList)
-    
-    def unsubscribe(self, properties):
-        self.iface_subscriber.Unsubscribe(properties)
+    def getChangedProp (self):
+        return self.changedRetProp, self.changedUndetProp
     
     def addProp(self,properties):
         for prop in properties:
@@ -143,8 +160,9 @@ class ContextDbusServer():
     
     def addSubscriber(self):
         new_object_path = self.iface_manager.GetSubscriber()
-        proxy_object_subscriber = bus.get_object("org.freedesktop.ContextKit", new_object_path)
-        self.iface_subscriber = dbus.Interface(proxy_object_subscriber, "org.freedesktop.ContextKit.Subscriber")
+        proxy_object_subscriber = bus.get_object(cfg.ctxBusName, new_object_path)
+        self.iface_subscriber = dbus.Interface(proxy_object_subscriber,
+                                               cfg.ctxScriberIfce)
         
         # Connect to the signal
         print "Connecting to the signal"
@@ -155,8 +173,9 @@ class ContextDbusServer():
     
     def execute_subscribe(self):
         bus = dbus.SessionBus()
-        proxy_object_manager = bus.get_object("org.freedesktop.ContextKit","/org/freedesktop/ContextKit/Manager")
-        iface_manager = dbus.Interface(proxy_object_manager, "org.freedesktop.ContextKit.Manager")
+        proxy_object_manager = bus.get_object(cfg.ctxBusName,
+                                              cfg.ctxMgrPath)
+        iface_manager = dbus.Interface(proxy_object_manager, cfg.ctxMgrIfce)
         print "Requesting the subscriber object"
         # Get the subscriber object
         new_object_path = iface_manager.GetSubscriber()
@@ -164,8 +183,9 @@ class ContextDbusServer():
         print "Got an object path", new_object_path
         # And then execute the actual subscribe property_names
         
-        proxy_object_subscriber = bus.get_object("org.freedesktop.ContextKit", new_object_path)
-        self.iface_subscriber = dbus.Interface(proxy_object_subscriber, "org.freedesktop.ContextKit.Subscriber")
+        proxy_object_subscriber = bus.get_object(cfg.ctxBusName, new_object_path)
+        self.iface_subscriber = dbus.Interface(proxy_object_subscriber,
+                                        cfg.ctxScriberIfce)
         
         # Connect to the signal
         print "Connecting to the signal"
