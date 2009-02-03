@@ -35,13 +35,14 @@ namespace ContextProvider {
 		 * Emits the contents of the changeset to all
 		 * listeners interested in the properties that have changed.
 		 */
-		public static void commit (ChangeSet #change_set /*take back ownership */) {
+		public static int commit (ChangeSet #change_set /*take back ownership */) {
 			ContextProvider.Manager manager = ContextProvider.Manager.get_instance ();
-			manager.property_values_changed(change_set.properties, change_set.undeterminable_keys);
+			int ret = manager.property_values_changed(change_set.properties, change_set.undeterminable_keys);
 //			changeset_holder_mutex.lock();
 			//removing it from the changeset_holder causes refcount to go to zero.
 			changeset_holder.remove (change_set);
 //			changeset_holder_mutex.unlock();
+			return ret; // Return the error / success value
 		}
 
 		/**
