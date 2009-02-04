@@ -2,6 +2,9 @@ using Gee;
 
 namespace ContextProvider {
 
+	// Records whether the context_init function has been called
+	bool init_called = false;
+
 	public class ChangeSet {
 		HashTable<string, Value?> properties;
 		/*shouldn't be public, but lists suck, see cprovider.vala*/
@@ -20,6 +23,8 @@ namespace ContextProvider {
 		 * Returns: a new #ChangeSet
 		 */
 		public static ChangeSet create () {
+			assert (init_called == true);
+
 			ChangeSet s = new ChangeSet();
 //			changeset_holder_mutex.lock();
 			changeset_holder.add(s);
@@ -36,6 +41,8 @@ namespace ContextProvider {
 		 * listeners interested in the properties that have changed.
 		 */
 		public static int commit (ChangeSet #change_set /*take back ownership */) {
+			assert (init_called == true);
+
 			ContextProvider.Manager manager = ContextProvider.Manager.get_instance ();
 			int ret = manager.property_values_changed(change_set.properties, change_set.undeterminable_keys);
 //			changeset_holder_mutex.lock();
@@ -52,6 +59,8 @@ namespace ContextProvider {
 		 * Cancels a changeset, cleaning up without emitting the contents.
 		 */
 		public static void cancel (ChangeSet #change_set /*take back ownership */) {
+			assert (init_called == true);
+
 //			changeset_holder_mutex.lock();
 			//removing it from the changeset_holder causes refcount to go to zero.
 			changeset_holder.remove (change_set);
@@ -71,6 +80,8 @@ namespace ContextProvider {
 		}
 
 		public int add_int (string key, int val) {
+			assert (init_called == true);
+
 			Value v = Value (typeof(int));
 			v.set_int (val);
 			properties.insert (key, v);
@@ -78,6 +89,8 @@ namespace ContextProvider {
 		}
 
 		public int add_double (string key, double val) {
+			assert (init_called == true);
+
 			Value v = Value (typeof(double));
 			v.set_double (val);
 			properties.insert (key, v);
@@ -85,6 +98,8 @@ namespace ContextProvider {
 		}
 
 		public int add_bool (string key, bool val) {
+			assert (init_called == true);
+
 			Value v = Value (typeof(bool));
 			v.set_boolean (val);
 			properties.insert (key, v);
@@ -92,6 +107,8 @@ namespace ContextProvider {
 		}
 
 		public int add_undetermined_key (string key) {
+			assert (init_called == true);
+
 			undeterminable_keys.prepend (key);
 			return 0;
 		}
@@ -102,6 +119,8 @@ namespace ContextProvider {
 	public delegate void SubscribeCallback(StringSet keys);
 
 	public bool init ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, bool useSessionBus, GetCallback? get_cb, SubscribeCallback? first_cb, SubscribeCallback? last_cb) {
+
+		init_called = true;
 
 		DBus.BusType busType = DBus.BusType.SESSION;
 		if (useSessionBus == false) {
