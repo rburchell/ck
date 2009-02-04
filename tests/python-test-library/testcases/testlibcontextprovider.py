@@ -17,14 +17,6 @@ import ContextProvider
 class LibraryTestCase(unittest.TestCase):
     def setUp(self):
         pass
-        # FIXME: This is obsolete, right?
-        #self.libc = CDLL("libcontextprovider.la")
-        #self.STRING_ARRAY = POINTER(c_char_p)
-        #self.STRING_SET = c_void_p
-        #self.CHANGE_SET = c_void_p
-        #self.GET_CALLBACK = CFUNCTYPE(self.STRING_SET, self.CHANGE_SET, c_void_p)
-        #self.SUBSCRIBE_CALLBACK = CFUNCTYPE(self.STRING_SET, c_void_p)
-        #self.libc.context_provider_init.argtypes = [self.STRING_ARRAY, self.GET_CALLBACK, c_void_p, self.SUBSCRIBE_CALLBACK, c_void_p, self.SUBSCRIBE_CALLBACK, c_void_p]
     def tearDown(self):
         print "LibraryTestCase tearDown"
         pass
@@ -32,61 +24,51 @@ class LibraryTestCase(unittest.TestCase):
 
 class Startup(LibraryTestCase):
     def setUp(self):
-        pass
-
-    def tearDown(self):
-        print "Startup tearDown"
-        pass # FIXME: Call parent class func explicitly
-
-    def test_startProvider(self):
-        bus = dbus.SessionBus()
-        # Note: We want to start the listener before the FakeProvider, therefore it FakeProvider is not started in setUp.
+        self.bus = dbus.SessionBus() # Note: using session bus
 
         # Start a listener which listens to dbus NameOwnerChanged signals
         os.system("python tests/python-test-library/stubs/dbus_listener.py &")
         sleep(0.5)
         # Command the listener to listen to FakeProvider
-        listener_proxy = bus.get_object("org.freedesktop.ContextKit.Testing.Listener","/org/freedesktop/ContextKit/Testing/Listener")
-        listener_iface = dbus.Interface(listener_proxy, "org.freedesktop.ContextKit.Testing.Listener")
-        listener_iface.SetTarget("org.freedesktop.ContextKit.Testing.Provider")
+        self.listener_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Listener","/org/freedesktop/ContextKit/Testing/Listener")
+        self.listener_iface = dbus.Interface(self.listener_proxy, "org.freedesktop.ContextKit.Testing.Listener")
+        self.listener_iface.SetTarget("org.freedesktop.ContextKit.Testing.Provider")
+
         # Start a provider stub
         os.system("python tests/python-test-library/stubs/provider_stub.py &")
         sleep(0.5)
         # Command the provider stub to start exposing services over dbus
-        provider_proxy = bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Testing/Provider")
-        provider_iface = dbus.Interface(provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
-        provider_iface.DoInit()
+        self.provider_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Testing/Provider")
+        self.provider_iface = dbus.Interface(self.provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
+        self.provider_iface.DoInit()
         sleep(0.5)
 
-        # Get the log from the listener
-        log = listener_iface.GetLog()
-        self.assert_(log == "(TargetAppeared)")
-
+    def tearDown(self):
+        print "Startup tearDown"
         # Stop the provider
-        provider_iface.Exit()
+        self.provider_iface.Exit()
         sleep(0.5)
-
-        # Get the log from the listener
-        log = listener_iface.GetLog()
-        self.assert_(log == "(TargetAppeared)(TargetDisappeared)")
 
         # Stop the listener
-        listener_iface.Exit()
+        self.listener_iface.Exit()
+        pass # FIXME: Call parent class func explicitly
+
+    def test_startProvider(self):
+        # Verify that the provider is started and exposed over dbus.
+
+        # Get the log from the listener
+        log = self.listener_iface.GetLog()
+        self.assert_(log == "(TargetAppeared)")
+
+        # Note: we could also test whether disappearing is noticed
+        # but that is dropped for simplicity.
+
 
     def test_managerInterfaceImplemented(self):
-        bus = dbus.SessionBus()
-
-        # Start a provider stub
-        os.system("python tests/python-test-library/stubs/provider_stub.py &")
-        sleep(0.5)
-        # Command the provider stub to start exposing services over dbus
-        provider_proxy = bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Testing/Provider")
-        provider_iface = dbus.Interface(provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
-        provider_iface.DoInit()
-        sleep(0.5)
+        # Verify that the provider exposes the Manager interface over dbus properly
 
         # Try to get the manager object
-        proxy_object_manager = bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
+        proxy_object_manager = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
         iface_manager = dbus.Interface(proxy_object_manager, "org.freedesktop.ContextKit.Manager")
         self.assert_ (proxy_object_manager != None) # FIXME: What is the correct validity check?
         self.assert_ (iface_manager != None) # FIXME: What is the correct validity check?
@@ -94,12 +76,8 @@ class Startup(LibraryTestCase):
             iface_manager.Get("temp")
         except:
             print "Exception caught"
-            provider_iface.Exit()
             self.assert_ (False) # Manager interface is not implemented properly
             # After this, only tearDown will be executed
-
-        # Stop the provider
-        provider_iface.Exit()
 
 
 class Subscription(LibraryTestCase):
@@ -176,5 +154,5 @@ if __name__ == "__main__":
     # Start listening to NameOwnerChanged dbus signal
     #listener = DBusListener()
 
-    runTests();
+    runTests()
     #libc.context_kit_key_usage_counter_add(None, None)

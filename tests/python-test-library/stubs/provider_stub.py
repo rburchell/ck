@@ -16,7 +16,6 @@ import sys
 sys.path.append("./python/")
 import ContextProvider as cb
 
-from ctypes import *
 import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
