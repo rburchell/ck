@@ -84,6 +84,13 @@ namespace ContextProvider {
 			return 0;
 		}
 
+		public int add_bool (string key, bool val) {
+			Value v = Value (typeof(bool));
+			v.set_boolean (val);
+			properties.insert (key, v);
+			return 0;
+		}
+
 		public int add_undetermined_key (string key) {
 			undeterminable_keys.prepend (key);
 			return 0;
