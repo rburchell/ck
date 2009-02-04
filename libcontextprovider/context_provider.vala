@@ -118,8 +118,7 @@ namespace ContextProvider {
 	public delegate void GetCallback(StringSet #keys, ChangeSet #change_set);
 	public delegate void SubscribeCallback(StringSet keys);
 
-	public bool init ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, bool useSessionBus, GetCallback? get_cb, SubscribeCallback? first_cb, SubscribeCallback? last_cb) {
-
+	public bool init (bool useSessionBus) {
 		init_called = true;
 
 		DBus.BusType busType = DBus.BusType.SESSION;
@@ -129,9 +128,6 @@ namespace ContextProvider {
 		Manager.setBusType (busType);
 
 		Manager manager = Manager.get_instance ();
-
-		CProvider provider = new CProvider(get_cb, first_cb, last_cb);
-		manager.providers.register (provided_keys, provider);
 
 		try {
 			debug ("Registering new Manager D-Bus service");
@@ -143,6 +139,20 @@ namespace ContextProvider {
 			return false;
 		}
 		return true;
+	}
+
+	public Provider install ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, GetCallback? get_cb, SubscribeCallback? first_cb, SubscribeCallback? last_cb) {
+
+		Manager manager = Manager.get_instance ();
+
+		CProvider provider = new CProvider(new StringSet.from_array(provided_keys), get_cb, first_cb, last_cb);
+		manager.providers.register (provider);
+		return provider;
+	}
+
+	public void remove (Provider provider) {
+		Manager manager = Manager.get_instance ();
+		manager.providers.unregister (provider);
 	}
 
 	public int no_of_subscribers (string key) {

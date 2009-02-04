@@ -30,7 +30,7 @@ namespace ContextKit {
 			public const string key_in_active_use = "Context.Device.Usage.inActiveUse";
 
 			// Information about keys provided by this plug-in
-			public const string[] keys = {
+			const string[] keys = {
 					key_edge_up,
 					key_facing_up, // Values: Undefined (0), face up (1), back side up (2)
 					key_display_state, // Values: Off (0), on (1), dimmed (2)
@@ -39,6 +39,8 @@ namespace ContextKit {
 					key_is_emergency_mode, // Values: TRUE (emergency call in progress), FALSE (otherwise)
 					key_in_active_use // Values: TRUE (device active), FALSE (device inactive)
 				};
+
+			StringSet all_keys = new StringSet.from_array (keys);
 
 			// Keys divided into sets based on how they are got from MCE
 			StringSet orientation_keys;
@@ -432,7 +434,7 @@ namespace ContextKit {
 
 			}
 
-			public void Get (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavail) {
+			public void get (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavail) {
 				get_orientation (keys, ret, ref unavail);
 				get_display_status (keys, ret, ref unavail);
 				get_device_mode (keys, ret, ref unavail);
@@ -446,9 +448,9 @@ namespace ContextKit {
 				}
 			}
 
-			public void KeysSubscribed (StringSet keys) {
+			public void keys_subscribed (StringSet keys) {
 
-				debug ("MCE plugin: KeysSubscribed %s", keys.debug());
+				debug ("MCE plugin: keys_subscribed %s", keys.debug());
 				ensure_mce_signal_exists();
 
 				// Connect the corresponding MCE signal to its handler
@@ -476,9 +478,9 @@ namespace ContextKit {
 				}
 			}
 
-			public void KeysUnsubscribed (StringSet keys) {
+			public void keys_unsubscribed (StringSet keys) {
 				
-				debug ("MCE plugin: KeysUnsubscribed %s", keys.debug());
+				debug ("MCE plugin: keys_unsubscribed %s", keys.debug());
 				// Disconnect the corresponding MCE signal from its handler
 				if (keys.is_disjoint (orientation_keys) == false) {
 					// Note: orientation_keys contains two keys
@@ -510,6 +512,10 @@ namespace ContextKit {
 				if (keys.is_disjoint (inactivity_status_keys) == false) {
 					mce_signal.system_inactivity_ind -= inactivity_status_changed;
 				}
+			}
+
+			StringSet provided_keys () {
+				return all_keys;
 			}
 		}
 	}

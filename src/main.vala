@@ -44,7 +44,7 @@ namespace ContextKit {
 					debug ("Creating new Manager D-Bus service");
 
 					Manager? manager = Manager.get_instance ();
-					manager.providers.register (MCE.Provider.keys, new MCE.Provider());
+					manager.providers.register (new MCE.Provider());
 
 					connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 

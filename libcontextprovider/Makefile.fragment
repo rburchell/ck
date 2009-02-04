@@ -6,13 +6,13 @@ libcontextprovider_VALASOURCES_PRIV = \
 	libcontextprovider/providers.vala \
 	libcontextprovider/key_usage_counter.vala \
 	libcontextprovider/subscriber.vala \
-	libcontextprovider/provider_interface.vala \
 	libcontextprovider/cprovider.vala \
 	$(NULL)
 
 libcontextprovider_VALASOURCES_PUB = \
 	libcontextprovider/context_provider.vala \
 	libcontextprovider/string_set.vala \
+	libcontextprovider/provider_interface.vala \
 	$(NULL)
 
 libcontextprovider_VALASOURCES = \
