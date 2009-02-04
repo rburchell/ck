@@ -12,7 +12,7 @@ import ContextProvider
 
 # FIXME: Missing testcases
 # - Using system bus flag in init
-# -
+# - Test that callbacks work
 
 class LibraryTestCase(unittest.TestCase):
     def setUp(self):
