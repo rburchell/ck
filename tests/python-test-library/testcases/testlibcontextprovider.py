@@ -9,7 +9,8 @@ from time import sleep
 
 class LibraryTestCase(unittest.TestCase):
     def setUp(self):
-        self.libc = CDLL("libcontextprovider.la")
+        print "CWD", os.getcwd()
+        self.libc = CDLL("libcontextprovider.so")
         self.STRING_ARRAY = POINTER(c_char_p)
         self.STRING_SET = c_void_p
         self.CHANGE_SET = c_void_p
