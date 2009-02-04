@@ -183,7 +183,8 @@ namespace ContextProvider {
 			var keys = properties.get_keys ();
 			foreach (var key in keys) {
 				if (providers.valid_keys.is_member (key) == false) {
-					error ("Key %s is not valid", key);
+					debug ("Key %s is not valid", key);
+					assert (false);
 					// FIXME: How to react?
 					// Now we drop the whole event and return an error value
 					return 1;
@@ -191,7 +192,8 @@ namespace ContextProvider {
 			}
 			foreach (var key in undeterminable_keys) {
 				if (providers.valid_keys.is_member (key) == false) {
-					error ("Key %s is not valid", key);
+					debug ("Key %s is not valid", key);
+					assert (false);
 					// FIXME: How to react?
 					// Now we drop the whole event and return an error value
 					return 1;
