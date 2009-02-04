@@ -36,11 +36,12 @@ class Startup(LibraryTestCase):
 
     def tearDown(self):
         print "Startup tearDown"
-        # FIXME: Try to ensure that the stubs are killed properly
         pass # FIXME: Call parent class func explicitly
 
-    def test_startProvidingKeys(self):
+    def test_startProvider(self):
         bus = dbus.SessionBus()
+        # Note: We want to start the listener before the FakeProvider, therefore it FakeProvider is not started in setUp.
+
         # Start a listener which listens to dbus NameOwnerChanged signals
         os.system("python tests/python-test-library/stubs/dbus_listener.py &")
         sleep(0.5)
@@ -71,6 +72,35 @@ class Startup(LibraryTestCase):
 
         # Stop the listener
         listener_iface.Exit()
+
+    def test_managerInterfaceImplemented(self):
+        bus = dbus.SessionBus()
+
+        # Start a provider stub
+        os.system("python tests/python-test-library/stubs/provider_stub.py &")
+        sleep(0.5)
+        # Command the provider stub to start exposing services over dbus
+        provider_proxy = bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Testing/Provider")
+        provider_iface = dbus.Interface(provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
+        provider_iface.DoInit()
+        sleep(0.5)
+
+        # Try to get the manager object
+        proxy_object_manager = bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
+        iface_manager = dbus.Interface(proxy_object_manager, "org.freedesktop.ContextKit.Manager")
+        self.assert_ (proxy_object_manager != None) # FIXME: What is the correct validity check?
+        self.assert_ (iface_manager != None) # FIXME: What is the correct validity check?
+        try:
+            iface_manager.Get("temp")
+        except:
+            print "Exception caught"
+            provider_iface.Exit()
+            self.assert_ (False) # Manager interface is not implemented properly
+            # After this, only tearDown will be executed
+
+        # Stop the provider
+        provider_iface.Exit()
+
 
 class Subscription(LibraryTestCase):
     def setUp(self):
@@ -137,8 +167,8 @@ def runTests():
     suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
     suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
 
-    unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
-    #unittest.TextTestRunner(verbosity=2).run(suiteStartup)
+    unittest.TextTestRunner(verbosity=2).run(suiteStartup)
+    #unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
     #unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
     #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
 
