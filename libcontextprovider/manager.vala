@@ -178,13 +178,25 @@ namespace ContextProvider {
 		}
 
 		/* Is called when the provider sets new values to context properties */
-		public void property_values_changed(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
+		public int property_values_changed(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
 			// Check that all the keys are valid
 			var keys = properties.get_keys ();
 			foreach (var key in keys) {
 				if (providers.valid_keys.is_member (key) == false) {
-					error ("Key %s is not valid", key);
-					// FIXME: What to do?
+					debug ("Key %s is not valid", key);
+					assert (false);
+					// FIXME: How to react?
+					// Now we drop the whole event and return an error value
+					return 1;
+				}
+			}
+			foreach (var key in undeterminable_keys) {
+				if (providers.valid_keys.is_member (key) == false) {
+					debug ("Key %s is not valid", key);
+					assert (false);
+					// FIXME: How to react?
+					// Now we drop the whole event and return an error value
+					return 1;
 				}
 			}
 
@@ -195,6 +207,8 @@ namespace ContextProvider {
 			foreach (var s in subscribers.get_values()) {
 				s.on_value_changed(properties, undeterminable_keys);
 			}
+			// Return success value
+			return 0;
 		}
 	}
 }

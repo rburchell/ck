@@ -21,7 +21,7 @@ import gobject
 class Provider (dbus.service.Object):
     def __init__(self, main_loop):
         # Load the libcontextprovider library
-        self.libc = CDLL("libcontextprovider.so.0.0.0")
+        self.libc = CDLL("libcontextprovider.so")
         
         # Initiate dbus connection so that this stub can be commanded throug it
         self.busSes = dbus.service.BusName("org.freedesktop.ContextKit.Testing.Provider",

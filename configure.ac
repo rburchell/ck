@@ -102,6 +102,7 @@ AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([doc/Makefile])
 AC_CONFIG_FILES([doc/reference/Makefile])
 AC_CONFIG_FILES([doc/reference/libcontextprovider/Makefile])
+AC_CONFIG_FILES([contextprovider-1.0.pc])
 
 
 AC_OUTPUT
