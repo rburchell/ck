@@ -123,6 +123,7 @@ namespace ContextProvider {
 
 		DBus.BusType busType = DBus.BusType.SESSION;
 		if (useSessionBus == false) {
+			debug ("Using system bus");
 			busType = DBus.BusType.SYSTEM;
 		}
 		Manager.setBusType (busType);

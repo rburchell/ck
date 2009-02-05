@@ -4,7 +4,7 @@
 ##
 ## Copyright (C) 2008 Nokia. All rights reserved.
 ##
-## 
+##
 ## This python file emulates a provider which uses
 ## libcontextprovider to provide context properties.
 ##
@@ -12,47 +12,54 @@
 ##
 ##
 
-from ctypes import *
+import sys
+sys.path.append("./python/")
+import ContextProvider as cb
+
 import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 import gobject
 
-class Provider (dbus.service.Object):
+class FakeProvider (dbus.service.Object):
+
+    def get_cb (ss, cs, d):
+        print StringSet.debug(ss)
+
+    def first_cb (ss, d):
+        print StringSet.debug(ss)
+
+    def last_cb (ss, d):
+        print StringSet.debug(ss)
+
     def __init__(self, main_loop):
-        # Load the libcontextprovider library
-        self.libc = CDLL("libcontextprovider.so")
-        
         # Initiate dbus connection so that this stub can be commanded throug it
         self.busSes = dbus.service.BusName("org.freedesktop.ContextKit.Testing.Provider",
                                            dbus.SessionBus())
-         
-        dbus.service.Object.__init__(self, self.busSes, 
+
+        dbus.service.Object.__init__(self, self.busSes,
                 "/org/freedesktop/ContextKit/Testing/Provider")
         self.main_loop = main_loop
-        
 
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='', out_signature='')
-    def Start (self):
-        print "Provider: Starting"
-        key1 = c_char_p("Context.Test.keyInt")
-        key2 = c_char_p("Context.Test.keyDouble")
-        key3 = c_char_p("Context.Test.keyString")
-        keyListType = c_char_p * 4
-        keyList = keyListType(key1, key2, key3, None)
-        print "Provider: initing"
-        self.libc.context_provider_init(keyList, None, None, None, None, None, None)
-   
+    def DoInit (self):
+        print "Provider: Executing Init"
+        cb.ContextProvider.init(["Context.Test.keyInt", "Context.Test.keyBool", "Context.Test.keyString"], 1,
+                         cb.ContextProvider.GET_CALLBACK(self.get_cb), None,
+                         cb.ContextProvider.SUBSCRIBE_CALLBACK(self.first_cb), None,
+                         cb.ContextProvider.SUBSCRIBE_CALLBACK(self.last_cb), None)
+
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='', out_signature='')
     def Exit (self):
-        #print "Provider: Exiting"
+        print "Provider: Exiting"
         self.main_loop.quit()
 
 if __name__ == "__main__":
     DBusGMainLoop(set_as_default=True)
     loop = gobject.MainLoop()
-    fakeProvider = Provider(loop)
+
+    fakeProvider = FakeProvider(loop)
     loop.run()
     print "Provider: Returned from run"
