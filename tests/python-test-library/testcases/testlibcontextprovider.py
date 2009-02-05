@@ -116,11 +116,39 @@ class InstallingProvider(LibraryTestCase):
             print "Exception caught"
             self.assert_ (False) # Manager interface is not implemented properly
 
-        # Check from the log that the get callback was called
+        # Check from the log that the callback was called
         log = self.provider_iface.GetLog()
 
-        print "Log was", log
+        self.assert_ (log == "(get_cb(test.int))");
 
+    def test_firstCallback(self):
+        # Execute GetSubscriber
+        manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
+        manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
+
+        subscriber_path = "";
+        self.provider_iface.ResetLog()
+        try:
+            subscriber_path = manager_iface.GetSubscriber()
+        except:
+            print "Exception caught"
+            self.assert_ (False) # Manager interface is not implemented properly
+
+        self.assert_ (subscriber_path == "/org/freedesktop/ContextKit/Subscribers/0")
+
+        # Execute Subscribe
+        subscriber_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider",subscriber_path)
+        subscriber_iface = dbus.Interface(subscriber_proxy, "org.freedesktop.ContextKit.Subscriber")
+
+        subscriber_iface.Subscribe(["test.string"])
+
+        # Check from the log that the callback was called
+        log = self.provider_iface.GetLog()
+
+        print "Log is:", log
+        self.assert_ ((log == "(get_cb(test.string))(first_cb(test.string))" or log == "(first_cb(test.string))(get_cb(test.string))"))
+
+        # Note that as part of subscribe, also get is called. Here we don't care about the order.
 
 class Subscription(LibraryTestCase):
     def setUp(self):

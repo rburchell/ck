@@ -16,7 +16,6 @@ class PROVIDER(c_void_p):
 
 class ContextProvider:
     GET_CALLBACK = CFUNCTYPE(c_int, STRING_SET, CHANGE_SET, c_void_p)
-
     SUBSCRIBE_CALLBACK = CFUNCTYPE(c_int, STRING_SET, c_void_p)
 
     init = cfunc('context_provider_init', _dll, None,
@@ -95,7 +94,7 @@ class StringSet:
                       ('right', STRING_SET, 1))
     size = cfunc('context_provider_string_set_size', _dll, None,
                 ('self', STRING_SET, 1))
-    debug = cfunc('context_provider_string_set_size', _dll, c_char_p,
+    debug = cfunc('context_provider_string_set_debug', _dll, c_char_p,
                 ('self', STRING_SET, 1))
     ref = cfunc('context_provider_string_set_ref', _dll, c_char_p,
                 ('self', STRING_SET, 1))

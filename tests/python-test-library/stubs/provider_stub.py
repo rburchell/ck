@@ -24,19 +24,16 @@ import gobject
 class FakeProvider (dbus.service.Object):
 
     def get_cb (self, ss, cs, d):
-        print "This is get callback"
-        #self.log += ("get_cb(" + cb.StringSet.debug(ss) + ")")
+        self.log += ("(get_cb(" + cb.StringSet.debug(ss) + "))")
         return 0
-        #print StringSet.debug(ss)
+
 
     def first_cb (self, ss, d):
-        #self.log += ("first_cb(" + cb.StringSet.debug(ss) + ")")
-        #print StringSet.debug(ss)
+        self.log += ("(first_cb(" + cb.StringSet.debug(ss) + "))")
         return 0
 
     def last_cb (self, ss, d):
-        #self.log += ("last_cb(" + cb.StringSet.debug(ss) + ")")
-        #print StringSet.debug(ss)
+        self.log += ("(last_cb(" + cb.StringSet.debug(ss) + "))")
         return 0
 
     def __init__(self, main_loop):
