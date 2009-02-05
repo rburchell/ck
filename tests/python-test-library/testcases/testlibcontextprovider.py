@@ -180,6 +180,8 @@ class Callbacks(LibraryTestCase):
 
         self.assert_ (log == "(last_cb(test.boolean))")
 
+# FIXME: missing test: change set from first callback is treated properly (its values affect the Get result)
+
 class Subscription(LibraryTestCase):
     def setUp(self):
         # Start a provider stub
@@ -216,17 +218,39 @@ class Subscription(LibraryTestCase):
 
 
 class ChangeSets(LibraryTestCase):
-    def test_createChangeSet(self):
-        # FIXME: This functionality is missing from the lib!
-        #self.libc.context_provider_init (['Context.Test.keyInt'], None, None, None, None, None, None)
-        #changeset = self.libc.context_provider_change_set_create()
-        #self.assert_(ret != None)
-        #ret = self.libc.context_provider_change_set_add_int(ret, "Context.Test.keyInt", 5)
-        #self.assert_(ret == 0) # Success return value
-        #ret = self.libc.context_provider_change_set_send_notification(ret)
-        #self.assert_(ret == 0) # Success return value
-        #ret = self.libc.context_change_set_delete(ret)
-        pass
+    def setUp(self):
+        self.bus = dbus.SessionBus() # Note: using session bus
+
+        # Start a provider stub
+        os.system("python tests/python-test-library/stubs/provider_stub.py &")
+        sleep(0.5)
+        # Command the provider stub to start exposing services over dbus
+        self.provider_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider.Command","/org/freedesktop/ContextKit/Testing/Provider")
+        self.provider_iface = dbus.Interface(self.provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
+        self.provider_iface.DoInit()
+
+        # Install a provider
+        self.provider_iface.DoInstall()
+        sleep(0.5)
+
+    def tearDown(self):
+        print "Startup tearDown"
+        # Uninstall a provider
+        self.provider_iface.DoRemove()
+        # Stop the provider stub
+        self.provider_iface.Exit()
+        sleep(0.5)
+
+    def test_changeSetNotifiedToSubscriber(self):
+        # Create a subscriber which subscribes to our properties
+        # FIXME: implementation missing
+
+        # Create a change set
+        self.provider_iface.SendChangeSet1()
+
+        # Check from the subscriber log that the change was done
+
+        self.assert_ (False) # This test is not yet implemented
 
 class KeyCounting(LibraryTestCase):
     def test_initialCount(self):
@@ -242,15 +266,18 @@ class KeyCounting(LibraryTestCase):
 def runTests():
     suiteStartup = unittest.TestLoader().loadTestsFromTestCase(Startup)
     suiteCallbacks = unittest.TestLoader().loadTestsFromTestCase(Callbacks)
+    suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
 
     suiteSubscription = unittest.TestLoader().loadTestsFromTestCase(Subscription)
-    suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
+
     suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
     unittest.TextTestRunner(verbosity=2).run(suiteCallbacks)
+    unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
+
     #unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
-    #unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
+
     #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
 
 if __name__ == "__main__":

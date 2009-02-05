@@ -69,6 +69,14 @@ class FakeProvider (dbus.service.Object):
 
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='', out_signature='')
+    def SendChangeSet1(self):
+        cs = cb.ContextProvider.change_set_create()
+        cb.ContextProvider.change_set_add_int(cs, "test.int", 1)
+        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.string")
+        cb.ContextProvider.change_set_commit(cs)
+
+    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+                       in_signature='', out_signature='')
     def Exit (self):
         print "Provider: Exiting"
         self.main_loop.quit()
