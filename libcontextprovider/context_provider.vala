@@ -3,7 +3,7 @@ using Gee;
 namespace ContextProvider {
 
 	// Records whether the context_init function has been called
-	bool init_called = false;
+	bool initialised = false;
 
 	public class ChangeSet {
 		HashTable<string, Value?> properties;
@@ -23,7 +23,7 @@ namespace ContextProvider {
 		 * Returns: a new #ChangeSet
 		 */
 		public static ChangeSet create () {
-			assert (init_called == true);
+			assert (initialised == true);
 
 			ChangeSet s = new ChangeSet();
 //			changeset_holder_mutex.lock();
@@ -41,7 +41,7 @@ namespace ContextProvider {
 		 * listeners interested in the properties that have changed.
 		 */
 		public static int commit (ChangeSet #change_set /*take back ownership */) {
-			assert (init_called == true);
+			assert (initialised == true);
 
 			ContextProvider.Manager manager = ContextProvider.Manager.get_instance ();
 			int ret = manager.property_values_changed(change_set.properties, change_set.undeterminable_keys);
@@ -59,7 +59,7 @@ namespace ContextProvider {
 		 * Cancels a changeset, cleaning up without emitting the contents.
 		 */
 		public static void cancel (ChangeSet #change_set /*take back ownership */) {
-			assert (init_called == true);
+			assert (initialised == true);
 
 //			changeset_holder_mutex.lock();
 			//removing it from the changeset_holder causes refcount to go to zero.
@@ -80,7 +80,7 @@ namespace ContextProvider {
 		}
 
 		public int add_int (string key, int val) {
-			assert (init_called == true);
+			assert (initialised == true);
 
 			Value v = Value (typeof(int));
 			v.set_int (val);
@@ -89,7 +89,7 @@ namespace ContextProvider {
 		}
 
 		public int add_double (string key, double val) {
-			assert (init_called == true);
+			assert (initialised == true);
 
 			Value v = Value (typeof(double));
 			v.set_double (val);
@@ -98,7 +98,7 @@ namespace ContextProvider {
 		}
 
 		public int add_bool (string key, bool val) {
-			assert (init_called == true);
+			assert (initialised == true);
 
 			Value v = Value (typeof(bool));
 			v.set_boolean (val);
@@ -107,7 +107,7 @@ namespace ContextProvider {
 		}
 
 		public int add_undetermined_key (string key) {
-			assert (init_called == true);
+			assert (initialised == true);
 
 			undeterminable_keys.prepend (key);
 			return 0;
@@ -118,19 +118,34 @@ namespace ContextProvider {
 	public delegate void GetCallback(StringSet #keys, ChangeSet #change_set);
 	public delegate void SubscribeCallback(StringSet keys);
 
-	public bool init (bool useSessionBus) {
-		init_called = true;
+	public bool init (bool useSessionBus, string? bus_name) {
 
 		DBus.BusType busType = DBus.BusType.SESSION;
 		if (useSessionBus == false) {
 			debug ("Using system bus");
 			busType = DBus.BusType.SYSTEM;
 		}
-		Manager.setBusType (busType);
-
-		Manager manager = Manager.get_instance ();
 
 		try {
+			if (bus_name != null) {
+				var connection = DBus.Bus.get (DBus.BusType.SESSION);
+				dynamic DBus.Object bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
+				// try to register service in session bus
+				uint request_name_result = bus.RequestName (bus_name, (uint) 0);
+
+				if (request_name_result != DBus.RequestNameReply.PRIMARY_OWNER) {
+					debug ("Unable to register bus name '%s'", bus_name);
+					return false;
+				}
+			}
+
+			debug ("Creating new Manager D-Bus service");
+
+
+			Manager.setBusType (busType);
+
+			Manager manager = Manager.get_instance ();
+
 			debug ("Registering new Manager D-Bus service");
 			var connection = DBus.Bus.get (busType);
 
@@ -139,6 +154,9 @@ namespace ContextProvider {
 			debug ("Registration failed: %s", e.message);
 			return false;
 		}
+
+
+		initialised = true;
 		return true;
 	}
 
