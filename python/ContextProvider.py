@@ -10,19 +10,27 @@ class STRING_SET(c_void_p):
 class CHANGE_SET(c_void_p):
     pass
 
+class PROVIDER(c_void_p):
+    pass
+
+
 class ContextProvider:
     GET_CALLBACK = CFUNCTYPE(STRING_SET, CHANGE_SET, c_void_p)
     SUBSCRIBE_CALLBACK = CFUNCTYPE(STRING_SET, c_void_p)
 
     init = cfunc('context_provider_init', _dll, None,
-                 ('provided_keys', ListPOINTER (c_char_p), 1),
                  ('useSessionBus', c_int, 1),
+                 ('bus_name', c_char_p, 1))
+    install = cfunc('context_provider_install', _dll, PROVIDER,
+                 ('provided_keys', ListPOINTER (c_char_p), 1),
                  ('get_cb', POINTER(GET_CALLBACK), 1),
                  ('get_cb_target', c_void_p, 1),
                  ('first_cb', POINTER(SUBSCRIBE_CALLBACK), 1),
                  ('first_cb_target', c_void_p, 1),
                  ('last_cb', POINTER(SUBSCRIBE_CALLBACK), 1),
                  ('last_cb_target', c_void_p, 1))
+    remove = cfunc('context_provider_remove', _dll, None,
+                    ('provider', PROVIDER, 1))
     no_of_subscribers = cfunc('context_provider_no_of_subscribers', _dll, c_int,
                               ('key', c_char_p, 1))
 
@@ -101,9 +109,6 @@ if __name__ == "__main__":
     DBusGMainLoop(set_as_default=True)
     loop = gobject.MainLoop()
 
-    busname = dbus.service.BusName("org.freedesktop.ContextKit.Testing.Provider",
-                                    dbus.SessionBus())
-
     def get_cb (ss, cs, d):
         print StringSet.debug(ss)
     def first_cb (ss, d):
@@ -112,7 +117,8 @@ if __name__ == "__main__":
         print StringSet.debug(ss)
 
 
-    ContextProvider.init(["foo.bar", "foo.baz"], 1,
+    ContextProvider.init(1, "org.freedesktop.ContextKit.Testing.Provider")
+    p =ContextProvider.install(["foo.bar", "foo.baz"],
                          ContextProvider.GET_CALLBACK(get_cb), None,
                          ContextProvider.SUBSCRIBE_CALLBACK(first_cb), None,
                          ContextProvider.SUBSCRIBE_CALLBACK(last_cb), None)
@@ -123,5 +129,5 @@ if __name__ == "__main__":
     ContextProvider.change_set_add_int(cs2, "foo.bar", 1)
     ContextProvider.change_set_add_undetermined_key(cs2, "foo.baz")
     ContextProvider.change_set_commit(cs2)
-
+    ContextProvider.remove (p)
     loop.run()
