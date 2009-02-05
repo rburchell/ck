@@ -63,21 +63,63 @@ class Startup(LibraryTestCase):
         # Note: we could also test whether disappearing is noticed
         # but that is dropped for simplicity.
 
-
     def test_managerInterfaceImplemented(self):
         # Verify that the provider exposes the Manager interface over dbus properly
 
         # Try to get the manager object
-        proxy_object_manager = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
-        iface_manager = dbus.Interface(proxy_object_manager, "org.freedesktop.ContextKit.Manager")
-        self.assert_ (proxy_object_manager != None) # FIXME: What is the correct validity check?
-        self.assert_ (iface_manager != None) # FIXME: What is the correct validity check?
+        manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
+        manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
+        self.assert_ (manager_proxy != None) # FIXME: What is the correct validity check?
+        self.assert_ (manager_iface != None) # FIXME: What is the correct validity check?
         try:
-            iface_manager.Get(["temp"])
+            manager_iface.Get(["temp"])
         except:
             print "Exception caught"
             self.assert_ (False) # Manager interface is not implemented properly
             # After this, only tearDown will be executed
+
+class InstallingProvider(LibraryTestCase):
+    def setUp(self):
+        self.bus = dbus.SessionBus() # Note: using session bus
+
+        # Start a provider stub
+        os.system("python tests/python-test-library/stubs/provider_stub.py &")
+        sleep(0.5)
+        # Command the provider stub to start exposing services over dbus
+        self.provider_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider.Command","/org/freedesktop/ContextKit/Testing/Provider")
+        self.provider_iface = dbus.Interface(self.provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
+        self.provider_iface.DoInit()
+
+        # Install a provider
+        self.provider_iface.DoInstall()
+
+        sleep(0.5)
+
+
+    def tearDown(self):
+        print "Startup tearDown"
+        # Uninstall a provider
+        self.provider_iface.DoRemove()
+        # Stop the provider stub
+        self.provider_iface.Exit()
+        sleep(0.5)
+
+    def test_getCallback(self):
+        # Execute Get
+        manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
+        manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
+
+        self.provider_iface.ResetLog()
+        try:
+            manager_iface.Get(["test.int"])
+        except:
+            print "Exception caught"
+            self.assert_ (False) # Manager interface is not implemented properly
+
+        # Check from the log that the get callback was called
+        log = self.provider_iface.GetLog()
+
+        print "Log was", log
 
 
 class Subscription(LibraryTestCase):
@@ -141,11 +183,14 @@ class KeyCounting(LibraryTestCase):
 
 def runTests():
     suiteStartup = unittest.TestLoader().loadTestsFromTestCase(Startup)
+    suiteInstallingProvider = unittest.TestLoader().loadTestsFromTestCase(InstallingProvider)
+
     suiteSubscription = unittest.TestLoader().loadTestsFromTestCase(Subscription)
     suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
     suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
+    unittest.TextTestRunner(verbosity=2).run(suiteInstallingProvider)
     #unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
     #unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
     #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)

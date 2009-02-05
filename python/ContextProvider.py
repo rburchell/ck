@@ -15,19 +15,20 @@ class PROVIDER(c_void_p):
 
 
 class ContextProvider:
-    GET_CALLBACK = CFUNCTYPE(STRING_SET, CHANGE_SET, c_void_p)
-    SUBSCRIBE_CALLBACK = CFUNCTYPE(STRING_SET, c_void_p)
+    GET_CALLBACK = CFUNCTYPE(c_int, STRING_SET, CHANGE_SET, c_void_p)
+
+    SUBSCRIBE_CALLBACK = CFUNCTYPE(c_int, STRING_SET, c_void_p)
 
     init = cfunc('context_provider_init', _dll, None,
                  ('useSessionBus', c_int, 1),
                  ('bus_name', c_char_p, 1))
     install = cfunc('context_provider_install', _dll, PROVIDER,
                  ('provided_keys', ListPOINTER (c_char_p), 1),
-                 ('get_cb', POINTER(GET_CALLBACK), 1),
+                 ('get_cb', GET_CALLBACK, 1),
                  ('get_cb_target', c_void_p, 1),
-                 ('first_cb', POINTER(SUBSCRIBE_CALLBACK), 1),
+                 ('first_cb', SUBSCRIBE_CALLBACK, 1),
                  ('first_cb_target', c_void_p, 1),
-                 ('last_cb', POINTER(SUBSCRIBE_CALLBACK), 1),
+                 ('last_cb', SUBSCRIBE_CALLBACK, 1),
                  ('last_cb_target', c_void_p, 1))
     remove = cfunc('context_provider_remove', _dll, None,
                     ('provider', PROVIDER, 1))
@@ -110,7 +111,9 @@ if __name__ == "__main__":
     loop = gobject.MainLoop()
 
     def get_cb (ss, cs, d):
-        print StringSet.debug(ss)
+        print "This is get callback"
+        #print StringSet.debug(ss)
+        return 0
     def first_cb (ss, d):
         print StringSet.debug(ss)
     def last_cb (ss, d):
@@ -129,5 +132,5 @@ if __name__ == "__main__":
     ContextProvider.change_set_add_int(cs2, "foo.bar", 1)
     ContextProvider.change_set_add_undetermined_key(cs2, "foo.baz")
     ContextProvider.change_set_commit(cs2)
-    ContextProvider.remove (p)
+    #ContextProvider.remove (p) # FIXME: Removed for testing purposes (now can be poked with d-feet)
     loop.run()
