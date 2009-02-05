@@ -38,7 +38,7 @@ class Startup(LibraryTestCase):
         os.system("python tests/python-test-library/stubs/provider_stub.py &")
         sleep(0.5)
         # Command the provider stub to start exposing services over dbus
-        self.provider_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Testing/Provider")
+        self.provider_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider.Command","/org/freedesktop/ContextKit/Testing/Provider")
         self.provider_iface = dbus.Interface(self.provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
         self.provider_iface.DoInit()
         sleep(0.5)
@@ -73,7 +73,7 @@ class Startup(LibraryTestCase):
         self.assert_ (proxy_object_manager != None) # FIXME: What is the correct validity check?
         self.assert_ (iface_manager != None) # FIXME: What is the correct validity check?
         try:
-            iface_manager.Get("temp")
+            iface_manager.Get(["temp"])
         except:
             print "Exception caught"
             self.assert_ (False) # Manager interface is not implemented properly
