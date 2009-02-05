@@ -34,7 +34,7 @@ class FakeProvider (dbus.service.Object):
 
     def __init__(self, main_loop):
         # Initiate dbus connection so that this stub can be commanded throug it
-        self.busSes = dbus.service.BusName("org.freedesktop.ContextKit.Testing.Provider",
+        self.busSes = dbus.service.BusName("org.freedesktop.ContextKit.Testing.Provider.Command",
                                            dbus.SessionBus())
 
         dbus.service.Object.__init__(self, self.busSes,
@@ -45,10 +45,7 @@ class FakeProvider (dbus.service.Object):
                        in_signature='', out_signature='')
     def DoInit (self):
         print "Provider: Executing Init"
-        cb.ContextProvider.init(["Context.Test.keyInt", "Context.Test.keyBool", "Context.Test.keyString"], 1,
-                         cb.ContextProvider.GET_CALLBACK(self.get_cb), None,
-                         cb.ContextProvider.SUBSCRIBE_CALLBACK(self.first_cb), None,
-                         cb.ContextProvider.SUBSCRIBE_CALLBACK(self.last_cb), None)
+        cb.ContextProvider.init(True, "org.freedesktop.ContextKit.Testing.Provider")
 
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='', out_signature='')
