@@ -12,7 +12,6 @@ import ContextProvider
 
 # FIXME: Missing testcases
 # - Using system bus flag in init
-# - Test that callbacks work
 
 class LibraryTestCase(unittest.TestCase):
     def setUp(self):
@@ -78,9 +77,9 @@ class Startup(LibraryTestCase):
             self.assert_ (False) # Manager interface is not implemented properly
             # After this, only tearDown will be executed
 
-# Test cases: Check that the callback functions are called properly.
-class Callbacks(LibraryTestCase):
+class TestCaseUsingProvider(unittest.TestCase):
     def setUp(self):
+        print "TestCaseUsingProvider setUp"
         self.bus = dbus.SessionBus() # Note: using session bus
 
         # Start a provider stub
@@ -96,15 +95,16 @@ class Callbacks(LibraryTestCase):
 
         sleep(0.5)
 
-
     def tearDown(self):
-        print "Startup tearDown"
+        print "TestCaseUsingProvider tearDown"
         # Uninstall a provider
         self.provider_iface.DoRemove()
         # Stop the provider stub
         self.provider_iface.Exit()
         sleep(0.5)
 
+# Test cases: Check that the Get callback function is called properly, and that the change set is treated properly
+class GetCallback(TestCaseUsingProvider):
     def test_getCallback(self):
         # Execute Get
         manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
@@ -121,6 +121,17 @@ class Callbacks(LibraryTestCase):
         log = self.provider_iface.GetLog()
 
         self.assert_ (log == "(get_cb(test.int))");
+
+# FIXME: missing test: change set from first callback is treated properly (its values affect the Get result)
+
+
+class SubscribeCallbacks(TestCaseUsingProvider):
+
+    def setUp(self):
+        TestCaseUsingProvider.setUp(self)
+
+    def tearDown(self):
+        TestCaseUsingProvider.tearDown(self)
 
     def test_firstCallbackIsCalled(self):
         # Execute GetSubscriber
@@ -180,7 +191,6 @@ class Callbacks(LibraryTestCase):
 
         self.assert_ (log == "(last_cb(test.boolean))")
 
-# FIXME: missing test: change set from first callback is treated properly (its values affect the Get result)
 
 class Subscription(LibraryTestCase):
     def setUp(self):
@@ -217,29 +227,14 @@ class Subscription(LibraryTestCase):
         # Verify that the provider got LastSubscribed event
 
 
-class ChangeSets(LibraryTestCase):
+class ChangeSets(TestCaseUsingProvider):
+
     def setUp(self):
-        self.bus = dbus.SessionBus() # Note: using session bus
-
-        # Start a provider stub
-        os.system("python tests/python-test-library/stubs/provider_stub.py &")
-        sleep(0.5)
-        # Command the provider stub to start exposing services over dbus
-        self.provider_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider.Command","/org/freedesktop/ContextKit/Testing/Provider")
-        self.provider_iface = dbus.Interface(self.provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
-        self.provider_iface.DoInit()
-
-        # Install a provider
-        self.provider_iface.DoInstall()
-        sleep(0.5)
+        TestCaseUsingProvider.setUp(self)
 
     def tearDown(self):
-        print "Startup tearDown"
-        # Uninstall a provider
-        self.provider_iface.DoRemove()
-        # Stop the provider stub
-        self.provider_iface.Exit()
-        sleep(0.5)
+        TestCaseUsingProvider.tearDown(self)
+
 
     def test_changeSetNotifiedToSubscriber(self):
         # Create a subscriber which subscribes to our properties
@@ -265,7 +260,8 @@ class KeyCounting(LibraryTestCase):
 
 def runTests():
     suiteStartup = unittest.TestLoader().loadTestsFromTestCase(Startup)
-    suiteCallbacks = unittest.TestLoader().loadTestsFromTestCase(Callbacks)
+    suiteGetCallback = unittest.TestLoader().loadTestsFromTestCase(GetCallback)
+    suiteSubscribeCallbacks = unittest.TestLoader().loadTestsFromTestCase(SubscribeCallbacks)
     suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
 
     suiteSubscription = unittest.TestLoader().loadTestsFromTestCase(Subscription)
@@ -273,7 +269,8 @@ def runTests():
     suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
-    unittest.TextTestRunner(verbosity=2).run(suiteCallbacks)
+    unittest.TextTestRunner(verbosity=2).run(suiteGetCallback)
+    unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
     unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
 
     #unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
