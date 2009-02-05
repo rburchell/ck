@@ -56,7 +56,7 @@ class FakeProvider (dbus.service.Object):
                        in_signature='', out_signature='')
     def DoInstall(self):
         print "Provider: Executing Install"
-        self.provider = cb.ContextProvider.install(["test.string", "test.int"],
+        self.provider = cb.ContextProvider.install(["test.string", "test.int", "test.boolean"],
                          cb.ContextProvider.GET_CALLBACK(self.get_cb), None,
                          cb.ContextProvider.SUBSCRIBE_CALLBACK(self.first_cb), None,
                          cb.ContextProvider.SUBSCRIBE_CALLBACK(self.last_cb), None)

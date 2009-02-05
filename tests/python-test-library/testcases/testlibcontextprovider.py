@@ -78,7 +78,8 @@ class Startup(LibraryTestCase):
             self.assert_ (False) # Manager interface is not implemented properly
             # After this, only tearDown will be executed
 
-class InstallingProvider(LibraryTestCase):
+# Test cases: Check that the callback functions are called properly.
+class Callbacks(LibraryTestCase):
     def setUp(self):
         self.bus = dbus.SessionBus() # Note: using session bus
 
@@ -121,7 +122,7 @@ class InstallingProvider(LibraryTestCase):
 
         self.assert_ (log == "(get_cb(test.int))");
 
-    def test_firstCallback(self):
+    def test_firstCallbackIsCalled(self):
         # Execute GetSubscriber
         manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
         manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
@@ -145,10 +146,39 @@ class InstallingProvider(LibraryTestCase):
         # Check from the log that the callback was called
         log = self.provider_iface.GetLog()
 
-        print "Log is:", log
-        self.assert_ ((log == "(get_cb(test.string))(first_cb(test.string))" or log == "(first_cb(test.string))(get_cb(test.string))"))
-
+        self.assert_ (log == "(get_cb(test.string))(first_cb(test.string))" or log == "(first_cb(test.string))(get_cb(test.string))")
         # Note that as part of subscribe, also get is called. Here we don't care about the order.
+
+    def test_lastCallbackIsCalled(self):
+        # Execute GetSubscriber
+        manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
+        manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
+
+        subscriber_path = "";
+        try:
+            subscriber_path = manager_iface.GetSubscriber()
+        except:
+            print "Exception caught"
+            self.assert_ (False) # Manager interface is not implemented properly
+
+        self.assert_ (subscriber_path == "/org/freedesktop/ContextKit/Subscribers/0")
+
+        # Execute Subscribe
+        subscriber_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider",subscriber_path)
+        subscriber_iface = dbus.Interface(subscriber_proxy, "org.freedesktop.ContextKit.Subscriber")
+
+        subscriber_iface.Subscribe(["test.boolean"])
+
+        # Reset log:
+        self.provider_iface.ResetLog()
+
+        # Execute Unsubscribe
+        subscriber_iface.Unsubscribe(["test.boolean"])
+
+        # Check from the log that the callback was called
+        log = self.provider_iface.GetLog()
+
+        self.assert_ (log == "(last_cb(test.boolean))")
 
 class Subscription(LibraryTestCase):
     def setUp(self):
@@ -211,14 +241,14 @@ class KeyCounting(LibraryTestCase):
 
 def runTests():
     suiteStartup = unittest.TestLoader().loadTestsFromTestCase(Startup)
-    suiteInstallingProvider = unittest.TestLoader().loadTestsFromTestCase(InstallingProvider)
+    suiteCallbacks = unittest.TestLoader().loadTestsFromTestCase(Callbacks)
 
     suiteSubscription = unittest.TestLoader().loadTestsFromTestCase(Subscription)
     suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
     suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
-    unittest.TextTestRunner(verbosity=2).run(suiteInstallingProvider)
+    unittest.TextTestRunner(verbosity=2).run(suiteCallbacks)
     #unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
     #unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
     #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
