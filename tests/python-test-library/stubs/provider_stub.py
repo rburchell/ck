@@ -91,6 +91,11 @@ class FakeProvider (dbus.service.Object):
         cb.ContextProvider.change_set_commit(cs)
 
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+                       in_signature='s', out_signature='i')
+    def GetSubscriberCount(self, key):
+        return cb.ContextProvider.no_of_subscribers(key)
+
+    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='', out_signature='')
     def Exit (self):
         print "Provider: Exiting"

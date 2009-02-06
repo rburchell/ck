@@ -310,39 +310,52 @@ class ChangeSets(TestCaseUsingProvider):
 
         self.assert_ (False) # This test is not yet implemented
 
-class KeyCounting(LibraryTestCase):
+# Test cases: Check that the subscriber counts of the keys are calculated properly.
+class KeyCounting(TestCaseUsingProvider):
+    def setUp(self):
+        TestCaseUsingProvider.setUp(self)
+
+    def tearDown(self):
+        TestCaseUsingProvider.tearDown(self)
+
+
     def test_initialCount(self):
         # Initial count of a key is zero
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
 
-        #i = c_int()
-        #ret = self.libc.context_provider_no_of_subscribers("Context.Test.keyInt", byref(i))
+    def test_subscriptionIncreasesCount(self):
 
-        #self.assert_(ret == 0) # Success return value
-        #self.assert_(i.value == 0) # 0 subscribers
-        pass
+        # Command the subscriberHandler to subscribe to test.int
+        # FIXME
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 1)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+
+        # Command another subscriberHandler to subscribe to test.int and test.double
+        # FIXME
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
 
 def runTests():
     suiteStartup = unittest.TestLoader().loadTestsFromTestCase(Startup)
     suiteGetCallback = unittest.TestLoader().loadTestsFromTestCase(GetCallback)
     suiteSubscribeCallbacks = unittest.TestLoader().loadTestsFromTestCase(SubscribeCallbacks)
     suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
+    suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
 
     suiteSubscription = unittest.TestLoader().loadTestsFromTestCase(Subscription)
-
-    suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
     unittest.TextTestRunner(verbosity=2).run(suiteGetCallback)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
     unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
+    unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
 
     #unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
 
-    #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
 
 if __name__ == "__main__":
-    # Start listening to NameOwnerChanged dbus signal
-    #listener = DBusListener()
-
     runTests()
-    #libc.context_kit_key_usage_counter_add(None, None)
