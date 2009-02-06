@@ -478,8 +478,7 @@ namespace ContextKit {
 				}
 			}
 
-			public void keys_unsubscribed (StringSet keys) {
-				
+			public void keys_unsubscribed (StringSet keys, StringSet keys_remaining) {
 				debug ("MCE plugin: keys_unsubscribed %s", keys.debug());
 				// Disconnect the corresponding MCE signal from its handler
 				if (keys.is_disjoint (orientation_keys) == false) {
@@ -490,7 +489,7 @@ namespace ContextKit {
 					foreach (var key in orientation_keys) {
 						no_of_subscribers += Manager.get_instance().key_counter.number_of_subscribers(key);
 					}
-					
+
 					if (no_of_subscribers == 0) {
 						mce_signal.sig_device_orientation_ind -= orientation_changed;
 					}

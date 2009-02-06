@@ -34,20 +34,30 @@ namespace ContextProvider {
 		public List<string> get (StringSet keys, HashTable<string, Value?> values) {
 			List<string> unavail = new List<string> ();
 			foreach (var provider in providers) {
-				provider.get (keys, values, ref unavail);
+				StringSet intersection = new StringSet.intersection (keys, provider.provided_keys());
+				if (intersection.size() > 0) {
+					provider.get (keys, values, ref unavail);
+				}
 			}
 			return unavail;
 		}
 
 		public void first_subscribed(StringSet keys) {
 			foreach (var provider in providers) {
-				provider.keys_subscribed (keys);
+				StringSet intersection = new StringSet.intersection (keys, provider.provided_keys());
+				if (intersection.size() > 0 ) {
+					provider.keys_subscribed (keys);
+				}
 			}
 		}
 
-		public void last_unsubscribed(StringSet keys) {
+		public void last_unsubscribed(StringSet keys_unsubscribed, StringSet keys_remaining) {
 			foreach (var provider in providers) {
-				provider.keys_unsubscribed (keys);
+				StringSet intersection = new StringSet.intersection (keys_unsubscribed, provider.provided_keys());
+				if (intersection.size() > 0 ) {
+					StringSet intersection_remaining = new StringSet.intersection (keys_remaining, provider.provided_keys());
+					provider.keys_unsubscribed (intersection, intersection_remaining);
+				}
 			}
 		}
 	}

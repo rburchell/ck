@@ -6,11 +6,11 @@ namespace ContextProvider {
 
 		// Stored callbacks
 		private GetCallback get_cb;
-		private SubscribeCallback first_cb;
-		private SubscribeCallback last_cb;
+		private SubscribedCallback first_cb;
+		private UnsubscribedCallback last_cb;
 		private StringSet keys;
 
-		public CProvider (StringSet keys, GetCallback get_cb, SubscribeCallback first_cb, SubscribeCallback last_cb) {
+		public CProvider (StringSet keys, GetCallback get_cb, SubscribedCallback first_cb, UnsubscribedCallback last_cb) {
 			this.get_cb = get_cb;
 			this.first_cb = first_cb;
 			this.last_cb = last_cb;
@@ -36,9 +36,9 @@ namespace ContextProvider {
 			}
 		}
 
-		public void keys_unsubscribed (StringSet keys) {
+		public void keys_unsubscribed (StringSet keys_unsubscribed, StringSet keys_remaining) {
 			if (last_cb != null) {
-				last_cb (keys);
+				last_cb (keys_unsubscribed, keys_remaining);
 			}
 		}
 

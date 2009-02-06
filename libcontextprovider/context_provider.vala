@@ -116,7 +116,8 @@ namespace ContextProvider {
 
 	// Definitions of callback function types
 	public delegate void GetCallback(StringSet #keys, ChangeSet #change_set);
-	public delegate void SubscribeCallback(StringSet keys);
+	public delegate void SubscribedCallback(StringSet keys_subscribed);
+	public delegate void UnsubscribedCallback(StringSet keys_unsubscribed, StringSet keys_remaining);
 
 	public bool init (bool useSessionBus, string? bus_name) {
 
@@ -160,7 +161,7 @@ namespace ContextProvider {
 		return true;
 	}
 
-	public Provider install ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, GetCallback? get_cb, SubscribeCallback? first_cb, SubscribeCallback? last_cb) {
+	public Provider install ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, GetCallback? get_cb, SubscribedCallback? first_cb, UnsubscribedCallback? last_cb) {
 
 		Manager manager = Manager.get_instance ();
 

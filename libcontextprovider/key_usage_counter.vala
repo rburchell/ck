@@ -5,6 +5,11 @@ namespace ContextProvider {
 	public class KeyUsageCounter {
 		// The number of subscribers for each key (over all subscriber objects)
 		Gee.HashMap<string, int> no_of_subscribers = new Gee.HashMap<string, int>(str_hash, str_equal);
+		public StringSet subscribed_keys { get; private set; }
+
+		public KeyUsageCounter() {
+			subscribed_keys = new StringSet();
+		}
 
 		public void add (StringSet keys) {
 			StringSet first_subscribed_keys = new StringSet();
@@ -34,7 +39,7 @@ namespace ContextProvider {
 				Manager.get_instance().providers.first_subscribed (first_subscribed_keys);
 			}
 
-			// FIXME: Do we need to care about which keys are subscribed to? What if the keys are something not provided by this provider?
+			subscribed_keys = new StringSet.union (subscribed_keys, first_subscribed_keys);
 		}
 
 		public void remove (StringSet keys) {
@@ -63,17 +68,18 @@ namespace ContextProvider {
 
 			if (last_unsubscribed_keys.size() > 0) {
 				// Signal that some keys are not subscribed to anymore
-				Manager.get_instance().providers.last_unsubscribed (last_unsubscribed_keys);
+				Manager.get_instance().providers.last_unsubscribed (last_unsubscribed_keys, subscribed_keys);
 			}
+
+			subscribed_keys = new StringSet.difference (subscribed_keys, last_unsubscribed_keys);
 		}
-		
+
 		public int number_of_subscribers (string key) {
 			if (no_of_subscribers.contains (key)) {
 				return no_of_subscribers.get (key);
 			}
 			return 0;
 		}
-		
 	}
 }
 
