@@ -35,8 +35,8 @@ class FakeProvider (dbus.service.Object):
         self.log += ("(first_cb(" + cb.StringSet.debug(ss) + "))")
         return 0
 
-    def last_cb (self, ss, d):
-        self.log += ("(last_cb(" + cb.StringSet.debug(ss) + "))")
+    def last_cb (self, keys, keys_remaining, d):
+        self.log += ("(last_cb(" + cb.StringSet.debug(keys) + ", " + keys_remaining + "))")
         return 0
 
     def __init__(self, main_loop):
@@ -61,8 +61,8 @@ class FakeProvider (dbus.service.Object):
         print "Provider: Executing Install"
         self.provider = cb.ContextProvider.install(["test.double", "test.int", "test.bool"],
                          cb.ContextProvider.GET_CALLBACK(self.get_cb), None,
-                         cb.ContextProvider.SUBSCRIBE_CALLBACK(self.first_cb), None,
-                         cb.ContextProvider.SUBSCRIBE_CALLBACK(self.last_cb), None)
+                         cb.ContextProvider.SUBSCRIBED_CALLBACK(self.first_cb), None,
+                         cb.ContextProvider.UNSUBSCRIBED_CALLBACK(self.last_cb), None)
 
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='', out_signature='')

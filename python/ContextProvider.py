@@ -16,7 +16,8 @@ class PROVIDER(c_void_p):
 
 class ContextProvider:
     GET_CALLBACK = CFUNCTYPE(c_int, STRING_SET, CHANGE_SET, c_void_p)
-    SUBSCRIBE_CALLBACK = CFUNCTYPE(c_int, STRING_SET, c_void_p)
+    SUBSCRIBED_CALLBACK = CFUNCTYPE(c_int, STRING_SET, c_void_p)
+    UNSUBSCRIBED_CALLBACK = CFUNCTYPE(c_int, STRING_SET, STRING_SET, c_void_p)
 
     init = cfunc('context_provider_init', _dll, None,
                  ('useSessionBus', c_int, 1),
@@ -25,9 +26,9 @@ class ContextProvider:
                  ('provided_keys', ListPOINTER (c_char_p), 1),
                  ('get_cb', GET_CALLBACK, 1),
                  ('get_cb_target', c_void_p, 1),
-                 ('first_cb', SUBSCRIBE_CALLBACK, 1),
+                 ('first_cb', SUBSCRIBED_CALLBACK, 1),
                  ('first_cb_target', c_void_p, 1),
-                 ('last_cb', SUBSCRIBE_CALLBACK, 1),
+                 ('last_cb', UNSUBSCRIBED_CALLBACK, 1),
                  ('last_cb_target', c_void_p, 1))
     remove = cfunc('context_provider_remove', _dll, None,
                     ('provider', PROVIDER, 1))
@@ -118,15 +119,16 @@ if __name__ == "__main__":
         return 0
     def first_cb (ss, d):
         print StringSet.debug(ss)
-    def last_cb (ss, d):
+    def last_cb (ss, ss_remain, d):
         print StringSet.debug(ss)
+        print StringSet.debug(ss_remain)
 
 
     ContextProvider.init(1, "org.freedesktop.ContextKit.Testing.Provider")
     p =ContextProvider.install(["foo.bar", "foo.baz"],
                          ContextProvider.GET_CALLBACK(get_cb), None,
-                         ContextProvider.SUBSCRIBE_CALLBACK(first_cb), None,
-                         ContextProvider.SUBSCRIBE_CALLBACK(last_cb), None)
+                         ContextProvider.SUBSCRIBED_CALLBACK(first_cb), None,
+                         ContextProvider.UNSUBSCRIBED_CALLBACK(last_cb), None)
     print ContextProvider.no_of_subscribers("foo.bar")
     cs = ContextProvider.change_set_create()
     ContextProvider.change_set_cancel(cs)
