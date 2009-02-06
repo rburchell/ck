@@ -24,7 +24,7 @@ import dbus_emulator
 import ConfigParser
 import commands
 from signal import *
-import contextSubscriberHandler as ctxHandler
+
 
 class Subscriber():
     
@@ -163,9 +163,14 @@ class TestCore(unittest.TestCase):
         self.assertEqual(len(undet),0)
         
     def testUnsubscribeProperty(self):
-        subscriber = self.ifceTest.getSubscriber()
-        properties, undetermined = self.ifceTest.subscribe(cfg.properties)
-        self.ifceTest.unsubscribe()
+        self.subscriber = self.ifceTest.addSubscriber(True, cfg.ctxBusName)
+        properties, undetermined = self.ifceTest.subscribe(cfg.properties,self.subscriber)
+        self.ifceMCE.req_device_facing_change("face_down")
+        self.ifceMCE.req_device_rotation_change("landscape")
+        self.ifceMCE.req_device_coord_change(20, 1000, 10)
+        self.ifceTest.unSubscribe(['Context.Device.Orientation.facingUp'],self.subscriber)
+        self.ifceMCE.req_device_facing_change("face_down")
+        self.assertEqual(self.ifceTest.getSignalStatus(self.subscriber),False)
         
 class ContextHelpers(unittest.TestCase):
 
