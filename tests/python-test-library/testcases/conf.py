@@ -25,9 +25,9 @@ mceBusName = "com.nokia.mce"
 mceRqstPath = "/com/nokia/mce/request"
 mceRqstIfce = "com.nokia.mce.request"
 
-testBusName = "org.freedesktop.context.testing"
-testRqstPath = "/org/freedesktop/context/testing/request"
-testRqstIfce = "org.freedesktop.context.testing.request"
+scriberBusName = "org.freedesktop.context.testing.subHandler"
+scriberHandlerPath = "/org/freedesktop/context/testing/subHandler/request"
+scriberHandlerIfce = "org.freedesktop.context.testing.subHandler.request"
 
 scriberOnePath = "/org/freedesktop/ContextKit/Subscribers/0"
 scriberTwoPath = "/org/freedesktop/ContextKit/Subscribers/1"
