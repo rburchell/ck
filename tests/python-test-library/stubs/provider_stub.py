@@ -25,6 +25,9 @@ class FakeProvider (dbus.service.Object):
 
     def get_cb (self, ss, cs, d):
         self.log += ("(get_cb(" + cb.StringSet.debug(ss) + "))")
+        # Set test.int to 5 and test.string to undetermined
+        cb.ContextProvider.change_set_add_int(cs, "test.int", 5)
+        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.string")
         return 0
 
 

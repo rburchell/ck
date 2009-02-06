@@ -20,7 +20,6 @@ class LibraryTestCase(unittest.TestCase):
         print "LibraryTestCase tearDown"
         pass
 
-
 class Startup(LibraryTestCase):
     def setUp(self):
         self.bus = dbus.SessionBus() # Note: using session bus
@@ -77,6 +76,7 @@ class Startup(LibraryTestCase):
             self.assert_ (False) # Manager interface is not implemented properly
             # After this, only tearDown will be executed
 
+# Parent class for testcases which need to start a provider and stop it
 class TestCaseUsingProvider(unittest.TestCase):
     def setUp(self):
         print "TestCaseUsingProvider setUp"
@@ -103,9 +103,9 @@ class TestCaseUsingProvider(unittest.TestCase):
         self.provider_iface.Exit()
         sleep(0.5)
 
-# Test cases: Check that the Get callback function is called properly, and that the change set is treated properly
+# Test cases: Check that the Get callback function is called properly, and that the change set is treated properly.
 class GetCallback(TestCaseUsingProvider):
-    def test_getCallback(self):
+    def test_getCallbackIsCalled(self):
         # Execute Get
         manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
         manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
@@ -122,8 +122,35 @@ class GetCallback(TestCaseUsingProvider):
 
         self.assert_ (log == "(get_cb(test.int))");
 
-# FIXME: missing test: change set from first callback is treated properly (its values affect the Get result)
+    def test_changeSetIsTreatedProperly(self):
+        # Execute Get
+        manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
+        manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
 
+        ret = None
+        try:
+            ret = manager_iface.Get(["test.int", "test.string"])
+        except:
+            print "Exception caught"
+            self.assert_ (False) # Manager interface is not implemented properly
+
+        self.assert_(ret != None)
+
+        properties = ret[0]
+        undetermined = ret[1]
+
+        print "Properties are", properties
+        print "Undetermined are", undetermined
+
+        self.assert_ (len(properties) == 1)
+
+        self.assert_ ("test.int" in properties)
+        self.assert_ (properties["test.int"] == 5)
+
+        self.assert_ (len(undetermined) == 1)
+        self.assert_ (undetermined.count("test.string") == 1)
+
+        #self.assert_ (False); # Test under implementation
 
 class SubscribeCallbacks(TestCaseUsingProvider):
 
@@ -134,6 +161,10 @@ class SubscribeCallbacks(TestCaseUsingProvider):
         TestCaseUsingProvider.tearDown(self)
 
     def test_firstCallbackIsCalled(self):
+
+        # FIXME: Consider refactoring getting the subscriber to the setUp.
+        # The problem is that it may fail.
+
         # Execute GetSubscriber
         manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
         manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
