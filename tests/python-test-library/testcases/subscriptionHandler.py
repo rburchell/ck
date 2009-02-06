@@ -32,6 +32,7 @@ class ChangedSignalHandler ():
         self.changedUndetProp = None
         
     def handleSignal(self, propList, unknownList):
+        print "Signal received"
         self.receivedSignal = True
         self.changedProp = propList
         self.changedUndetProp = unknownList
