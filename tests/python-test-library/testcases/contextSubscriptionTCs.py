@@ -24,6 +24,7 @@ import dbus_emulator
 import ConfigParser
 import commands
 from signal import *
+import contextSubscriberHandler as ctxHandler
 
 class Subscriber():
     
@@ -33,19 +34,28 @@ class Subscriber():
             self.mgr = self.bus.get_object(cfg.ctxBusName, cfg.ctxMgrPath)
             self.ifceMgr = dbus.Interface(self.mgr, cfg.ctxMgrIfce)
         except dbus.DBusException:
-            traceback.print_exc()
-            sys.exit(1)
+            pass
 
         self.scrberPath = self.ifceMgr.GetSubscriber()
                 
     def getObjPath(self):
         return self.scrberPath
     
+    def getSubProxy(self):
+        return self.bus.get_object(cfg.ctxBusName,self.scrberPath)
+    
+    def closeBus(self):
+        try:
+            self.bus.close()
+        except dbus.DBusException:
+            pass
+    
     def __del__(self):
         try:
             self.bus.close()
         except dbus.DBusException:
-            traceback.print_exc()
+            pass
+            #traceback.print_exc()
             
 class TestSubscriber (unittest.TestCase):
     
@@ -56,16 +66,16 @@ class TestSubscriber (unittest.TestCase):
         #sleep (4)
         #print os.environ['DBUS_SESSION_BUS_ADDRESS']
 
-        config = ConfigParser.RawConfigParser()
-        config.read("/tmp/dbus")
-        sections = config.sections()
-        for section in sections:
-            for item in config.items(section):
-                if item[0] == 'dbus_system_bus_address':
-                    os.environ['DBUS_SYSTEM_BUS_ADDRESS'] = item[1] 
-                elif item[0] == 'dbus_session_bus_address':
-                    os.environ['DBUS_SESSION_BUS_ADDRESS'] = item[1]
-        
+        #config = ConfigParser.RawConfigParser()
+        #config.read("../stubs/dbus")
+        #sections = config.sections()
+        #for section in sections:
+        #    for item in config.items(section):
+        #        if item[0] == 'dbus_system_bus_address':
+        #            os.environ['DBUS_SYSTEM_BUS_ADDRESS'] = item[1] 
+        #        elif item[0] == 'dbus_session_bus_address':
+        #            os.environ['DBUS_SESSION_BUS_ADDRESS'] = item[1]
+        pass
     
     def tearDown(self):
         #for pid in commands.getoutput("ps -Af | egrep -i contextd | awk '{print $2}'").split() :
@@ -87,12 +97,12 @@ class TestSubscriber (unittest.TestCase):
         self.subscriber = Subscriber()
         self.assert_ ( str(self.subscriber.getObjPath()) == cfg.scriberOnePath, 
                      "First subscriber id is incorrect")
-    # 
-    #def testSubscriberCounter(self):
-    #    for i in range(2147483648):
-    #        self.subscriber = Subscriber()
-    #        self.subscriber = None
-    #    self.assertRaises(dbus.DBusException,Subscriber)
+    
+#    def testCounterOverflow(self):
+#        for i in range(2147483648):
+#            self.subscriber = Subscriber()
+#            self.subscriber = None
+#        self.assertRaises(dbus.DBusException,Subscriber)
     
     def testCounter(self):
         self.subscriber1 = Subscriber()
@@ -106,13 +116,58 @@ class TestSubscriber (unittest.TestCase):
                      "Third subscriber id is incorrect")
     
     def testDeleteSubscriber(self):
+        exception = False
         self.subscriber = Subscriber()
         path = self.subscriber.getObjPath()
-        self.subscriber = None
+        remoteSub = self.subscriber.getSubProxy()
+        self.subscriber.closeBus()
         bus = dbus.SessionBus()
-        self.subscriber = Subscriber()
-        #self.assertRaises(dbus.DBusException,bus.get_object,cfg.ctxBusName,path)
+        self.assertRaises(dbus.DBusException,remoteSub.Introspect)
 
+class TestCore(unittest.TestCase):
+    
+    def setUp(self):
+        sysBus = dbus.SystemBus()
+        try:
+            mce_proxy_obj  = sysBus.get_object(cfg.mceBusName,cfg.mceRqstPath)
+            self.ifceMCE = dbus.Interface(mce_proxy_obj, cfg.mceRqstIfce)
+        except dbus.DBusException:
+            pass
+        
+        sessionBus = dbus.SessionBus()
+        try:
+            test_proxy_obj = sessionBus.get_object(cfg.testBusName,cfg.testRqstPath)
+            self.ifceTest = dbus.Interface(test_proxy_obj, cfg.testRqstIfce)
+        except dbus.DBusException:
+            print "dbus exception"
+            pass
+    
+    def tearDown(self):
+        pass
+    
+    def testSubscribeProperty(self):
+        self.subscriber = self.ifceTest.addSubscriber(True, cfg.ctxBusName)
+        #subscriber = self.ifceTest.getSubscriber()
+        self.ifceMCE.req_device_facing_change("face_up")
+        self.ifceMCE.req_device_rotation_change("portrait")
+        self.ifceMCE.req_device_coord_change(1000, 20, -10)
+        properties, undetermined = self.ifceTest.subscribe(cfg.properties,self.subscriber)
+        self.ifceMCE.req_device_facing_change("face_down")
+        self.ifceMCE.req_device_rotation_change("landscape")
+        self.ifceMCE.req_device_coord_change(20, 1000, 10)
+        prop, undet = self.ifceTest.getChangedProp(self.subscriber)
+        self.assertEqual(properties['Context.Device.Orientation.facingUp'],1)
+        self.assertEqual(properties['Context.Device.Orientation.edgeUp'],3)
+        self.assertEqual(len(undetermined),0)
+        self.assertEqual(prop['Context.Device.Orientation.facingUp'],2)
+        self.assertEqual(prop['Context.Device.Orientation.edgeUp'],4)
+        self.assertEqual(len(undet),0)
+        
+    #def testUnsubscribeProperty(self):
+    #    subscriber = self.ifceTest.getSubscriber()
+    #    properties, undetermined = self.ifceTest.subscribe(cfg.properties)
+    #    self.ifceTest.unsubscribe()
+        
 class ContextHelpers(unittest.TestCase):
 
     def setUp(self):
@@ -287,10 +342,12 @@ class Environment(ContextHelpers):
 
         
 def testRun():
-    suiteCore = unittest.TestLoader().loadTestsFromTestCase(TestSubscriber)
-    suiteDevice = unittest.TestLoader().loadTestsFromTestCase(Device)
-    suiteEnv = unittest.TestLoader().loadTestsFromTestCase(Environment)
+    #suiteSubscriber = unittest.TestLoader().loadTestsFromTestCase(TestSubscriber)
+    suiteCore = unittest.TestLoader().loadTestsFromTestCase(TestCore)
+#    suiteDevice = unittest.TestLoader().loadTestsFromTestCase(Device)
+#    suiteEnv = unittest.TestLoader().loadTestsFromTestCase(Environment)
+    #unittest.TextTestRunner(verbosity=2).run(suiteSubscriber)
     unittest.TextTestRunner(verbosity=2).run(suiteCore)
-    unittest.TextTestRunner(verbosity=2).run(suiteDevice)
-    unittest.TextTestRunner(verbosity=2).run(suiteEnv)
+#    unittest.TextTestRunner(verbosity=2).run(suiteDevice)
+#    unittest.TextTestRunner(verbosity=2).run(suiteEnv)
     
