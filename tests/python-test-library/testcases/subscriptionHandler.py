@@ -51,8 +51,8 @@ class SubscriptionHandler (dbus.service.Object):
         
         #Export on session bus Subscription Handler on org.freedesktop.context.testing
         dbus.service.Object.__init__(self,
-                 dbus.service.BusName(cfg.testBusName, bus=dbus.SessionBus()),
-                 cfg.testRqstPath)
+                 dbus.service.BusName(cfg.scriberBusName, bus=dbus.SessionBus()),
+                 cfg.scriberHandlerPath)
 
         self.main_loop = main_loop
         self.stopped = False
@@ -61,7 +61,7 @@ class SubscriptionHandler (dbus.service.Object):
     #
     # DBUS methods
     #
-    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
+    @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
                        in_signature='bs', out_signature='s')
     
     def addSubscriber(self, sessionBus, providerBusName):
@@ -93,7 +93,7 @@ class SubscriptionHandler (dbus.service.Object):
         
         return self.subscriber_object_path
     
-    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
+    @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
                        in_signature='ass', out_signature='a{sv}as')
     def subscribe(self, properties, subscriberId):
         iface_subscriber = self.subscribers [subscriberId][0]
@@ -104,7 +104,7 @@ class SubscriptionHandler (dbus.service.Object):
         
         return iface_subscriber.Subscribe(properties)
     
-    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
+    @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
                        in_signature='ass', out_signature='')
     def unSubscribe(self, properties, subscriberId):
         iface_subscriber = self.subscribers [subscriberId][0]
@@ -115,19 +115,19 @@ class SubscriptionHandler (dbus.service.Object):
         
         iface_subscriber.Unsubscribe(properties)
     
-    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
+    @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
                        in_signature='s', out_signature='a{sv}as')
     def getChangedProp(self, subscriberId):
         signalHandler = self.subscribers [subscriberId][2]
         sleep(1)
         return signalHandler.getChangedProp(), signalHandler.getChangedUnknownProp()
     
-    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
+    @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
                        in_signature='s', out_signature='as')
     def getSubscribedProperties(self, subscriberId):
         return self.subscribers [subscriberId][1]
     
-    @dbus.service.method(dbus_interface=cfg.testRqstIfce,
+    @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
                        in_signature='', out_signature='')
     def loopQuit(self):
         print "quit"
