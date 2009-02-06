@@ -36,7 +36,7 @@ class FakeProvider (dbus.service.Object):
         return 0
 
     def last_cb (self, keys, keys_remaining, d):
-        self.log += ("(last_cb(" + cb.StringSet.debug(keys) + ", " + keys_remaining + "))")
+        self.log += ("(last_cb(" + cb.StringSet.debug(keys) + ", " + db.StringSet.debug(keys_remaining) + "))")
         return 0
 
     def __init__(self, main_loop):
@@ -89,6 +89,33 @@ class FakeProvider (dbus.service.Object):
         cb.ContextProvider.change_set_add_double(cs, "test.double", 3.1415)
         cb.ContextProvider.change_set_add_bool(cs, "test.bool", False)
         cb.ContextProvider.change_set_commit(cs)
+
+    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+                       in_signature='', out_signature='')
+    def SendChangeSetWithAllDataTypes(self):
+        cs = cb.ContextProvider.change_set_create()
+        cb.ContextProvider.change_set_add_int(cs, "test.int", -8)
+        cb.ContextProvider.change_set_add_double(cs, "test.double", 0.2)
+        cb.ContextProvider.change_set_add_bool(cs, "test.bool", True)
+        # FIXME: Add new data types here as needed
+        cb.ContextProvider.change_set_commit(cs)
+
+    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+                       in_signature='', out_signature='')
+    def SendChangeSetWithAllUndetermined(self):
+        cs = cb.ContextProvider.change_set_create()
+        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.int")
+        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.double")
+        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
+        cb.ContextProvider.change_set_commit(cs)
+
+    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+                       in_signature='', out_signature='')
+    def CancelChangeSet(self):
+        cs = cb.ContextProvider.change_set_create()
+        cb.ContextProvider.change_set_add_double(cs, "test.double", 2.13)
+        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
+        cb.ContextProvider.change_set_cancel(cs)
 
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='s', out_signature='i')
