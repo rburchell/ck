@@ -5,11 +5,18 @@ import unittest
 from time import sleep
 
 import sys
-sys.path.append("./python/")
+sys.path.append("./python/") # libcontextprovider python bindings
 import ContextProvider
+
+# Test configuration file
+import conf as cfg
+
+# Stubs
+sys.path.append("./tests/python-test-library/stubs")
 
 # FIXME: Use the fake dbus.
 # FIXME: Make tests find the library
+# FIXME: Make tests run when make check is executed
 
 # FIXME: Missing testcases
 # - Using system bus flag in init
@@ -50,7 +57,6 @@ class Startup(LibraryTestCase):
 
         # Stop the listener
         self.listener_iface.Exit()
-        pass # FIXME: Call parent class func explicitly
 
     def test_startProvider(self):
         # Verify that the provider is started and exposed over dbus.
@@ -145,14 +151,11 @@ class GetCallback(TestCaseUsingProvider):
         #print "Undetermined are", undetermined
 
         self.assert_ (len(properties) == 1)
-
         self.assert_ ("test.int" in properties)
         self.assert_ (properties["test.int"] == 5)
 
         self.assert_ (len(undetermined) == 1)
         self.assert_ (undetermined.count("test.double") == 1)
-
-        #self.assert_ (False); # Test under implementation
 
 # Test cases: Check that the First subscriber / Last subscriber callback functions
 # are called properly.
@@ -210,7 +213,7 @@ class SubscribeCallbacks(TestCaseUsingProvider):
         self.assert_ (subscriber_path == "/org/freedesktop/ContextKit/Subscribers/0")
 
         # Execute Subscribe
-        subscriber_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider",subscriber_path)
+        subscriber_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider", subscriber_path)
         subscriber_iface = dbus.Interface(subscriber_proxy, "org.freedesktop.ContextKit.Subscriber")
 
         subscriber_iface.Subscribe(["test.bool"])
@@ -230,29 +233,57 @@ class SubscribeCallbacks(TestCaseUsingProvider):
 class Subscription(TestCaseUsingProvider):
 
     def setUp(self):
+        self.initOk = True
         TestCaseUsingProvider.setUp(self)
+        # Start subscription handler
+        os.system(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py &")
+        sleep(0.5)
+
+        # Connect to subscription handler
+        sessionBus = dbus.SessionBus()
+
+        #try:
+        subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+        self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
+        #except:
+        #    self.initOk = False
 
     def tearDown(self):
+        # Command the subscription handler to exit
+        self.subscription_handler_iface.loopQuit()
+
         TestCaseUsingProvider.tearDown(self)
 
     def test_subscriberGetsInfo(self):
+        self.assert_ (self.initOk)
+
         bus = dbus.SessionBus()
         # Start a subscriber handler
-        #os.system("python tests/python-test-library/stubs/subscriber_stub.py &")
-        #sleep(1)
+        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
 
         # Tell the subscriber to subscribe to test.int, test.double and test.bool
-        # FIXME
+        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
 
         # Command the fake provider send the change set
         self.provider_iface.SendChangeSet1()
         sleep(0.5)
 
         # Ask the subscriber what changes it got
+        properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
 
-        # FIXME
+        self.assert_ (properties != None)
+        self.assert_ (undetermined != None)
+
+        self.assert_ (len(properties) == 1)
+        self.assert_ ("test.double" in properties)
+        self.assert_ (properties["test.double"] == 2.13)
+
+        self.assert_ (len(undetermined) == 1)
+        self.assert_ (undetermined.count("test.bool") == 1)
 
     def test_subscriberGetsOnlyRelevantKeys(self):
+        self.assert_ (self.initOk)
+
         bus = dbus.SessionBus()
         # Start a subscriber handler
         #os.system("python tests/python-test-library/stubs/subscriber_stub.py &")
@@ -270,6 +301,8 @@ class Subscription(TestCaseUsingProvider):
         # FIXME
 
     def test_subscriberDoesntGetUnsubscribedKeys(self):
+        self.assert_ (self.initOk)
+
         bus = dbus.SessionBus()
         # Start a subscriber handler
         #os.system("python tests/python-test-library/stubs/subscriber_stub.py &")
@@ -345,16 +378,14 @@ def runTests():
     suiteSubscribeCallbacks = unittest.TestLoader().loadTestsFromTestCase(SubscribeCallbacks)
     suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
     suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
-
     suiteSubscription = unittest.TestLoader().loadTestsFromTestCase(Subscription)
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
     unittest.TextTestRunner(verbosity=2).run(suiteGetCallback)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
     unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
-    unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
-
-    #unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
+    #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
+    unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
 
 
 if __name__ == "__main__":
