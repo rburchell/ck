@@ -77,8 +77,8 @@ class FakeProvider (dbus.service.Object):
                        in_signature='', out_signature='')
     def SendChangeSet1(self):
         cs = cb.ContextProvider.change_set_create()
-        cb.ContextProvider.change_set_add_int(cs, "test.int", 1)
-        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.double")
+        cb.ContextProvider.change_set_add_double(cs, "test.double", 2.13)
+        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
         cb.ContextProvider.change_set_commit(cs)
 
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
@@ -86,7 +86,7 @@ class FakeProvider (dbus.service.Object):
     def SendChangeSet2(self):
         cs = cb.ContextProvider.change_set_create()
         cb.ContextProvider.change_set_add_int(cs, "test.int", 1)
-        cb.ContextProvider.change_set_add_string(cs, "test.double", 3.1415)
+        cb.ContextProvider.change_set_add_double(cs, "test.double", 3.1415)
         cb.ContextProvider.change_set_add_bool(cs, "test.bool", True)
         cb.ContextProvider.change_set_commit(cs)
 
