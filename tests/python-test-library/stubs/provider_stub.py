@@ -87,7 +87,7 @@ class FakeProvider (dbus.service.Object):
         cs = cb.ContextProvider.change_set_create()
         cb.ContextProvider.change_set_add_int(cs, "test.int", 1)
         cb.ContextProvider.change_set_add_double(cs, "test.double", 3.1415)
-        cb.ContextProvider.change_set_add_bool(cs, "test.bool", True)
+        cb.ContextProvider.change_set_add_bool(cs, "test.bool", False)
         cb.ContextProvider.change_set_commit(cs)
 
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',

@@ -258,7 +258,7 @@ class Subscription(TestCaseUsingProvider):
         self.assert_ (self.initOk)
 
         bus = dbus.SessionBus()
-        # Start a subscriber handler
+        # Start a subscription handler
         subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
 
         # Tell the subscriber to subscribe to test.int, test.double and test.bool
@@ -270,6 +270,9 @@ class Subscription(TestCaseUsingProvider):
 
         # Ask the subscriber what changes it got
         properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
+
+        # Unsubscribe
+        self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -285,19 +288,32 @@ class Subscription(TestCaseUsingProvider):
         self.assert_ (self.initOk)
 
         bus = dbus.SessionBus()
-        # Start a subscriber handler
-        #os.system("python tests/python-test-library/stubs/subscriber_stub.py &")
-        #sleep(1)
+        # Start a subscription handler
+        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
 
         # Tell the subscriber to subscribe to test.double and test.bool
-        # FIXME
+        properties, undetermined = self.subscription_handler_iface.subscribe(["test.double", "test.bool"], subscriber_path_1)
 
         # Command the fake provider send the change set
         self.provider_iface.SendChangeSet2()
         sleep(0.5)
 
         # Ask the subscriber what changes it got
+        properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
 
+        # Unsubscribe
+        self.subscription_handler_iface.unSubscribe(["test.double", "test.bool"], subscriber_path_1)
+
+        self.assert_ (properties != None)
+        self.assert_ (undetermined != None)
+
+        self.assert_ (len(properties) == 2)
+        self.assert_ ("test.double" in properties)
+        self.assert_ (properties["test.double"] == 3.1415)
+        self.assert_ ("test.bool" in properties)
+        self.assert_ (properties["test.bool"] == False)
+
+        self.assert_ (len(undetermined) == 0)
         # FIXME
 
     def test_subscriberDoesntGetUnsubscribedKeys(self):
