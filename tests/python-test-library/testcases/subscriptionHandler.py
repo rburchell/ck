@@ -93,9 +93,17 @@ class SubscriptionHandler (dbus.service.Object):
         
         iface_subscriber.connect_to_signal("Changed", signalHandler.handleSignal)
         
-        self.subscribers [self.subscriber_object_path] = iface_subscriber, [""], signalHandler
+        self.subscribers [self.subscriber_object_path] = iface_subscriber, [""], \
+                                                    signalHandler, self.bus
         
         return self.subscriber_object_path
+    
+    @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
+                       in_signature='s', out_signature='')
+    
+    def rmSubscriber(self, subscriberId):
+        bus = self.subscribers[subscriberId][3]
+        bus.close()
     
     @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
                        in_signature='ass', out_signature='a{sv}as')
@@ -115,25 +123,30 @@ class SubscriptionHandler (dbus.service.Object):
         
         signalHandler = self.subscribers [subscriberId][2]
         
-        signalHandler.resetSignalStatus()
-        
         for prop in properties:
             if self.subscribers[subscriberId][1].__contains__(prop):
                 self.subscribers [subscriberId][1].remove(prop)
         
         iface_subscriber.Unsubscribe(properties)
-    
+        
+        signalHandler.resetSignalStatus()
     
     @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
                        in_signature='', out_signature='b')
     def getSignalStatus(self, subscriberId):
         return self.subscribers [subscriberId][2].getSignalStatus()
+    
+    @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
+                       in_signature='s', out_signature='')
+    def resetSignalStatus(self, subscriberId):
+        signalHandler = self.subscribers [subscriberId][2]
+        signalHandler.resetSignalStatus()
         
     @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
                        in_signature='s', out_signature='a{sv}as')
     def getChangedProp(self, subscriberId):
         signalHandler = self.subscribers [subscriberId][2]
-        sleep(1)
+        sleep(2)
         return signalHandler.getChangedProp(), signalHandler.getChangedUnknownProp()
     
     @dbus.service.method(dbus_interface=cfg.scriberHandlerIfce,
