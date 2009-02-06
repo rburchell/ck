@@ -9,6 +9,7 @@ sys.path.append("./python/")
 import ContextProvider
 
 # FIXME: Use the fake dbus.
+# FIXME: Make tests find the library
 
 # FIXME: Missing testcases
 # - Using system bus flag in init
@@ -103,7 +104,8 @@ class TestCaseUsingProvider(unittest.TestCase):
         self.provider_iface.Exit()
         sleep(0.5)
 
-# Test cases: Check that the Get callback function is called properly, and that the change set is treated properly.
+# Test cases: Check that the Get callback function is called properly,
+# and that the change set is treated properly.
 class GetCallback(TestCaseUsingProvider):
     def test_getCallbackIsCalled(self):
         # Execute Get
@@ -129,7 +131,7 @@ class GetCallback(TestCaseUsingProvider):
 
         ret = None
         try:
-            ret = manager_iface.Get(["test.int", "test.string"])
+            ret = manager_iface.Get(["test.int", "test.double"])
         except:
             print "Exception caught"
             self.assert_ (False) # Manager interface is not implemented properly
@@ -139,8 +141,8 @@ class GetCallback(TestCaseUsingProvider):
         properties = ret[0]
         undetermined = ret[1]
 
-        print "Properties are", properties
-        print "Undetermined are", undetermined
+        #print "Properties are", properties
+        #print "Undetermined are", undetermined
 
         self.assert_ (len(properties) == 1)
 
@@ -148,10 +150,12 @@ class GetCallback(TestCaseUsingProvider):
         self.assert_ (properties["test.int"] == 5)
 
         self.assert_ (len(undetermined) == 1)
-        self.assert_ (undetermined.count("test.string") == 1)
+        self.assert_ (undetermined.count("test.double") == 1)
 
         #self.assert_ (False); # Test under implementation
 
+# Test cases: Check that the First subscriber / Last subscriber callback functions
+# are called properly.
 class SubscribeCallbacks(TestCaseUsingProvider):
 
     def setUp(self):
@@ -183,12 +187,12 @@ class SubscribeCallbacks(TestCaseUsingProvider):
         subscriber_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider",subscriber_path)
         subscriber_iface = dbus.Interface(subscriber_proxy, "org.freedesktop.ContextKit.Subscriber")
 
-        subscriber_iface.Subscribe(["test.string"])
+        subscriber_iface.Subscribe(["test.double"])
 
         # Check from the log that the callback was called
         log = self.provider_iface.GetLog()
 
-        self.assert_ (log == "(get_cb(test.string))(first_cb(test.string))" or log == "(first_cb(test.string))(get_cb(test.string))")
+        self.assert_ (log == "(get_cb(test.double))(first_cb(test.double))" or log == "(first_cb(test.double))(get_cb(test.double))")
         # Note that as part of subscribe, also get is called. Here we don't care about the order.
 
     def test_lastCallbackIsCalled(self):
@@ -209,54 +213,82 @@ class SubscribeCallbacks(TestCaseUsingProvider):
         subscriber_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider",subscriber_path)
         subscriber_iface = dbus.Interface(subscriber_proxy, "org.freedesktop.ContextKit.Subscriber")
 
-        subscriber_iface.Subscribe(["test.boolean"])
+        subscriber_iface.Subscribe(["test.bool"])
 
         # Reset log:
         self.provider_iface.ResetLog()
 
         # Execute Unsubscribe
-        subscriber_iface.Unsubscribe(["test.boolean"])
+        subscriber_iface.Unsubscribe(["test.bool"])
 
         # Check from the log that the callback was called
         log = self.provider_iface.GetLog()
 
-        self.assert_ (log == "(last_cb(test.boolean))")
+        self.assert_ (log == "(last_cb(test.bool))")
 
+# Test cases: Check that the subscriber gets the change set when it is sent.
+class Subscription(TestCaseUsingProvider):
 
-class Subscription(LibraryTestCase):
     def setUp(self):
-        # Start a provider stub
-        os.system("python tests/python-test-library/stubs/provider_stub.py &")
-        sleep(0.5)
-        # Command the provider stub to start exposing services over dbus
-        bus = dbus.SessionBus()
-        self.provider_proxy = bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Testing/Provider")
-        self.provider_iface = dbus.Interface(self.provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
-        self.provider_iface.DoInit()
-        sleep(0.5)
+        TestCaseUsingProvider.setUp(self)
 
     def tearDown(self):
-        print "Subscription tearDown"
-        self.provider_iface.Exit()
-        # FIXME: Try to ensure that the stubs are killed properly
-        pass # FIXME: Call parent class func explicitly
+        TestCaseUsingProvider.tearDown(self)
 
-    def test_subscriberCallbacks(self):
+    def test_subscriberGetsInfo(self):
         bus = dbus.SessionBus()
-        # Start a subscriber
+        # Start a subscriber handler
         #os.system("python tests/python-test-library/stubs/subscriber_stub.py &")
         #sleep(1)
 
+        # Tell the subscriber to subscribe to test.int, test.double and test.bool
+        # FIXME
 
-        #subscriber_proxy = bus.get_object("org.freedesktop.ContextKit.Testing.SubscriberStub","/org/freedesktop/ContextKit/Testing/SubscriberStub")
-        #subscriber_iface = dbus.Interface(subscriber_proxy, "org.freedesktop.ContextKit.Testing.SubscriberStub")
-        #subscriber_iface.DoSubscribe()
+        # Command the fake provider send the change set
+        self.provider_iface.SendChangeSet1()
+        sleep(0.5)
 
-        # Verify that the provider got FirstSubscribed event
-        # Stop the subscriber
+        # Ask the subscriber what changes it got
 
-        # Verify that the provider got LastSubscribed event
+        # FIXME
 
+    def test_subscriberGetsOnlyRelevantKeys(self):
+        bus = dbus.SessionBus()
+        # Start a subscriber handler
+        #os.system("python tests/python-test-library/stubs/subscriber_stub.py &")
+        #sleep(1)
+
+        # Tell the subscriber to subscribe to test.double and test.bool
+        # FIXME
+
+        # Command the fake provider send the change set
+        self.provider_iface.SendChangeSet2()
+        sleep(0.5)
+
+        # Ask the subscriber what changes it got
+
+        # FIXME
+
+    def test_subscriberDoesntGetUnsubscribedKeys(self):
+        bus = dbus.SessionBus()
+        # Start a subscriber handler
+        #os.system("python tests/python-test-library/stubs/subscriber_stub.py &")
+        #sleep(1)
+
+        # Tell the subscriber to subscribe to test.int, test.double and test.bool
+        # FIXME
+
+
+        # Tell the subscriber to unsubscribe from test.int
+        # FIXME
+
+        # Command the fake provider send the change set
+        self.provider_iface.SendChangeSet2()
+        sleep(0.5)
+
+        # Ask the subscriber what changes it got
+
+        # FIXME
 
 class ChangeSets(TestCaseUsingProvider):
 
@@ -278,39 +310,52 @@ class ChangeSets(TestCaseUsingProvider):
 
         self.assert_ (False) # This test is not yet implemented
 
-class KeyCounting(LibraryTestCase):
+# Test cases: Check that the subscriber counts of the keys are calculated properly.
+class KeyCounting(TestCaseUsingProvider):
+    def setUp(self):
+        TestCaseUsingProvider.setUp(self)
+
+    def tearDown(self):
+        TestCaseUsingProvider.tearDown(self)
+
+
     def test_initialCount(self):
         # Initial count of a key is zero
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
 
-        #i = c_int()
-        #ret = self.libc.context_provider_no_of_subscribers("Context.Test.keyInt", byref(i))
+    def test_subscriptionIncreasesCount(self):
 
-        #self.assert_(ret == 0) # Success return value
-        #self.assert_(i.value == 0) # 0 subscribers
-        pass
+        # Command the subscriberHandler to subscribe to test.int
+        # FIXME
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 1)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+
+        # Command another subscriberHandler to subscribe to test.int and test.double
+        # FIXME
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
 
 def runTests():
     suiteStartup = unittest.TestLoader().loadTestsFromTestCase(Startup)
     suiteGetCallback = unittest.TestLoader().loadTestsFromTestCase(GetCallback)
     suiteSubscribeCallbacks = unittest.TestLoader().loadTestsFromTestCase(SubscribeCallbacks)
     suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
+    suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
 
     suiteSubscription = unittest.TestLoader().loadTestsFromTestCase(Subscription)
-
-    suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
     unittest.TextTestRunner(verbosity=2).run(suiteGetCallback)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
     unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
+    unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
 
     #unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
 
-    #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
 
 if __name__ == "__main__":
-    # Start listening to NameOwnerChanged dbus signal
-    #listener = DBusListener()
-
     runTests()
-    #libc.context_kit_key_usage_counter_add(None, None)
