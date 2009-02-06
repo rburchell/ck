@@ -136,8 +136,8 @@ class TestCore(unittest.TestCase):
         
         sessionBus = dbus.SessionBus()
         try:
-            test_proxy_obj = sessionBus.get_object(cfg.testBusName,cfg.testRqstPath)
-            self.ifceTest = dbus.Interface(test_proxy_obj, cfg.testRqstIfce)
+            test_proxy_obj = sessionBus.get_object(cfg.scriberBusName,cfg.scriberHandlerPath)
+            self.ifceTest = dbus.Interface(test_proxy_obj, cfg.scriberHandlerIfce)
         except dbus.DBusException:
             print "dbus exception"
             pass
@@ -147,7 +147,6 @@ class TestCore(unittest.TestCase):
     
     def testSubscribeProperty(self):
         self.subscriber = self.ifceTest.addSubscriber(True, cfg.ctxBusName)
-        #subscriber = self.ifceTest.getSubscriber()
         self.ifceMCE.req_device_facing_change("face_up")
         self.ifceMCE.req_device_rotation_change("portrait")
         self.ifceMCE.req_device_coord_change(1000, 20, -10)
@@ -163,10 +162,10 @@ class TestCore(unittest.TestCase):
         self.assertEqual(prop['Context.Device.Orientation.edgeUp'],4)
         self.assertEqual(len(undet),0)
         
-    #def testUnsubscribeProperty(self):
-    #    subscriber = self.ifceTest.getSubscriber()
-    #    properties, undetermined = self.ifceTest.subscribe(cfg.properties)
-    #    self.ifceTest.unsubscribe()
+    def testUnsubscribeProperty(self):
+        subscriber = self.ifceTest.getSubscriber()
+        properties, undetermined = self.ifceTest.subscribe(cfg.properties)
+        self.ifceTest.unsubscribe()
         
 class ContextHelpers(unittest.TestCase):
 
