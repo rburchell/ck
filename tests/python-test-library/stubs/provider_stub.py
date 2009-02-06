@@ -25,6 +25,9 @@ class FakeProvider (dbus.service.Object):
 
     def get_cb (self, ss, cs, d):
         self.log += ("(get_cb(" + cb.StringSet.debug(ss) + "))")
+        # Set test.int to 5 and test.string to undetermined
+        cb.ContextProvider.change_set_add_int(cs, "test.int", 5)
+        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.double")
         return 0
 
 
@@ -56,7 +59,7 @@ class FakeProvider (dbus.service.Object):
                        in_signature='', out_signature='')
     def DoInstall(self):
         print "Provider: Executing Install"
-        self.provider = cb.ContextProvider.install(["test.string", "test.int", "test.boolean"],
+        self.provider = cb.ContextProvider.install(["test.double", "test.int", "test.bool"],
                          cb.ContextProvider.GET_CALLBACK(self.get_cb), None,
                          cb.ContextProvider.SUBSCRIBE_CALLBACK(self.first_cb), None,
                          cb.ContextProvider.SUBSCRIBE_CALLBACK(self.last_cb), None)
@@ -67,13 +70,30 @@ class FakeProvider (dbus.service.Object):
         print "Provider: Executing Remove"
         cb.ContextProvider.remove(self.provider)
 
+    # Hard-coded change sets for different tests.
+    # Could be refactored so that change sets are given as parameter,
+    # if more tests are needed.
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='', out_signature='')
     def SendChangeSet1(self):
         cs = cb.ContextProvider.change_set_create()
-        cb.ContextProvider.change_set_add_int(cs, "test.int", 1)
-        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.string")
+        cb.ContextProvider.change_set_add_double(cs, "test.double", 2.13)
+        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
         cb.ContextProvider.change_set_commit(cs)
+
+    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+                       in_signature='', out_signature='')
+    def SendChangeSet2(self):
+        cs = cb.ContextProvider.change_set_create()
+        cb.ContextProvider.change_set_add_int(cs, "test.int", 1)
+        cb.ContextProvider.change_set_add_double(cs, "test.double", 3.1415)
+        cb.ContextProvider.change_set_add_bool(cs, "test.bool", False)
+        cb.ContextProvider.change_set_commit(cs)
+
+    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+                       in_signature='s', out_signature='i')
+    def GetSubscriberCount(self, key):
+        return cb.ContextProvider.no_of_subscribers(key)
 
     @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
                        in_signature='', out_signature='')
