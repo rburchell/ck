@@ -4,7 +4,7 @@ namespace ContextProvider {
 	 * SECTION:string_set
 	 * @short_description: An unorder efficient set of strings
 	 * @include: string_set.h
-	 * @see_also: <link linkend="context_provider">Context Provider</link>
+	 * @see_also: <link linkend="libcontextprovider-Context-provider-setup">Context Provider</link>
 	 *
 	 * A data structure which efficiently holds a set of strings. A string set has a maximum memory usage
 	 * of (total number of strings stored)/8 bytes.
