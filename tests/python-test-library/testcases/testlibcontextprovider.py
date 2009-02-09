@@ -14,6 +14,9 @@ import conf as cfg
 # Stubs
 sys.path.append("./tests/python-test-library/stubs")
 
+# Note: execute this program: libtool --mode=execute -dlopen libcontextprovider.la python tests/python-test-library/testcases/testlibcontextprovider.py
+
+
 # FIXME: Use the fake dbus.
 # FIXME: Make tests find the library
 # FIXME: Make tests run when make check is executed
@@ -228,7 +231,9 @@ class SubscribeCallbacks(TestCaseUsingProvider):
         # Check from the log that the callback was called
         log = self.provider_iface.GetLog()
 
-        self.assert_ (log == "(last_cb(test.bool))")
+        print "Log is:", log
+
+        self.assert_ (log == "(last_cb(test.bool, ))")
 
 # Test cases: Check that the subscriber gets the change set when it is sent.
 class Subscription(TestCaseUsingProvider):
