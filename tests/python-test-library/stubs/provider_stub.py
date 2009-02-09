@@ -13,13 +13,17 @@
 ##
 
 import sys
-sys.path.append("./python/")
+sys.path.append("./python/") # libcontextprovider python bindings
 import ContextProvider as cb
+
+sys.path.append("./tests/python-test-library/testcases/")
+import conf as cfg
 
 import dbus
 import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 import gobject
+
 
 class FakeProvider (dbus.service.Object):
 
@@ -42,20 +46,20 @@ class FakeProvider (dbus.service.Object):
     def __init__(self, main_loop):
         self.log = "";
         # Initiate dbus connection so that this stub can be commanded throug it
-        self.busSes = dbus.service.BusName("org.freedesktop.ContextKit.Testing.Provider.Command",
+        self.busSes = dbus.service.BusName(cfg.fakeProviderBusName,
                                            dbus.SessionBus())
 
         dbus.service.Object.__init__(self, self.busSes,
-                "/org/freedesktop/ContextKit/Testing/Provider")
+                cfg.fakeProviderPath)
         self.main_loop = main_loop
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def DoInit(self):
         print "Provider: Executing Init"
-        cb.ContextProvider.init(True, "org.freedesktop.ContextKit.Testing.Provider")
+        cb.ContextProvider.init(True, cfg.fakeProviderLibBusName)
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def DoInstall(self):
         print "Provider: Executing Install"
@@ -64,7 +68,7 @@ class FakeProvider (dbus.service.Object):
                          cb.ContextProvider.SUBSCRIBED_CALLBACK(self.first_cb), None,
                          cb.ContextProvider.UNSUBSCRIBED_CALLBACK(self.last_cb), None)
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def DoRemove(self):
         print "Provider: Executing Remove"
@@ -73,7 +77,7 @@ class FakeProvider (dbus.service.Object):
     # Hard-coded change sets for different tests.
     # Could be refactored so that change sets are given as parameter,
     # if more tests are needed.
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def SendChangeSet1(self):
         cs = cb.ContextProvider.change_set_create()
@@ -81,7 +85,7 @@ class FakeProvider (dbus.service.Object):
         cb.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
         cb.ContextProvider.change_set_commit(cs)
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def SendChangeSet2(self):
         cs = cb.ContextProvider.change_set_create()
@@ -90,7 +94,7 @@ class FakeProvider (dbus.service.Object):
         cb.ContextProvider.change_set_add_bool(cs, "test.bool", False)
         cb.ContextProvider.change_set_commit(cs)
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def SendChangeSetWithAllDataTypes(self):
         cs = cb.ContextProvider.change_set_create()
@@ -100,7 +104,7 @@ class FakeProvider (dbus.service.Object):
         # FIXME: Add new data types here as needed
         cb.ContextProvider.change_set_commit(cs)
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def SendChangeSetWithAllUndetermined(self):
         cs = cb.ContextProvider.change_set_create()
@@ -109,7 +113,7 @@ class FakeProvider (dbus.service.Object):
         cb.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
         cb.ContextProvider.change_set_commit(cs)
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def CancelChangeSet(self):
         cs = cb.ContextProvider.change_set_create()
@@ -117,23 +121,23 @@ class FakeProvider (dbus.service.Object):
         cb.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
         cb.ContextProvider.change_set_cancel(cs)
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='s', out_signature='i')
     def GetSubscriberCount(self, key):
         return cb.ContextProvider.no_of_subscribers(key)
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def Exit (self):
         print "Provider: Exiting"
         self.main_loop.quit()
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def ResetLog (self):
         self.log = "";
 
-    @dbus.service.method(dbus_interface='org.freedesktop.ContextKit.Testing.Provider',
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='s')
     def GetLog (self):
         return self.log;

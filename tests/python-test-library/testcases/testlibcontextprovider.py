@@ -16,11 +16,10 @@ sys.path.append("./tests/python-test-library/stubs")
 
 # Note: execute this program: libtool --mode=execute -dlopen libcontextprovider.la python tests/python-test-library/testcases/testlibcontextprovider.py
 
-
 # FIXME: Use the fake dbus.
-# FIXME: Make tests find the library
 # FIXME: Make tests run when make check is executed
 # FIXME: Put constants to conf
+# FIXME: Code coverage
 
 # FIXME: Missing testcases
 # - Using system bus flag in init
@@ -29,55 +28,77 @@ class LibraryTestCase(unittest.TestCase):
     def setUp(self):
         pass
     def tearDown(self):
-        print "LibraryTestCase tearDown"
         pass
 
 class Startup(LibraryTestCase):
     def setUp(self):
         self.bus = dbus.SessionBus() # Note: using session bus
 
+        self.initOk = True
         # Start a listener which listens to dbus NameOwnerChanged signals
         os.system("python tests/python-test-library/stubs/dbus_listener.py &")
         sleep(0.5)
-        # Command the listener to listen to FakeProvider
-        self.listener_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Listener","/org/freedesktop/ContextKit/Testing/Listener")
-        self.listener_iface = dbus.Interface(self.listener_proxy, "org.freedesktop.ContextKit.Testing.Listener")
-        self.listener_iface.SetTarget("org.freedesktop.ContextKit.Testing.Provider")
+        try:
+            # Command the listener to listen to FakeProvider
+            self.listener_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Listener","/org/freedesktop/ContextKit/Testing/Listener")
+            self.listener_iface = dbus.Interface(self.listener_proxy, "org.freedesktop.ContextKit.Testing.Listener")
+            self.listener_iface.SetTarget(cfg.fakeProviderLibBusName)
+        except:
+            self.initOk = False
+            return
 
         # Start a provider stub
         os.system("python tests/python-test-library/stubs/provider_stub.py &")
         sleep(0.5)
-        # Command the provider stub to start exposing services over dbus
-        self.provider_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider.Command","/org/freedesktop/ContextKit/Testing/Provider")
-        self.provider_iface = dbus.Interface(self.provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
-        self.provider_iface.DoInit()
+
+        try:
+            # Command the provider stub to start exposing services over dbus
+            self.provider_proxy = self.bus.get_object(cfg.fakeProviderBusName, cfg.fakeProviderPath)
+            self.provider_iface = dbus.Interface(self.provider_proxy, cfg.fakeProviderIfce)
+            self.provider_iface.DoInit()
+        except:
+            self.initOk = False
+            return
+
         sleep(0.5)
 
     def tearDown(self):
         print "Startup tearDown"
         # Stop the provider
-        self.provider_iface.Exit()
-        sleep(0.5)
+        try:
+            self.provider_iface.Exit()
+        except:
+            print "Stopping provider failed"
 
         # Stop the listener
-        self.listener_iface.Exit()
+        try:
+            self.listener_iface.Exit()
+        except:
+            print "Stopping provider failed"
 
     def test_startProvider(self):
+        self.assert_ (self.initOk)
+
         # Verify that the provider is started and exposed over dbus.
 
         # Get the log from the listener
-        log = self.listener_iface.GetLog()
+        try:
+            log = self.listener_iface.GetLog()
+        except:
+            self.assert_ (False) # Listener not working
+
         self.assert_(log == "(TargetAppeared)")
 
         # Note: we could also test whether disappearing is noticed
         # but that is dropped for simplicity.
 
     def test_managerInterfaceImplemented(self):
+        self.assert_ (self.initOk)
         # Verify that the provider exposes the Manager interface over dbus properly
 
         # Try to get the manager object
-        manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
-        manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
+        manager_proxy = self.bus.get_object(cfg.fakeProviderLibBusName, cfg.ctxMgrPath)
+        manager_iface = dbus.Interface(manager_proxy, cfg.ctxMgrIfce)
         self.assert_ (manager_proxy != None) # FIXME: What is the correct validity check?
         self.assert_ (manager_iface != None) # FIXME: What is the correct validity check?
         try:
@@ -90,6 +111,7 @@ class Startup(LibraryTestCase):
 # Parent class for testcases which need to start a provider and stop it
 class TestCaseUsingProvider(unittest.TestCase):
     def setUp(self):
+        self.initOk = True
         print "TestCaseUsingProvider setUp"
         self.bus = dbus.SessionBus() # Note: using session bus
 
@@ -97,32 +119,43 @@ class TestCaseUsingProvider(unittest.TestCase):
         os.system("python tests/python-test-library/stubs/provider_stub.py &")
         sleep(0.5)
         # Command the provider stub to start exposing services over dbus
-        self.provider_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider.Command","/org/freedesktop/ContextKit/Testing/Provider")
-        self.provider_iface = dbus.Interface(self.provider_proxy, "org.freedesktop.ContextKit.Testing.Provider")
-        self.provider_iface.DoInit()
+        self.provider_proxy = self.bus.get_object(cfg.fakeProviderBusName, cfg.fakeProviderPath)
+        self.provider_iface = dbus.Interface(self.provider_proxy, cfg.fakeProviderIfce)
 
-        # Install a provider
-        self.provider_iface.DoInstall()
+        try:
+            self.provider_iface.DoInit()
+            # Install a provider
+            self.provider_iface.DoInstall()
+        except:
+            self.initOk = False
 
         sleep(0.5)
 
     def tearDown(self):
         print "TestCaseUsingProvider tearDown"
-        # Uninstall a provider
-        self.provider_iface.DoRemove()
-        # Stop the provider stub
-        self.provider_iface.Exit()
+        try:
+            # Uninstall a provider
+            self.provider_iface.DoRemove()
+            # Stop the provider stub
+            self.provider_iface.Exit()
+        except:
+            print "Stopping provider stub failed"
         sleep(0.5)
 
 # Test cases: Check that the Get callback function is called properly,
 # and that the change set is treated properly.
 class GetCallback(TestCaseUsingProvider):
     def test_getCallbackIsCalled(self):
-        # Execute Get
-        manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
-        manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
+        self.assert_ (self.initOk)
 
-        self.provider_iface.ResetLog()
+        # Execute Get
+        manager_proxy = self.bus.get_object(cfg.fakeProviderLibBusName, cfg.ctxMgrPath)
+        manager_iface = dbus.Interface(manager_proxy, cfg.ctxMgrIfce)
+        try:
+            self.provider_iface.ResetLog()
+        except:
+            self.assert_ (False) # Provider not working
+
         try:
             manager_iface.Get(["test.int"])
         except:
@@ -130,14 +163,17 @@ class GetCallback(TestCaseUsingProvider):
             self.assert_ (False) # Manager interface is not implemented properly
 
         # Check from the log that the callback was called
-        log = self.provider_iface.GetLog()
+        try:
+            log = self.provider_iface.GetLog()
+        except:
+            self.assert_ (False) # Provider not working
 
         self.assert_ (log == "(get_cb(test.int))");
 
     def test_changeSetIsTreatedProperly(self):
         # Execute Get
-        manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
-        manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
+        manager_proxy = self.bus.get_object(cfg.fakeProviderLibBusName, cfg.ctxMgrPath)
+        manager_iface = dbus.Interface(manager_proxy, cfg.ctxMgrIfce)
 
         ret = None
         try:
@@ -168,20 +204,26 @@ class SubscribeCallbacks(TestCaseUsingProvider):
     def setUp(self):
         self.initOk = True
         TestCaseUsingProvider.setUp(self)
+
         # Execute GetSubscriber
-        manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
-        manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
+        manager_proxy = self.bus.get_object(cfg.fakeProviderLibBusName,cfg.ctxMgrPath)
+        manager_iface = dbus.Interface(manager_proxy, cfg.ctxMgrIfce)
 
         self.subscriber_path = "";
-        self.provider_iface.ResetLog()
+
+        try:
+            self.provider_iface.ResetLog()
+        except:
+            self.initOk = False
+
         try:
             self.subscriber_path = manager_iface.GetSubscriber()
         except:
             print "Exception caught"
             self.initOk = False
 
-        subscriber_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider", self.subscriber_path)
-        self.subscriber_iface = dbus.Interface(subscriber_proxy, "org.freedesktop.ContextKit.Subscriber")
+        subscriber_proxy = self.bus.get_object(cfg.fakeProviderLibBusName, self.subscriber_path)
+        self.subscriber_iface = dbus.Interface(subscriber_proxy, cfg.ctxScriberIfce)
 
     def tearDown(self):
         TestCaseUsingProvider.tearDown(self)
@@ -192,10 +234,16 @@ class SubscribeCallbacks(TestCaseUsingProvider):
         self.assert_ (self.initOk)
 
         # Execute Subscribe
-        self.subscriber_iface.Subscribe(["test.double"])
+        try:
+            self.subscriber_iface.Subscribe(["test.double"])
+        except:
+            self.assert_ (False) # Subscriber not working
 
         # Check from the log that the callback was called
-        log = self.provider_iface.GetLog()
+        try:
+            log = self.provider_iface.GetLog()
+        except:
+            self.assert_ (False) # Provider not working
 
         self.assert_ (log == "(get_cb(test.double))(first_cb(test.double))" or log == "(first_cb(test.double))(get_cb(test.double))")
         # Note that as part of subscribe, also get is called. Here we don't care about the order.
@@ -203,16 +251,28 @@ class SubscribeCallbacks(TestCaseUsingProvider):
     def test_lastCallbackIsCalled(self):
 
         # Execute Subscribe
-        self.subscriber_iface.Subscribe(["test.bool"])
+        try:
+            self.subscriber_iface.Subscribe(["test.bool"])
+        except:
+            self.assert_ (False) # Subscriber not working
 
         # Reset log:
-        self.provider_iface.ResetLog()
+        try:
+            self.provider_iface.ResetLog()
+        except:
+            self.assert_ (False) # Provider not working
 
         # Execute Unsubscribe
-        self.subscriber_iface.Unsubscribe(["test.bool"])
+        try:
+            self.subscriber_iface.Unsubscribe(["test.bool"])
+        except:
+            self.assert_ (False) # Subscriber handler not working
 
         # Check from the log that the callback was called
-        log = self.provider_iface.GetLog()
+        try:
+            log = self.provider_iface.GetLog()
+        except:
+            self.assert_ (False) # Provider not working
 
         #print "Log is:", log
 
@@ -266,20 +326,27 @@ class Subscription(TestCaseUsingProvider):
         self.assert_ (self.initOk)
 
         # Get a subscriber
-        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
+        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
 
         # Tell the subscriber to subscribe to test.int, test.double and test.bool
         properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
 
         # Command the fake provider send the change set
-        self.provider_iface.SendChangeSet1()
+        try:
+            self.provider_iface.SendChangeSet1()
+        except:
+            self.assert_ (False) # Provider not working
+
         sleep(0.5)
 
         # Ask the subscriber what changes it got
-        properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
+        try:
+            properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
 
-        # Unsubscribe
-        self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
+            # Unsubscribe
+            self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
+        except:
+            self.assert_ (False) # Subscription handler not working
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -295,20 +362,30 @@ class Subscription(TestCaseUsingProvider):
         self.assert_ (self.initOk)
 
         # Get a subscriber
-        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
+        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
 
         # Tell the subscriber to subscribe to test.double and test.bool
-        properties, undetermined = self.subscription_handler_iface.subscribe(["test.double", "test.bool"], subscriber_path_1)
+        try:
+            properties, undetermined = self.subscription_handler_iface.subscribe(["test.double", "test.bool"], subscriber_path_1)
+        except:
+            self.assert_ (False) # Subscription handler not working
 
         # Command the fake provider send the change set
-        self.provider_iface.SendChangeSet2()
+        try:
+            self.provider_iface.SendChangeSet2()
+        except:
+            self.assert_ (False) # Provider not working
+
         sleep(0.5)
 
         # Ask the subscriber what changes it got
-        properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
+        try:
+            properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
 
-        # Unsubscribe
-        self.subscription_handler_iface.unSubscribe(["test.double", "test.bool"], subscriber_path_1)
+            # Unsubscribe
+            self.subscription_handler_iface.unSubscribe(["test.double", "test.bool"], subscriber_path_1)
+        except:
+            self.assert_ (False) # Subscription handler not working
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -325,22 +402,32 @@ class Subscription(TestCaseUsingProvider):
         self.assert_ (self.initOk)
 
         # Get a subscriber
-        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
+        try:
+            subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
 
-        # Tell the subscriber to subscribe to test.int, test.double and test.bool
-        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
+            # Tell the subscriber to subscribe to test.int, test.double and test.bool
+            properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
 
-        self.subscription_handler_iface.unSubscribe(["test.int"], subscriber_path_1)
+            self.subscription_handler_iface.unSubscribe(["test.int"], subscriber_path_1)
+        except:
+            self.assert_ (False) # Subscription handler not working
 
         # Command the fake provider to send the change set
-        self.provider_iface.SendChangeSet2() # contains test.int, test.double and test.bool
+        try:
+            self.provider_iface.SendChangeSet2() # contains test.int, test.double and test.bool
+        except:
+            self.assert_ (False) # Provider not working
+
         sleep(0.5)
 
-        # Ask the subscriber what changes it got
-        properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
+        try:
+            # Ask the subscriber what changes it got
+            properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
 
-        # Unsubscribe from the rest
-        self.subscription_handler_iface.unSubscribe(["test.double", "test.bool"], subscriber_path_1)
+            # Unsubscribe from the rest
+            self.subscription_handler_iface.unSubscribe(["test.double", "test.bool"], subscriber_path_1)
+        except:
+            self.assert_ (False) # Subscription handler not working
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -375,22 +462,25 @@ class ChangeSets(TestCaseUsingProvider):
         try:
             subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
             self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
+
+            # Get a subscriber
+            self.subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+
+            # Tell the subscriber to subscribe to all the properties
+            self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
         except:
             self.initOk = False
             return
 
-        # Get a subscriber
-        self.subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
-
-        # Tell the subscriber to subscribe to all the properties
-        self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
-
     def tearDown(self):
         # Tell the subscriber to unsubscribe from all the properties
-        self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
+        try:
+            self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
 
-        # Command the subscription handler to exit
-        self.subscription_handler_iface.loopQuit()
+            # Command the subscription handler to exit
+            self.subscription_handler_iface.loopQuit()
+        except:
+            print "Stopping subscription handler failed"
 
         TestCaseUsingProvider.tearDown(self)
 
@@ -399,11 +489,17 @@ class ChangeSets(TestCaseUsingProvider):
         self.assert_ (self.initOk)
 
         # Command the fake provider to send the change set
-        self.provider_iface.SendChangeSetWithAllDataTypes()
+        try:
+            self.provider_iface.SendChangeSetWithAllDataTypes()
+        except:
+            self.assert_ (False) # Provider not working
         sleep(0.5)
 
         # Ask the subscriber what changes it got
-        properties, undetermined = self.subscription_handler_iface.getChangedProp(self.subscriber_path_1)
+        try:
+            properties, undetermined = self.subscription_handler_iface.getChangedProp(self.subscriber_path_1)
+        except:
+            self.assert_ (False) # Subscription handler not working
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -426,11 +522,18 @@ class ChangeSets(TestCaseUsingProvider):
         self.assert_ (self.initOk)
 
         # Command the fake provider to send the change set
-        self.provider_iface.SendChangeSetWithAllUndetermined()
+        try:
+            self.provider_iface.SendChangeSetWithAllUndetermined()
+        except:
+            self.assert_ (False) # Provider not working
+
         sleep(0.5)
 
         # Ask the subscriber what changes it got
-        properties, undetermined = self.subscription_handler_iface.getChangedProp(self.subscriber_path_1)
+        try:
+            properties, undetermined = self.subscription_handler_iface.getChangedProp(self.subscriber_path_1)
+        except:
+            self.assert_ (False) # Subscription handler not working
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -449,11 +552,23 @@ class ChangeSets(TestCaseUsingProvider):
 
         self.assert_ (self.initOk)
 
-        self.subscription_handler_iface.resetSignalStatus(self.subscriber_path_1)
+        try:
+            self.subscription_handler_iface.resetSignalStatus(self.subscriber_path_1)
+        except:
+            self.assert_ (False) # Subscription handler not working
 
-        self.provider_iface.CancelChangeSet()
+        try:
+            self.provider_iface.CancelChangeSet()
+        except:
+            self.assert_ (False) # Provider not working
         sleep(0.5)
-        self.assert_ (self.subscription_handler_iface.getSignalStatus(self.subscriber_path_1) == False)
+
+        try:
+            status = self.subscription_handler_iface.getSignalStatus(self.subscriber_path_1)
+        except:
+            self.assert_ (False) # Subscription handler not working
+
+        self.assert_ (status == False)
 
 # Test cases: Check that the subscriber counts of the keys are calculated properly.
 class KeyCounting(TestCaseUsingProvider):
@@ -497,12 +612,15 @@ class KeyCounting(TestCaseUsingProvider):
         # Command the subscriberHandler to subscribe to test.int
 
         # Get a subscriber
-        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
-        print "Path is:", subscriber_path_1
+        try:
+            subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+            print "Path is:", subscriber_path_1
 
-        # Tell the subscriber to subscribe to test.int
-        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int"], subscriber_path_1)
-        sleep(0.5)
+            # Tell the subscriber to subscribe to test.int
+            properties, undetermined = self.subscription_handler_iface.subscribe(["test.int"], subscriber_path_1)
+            sleep(0.5)
+        except:
+            self.assert_ (False) # Subscription handler not working
 
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 1)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
@@ -511,12 +629,16 @@ class KeyCounting(TestCaseUsingProvider):
         # Command another subscriberHandler to subscribe to test.int and test.double
 
         # Get a subscriber
-        subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
-        print "Path is:", subscriber_path_2
+        try:
+            subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+            print "Path is:", subscriber_path_2
 
-        # Tell the subscriber to subscribe to test.int and test.double
-        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double"], subscriber_path_2)
-        sleep(0.5)
+            # Tell the subscriber to subscribe to test.int and test.double
+            properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double"], subscriber_path_2)
+            sleep(0.5)
+        except:
+            self.assert_ (False) # Subscription handler not working
+
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
