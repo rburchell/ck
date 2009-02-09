@@ -30,7 +30,7 @@ class FakeProvider (dbus.service.Object):
     def get_cb (self, ss, cs, d):
         self.log += ("(get_cb(" + cb.StringSet.debug(ss) + "))")
         # Set test.int to 5 and test.string to undetermined
-        cb.ContextProvider.change_set_add_int(cs, "test.int", 5)
+        cb.ContextProvider.change_set_add_integer(cs, "test.int", 5)
         cb.ContextProvider.change_set_add_undetermined_key(cs, "test.double")
         return 0
 
@@ -89,18 +89,18 @@ class FakeProvider (dbus.service.Object):
                        in_signature='', out_signature='')
     def SendChangeSet2(self):
         cs = cb.ContextProvider.change_set_create()
-        cb.ContextProvider.change_set_add_int(cs, "test.int", 1)
+        cb.ContextProvider.change_set_add_integer(cs, "test.int", 1)
         cb.ContextProvider.change_set_add_double(cs, "test.double", 3.1415)
-        cb.ContextProvider.change_set_add_bool(cs, "test.bool", False)
+        cb.ContextProvider.change_set_add_boolean(cs, "test.bool", False)
         cb.ContextProvider.change_set_commit(cs)
 
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def SendChangeSetWithAllDataTypes(self):
         cs = cb.ContextProvider.change_set_create()
-        cb.ContextProvider.change_set_add_int(cs, "test.int", -8)
+        cb.ContextProvider.change_set_add_integer(cs, "test.int", -8)
         cb.ContextProvider.change_set_add_double(cs, "test.double", 0.2)
-        cb.ContextProvider.change_set_add_bool(cs, "test.bool", True)
+        cb.ContextProvider.change_set_add_boolean(cs, "test.bool", True)
         # FIXME: Add new data types here as needed
         cb.ContextProvider.change_set_commit(cs)
 

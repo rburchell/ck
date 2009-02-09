@@ -40,7 +40,7 @@ class ContextProvider:
                               ('change_set', CHANGE_SET, 1))
     change_set_cancel = cfunc('context_provider_change_set_cancel', _dll, None,
                               ('change_set', CHANGE_SET, 1))
-    change_set_add_int = cfunc('context_provider_change_set_add_int', _dll, c_int,
+    change_set_add_integer = cfunc('context_provider_change_set_add_integer', _dll, c_int,
                                ('change_set', CHANGE_SET, 1),
                                ('key', c_char_p, 1),
                                ('val', c_int, 1))
@@ -48,7 +48,7 @@ class ContextProvider:
                                   ('change_set', CHANGE_SET, 1),
                                   ('key', c_char_p, 1),
                                   ('val', c_double, 1))
-    change_set_add_bool = cfunc('context_provider_change_set_add_bool', _dll, c_int,
+    change_set_add_boolean = cfunc('context_provider_change_set_add_boolean', _dll, c_int,
                                ('change_set', CHANGE_SET, 1),
                                ('key', c_char_p, 1),
                                ('val', c_int, 1))

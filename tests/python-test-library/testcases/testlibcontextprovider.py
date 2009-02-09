@@ -18,7 +18,6 @@ sys.path.append("./tests/python-test-library/stubs")
 
 # FIXME: Use the fake dbus.
 # FIXME: Make tests run when make check is executed
-# FIXME: Put constants to conf
 # FIXME: Code coverage
 
 # FIXME: Missing testcases
