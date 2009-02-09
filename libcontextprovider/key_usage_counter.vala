@@ -66,12 +66,13 @@ namespace ContextProvider {
 				}
 			}
 
+			subscribed_keys = new StringSet.difference (subscribed_keys, last_unsubscribed_keys);
+
 			if (last_unsubscribed_keys.size() > 0) {
 				// Signal that some keys are not subscribed to anymore
 				Manager.get_instance().providers.last_unsubscribed (last_unsubscribed_keys, subscribed_keys);
 			}
 
-			subscribed_keys = new StringSet.difference (subscribed_keys, last_unsubscribed_keys);
 		}
 
 		public int number_of_subscribers (string key) {
@@ -82,5 +83,3 @@ namespace ContextProvider {
 		}
 	}
 }
-
-
