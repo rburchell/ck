@@ -14,9 +14,13 @@ import conf as cfg
 # Stubs
 sys.path.append("./tests/python-test-library/stubs")
 
+# Note: execute this program: libtool --mode=execute -dlopen libcontextprovider.la python tests/python-test-library/testcases/testlibcontextprovider.py
+
+
 # FIXME: Use the fake dbus.
 # FIXME: Make tests find the library
 # FIXME: Make tests run when make check is executed
+# FIXME: Put constants to conf
 
 # FIXME: Missing testcases
 # - Using system bus flag in init
@@ -162,35 +166,33 @@ class GetCallback(TestCaseUsingProvider):
 class SubscribeCallbacks(TestCaseUsingProvider):
 
     def setUp(self):
+        self.initOk = True
         TestCaseUsingProvider.setUp(self)
-
-    def tearDown(self):
-        TestCaseUsingProvider.tearDown(self)
-
-    def test_firstCallbackIsCalled(self):
-
-        # FIXME: Consider refactoring getting the subscriber to the setUp.
-        # The problem is that it may fail.
-
         # Execute GetSubscriber
         manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
         manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
 
-        subscriber_path = "";
+        self.subscriber_path = "";
         self.provider_iface.ResetLog()
         try:
-            subscriber_path = manager_iface.GetSubscriber()
+            self.subscriber_path = manager_iface.GetSubscriber()
         except:
             print "Exception caught"
-            self.assert_ (False) # Manager interface is not implemented properly
+            self.initOk = False
 
-        self.assert_ (subscriber_path == "/org/freedesktop/ContextKit/Subscribers/0")
+        subscriber_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider", self.subscriber_path)
+        self.subscriber_iface = dbus.Interface(subscriber_proxy, "org.freedesktop.ContextKit.Subscriber")
+
+    def tearDown(self):
+        TestCaseUsingProvider.tearDown(self)
+        # Note that the provider is stopped.
+        # All information about current subscriptions is reset.
+
+    def test_firstCallbackIsCalled(self):
+        self.assert_ (self.initOk)
 
         # Execute Subscribe
-        subscriber_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider",subscriber_path)
-        subscriber_iface = dbus.Interface(subscriber_proxy, "org.freedesktop.ContextKit.Subscriber")
-
-        subscriber_iface.Subscribe(["test.double"])
+        self.subscriber_iface.Subscribe(["test.double"])
 
         # Check from the log that the callback was called
         log = self.provider_iface.GetLog()
@@ -199,35 +201,40 @@ class SubscribeCallbacks(TestCaseUsingProvider):
         # Note that as part of subscribe, also get is called. Here we don't care about the order.
 
     def test_lastCallbackIsCalled(self):
-        # Execute GetSubscriber
-        manager_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider","/org/freedesktop/ContextKit/Manager")
-        manager_iface = dbus.Interface(manager_proxy, "org.freedesktop.ContextKit.Manager")
-
-        subscriber_path = "";
-        try:
-            subscriber_path = manager_iface.GetSubscriber()
-        except:
-            print "Exception caught"
-            self.assert_ (False) # Manager interface is not implemented properly
-
-        self.assert_ (subscriber_path == "/org/freedesktop/ContextKit/Subscribers/0")
 
         # Execute Subscribe
-        subscriber_proxy = self.bus.get_object("org.freedesktop.ContextKit.Testing.Provider", subscriber_path)
-        subscriber_iface = dbus.Interface(subscriber_proxy, "org.freedesktop.ContextKit.Subscriber")
-
-        subscriber_iface.Subscribe(["test.bool"])
+        self.subscriber_iface.Subscribe(["test.bool"])
 
         # Reset log:
         self.provider_iface.ResetLog()
 
         # Execute Unsubscribe
-        subscriber_iface.Unsubscribe(["test.bool"])
+        self.subscriber_iface.Unsubscribe(["test.bool"])
 
         # Check from the log that the callback was called
         log = self.provider_iface.GetLog()
 
-        self.assert_ (log == "(last_cb(test.bool))")
+        #print "Log is:", log
+
+        self.assert_ (log == "(last_cb(test.bool, ))")
+
+    def test_remainingKeys(self):
+
+        # Execute Subscribe
+        self.subscriber_iface.Subscribe(["test.bool", "test.int"])
+
+        # Reset log:
+        self.provider_iface.ResetLog()
+
+        # Execute Unsubscribe
+        self.subscriber_iface.Unsubscribe(["test.bool"])
+
+        # Check from the log that the callback was called
+        log = self.provider_iface.GetLog()
+
+        #print "Log is:", log
+
+        self.assert_ (log == "(last_cb(test.bool, test.int))")
 
 # Test cases: Check that the subscriber gets the change set when it is sent.
 class Subscription(TestCaseUsingProvider):
@@ -235,6 +242,7 @@ class Subscription(TestCaseUsingProvider):
     def setUp(self):
         self.initOk = True
         TestCaseUsingProvider.setUp(self)
+
         # Start subscription handler
         os.system(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py &")
         sleep(0.5)
@@ -242,11 +250,11 @@ class Subscription(TestCaseUsingProvider):
         # Connect to subscription handler
         sessionBus = dbus.SessionBus()
 
-        #try:
-        subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
-        self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
-        #except:
-        #    self.initOk = False
+        try:
+            subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
+        except:
+            self.initOk = False
 
     def tearDown(self):
         # Command the subscription handler to exit
@@ -257,8 +265,7 @@ class Subscription(TestCaseUsingProvider):
     def test_subscriberGetsInfo(self):
         self.assert_ (self.initOk)
 
-        bus = dbus.SessionBus()
-        # Start a subscription handler
+        # Get a subscriber
         subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
 
         # Tell the subscriber to subscribe to test.int, test.double and test.bool
@@ -287,8 +294,7 @@ class Subscription(TestCaseUsingProvider):
     def test_subscriberGetsOnlyRelevantKeys(self):
         self.assert_ (self.initOk)
 
-        bus = dbus.SessionBus()
-        # Start a subscription handler
+        # Get a subscriber
         subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
 
         # Tell the subscriber to subscribe to test.double and test.bool
@@ -314,61 +320,171 @@ class Subscription(TestCaseUsingProvider):
         self.assert_ (properties["test.bool"] == False)
 
         self.assert_ (len(undetermined) == 0)
-        # FIXME
 
     def test_subscriberDoesntGetUnsubscribedKeys(self):
         self.assert_ (self.initOk)
 
-        bus = dbus.SessionBus()
-        # Start a subscriber handler
-        #os.system("python tests/python-test-library/stubs/subscriber_stub.py &")
-        #sleep(1)
+        # Get a subscriber
+        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
 
         # Tell the subscriber to subscribe to test.int, test.double and test.bool
-        # FIXME
+        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
 
+        self.subscription_handler_iface.unSubscribe(["test.int"], subscriber_path_1)
 
-        # Tell the subscriber to unsubscribe from test.int
-        # FIXME
-
-        # Command the fake provider send the change set
-        self.provider_iface.SendChangeSet2()
+        # Command the fake provider to send the change set
+        self.provider_iface.SendChangeSet2() # contains test.int, test.double and test.bool
         sleep(0.5)
 
         # Ask the subscriber what changes it got
+        properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
 
-        # FIXME
+        # Unsubscribe from the rest
+        self.subscription_handler_iface.unSubscribe(["test.double", "test.bool"], subscriber_path_1)
 
+        self.assert_ (properties != None)
+        self.assert_ (undetermined != None)
+
+        #print "Properties:", properties
+        #print "Undetermined:", undetermined
+
+        self.assert_ (len(properties) == 2)
+        self.assert_ ("test.double" in properties)
+        self.assert_ (properties["test.double"] == 3.1415)
+        self.assert_ ("test.bool" in properties)
+        self.assert_ (properties["test.bool"] == False)
+
+        self.assert_ (len(undetermined) == 0)
+
+# Test cases: functionality related to change sets
+# Note that "Subscription" test suite tests that change sets are
+# sent to the subscriber properly.
 class ChangeSets(TestCaseUsingProvider):
 
     def setUp(self):
+        self.initOk = True
         TestCaseUsingProvider.setUp(self)
 
+        # Start subscription handler
+        os.system(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py &")
+        sleep(0.5)
+
+        # Connect to subscription handler
+        sessionBus = dbus.SessionBus()
+
+        try:
+            subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
+        except:
+            self.initOk = False
+            return
+
+        # Get a subscriber
+        self.subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
+
+        # Tell the subscriber to subscribe to all the properties
+        self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
+
     def tearDown(self):
+        # Tell the subscriber to unsubscribe from all the properties
+        self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
+
+        # Command the subscription handler to exit
+        self.subscription_handler_iface.loopQuit()
+
         TestCaseUsingProvider.tearDown(self)
 
+    def test_dataTypes(self):
 
-    def test_changeSetNotifiedToSubscriber(self):
-        # Create a subscriber which subscribes to our properties
-        # FIXME: implementation missing
+        self.assert_ (self.initOk)
 
-        # Create a change set
-        self.provider_iface.SendChangeSet1()
+        # Command the fake provider to send the change set
+        self.provider_iface.SendChangeSetWithAllDataTypes()
+        sleep(0.5)
 
-        # Check from the subscriber log that the change was done
+        # Ask the subscriber what changes it got
+        properties, undetermined = self.subscription_handler_iface.getChangedProp(self.subscriber_path_1)
 
-        self.assert_ (False) # This test is not yet implemented
+        self.assert_ (properties != None)
+        self.assert_ (undetermined != None)
+
+        #print "Properties:", properties
+        #print "Undetermined:", undetermined
+
+        self.assert_ (len(properties) == 3)
+        self.assert_ ("test.int" in properties)
+        self.assert_ (properties["test.int"] == -8)
+        self.assert_ ("test.double" in properties)
+        self.assert_ (properties["test.double"] == 0.2)
+        self.assert_ ("test.bool" in properties)
+        self.assert_ (properties["test.bool"] == True)
+
+        self.assert_ (len(undetermined) == 0)
+
+    def test_undetermined(self):
+
+        self.assert_ (self.initOk)
+
+        # Command the fake provider to send the change set
+        self.provider_iface.SendChangeSetWithAllUndetermined()
+        sleep(0.5)
+
+        # Ask the subscriber what changes it got
+        properties, undetermined = self.subscription_handler_iface.getChangedProp(self.subscriber_path_1)
+
+        self.assert_ (properties != None)
+        self.assert_ (undetermined != None)
+
+        #print "Properties:", properties
+        #print "Undetermined:", undetermined
+
+        self.assert_ (len(properties) == 0)
+
+        self.assert_ (len(undetermined) == 3)
+        self.assert_ (undetermined.count("test.int") == 1)
+        self.assert_ (undetermined.count("test.double") == 1)
+        self.assert_ (undetermined.count("test.bool") == 1)
+
+    def test_cancelling(self):
+
+        self.assert_ (self.initOk)
+
+        self.subscription_handler_iface.resetSignalStatus(self.subscriber_path_1)
+
+        self.provider_iface.CancelChangeSet()
+        sleep(0.5)
+        self.assert_ (self.subscription_handler_iface.getSignalStatus(self.subscriber_path_1) == False)
 
 # Test cases: Check that the subscriber counts of the keys are calculated properly.
 class KeyCounting(TestCaseUsingProvider):
     def setUp(self):
+        self.initOk = True
         TestCaseUsingProvider.setUp(self)
 
+        # Start subscription handler
+        os.system(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py &")
+        sleep(0.5)
+
+        # Connect to subscription handler
+        sessionBus = dbus.SessionBus()
+
+        try:
+            subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
+        except:
+            self.initOk = False
+
     def tearDown(self):
+        # Command the subscription handler to exit
+        self.subscription_handler_iface.loopQuit()
+
         TestCaseUsingProvider.tearDown(self)
 
 
     def test_initialCount(self):
+
+        self.assert_ (self.initOk)
+
         # Initial count of a key is zero
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 0)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
@@ -376,14 +492,31 @@ class KeyCounting(TestCaseUsingProvider):
 
     def test_subscriptionIncreasesCount(self):
 
+        self.assert_ (self.initOk)
+
         # Command the subscriberHandler to subscribe to test.int
-        # FIXME
+
+        # Get a subscriber
+        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
+        print "Path is:", subscriber_path_1
+
+        # Tell the subscriber to subscribe to test.int
+        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int"], subscriber_path_1)
+        sleep(0.5)
+
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 1)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
 
         # Command another subscriberHandler to subscribe to test.int and test.double
-        # FIXME
+
+        # Get a subscriber
+        subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
+        print "Path is:", subscriber_path_2
+
+        # Tell the subscriber to subscribe to test.int and test.double
+        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double"], subscriber_path_2)
+        sleep(0.5)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
@@ -400,7 +533,7 @@ def runTests():
     unittest.TextTestRunner(verbosity=2).run(suiteGetCallback)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
     unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
-    #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
+    unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
 
 
