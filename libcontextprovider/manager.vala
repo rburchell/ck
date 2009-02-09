@@ -48,25 +48,19 @@ namespace ContextProvider {
 			debug ("Manager.Get");
 
 			// Check input against valid keys
-			// Do not create a StringSet from the parameter "keys" as that would be add Quarks
 			StringSet keyset = check_keys(keys);
 			get_internal (keyset, out values_to_send, out undeterminable_keys);
 		}
 
 		internal void get_internal (StringSet keyset, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
 			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash, str_equal);
-			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
-			  leaving a possible DOS or at least random memory leaks */
-
-			// Ignore keys which are not recognized as valid
-			StringSet valid_keyset = new StringSet.intersection (keyset, providers.valid_keys);
 
 			// Let providers update the central value table
-			List<string> undeterminable_key_list = providers.get (valid_keyset, values);
+			List<string> undeterminable_key_list = providers.get (keyset, values);
 			insert_to_value_table (values, undeterminable_key_list);
 
 			// Then read the values from the value table
-			read_from_value_table(valid_keyset, out values_to_send, out undeterminable_keys);
+			read_from_value_table(keyset, out values_to_send, out undeterminable_keys);
 		}
 
 		public DBus.ObjectPath GetSubscriber (DBus.BusName name) throws DBus.Error {
