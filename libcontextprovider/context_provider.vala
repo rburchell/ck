@@ -14,7 +14,7 @@ namespace ContextProvider {
 	 * #ContextProviderChangeSet is used to signal changes to contextual values by a provider.
 	 * As a provider you can asynchronously emit value changes for keys which you are providing
 	 * by creating a #ContextProviderChangeSet and commiting it using #context_provider_change_set_commit.
-	 * #ContextProviderChangeSet can also be provided to you, for example in 
+	 * #ContextProviderChangeSet can also be provided to you, for example in
 	 * #ContextProviderGetCallback. In this case, you should simply add the values requested
 	 * and return without calling #context_provider_change_set_commit.
 	 */
@@ -109,7 +109,7 @@ namespace ContextProvider {
 			assert (initialised == true);
 
 			Value v = Value (typeof(int));
-			v.set_int (val);
+			v.set_int (value);
 			properties.insert (key, v);
 		}
 
@@ -125,7 +125,7 @@ namespace ContextProvider {
 			assert (initialised == true);
 
 			Value v = Value (typeof(double));
-			v.set_double (val);
+			v.set_double (value);
 			properties.insert (key, v);
 		}
 
@@ -141,7 +141,7 @@ namespace ContextProvider {
 			assert (initialised == true);
 
 			Value v = Value (typeof(bool));
-			v.set_boolean (val);
+			v.set_boolean (value);
 			properties.insert (key, v);
 		}
 
