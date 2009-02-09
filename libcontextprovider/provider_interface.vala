@@ -1,6 +1,11 @@
 using GLib;
 
 namespace ContextProvider {
+	/**
+	 * ContextProviderProvider:
+	 *
+	 * Represents a provider of context
+	 */
 	public interface Provider : GLib.Object {
 		public abstract void get (StringSet keys, HashTable<string, Value?> ret, ref List<string> unavailable_keys);
 		public abstract void keys_subscribed (StringSet keys_subscribed);

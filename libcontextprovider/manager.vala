@@ -34,13 +34,13 @@ namespace ContextProvider {
 			this.subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			this.values = new HashTable<string, Value?>(str_hash, str_equal);
 			// Note: Use session / system bus according to the configuration
-			// (which can be changed via setBusType).
+			// (which can be changed via set_bus_type).
 			var connection = DBus.Bus.get (busType);
 			bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 			bus.NameOwnerChanged += this.on_name_owner_changed;
 		}
 
-		public static void setBusType(DBus.BusType b) {
+		public static void set_bus_type(DBus.BusType b) {
 			busType = b;
 		}
 
@@ -172,7 +172,7 @@ namespace ContextProvider {
 		}
 
 		/* Is called when the provider sets new values to context properties */
-		public int property_values_changed(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
+		public bool property_values_changed(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
 			// Check that all the keys are valid
 			var keys = properties.get_keys ();
 			foreach (var key in keys) {
@@ -181,7 +181,7 @@ namespace ContextProvider {
 					assert (false);
 					// FIXME: How to react?
 					// Now we drop the whole event and return an error value
-					return 1;
+					return false;
 				}
 			}
 			foreach (var key in undeterminable_keys) {
@@ -190,7 +190,7 @@ namespace ContextProvider {
 					assert (false);
 					// FIXME: How to react?
 					// Now we drop the whole event and return an error value
-					return 1;
+					return false;
 				}
 			}
 
@@ -201,8 +201,8 @@ namespace ContextProvider {
 			foreach (var s in subscribers.get_values()) {
 				s.on_value_changed(properties, undeterminable_keys);
 			}
-			// Return success value
-			return 0;
+
+			return true;
 		}
 	}
 }
