@@ -36,7 +36,7 @@ class FakeProvider (dbus.service.Object):
         return 0
 
     def last_cb (self, keys, keys_remaining, d):
-        self.log += ("(last_cb(" + cb.StringSet.debug(keys) + ", " + db.StringSet.debug(keys_remaining) + "))")
+        self.log += ("(last_cb(" + cb.StringSet.debug(keys) + ", " + cb.StringSet.debug(keys_remaining) + "))")
         return 0
 
     def __init__(self, main_loop):
