@@ -362,6 +362,7 @@ class Subscription(TestCaseUsingProvider):
 class ChangeSets(TestCaseUsingProvider):
 
     def setUp(self):
+        self.initOk = True
         TestCaseUsingProvider.setUp(self)
 
         # Start subscription handler
@@ -395,6 +396,8 @@ class ChangeSets(TestCaseUsingProvider):
 
     def test_dataTypes(self):
 
+        self.assert_ (self.initOk)
+
         # Command the fake provider to send the change set
         self.provider_iface.SendChangeSetWithAllDataTypes()
         sleep(0.5)
@@ -419,6 +422,9 @@ class ChangeSets(TestCaseUsingProvider):
         self.assert_ (len(undetermined) == 0)
 
     def test_undetermined(self):
+
+        self.assert_ (self.initOk)
+
         # Command the fake provider to send the change set
         self.provider_iface.SendChangeSetWithAllUndetermined()
         sleep(0.5)
@@ -440,6 +446,9 @@ class ChangeSets(TestCaseUsingProvider):
         self.assert_ (undetermined.count("test.bool") == 1)
 
     def test_cancelling(self):
+
+        self.assert_ (self.initOk)
+
         self.subscription_handler_iface.resetSignalStatus(self.subscriber_path_1)
 
         self.provider_iface.CancelChangeSet()
@@ -449,13 +458,33 @@ class ChangeSets(TestCaseUsingProvider):
 # Test cases: Check that the subscriber counts of the keys are calculated properly.
 class KeyCounting(TestCaseUsingProvider):
     def setUp(self):
+        self.initOk = True
         TestCaseUsingProvider.setUp(self)
 
+        # Start subscription handler
+        os.system(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py &")
+        sleep(0.5)
+
+        # Connect to subscription handler
+        sessionBus = dbus.SessionBus()
+
+        try:
+            subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
+        except:
+            self.initOk = False
+
     def tearDown(self):
+        # Command the subscription handler to exit
+        self.subscription_handler_iface.loopQuit()
+
         TestCaseUsingProvider.tearDown(self)
 
 
     def test_initialCount(self):
+
+        self.assert_ (self.initOk)
+
         # Initial count of a key is zero
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 0)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
@@ -463,14 +492,31 @@ class KeyCounting(TestCaseUsingProvider):
 
     def test_subscriptionIncreasesCount(self):
 
+        self.assert_ (self.initOk)
+
         # Command the subscriberHandler to subscribe to test.int
-        # FIXME
+
+        # Get a subscriber
+        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
+        print "Path is:", subscriber_path_1
+
+        # Tell the subscriber to subscribe to test.int
+        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int"], subscriber_path_1)
+        sleep(0.5)
+
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 1)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
 
         # Command another subscriberHandler to subscribe to test.int and test.double
-        # FIXME
+
+        # Get a subscriber
+        subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, "org.freedesktop.ContextKit.Testing.Provider")
+        print "Path is:", subscriber_path_2
+
+        # Tell the subscriber to subscribe to test.int and test.double
+        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double"], subscriber_path_2)
+        sleep(0.5)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
@@ -487,7 +533,7 @@ def runTests():
     unittest.TextTestRunner(verbosity=2).run(suiteGetCallback)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
     unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
-    #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
+    unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
 
 
