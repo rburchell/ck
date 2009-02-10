@@ -20,7 +20,7 @@ class ContextProvider:
     UNSUBSCRIBED_CALLBACK = CFUNCTYPE(c_int, STRING_SET, STRING_SET, c_void_p)
 
     init = cfunc('context_provider_init', _dll, None,
-                 ('useSessionBus', c_int, 1),
+                 ('bus_type', c_int, 1),
                  ('bus_name', c_char_p, 1))
     install = cfunc('context_provider_install', _dll, PROVIDER,
                  ('provided_keys', ListPOINTER (c_char_p), 1),

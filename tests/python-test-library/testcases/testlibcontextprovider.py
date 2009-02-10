@@ -54,8 +54,9 @@ class Startup(LibraryTestCase):
             # Command the provider stub to start exposing services over dbus
             self.provider_proxy = self.bus.get_object(cfg.fakeProviderBusName, cfg.fakeProviderPath)
             self.provider_iface = dbus.Interface(self.provider_proxy, cfg.fakeProviderIfce)
-            self.provider_iface.DoInit()
+            self.provider_iface.DoInit(True)
         except:
+            print "Exception when executing DoInit"
             self.initOk = False
             return
 
@@ -122,7 +123,7 @@ class TestCaseUsingProvider(unittest.TestCase):
         self.provider_iface = dbus.Interface(self.provider_proxy, cfg.fakeProviderIfce)
 
         try:
-            self.provider_iface.DoInit()
+            self.provider_iface.DoInit(True)
             # Install a provider
             self.provider_iface.DoInstall()
         except:
@@ -628,19 +629,53 @@ class KeyCounting(TestCaseUsingProvider):
         # Command another subscriberHandler to subscribe to test.int and test.double
 
         # Get a subscriber
+        #try:
+        #    subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+        #    print "Path is:", subscriber_path_2
+
+        #    # Tell the subscriber to subscribe to test.int and test.double
+        #    properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double"], subscriber_path_2)
+        #    sleep(0.5)
+        #except:
+        #    self.assert_ (False) # Subscription handler not working
+
+        #self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
+        #self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
+        #self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+
+# Parent class for testcases which need to start a provider and stop it
+class TestCaseUseSystemBus(unittest.TestCase):
+    def setUp(self):
+        self.initOk = True
+        self.bus = dbus.SessionBus() # Note: using session bus
+
+        # Start a provider stub
+        os.system("python tests/python-test-library/stubs/provider_stub.py &")
+        sleep(0.5)
+        # Command the provider stub to start exposing services over dbus
+        self.provider_proxy = self.bus.get_object(cfg.fakeProviderBusName, cfg.fakeProviderPath)
+        self.provider_iface = dbus.Interface(self.provider_proxy, cfg.fakeProviderIfce)
+
         try:
-            subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
-            print "Path is:", subscriber_path_2
-
-            # Tell the subscriber to subscribe to test.int and test.double
-            properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double"], subscriber_path_2)
-            sleep(0.5)
+            self.provider_iface.DoInit(False) # Note: use the system bus
+            # Install a provider
+            self.provider_iface.DoInstall()
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.initOk = False
 
-        self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
-        self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
-        self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+        sleep(0.5)
+
+    def tearDown(self):
+        try:
+            # Uninstall a provider
+            self.provider_iface.DoRemove()
+            # Stop the provider stub
+            self.provider_iface.Exit()
+        except:
+            print "Stopping provider stub failed"
+        sleep(0.5)
+
+    # FIXME: Add test cases.
 
 def runTests():
     suiteStartup = unittest.TestLoader().loadTestsFromTestCase(Startup)
@@ -649,14 +684,15 @@ def runTests():
     suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
     suiteKeyCounting = unittest.TestLoader().loadTestsFromTestCase(KeyCounting)
     suiteSubscription = unittest.TestLoader().loadTestsFromTestCase(Subscription)
+    suiteUseSystemBus = unittest.TestLoader().loadTestsFromTestCase(TestCaseUseSystemBus)
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
     unittest.TextTestRunner(verbosity=2).run(suiteGetCallback)
-    unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
-    unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
-    unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
-    unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
-
+    #unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
+    #unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
+    #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
+    #unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
+    #unittest.TextTestRunner(verbosity=2).run(suiteUseSystemBus)
 
 if __name__ == "__main__":
     runTests()

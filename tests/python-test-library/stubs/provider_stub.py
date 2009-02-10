@@ -27,6 +27,7 @@ import gobject
 
 class FakeProvider (dbus.service.Object):
 
+    # Callback functions for libcontextd
     def get_cb (self, ss, cs, d):
         self.log += ("(get_cb(" + cb.StringSet.debug(ss) + "))")
         # Set test.int to 5 and test.string to undetermined
@@ -43,6 +44,7 @@ class FakeProvider (dbus.service.Object):
         self.log += ("(last_cb(" + cb.StringSet.debug(keys) + ", " + cb.StringSet.debug(keys_remaining) + "))")
         return 0
 
+    # Initializing the provider object
     def __init__(self, main_loop):
         self.log = "";
         # Initiate dbus connection so that this stub can be commanded throug it
@@ -54,10 +56,17 @@ class FakeProvider (dbus.service.Object):
         self.main_loop = main_loop
 
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
-                       in_signature='', out_signature='')
-    def DoInit(self):
+                       in_signature='b', out_signature='')
+    def DoInit(self, useSession):
         print "Provider: Executing Init"
-        cb.ContextProvider.init(True, cfg.fakeProviderLibBusName)
+        if useSession:
+            print "Provider: Using session bus"
+            cb.ContextProvider.init(0, cfg.fakeProviderLibBusName)
+        else:
+            print "Provider: Using system bus"
+            cb.ContextProvider.init(1, cfg.fakeProviderLibBusName)
+        print "Provider: Init done"
+
 
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
