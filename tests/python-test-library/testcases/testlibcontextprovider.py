@@ -1,5 +1,7 @@
 import dbus
 import os
+from subprocess import Popen
+from signal import SIGKILL
 
 import unittest
 from time import sleep
@@ -35,7 +37,8 @@ class Startup(LibraryTestCase):
 
         self.initOk = True
         # Start a listener which listens to dbus NameOwnerChanged signals
-        os.system("python tests/python-test-library/stubs/dbus_listener.py &")
+        self.dbus_listener_p = Popen("python tests/python-test-library/stubs/dbus_listener.py", shell=True)
+
         sleep(0.5)
         try:
             # Command the listener to listen to FakeProvider
@@ -47,7 +50,7 @@ class Startup(LibraryTestCase):
             return
 
         # Start a provider stub
-        os.system("python tests/python-test-library/stubs/provider_stub.py &")
+        self.provider_stub_p = Popen("python tests/python-test-library/stubs/provider_stub.py", shell=True)
         sleep(0.5)
 
         try:
@@ -67,14 +70,18 @@ class Startup(LibraryTestCase):
         # Stop the provider
         try:
             self.provider_iface.Exit()
+            os.waitpid(self.provider_stub_p.pid, 0)
         except:
             print "Stopping provider failed"
+            os.kill (self.provider_stub_p.pid, SIGKILL)
 
         # Stop the listener
         try:
             self.listener_iface.Exit()
+            os.waitpid(self.dbus_listener_p.pid, 0)
         except:
             print "Stopping provider failed"
+            os.kill (self.dbus_listener_p.pid, SIGKILL)
 
     def test_startProvider(self):
         self.assert_ (self.initOk)
@@ -116,7 +123,7 @@ class TestCaseUsingProvider(unittest.TestCase):
         self.bus = dbus.SessionBus() # Note: using session bus
 
         # Start a provider stub
-        os.system("python tests/python-test-library/stubs/provider_stub.py &")
+        self.p = Popen("python tests/python-test-library/stubs/provider_stub.py", shell=True)
         sleep(0.5)
         # Command the provider stub to start exposing services over dbus
         self.provider_proxy = self.bus.get_object(cfg.fakeProviderBusName, cfg.fakeProviderPath)
@@ -138,8 +145,10 @@ class TestCaseUsingProvider(unittest.TestCase):
             self.provider_iface.DoRemove()
             # Stop the provider stub
             self.provider_iface.Exit()
+            os.waitpid(self.p.pid)
         except:
             print "Stopping provider stub failed"
+            os.kill(self.p.pid, SIGKILL)
         sleep(0.5)
 
 # Test cases: Check that the Get callback function is called properly,
@@ -187,8 +196,8 @@ class GetCallback(TestCaseUsingProvider):
         properties = ret[0]
         undetermined = ret[1]
 
-        #print "Properties are", properties
-        #print "Undetermined are", undetermined
+        print "Properties are", properties
+        print "Undetermined are", undetermined
 
         self.assert_ (len(properties) == 1)
         self.assert_ ("test.int" in properties)
@@ -304,7 +313,7 @@ class Subscription(TestCaseUsingProvider):
         TestCaseUsingProvider.setUp(self)
 
         # Start subscription handler
-        os.system(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py &")
+        self.p = Popen(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py", shell=True)
         sleep(0.5)
 
         # Connect to subscription handler
@@ -321,6 +330,7 @@ class Subscription(TestCaseUsingProvider):
         self.subscription_handler_iface.loopQuit()
 
         TestCaseUsingProvider.tearDown(self)
+        os.waitpid(self.p.pid)
 
     def test_subscriberGetsInfo(self):
         self.assert_ (self.initOk)
@@ -453,7 +463,7 @@ class ChangeSets(TestCaseUsingProvider):
         TestCaseUsingProvider.setUp(self)
 
         # Start subscription handler
-        os.system(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py &")
+        self.p = Popen(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py", shell=True)
         sleep(0.5)
 
         # Connect to subscription handler
@@ -479,8 +489,10 @@ class ChangeSets(TestCaseUsingProvider):
 
             # Command the subscription handler to exit
             self.subscription_handler_iface.loopQuit()
+            os.waitpid(self.p.pid)
         except:
             print "Stopping subscription handler failed"
+            os.kill(self.p.pid, SIGKILL)
 
         TestCaseUsingProvider.tearDown(self)
 
@@ -577,7 +589,7 @@ class KeyCounting(TestCaseUsingProvider):
         TestCaseUsingProvider.setUp(self)
 
         # Start subscription handler
-        os.system(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py &")
+        self.p = Popen(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py", shell=True)
         sleep(0.5)
 
         # Connect to subscription handler
@@ -592,9 +604,9 @@ class KeyCounting(TestCaseUsingProvider):
     def tearDown(self):
         # Command the subscription handler to exit
         self.subscription_handler_iface.loopQuit()
+        os.waitpid(self.p.pid)
 
         TestCaseUsingProvider.tearDown(self)
-
 
     def test_initialCount(self):
 
@@ -650,7 +662,7 @@ class TestCaseUseSystemBus(unittest.TestCase):
         self.bus = dbus.SessionBus() # Note: using session bus
 
         # Start a provider stub
-        os.system("python tests/python-test-library/stubs/provider_stub.py &")
+        self.p = Popen("python tests/python-test-library/stubs/provider_stub.py", shell=True)
         sleep(0.5)
         # Command the provider stub to start exposing services over dbus
         self.provider_proxy = self.bus.get_object(cfg.fakeProviderBusName, cfg.fakeProviderPath)
@@ -671,8 +683,10 @@ class TestCaseUseSystemBus(unittest.TestCase):
             self.provider_iface.DoRemove()
             # Stop the provider stub
             self.provider_iface.Exit()
+            os.waitpid(self.p.pid);
         except:
             print "Stopping provider stub failed"
+            os.kill(self.p.pid, SIGKILL)
         sleep(0.5)
 
     # FIXME: Add test cases.
