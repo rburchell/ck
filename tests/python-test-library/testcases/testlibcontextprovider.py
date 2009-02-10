@@ -25,6 +25,7 @@ sys.path.append("./tests/python-test-library/stubs")
 # FIXME: Missing testcases
 # - Using system bus flag in init
 
+
 class LibraryTestCase(unittest.TestCase):
     def setUp(self):
         pass
@@ -141,8 +142,6 @@ class TestCaseUsingProvider(unittest.TestCase):
     def tearDown(self):
         print "TestCaseUsingProvider tearDown"
         try:
-            # Uninstall a provider
-            self.provider_iface.DoRemove()
             # Stop the provider stub
             self.provider_iface.Exit()
             os.waitpid(self.p.pid)
@@ -177,6 +176,7 @@ class GetCallback(TestCaseUsingProvider):
         except:
             self.assert_ (False) # Provider not working
 
+        #print "Log is:", log
         self.assert_ (log == "(get_cb(test.int))");
 
     def test_changeSetIsTreatedProperly(self):
@@ -317,10 +317,9 @@ class Subscription(TestCaseUsingProvider):
         sleep(0.5)
 
         # Connect to subscription handler
-        sessionBus = dbus.SessionBus()
 
         try:
-            subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            subscptionHandlerProxy = self.bus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
             self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
         except:
             self.initOk = False
@@ -467,10 +466,9 @@ class ChangeSets(TestCaseUsingProvider):
         sleep(0.5)
 
         # Connect to subscription handler
-        sessionBus = dbus.SessionBus()
 
         try:
-            subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            subscptionHandlerProxy = self.bus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
             self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
 
             # Get a subscriber
@@ -485,8 +483,6 @@ class ChangeSets(TestCaseUsingProvider):
     def tearDown(self):
         # Tell the subscriber to unsubscribe from all the properties
         try:
-            self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
-
             # Command the subscription handler to exit
             self.subscription_handler_iface.loopQuit()
             os.waitpid(self.p.pid)
@@ -593,10 +589,9 @@ class KeyCounting(TestCaseUsingProvider):
         sleep(0.5)
 
         # Connect to subscription handler
-        sessionBus = dbus.SessionBus()
 
         try:
-            subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            subscptionHandlerProxy = self.bus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
             self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
         except:
             self.initOk = False
@@ -639,7 +634,7 @@ class KeyCounting(TestCaseUsingProvider):
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
 
         # Command another subscriberHandler to subscribe to test.int and test.double
-
+        # FIXME: Being able to have 2 independent subscribers not supporeted by the subscription handler
         # Get a subscriber
         #try:
         #    subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
@@ -655,7 +650,6 @@ class KeyCounting(TestCaseUsingProvider):
         #self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
         #self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
 
-# Parent class for testcases which need to start a provider and stop it
 class TestCaseUseSystemBus(unittest.TestCase):
     def setUp(self):
         self.initOk = True
@@ -673,23 +667,78 @@ class TestCaseUseSystemBus(unittest.TestCase):
             # Install a provider
             self.provider_iface.DoInstall()
         except:
+            print "Setting up provider stub failed"
             self.initOk = False
+            return
 
         sleep(0.5)
 
-    def tearDown(self):
+        # Start subscription handler
+        os.system(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py &")
+        sleep(0.5)
+
         try:
-            # Uninstall a provider
-            self.provider_iface.DoRemove()
+            subscptionHandlerProxy = self.bus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
+
+            # Get a subscriber
+            self.subscriber_path_1 = self.subscription_handler_iface.addSubscriber(False, cfg.fakeProviderLibBusName)
+            # Note: use the system bus
+
+            # Tell the subscriber to subscribe to all the properties
+            self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
+        except:
+            print "Setting up subscription handler failed"
+            self.initOk = False
+            return
+
+    def tearDown(self):
+        # Command the subscription handler to exit
+        try:
+            self.subscription_handler_iface.loopQuit()
+        except:
+            print "Stopping subscription handler failed"
+
+        try:
             # Stop the provider stub
             self.provider_iface.Exit()
             os.waitpid(self.p.pid);
         except:
             print "Stopping provider stub failed"
             os.kill(self.p.pid, SIGKILL)
+
         sleep(0.5)
 
-    # FIXME: Add test cases.
+    def test_subscriberGetsInfo(self):
+
+        self.assert_ (self.initOk)
+
+        # Command the fake provider send the change set
+        try:
+            self.provider_iface.SendChangeSet1()
+        except:
+            self.assert_ (False) # Provider not working
+
+        sleep(0.5)
+
+        # Ask the subscriber what changes it got
+        try:
+            properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
+
+            # Unsubscribe
+            self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
+        except:
+            self.assert_ (False) # Subscription handler not working
+
+        self.assert_ (properties != None)
+        self.assert_ (undetermined != None)
+
+        self.assert_ (len(properties) == 1)
+        self.assert_ ("test.double" in properties)
+        self.assert_ (properties["test.double"] == 2.13)
+
+        self.assert_ (len(undetermined) == 1)
+        self.assert_ (undetermined.count("test.bool") == 1)
 
 def runTests():
     suiteStartup = unittest.TestLoader().loadTestsFromTestCase(Startup)
@@ -702,11 +751,11 @@ def runTests():
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
     unittest.TextTestRunner(verbosity=2).run(suiteGetCallback)
-    #unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
-    #unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
-    #unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
-    #unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
-    #unittest.TextTestRunner(verbosity=2).run(suiteUseSystemBus)
+    unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
+    unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
+    unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
+    unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
+    unittest.TextTestRunner(verbosity=2).run(suiteUseSystemBus)
 
 if __name__ == "__main__":
     runTests()

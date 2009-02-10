@@ -20,7 +20,7 @@ namespace ContextProvider {
 		private IntSet intset;
 
 		StringSet.from_intset (IntSet #intset) {
-			intset = #intset;
+			this.intset = #intset;
 		}
 
 		/**
