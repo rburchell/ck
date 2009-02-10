@@ -84,8 +84,9 @@ namespace ContextProvider {
 		 * @left: a #ContextProviderStringSet
 		 * @right: a #ContextProviderStringSet
 		 *
-		 * Create a new #ContextProviderStringSet by finding the symettric difference
+		 * Create a new #ContextProviderStringSet by finding the symmetric difference
 		 * between two existing string sets.
+		 * Symmetric difference gives you the elements that are in either set, but not in both
 		 *
 		 * Returns: a new #ContextProviderStringSet
 		 */
@@ -100,6 +101,7 @@ namespace ContextProvider {
 		 *
 		 * Create a new #ContextProviderStringSet by finding the difference
 		 * between two existing string sets.
+		 * Difference gives you the elements that are in #left, but not in #right.
 		 *
 		 * Returns: a new #ContextProviderStringSet
 		 */
@@ -204,16 +206,16 @@ namespace ContextProvider {
 
 
 		/**
-		 * context_provider_string_set_is_subset:
+		 * context_provider_string_set_is_subset_of:
 		 * @self: a #ContextProviderStringSet
 		 * @string_set: a #ContextProviderStringSet
 		 *
-		 * Find if all the elements of #string_set are contained in #self
+		 * Find if all the elements of #self are contained in #string_set
 		 *
 		 * Returns: TRUE if #string_set is a subset of #self
 		 */
-		public bool is_subset (StringSet string_set) {
-			return intset.is_subset (string_set.intset);
+		public bool is_subset_of (StringSet string_set) {
+			return intset.is_subset_of (string_set.intset);
 		}
 
 		/**

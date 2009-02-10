@@ -212,16 +212,16 @@ context_provider_intset_is_member (const ContextProviderIntSet *set, guint eleme
 }
 
 /**
- * context_provider_intset_is_subset:
+ * context_provider_intset_is_subset_of:
  * @left: set
  * @right: set
  *
- * Tests if @right is a subset of @left
+ * Tests if @left is a subset of @right
  *
- * Returns: %TRUE if @right is a subset of @left
+ * Returns: %TRUE if @left is a subset of @right
  */
 gboolean
-context_provider_intset_is_subset (const ContextProviderIntSet *left, const ContextProviderIntSet *right)
+context_provider_intset_is_subset_of (const ContextProviderIntSet *left, const ContextProviderIntSet *right)
 {
   guint offset;
   gboolean ret = TRUE;
@@ -230,7 +230,7 @@ context_provider_intset_is_subset (const ContextProviderIntSet *left, const Cont
     return FALSE;
   } else {
     for (offset = 0; offset < right->size; offset++) {
-      ret = ret && (left->bits[offset] & right->bits[offset]) == right->bits[offset];
+      ret = ret && (left->bits[offset] & right->bits[offset]) == left->bits[offset];
 
       if (!ret)
         break;

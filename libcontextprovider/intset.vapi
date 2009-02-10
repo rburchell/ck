@@ -32,8 +32,8 @@ namespace ContextProvider {
 		public bool is_equal (IntSet right);
 		[CCode (cname = "context_provider_intset_is_member")]
 		public bool is_member (uint element);
-		[CCode (cname = "context_provider_intset_is_subset")]
-		public bool is_subset (IntSet right);
+		[CCode (cname = "context_provider_intset_is_subset_of")]
+		public bool is_subset_of (IntSet right);
 		[CCode (cname = "context_provider_intset_is_disjoint")]
 		public bool is_disjoint (IntSet right);
 		[CCode (cname = "context_provider_intset_remove")]
