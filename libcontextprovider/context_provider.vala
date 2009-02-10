@@ -18,13 +18,14 @@ namespace ContextProvider {
 	 * #ContextProviderGetCallback. In this case, you should simply add the values requested
 	 * and return without calling #context_provider_change_set_commit.
 	 */
-
-	/**
-	 * ContextProviderChangeSet:
-	 *
-	 * An opaque structure representing a set of key's values
-	 */
 	public class ChangeSet {
+
+		/**
+		 * ContextProviderChangeSet:
+		 *
+		 * An opaque structure representing a set of key's values
+		 */
+
 		HashTable<string, Value?> properties;
 		/*shouldn't be public, but lists suck, see cprovider.vala*/
 		public GLib.List<string> undeterminable_keys;
