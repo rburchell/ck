@@ -135,8 +135,6 @@ class TestCaseUsingProvider(unittest.TestCase):
     def tearDown(self):
         print "TestCaseUsingProvider tearDown"
         try:
-            # Uninstall a provider
-            self.provider_iface.DoRemove()
             # Stop the provider stub
             self.provider_iface.Exit()
         except:
@@ -310,10 +308,9 @@ class Subscription(TestCaseUsingProvider):
         sleep(0.5)
 
         # Connect to subscription handler
-        sessionBus = dbus.SessionBus()
 
         try:
-            subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            subscptionHandlerProxy = self.bus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
             self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
         except:
             self.initOk = False
@@ -459,10 +456,9 @@ class ChangeSets(TestCaseUsingProvider):
         sleep(0.5)
 
         # Connect to subscription handler
-        sessionBus = dbus.SessionBus()
 
         try:
-            subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            subscptionHandlerProxy = self.bus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
             self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
 
             # Get a subscriber
@@ -477,8 +473,6 @@ class ChangeSets(TestCaseUsingProvider):
     def tearDown(self):
         # Tell the subscriber to unsubscribe from all the properties
         try:
-            self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
-
             # Command the subscription handler to exit
             self.subscription_handler_iface.loopQuit()
         except:
@@ -583,10 +577,9 @@ class KeyCounting(TestCaseUsingProvider):
         sleep(0.5)
 
         # Connect to subscription handler
-        sessionBus = dbus.SessionBus()
 
         try:
-            subscptionHandlerProxy = sessionBus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
+            subscptionHandlerProxy = self.bus.get_object(cfg.scriberBusName, cfg.scriberHandlerPath)
             self.subscription_handler_iface = dbus.Interface(subscptionHandlerProxy, cfg.scriberHandlerIfce)
         except:
             self.initOk = False
@@ -748,7 +741,7 @@ def runTests():
     unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
     unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
-    #unittest.TextTestRunner(verbosity=2).run(suiteUseSystemBus)
+    unittest.TextTestRunner(verbosity=2).run(suiteUseSystemBus)
 
 if __name__ == "__main__":
     runTests()
