@@ -27,7 +27,6 @@ sys.path.append("./tests/python-test-library/stubs")
 # - Removing a provider
 # - Getting subscriber twice
 
-
 class LibraryTestCase(unittest.TestCase):
     def setUp(self):
         pass
@@ -117,6 +116,50 @@ class Startup(LibraryTestCase):
             print "Exception caught"
             self.assert_ (False) # Manager interface is not implemented properly
             # After this, only tearDown will be executed
+
+class Installation(LibraryTestCase):
+    def setUp(self):
+        self.bus = dbus.SessionBus() # Note: using session bus
+
+        self.initOk = True
+
+        # Start a provider stub
+        self.provider_stub_p = Popen("python tests/python-test-library/stubs/provider_stub.py", shell=True)
+        sleep(0.5)
+
+        try:
+            # Command the provider stub to start exposing services over dbus
+            self.provider_proxy = self.bus.get_object(cfg.fakeProviderBusName, cfg.fakeProviderPath)
+            self.provider_iface = dbus.Interface(self.provider_proxy, cfg.fakeProviderIfce)
+            self.provider_iface.DoInit(True)
+        except:
+            self.initOk = False
+
+    def tearDown(self):
+        print "Stopping the provider"
+        # Stop the provider
+        try:
+            self.provider_iface.Exit()
+            print "Waiting for the provider"
+            os.waitpid(self.provider_stub_p.pid, 0)
+        except:
+            print "Stopping provider failed"
+            os.kill (self.provider_stub_p.pid, SIGKILL)
+
+    def test_installAndRemoveProvider(self):
+        self.assert_ (self.initOk)
+
+        try:
+            # Install a provider
+            self.provider_iface.DoInstall()
+        except:
+            self.assert_(False) # Provider stub not working
+
+        try:
+            # Remove a provider
+            self.provider_iface.DoRemove()
+        except:
+            self.assert_(False) # Provider stub not working
 
 # Parent class for testcases which need to start a provider and stop it
 class TestCaseUsingProvider(unittest.TestCase):
@@ -337,6 +380,16 @@ class Subscription(TestCaseUsingProvider):
             os.kill(self.subscription_handler.pid, SIGKILL)
         TestCaseUsingProvider.tearDown(self)
 
+    def test_getSubscriberTwice(self):
+        self.assert_ (self.initOk)
+
+        # Get a subscriber
+        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+
+        # Get another subscriber
+        subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+
+        self.assert_ (subscriber_path_1 == subscriber_path_2)
 
     def test_subscriberGetsInfo(self):
         self.assert_ (self.initOk)
@@ -775,6 +828,7 @@ class TestCaseUseSystemBus(unittest.TestCase):
 
 def runTests():
     suiteStartup = unittest.TestLoader().loadTestsFromTestCase(Startup)
+    suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(Installation)
     suiteGetCallback = unittest.TestLoader().loadTestsFromTestCase(GetCallback)
     suiteSubscribeCallbacks = unittest.TestLoader().loadTestsFromTestCase(SubscribeCallbacks)
     suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
@@ -783,6 +837,7 @@ def runTests():
     suiteUseSystemBus = unittest.TestLoader().loadTestsFromTestCase(TestCaseUseSystemBus)
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
+    unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
     unittest.TextTestRunner(verbosity=2).run(suiteGetCallback)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
     unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
