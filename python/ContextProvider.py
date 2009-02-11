@@ -15,9 +15,9 @@ class PROVIDER(c_void_p):
 
 
 class ContextProvider:
-    GET_CALLBACK = CFUNCTYPE(c_int, STRING_SET, CHANGE_SET, c_void_p)
-    SUBSCRIBED_CALLBACK = CFUNCTYPE(c_int, STRING_SET, c_void_p)
-    UNSUBSCRIBED_CALLBACK = CFUNCTYPE(c_int, STRING_SET, STRING_SET, c_void_p)
+    GET_CALLBACK = CFUNCTYPE(None, STRING_SET, CHANGE_SET, c_void_p)
+    SUBSCRIBED_CALLBACK = CFUNCTYPE(None, STRING_SET, c_void_p)
+    UNSUBSCRIBED_CALLBACK = CFUNCTYPE(None, STRING_SET, STRING_SET, c_void_p)
 
     init = cfunc('context_provider_init', _dll, None,
                  ('bus_type', c_int, 1),
