@@ -246,13 +246,13 @@ namespace ContextProvider {
 
 	/**
 	 * context_provider_install:
-	 * @provided_keys: an array of context key names
+	 * @provided_keys: a NULL-terminated array of context key names
 	 * @get_cb: a #ContextProviderGetCallback to be called when values are requested for keys
-	 * @get_cb_target: use data to pass to #get_cb
-	 * @subscribed_cb: a #SubscribedCallback to be called when a key is first subscribed to
-	 * @subscribed_cb_target: use data to pass to #subscribed_cb
-	 * @unsubscribed_cb: a #UnsubscribedCallback to be called when a key is last unsubscribed from
-	 * @unsubscribed_cb_target: use data to pass to #unsubscribed_cb
+	 * @get_cb_target: user data to pass to #get_cb
+	 * @subscribed_cb: a #ContextProviderSubscribedCallback to be called when a key is first subscribed to
+	 * @subscribed_cb_target: user data to pass to #subscribed_cb
+	 * @unsubscribed_cb: a #ContextProviderUnsubscribedCallback to be called when a key is last unsubscribed from
+	 * @unsubscribed_cb_target: user data to pass to #unsubscribed_cb
 	 *
 	 * Install a new service providing context.
 	 *
@@ -269,7 +269,7 @@ namespace ContextProvider {
 
 	/**
 	 * context_provider_remove:
-	 * @provider: a #ContextProvder created with #context_provider_install
+	 * @provider: a #ContextProvder created with #context_provider_install.
 	 *
 	 * Remove and dealloctate resources for a #ContextProvider created with #context_provider_install
 	 */
@@ -282,7 +282,7 @@ namespace ContextProvider {
 	 * context_provider_no_of_subscribers:
 	 * @key: the name of a context key
 	 *
-	 * Query the current number of subscribers for a given context key
+	 * Returns: the current number of subscribers for a given context key
 	 */
 	public int no_of_subscribers (string key) {
 		Manager manager = Manager.get_instance ();
