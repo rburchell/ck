@@ -212,7 +212,7 @@ namespace ContextProvider {
 
 		try {
 			if (bus_name != null) {
-				var connection = DBus.Bus.get (DBus.BusType.SESSION);
+				var connection = DBus.Bus.get (bus_type);
 				dynamic DBus.Object bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 				// try to register service in session bus
 				uint request_name_result = bus.RequestName (bus_name, (uint) 0);
