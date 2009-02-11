@@ -90,7 +90,7 @@ class StringSet:
     is_equal =  cfunc('context_provider_string_set_is_equal', _dll, c_int,
                       ('left', STRING_SET, 1),
                       ('right', STRING_SET, 1))
-    is_subset =  cfunc('context_provider_string_set_is_subset', _dll, c_int,
+    is_subset_of =  cfunc('context_provider_string_set_is_subset_of', _dll, c_int,
                       ('left', STRING_SET, 1),
                       ('right', STRING_SET, 1))
     is_disjoint =  cfunc('context_provider_string_set_is_disjoint', _dll, c_int,
