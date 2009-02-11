@@ -124,13 +124,14 @@ class TestCaseUsingProvider(unittest.TestCase):
         self.bus = dbus.SessionBus() # Note: using session bus
 
         # Start a provider stub
-        self.p = Popen("python tests/python-test-library/stubs/provider_stub.py", shell=True)
+        self.provider_stub_p = Popen("python tests/python-test-library/stubs/provider_stub.py", shell=True)
         sleep(0.5)
-        # Command the provider stub to start exposing services over dbus
+
         self.provider_proxy = self.bus.get_object(cfg.fakeProviderBusName, cfg.fakeProviderPath)
         self.provider_iface = dbus.Interface(self.provider_proxy, cfg.fakeProviderIfce)
 
         try:
+            # Command the provider stub to start exposing services over dbus
             self.provider_iface.DoInit(True)
             # Install a provider
             self.provider_iface.DoInstall()
@@ -144,10 +145,10 @@ class TestCaseUsingProvider(unittest.TestCase):
         try:
             # Stop the provider stub
             self.provider_iface.Exit()
-            os.waitpid(self.p.pid)
+            os.waitpid(self.provider_stub_p.pid, 0)
         except:
             print "Stopping provider stub failed"
-            os.kill(self.p.pid, SIGKILL)
+            os.kill(self.provider_stub_p.pid, SIGKILL)
         sleep(0.5)
 
 # Test cases: Check that the Get callback function is called properly,
@@ -313,7 +314,7 @@ class Subscription(TestCaseUsingProvider):
         TestCaseUsingProvider.setUp(self)
 
         # Start subscription handler
-        self.p = Popen(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py", shell=True)
+        self.subscription_handler_p = Popen(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py", shell=True)
         sleep(0.5)
 
         # Connect to subscription handler
@@ -325,11 +326,15 @@ class Subscription(TestCaseUsingProvider):
             self.initOk = False
 
     def tearDown(self):
-        # Command the subscription handler to exit
-        self.subscription_handler_iface.loopQuit()
-
+        # Stop the subscription handler
+        try:
+            self.subscription_handler_iface.loopQuit()
+            os.waitpid(self.subscription_handler_p.pid, 0)
+        except:
+            print "Stopping subscription handler failed"
+            os.kill(self.subscription_handler.pid, SIGKILL)
         TestCaseUsingProvider.tearDown(self)
-        os.waitpid(self.p.pid)
+
 
     def test_subscriberGetsInfo(self):
         self.assert_ (self.initOk)
@@ -462,7 +467,7 @@ class ChangeSets(TestCaseUsingProvider):
         TestCaseUsingProvider.setUp(self)
 
         # Start subscription handler
-        self.p = Popen(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py", shell=True)
+        self.subscription_handler_p = Popen(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py", shell=True)
         sleep(0.5)
 
         # Connect to subscription handler
@@ -481,14 +486,13 @@ class ChangeSets(TestCaseUsingProvider):
             return
 
     def tearDown(self):
-        # Tell the subscriber to unsubscribe from all the properties
+        # Stop the subscription handler
         try:
-            # Command the subscription handler to exit
             self.subscription_handler_iface.loopQuit()
-            os.waitpid(self.p.pid)
+            os.waitpid(self.subscription_handler_p.pid, 0)
         except:
             print "Stopping subscription handler failed"
-            os.kill(self.p.pid, SIGKILL)
+            os.kill(self.subscription_handler.pid, SIGKILL)
 
         TestCaseUsingProvider.tearDown(self)
 
@@ -585,7 +589,7 @@ class KeyCounting(TestCaseUsingProvider):
         TestCaseUsingProvider.setUp(self)
 
         # Start subscription handler
-        self.p = Popen(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py", shell=True)
+        self.subscription_handler_p = Popen(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py", shell=True)
         sleep(0.5)
 
         # Connect to subscription handler
@@ -597,9 +601,13 @@ class KeyCounting(TestCaseUsingProvider):
             self.initOk = False
 
     def tearDown(self):
-        # Command the subscription handler to exit
-        self.subscription_handler_iface.loopQuit()
-        os.waitpid(self.p.pid)
+        # Stop the subscription handler
+        try:
+            self.subscription_handler_iface.loopQuit()
+            os.waitpid(self.subscription_handler_p.pid, 0)
+        except:
+            print "Stopping subscription handler failed"
+            os.kill(self.subscription_handler.pid, SIGKILL)
 
         TestCaseUsingProvider.tearDown(self)
 
@@ -755,7 +763,7 @@ def runTests():
     unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
     unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
-    unittest.TextTestRunner(verbosity=2).run(suiteUseSystemBus)
+    #unittest.TextTestRunner(verbosity=2).run(suiteUseSystemBus)
 
 if __name__ == "__main__":
     runTests()
