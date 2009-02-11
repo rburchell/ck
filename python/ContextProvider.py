@@ -124,7 +124,7 @@ if __name__ == "__main__":
         print StringSet.debug(ss_remain)
 
 
-    ContextProvider.init(1, "org.freedesktop.ContextKit.Testing.Provider")
+    ContextProvider.init(0, "org.freedesktop.ContextKit.Testing.Provider")
     p =ContextProvider.install(["foo.bar", "foo.baz"],
                          ContextProvider.GET_CALLBACK(get_cb), None,
                          ContextProvider.SUBSCRIBED_CALLBACK(first_cb), None,
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     cs = ContextProvider.change_set_create()
     ContextProvider.change_set_cancel(cs)
     cs2 = ContextProvider.change_set_create()
-    ContextProvider.change_set_add_int(cs2, "foo.bar", 1)
+    ContextProvider.change_set_add_integer(cs2, "foo.bar", 1)
     ContextProvider.change_set_add_undetermined_key(cs2, "foo.baz")
     ContextProvider.change_set_commit(cs2)
     #ContextProvider.remove (p) # FIXME: Removed for testing purposes (now can be poked with d-feet)

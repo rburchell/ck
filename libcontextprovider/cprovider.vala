@@ -21,6 +21,7 @@ namespace ContextProvider {
 		// Implementation of the Provider interface by using callbacks
 
 		public void get (StringSet keys, HashTable<string, Value?> ret, ArrayList<string> unavail) {
+			debug("CProvider.get called with keys %s", keys.debug());
 			if (get_cb != null) {
 				ChangeSet change_set = new ChangeSet.from_get(ret, unavail);
 				get_cb (keys, change_set);

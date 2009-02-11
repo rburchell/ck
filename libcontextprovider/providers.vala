@@ -14,11 +14,13 @@ namespace ContextProvider {
 		}
 
 		public void register (Provider provider) {
+			debug ("New provider registered: %s (%p)", provider.provided_keys().debug(), provider);
 			providers.add (provider);
 			valid_keys = new StringSet.union (valid_keys, provider.provided_keys());
 		}
 
 		public void unregister (Provider provider) {
+			debug ("Provider unregistered: %s (%p)", provider.provided_keys().debug(), provider);
 			providers.remove (provider);
 			StringSet s = new StringSet();
 
@@ -32,10 +34,12 @@ namespace ContextProvider {
 		}
 
 		public ArrayList<string> get (StringSet keys, HashTable<string, Value?> values) {
+			debug("Providers.get called (%s)", keys.debug());
 			ArrayList<string> unavail = new ArrayList<string> ();
 			foreach (var provider in providers) {
 				StringSet intersection = new StringSet.intersection (keys, provider.provided_keys());
 				if (intersection.size() > 0) {
+					debug ("calling provider %p", provider);
 					provider.get (keys, values, unavail);
 				}
 			}
