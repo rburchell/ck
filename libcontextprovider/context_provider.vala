@@ -91,8 +91,8 @@ namespace ContextProvider {
 
 
 		private ChangeSet () {
-			properties = new HashTable<string, Value?>(str_hash, str_equal);
-			undeterminable_keys = new GLib.List<string>();
+			this.properties = new HashTable<string, Value?>(str_hash, str_equal);
+			this.undeterminable_keys = new GLib.List<string>();
 		}
 
 		internal ChangeSet.from_get (HashTable<string, Value?> properties)
