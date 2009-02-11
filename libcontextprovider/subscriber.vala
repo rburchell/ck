@@ -1,4 +1,5 @@
 using GLib;
+using Gee;
 
 namespace ContextProvider {
 
@@ -27,9 +28,7 @@ namespace ContextProvider {
 		}
 
 		// Emit the Changed signal over DBus
-		internal void emit_changed (HashTable<string, Value?> values, List<string>? unavail_l) {
-			// Note: The unavail_l is never going to be NULL but it can be an empty list.
-			// An empty GList is NULL and Vala doesn't know about that feature.
+		internal void emit_changed (HashTable<string, Value?> values, ArrayList<string>? unavail_l) {
 			string[] unavail = {};
 
 			foreach (string str in unavail_l) {
@@ -78,9 +77,9 @@ namespace ContextProvider {
 		}
 
 		/* Is called when the value of a property changes */
-		internal void on_value_changed(HashTable<string, Value?> changed_properties, List<string>? changed_undeterminable) {
+		internal void on_value_changed(HashTable<string, Value?> changed_properties, ArrayList<string>? changed_undeterminable) {
 			HashTable<string, Value?> values_to_send = new HashTable<string, Value?>(str_hash, str_equal);
-			List<string> undeterminable_keys = new GLib.List<string>();
+			ArrayList<string> undeterminable_keys = new ArrayList<string>();
 
 			// Loop through the properties we got and
 			// check if the client is interested in them.
@@ -94,25 +93,25 @@ namespace ContextProvider {
 					Value? v = changed_properties.lookup (key);
 
 					if (v == null) { // FIXME: Is this needed?
-						undeterminable_keys.append (key);
+						undeterminable_keys.add (key);
 					}
 					else {
 						values_to_send.insert (key, v);
 					}
 				}
 			}
-			
+
 			// Loop through the undetermined properties we got and
 			// check if the client is interested in them.
 			foreach (var key in changed_undeterminable) {
 				if (subscribed_keys.is_member (key)) {
 					// The client of this subscriber is interested in the key
-					undeterminable_keys.append (key);
+					undeterminable_keys.add (key);
 				}
 			}
 
 			// Check if we have something to send to the client
-			if (values_to_send.size () > 0 || undeterminable_keys.length () > 0) {
+			if (values_to_send.size () > 0 || undeterminable_keys.size > 0) {
 				emit_changed (values_to_send, undeterminable_keys);
 			}
 		}

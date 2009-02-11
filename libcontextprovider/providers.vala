@@ -1,4 +1,4 @@
-using GLib;
+using Gee;
 
 namespace ContextProvider {
 
@@ -31,12 +31,12 @@ namespace ContextProvider {
 			valid_keys = s;
 		}
 
-		public List<string> get (StringSet keys, HashTable<string, Value?> values) {
-			List<string> unavail = new List<string> ();
+		public ArrayList<string> get (StringSet keys, HashTable<string, Value?> values) {
+			ArrayList<string> unavail = new ArrayList<string> ();
 			foreach (var provider in providers) {
 				StringSet intersection = new StringSet.intersection (keys, provider.provided_keys());
 				if (intersection.size() > 0) {
-					provider.get (keys, values, ref unavail);
+					provider.get (keys, values, unavail);
 				}
 			}
 			return unavail;

@@ -1,4 +1,5 @@
 using GLib;
+using Gee;
 
 namespace ContextProvider {
 
@@ -56,7 +57,7 @@ namespace ContextProvider {
 			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash, str_equal);
 
 			// Let providers update the central value table
-			List<string> undeterminable_key_list = providers.get (keyset, values);
+			ArrayList<string> undeterminable_key_list = providers.get (keyset, values);
 			insert_to_value_table (values, undeterminable_key_list);
 
 			// Then read the values from the value table
@@ -129,7 +130,7 @@ namespace ContextProvider {
 		/*
 		Update the value table with new values.
 		*/
-		private void insert_to_value_table(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
+		private void insert_to_value_table(HashTable<string, Value?> properties, ArrayList<string>? undeterminable_keys) {
 			//debug ("insert_to_value_table");
 			var keys = properties.get_keys ();
 			// Note: get_keys returns a list of unowned strings. We shouldn't assign it to
@@ -172,7 +173,7 @@ namespace ContextProvider {
 		}
 
 		/* Is called when the provider sets new values to context properties */
-		public bool property_values_changed(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
+		public bool property_values_changed(HashTable<string, Value?> properties, ArrayList<string>? undeterminable_keys) {
 			// Check that all the keys are valid
 			var keys = properties.get_keys ();
 			foreach (var key in keys) {
