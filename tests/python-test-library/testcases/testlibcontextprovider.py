@@ -1,5 +1,6 @@
 import dbus
 import os
+import re
 from subprocess import Popen
 from signal import SIGKILL
 
@@ -16,15 +17,15 @@ import conf as cfg
 # Stubs
 sys.path.append("./tests/python-test-library/stubs")
 
-# Note: execute this program: libtool --mode=execute -dlopen libcontextprovider.la python tests/python-test-library/testcases/testlibcontextprovider.py
+# Note: execute this program: libtool --mode=execute -dlopen libcontextprovider.la dbus-launch python tests/python-test-library/testcases/testlibcontextprovider.py
 
 # FIXME: Use the fake dbus.
 # FIXME: Make tests run when make check is executed
 # FIXME: Code coverage
 
 # FIXME: Missing testcases
-# - Using system bus flag in init
-
+# - Removing a provider
+# - Getting subscriber twice
 
 class LibraryTestCase(unittest.TestCase):
     def setUp(self):
@@ -115,6 +116,50 @@ class Startup(LibraryTestCase):
             print "Exception caught"
             self.assert_ (False) # Manager interface is not implemented properly
             # After this, only tearDown will be executed
+
+class Installation(LibraryTestCase):
+    def setUp(self):
+        self.bus = dbus.SessionBus() # Note: using session bus
+
+        self.initOk = True
+
+        # Start a provider stub
+        self.provider_stub_p = Popen("python tests/python-test-library/stubs/provider_stub.py", shell=True)
+        sleep(0.5)
+
+        try:
+            # Command the provider stub to start exposing services over dbus
+            self.provider_proxy = self.bus.get_object(cfg.fakeProviderBusName, cfg.fakeProviderPath)
+            self.provider_iface = dbus.Interface(self.provider_proxy, cfg.fakeProviderIfce)
+            self.provider_iface.DoInit(True)
+        except:
+            self.initOk = False
+
+    def tearDown(self):
+        print "Stopping the provider"
+        # Stop the provider
+        try:
+            self.provider_iface.Exit()
+            print "Waiting for the provider"
+            os.waitpid(self.provider_stub_p.pid, 0)
+        except:
+            print "Stopping provider failed"
+            os.kill (self.provider_stub_p.pid, SIGKILL)
+
+    def test_installAndRemoveProvider(self):
+        self.assert_ (self.initOk)
+
+        try:
+            # Install a provider
+            self.provider_iface.DoInstall()
+        except:
+            self.assert_(False) # Provider stub not working
+
+        try:
+            # Remove a provider
+            self.provider_iface.DoRemove()
+        except:
+            self.assert_(False) # Provider stub not working
 
 # Parent class for testcases which need to start a provider and stop it
 class TestCaseUsingProvider(unittest.TestCase):
@@ -335,6 +380,16 @@ class Subscription(TestCaseUsingProvider):
             os.kill(self.subscription_handler.pid, SIGKILL)
         TestCaseUsingProvider.tearDown(self)
 
+    def test_getSubscriberTwice(self):
+        self.assert_ (self.initOk)
+
+        # Get a subscriber
+        subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+
+        # Get another subscriber
+        subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+
+        self.assert_ (subscriber_path_1 == subscriber_path_2)
 
     def test_subscriberGetsInfo(self):
         self.assert_ (self.initOk)
@@ -537,7 +592,7 @@ class ChangeSets(TestCaseUsingProvider):
         try:
             self.provider_iface.SendChangeSetWithAllUndetermined()
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False) # Provider not working # Undeterministic segfaults here?
 
         sleep(0.5)
 
@@ -661,10 +716,27 @@ class KeyCounting(TestCaseUsingProvider):
 class TestCaseUseSystemBus(unittest.TestCase):
     def setUp(self):
         self.initOk = True
-        self.bus = dbus.SessionBus() # Note: using session bus
+
+        # Create a session bus
+        # and put it's address to the "system bus address" environment variable.
+        # This way, all child processes trying to use the system bus go there.
+        output = os.popen("dbus-launch").readlines()
+        if len(output) >= 2:
+            self.dbusAddress = re.match("(DBUS_SESSION_BUS_ADDRESS)=(.*)",output[0]).group(2)
+            self.dbusDaemonPid = int(re.match("(DBUS_SESSION_BUS_PID)=(.*)",output[1]).group(2))
+            print "New session bus address:", self.dbusAddress
+            print "Process pid:", self.dbusDaemonPid
+            os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = self.dbusAddress
+
+        else:
+            print "Failed to start new session bus"
+            self.initOk = False
+
+
+        self.bus = dbus.SessionBus() # Note: using session bus for commanding the stubs
 
         # Start a provider stub
-        self.p = Popen("python tests/python-test-library/stubs/provider_stub.py", shell=True)
+        self.providerProcess = Popen("python tests/python-test-library/stubs/provider_stub.py", shell=True)
         sleep(0.5)
         # Command the provider stub to start exposing services over dbus
         self.provider_proxy = self.bus.get_object(cfg.fakeProviderBusName, cfg.fakeProviderPath)
@@ -682,7 +754,7 @@ class TestCaseUseSystemBus(unittest.TestCase):
         sleep(0.5)
 
         # Start subscription handler
-        os.system(cfg.contextSrcPath + os.path.sep + "tests/python-test-library/testcases/subscriptionHandler.py &")
+        self.subscriptionHandlerProcess = Popen("python tests/python-test-library/testcases/subscriptionHandler.py", shell=True)
         sleep(0.5)
 
         try:
@@ -704,16 +776,24 @@ class TestCaseUseSystemBus(unittest.TestCase):
         # Command the subscription handler to exit
         try:
             self.subscription_handler_iface.loopQuit()
+            os.waitpid(self.subscriptionHandlerProcess.pid, 0)
         except:
             print "Stopping subscription handler failed"
+            os.kill(self.subscriptionHandlerProcess.pid, SIGKILL)
 
         try:
             # Stop the provider stub
             self.provider_iface.Exit()
-            os.waitpid(self.p.pid);
+            os.waitpid(self.providerProcess.pid, 0)
         except:
             print "Stopping provider stub failed"
-            os.kill(self.p.pid, SIGKILL)
+            os.kill(self.providerProcess.pid, SIGKILL)
+
+        # Kill the dbus daemon
+        #try:
+        os.kill(self.dbusDaemonPid, SIGKILL)
+        #except:
+        #    print "Stopping dbus daemon failed"
 
         sleep(0.5)
 
@@ -731,10 +811,8 @@ class TestCaseUseSystemBus(unittest.TestCase):
 
         # Ask the subscriber what changes it got
         try:
-            properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
+            properties, undetermined = self.subscription_handler_iface.getChangedProp(self.subscriber_path_1)
 
-            # Unsubscribe
-            self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
         except:
             self.assert_ (False) # Subscription handler not working
 
@@ -750,6 +828,7 @@ class TestCaseUseSystemBus(unittest.TestCase):
 
 def runTests():
     suiteStartup = unittest.TestLoader().loadTestsFromTestCase(Startup)
+    suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(Installation)
     suiteGetCallback = unittest.TestLoader().loadTestsFromTestCase(GetCallback)
     suiteSubscribeCallbacks = unittest.TestLoader().loadTestsFromTestCase(SubscribeCallbacks)
     suiteChangeSets = unittest.TestLoader().loadTestsFromTestCase(ChangeSets)
@@ -758,12 +837,13 @@ def runTests():
     suiteUseSystemBus = unittest.TestLoader().loadTestsFromTestCase(TestCaseUseSystemBus)
 
     unittest.TextTestRunner(verbosity=2).run(suiteStartup)
+    unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
     unittest.TextTestRunner(verbosity=2).run(suiteGetCallback)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscribeCallbacks)
     unittest.TextTestRunner(verbosity=2).run(suiteChangeSets)
     unittest.TextTestRunner(verbosity=2).run(suiteKeyCounting)
     unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
-    #unittest.TextTestRunner(verbosity=2).run(suiteUseSystemBus)
+    unittest.TextTestRunner(verbosity=2).run(suiteUseSystemBus)
 
 if __name__ == "__main__":
     runTests()
