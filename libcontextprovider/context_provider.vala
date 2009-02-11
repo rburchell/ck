@@ -28,7 +28,7 @@ namespace ContextProvider {
 
 		HashTable<string, Value?> properties;
 		/*shouldn't be public, but lists suck, see cprovider.vala*/
-		public GLib.List<string> undeterminable_keys;
+		public ArrayList<string> undeterminable_keys;
 
 		/* TODO. some proper thinking needs to be done to make this
 		   whole lib thread safe
@@ -92,13 +92,13 @@ namespace ContextProvider {
 
 		private ChangeSet () {
 			this.properties = new HashTable<string, Value?>(str_hash, str_equal);
-			this.undeterminable_keys = new GLib.List<string>();
+			this.undeterminable_keys = new ArrayList<string>();
 		}
 
-		internal ChangeSet.from_get (HashTable<string, Value?> properties)
+		internal ChangeSet.from_get (HashTable<string, Value?> properties, ArrayList<string> undeterminable_keys)
 		{
 			this.properties = properties;
-			this.undeterminable_keys = new GLib.List<string>();
+			this.undeterminable_keys = undeterminable_keys;
 		}
 
 		/**
@@ -159,7 +159,7 @@ namespace ContextProvider {
 		public void add_undetermined_key (string key) {
 			assert (initialised == true);
 
-			undeterminable_keys.prepend (key);
+			undeterminable_keys.add (key);
 		}
 	}
 

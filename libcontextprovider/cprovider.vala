@@ -1,4 +1,5 @@
 using GLib;
+using Gee;
 
 namespace ContextProvider {
 
@@ -19,14 +20,10 @@ namespace ContextProvider {
 
 		// Implementation of the Provider interface by using callbacks
 
-		public void get (StringSet keys, HashTable<string, Value?> ret, ref GLib.List<string> unavail) {
+		public void get (StringSet keys, HashTable<string, Value?> ret, ArrayList<string> unavail) {
 			if (get_cb != null) {
-				ChangeSet change_set = new ChangeSet.from_get(ret);
+				ChangeSet change_set = new ChangeSet.from_get(ret, unavail);
 				get_cb (keys, change_set);
-				/*UGLY UGLY UGLY. GList sucks in vala. must write Gee.LinkedList*/
-				foreach (var s in change_set.undeterminable_keys) {
-					unavail.prepend(s);
-				}
 			}
 		}
 
