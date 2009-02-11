@@ -28,20 +28,20 @@ import gobject
 class FakeProvider (dbus.service.Object):
 
     # Callback functions for libcontextd
-    def get_cb (self, ss, cs, d):
-        self.log += ("(get_cb(" + cb.StringSet.debug(ss) + "))")
+    def py_get_cb (self, ss, cs, d):
+        self.log += ("(py_get_cb(" + cb.StringSet.debug(ss) + "))")
         # Set test.int to 5 and test.string to undetermined
         cb.ContextProvider.change_set_add_integer(cs, "test.int", 5)
         cb.ContextProvider.change_set_add_undetermined_key(cs, "test.double")
         return 0
 
 
-    def first_cb (self, ss, d):
-        self.log += ("(first_cb(" + cb.StringSet.debug(ss) + "))")
+    def py_subscribed_cb (self, ss, d):
+        self.log += ("(py_subscribed_cb(" + cb.StringSet.debug(ss) + "))")
         return 0
 
-    def last_cb (self, keys, keys_remaining, d):
-        self.log += ("(last_cb(" + cb.StringSet.debug(keys) + ", " + cb.StringSet.debug(keys_remaining) + "))")
+    def py_unsubscribed_cb (self, keys, keys_remaining, d):
+        self.log += ("(py_unsubscribed_cb(" + cb.StringSet.debug(keys) + ", " + cb.StringSet.debug(keys_remaining) + "))")
         return 0
 
     # Initializing the provider object
@@ -72,10 +72,15 @@ class FakeProvider (dbus.service.Object):
                        in_signature='', out_signature='')
     def DoInstall(self):
         print "Provider: Executing Install"
+        self.get_cb = cb.ContextProvider.GET_CALLBACK(self.py_get_cb)
+        self.subscribed_cb = cb.ContextProvider.SUBSCRIBED_CALLBACK(self.py_subscribed_cb)
+        self.unsubscribed_cb = cb.ContextProvider.UNSUBSCRIBED_CALLBACK(self.py_unsubscribed_cb)
+
+
         self.provider = cb.ContextProvider.install(["test.double", "test.int", "test.bool"],
-                         cb.ContextProvider.GET_CALLBACK(self.get_cb), None,
-                         cb.ContextProvider.SUBSCRIBED_CALLBACK(self.first_cb), None,
-                         cb.ContextProvider.UNSUBSCRIBED_CALLBACK(self.last_cb), None)
+                         self.get_cb, None,
+                         self.subscribed_cb, None,
+                         self.unsubscribed_cb, None)
 
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')

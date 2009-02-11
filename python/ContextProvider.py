@@ -113,22 +113,25 @@ if __name__ == "__main__":
     DBusGMainLoop(set_as_default=True)
     loop = gobject.MainLoop()
 
-    def get_cb (ss, cs, d):
+    def py_get_cb (ss, cs, d):
         print "This is get callback"
         #print StringSet.debug(ss)
         return 0
-    def first_cb (ss, d):
+    def py_first_cb (ss, d):
         print StringSet.debug(ss)
-    def last_cb (ss, ss_remain, d):
+    def py_last_cb (ss, ss_remain, d):
         print StringSet.debug(ss)
         print StringSet.debug(ss_remain)
 
 
     ContextProvider.init(0, "org.freedesktop.ContextKit.Testing.Provider")
+    get_cb = ContextProvider.GET_CALLBACK(py_get_cb)
+    subscribe_cb = ContextProvider.SUBSCRIBED_CALLBACK(py_first_cb)
+    unsubscribe_cb = ContextProvider.UNSUBSCRIBED_CALLBACK(py_last_cb)
     p =ContextProvider.install(["foo.bar", "foo.baz"],
-                         ContextProvider.GET_CALLBACK(get_cb), None,
-                         ContextProvider.SUBSCRIBED_CALLBACK(first_cb), None,
-                         ContextProvider.UNSUBSCRIBED_CALLBACK(last_cb), None)
+                         get_cb, None,
+                         subscribe_cb, None,
+                         unsubscribe_cb, None)
     print ContextProvider.no_of_subscribers("foo.bar")
     cs = ContextProvider.change_set_create()
     ContextProvider.change_set_cancel(cs)
