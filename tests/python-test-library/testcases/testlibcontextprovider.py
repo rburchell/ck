@@ -17,7 +17,8 @@ import conf as cfg
 # Stubs
 sys.path.append("./tests/python-test-library/stubs")
 
-# Note: this test program can be executed separately: libtool --mode=execute -dlopen libcontextprovider.la dbus-launch python tests/python-test-library/testcases/testlibcontextprovider.py
+# Note: because of the system bus test, the tests cannot no longer be executed separately.
+# But in principle, to execute them separately: libtool --mode=execute -dlopen libcontextprovider.la python tests/python-test-library/testcases/testlibcontextprovider.py
 
 # FIXME: Missing testcases
 # - Error cases: provider doing something incorrect, client doing something incorrect
