@@ -223,7 +223,7 @@ class GetCallback(TestCaseUsingProvider):
             self.assert_ (False) # Provider not working
 
         #print "Log is:", log
-        self.assert_ (log == "(get_cb(test.int))");
+        self.assert_ (log == "(py_get_cb(test.int))");
 
     def test_changeSetIsTreatedProperly(self):
         # Execute Get
@@ -300,7 +300,7 @@ class SubscribeCallbacks(TestCaseUsingProvider):
         except:
             self.assert_ (False) # Provider not working
 
-        self.assert_ (log == "(get_cb(test.double))(first_cb(test.double))" or log == "(first_cb(test.double))(get_cb(test.double))")
+        self.assert_ (log == "(py_get_cb(test.double))(py_subscribed_cb(test.double))" or log == "(py_subscribed_cb(test.double))(py_get_cb(test.double))")
         # Note that as part of subscribe, also get is called. Here we don't care about the order.
 
     def test_lastCallbackIsCalled(self):
@@ -331,7 +331,7 @@ class SubscribeCallbacks(TestCaseUsingProvider):
 
         #print "Log is:", log
 
-        self.assert_ (log == "(last_cb(test.bool, ))")
+        self.assert_ (log == "(py_unsubscribed_cb(test.bool, ))")
 
     def test_remainingKeys(self):
 
@@ -349,7 +349,7 @@ class SubscribeCallbacks(TestCaseUsingProvider):
 
         #print "Log is:", log
 
-        self.assert_ (log == "(last_cb(test.bool, test.int))")
+        self.assert_ (log == "(py_unsubscribed_cb(test.bool, test.int))")
 
 # Test cases: Check that the subscriber gets the change set when it is sent.
 class Subscription(TestCaseUsingProvider):
@@ -679,9 +679,7 @@ class KeyCounting(TestCaseUsingProvider):
 
         self.assert_ (self.initOk)
 
-        # Command the subscriberHandler to subscribe to test.int
-
-        # Get a subscriber
+        # Get a subscriber and command it to subscribe to test.int
         try:
             subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
             print "Path is:", subscriber_path_1
@@ -696,22 +694,59 @@ class KeyCounting(TestCaseUsingProvider):
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
 
-        # Command another subscriberHandler to subscribe to test.int and test.double
-        # FIXME: Being able to have 2 independent subscribers not supporeted by the subscription handler
+    def test_unsubscriptionDecreasesCount(self):
+
+        self.assert_ (self.initOk)
+
         # Get a subscriber
-        #try:
-        #    subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
-        #    print "Path is:", subscriber_path_2
+        try:
+            subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+            print "Path is:", subscriber_path_1
 
-        #    # Tell the subscriber to subscribe to test.int and test.double
-        #    properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double"], subscriber_path_2)
-        #    sleep(0.5)
-        #except:
-        #    self.assert_ (False) # Subscription handler not working
+            # Tell the subscriber to subscribe to test.int and test.double
+            properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double"], subscriber_path_1)
 
-        #self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
-        #self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
-        #self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+            # Tell the subscriber to unsubscribe from test.int
+            self.subscription_handler_iface.unSubscribe(["test.int"], subscriber_path_1)
+            sleep(0.5)
+        except:
+            self.assert_ (False) # Subscription handler not working
+
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+
+    # FIXME: Being able to have 2 independent subscribers not supporeted by the subscription handler
+    '''def test_twoSubscribers(self):
+
+        # Get a subscriber and command it to subscribe to test.int
+        try:
+            subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+            print "Path is:", subscriber_path_1
+
+            # Tell the subscriber to subscribe to test.int
+            properties, undetermined = self.subscription_handler_iface.subscribe(["test.int"], subscriber_path_1)
+            sleep(0.5)
+        except:
+            self.assert_ (False) # Subscription handler not working
+
+        # Command another subscriberHandler to subscribe to test.int and test.double
+
+        # Get a subscriber and command it to subscribe to test.int and test.double
+        try:
+            subscriber_path_2 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
+            print "Path is:", subscriber_path_2
+
+            # Tell the subscriber to subscribe to test.int and test.double
+            properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double"], subscriber_path_2)
+            sleep(0.5)
+        except:
+            self.assert_ (False) # Subscription handler not working
+
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+        '''
 
 class TestCaseUseSystemBus(unittest.TestCase):
     def setUp(self):
