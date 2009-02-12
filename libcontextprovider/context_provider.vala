@@ -259,7 +259,7 @@ namespace ContextProvider {
 	 * Returns: a new #ContextProvider object
 	 */
 	public Provider install ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, GetCallback? get_cb, SubscribedCallback? subscribed_cb, UnsubscribedCallback? unsubscribed_cb) {
-
+		assert (initialised == true);
 		Manager manager = Manager.get_instance ();
 
 		CProvider provider = new CProvider(new StringSet.from_array(provided_keys), get_cb, subscribed_cb, unsubscribed_cb);
@@ -274,6 +274,7 @@ namespace ContextProvider {
 	 * Remove and dealloctate resources for a #ContextProvider created with #context_provider_install
 	 */
 	public void remove (Provider provider) {
+		assert (initialised == true);
 		Manager manager = Manager.get_instance ();
 		manager.providers.unregister (provider);
 	}
@@ -285,6 +286,7 @@ namespace ContextProvider {
 	 * Returns: the current number of subscribers for a given context key
 	 */
 	public int no_of_subscribers (string key) {
+		assert (initialised == true);
 		Manager manager = Manager.get_instance ();
 		return manager.key_counter.number_of_subscribers (key);
 	}
