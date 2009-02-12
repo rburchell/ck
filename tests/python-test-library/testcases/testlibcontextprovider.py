@@ -17,15 +17,10 @@ import conf as cfg
 # Stubs
 sys.path.append("./tests/python-test-library/stubs")
 
-# Note: execute this program: libtool --mode=execute -dlopen libcontextprovider.la dbus-launch python tests/python-test-library/testcases/testlibcontextprovider.py
-
-# FIXME: Use the fake dbus.
-# FIXME: Make tests run when make check is executed
-# FIXME: Code coverage
+# Note: this test program can be executed separately: libtool --mode=execute -dlopen libcontextprovider.la dbus-launch python tests/python-test-library/testcases/testlibcontextprovider.py
 
 # FIXME: Missing testcases
-# - Removing a provider
-# - Getting subscriber twice
+# - Error cases: provider doing something incorrect, client doing something incorrect
 
 class LibraryTestCase(unittest.TestCase):
     def setUp(self):
@@ -752,22 +747,6 @@ class TestCaseUseSystemBus(unittest.TestCase):
     def setUp(self):
         self.initOk = True
 
-        # Create a session bus
-        # and put it's address to the "system bus address" environment variable.
-        # This way, all child processes trying to use the system bus go there.
-        output = os.popen("dbus-launch").readlines()
-        if len(output) >= 2:
-            self.dbusAddress = re.match("(DBUS_SESSION_BUS_ADDRESS)=(.*)",output[0]).group(2)
-            self.dbusDaemonPid = int(re.match("(DBUS_SESSION_BUS_PID)=(.*)",output[1]).group(2))
-            print "New session bus address:", self.dbusAddress
-            print "Process pid:", self.dbusDaemonPid
-            os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = self.dbusAddress
-
-        else:
-            print "Failed to start new session bus"
-            self.initOk = False
-
-
         self.bus = dbus.SessionBus() # Note: using session bus for commanding the stubs
 
         # Start a provider stub
@@ -808,8 +787,8 @@ class TestCaseUseSystemBus(unittest.TestCase):
             return
 
     def tearDown(self):
-        # Command the subscription handler to exit
         try:
+            # Stop the subscription handler
             self.subscription_handler_iface.loopQuit()
             os.waitpid(self.subscriptionHandlerProcess.pid, 0)
         except:
@@ -823,12 +802,6 @@ class TestCaseUseSystemBus(unittest.TestCase):
         except:
             print "Stopping provider stub failed"
             os.kill(self.providerProcess.pid, SIGKILL)
-
-        # Kill the dbus daemon
-        #try:
-        os.kill(self.dbusDaemonPid, SIGKILL)
-        #except:
-        #    print "Stopping dbus daemon failed"
 
         sleep(0.5)
 
