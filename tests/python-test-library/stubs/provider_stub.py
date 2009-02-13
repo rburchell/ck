@@ -14,7 +14,7 @@
 
 import sys
 sys.path.append("./python/") # libcontextprovider python bindings
-import ContextProvider as cb
+import ContextProvider as cp
 
 sys.path.append("./tests/python-test-library/testcases/")
 import conf as cfg
@@ -24,25 +24,21 @@ import dbus.service
 from dbus.mainloop.glib import DBusGMainLoop
 import gobject
 
-
 class FakeProvider (dbus.service.Object):
 
     # Callback functions for libcontextd
     def py_get_cb (self, ss, cs, d):
-        self.log += ("(py_get_cb(" + cb.StringSet.debug(ss) + "))")
+        self.log += ("(py_get_cb(" + cp.StringSet.debug(ss) + "))")
         # Set test.int to 5 and test.string to undetermined
-        cb.ContextProvider.change_set_add_integer(cs, "test.int", 5)
-        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.double")
-        return 0
+        cp.ContextProvider.change_set_add_integer(cs, "test.int", 5)
+        cp.ContextProvider.change_set_add_undetermined_key(cs, "test.double")
 
 
     def py_subscribed_cb (self, ss, d):
-        self.log += ("(py_subscribed_cb(" + cb.StringSet.debug(ss) + "))")
-        return 0
+        self.log += ("(py_subscribed_cb(" + cp.StringSet.debug(ss) + "))")
 
     def py_unsubscribed_cb (self, keys, keys_remaining, d):
-        self.log += ("(py_unsubscribed_cb(" + cb.StringSet.debug(keys) + ", " + cb.StringSet.debug(keys_remaining) + "))")
-        return 0
+        self.log += ("(py_unsubscribed_cb(" + cp.StringSet.debug(keys) + ", " + cp.StringSet.debug(keys_remaining) + "))")
 
     # Initializing the provider object
     def __init__(self, main_loop):
@@ -61,10 +57,10 @@ class FakeProvider (dbus.service.Object):
         print "Provider: Executing Init"
         if useSession:
             print "Provider: Using session bus"
-            cb.ContextProvider.init(0, cfg.fakeProviderLibBusName)
+            cp.ContextProvider.init(0, cfg.fakeProviderLibBusName)
         else:
             print "Provider: Using system bus"
-            cb.ContextProvider.init(1, cfg.fakeProviderLibBusName)
+            cp.ContextProvider.init(1, cfg.fakeProviderLibBusName)
         print "Provider: Init done"
 
 
@@ -72,12 +68,12 @@ class FakeProvider (dbus.service.Object):
                        in_signature='', out_signature='')
     def DoInstall(self):
         print "Provider: Executing Install"
-        self.get_cb = cb.ContextProvider.GET_CALLBACK(self.py_get_cb)
-        self.subscribed_cb = cb.ContextProvider.SUBSCRIBED_CALLBACK(self.py_subscribed_cb)
-        self.unsubscribed_cb = cb.ContextProvider.UNSUBSCRIBED_CALLBACK(self.py_unsubscribed_cb)
+        self.get_cb = cp.ContextProvider.GET_CALLBACK(self.py_get_cb)
+        self.subscribed_cb = cp.ContextProvider.SUBSCRIBED_CALLBACK(self.py_subscribed_cb)
+        self.unsubscribed_cb = cp.ContextProvider.UNSUBSCRIBED_CALLBACK(self.py_unsubscribed_cb)
 
 
-        self.provider = cb.ContextProvider.install(["test.double", "test.int", "test.bool"],
+        self.provider = cp.ContextProvider.install(["test.double", "test.int", "test.bool"],
                          self.get_cb, None,
                          self.subscribed_cb, None,
                          self.unsubscribed_cb, None)
@@ -86,59 +82,41 @@ class FakeProvider (dbus.service.Object):
                        in_signature='', out_signature='')
     def DoRemove(self):
         print "Provider: Executing Remove"
-        cb.ContextProvider.remove(self.provider)
-
-    # Hard-coded change sets for different tests.
-    # Could be refactored so that change sets are given as parameter,
-    # if more tests are needed.
-    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
-                       in_signature='', out_signature='')
-    def SendChangeSet1(self):
-        cs = cb.ContextProvider.change_set_create()
-        cb.ContextProvider.change_set_add_double(cs, "test.double", 2.13)
-        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
-        cb.ContextProvider.change_set_commit(cs)
+        cp.ContextProvider.remove(self.provider)
 
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
-                       in_signature='', out_signature='')
-    def SendChangeSet2(self):
-        cs = cb.ContextProvider.change_set_create()
-        cb.ContextProvider.change_set_add_integer(cs, "test.int", 1)
-        cb.ContextProvider.change_set_add_double(cs, "test.double", 3.1415)
-        cb.ContextProvider.change_set_add_boolean(cs, "test.bool", False)
-        cb.ContextProvider.change_set_commit(cs)
+                       in_signature='a{sv}as', out_signature='')
+    def SendChangeSet(self, values, undetermined):
+        cs = cp.ContextProvider.change_set_create()
 
-    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
-                       in_signature='', out_signature='')
-    def SendChangeSetWithAllDataTypes(self):
-        cs = cb.ContextProvider.change_set_create()
-        cb.ContextProvider.change_set_add_integer(cs, "test.int", -8)
-        cb.ContextProvider.change_set_add_double(cs, "test.double", 0.2)
-        cb.ContextProvider.change_set_add_boolean(cs, "test.bool", True)
-        # FIXME: Add new data types here as needed
-        cb.ContextProvider.change_set_commit(cs)
+        for key in values.keys():
+            value = values[key]
+            if type(value) is dbus.Int32:
+                cp.ContextProvider.change_set_add_integer(cs, key, value)
+            elif type(value) is dbus.Double:
+                cp.ContextProvider.change_set_add_double(cs, key, value)
+            elif type(value) is dbus.Boolean:
+                cp.ContextProvider.change_set_add_boolean(cs, key, value)
+            # Note: add more types here if needed.
 
-    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
-                       in_signature='', out_signature='')
-    def SendChangeSetWithAllUndetermined(self):
-        cs = cb.ContextProvider.change_set_create()
-        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.int")
-        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.double")
-        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
-        cb.ContextProvider.change_set_commit(cs)
+        if len(undetermined) > 0:
+            for key in undetermined:
+                cp.ContextProvider.change_set_add_undetermined_key(cs, str(key))
+
+        cp.ContextProvider.change_set_commit(cs)
 
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def CancelChangeSet(self):
-        cs = cb.ContextProvider.change_set_create()
-        cb.ContextProvider.change_set_add_double(cs, "test.double", 2.13)
-        cb.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
-        cb.ContextProvider.change_set_cancel(cs)
+        cs = cp.ContextProvider.change_set_create()
+        cp.ContextProvider.change_set_add_double(cs, "test.double", 2.13)
+        cp.ContextProvider.change_set_add_undetermined_key(cs, "test.bool")
+        cp.ContextProvider.change_set_cancel(cs)
 
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='s', out_signature='i')
     def GetSubscriberCount(self, key):
-        return cb.ContextProvider.no_of_subscribers(key)
+        return cp.ContextProvider.no_of_subscribers(key)
 
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')

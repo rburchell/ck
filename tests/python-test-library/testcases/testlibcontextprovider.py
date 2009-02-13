@@ -22,14 +22,10 @@ sys.path.append("./tests/python-test-library/stubs")
 
 # FIXME: Missing testcases
 # - Error cases: provider doing something incorrect, client doing something incorrect
+# - Multiple subscribers
 
-class LibraryTestCase(unittest.TestCase):
-    def setUp(self):
-        pass
-    def tearDown(self):
-        pass
-
-class Startup(LibraryTestCase):
+class Startup(unittest.TestCase):
+    """ Test cases: check that the provider starts providing service over dbus """
     def setUp(self):
         self.bus = dbus.SessionBus() # Note: using session bus
 
@@ -104,8 +100,8 @@ class Startup(LibraryTestCase):
         # Try to get the manager object
         manager_proxy = self.bus.get_object(cfg.fakeProviderLibBusName, cfg.ctxMgrPath)
         manager_iface = dbus.Interface(manager_proxy, cfg.ctxMgrIfce)
-        self.assert_ (manager_proxy != None) # FIXME: What is the correct validity check?
-        self.assert_ (manager_iface != None) # FIXME: What is the correct validity check?
+        self.assert_ (manager_proxy != None)
+        self.assert_ (manager_iface != None)
         try:
             manager_iface.Get(["temp"])
         except:
@@ -113,7 +109,8 @@ class Startup(LibraryTestCase):
             self.assert_ (False) # Manager interface is not implemented properly
             # After this, only tearDown will be executed
 
-class Installation(LibraryTestCase):
+class Installation(unittest.TestCase):
+    """ Test cases: test installing and removing a provider module """
     def setUp(self):
         self.bus = dbus.SessionBus() # Note: using session bus
 
@@ -149,16 +146,16 @@ class Installation(LibraryTestCase):
             # Install a provider
             self.provider_iface.DoInstall()
         except:
-            self.assert_(False) # Provider stub not working
+            self.assert_(False, "Provider stub not working")
 
         try:
             # Remove a provider
             self.provider_iface.DoRemove()
         except:
-            self.assert_(False) # Provider stub not working
+            self.assert_(False, "Provider stub not working")
 
-# Parent class for testcases which need to start a provider and stop it
 class TestCaseUsingProvider(unittest.TestCase):
+    """ Parent class for testcases which need to start a provider and stop it """
     def setUp(self):
         self.initOk = True
         print "TestCaseUsingProvider setUp"
@@ -192,9 +189,9 @@ class TestCaseUsingProvider(unittest.TestCase):
             os.kill(self.provider_stub_p.pid, SIGKILL)
         sleep(0.5)
 
-# Test cases: Check that the Get callback function is called properly,
-# and that the change set is treated properly.
 class GetCallback(TestCaseUsingProvider):
+    """ Test cases: Check that the Get callback function is called properly,
+    and that the change set is treated properly."""
     def test_getCallbackIsCalled(self):
         self.assert_ (self.initOk)
 
@@ -204,22 +201,22 @@ class GetCallback(TestCaseUsingProvider):
         try:
             self.provider_iface.ResetLog()
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
 
         try:
             manager_iface.Get(["test.int"])
         except:
             print "Exception caught"
-            self.assert_ (False) # Manager interface is not implemented properly
+            self.assert_ (False, "Manager interface is not implemented properly")
 
         # Check from the log that the callback was called
         try:
             log = self.provider_iface.GetLog()
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
 
         #print "Log is:", log
-        self.assert_ (log == "(py_get_cb(test.int))");
+        self.assert_ (log == "(py_get_cb(test.int))")
 
     def test_changeSetIsTreatedProperly(self):
         # Execute Get
@@ -231,7 +228,7 @@ class GetCallback(TestCaseUsingProvider):
             ret = manager_iface.Get(["test.int", "test.double"])
         except:
             print "Exception caught"
-            self.assert_ (False) # Manager interface is not implemented properly
+            self.assert_ (False, "Manager interface is not implemented properly")
 
         self.assert_(ret != None)
 
@@ -248,10 +245,9 @@ class GetCallback(TestCaseUsingProvider):
         self.assert_ (len(undetermined) == 1)
         self.assert_ (undetermined.count("test.double") == 1)
 
-# Test cases: Check that the First subscriber / Last subscriber callback functions
-# are called properly.
 class SubscribeCallbacks(TestCaseUsingProvider):
-
+    """ Test cases: Check that the First subscriber / Last subscriber callback functions
+    are called properly."""
     def setUp(self):
         self.initOk = True
         TestCaseUsingProvider.setUp(self)
@@ -288,13 +284,13 @@ class SubscribeCallbacks(TestCaseUsingProvider):
         try:
             self.subscriber_iface.Subscribe(["test.double"])
         except:
-            self.assert_ (False) # Subscriber not working
+            self.assert_ (False, "Subscriber not working")
 
         # Check from the log that the callback was called
         try:
             log = self.provider_iface.GetLog()
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
 
         self.assert_ (log == "(py_get_cb(test.double))(py_subscribed_cb(test.double))" or log == "(py_subscribed_cb(test.double))(py_get_cb(test.double))")
         # Note that as part of subscribe, also get is called. Here we don't care about the order.
@@ -305,25 +301,25 @@ class SubscribeCallbacks(TestCaseUsingProvider):
         try:
             self.subscriber_iface.Subscribe(["test.bool"])
         except:
-            self.assert_ (False) # Subscriber not working
+            self.assert_ (False, "Subscriber not working")
 
         # Reset log:
         try:
             self.provider_iface.ResetLog()
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
 
         # Execute Unsubscribe
         try:
             self.subscriber_iface.Unsubscribe(["test.bool"])
         except:
-            self.assert_ (False) # Subscriber handler not working
+            self.assert_ (False, "Subscriber handler not working")
 
         # Check from the log that the callback was called
         try:
             log = self.provider_iface.GetLog()
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
 
         #print "Log is:", log
 
@@ -397,10 +393,12 @@ class Subscription(TestCaseUsingProvider):
         properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
 
         # Command the fake provider send the change set
+        propertiesToSend = {"test.double" : 2.13}
+        undeterminedToSend = ["test.bool"]
         try:
-            self.provider_iface.SendChangeSet1()
+            self.provider_iface.SendChangeSet(propertiesToSend, undeterminedToSend)
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
 
         sleep(0.5)
 
@@ -411,7 +409,7 @@ class Subscription(TestCaseUsingProvider):
             # Unsubscribe
             self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -433,13 +431,15 @@ class Subscription(TestCaseUsingProvider):
         try:
             properties, undetermined = self.subscription_handler_iface.subscribe(["test.double", "test.bool"], subscriber_path_1)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         # Command the fake provider send the change set
+        propertiesToSend = {"test.int" : 4, "test.double" : 3.1415, "test.bool" : False}
+        undeterminedToSend = []
         try:
-            self.provider_iface.SendChangeSet2()
+            self.provider_iface.SendChangeSet(propertiesToSend, undeterminedToSend)
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
 
         sleep(0.5)
 
@@ -450,7 +450,7 @@ class Subscription(TestCaseUsingProvider):
             # Unsubscribe
             self.subscription_handler_iface.unSubscribe(["test.double", "test.bool"], subscriber_path_1)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -475,13 +475,15 @@ class Subscription(TestCaseUsingProvider):
 
             self.subscription_handler_iface.unSubscribe(["test.int"], subscriber_path_1)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         # Command the fake provider to send the change set
+        propertiesToSend = {"test.int" : 4, "test.double" : 3.1415, "test.bool" : False}
+        undeterminedToSend = []
         try:
-            self.provider_iface.SendChangeSet2() # contains test.int, test.double and test.bool
+            self.provider_iface.SendChangeSet(propertiesToSend, undeterminedToSend)
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
 
         sleep(0.5)
 
@@ -492,7 +494,7 @@ class Subscription(TestCaseUsingProvider):
             # Unsubscribe from the rest
             self.subscription_handler_iface.unSubscribe(["test.double", "test.bool"], subscriber_path_1)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -508,11 +510,9 @@ class Subscription(TestCaseUsingProvider):
 
         self.assert_ (len(undetermined) == 0)
 
-# Test cases: functionality related to change sets
-# Note that "Subscription" test suite tests that change sets are
-# sent to the subscriber properly.
 class ChangeSets(TestCaseUsingProvider):
-
+    """ Test cases: functionality related to change sets. Note that
+    "Subscription" test suite tests that change sets are sent to the subscriber properly."""
     def setUp(self):
         self.initOk = True
         TestCaseUsingProvider.setUp(self)
@@ -552,17 +552,20 @@ class ChangeSets(TestCaseUsingProvider):
         self.assert_ (self.initOk)
 
         # Command the fake provider to send the change set
+        # Note: the following change set should contain all supported data types. Update them here if needed.
+        propertiesToSend = {"test.int" : -8, "test.double" : 0.2, "test.bool" : True}
+        undeterminedToSend = []
         try:
-            self.provider_iface.SendChangeSetWithAllDataTypes()
+            self.provider_iface.SendChangeSet(propertiesToSend, undeterminedToSend)
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
         sleep(0.5)
 
         # Ask the subscriber what changes it got
         try:
             properties, undetermined = self.subscription_handler_iface.getChangedProp(self.subscriber_path_1)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -585,10 +588,12 @@ class ChangeSets(TestCaseUsingProvider):
         self.assert_ (self.initOk)
 
         # Command the fake provider to send the change set
+        propertiesToSend = {}
+        undeterminedToSend = ["test.int", "test.double", "test.bool"]
         try:
-            self.provider_iface.SendChangeSetWithAllUndetermined()
+            self.provider_iface.SendChangeSet(propertiesToSend, undeterminedToSend)
         except:
-            self.assert_ (False) # Provider not working # Undeterministic segfaults here?
+            self.assert_ (False, "Provider not working")
 
         sleep(0.5)
 
@@ -596,7 +601,7 @@ class ChangeSets(TestCaseUsingProvider):
         try:
             properties, undetermined = self.subscription_handler_iface.getChangedProp(self.subscriber_path_1)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
@@ -618,23 +623,23 @@ class ChangeSets(TestCaseUsingProvider):
         try:
             self.subscription_handler_iface.resetSignalStatus(self.subscriber_path_1)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         try:
             self.provider_iface.CancelChangeSet()
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
         sleep(0.5)
 
         try:
             status = self.subscription_handler_iface.getSignalStatus(self.subscriber_path_1)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         self.assert_ (status == False)
 
-# Test cases: Check that the subscriber counts of the keys are calculated properly.
 class KeyCounting(TestCaseUsingProvider):
+    """ Test cases: Check that the subscriber counts of the keys are calculated properly """
     def setUp(self):
         self.initOk = True
         TestCaseUsingProvider.setUp(self)
@@ -684,7 +689,7 @@ class KeyCounting(TestCaseUsingProvider):
             properties, undetermined = self.subscription_handler_iface.subscribe(["test.int"], subscriber_path_1)
             sleep(0.5)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 1)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
@@ -706,7 +711,7 @@ class KeyCounting(TestCaseUsingProvider):
             self.subscription_handler_iface.unSubscribe(["test.int"], subscriber_path_1)
             sleep(0.5)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 0)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
@@ -724,7 +729,7 @@ class KeyCounting(TestCaseUsingProvider):
             properties, undetermined = self.subscription_handler_iface.subscribe(["test.int"], subscriber_path_1)
             sleep(0.5)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         # Command another subscriberHandler to subscribe to test.int and test.double
 
@@ -737,7 +742,7 @@ class KeyCounting(TestCaseUsingProvider):
             properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double"], subscriber_path_2)
             sleep(0.5)
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
@@ -745,6 +750,7 @@ class KeyCounting(TestCaseUsingProvider):
         '''
 
 class TestCaseUseSystemBus(unittest.TestCase):
+    """ Test cases: Check that the provider can also provide service over system bus. """
     def setUp(self):
         self.initOk = True
 
@@ -811,10 +817,12 @@ class TestCaseUseSystemBus(unittest.TestCase):
         self.assert_ (self.initOk)
 
         # Command the fake provider send the change set
+        propertiesToSend = {"test.double" : 2.13}
+        undeterminedToSend = ["test.bool"]
         try:
-            self.provider_iface.SendChangeSet1()
+            self.provider_iface.SendChangeSet(propertiesToSend, undeterminedToSend)
         except:
-            self.assert_ (False) # Provider not working
+            self.assert_ (False, "Provider not working")
 
         sleep(0.5)
 
@@ -823,7 +831,7 @@ class TestCaseUseSystemBus(unittest.TestCase):
             properties, undetermined = self.subscription_handler_iface.getChangedProp(self.subscriber_path_1)
 
         except:
-            self.assert_ (False) # Subscription handler not working
+            self.assert_ (False, "Subscription handler not working")
 
         self.assert_ (properties != None)
         self.assert_ (undetermined != None)
