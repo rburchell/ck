@@ -1,4 +1,4 @@
-using GLib;
+using Gee;
 
 namespace ContextProvider {
 
@@ -13,28 +13,55 @@ namespace ContextProvider {
 			valid_keys = new StringSet();
 		}
 
-		public void register (string[] keys, Provider provider) {
+		public void register (Provider provider) {
+			debug ("New provider registered: %s (%p)", provider.provided_keys().debug(), provider);
 			providers.add (provider);
-			valid_keys = new StringSet.union (valid_keys, new StringSet.from_array (keys));
+			valid_keys = new StringSet.union (valid_keys, provider.provided_keys());
 		}
 
-		public List<string> get (StringSet keys, HashTable<string, Value?> values) {
-			List<string> unavail = new List<string> ();
+		public void unregister (Provider provider) {
+			debug ("Provider unregistered: %s (%p)", provider.provided_keys().debug(), provider);
+			providers.remove (provider);
+			StringSet s = new StringSet();
+
+			/* a bit inefficient, but it'll do for now...
+			   TODO: make the stringset stuff not use ctors..
+			 */
+			foreach (var p in providers) {
+				s = new StringSet.union (s, p.provided_keys());
+			}
+			valid_keys = s;
+		}
+
+		public ArrayList<string> get (StringSet keys, HashTable<string, Value?> values) {
+			debug("Providers.get called (%s)", keys.debug());
+			ArrayList<string> unavail = new ArrayList<string> ();
 			foreach (var provider in providers) {
-				provider.Get (keys, values, ref unavail);
+				StringSet intersection = new StringSet.intersection (keys, provider.provided_keys());
+				if (intersection.size() > 0) {
+					debug ("calling provider %p", provider);
+					provider.get (keys, values, unavail);
+				}
 			}
 			return unavail;
 		}
 
 		public void first_subscribed(StringSet keys) {
 			foreach (var provider in providers) {
-				provider.KeysSubscribed (keys);
+				StringSet intersection = new StringSet.intersection (keys, provider.provided_keys());
+				if (intersection.size() > 0 ) {
+					provider.keys_subscribed (keys);
+				}
 			}
 		}
 
-		public void last_unsubscribed(StringSet keys) {
+		public void last_unsubscribed(StringSet keys_unsubscribed, StringSet keys_remaining) {
 			foreach (var provider in providers) {
-				provider.KeysUnsubscribed (keys);
+				StringSet intersection = new StringSet.intersection (keys_unsubscribed, provider.provided_keys());
+				if (intersection.size() > 0 ) {
+					StringSet intersection_remaining = new StringSet.intersection (keys_remaining, provider.provided_keys());
+					provider.keys_unsubscribed (intersection, intersection_remaining);
+				}
 			}
 		}
 	}

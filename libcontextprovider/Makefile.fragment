@@ -6,13 +6,13 @@ libcontextprovider_VALASOURCES_PRIV = \
 	libcontextprovider/providers.vala \
 	libcontextprovider/key_usage_counter.vala \
 	libcontextprovider/subscriber.vala \
-	libcontextprovider/provider_interface.vala \
 	libcontextprovider/cprovider.vala \
 	$(NULL)
 
 libcontextprovider_VALASOURCES_PUB = \
 	libcontextprovider/context_provider.vala \
 	libcontextprovider/string_set.vala \
+	libcontextprovider/provider_interface.vala \
 	$(NULL)
 
 libcontextprovider_VALASOURCES = \
@@ -49,7 +49,7 @@ libcontextproviderdir=$(includedir)/contextprovider
 
 libcontextprovider_HEADERS = $(libcontextprovider_GENERATEDSOURCES_PUB)
 
-libcontextprovider/libcontextprovider.vala.stamp $(libcontextprovider_GENERATEDSOURCES) contextprovider.vapi: $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
+libcontextprovider/libcontextprovider.vala.stamp contextprovider.vapi: $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
 	$(VALAC) -C --basedir $(top_srcdir)/libcontextprovider --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation --library contextprovider $^
 	touch libcontextprovider/libcontextprovider.vala.stamp
 

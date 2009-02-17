@@ -12,9 +12,9 @@
   </bookinfo>
 
   <chapter>
-    <title>Libcontextprovider Plain C Interface</title>
+    <title>ContextKit Context provider C Interface</title>
     <xi:include href="xml/c_interface.xml"/>
-    <xi:include href="xml/context_provider.xml"/>
+    <xi:include href="xml/change_set.xml"/>
     <xi:include href="xml/string_set.xml"/>
   </chapter>
 </book>

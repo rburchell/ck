@@ -1,4 +1,5 @@
 using GLib;
+using Gee;
 
 namespace ContextProvider {
 
@@ -34,13 +35,13 @@ namespace ContextProvider {
 			this.subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			this.values = new HashTable<string, Value?>(str_hash, str_equal);
 			// Note: Use session / system bus according to the configuration
-			// (which can be changed via setBusType).
+			// (which can be changed via set_bus_type).
 			var connection = DBus.Bus.get (busType);
 			bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 			bus.NameOwnerChanged += this.on_name_owner_changed;
 		}
 
-		public static void setBusType(DBus.BusType b) {
+		public static void set_bus_type(DBus.BusType b) {
 			busType = b;
 		}
 
@@ -48,25 +49,19 @@ namespace ContextProvider {
 			debug ("Manager.Get");
 
 			// Check input against valid keys
-			// Do not create a StringSet from the parameter "keys" as that would be add Quarks
 			StringSet keyset = check_keys(keys);
 			get_internal (keyset, out values_to_send, out undeterminable_keys);
 		}
 
 		internal void get_internal (StringSet keyset, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
 			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash, str_equal);
-			/*todo, this is a bit fail, as we'll intern anything that comes off the wire,
-			  leaving a possible DOS or at least random memory leaks */
-
-			// Ignore keys which are not recognized as valid
-			StringSet valid_keyset = new StringSet.intersection (keyset, providers.valid_keys);
 
 			// Let providers update the central value table
-			List<string> undeterminable_key_list = providers.get (valid_keyset, values);
+			ArrayList<string> undeterminable_key_list = providers.get (keyset, values);
 			insert_to_value_table (values, undeterminable_key_list);
 
 			// Then read the values from the value table
-			read_from_value_table(valid_keyset, out values_to_send, out undeterminable_keys);
+			read_from_value_table(keyset, out values_to_send, out undeterminable_keys);
 		}
 
 		public DBus.ObjectPath GetSubscriber (DBus.BusName name) throws DBus.Error {
@@ -135,7 +130,7 @@ namespace ContextProvider {
 		/*
 		Update the value table with new values.
 		*/
-		private void insert_to_value_table(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
+		private void insert_to_value_table(HashTable<string, Value?> properties, ArrayList<string>? undeterminable_keys) {
 			//debug ("insert_to_value_table");
 			var keys = properties.get_keys ();
 			// Note: get_keys returns a list of unowned strings. We shouldn't assign it to
@@ -178,7 +173,7 @@ namespace ContextProvider {
 		}
 
 		/* Is called when the provider sets new values to context properties */
-		public int property_values_changed(HashTable<string, Value?> properties, List<string>? undeterminable_keys) {
+		public bool property_values_changed(HashTable<string, Value?> properties, ArrayList<string>? undeterminable_keys) {
 			// Check that all the keys are valid
 			var keys = properties.get_keys ();
 			foreach (var key in keys) {
@@ -187,7 +182,7 @@ namespace ContextProvider {
 					assert (false);
 					// FIXME: How to react?
 					// Now we drop the whole event and return an error value
-					return 1;
+					return false;
 				}
 			}
 			foreach (var key in undeterminable_keys) {
@@ -196,7 +191,7 @@ namespace ContextProvider {
 					assert (false);
 					// FIXME: How to react?
 					// Now we drop the whole event and return an error value
-					return 1;
+					return false;
 				}
 			}
 
@@ -207,8 +202,8 @@ namespace ContextProvider {
 			foreach (var s in subscribers.get_values()) {
 				s.on_value_changed(properties, undeterminable_keys);
 			}
-			// Return success value
-			return 0;
+
+			return true;
 		}
 	}
 }

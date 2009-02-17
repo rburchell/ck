@@ -10,19 +10,28 @@ class STRING_SET(c_void_p):
 class CHANGE_SET(c_void_p):
     pass
 
+class PROVIDER(c_void_p):
+    pass
+
+
 class ContextProvider:
-    GET_CALLBACK = CFUNCTYPE(STRING_SET, CHANGE_SET, c_void_p)
-    SUBSCRIBE_CALLBACK = CFUNCTYPE(STRING_SET, c_void_p)
+    GET_CALLBACK = CFUNCTYPE(None, STRING_SET, CHANGE_SET, c_void_p)
+    SUBSCRIBED_CALLBACK = CFUNCTYPE(None, STRING_SET, c_void_p)
+    UNSUBSCRIBED_CALLBACK = CFUNCTYPE(None, STRING_SET, STRING_SET, c_void_p)
 
     init = cfunc('context_provider_init', _dll, None,
+                 ('bus_type', c_int, 1),
+                 ('bus_name', c_char_p, 1))
+    install = cfunc('context_provider_install', _dll, PROVIDER,
                  ('provided_keys', ListPOINTER (c_char_p), 1),
-                 ('useSessionBus', c_int, 1),
-                 ('get_cb', POINTER(GET_CALLBACK), 1),
+                 ('get_cb', GET_CALLBACK, 1),
                  ('get_cb_target', c_void_p, 1),
-                 ('first_cb', POINTER(SUBSCRIBE_CALLBACK), 1),
+                 ('first_cb', SUBSCRIBED_CALLBACK, 1),
                  ('first_cb_target', c_void_p, 1),
-                 ('last_cb', POINTER(SUBSCRIBE_CALLBACK), 1),
+                 ('last_cb', UNSUBSCRIBED_CALLBACK, 1),
                  ('last_cb_target', c_void_p, 1))
+    remove = cfunc('context_provider_remove', _dll, None,
+                    ('provider', PROVIDER, 1))
     no_of_subscribers = cfunc('context_provider_no_of_subscribers', _dll, c_int,
                               ('key', c_char_p, 1))
 
@@ -31,7 +40,7 @@ class ContextProvider:
                               ('change_set', CHANGE_SET, 1))
     change_set_cancel = cfunc('context_provider_change_set_cancel', _dll, None,
                               ('change_set', CHANGE_SET, 1))
-    change_set_add_int = cfunc('context_provider_change_set_add_int', _dll, c_int,
+    change_set_add_integer = cfunc('context_provider_change_set_add_integer', _dll, c_int,
                                ('change_set', CHANGE_SET, 1),
                                ('key', c_char_p, 1),
                                ('val', c_int, 1))
@@ -39,7 +48,10 @@ class ContextProvider:
                                   ('change_set', CHANGE_SET, 1),
                                   ('key', c_char_p, 1),
                                   ('val', c_double, 1))
-
+    change_set_add_boolean = cfunc('context_provider_change_set_add_boolean', _dll, c_int,
+                               ('change_set', CHANGE_SET, 1),
+                               ('key', c_char_p, 1),
+                               ('val', c_int, 1))
     change_set_add_undetermined_key = cfunc('context_provider_change_set_add_undetermined_key', _dll, c_int,
                                             ('change_set', CHANGE_SET, 1),
                                             ('key', c_char_p, 1))
@@ -78,7 +90,7 @@ class StringSet:
     is_equal =  cfunc('context_provider_string_set_is_equal', _dll, c_int,
                       ('left', STRING_SET, 1),
                       ('right', STRING_SET, 1))
-    is_subset =  cfunc('context_provider_string_set_is_subset', _dll, c_int,
+    is_subset_of =  cfunc('context_provider_string_set_is_subset_of', _dll, c_int,
                       ('left', STRING_SET, 1),
                       ('right', STRING_SET, 1))
     is_disjoint =  cfunc('context_provider_string_set_is_disjoint', _dll, c_int,
@@ -86,7 +98,7 @@ class StringSet:
                       ('right', STRING_SET, 1))
     size = cfunc('context_provider_string_set_size', _dll, None,
                 ('self', STRING_SET, 1))
-    debug = cfunc('context_provider_string_set_size', _dll, c_char_p,
+    debug = cfunc('context_provider_string_set_debug', _dll, c_char_p,
                 ('self', STRING_SET, 1))
     ref = cfunc('context_provider_string_set_ref', _dll, c_char_p,
                 ('self', STRING_SET, 1))
@@ -101,27 +113,31 @@ if __name__ == "__main__":
     DBusGMainLoop(set_as_default=True)
     loop = gobject.MainLoop()
 
-    busname = dbus.service.BusName("org.freedesktop.ContextKit.Testing.Provider",
-                                    dbus.SessionBus())
-
-    def get_cb (ss, cs, d):
+    def py_get_cb (ss, cs, d):
+        print "This is get callback"
+        #print StringSet.debug(ss)
+        return 0
+    def py_first_cb (ss, d):
         print StringSet.debug(ss)
-    def first_cb (ss, d):
+    def py_last_cb (ss, ss_remain, d):
         print StringSet.debug(ss)
-    def last_cb (ss, d):
-        print StringSet.debug(ss)
+        print StringSet.debug(ss_remain)
 
 
-    ContextProvider.init(["foo.bar", "foo.baz"], 1,
-                         ContextProvider.GET_CALLBACK(get_cb), None,
-                         ContextProvider.SUBSCRIBE_CALLBACK(first_cb), None,
-                         ContextProvider.SUBSCRIBE_CALLBACK(last_cb), None)
+    ContextProvider.init(0, "org.freedesktop.ContextKit.Testing.Provider")
+    get_cb = ContextProvider.GET_CALLBACK(py_get_cb)
+    subscribe_cb = ContextProvider.SUBSCRIBED_CALLBACK(py_first_cb)
+    unsubscribe_cb = ContextProvider.UNSUBSCRIBED_CALLBACK(py_last_cb)
+    p =ContextProvider.install(["foo.bar", "foo.baz"],
+                         get_cb, None,
+                         subscribe_cb, None,
+                         unsubscribe_cb, None)
     print ContextProvider.no_of_subscribers("foo.bar")
     cs = ContextProvider.change_set_create()
     ContextProvider.change_set_cancel(cs)
     cs2 = ContextProvider.change_set_create()
-    ContextProvider.change_set_add_int(cs2, "foo.bar", 1)
+    ContextProvider.change_set_add_integer(cs2, "foo.bar", 1)
     ContextProvider.change_set_add_undetermined_key(cs2, "foo.baz")
     ContextProvider.change_set_commit(cs2)
-
+    #ContextProvider.remove (p) # FIXME: Removed for testing purposes (now can be poked with d-feet)
     loop.run()

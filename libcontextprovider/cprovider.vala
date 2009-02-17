@@ -1,4 +1,5 @@
 using GLib;
+using Gee;
 
 namespace ContextProvider {
 
@@ -6,38 +7,41 @@ namespace ContextProvider {
 
 		// Stored callbacks
 		private GetCallback get_cb;
-		private SubscribeCallback first_cb;
-		private SubscribeCallback last_cb;
+		private SubscribedCallback first_cb;
+		private UnsubscribedCallback last_cb;
+		private StringSet keys;
 
-		public CProvider (GetCallback get_cb, SubscribeCallback first_cb, SubscribeCallback last_cb) {
+		public CProvider (StringSet keys, GetCallback get_cb, SubscribedCallback first_cb, UnsubscribedCallback last_cb) {
 			this.get_cb = get_cb;
 			this.first_cb = first_cb;
 			this.last_cb = last_cb;
+			this.keys = keys;
 		}
 
 		// Implementation of the Provider interface by using callbacks
 
-		public void Get (StringSet keys, HashTable<string, Value?> ret, ref GLib.List<string> unavail) {
+		public void get (StringSet keys, HashTable<string, Value?> ret, ArrayList<string> unavail) {
+			debug("CProvider.get called with keys %s", keys.debug());
 			if (get_cb != null) {
-				ChangeSet change_set = new ChangeSet.from_get(ret);
+				ChangeSet change_set = new ChangeSet.from_get(ret, unavail);
 				get_cb (keys, change_set);
-				/*UGLY UGLY UGLY. GList sucks in vala. must write Gee.LinkedList*/
-				foreach (var s in change_set.undeterminable_keys) {
-					unavail.prepend(s);
-				}
 			}
 		}
 
-		public void KeysSubscribed (StringSet keys) {
+		public void keys_subscribed (StringSet keys) {
 			if (first_cb != null) {
 				first_cb (keys);
 			}
 		}
 
-		public void KeysUnsubscribed (StringSet keys) {
+		public void keys_unsubscribed (StringSet keys_unsubscribed, StringSet keys_remaining) {
 			if (last_cb != null) {
-				last_cb (keys);
+				last_cb (keys_unsubscribed, keys_remaining);
 			}
+		}
+
+		public StringSet provided_keys () {
+			return keys;
 		}
 	}
 }
