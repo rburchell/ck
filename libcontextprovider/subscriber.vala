@@ -4,7 +4,7 @@ using Gee;
 namespace ContextProvider {
 
 	public class Subscriber : GLib.Object, DBusSubscriber {
-		static Manager manager;
+		Manager manager;
 		internal DBus.ObjectPath object_path {get; set;}
 
 		// Keys subscribed to by this subscriber
