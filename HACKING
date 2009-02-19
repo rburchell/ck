@@ -1,0 +1,18 @@
+See HACKING in the subsys-context-doc package for general coding guide
+lines.
+
+There are some ContextKit specific additions:
+
+- Packaging is done in the "pkg-master" branch, "master" is kept free
+  from packaging bits.
+
+  You should merge "master" into "pkg-master" from time to time.
+  Never merge "pkg-master" into "master".  If you want to move changes
+  from "pkg-master" back to "master", cherry-pick them.
+
+- Package releases are also made from "pkg-master", of course.
+
+  Merge "master" into "pkg-master" and test, fixing any package
+  related things.
+
+  Then make a release tag as explained in subsys-context-doc/HACKING.
