@@ -148,7 +148,7 @@ EXTRA_DIST += \
 	spec/context.xml \
 	spec/context.xsd \
 	$(SPEC_TOOLS) \
-	debian \ 
+	debian \
 	$(NULL)
 
 DISTCLEANFILES = \
