@@ -12,7 +12,6 @@ python_testcases = \
 	$(NULL)
 
 python_stubs = \
-	tests/python-test-library/stubs/conf.py \
 	tests/python-test-library/stubs/mce_stub.py \
 	tests/python-test-library/stubs/runtests.py \
 	tests/python-test-library/stubs/session.conf \
