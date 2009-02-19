@@ -2,6 +2,30 @@ PYTHON_TEST_PROGS += \
 	tests/python-test-library/testcases/runtests.py		\
 	$(NULL)
 
+python_testcases = \
+	tests/python-test-library/testcases/runtests.py \
+	tests/python-test-library/testcases/contextGetPropertiesTCs.py \
+	tests/python-test-library/testcases/contextSubscriptionTCs.py \
+	tests/python-test-library/testcases/subscriptionHandler.py \
+	tests/python-test-library/testcases/conf.py \
+	tests/python-test-library/testcases/testlibcontextprovider.py \
+	$(NULL)
+
+python_stubs = \
+	tests/python-test-library/stubs/conf.py \
+	tests/python-test-library/stubs/mce_stub.py \
+	tests/python-test-library/stubs/runtests.py \
+	tests/python-test-library/stubs/session.conf \
+	tests/python-test-library/stubs/dbus_emulator.py \
+	tests/python-test-library/stubs/dbus_listener.py \
+	tests/python-test-library/stubs/provider_stub.py \
+	$(NULL)
+
+EXTRA_DIST += \
+	$(python_testcases) \
+	$(python_stubs) \
+	$(NULL)
+
 DISTCLEANFILES += \
 	tests/python-test-library/testcases/*.pyc		\
 	tests/python-test-library/stubs/*.pyc			\
