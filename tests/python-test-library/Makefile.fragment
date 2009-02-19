@@ -13,7 +13,6 @@ python_testcases = \
 
 python_stubs = \
 	tests/python-test-library/stubs/mce_stub.py \
-	tests/python-test-library/stubs/runtests.py \
 	tests/python-test-library/stubs/session.conf \
 	tests/python-test-library/stubs/dbus_emulator.py \
 	tests/python-test-library/stubs/dbus_listener.py \
