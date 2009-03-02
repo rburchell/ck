@@ -70,10 +70,13 @@ EXTRA_DIST += \
 	$(NULL)
 
 DISTCLEANFILES += \
-	$(libcontextprovider_GENERATEDSOURCES) \
-	libcontextprovider/libcontextprovider.vala.stamp \
 	libcontextprovider/*.gcno \
 	libcontextprovider/*.gcda \
+	$(NULL)
+
+MAINTAINERCLEANFILES += \
+	$(libcontextprovider_GENERATEDSOURCES) \
+	libcontextprovider/libcontextprovider.vala.stamp \
 	$(NULL)
 
 BUILT_SOURCES += \
