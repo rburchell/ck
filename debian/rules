@@ -5,10 +5,7 @@
 
 docdir=/usr/share/maemo-doc/
 
-configure: autogen.sh
-	NOCONFIGURE=yes ./autogen.sh
-
-Makefile: configure
+Makefile:
 	./configure --prefix /usr --sysconfdir=/etc --enable-gtk-doc
 
 build: build-stamp
