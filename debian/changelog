@@ -1,3 +1,10 @@
+contextkit (0.1.1-3) unstable; urgency=low
+
+  * Don't remove files during distclean that we can't regenerate, such as
+    the sources generated from Vala.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Mon, 02 Mar 2009 22:06:18 +0200
+
 contextkit (0.1.1-2) unstable; urgency=low
 
   * Don't try to build docs in debian/rules.
