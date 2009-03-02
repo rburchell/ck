@@ -121,7 +121,7 @@ doc/context.html: context.valid.stamp spec/context.xml tools/context2html.pl
 	install -d doc
 	$(top_srcdir)/tools/context2html.pl < $(top_srcdir)/spec/context.xml > $@
 
-CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) $(DOCS) context.valid.stamp
+CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) context.valid.stamp
 clean-local:
 	-rm -rf introspect
 
