@@ -1,3 +1,9 @@
+contextkit (0.1.1-2) unstable; urgency=low
+
+  * Don't try to build docs in debian/rules.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Mon, 02 Mar 2009 21:42:34 +0200
+
 contextkit (0.1.1-1) unstable; urgency=low
 
   * Initial release.
