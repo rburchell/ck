@@ -1,3 +1,9 @@
+contextkit (0.1.1-5) unstable; urgency=low
+
+  * Don't clean docs.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Mon, 02 Mar 2009 22:48:25 +0200
+
 contextkit (0.1.1-4) unstable; urgency=low
 
   * Include docs in source distribution.
