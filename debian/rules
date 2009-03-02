@@ -6,14 +6,12 @@
 docdir=/usr/share/maemo-doc/
 
 Makefile:
-	./configure --prefix /usr --sysconfdir=/etc --enable-gtk-doc
+	./configure --prefix /usr --sysconfdir=/etc
 
 build: build-stamp
 build-stamp: Makefile
 	dh_testdir
 	$(MAKE) all
-	$(MAKE) doc/contextkit.html
-	$(MAKE) doc/context.html
 	touch build-stamp
 
 clean: Makefile
