@@ -139,6 +139,7 @@ contextd_LDADD = \
 endif
 
 EXTRA_DIST += \
+	$(DOCS) \
 	$(contextd_GENERATEDSOURCES) \
 	$(contextd_VALASOURCES) \
 	$(contextd_VAPISOURCES) \
