@@ -151,12 +151,14 @@ EXTRA_DIST += \
 	$(NULL)
 
 DISTCLEANFILES = \
-	$(contextd_GENERATEDSOURCES) \
-	$(contextd_SOURCES)	\
-	src/contextd.vala.stamp \
 	src/*.gcov \
 	src/*.gcno \
 	src/*.gcda \
+	$(NULL)
+
+MAINTAINERCLEANFILES = \
+	$(contextd_GENERATEDSOURCES) \
+	$(contextd_SOURCES)	\
 	$(NULL)
 
 clean-gcov:

@@ -75,10 +75,11 @@ EXTRA_DIST += \
 	$(NULL)
 
 DISTCLEANFILES += \
+	$(NULL)
+
+MAINTAINERCLEANFILES += \
 	$(tests_unit_tests_intset_GENERATEDSOURCES)			\
 	tests/unit_tests/intset.vala.stamp				\
 	$(tests_unit_tests_stringset_GENERATEDSOURCES)			\
 	tests/unit_tests/stringset.vala.stamp			\
 	$(NULL)
-
-
