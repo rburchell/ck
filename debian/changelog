@@ -1,3 +1,9 @@
+contextkit (0.1.1-7) unstable; urgency=low
+
+  * Forgot libdbus-1-dev, stupid.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Tue, 03 Mar 2009 12:45:37 +0200
+
 contextkit (0.1.1-6) unstable; urgency=low
 
   * Added needed dependencies to libcontextprovider-dev.
