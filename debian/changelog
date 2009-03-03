@@ -1,3 +1,9 @@
+contextkit (0.1.1-6) unstable; urgency=low
+
+  * Added needed dependencies to libcontextprovider-dev.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Tue, 03 Mar 2009 12:32:11 +0200
+
 contextkit (0.1.1-5) unstable; urgency=low
 
   * Don't clean docs.
