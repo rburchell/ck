@@ -390,7 +390,7 @@ class Subscription(TestCaseUsingProvider):
         subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
 
         # Tell the subscriber to subscribe to test.int, test.double and test.bool
-        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
+        properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool", "test.string"], subscriber_path_1)
 
         # Command the fake provider send the change set
         propertiesToSend = {"test.double" : 2.13}
@@ -407,7 +407,7 @@ class Subscription(TestCaseUsingProvider):
             properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
 
             # Unsubscribe
-            self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
+            self.subscription_handler_iface.unSubscribe(["test.int", "test.double", "test.bool", "test.string"], subscriber_path_1)
         except:
             self.assert_ (False, "Subscription handler not working")
 
@@ -434,7 +434,7 @@ class Subscription(TestCaseUsingProvider):
             self.assert_ (False, "Subscription handler not working")
 
         # Command the fake provider send the change set
-        propertiesToSend = {"test.int" : 4, "test.double" : 3.1415, "test.bool" : False}
+        propertiesToSend = {"test.int" : 4, "test.double" : 3.1415, "test.bool" : False, "test.string" : "hello"}
         undeterminedToSend = []
         try:
             self.provider_iface.SendChangeSet(propertiesToSend, undeterminedToSend)
@@ -470,15 +470,15 @@ class Subscription(TestCaseUsingProvider):
         try:
             subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
 
-            # Tell the subscriber to subscribe to test.int, test.double and test.bool
-            properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], subscriber_path_1)
+            # Tell the subscriber to subscribe to test.int, test.double, test.bool and test.string
+            properties, undetermined = self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool", "test.string"], subscriber_path_1)
 
             self.subscription_handler_iface.unSubscribe(["test.int"], subscriber_path_1)
         except:
             self.assert_ (False, "Subscription handler not working")
 
         # Command the fake provider to send the change set
-        propertiesToSend = {"test.int" : 4, "test.double" : 3.1415, "test.bool" : False}
+        propertiesToSend = {"test.int" : 4, "test.double" : 3.1415, "test.bool" : False, "test.string" : "hello"}
         undeterminedToSend = []
         try:
             self.provider_iface.SendChangeSet(propertiesToSend, undeterminedToSend)
@@ -492,7 +492,7 @@ class Subscription(TestCaseUsingProvider):
             properties, undetermined = self.subscription_handler_iface.getChangedProp(subscriber_path_1)
 
             # Unsubscribe from the rest
-            self.subscription_handler_iface.unSubscribe(["test.double", "test.bool"], subscriber_path_1)
+            self.subscription_handler_iface.unSubscribe(["test.double", "test.bool", "test.string"], subscriber_path_1)
         except:
             self.assert_ (False, "Subscription handler not working")
 
@@ -502,11 +502,13 @@ class Subscription(TestCaseUsingProvider):
         #print "Properties:", properties
         #print "Undetermined:", undetermined
 
-        self.assert_ (len(properties) == 2)
+        self.assert_ (len(properties) == 4)
         self.assert_ ("test.double" in properties)
         self.assert_ (properties["test.double"] == 3.1415)
         self.assert_ ("test.bool" in properties)
         self.assert_ (properties["test.bool"] == False)
+        self.assert_ ("test.string" in properties)
+        self.assert_ (properties["test.string"] == "hello")
 
         self.assert_ (len(undetermined) == 0)
 
@@ -531,7 +533,7 @@ class ChangeSets(TestCaseUsingProvider):
             self.subscriber_path_1 = self.subscription_handler_iface.addSubscriber(True, cfg.fakeProviderLibBusName)
 
             # Tell the subscriber to subscribe to all the properties
-            self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
+            self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool", "test.string"], self.subscriber_path_1)
         except:
             self.initOk = False
             return
@@ -553,7 +555,7 @@ class ChangeSets(TestCaseUsingProvider):
 
         # Command the fake provider to send the change set
         # Note: the following change set should contain all supported data types. Update them here if needed.
-        propertiesToSend = {"test.int" : -8, "test.double" : 0.2, "test.bool" : True}
+        propertiesToSend = {"test.int" : -8, "test.double" : 0.2, "test.bool" : True, "test.string" : "foo"}
         undeterminedToSend = []
         try:
             self.provider_iface.SendChangeSet(propertiesToSend, undeterminedToSend)
@@ -580,6 +582,8 @@ class ChangeSets(TestCaseUsingProvider):
         self.assert_ (properties["test.double"] == 0.2)
         self.assert_ ("test.bool" in properties)
         self.assert_ (properties["test.bool"] == True)
+        self.assert_ ("test.string" in properties)
+        self.assert_ (properties["test.string"] == "foo")
 
         self.assert_ (len(undetermined) == 0)
 
@@ -589,7 +593,7 @@ class ChangeSets(TestCaseUsingProvider):
 
         # Command the fake provider to send the change set
         propertiesToSend = {}
-        undeterminedToSend = ["test.int", "test.double", "test.bool"]
+        undeterminedToSend = ["test.int", "test.double", "test.bool", "test.string"]
         try:
             self.provider_iface.SendChangeSet(propertiesToSend, undeterminedToSend)
         except:
@@ -615,6 +619,7 @@ class ChangeSets(TestCaseUsingProvider):
         self.assert_ (undetermined.count("test.int") == 1)
         self.assert_ (undetermined.count("test.double") == 1)
         self.assert_ (undetermined.count("test.bool") == 1)
+        self.assert_ (undetermined.count("test.string") == 1)
 
     def test_cancelling(self):
 
@@ -675,6 +680,7 @@ class KeyCounting(TestCaseUsingProvider):
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 0)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.string") == 0)
 
     def test_subscriptionIncreasesCount(self):
 
@@ -694,6 +700,7 @@ class KeyCounting(TestCaseUsingProvider):
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 1)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 0)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.string") == 0)
 
     def test_unsubscriptionDecreasesCount(self):
 
@@ -716,6 +723,7 @@ class KeyCounting(TestCaseUsingProvider):
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 0)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.string") == 0)
 
     # FIXME: Being able to have 2 independent subscribers not supporeted by the subscription handler
     '''def test_twoSubscribers(self):
@@ -747,6 +755,7 @@ class KeyCounting(TestCaseUsingProvider):
         self.assert_ (self.provider_iface.GetSubscriberCount("test.int") == 2)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.double") == 1)
         self.assert_ (self.provider_iface.GetSubscriberCount("test.bool") == 0)
+        self.assert_ (self.provider_iface.GetSubscriberCount("test.string") == 0)
         '''
 
 class TestCaseUseSystemBus(unittest.TestCase):
@@ -787,7 +796,7 @@ class TestCaseUseSystemBus(unittest.TestCase):
             # Note: use the system bus
 
             # Tell the subscriber to subscribe to all the properties
-            self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool"], self.subscriber_path_1)
+            self.subscription_handler_iface.subscribe(["test.int", "test.double", "test.bool", "test.string"], self.subscriber_path_1)
         except:
             print "Setting up subscription handler failed"
             self.initOk = False

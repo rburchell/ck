@@ -150,6 +150,22 @@ namespace ContextProvider {
 		}
 
 		/**
+		 * context_provider_change_set_add_string:
+		 * @self: a #ContextProviderChangeSet to add a value to
+		 * @key: name of key
+		 * @value: new value of key
+		 *
+		 * Set a key to have an boolean value of #val
+		 */
+		public void add_string (string key, string value) {
+			assert (initialised == true);
+
+			Value v = Value (typeof(string));
+			v.set_string (value);
+			properties.insert (key, v);
+		}
+
+		/**
 		 * context_provider_change_set_add_undetermined_key:
 		 * @self: a #ContextProviderChangeSet to which to add an undeterminable value
 		 * @key: name of key
