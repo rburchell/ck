@@ -104,3 +104,4 @@ libcontextprovider/context_provider.h
 libcontextprovider/cprovider.h
 libcontextprovider/cprovider.c
 m4/gtk-doc.m4
+/contextprovider-1.0.pc

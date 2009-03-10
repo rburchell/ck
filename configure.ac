@@ -1,7 +1,7 @@
-AC_INIT([ContextKit], [0.1.1], [rob.taylor@codethink.co.uk], ContextKit)
+AC_INIT([ContextKit], [0.1.2], [rob.taylor@codethink.co.uk], ContextKit)
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
-AM_INIT_AUTOMAKE([-Wall -Werror dist-bzip2])
+AM_INIT_AUTOMAKE([-Wall -Werror dist-bzip2 tar-ustar])
 AM_MAINTAINER_MODE
 
 # Honor aclocal flags
@@ -41,8 +41,6 @@ AC_PROG_PERL_MODULES([XML::LibXML::Reader], [],
 ])
 
 AM_CONDITIONAL(CONTEXTKIT_BUILD_DOCS, test x$build_docs = xyes)
-
-AM_PATH_PYTHON([2.5])
 
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
