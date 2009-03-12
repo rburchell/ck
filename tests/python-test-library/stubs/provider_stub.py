@@ -29,7 +29,7 @@ class FakeProvider (dbus.service.Object):
     # Callback functions for libcontextd
     def py_get_cb (self, ss, cs, d):
         self.log += ("(py_get_cb(" + cp.StringSet.debug(ss) + "))")
-        # Set test.int to 5 and test.string to undetermined
+        # Set test.int to 5 and test.double to undetermined
         cp.ContextProvider.change_set_add_integer(cs, "test.int", 5)
         cp.ContextProvider.change_set_add_undetermined_key(cs, "test.double")
 
@@ -73,7 +73,7 @@ class FakeProvider (dbus.service.Object):
         self.unsubscribed_cb = cp.ContextProvider.UNSUBSCRIBED_CALLBACK(self.py_unsubscribed_cb)
 
 
-        self.provider = cp.ContextProvider.install(["test.double", "test.int", "test.bool"],
+        self.provider = cp.ContextProvider.install(["test.double", "test.int", "test.bool", "test.string"],
                          self.get_cb, None,
                          self.subscribed_cb, None,
                          self.unsubscribed_cb, None)
@@ -96,6 +96,8 @@ class FakeProvider (dbus.service.Object):
             elif type(value) is dbus.Double:
                 cp.ContextProvider.change_set_add_double(cs, key, value)
             elif type(value) is dbus.Boolean:
+                cp.ContextProvider.change_set_add_boolean(cs, key, value)
+            elif type(value) is dbus.String:
                 cp.ContextProvider.change_set_add_boolean(cs, key, value)
             # Note: add more types here if needed.
 

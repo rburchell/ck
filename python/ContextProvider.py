@@ -52,6 +52,10 @@ class ContextProvider:
                                ('change_set', CHANGE_SET, 1),
                                ('key', c_char_p, 1),
                                ('val', c_int, 1))
+    change_set_add_string = cfunc('context_provider_change_set_add_string', _dll, c_int,
+                               ('change_set', CHANGE_SET, 1),
+                               ('key', c_char_p, 1),
+                               ('val', c_char_p, 1))
     change_set_add_undetermined_key = cfunc('context_provider_change_set_add_undetermined_key', _dll, c_int,
                                             ('change_set', CHANGE_SET, 1),
                                             ('key', c_char_p, 1))

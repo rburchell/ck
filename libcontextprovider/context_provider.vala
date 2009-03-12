@@ -65,6 +65,11 @@ namespace ContextProvider {
 		public static bool commit (ChangeSet #change_set /*take back ownership */) {
 			assert (initialised == true);
 
+			if (change_set.properties.size() == 0 && change_set.undeterminable_keys.size == 0) {
+				//nothing to do
+				return true;
+			}
+
 			ContextProvider.Manager manager = ContextProvider.Manager.get_instance ();
 			bool ret = manager.property_values_changed(change_set.properties, change_set.undeterminable_keys);
 //			changeset_holder_mutex.lock();
@@ -99,6 +104,17 @@ namespace ContextProvider {
 		{
 			this.properties = properties;
 			this.undeterminable_keys = undeterminable_keys;
+		}
+
+		/**
+		 * context_provider_change_set_size:
+		 * @self: a #ContextProviderChangeSet to add a value to
+		 *
+		 * Gets the numer of elements in a #ContextProviderChangeSet
+		 * Returns: the number of elements in the #ContextProviderChangeSet
+		 */
+		public uint size () {
+			return properties.size();
 		}
 
 		/**
@@ -146,6 +162,22 @@ namespace ContextProvider {
 
 			Value v = Value (typeof(bool));
 			v.set_boolean (value);
+			properties.insert (key, v);
+		}
+
+		/**
+		 * context_provider_change_set_add_string:
+		 * @self: a #ContextProviderChangeSet to add a value to
+		 * @key: name of key
+		 * @value: new value of key
+		 *
+		 * Set a key to have an boolean value of #val
+		 */
+		public void add_string (string key, string value) {
+			assert (initialised == true);
+
+			Value v = Value (typeof(string));
+			v.set_string (value);
 			properties.insert (key, v);
 		}
 
