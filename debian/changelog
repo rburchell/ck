@@ -1,3 +1,11 @@
+contextkit (0.1.2-1) unstable; urgency=low
+
+  New upstream release.
+  
+  * Add string support to libcontextprovider.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Thu, 12 Mar 2009 21:34:03 +0200
+
 contextkit (0.1.1-8) unstable; urgency=low
 
   * Added dbus-glib-1 to dependencies of contextprovider-1.0.
