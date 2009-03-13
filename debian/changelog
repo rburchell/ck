@@ -1,3 +1,10 @@
+contextkit (0.1.2-2) unstable; urgency=low
+
+  * Rereleased with correctly generated buildcruft.
+  * Don't use AM_MAINTAINER_MODE to avoid this in the future.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Fri, 13 Mar 2009 14:49:07 +0200
+
 contextkit (0.1.2-1) unstable; urgency=low
 
   New upstream release.
