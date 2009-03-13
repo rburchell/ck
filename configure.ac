@@ -1,8 +1,7 @@
 AC_INIT([ContextKit], [0.1.2], [rob.taylor@codethink.co.uk], ContextKit)
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
-AM_INIT_AUTOMAKE([-Wall -Werror dist-bzip2 tar-ustar])
-AM_MAINTAINER_MODE
+AM_INIT_AUTOMAKE([-Wall -Werror dist-bzip2 tar-ustar 1.9])
 
 # Honor aclocal flags
 ACLOCAL="$ACLOCAL $ACLOCAL_FLAGS"
