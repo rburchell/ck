@@ -93,7 +93,7 @@ SPEC_FILES = \
 
 INTROSPECT = $(INTERFACES:spec/%.xml=introspect/%.xml)
 ASYNC_INTROSPECT = $(INTERFACES:spec/%.xml=introspect/async/%.xml)
-DOCS = doc/contextkit.html doc/context.html
+DOCS = doc/contextkit.html doc/context.html doc/context-providers.html
 
 src/contextd.vala.stamp: contextprovider.vapi $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg posix --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
@@ -121,6 +121,9 @@ doc/context.html: context.valid.stamp spec/context.xml tools/context2html.pl
 	install -d doc
 	$(top_srcdir)/tools/context2html.pl < $(top_srcdir)/spec/context.xml > $@
 
+doc/context-providers.html: doc/context-providers.txt
+	asciidoc $^
+
 CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) context.valid.stamp
 clean-local:
 	-rm -rf introspect
@@ -144,6 +147,7 @@ EXTRA_DIST += \
 	$(contextd_VALASOURCES) \
 	$(contextd_VAPISOURCES) \
 	src/contextd.vala.stamp \
+	doc/context-providers.txt \
 	$(SPEC_FILES) \
 	spec/all.xml \
 	spec/context.xml \
