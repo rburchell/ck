@@ -37,9 +37,14 @@ link:schema.html[this XML schema].  A simple example for the
 <provider bus="session" service="com.example.RandomProvider">
   <node name="Context">
     <node name="Example">
-      <doc>A exemplary context provider.</doc>
-      <key name="Random" type="DOUBLE">
-        <doc>A random number that changes every now and then.</doc>
+      <doc>
+        A exemplary context provider.
+      </doc>
+      <key name="Random">
+        <float min="0.0" max="1.0"/>
+        <doc>
+ 	  A random number between 0 and 1 that changes every now and then.
+	</doc>
       </key>
     </node>
   </node>
@@ -65,7 +70,7 @@ you should usually execute +update-context-propoerties+ like so:
 
 [source,sh]
 -----------------------
-$ update-context-properties $dir
+update-context-properties $dir
 -----------------------
 
 This will update the various caches that clients like the
@@ -76,6 +81,112 @@ you should not call +update-context-propoerties+ in your maintainer
 scripts.  Triggers in the relevant packages take care of running
 update-context-properties at the right time and only as often as
 necessary.
+
+XML structure
+~~~~~~~~~~~~~
+
+The XML element tree in the property declaration file consists of
+nested +node+ elements, and each +node+ defines the prefix for the
+names of all its children.  The top level node should always have the
+name "Context".
+
+Actual properties are defined with +key+ elements.  A +key+ element
+contains child elements that describe the possible values of the
+property, using elements such as +string+ or +float+.
+
+Documentation
+~~~~~~~~~~~~~
+
+Every +node+ and +key+ element in the property declaration tree can
+have a +doc+ element.  The contents of this element should be text
+formatted using link:http://www.methods.co.nz/asciidoc/[asccidoc]
+markup.
+
+Types
+~~~~~
+
+Each +key+ element in the property declaration tree should contain a
+child element that describes the possible values of the property.
+Allowed elements are:
+
++bool+::
+True or false.
+
++int+::
+A integer.  Attributes min, max.
+
++float+::
+A floating point number.  Attributes min, max.
+
++string+::
+A arbitrary string.
+
++const+::
+A constant.  Constant are useful inside of a +choice+
+element. Attributes +bool+, +int+, +float+, +string+.
+
++repeat+::
+A list.  The single child element of +repeat+ specifies the possible values
+for all the list elements.
+
++list+::
+A list.  Each child element of +list+ specifies the possible values
+for the corresponding list element.  The +tag+ attribute of the
+children can be used to give names to the list elements.
+
++choice+::
+One of a given set of alternative.  Each child element describes one
+alternative.  The possible values for the alternatives must not
+overlap with each other.  This makes it possible to find the
+alternative that corresponds to a given value.  The +tag+ attribute of
+the children can be used to give names to the alternatives.
+
+For example,
+
+[source,xml]
+----
+<list>
+  <bool tag="landscape"/>
+  <bool tag="inverted"/>
+<list>
+----
+
+describes a pair of booleans.  When showing it, the first boolean is
+named "landscape" and the second is named "inverted".
+
+This example
+
+[source,xml]
+----
+<choice>
+  <const int="1" tag="First"/>
+  <const int="2" tag="Second"/>
+</choice>
+----
+
+describes a property that can have the values +1+ and +2+.  When
+letting the user edit the value, the given tags will be used in a drop
+down list instead of the raw numbers.
+
+The following example takes things to far.  It describes a tagged
+union that represents a location either by name or by geographical
+coordinates.
+
+[source,xml]
+----
+<choice>
+  <list tag="named">
+    <const int="0"/>
+    <string/>
+  </list>
+  <list tag="coords">
+    <const int="1"/>
+    <float tag="latitude"/>
+    <float tag="longitude"/>
+  </list>
+</choice>
+----
+
 
 Guidelines for property providers
 ---------------------------------

@@ -77,6 +77,7 @@ SPEC_TOOLS = \
 	tools/doc-generator.xsl \
 	tools/spec-to-introspect.xsl \
 	tools/context2html.pl \
+	tools/context2asciidoc.pl \
 	$(NULL)
 
 
@@ -117,9 +118,10 @@ context.valid.stamp: spec/context.xsd spec/context.xml
 	$(XMLLINT) $^ 
 	touch $@
 
-doc/context.html: context.valid.stamp spec/context.xml tools/context2html.pl
+doc/context.html: spec/context.xml tools/context2asciidoc.pl
 	install -d doc
-	$(top_srcdir)/tools/context2html.pl < $(top_srcdir)/spec/context.xml > $@
+	$(top_srcdir)/tools/context2asciidoc.pl \
+          < $(top_srcdir)/spec/context.xml | asciidoc -f myfilter.conf -o $@ -
 
 doc/context-providers.html: doc/context-providers.txt
 	asciidoc -f myfilter.conf $^

@@ -1,27 +1,134 @@
 <?xml version="1.0"?>
 <provider service="org.freedesktop.ContextKit">
  <doc>
-   This is the list of the 'core' contextual properties of the Maemo
-   platform.
+Core Context Properties
+=======================
+
+This is the list of the core contextual properties of the Maemo
+platform.
+
+*NOTE:* Most of these properties are unstable and their definition will
+change for some time still.  Only the ones explicitly marked as stable
+should be used for now.
+
  </doc>
  <root>
    <node name="Context">
      <node name="Screen">
-       <key name="TopEdge" type="STRING">
+       <doc>
+Display screens
+---------------
+
+These properties talk about the display screens of the device.
+       </doc>
+       <key name="TopEdge">
+	 <choice>
+	   <const string="top"/>
+	   <const string="bottom"/>
+	   <const string="left"/>
+	   <const string="right"/>
+	 </choice>
          <doc>
-	   The side of the main display screen where the user expects
-	   the top-most UI elements to be.  Possible values are the
-	   strings "top", "bottom", "left", and "right", which refer to
-	   the edges of the screen in its normal orientation as defined
-	   by the graphics hardware.
+The edge of the main display screen where the user expects
+the top-most UI elements to be.  Possible values are the
+strings "top", "bottom", "left", and "right", which refer to
+the edges of the screen in its normal orientation as defined
+by the graphics hardware.  _(stable)_
          </doc>
        </key>
-       <key name="IsCovered" type="TRUTH">
+       <key name="IsCovered">
+	 <bool/>
 	 <doc>
-	   Whether or not the main display screen is covered and can
-	   not be seen by the user.  This might mean that the device is
-	   laying face down on a table, or that its lid is closed if it
-	   has one.
+Whether or not the main display screen is covered and can
+not be seen by the user.  This might mean that the device is
+laying face down on a table, or that its lid is closed if it
+has one.  _(stable)_
+	 </doc>
+       </key>
+     </node>
+     <node name="Location">
+       <doc>
+Location
+--------
+
+Information about the geographic location of the device.
+       </doc>
+       <key name="Streets">
+	 <repeat><string/></repeat>
+	 <doc>
+The names of the nearby streets, as a list of strings.  The list might
+be empty when the current location is not near any street, or there
+might be more than one name in the list, when we are at an
+intersection.
+	 </doc>
+       </key>
+       <key name="City">
+	 <string/>
+	 <doc>
+The name of the current city in the users language, as a string.
+	 </doc>
+       </key>
+       <key name="State">
+	 <string/>
+	 <doc>
+The name of the current state in the users language, as a string.
+	 </doc>
+       </key>
+       <key name="StateCode">
+	 <string/>
+	 <doc>
+The ISO 3166-2 code of the current state, as a string.  See
+link:http://en.wikipedia.org/wiki/ISO_3166-2[here] for more
+information.  This value of this property includes the IS3166-1
+alpha-2 prefix, as is usual for ISO 3166-2 codes.
+	 </doc>
+       </key>
+       <key name="Country">
+	 <string/>
+	 <doc>
+The name of the current country in the users language, as a string.
+	 </doc>
+       </key>
+       <key name="CountryCode">
+	 <string/>
+	 <doc>
+The ISO 3166-1 alpha-2 code of the current country, as a string.  See
+link:http://en.wikipedia.org/wiki/ISO_3166-1[here] for more
+information.
+	 </doc>
+       </key>
+       <key name="Continent">
+	 <string/>
+	 <doc>
+The name of the current continent, as a string.
+	 </doc>
+       </key>
+       <key name="Planet">
+	 <string/>
+	 <doc>
+The name of the current planet (or dwarf planet), as a string.
+	 </doc>
+       </key>
+     </node>
+     <node name="Connectivity">
+       <doc>
+Network connectivity
+--------------------
+
+Information about the network connectivity of the device.
+       </doc>
+     </node>
+     <node name="Situation">
+       <doc>
+Situations
+----------
+
+Information about the _situation_ the device is in.
+       </doc>
+       <key name="IsDark">
+	 <bool/>
+	 <doc>
+Whether or not it is dark.
 	 </doc>
        </key>
      </node>
