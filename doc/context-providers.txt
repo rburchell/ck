@@ -1,3 +1,86 @@
-How to write a context provider
-===============================
+How to provide context properties
+=================================
 
+Any component can provide its own key/value pairs and make them appear
+in the api:libduivaluespace[+DuiValueSpace+] (and other interfaces
+that expose context properties).
+
+As a provider of context properties, you need to drop one or more
+_property declaration_ files into +/usr/share/context-providers/+ to
+register your properties with the context framework.  This file
+follows a format described below and is used by DuiValueSpace and
+others to find you when someone subscribes to your properties.  The
+file is also used by the Context Commander to show descriptions of
+your properties and to learn about the possible values that a property
+can legally have.
+
+The property declaration files also inform the context framework how
+you want to be contacted.  Right now, you have to implement the
+api:org.freedesktop.ContextKit[] D-Bus interface, and register
+yourself on either the system or the session D-Bus with a suitable bus
+name.  The choice iof system or session bus and your bus name go into
+the property declaration file.
+
+The easiest way to implement the api:org.freedesktop.ContextKit[]
+interface is to use the api:libcontextprovider[] library.
+
+The property declaration file
+-----------------------------
+
+The property declaration file contains XML and must follow
+link:schema.html[this XML schema].  A simple example for the
++Context.Example.Random+ property looks like this:
+
+[source,xml]
+------------------
+<?xml version="1.0"?>
+<provider bus="session" service="com.example.RandomProvider">
+  <node name="Context">
+    <node name="Example">
+      <doc>A exemplary context provider.</doc>
+      <key name="Random" type="DOUBLE">
+        <doc>A random number that changes every now and then.</doc>
+      </key>
+    </node>
+  </node>
+</provider>
+------------------
+
+This file declares the single property +Context.Example.Random+ and
+instructs the Content Framework to connect to the
++com.exmple.RandomProvider+ bus name on the session D-Bus.
+
+You need to be careful when choosing property name; see the
+"Guidelines for property providers" section for how to avoid
+conflicts.
+
+When providing properties from the api:context-properties[core list],
+you need to follow additional rules to make sure that your property
+declarations and the centrally maintained core list do not fall out of
+synch.  See the "Providing core properties" section for more about
+them.
+
+After installing a property declaration file into a directory +$dir+,
+you should usually execute +update-context-propoerties+ like so:
+
+[source,sh]
+-----------------------
+$ update-context-properties $dir
+-----------------------
+
+This will update the various caches that clients like the
++DuiValueSpace+ use.
+
+But, if a property declaration file is installed via a Debian package,
+you should not call +update-context-propoerties+ in your maintainer
+scripts.  Triggers in the relevant packages take care of running
+update-context-properties at the right time and only as often as
+necessary.
+
+Guidelines for property providers
+---------------------------------
+
+Providing core properties
+-------------------------
+
+- Using the check/update tool.

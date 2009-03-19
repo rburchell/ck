@@ -122,7 +122,7 @@ doc/context.html: context.valid.stamp spec/context.xml tools/context2html.pl
 	$(top_srcdir)/tools/context2html.pl < $(top_srcdir)/spec/context.xml > $@
 
 doc/context-providers.html: doc/context-providers.txt
-	asciidoc $^
+	asciidoc -f myfilter.conf $^
 
 CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) context.valid.stamp
 clean-local:
