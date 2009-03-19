@@ -17,8 +17,10 @@ while ($reader->read) {
       $name[$depth] = $reader->getAttribute(name); 
       $id[$depth]++;
       $depth++ unless $reader->isEmptyElement;
-      print "<h2>" . join('.', @id) . " " . join('.', @name) . "</h2>\n";
-      $firstKey = true;
+      if ($depth > 1) {
+	  print "<h2>" . join('.', @id[1..depth+1]) . " " . join('.', @name) . "</h2>\n";
+	  $firstKey = true;
+      }
     }  elsif ($reader->nodeType == XML_READER_TYPE_END_ELEMENT) {
       $depth--;
       if (!$firsttime++) {
@@ -32,7 +34,7 @@ while ($reader->read) {
         print "<ul>\n";
         $firstkey = false;
       }
-      print "<li><strong>" . $reader->getAttribute(name) . " (" . $reader->getAttribute(type). ")</strong> ";
+      print "<li><strong>" . $reader->getAttribute(name) . "</strong> ";
       $inKey = !$reader->isEmptyElement;
       print  "</li>\n" unless ($inKey);
     } elsif ($reader->nodeType == XML_READER_TYPE_END_ELEMENT) {

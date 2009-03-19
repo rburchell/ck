@@ -121,7 +121,7 @@ doc/context.html: context.valid.stamp spec/context.xml tools/context2html.pl
 	install -d doc
 	$(top_srcdir)/tools/context2html.pl < $(top_srcdir)/spec/context.xml > $@
 
-CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) $(DOCS) context.valid.stamp
+CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) context.valid.stamp
 clean-local:
 	-rm -rf introspect
 
@@ -139,6 +139,7 @@ contextd_LDADD = \
 endif
 
 EXTRA_DIST += \
+	$(DOCS) \
 	$(contextd_GENERATEDSOURCES) \
 	$(contextd_VALASOURCES) \
 	$(contextd_VAPISOURCES) \
@@ -151,12 +152,14 @@ EXTRA_DIST += \
 	$(NULL)
 
 DISTCLEANFILES = \
-	$(contextd_GENERATEDSOURCES) \
-	$(contextd_SOURCES)	\
-	src/contextd.vala.stamp \
 	src/*.gcov \
 	src/*.gcno \
 	src/*.gcda \
+	$(NULL)
+
+MAINTAINERCLEANFILES = \
+	$(contextd_GENERATEDSOURCES) \
+	$(contextd_SOURCES)	\
 	$(NULL)
 
 clean-gcov:
