@@ -1,65 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-  <xs:element name="provider">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="doc"/>
-        <xs:element name="root">
-          <xs:complexType>
-            <xs:group maxOccurs="unbounded" ref="node"/>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-      <xs:attribute name="service" use="required" type="xs:NCName"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:group name="node">
-    <xs:sequence>
-      <xs:element name="node">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element minOccurs="0" ref="doc"/>
-            <xs:choice>
-              <xs:group minOccurs="0" maxOccurs="unbounded" ref="node"/>
-              <xs:group minOccurs="0" maxOccurs="unbounded" ref="key"/>
-            </xs:choice>
-          </xs:sequence>
-          <xs:attribute name="name" use="required" type="xs:NCName"/>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-  </xs:group>
-  <xs:element name="doc" type="xs:string"/>
-  <xs:group name="key">
-    <xs:sequence>
-      <xs:element name="key">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element minOccurs="0" ref="doc"/>
-            <xs:element minOccurs="0" maxOccurs="unbounded" ref="enumerator"/>
-          </xs:sequence>
-          <xs:attribute name="name" use="required" type="xs:NCName"/>
-          <xs:attribute name="type" use="required" type="typetype"/>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-  </xs:group>
-  <xs:element name="enumerator">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enumerator"/>
-      </xs:sequence>
-      <xs:attribute name="name" use="required" type="xs:NCName"/>
-      <xs:attribute name="value" use="required" type="xs:integer"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:simpleType name="typetype">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="INT"/>
-      <xs:enumeration value="DOUBLE"/>
-      <xs:enumeration value="STRING"/>
-      <xs:enumeration value="TRUTH"/>
-      <xs:enumeration value="ENUM"/>
-    </xs:restriction>
-  </xs:simpleType>
-</xs:schema>
+<schema targetNamespace="http://contextkit.freedesktop.org/Provider" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:r="http://contextkit.freedesktop.org/Provider" elementFormDefault="qualified">
+
+  <annotation>
+    <documentation xml:lang="en">
+      Documentation for ContextKit Provider schema.
+      Copyright 2009 Nokia Corporation.
+    </documentation>
+  </annotation>
+
+  <annotation>
+    <documentation xml:lang="en">
+      This schema is free software; you can redistribute it and/or
+      modify it under the terms of the GNU Lesser General Public License
+      as published by the Free Software Foundation; either version 2.1 of
+      the License, or (at your option) any later version.
+    </documentation>
+  </annotation>
+
+  <annotation>
+    <documentation xml:lang="en">
+
+      This schema is distributed in the hope that it will be useful, but
+      WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+      Lesser General Public License for more details.
+    </documentation>
+  </annotation>
+
+  <annotation>
+    <documentation xml:lang="en">
+      You should have received a copy of the GNU Lesser General Public
+      License along with this library; if not, write to the Free Software
+      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+      02110-1301 USA
+    </documentation>
+  </annotation>
+  <element name="provider">
+    <complexType>
+      <sequence>
+        <element minOccurs="0" ref="doc"/>
+        <element name="root">
+          <complexType>
+            <group maxOccurs="unbounded" ref="node"/>
+          </complexType>
+        </element>
+      </sequence>
+      <attribute name="service" use="required" type="NCName"/>
+    </complexType>
+  </element>
+  <group name="node">
+    <sequence>
+      <element name="node">
+        <complexType>
+          <sequence>
+            <element minOccurs="0" ref="doc"/>
+            <choice>
+              <group minOccurs="0" maxOccurs="unbounded" ref="node"/>
+              <group minOccurs="0" maxOccurs="unbounded" ref="key"/>
+            </choice>
+          </sequence>
+          <attribute name="name" use="required" type="NCName"/>
+        </complexType>
+      </element>
+    </sequence>
+  </group>
+  <element name="doc" type="string"/>
+  <group name="key">
+    <sequence>
+      <element name="key">
+        <complexType>
+          <sequence>
+            <element minOccurs="0" ref="doc"/>
+            <element minOccurs="0" maxOccurs="unbounded" ref="enumerator"/>
+          </sequence>
+          <attribute name="name" use="required" type="NCName"/>
+          <attribute name="type" use="required" type="typetype"/>
+        </complexType>
+      </element>
+    </sequence>
+  </group>
+  <element name="enumerator">
+    <complexType>
+      <sequence>
+        <element minOccurs="0" maxOccurs="unbounded" ref="enumerator"/>
+      </sequence>
+      <attribute name="name" use="required" type="NCName"/>
+      <attribute name="value" use="required" type="integer"/>
+    </complexType>
+  </element>
+  <simpleType name="typetype">
+    <restriction base="string">
+      <enumeration value="INT"/>
+      <enumeration value="DOUBLE"/>
+      <enumeration value="STRING"/>
+      <enumeration value="TRUTH"/>
+      <enumeration value="ENUM"/>
+    </restriction>
+  </simpleType>
+</schema>
