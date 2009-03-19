@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema targetNamespace="http://contextkit.freedesktop.org/Provider" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:r="http://contextkit.freedesktop.org/Provider" elementFormDefault="qualified">
+<schema targetNamespace="http://contextkit.freedesktop.org/Provider" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:provider="http://contextkit.freedesktop.org/Provider" elementFormDefault="qualified">
 
   <annotation>
     <documentation xml:lang="en">
@@ -35,7 +35,23 @@
       02110-1301 USA
     </documentation>
   </annotation>
+
+  <simpleType name="dbus_bus_type">
+    <annotation><documentation xml:lang="en">
+      Represents a standard D-Bus bus type.
+    </documentation></annotation>
+    <restriction base="string">
+      <enumeration value="system"/>
+      <enumeration value="session"/>
+    </restriction>
+  </simpleType>
+
   <element name="provider">
+    <annotation><documentation xml:lang="en">
+      A top-level declaration of a context-providing service using the
+      ContextKit framework.
+    </documentation></annotation>
+
     <complexType>
       <sequence>
         <element minOccurs="0" ref="doc"/>
@@ -45,10 +61,25 @@
           </complexType>
         </element>
       </sequence>
-      <attribute name="service" use="required" type="NCName"/>
+      <attribute name="bus" use="required" type="dbus_bus_type">
+	<annotation><documentation xml:lang="en">
+	    Which standard D-Bus bus this service can be activated on
+	</documentation></annotation>
+      </attribute>
+      <attribute name="service" use="required" type="NCName">
+	<annotation><documentation xml:lang="en">
+	  The bus name of the service that will provide these keys.
+	  This service must be activatable on the bus specified in "bus".
+	</documentation></annotation>
+      </attribute>
     </complexType>
   </element>
+
   <group name="node">
+    <annotation><documentation xml:lang="en">
+	A node in the tree of provided context.
+	A node can have children that are keys or nodes.
+    </documentation></annotation>
     <sequence>
       <element name="node">
         <complexType>
@@ -59,12 +90,21 @@
               <group minOccurs="0" maxOccurs="unbounded" ref="key"/>
             </choice>
           </sequence>
-          <attribute name="name" use="required" type="NCName"/>
+	  <attribute name="name" use="required" type="NCName">
+	    <annotation><documentation xml:lang="en">
+		The name of the node.
+	    </documentation></annotation>
+	  </attribute>
         </complexType>
       </element>
     </sequence>
   </group>
-  <element name="doc" type="string"/>
+  <element name="doc" type="string">
+    <annotation><documentation xml:lang="en">
+	Documentation about a key
+    </documentation></annotation>
+  </element>
+
   <group name="key">
     <sequence>
       <element name="key">
@@ -73,28 +113,26 @@
             <element minOccurs="0" ref="doc"/>
             <element minOccurs="0" maxOccurs="unbounded" ref="enumerator"/>
           </sequence>
-          <attribute name="name" use="required" type="NCName"/>
-          <attribute name="type" use="required" type="typetype"/>
+	  <attribute name="name" use="required" type="NCName">
+	    The name of this key.
+	  </attribute>
+	  <attribute name="type" use="required" type="context-type">
+	    The type of this key.
+	  </attribute>
         </complexType>
       </element>
     </sequence>
   </group>
-  <element name="enumerator">
-    <complexType>
-      <sequence>
-        <element minOccurs="0" maxOccurs="unbounded" ref="enumerator"/>
-      </sequence>
-      <attribute name="name" use="required" type="NCName"/>
-      <attribute name="value" use="required" type="integer"/>
-    </complexType>
-  </element>
-  <simpleType name="typetype">
+
+  <simpleType name="context-type">
+    <annotation><documentation xml:lang="en">
+	The type of a simple context key.
+    </documentation></annotation>
     <restriction base="string">
       <enumeration value="INT"/>
       <enumeration value="DOUBLE"/>
       <enumeration value="STRING"/>
       <enumeration value="TRUTH"/>
-      <enumeration value="ENUM"/>
     </restriction>
   </simpleType>
 </schema>
