@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<schema targetNamespace="http://contextkit.freedesktop.org/Provider" xmlns:provider="http://contextkit.freedesktop.org/Provider" xmlns="http://www.w3.org/2001/XMLSchema" xml:lang="EN" elementFormDefault="qualified">
-
-
+<schema targetNamespace="http://contextkit.freedesktop.org/Provider"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  xmlns:provider="http://contextkit.freedesktop.org/Provider"
+>
   <annotation>
     <documentation>
       Documentation for ContextKit Provider schema.
@@ -20,7 +20,6 @@
 
   <annotation>
     <documentation>
-
       This schema is distributed in the hope that it will be useful, but
       WITHOUT ANY WARRANTY; without even the implied warranty of
       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
@@ -37,7 +36,7 @@
     </documentation>
   </annotation>
 
-  <simpleType name="dbus_bus_type">
+  <simpleType name="dbusBusType">
     <annotation><documentation>
       Represents a standard D-Bus bus type.
     </documentation></annotation>
@@ -58,11 +57,11 @@
         <element minOccurs="0" ref="provider:doc"/>
         <element name="root">
           <complexType>
-            <group maxOccurs="unbounded" ref="provider:node"/>
+            <group maxOccurs="unbounded" ref="provider:nodeGroup"/>
           </complexType>
         </element>
       </sequence>
-      <attribute name="bus" use="required" type="provider:dbus_bus_type">
+      <attribute name="bus" use="required" type="provider:dbusBusType">
 	<annotation><documentation>
 	    Which standard D-Bus bus this service can be activated on
 	</documentation></annotation>
@@ -76,59 +75,60 @@
     </complexType>
   </element>
 
-  <group name="node">
+  <complexType name="node">
+    <sequence>
+      <element minOccurs="0" ref="provider:doc"/>
+      <choice>
+	<group minOccurs="0" maxOccurs="unbounded" ref="provider:nodeGroup"/>
+	<group minOccurs="0" maxOccurs="unbounded" ref="provider:keyGroup"/>
+      </choice>
+    </sequence>
+    <attribute name="name" use="required" type="NCName">
+      <annotation><documentation>
+	  The name of the node.
+      </documentation></annotation>
+    </attribute>
+  </complexType>
+
+  <group name="nodeGroup">
     <annotation><documentation>
 	A node in the tree of provided context.
 	A node can have children that are keys or nodes.
     </documentation></annotation>
     <sequence>
-      <element name="node">
-        <complexType>
-          <sequence>
-            <element minOccurs="0" ref="provider:doc"/>
-            <choice>
-              <group minOccurs="0" maxOccurs="unbounded" ref="provider:node"/>
-              <group minOccurs="0" maxOccurs="unbounded" ref="provider:key"/>
-            </choice>
-          </sequence>
-	  <attribute name="name" use="required" type="NCName">
-	    <annotation><documentation>
-		The name of the node.
-	    </documentation></annotation>
-	  </attribute>
-        </complexType>
-      </element>
+      <element name="node" type="provider:node"/>
     </sequence>
   </group>
+
   <element name="doc" type="string">
     <annotation><documentation>
 	Documentation about a key or node.
     </documentation></annotation>
   </element>
 
-  <group name="key">
+  <complexType name="key">
     <sequence>
-      <element name="key">
-        <complexType>
-          <sequence>
-            <element minOccurs="0" ref="provider:doc"/>
-          </sequence>
-	  <attribute name="name" use="required" type="NCName">
-	    <annotation><documentation>
-	      The name of this key.
-	    </documentation></annotation>
-	  </attribute>
-	  <attribute name="type" use="required" type="provider:context-type">
-	    <annotation><documentation>
-	      The type of this key.
-	    </documentation></annotation>
-	  </attribute>
-        </complexType>
-      </element>
+      <element minOccurs="0" ref="provider:doc"/>
+    </sequence>
+    <attribute name="name" use="required" type="NCName">
+      <annotation><documentation>
+	The name of this key.
+      </documentation></annotation>
+    </attribute>
+    <attribute name="type" use="required" type="provider:contextType">
+      <annotation><documentation>
+	The type of this key.
+      </documentation></annotation>
+    </attribute>
+  </complexType>
+
+  <group name="keyGroup">
+    <sequence>
+      <element name="key" type="provider:key"/>
     </sequence>
   </group>
 
-  <simpleType name="context-type">
+  <simpleType name="contextType">
     <annotation><documentation>
 	The type of a simple context key.
     </documentation></annotation>
