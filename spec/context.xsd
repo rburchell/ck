@@ -1,142 +1,142 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://contextkit.freedesktop.org/Provider" xmlns="http://contextkit.freedesktop.org/Provider" xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="EN" elementFormDefault="qualified">
+<schema targetNamespace="http://contextkit.freedesktop.org/Provider" xmlns:provider="http://contextkit.freedesktop.org/Provider" xmlns="http://www.w3.org/2001/XMLSchema" xml:lang="EN" elementFormDefault="qualified">
 
 
-  <xs:annotation>
-    <xs:documentation>
+  <annotation>
+    <documentation>
       Documentation for ContextKit Provider schema.
       Copyright 2009 Nokia Corporation.
-    </xs:documentation>
-  </xs:annotation>
+    </documentation>
+  </annotation>
 
-  <xs:annotation>
-    <xs:documentation>
+  <annotation>
+    <documentation>
       This schema is free software; you can redistribute it and/or
       modify it under the terms of the GNU Lesser General Public License
       as published by the Free Software Foundation; either version 2.1 of
       the License, or (at your option) any later version.
-    </xs:documentation>
-  </xs:annotation>
+    </documentation>
+  </annotation>
 
-  <xs:annotation>
-    <xs:documentation>
+  <annotation>
+    <documentation>
 
       This schema is distributed in the hope that it will be useful, but
       WITHOUT ANY WARRANTY; without even the implied warranty of
       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
       Lesser General Public License for more details.
-    </xs:documentation>
-  </xs:annotation>
+    </documentation>
+  </annotation>
 
-  <xs:annotation>
-    <xs:documentation>
+  <annotation>
+    <documentation>
       You should have received a copy of the GNU Lesser General Public
       License along with this library; if not, write to the Free Software
       Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
       02110-1301 USA
-    </xs:documentation>
-  </xs:annotation>
+    </documentation>
+  </annotation>
 
-  <xs:simpleType name="dbus_bus_type">
-    <xs:annotation><xs:documentation>
+  <simpleType name="dbus_bus_type">
+    <annotation><documentation>
       Represents a standard D-Bus bus type.
-    </xs:documentation></xs:annotation>
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="system"/>
-      <xs:enumeration value="session"/>
-    </xs:restriction>
-  </xs:simpleType>
+    </documentation></annotation>
+    <restriction base="string">
+      <enumeration value="system"/>
+      <enumeration value="session"/>
+    </restriction>
+  </simpleType>
 
-  <xs:element name="provider">
-    <xs:annotation><xs:documentation>
+  <element name="provider">
+    <annotation><documentation>
       A top-level declaration of a context-providing service using the
       ContextKit framework.
-    </xs:documentation></xs:annotation>
+    </documentation></annotation>
 
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="doc"/>
-        <xs:element name="root">
-          <xs:complexType>
-            <xs:group maxOccurs="unbounded" ref="node"/>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-      <xs:attribute name="bus" use="required" type="dbus_bus_type">
-	<xs:annotation><xs:documentation>
+    <complexType>
+      <sequence>
+        <element minOccurs="0" ref="provider:doc"/>
+        <element name="root">
+          <complexType>
+            <group maxOccurs="unbounded" ref="provider:node"/>
+          </complexType>
+        </element>
+      </sequence>
+      <attribute name="bus" use="required" type="provider:dbus_bus_type">
+	<annotation><documentation>
 	    Which standard D-Bus bus this service can be activated on
-	</xs:documentation></xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="service" use="required" type="xs:NCName">
-	<xs:annotation><xs:documentation>
+	</documentation></annotation>
+      </attribute>
+      <attribute name="service" use="required" type="NCName">
+	<annotation><documentation>
 	  The bus name of the service that will provide these keys.
 	  This service must be activatable on the bus specified in "bus".
-	</xs:documentation></xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	</documentation></annotation>
+      </attribute>
+    </complexType>
+  </element>
 
-  <xs:group name="node">
-    <xs:annotation><xs:documentation>
+  <group name="node">
+    <annotation><documentation>
 	A node in the tree of provided context.
 	A node can have children that are keys or nodes.
-    </xs:documentation></xs:annotation>
-    <xs:sequence>
-      <xs:element name="node">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element minOccurs="0" ref="doc"/>
-            <xs:choice>
-              <xs:group minOccurs="0" maxOccurs="unbounded" ref="node"/>
-              <xs:group minOccurs="0" maxOccurs="unbounded" ref="key"/>
-            </xs:choice>
-          </xs:sequence>
-	  <xs:attribute name="name" use="required" type="xs:NCName">
-	    <xs:annotation><xs:documentation>
+    </documentation></annotation>
+    <sequence>
+      <element name="node">
+        <complexType>
+          <sequence>
+            <element minOccurs="0" ref="provider:doc"/>
+            <choice>
+              <group minOccurs="0" maxOccurs="unbounded" ref="provider:node"/>
+              <group minOccurs="0" maxOccurs="unbounded" ref="provider:key"/>
+            </choice>
+          </sequence>
+	  <attribute name="name" use="required" type="NCName">
+	    <annotation><documentation>
 		The name of the node.
-	    </xs:documentation></xs:annotation>
-	  </xs:attribute>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-  </xs:group>
-  <xs:element name="doc" type="xs:string">
-    <xs:annotation><xs:documentation>
+	    </documentation></annotation>
+	  </attribute>
+        </complexType>
+      </element>
+    </sequence>
+  </group>
+  <element name="doc" type="string">
+    <annotation><documentation>
 	Documentation about a key or node.
-    </xs:documentation></xs:annotation>
-  </xs:element>
+    </documentation></annotation>
+  </element>
 
-  <xs:group name="key">
-    <xs:sequence>
-      <xs:element name="key">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element minOccurs="0" ref="doc"/>
-          </xs:sequence>
-	  <xs:attribute name="name" use="required" type="xs:NCName">
-	    <xs:annotation><xs:documentation>
+  <group name="key">
+    <sequence>
+      <element name="key">
+        <complexType>
+          <sequence>
+            <element minOccurs="0" ref="provider:doc"/>
+          </sequence>
+	  <attribute name="name" use="required" type="NCName">
+	    <annotation><documentation>
 	      The name of this key.
-	    </xs:documentation></xs:annotation>
-	  </xs:attribute>
-	  <xs:attribute name="type" use="required" type="context-type">
-	    <xs:annotation><xs:documentation>
+	    </documentation></annotation>
+	  </attribute>
+	  <attribute name="type" use="required" type="provider:context-type">
+	    <annotation><documentation>
 	      The type of this key.
-	    </xs:documentation></xs:annotation>
-	  </xs:attribute>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-  </xs:group>
+	    </documentation></annotation>
+	  </attribute>
+        </complexType>
+      </element>
+    </sequence>
+  </group>
 
-  <xs:simpleType name="context-type">
-    <xs:annotation><xs:documentation>
+  <simpleType name="context-type">
+    <annotation><documentation>
 	The type of a simple context key.
-    </xs:documentation></xs:annotation>
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="INT"/>
-      <xs:enumeration value="DOUBLE"/>
-      <xs:enumeration value="STRING"/>
-      <xs:enumeration value="TRUTH"/>
-    </xs:restriction>
-  </xs:simpleType>
-</xs:schema>
+    </documentation></annotation>
+    <restriction base="string">
+      <enumeration value="INT"/>
+      <enumeration value="DOUBLE"/>
+      <enumeration value="STRING"/>
+      <enumeration value="TRUTH"/>
+    </restriction>
+  </simpleType>
+</schema>
