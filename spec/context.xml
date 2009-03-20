@@ -7,6 +7,10 @@ Core Context Properties
 This is the list of the core contextual properties of the Maemo
 platform.
 
+This document is maintained as part of the +contextkit+ package.
+Please report change requests as bugs against the +contextkit+
+package.
+ 
 *NOTE:* Most of these properties are unstable and their definition will
 change for some time still.  Only the ones explicitly marked as stable
 should be used for now.
