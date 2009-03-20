@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<provider service="org.freedesktop.ContextKit">
+<provider bus="session" service="org.freedesktop.ContextKit.IMAGINARY" xmlns="http://contextkit.freedesktop.org/Provider" >
  <doc>
 Core Context Properties
 =======================
