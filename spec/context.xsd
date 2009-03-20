@@ -1,7 +1,6 @@
 <schema targetNamespace="http://contextkit.freedesktop.org/Provider"
-  xmlns="http://www.w3.org/2001/XMLSchema"
-  xmlns:provider="http://contextkit.freedesktop.org/Provider"
->
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:provider="http://contextkit.freedesktop.org/Provider">
   <annotation>
     <documentation>
       Documentation for ContextKit Provider schema.
@@ -55,11 +54,7 @@
     <complexType>
       <sequence>
         <element minOccurs="0" ref="provider:doc"/>
-        <element name="root">
-          <complexType>
-            <group maxOccurs="unbounded" ref="provider:nodeGroup"/>
-          </complexType>
-        </element>
+	<group maxOccurs="unbounded" ref="provider:nodeGroup"/>
       </sequence>
       <attribute name="bus" use="required" type="provider:dbusBusType">
 	<annotation><documentation>
