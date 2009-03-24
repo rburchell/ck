@@ -1,3 +1,11 @@
+contextkit (0.1.3-1) unstable; urgency=low
+
+  New upstream release
+  
+  * More docs, mostly.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Tue, 24 Mar 2009 18:13:25 +0200
+
 contextkit (0.1.2-2) unstable; urgency=low
 
   * Rereleased with correctly generated buildcruft.
