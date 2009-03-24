@@ -7,6 +7,7 @@ libcontextprovider_VALASOURCES_PRIV = \
 	libcontextprovider/key_usage_counter.vala \
 	libcontextprovider/subscriber.vala \
 	libcontextprovider/cprovider.vala \
+	libcontextprovider/value_compare.vala \
 	$(NULL)
 
 libcontextprovider_VALASOURCES_PUB = \

@@ -74,15 +74,26 @@ namespace ContextProvider {
 			get_internal (keyset, out values_to_send, out undeterminable_keys);
 		}
 
-		internal void get_internal (StringSet keyset, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
-			HashTable<string, Value?> values = new HashTable<string, Value?> (str_hash, str_equal);
+		internal void get_internal (StringSet keyset, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
+			// Note: Vala doesn't support += for parameters yet; using a temp array
+			properties = new HashTable<string, Value?>(str_hash, str_equal);
+			string[] undeterminable_keys_temp = {};
+			foreach (var key in keyset) {
+				debug ("  %s", key);
+				//debug ("reading value for key %s", key);
+				Value? v = values.lookup (key);
 
-			// Let providers update the central value table
-			ArrayList<string> undeterminable_key_list = providers.get (keyset, values);
-			insert_to_value_table (values, undeterminable_key_list);
-
-			// Then read the values from the value table
-			read_from_value_table(keyset, out values_to_send, out undeterminable_keys);
+				if (v == null) {
+					debug ("    - undeterminable");
+					undeterminable_keys_temp += key;
+				}
+				else {
+					debug ("    - %s", v.strdup_contents());
+					properties.insert (key, v);
+				}
+			}
+			undeterminable_keys = undeterminable_keys_temp;
+			debug ("read_from_value_table done");
 		}
 
 		public DBus.ObjectPath GetSubscriber (DBus.BusName name) throws DBus.Error {
@@ -148,76 +159,27 @@ namespace ContextProvider {
 			return checked_keys;
 		}
 
-		/*
-		Update the value table with new values.
-		*/
-		private void insert_to_value_table(HashTable<string, Value?> properties, ArrayList<string>? undeterminable_keys) {
-			//debug ("insert_to_value_table");
-			var keys = properties.get_keys ();
+		/* Is called when the provider sets new values to context properties */
+		public bool property_values_changed(HashTable<string, Value?> properties, ArrayList<string>? undeterminable_keys) {
 			// Note: get_keys returns a list of unowned strings. We shouldn't assign it to
 			// a list of owned strings. At the moment, the Vala compiler doesn't prevent us
 			// from doing so.
-			foreach (var key in keys) {
-				// Overwrite the value in the value table.
-				// Do not care whether it was already there or not.
+			foreach (var key in properties.get_keys()) {
+				if (providers.valid_keys.is_member (key) == false) {
+					critical ("Key %s is not valid", key);
+				}
+				// Remove unchanged keys
+				if (value_compare(values.lookup(key),properties.lookup (key))) {
+					properties.remove(key);
+				}
 				values.insert (key, properties.lookup (key));
 			}
 			foreach (var key in undeterminable_keys) {
+				if (providers.valid_keys.is_member (key) == false) {
+					critical ("Key %s is not valid", key);
+				}
 				values.insert (key, null);
 			}
-		}
-
-		/*
-		Read the values of the specified keys from the value table.
-		*/
-		private void read_from_value_table(StringSet keys, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
-			debug ("read_from_value_table");
-			// Note: Vala doesn't support += for parameters yet; using a temp array
-			properties = new HashTable<string, Value?>(str_hash, str_equal);
-			string[] undeterminable_keys_temp = {};
-			foreach (var key in keys) {
-				debug ("  %s", key);
-				//debug ("reading value for key %s", key);
-				Value? v = values.lookup (key);
-
-				if (v == null) {
-					debug ("    - undeterminable");
-					undeterminable_keys_temp += key;
-				}
-				else {
-					debug ("    - %s", v.strdup_contents());
-					properties.insert (key, v);
-				}
-			}
-			undeterminable_keys = undeterminable_keys_temp;
-			debug ("read_from_value_table done");
-		}
-
-		/* Is called when the provider sets new values to context properties */
-		public bool property_values_changed(HashTable<string, Value?> properties, ArrayList<string>? undeterminable_keys) {
-			// Check that all the keys are valid
-			var keys = properties.get_keys ();
-			foreach (var key in keys) {
-				if (providers.valid_keys.is_member (key) == false) {
-					debug ("Key %s is not valid", key);
-					assert (false);
-					// FIXME: How to react?
-					// Now we drop the whole event and return an error value
-					return false;
-				}
-			}
-			foreach (var key in undeterminable_keys) {
-				if (providers.valid_keys.is_member (key) == false) {
-					debug ("Key %s is not valid", key);
-					assert (false);
-					// FIXME: How to react?
-					// Now we drop the whole event and return an error value
-					return false;
-				}
-			}
-
-			// Update the value table
-			insert_to_value_table(properties, undeterminable_keys);
 
 			// Inform the subscribers of the change
 			foreach (var s in subscribers.get_values()) {
