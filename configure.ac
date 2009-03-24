@@ -1,4 +1,4 @@
-AC_INIT([ContextKit], [0.1.2], [rob.taylor@codethink.co.uk], ContextKit)
+AC_INIT([ContextKit], [0.1.3], [rob.taylor@codethink.co.uk], ContextKit)
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([-Wall -Werror dist-bzip2 tar-ustar 1.9])
@@ -66,7 +66,7 @@ AC_ARG_ENABLE(debug,
 GLIB_REQUIRED=2.12.0
 GEE_REQUIRED=0.1.3
 
-PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED sqlite3 dbus-glib-1 gee-1.0 >=  $GEE_REQUIRED)
+PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED dbus-glib-1 gee-1.0 >=  $GEE_REQUIRED)
 
 ##################################
 # Flags for coverage measurement

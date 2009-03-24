@@ -1,67 +1,123 @@
 <?xml version="1.0"?>
-<provider service="org.freedesktop.ContextKit">
- <doc>
-    Contextd daemon provides the below specified read only properties.
-    This file is the ultimate source of information about the properties provided
-    by contextd. As such it should be kept closely synchronized with contextd.
- </doc>
- <root>
+<properties xmlns="http://contextkit.freedesktop.org/Provider">
+  <doc>
+Core Context Properties
+=======================
+
+This is the list of the core contextual properties of the Maemo
+platform.
+
+This document is maintained as part of the +contextkit+ package.
+Please report change requests as bugs against the +contextkit+
+package.
+ 
+*NOTE:* Most of these properties are unstable and their definition will
+change for some time still.  Only the ones explicitly marked as stable
+should be used for now.
+
+  </doc>
   <node name="Context">
-    <doc> There will be probably one top level node as here, but more can be added. </doc>
-    <node name="Device">
-<!--
-      <node name="Display">
-        <doc> These are properties related to the built-in display. </doc>
-        <key name="displayLit" type="INT"/>
-        <key name="inHomeScreen" type="STRING">
-          <doc> What this might be? </doc>
-        </key>
-        <key name="brightnessLevel" type="STRING">
-          <doc> these should be one-liner commentst about the property </doc>
-        </key>
-      </node>
-      <node name="Battery">
-        <key name="capacity" type="INT"/>
-        <key name="percentRemaining" type="INT"/>
-        <key name="timeOnBattery" type="INT"/>
-        <key name="timeLeftOnBattery" type="INT">
-          <doc> We store time in the battery  </doc>
-        </key>
-        <key name="isCharging" type="INT"/>
-        <key name="timeToCompleteCharge" type="INT"/>
-      </node>
-      <node name="CurrentProfile"/>
--->
-      <node name="Orientation">
-         <key name="facingUp" type="TRUTH">
-           <doc>A boolean , true if the device is face up, false if face down </doc>
-         </key>
-         <key name="edgeUp" type="ENUM">
-            <doc> The screen edge that is currently pointing upwards.</doc>
-            <enumerator name="Top" value="1"/>
-            <enumerator name="Left" value="2"/>
-            <enumerator name="Right" value="3"/>
-            <enumerator name="Bottom" value="4"/>
-         </key>
-      </node>
-<!--
-      <node name="Memory">
-        <doc>These are coming from /proc/meminfo, right?</doc>
-        <key name="ramUsed" type="INT"/>
-        <key name="ramTotal" type="INT"/>
-        <key name="swapFree" type="INT"/>
-        <key name="swapUsed" type="INT"/>
-        <key name="swapTotal" type="INT"/>
-        <key name="internalFree" type="INT"/>
-        <key name="internalUsed" type="INT"/>
-        <key name="internalTotal" type="INT"/>
-        <key name="externalFree" type="INT"/>
-        <key name="externalUsed" type="INT"/>
-        <key name="externalTotal" type="INT"/>
-        <key name="isInternalCardCorrupted" type="INT"/>
-      </node>
--->
+    <node name="Screen">
+      <doc>
+Display screens
+---------------
+
+These properties talk about the display screens of the device.
+      </doc>
+      <key name="TopEdge" type="STRING">
+        <doc>
+The edge of the main display screen where the user expects
+the top-most UI elements to be.  Possible values are the
+strings "top", "bottom", "left", and "right", which refer to
+the edges of the screen in its normal orientation as defined
+by the graphics hardware.  _(stable)_
+        </doc>
+      </key>
+      <key name="IsCovered" type="TRUTH">
+	<doc>
+Whether or not the main display screen is covered and can
+not be seen by the user.  This might mean that the device is
+laying face down on a table, or that its lid is closed if it
+has one.  _(stable)_
+	</doc>
+      </key>
+    </node>
+    <node name="Location">
+      <doc>
+Location
+--------
+
+Information about the geographic location of the device.
+      </doc>
+      <key name="Streets" type="STRING">
+	<doc>
+The names of the nearby streets, as a list of strings.  The list might
+be empty when the current location is not near any street, or there
+might be more than one name in the list, when we are at an
+intersection.
+	</doc>
+      </key>
+      <key name="City" type="STRING">
+	<doc>
+The name of the current city in the users language, as a string.
+	</doc>
+      </key>
+      <key name="State" type="STRING">
+	<doc>
+The name of the current state in the users language, as a string.
+	</doc>
+      </key>
+      <key name="StateCode" type="STRING">
+	<doc>
+The ISO 3166-2 code of the current state, as a string.  See
+link:http://en.wikipedia.org/wiki/ISO_3166-2[here] for more
+information.  This value of this property includes the IS3166-1
+alpha-2 prefix, as is usual for ISO 3166-2 codes.
+	</doc>
+      </key>
+      <key name="Country" type="STRING">
+	<doc>
+The name of the current country in the users language, as a string.
+	</doc>
+      </key>
+      <key name="CountryCode" type="STRING">
+	<doc>
+The ISO 3166-1 alpha-2 code of the current country, as a string.  See
+link:http://en.wikipedia.org/wiki/ISO_3166-1[here] for more
+information.
+	</doc>
+      </key>
+      <key name="Continent" type="STRING">
+	<doc>
+The name of the current continent, as a string.
+	</doc>
+      </key>
+      <key name="Planet" type="STRING">
+	<doc>
+The name of the current planet (or dwarf planet), as a string.
+	</doc>
+      </key>
+    </node>
+    <node name="Connectivity">
+      <doc>
+Network connectivity
+--------------------
+
+Information about the network connectivity of the device.
+      </doc>
+    </node>
+    <node name="Situation">
+      <doc>
+Situations
+----------
+
+Information about the _situation_ the device is in.
+      </doc>
+      <key name="IsDark" type="TRUTH">
+	<doc>
+Whether or not it is dark.
+	</doc>
+      </key>
     </node>
   </node>
- </root>
-</provider>
+</properties>

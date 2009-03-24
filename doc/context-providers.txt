@@ -1,0 +1,251 @@
+How to provide context properties
+=================================
+
+Any component can provide its own key/value pairs and make them appear
+in the api:libduivaluespace[+DuiValueSpace+] (and other interfaces
+that expose context properties).
+
+As a provider of context properties, you need to drop one or more
+_property declaration_ files into +/usr/share/context-providers/+ to
+register your properties with the context framework.  This file
+follows a format described below and is used by DuiValueSpace and
+others to find you when someone subscribes to your properties.  The
+file is also used by the Context Commander to show descriptions of
+your properties and to learn about the possible values that a property
+can legally have.
+
+The property declaration files also inform the context framework how
+you want to be contacted.  Right now, you have to implement the
+api:org.freedesktop.ContextKit[] D-Bus interface, and register
+yourself on either the system or the session D-Bus with a suitable bus
+name.  The choice iof system or session bus and your bus name go into
+the property declaration file.
+
+The easiest way to implement the api:org.freedesktop.ContextKit[]
+interface is to use the api:libcontextprovider[] library.
+
+The property declaration file
+-----------------------------
+
+The property declaration file contains XML and must follow
+link:schema.html[this XML schema].  A simple example for the
++Context.Example.Random+ property looks like this:
+
+[source,xml]
+------------------
+<?xml version="1.0"?>
+<provider bus="session" service="com.example.RandomProvider">
+  <node name="Context">
+    <node name="Example">
+      <doc>
+        A exemplary context provider.
+      </doc>
+      <key name="Random" type="DOUBLE">
+        <doc>
+ 	  A random number between 0 and 1 that changes every now and then.
+	</doc>
+      </key>
+    </node>
+  </node>
+</provider>
+------------------
+
+This file declares the single property +Context.Example.Random+ and
+instructs the Content Framework to connect to the
++com.exmple.RandomProvider+ bus name on the session D-Bus.
+
+You need to be careful when choosing property name; see the
+"Guidelines for property providers" section for how to avoid
+conflicts.
+
+When providing properties from the api:context-properties[core list],
+you need to follow additional rules to make sure that your property
+declarations and the centrally maintained core list do not fall out of
+synch.  See the "Providing core properties" section for more about
+them.
+
+After installing a property declaration file into a directory +$dir+,
+you should usually execute +update-context-propoerties+ like so:
+
+[source,sh]
+-----------------------
+update-context-properties $dir
+-----------------------
+
+This will update the various caches that clients like the
++DuiValueSpace+ use.
+
+But, if a property declaration file is installed via a Debian package,
+you should not call +update-context-propoerties+ in your maintainer
+scripts.  Triggers in the relevant packages take care of running
+update-context-properties at the right time and only as often as
+necessary.
+
+XML structure
+~~~~~~~~~~~~~
+
+The XML element tree in the property declaration file consists of
+nested +node+ elements, and each +node+ defines the prefix for the
+names of all its children.  The top level node should always have the
+name "Context".
+
+Actual properties are defined with +key+ elements.  A +key+ element
+contains child elements that describe the possible values of the
+property, using elements such as +string+ or +float+.
+
+Documentation
+~~~~~~~~~~~~~
+
+Every +node+ and +key+ element in the property declaration tree can
+have a +doc+ element.  The contents of this element should be text
+formatted using link:http://www.methods.co.nz/asciidoc/[asccidoc]
+markup.
+
+Types
+~~~~~
+
+*NOTE:* This is preview of things that might come, or not.  For now,
+just use a +type+ attribute in your +key+ elements with one of
++"TRUTH"+, +"STRING"+, +"INT"+, or +"DOUBLE"+ as the value.
+
+
+Each +key+ element in the property declaration tree should contain a
+child element that describes the possible values of the property.
+Allowed elements are:
+
++bool+::
+True or false.
+
++int+::
+A integer.  Attributes min, max.
+
++float+::
+A floating point number.  Attributes min, max.
+
++string+::
+A arbitrary string.
+
++const+::
+A constant.  Constant are useful inside of a +choice+
+element. Attributes +bool+, +int+, +float+, +string+.
+
++list+::
+A list.  The single child element of +list+ specifies the possible values
+for all the list elements.
+
++struct+::
+A fixed length list.  Each child element of +struct+ specifies the
+possible values for the corresponding list element.  The +tag+
+attribute of the children can be used to give names to the list
+elements.
+
++choice+::
+One of a given set of alternative.  Each child element describes one
+alternative.  The possible values for the alternatives must not
+overlap with each other.  This makes it possible to find the
+alternative that corresponds to a given value.  The +tag+ attribute of
+the children can be used to give names to the alternatives.
+
+For example,
+
+[source,xml]
+----
+<struct>
+  <bool tag="landscape"/>
+  <bool tag="inverted"/>
+<struct>
+----
+
+describes a pair of booleans.  When showing it, the first boolean is
+named "landscape" and the second is named "inverted".
+
+This example
+
+[source,xml]
+----
+<choice>
+  <const int="1" tag="First"/>
+  <const int="2" tag="Second"/>
+</choice>
+----
+
+describes a property that can have the values +1+ and +2+.  When
+letting the user edit the value, the given tags will be used in a drop
+down list instead of the raw numbers.
+
+The following example takes things to far.  It describes a tagged
+union that represents a location either by name or by geographical
+coordinates.
+
+[source,xml]
+----
+<choice>
+  <struct tag="named">
+    <const int="0"/>
+    <string/>
+  </struct>
+  <struct tag="coords">
+    <const int="1"/>
+    <float tag="latitude"/>
+    <float tag="longitude"/>
+  </struct>
+</choice>
+----
+
+Guidelines for property providers
+---------------------------------
+
+TBW.
+
+Providing core properties
+-------------------------
+
+The Context Framework project maintains a list of _core properties_.
+These core properties are intended to cover the needs of most
+applications and be meaningful for many different devices.
+
+When you are implementing a provider for some of the core properties,
+you must of course make sure that you follow the specification of that
+property.  You can not redefine its type or description in your
+property declaration file, obviously.
+
+But you still need to include a complete property declaration file
+with your provider and install it in +/usr/share/context-providers/+.
+At run-time, all properties are equal and there isn't anything special
+about core properties anymore.
+
+To create a property declaration file that includes core properties,
+you should copy the necesarry fragments out of the core declaration
+file into yours.  The core declaration file can be found in the
++contextkit-dev+ package and also link:context.xml[here].
+
+The core properties will not change very often, but there might be
+changes.  When that happens, you need to review the changes and
+maybe--after careful consideration--update your implementation to
+reflect the changes.  You also need to update your property
+declaration file at that time.
+
+The +contextkit-dev+ package contains the +check-core-properties+ tool
+to help with this.  Running it like this
+
+[source,sh]
+----
+check-context-properties properties.xml
+----
+
+will check every core property declared in the file +properties.xml+
+against its current official declarations.  It will output some
+diagnosis and fail if there are any discrepancies.  You should run it
+as part of your test-suite.
+
+You can automatically update your property declaration file from the
+current official declarations by using the +--update+ option:
+
+[source,sh]
+----
+check-context-properties --update properties.xml
+----
+
+This will modify +properties.xml+ in place.  You should run it
+manually when adapting your provider to changes in the official core
+property declarations.

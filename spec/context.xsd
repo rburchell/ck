@@ -1,65 +1,149 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-  <xs:element name="provider">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="doc"/>
-        <xs:element name="root">
-          <xs:complexType>
-            <xs:group maxOccurs="unbounded" ref="node"/>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-      <xs:attribute name="service" use="required" type="xs:NCName"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:group name="node">
-    <xs:sequence>
-      <xs:element name="node">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element minOccurs="0" ref="doc"/>
-            <xs:choice>
-              <xs:group minOccurs="0" maxOccurs="unbounded" ref="node"/>
-              <xs:group minOccurs="0" maxOccurs="unbounded" ref="key"/>
-            </xs:choice>
-          </xs:sequence>
-          <xs:attribute name="name" use="required" type="xs:NCName"/>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-  </xs:group>
-  <xs:element name="doc" type="xs:string"/>
-  <xs:group name="key">
-    <xs:sequence>
-      <xs:element name="key">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element minOccurs="0" ref="doc"/>
-            <xs:element minOccurs="0" maxOccurs="unbounded" ref="enumerator"/>
-          </xs:sequence>
-          <xs:attribute name="name" use="required" type="xs:NCName"/>
-          <xs:attribute name="type" use="required" type="typetype"/>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-  </xs:group>
-  <xs:element name="enumerator">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="enumerator"/>
-      </xs:sequence>
-      <xs:attribute name="name" use="required" type="xs:NCName"/>
-      <xs:attribute name="value" use="required" type="xs:integer"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:simpleType name="typetype">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="INT"/>
-      <xs:enumeration value="DOUBLE"/>
-      <xs:enumeration value="STRING"/>
-      <xs:enumeration value="TRUTH"/>
-      <xs:enumeration value="ENUM"/>
-    </xs:restriction>
-  </xs:simpleType>
-</xs:schema>
+<schema targetNamespace="http://contextkit.freedesktop.org/Provider"
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:provider="http://contextkit.freedesktop.org/Provider">
+  <annotation>
+    <documentation>
+      Documentation for ContextKit Provider schema.
+      Copyright 2009 Nokia Corporation.
+    </documentation>
+  </annotation>
+
+  <annotation>
+    <documentation>
+      This schema is free software; you can redistribute it and/or
+      modify it under the terms of the GNU Lesser General Public License
+      as published by the Free Software Foundation; either version 2.1 of
+      the License, or (at your option) any later version.
+    </documentation>
+  </annotation>
+
+  <annotation>
+    <documentation>
+      This schema is distributed in the hope that it will be useful, but
+      WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+      Lesser General Public License for more details.
+    </documentation>
+  </annotation>
+
+  <annotation>
+    <documentation>
+      You should have received a copy of the GNU Lesser General Public
+      License along with this library; if not, write to the Free Software
+      Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+      02110-1301 USA
+    </documentation>
+  </annotation>
+
+  <simpleType name="dbusBusType">
+    <annotation><documentation>
+      Represents a standard D-Bus bus type.
+    </documentation></annotation>
+    <restriction base="string">
+      <enumeration value="system"/>
+      <enumeration value="session"/>
+    </restriction>
+  </simpleType>
+
+  <complexType name="propertyList">
+    <sequence>
+      <element minOccurs="0" ref="provider:doc"/>
+      <element maxOccurs="unbounded" ref="provider:node"/>
+    </sequence>
+  </complexType>
+
+  <complexType name="providerDefn">
+    <complexContent>
+      <extension base="provider:propertyList">
+	<attribute name="bus" use="required" type="provider:dbusBusType">
+	  <annotation><documentation>
+	      Which standard D-Bus bus this service can be activated on
+	  </documentation></annotation>
+	</attribute>
+	<attribute name="service" use="required" type="NCName">
+	  <annotation><documentation>
+	    The bus name of the service that will provide these keys.
+	    This service must be activatable on the bus specified in "bus".
+	  </documentation></annotation>
+	</attribute>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="provider" type="provider:providerDefn">
+    <annotation>
+      <documentation>
+	A top-level declaration of a context-providing service using the
+	ContextKit framework.
+      </documentation>
+    </annotation>
+  </element>
+
+  <element name="properties" type="provider:propertyList">
+    <annotation>
+      <documentation>
+	A top-level definition of property names and meaning, divorced from a
+	specific context providing service.
+      </documentation>
+    </annotation>
+  </element>
+
+
+  <element name="node">
+    <complexType>
+      <annotation><documentation>
+	  A node in the tree of provided context.
+	  A node can have children that are keys or nodes.
+      </documentation></annotation>
+
+      <sequence>
+	<element minOccurs="0" ref="provider:doc"/>
+	<choice>
+	  <element minOccurs="0" maxOccurs="unbounded" ref="provider:node"/>
+	  <element minOccurs="0" maxOccurs="unbounded" ref="provider:key"/>
+	</choice>
+      </sequence>
+      <attribute name="name" use="required" type="NCName">
+	<annotation><documentation>
+	    The name of the node.
+	</documentation></annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <element name="doc" type="string">
+    <annotation><documentation>
+	Documentation about a key or node.
+    </documentation></annotation>
+  </element>
+
+  <element name="key">
+    <complexType >
+      <sequence>
+	<element minOccurs="0" ref="provider:doc"/>
+      </sequence>
+      <attribute name="name" use="required" type="NCName">
+	<annotation><documentation>
+	  The name of this key.
+	</documentation></annotation>
+      </attribute>
+      <attribute name="type" use="required" type="provider:contextType">
+	<annotation><documentation>
+	  The type of this key.
+	</documentation></annotation>
+      </attribute>
+    </complexType>
+  </element>
+
+  <simpleType name="contextType">
+    <annotation><documentation>
+	The type of a simple context key.
+    </documentation></annotation>
+    <restriction base="string">
+      <enumeration value="INT"/>
+      <enumeration value="DOUBLE"/>
+      <enumeration value="STRING"/>
+      <enumeration value="TRUTH"/>
+    </restriction>
+  </simpleType>
+</schema>

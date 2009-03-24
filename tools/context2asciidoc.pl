@@ -1,14 +1,12 @@
 #!/usr/bin/perl
 #
-# Make simple HTML docs from spec/context.xml 
+# Make a asciidoc document from spec/context.xml 
 #
 
 use XML::LibXML::Reader;
 
 $reader = new XML::LibXML::Reader(FD => STDIN)
       or die "cannot read standard input?";
-
-print "<html><body>\n<h1>Contextual Properties</h1>\n";
 
 $depth = 0;
 while ($reader->read) {
@@ -17,10 +15,6 @@ while ($reader->read) {
       $name[$depth] = $reader->getAttribute(name); 
       $id[$depth]++;
       $depth++ unless $reader->isEmptyElement;
-      if ($depth > 1) {
-	  print "<h2>" . join('.', @id[1..depth+1]) . " " . join('.', @name) . "</h2>\n";
-	  $firstKey = true;
-      }
     }  elsif ($reader->nodeType == XML_READER_TYPE_END_ELEMENT) {
       $depth--;
       if (!$firsttime++) {
@@ -30,23 +24,12 @@ while ($reader->read) {
     }
   } elsif ($reader->name eq "key") {      # print keys with type
     if ($reader->nodeType == XML_READER_TYPE_ELEMENT) {
-      if ($firstkey) {
-        print "<ul>\n";
-        $firstkey = false;
-      }
-      print "<li><strong>" . $reader->getAttribute(name) . "</strong> ";
-      $inKey = !$reader->isEmptyElement;
-      print  "</li>\n" unless ($inKey);
+      print "*" . join('.', @name) . "." . $reader->getAttribute(name) . "*::\n";
     } elsif ($reader->nodeType == XML_READER_TYPE_END_ELEMENT) {
-      print "</li>\n";
-      $inKey = 0;
+      print "\n";
     }
   } elsif ($reader->name eq "doc" && $reader->nodeType == XML_READER_TYPE_ELEMENT) {
     # print the related documentation
-    print " -- " if ($inKey); 
     print $reader->readInnerXml() . "\n";
-    print "<p>" unless ($inKey);
   }
 }
-
-print "</body></html>\n";
