@@ -1,3 +1,9 @@
+contextkit (0.1.3-3~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Wed, 25 Mar 2009 17:31:38 +0200
+
 contextkit (0.1.3-2) unstable; urgency=low
 
   * Ported bug fix from upstream: Don't crash when comparing nulls with
