@@ -13,8 +13,8 @@ build-stamp: Makefile
 	dh_testdir
 	# We know that we don't want to run vala when building the
 	# package, but the timestamps sometimes lie.
-	find . -name '*.vala.stamp' 
-	touch `find . -name '*.vala.stamp' `
+	find . -name '*.vala.stamp' -o -name '*.vapi'
+	touch `find . -name '*.vala.stamp' -o -name '*.vapi'`
 	$(MAKE) all
 	touch build-stamp
 
