@@ -66,14 +66,6 @@ namespace ContextProvider {
 			busType = b;
 		}
 
-		public void Get (string[] keys, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
-			debug ("Manager.Get");
-
-			// Check input against valid keys
-			StringSet keyset = check_keys(keys);
-			get_internal (keyset, out values_to_send, out undeterminable_keys);
-		}
-
 		internal void get_internal (StringSet keyset, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
 			// Note: Vala doesn't support += for parameters yet; using a temp array
 			properties = new HashTable<string, Value?>(str_hash, str_equal);
