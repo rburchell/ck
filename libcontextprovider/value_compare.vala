@@ -6,6 +6,8 @@ namespace ContextProvider {
 	bool value_compare (Value? v1, Value? v2) {
 		if (v1 == null && v2 == null)
 			return true;
+		if (v1 == null || v2 == null)
+			return false;
 		if (v1.type() == typeof(int) && v2.type() == typeof(int))
 			return (v1.get_int() == v2.get_int());
 		if (v1.type() == typeof(double) && v2.type() == typeof(double))
