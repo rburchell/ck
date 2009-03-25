@@ -27,227 +27,80 @@ namespace ContextProvider {
 	bool initialised = false;
 
 	/**
-	 * SECTION:change_set
-	 * @short_description: Context value change handling
-	 * @include: context_provider.h
-	 * @see_also: #ContextProviderGetCallback
+	 * context_provider_set_integer:
+	 * @key: name of key
+	 * @value: new value of key
 	 *
-	 * #ContextProviderChangeSet is used to signal changes to contextual values by a provider.
-	 * As a provider you can asynchronously emit value changes for keys which you are providing
-	 * by creating a #ContextProviderChangeSet and commiting it using #context_provider_change_set_commit.
-	 * #ContextProviderChangeSet can also be provided to you, for example in
-	 * #ContextProviderGetCallback. In this case, you should simply add the values requested
-	 * and return without calling #context_provider_change_set_commit.
+	 * Set a key to have an integer value of #value
 	 */
-	public class ChangeSet {
+	public void set_integer (string key, int value) {
+		assert (initialised == true);
 
-		/**
-		 * ContextProviderChangeSet:
-		 *
-		 * An opaque structure representing a set of key's values
-		 */
-
-		HashTable<string, Value?> properties;
-		/*shouldn't be public, but lists suck, see cprovider.vala*/
-		public ArrayList<string> undeterminable_keys;
-
-		/* TODO. some proper thinking needs to be done to make this
-		   whole lib thread safe
-		   */
-//		static private Mutex changeset_holder_mutex;
-		private static HashSet<ChangeSet> changeset_holder = new HashSet<ChangeSet>();
-
-		/**
-		 * context_provider_change_set_create:
-		 *
-		 * Create a new change set to emit key changes
-		 * Returns: a new #ContextProviderChangeSet
-		 */
-		public static ChangeSet create () {
-			assert (initialised == true);
-
-			ChangeSet s = new ChangeSet();
-//			changeset_holder_mutex.lock();
-			changeset_holder.add(s);
-//			changeset_holder_mutex.unlock();
-			// s will have a floating reference
-			return s;
-		}
-
-		/**
-		 * context_provider_change_set_commit:
-		 * @change_set: a #ContextProviderChangeSet to commit
-		 *
-		 * Emits the contents of the changeset to all
-		 * listeners interested in the properties that have changed.
-		 *
-		 * Returns: TRUE if changes were emitted
-		 */
-		public static bool commit (ChangeSet #change_set /*take back ownership */) {
-			assert (initialised == true);
-
-			if (change_set.properties.size() == 0 && change_set.undeterminable_keys.size == 0) {
-				//nothing to do
-				return true;
-			}
-
-			ContextProvider.Manager manager = ContextProvider.Manager.get_instance ();
-			bool ret = manager.property_values_changed(change_set.properties, change_set.undeterminable_keys);
-//			changeset_holder_mutex.lock();
-			//removing it from the changeset_holder causes refcount to go to zero.
-			changeset_holder.remove (change_set);
-//			changeset_holder_mutex.unlock();
-			return ret;
-		}
-
-		/**
-		 * context_provider_change_set_cancel:
-		 * @change_set : a #ContextProviderChangeSet to cancel
-		 *
-		 * Cancels a changeset, cleaning up without emitting the contents.
-		 */
-		public static void cancel (ChangeSet #change_set /*take back ownership */) {
-			assert (initialised == true);
-
-//			changeset_holder_mutex.lock();
-			//removing it from the changeset_holder causes refcount to go to zero.
-			changeset_holder.remove (change_set);
-//			changeset_holder_mutex.unlock();
-		}
-
-
-		private ChangeSet () {
-			this.properties = new HashTable<string, Value?>(str_hash, str_equal);
-			this.undeterminable_keys = new ArrayList<string>();
-		}
-
-		internal ChangeSet.from_get (HashTable<string, Value?> properties, ArrayList<string> undeterminable_keys)
-		{
-			this.properties = properties;
-			this.undeterminable_keys = undeterminable_keys;
-		}
-
-		/**
-		 * context_provider_change_set_size:
-		 * @self: a #ContextProviderChangeSet to add a value to
-		 *
-		 * Gets the numer of elements in a #ContextProviderChangeSet
-		 * Returns: the number of elements in the #ContextProviderChangeSet
-		 */
-		public uint size () {
-			return properties.size();
-		}
-
-		/**
-		 * context_provider_change_set_add_integer:
-		 * @self: a #ContextProviderChangeSet to add a value to
-		 * @key: name of key
-		 * @value: new value of key
-		 *
-		 * Set a key to have an integer value of #value
-		 */
-		public void add_integer (string key, int value) {
-			assert (initialised == true);
-
-			Value v = Value (typeof(int));
-			v.set_int (value);
-			properties.insert (key, v);
-		}
-
-		/**
-		 * context_provider_change_set_add_double:
-		 * @self: a #ContextProviderChangeSet to add a value to
-		 * @key: name of key
-		 * @value: new value of key
-		 *
-		 * Set a key to have an floating point value of #value
-		 */
-		public void add_double (string key, double value) {
-			assert (initialised == true);
-
-			Value v = Value (typeof(double));
-			v.set_double (value);
-			properties.insert (key, v);
-		}
-
-		/**
-		 * context_provider_change_set_add_boolean:
-		 * @self: a #ContextProviderChangeSet to add a value to
-		 * @key: name of key
-		 * @value: new value of key
-		 *
-		 * Set a key to have an boolean value of #val
-		 */
-		public void add_boolean (string key, bool value) {
-			assert (initialised == true);
-
-			Value v = Value (typeof(bool));
-			v.set_boolean (value);
-			properties.insert (key, v);
-		}
-
-		/**
-		 * context_provider_change_set_add_string:
-		 * @self: a #ContextProviderChangeSet to add a value to
-		 * @key: name of key
-		 * @value: new value of key
-		 *
-		 * Set a key to have an boolean value of #val
-		 */
-		public void add_string (string key, string value) {
-			assert (initialised == true);
-
-			Value v = Value (typeof(string));
-			v.set_string (value);
-			properties.insert (key, v);
-		}
-
-		/**
-		 * context_provider_change_set_add_undetermined_key:
-		 * @self: a #ContextProviderChangeSet to which to add an undeterminable value
-		 * @key: name of key
-		 *
-		 * Marks #key as not having a determinable value.
-		 */
-		public void add_undetermined_key (string key) {
-			assert (initialised == true);
-
-			undeterminable_keys.add (key);
-		}
+		Value v = Value (typeof(int));
+		v.set_int (value);
 	}
 
 	/**
-	 * ContextProviderGetCallback:
-	 * @keys: a #ContextProviderStringSet of keys for which values have been requested
-	 * @change_set: a #ContextProvideChangeSet in which to fill in the requested values
-	 * @user_data: the user data passed in #context_provider_install
+	 * context_provider_set_double:
+	 * @key: name of key
+	 * @value: new value of key
 	 *
-	 * Type definition for a function that will be called back when key values are needed.
-	 * The keys will only ever be keys that this provider registered as providing.
+	 * Set a key to have an floating point value of #value
 	 */
-	public delegate void GetCallback(StringSet #keys, ChangeSet #change_set);
+	public void set_double (string key, double value) {
+		assert (initialised == true);
+
+		Value v = Value (typeof(double));
+		v.set_double (value);
+	}
 
 	/**
-	 * ContextProviderSubscribedCallback:
-	 * @keys_subscribed: a #ContextProviderStringSet of keys which have been newly subscibed
-	 * @user_data: the user data passed in #context_provider_install
+	 * context_provider_set_boolean:
+	 * @key: name of key
+	 * @value: new value of key
 	 *
-	 * Type definition for a function that will be called back when a key is first subscribed to
-	 * The keys will only ever be keys that this provider registered as providing.
+	 * Set a key to have an boolean value of #val
 	 */
-	public delegate void SubscribedCallback(StringSet keys_subscribed);
+	public void set_boolean (string key, bool value) {
+		assert (initialised == true);
+
+		Value v = Value (typeof(bool));
+		v.set_boolean (value);
+	}
 
 	/**
-	 * ContextProviderUnsubscribedCallback:
-	 * @keys_unsubscribed: a #ContextProviderStringSet of keys that have been newly unsubscribed
-	 * @keys_remaining: a #ContextProviderStringSet of keys provided by this provider that are still
-	 * subscribed to
+	 * context_provider_set_string:
+	 * @key: name of key
+	 * @value: new value of key
+	 *
+	 * Set a key to have an boolean value of #val
+	 */
+	public void set_string (string key, string value) {
+		assert (initialised == true);
+
+		Value v = Value (typeof(string));
+		v.set_string (value);
+	}
+
+	/**
+	 * context_provider_set_null:
+	 * @key: name of key
+	 *
+	 * Marks #key as not having a determinable value.
+	 */
+	public void set_null (string key) {
+		assert (initialised == true);
+
+	}
+
+	/**
+	 * ContextProviderSubscriptionChangedCallback:
+	 * @subscribe: TRUE if the group was subscribed to or FALSE if unsubscribed from
 	 * @user_data: the user data passed in #context_provider_install
 	 *
-	 * Type definition for a function that will be called back when a key is last unsubscribed from.
-	 * The keys will only ever be keys that this provider registered as providing.
+	 * Type definition for a function that will be called back when a group is first subscribed to
 	 */
-	public delegate void UnsubscribedCallback(StringSet keys_unsubscribed, StringSet keys_remaining);
+	public delegate void SubscriptionChangedCallback(bool subscribe);
 
 	/**
 	 * context_provider_init:
@@ -298,49 +151,30 @@ namespace ContextProvider {
 	}
 
 	/**
-	 * context_provider_install:
-	 * @provided_keys: a NULL-terminated array of context key names
-	 * @get_cb: a #ContextProviderGetCallback to be called when values are requested for keys
-	 * @get_cb_target: user data to pass to #get_cb
-	 * @subscribed_cb: a #ContextProviderSubscribedCallback to be called when a key is first subscribed to
-	 * @subscribed_cb_target: user data to pass to #subscribed_cb
-	 * @unsubscribed_cb: a #ContextProviderUnsubscribedCallback to be called when a key is last unsubscribed from
-	 * @unsubscribed_cb_target: user data to pass to #unsubscribed_cb
+	 * context_provider_install_group:
+	 * @key_group: a NULL-terminated array of context key names
+	 * @clear_values_on_subscribe: if TRUE then the keys in this group will be reset to null
+	 * 	when the group is first subscribed to after being unsubscribed from.
+	 * @subscription_changed_cb: a #ContextProviderSubscriptionChangedCallback to be called when a key is first subscribed to
+	 * @subscription_changed_cb_target: user data to pass to #subscription_changed_cb
 	 *
-	 * Install a new service providing context.
-	 *
-	 * Returns: a new #ContextProvider object
 	 */
-	public Provider install ([CCode (array_length = false, array_null_terminated = true)] string[] provided_keys, GetCallback? get_cb, SubscribedCallback? subscribed_cb, UnsubscribedCallback? unsubscribed_cb) {
+	public void install_group ([CCode (array_length = false, array_null_terminated = true)] string[] key_group, bool clear_values_on_subscribe SubscriptionChangedCallback? subscription_changed_cb) {
 		assert (initialised == true);
-		Manager manager = Manager.get_instance ();
-
-		CProvider provider = new CProvider(new StringSet.from_array(provided_keys), get_cb, subscribed_cb, unsubscribed_cb);
-		manager.providers.register (provider);
-		return provider;
 	}
 
 	/**
-	 * context_provider_remove:
-	 * @provider: a #ContextProvder created with #context_provider_install.
+	 * context_provider_install_key:
+	 * @key: a context key name
+	 * @clear_values_on_subscribe: if TRUE then the keys in this group will be reset to null
+	 * 	when the group is first subscribed to after being unsubscribed from.
+	 * @subscription_changed_cb: a #ContextProviderSubscriptionChangedCallback to be called when a key is first subscribed to
+	 * @subscription_changed_cb_target: user data to pass to #subscription_changed_cb
 	 *
-	 * Remove and dealloctate resources for a #ContextProvider created with #context_provider_install
 	 */
-	public void remove (Provider provider) {
+	public void install_group (string key, bool clear_values_on_subscribe SubscriptionChangedCallback? subscription_changed_cb) {
 		assert (initialised == true);
-		Manager manager = Manager.get_instance ();
-		manager.providers.unregister (provider);
 	}
 
-	/**
-	 * context_provider_no_of_subscribers:
-	 * @key: the name of a context key
-	 *
-	 * Returns: the current number of subscribers for a given context key
-	 */
-	public int no_of_subscribers (string key) {
-		assert (initialised == true);
-		Manager manager = Manager.get_instance ();
-		return manager.key_counter.number_of_subscribers (key);
-	}
+
 }
