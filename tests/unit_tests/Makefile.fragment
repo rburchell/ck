@@ -6,6 +6,12 @@ TEST_PROGS += \
 
 noinst_PROGRAMS = $(TEST_PROGS)
 
+BUILT_SOURCES += \
+	tests/unit_tests/intset.vala.stamp			\
+	tests/unit_tests/stringset.vala.stamp			\
+	tests/unit_tests/value_compare.vala.stamp		\
+	$(NULL)
+
 tests_unit_tests_intset_VAPISOURCES = \
 	libcontextprovider/intset.vapi               \
 	$(NULL)
