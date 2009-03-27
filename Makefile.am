@@ -30,7 +30,6 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 BUILT_SOURCES = \
-	src/contextd.vala.stamp \
 	$(INTROSPECT) \
 	$(ASYNC_INTROSPECT) \
 	context.valid.stamp \
@@ -38,38 +37,6 @@ BUILT_SOURCES = \
 
 if CONTEXTKIT_BUILD_DOCS
 BUILT_SOURCES += $(DOCS)
-endif
-
-bin_PROGRAMS = contextd
-
-contextd_core_VALASOURCES = \
-	src/main.vala \
-	src/MCE.vala \
-	$(NULL)
-
-contextd_liblocation_VALASOURCES = \
-	$(NULL)
-
-contextd_VALASOURCES = \
-	$(contextd_core_VALASOURCES) \
-	$(contextd_liblocation_VALASOURCES) \
-	$(NULL)
-
-contextd_GENERATEDSOURCES = \
-	$(contextd_VALASOURCES:.vala=.c) \
-	$(contextd_VALASOURCES:.vala=.h) \
-	$(NULL)
-
-contextd_SOURCES = \
-	$(contextd_core_VALASOURCES:.vala=.c) \
-	$(contextd_core_VALASOURCES:.vala=.h) \
-	$(NULL)
-
-if HAVE_LOCATION
-contextd_SOURCES += \
-	$(contextd_liblocation_VALASOURCES:.vala=.c) \
-	$(contextd_liblocation_VALASOURCES:.vala=.h) \
-	$(NULL)
 endif
 
 
@@ -95,10 +62,6 @@ SPEC_FILES = \
 INTROSPECT = $(INTERFACES:spec/%.xml=introspect/%.xml)
 ASYNC_INTROSPECT = $(INTERFACES:spec/%.xml=introspect/async/%.xml)
 DOCS = doc/contextkit.html doc/context.html doc/context-providers.html
-
-src/contextd.vala.stamp: contextprovider.vapi $(contextd_VALASOURCES) $(contextd_VAPISOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg posix --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
-	touch $@
 
 tools_dir = $(top_srcdir)/tools
 
@@ -130,25 +93,8 @@ CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) context.valid.stamp
 clean-local:
 	-rm -rf introspect
 
-if HAVE_LOCATION
-contextd_LDADD = \
-	$(CONTEXTD_LIBS) \
-	$(LOCATION_LIBS) \
-	libcontextprovider.la \
-	$(NULL)
-else
-contextd_LDADD = \
-	$(CONTEXTD_LIBS) \
-	libcontextprovider.la \
-	$(NULL)
-endif
-
 EXTRA_DIST += \
 	$(DOCS) \
-	$(contextd_GENERATEDSOURCES) \
-	$(contextd_VALASOURCES) \
-	$(contextd_VAPISOURCES) \
-	src/contextd.vala.stamp \
 	doc/context-providers.txt \
 	$(SPEC_FILES) \
 	spec/all.xml \
@@ -164,8 +110,6 @@ DISTCLEANFILES = \
 	$(NULL)
 
 MAINTAINERCLEANFILES = \
-	$(contextd_GENERATEDSOURCES) \
-	$(contextd_SOURCES)	\
 	$(NULL)
 
 clean-gcov:

@@ -159,7 +159,7 @@ namespace ContextProvider {
 	 * @subscription_changed_cb_target: user data to pass to #subscription_changed_cb
 	 *
 	 */
-	public void install_group ([CCode (array_length = false, array_null_terminated = true)] string[] key_group, bool clear_values_on_subscribe SubscriptionChangedCallback? subscription_changed_cb) {
+	public void install_group ([CCode (array_length = false, array_null_terminated = true)] string[] key_group, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
 		assert (initialised == true);
 	}
 
@@ -172,7 +172,7 @@ namespace ContextProvider {
 	 * @subscription_changed_cb_target: user data to pass to #subscription_changed_cb
 	 *
 	 */
-	public void install_group (string key, bool clear_values_on_subscribe SubscriptionChangedCallback? subscription_changed_cb) {
+	public void install_key(string key, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
 		assert (initialised == true);
 	}
 
