@@ -66,14 +66,6 @@ namespace ContextProvider {
 			busType = b;
 		}
 
-		public void Get (string[] keys, out HashTable<string, Value?> values_to_send, out string[] undeterminable_keys) {
-			debug ("Manager.Get");
-
-			// Check input against valid keys
-			StringSet keyset = check_keys(keys);
-			get_internal (keyset, out values_to_send, out undeterminable_keys);
-		}
-
 		internal void get_internal (StringSet keyset, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
 			// Note: Vala doesn't support += for parameters yet; using a temp array
 			properties = new HashTable<string, Value?>(str_hash, str_equal);
@@ -160,33 +152,20 @@ namespace ContextProvider {
 		}
 
 		/* Is called when the provider sets new values to context properties */
-		public bool property_values_changed(HashTable<string, Value?> properties, ArrayList<string>? undeterminable_keys) {
-			// Note: get_keys returns a list of unowned strings. We shouldn't assign it to
-			// a list of owned strings. At the moment, the Vala compiler doesn't prevent us
-			// from doing so.
-			foreach (var key in properties.get_keys()) {
-				if (providers.valid_keys.is_member (key) == false) {
-					critical ("Key %s is not valid", key);
-				}
-				// Remove unchanged keys
-				if (value_compare(values.lookup(key),properties.lookup (key))) {
-					properties.remove(key);
-				}
-				values.insert (key, properties.lookup (key));
+		public void property_value_change(string key, Value? value) {
+			if (providers.valid_keys.is_member (key) == false) {
+				critical ("Key %s is not valid", key);
 			}
-			foreach (var key in undeterminable_keys) {
-				if (providers.valid_keys.is_member (key) == false) {
-					critical ("Key %s is not valid", key);
-				}
-				values.insert (key, null);
+			// ignore unchanged keys
+			if (value_compare(values.lookup(key), value)) {
+				return;
 			}
+			values.insert (key, value);
 
 			// Inform the subscribers of the change
 			foreach (var s in subscribers.get_values()) {
-				s.on_value_changed(properties, undeterminable_keys);
+				s.on_value_changed(key, value);
 			}
-
-			return true;
 		}
 	}
 }

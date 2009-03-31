@@ -26,7 +26,6 @@ namespace ContextProvider {
 
 	[DBus (name = "org.freedesktop.ContextKit.Manager")]
 	public interface DBusManager : GLib.Object {
-		public abstract void Get (string[] keys, out HashTable<string, Value?> values, out string[] undeterminable_keys);
 		public abstract DBus.ObjectPath GetSubscriber (DBus.BusName name) throws DBus.Error;
 	}
 

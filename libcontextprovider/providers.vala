@@ -54,19 +54,6 @@ namespace ContextProvider {
 			valid_keys = s;
 		}
 
-		public ArrayList<string> get (StringSet keys, HashTable<string, Value?> values) {
-			debug("Providers.get called (%s)", keys.debug());
-			ArrayList<string> unavail = new ArrayList<string> ();
-			foreach (var provider in providers) {
-				StringSet intersection = new StringSet.intersection (keys, provider.provided_keys());
-				if (intersection.size() > 0) {
-					debug ("calling provider %p", provider);
-					provider.get (keys, values, unavail);
-				}
-			}
-			return unavail;
-		}
-
 		public void first_subscribed(StringSet keys) {
 			foreach (var provider in providers) {
 				StringSet intersection = new StringSet.intersection (keys, provider.provided_keys());

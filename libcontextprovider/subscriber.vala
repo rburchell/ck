@@ -31,6 +31,8 @@ namespace ContextProvider {
 		// Keys subscribed to by this subscriber
 		StringSet subscribed_keys;
 		KeyUsageCounter key_counter;
+		HashTable<string, Value?> values_to_send;
+		bool idle_scheduled = false;
 
 		internal Subscriber (Manager manager, KeyUsageCounter key_counter, int id) {
 			string path = "/org/freedesktop/ContextKit/Subscribers/%d".printf (id);
@@ -38,6 +40,7 @@ namespace ContextProvider {
 			this.manager = manager;
 			this.key_counter = key_counter;
 			subscribed_keys = new StringSet();
+			this.values_to_send = new HashTable<string, Value?>(str_hash, str_equal);
 		}
 
 		~Subscriber () {
@@ -49,27 +52,26 @@ namespace ContextProvider {
 		}
 
 		// Emit the Changed signal over DBus
-		internal void emit_changed (HashTable<string, Value?> values, ArrayList<string>? unavail_l) {
+		internal bool emit_changed () {
 			string[] unavail = {};
 
-			foreach (string str in unavail_l) {
-				unavail += str;
+			foreach (var i in values_to_send.get_keys()) {
+				if (values_to_send.lookup(i) == null) {
+					unavail += i;
+					values_to_send.remove(i);
+				}
 			}
 
-			Changed (values, unavail);
+			Changed (values_to_send, unavail);
+			values_to_send.remove_all();
+			return false;
 		}
 
 		public void Subscribe (string[] keys, out HashTable<string, Value?> values, out string[] undeterminable_keys) {
-			// Check input against valid keys
 			StringSet keyset = manager.check_keys(keys);
-
-			message ("Subscribe: requested valid keys %s", keyset.debug());
-
-			// Ignore keys which are already subscribed to
+			debug("Subscribe: requested valid keys %s", keyset.debug());
 			StringSet new_keys = new StringSet.difference (keyset, subscribed_keys);
-			message ("Subscribe: new keys %s", new_keys.debug());
-
-			// Increase the subscriber count of the new keys.
+			debug("Subscribe: new keys %s", new_keys.debug());
 			key_counter.add (new_keys);
 
 			subscribed_keys = new StringSet.union(subscribed_keys, new_keys);
@@ -77,63 +79,23 @@ namespace ContextProvider {
 			// Read the values from the central value table and return them
 			// Note: Use also those keys which were already subscribed to (and are subscribed to again)
 			manager.get_internal (keyset, out values, out undeterminable_keys);
-
-			debug ("Subscribe done");
 		}
 
 		public void Unsubscribe (string[] keys) {
-			// Check input against valid keys
 			StringSet keyset = manager.check_keys(keys);
-
-			// Ignore keys which are not subscribed to
 			StringSet decreasing_keys = new StringSet.intersection (keyset, subscribed_keys);
-
-			// Decrease the (global) subscriber count for the keys 
 			key_counter.remove (decreasing_keys);
-
-			// Track the keys which are currently subscribed to (with this subscriber) 
 			subscribed_keys = new StringSet.difference (subscribed_keys, decreasing_keys);
-
-			// FIXME: Other actions needed?
 		}
 
 		/* Is called when the value of a property changes */
-		internal void on_value_changed(HashTable<string, Value?> changed_properties, ArrayList<string>? changed_undeterminable) {
-			HashTable<string, Value?> values_to_send = new HashTable<string, Value?>(str_hash, str_equal);
-			ArrayList<string> undeterminable_keys = new ArrayList<string>();
-
-			// Loop through the properties we got and
-			// check if the client is interested in them.
-			var keys = changed_properties.get_keys ();
-			// Note: get_keys returns a list of unowned strings. We shouldn't assign it to
-			// a list of owned strings. At the moment, the Vala compiler doesn't prevent us
-			// from doing so. 
-			foreach (var key in keys) {
-				if (subscribed_keys.is_member (key)) {
-					// The client of this subscriber is interested in the key
-					Value? v = changed_properties.lookup (key);
-
-					if (v == null) { // FIXME: Is this needed?
-						undeterminable_keys.add (key);
-					}
-					else {
-						values_to_send.insert (key, v);
-					}
+		internal void on_value_changed(string key, Value? value) {
+			if (subscribed_keys.is_member (key)) {
+				values_to_send.insert (key, value);
+				if (!idle_scheduled) {
+					Idle.add(this.emit_changed);
+					idle_scheduled = true;
 				}
-			}
-
-			// Loop through the undetermined properties we got and
-			// check if the client is interested in them.
-			foreach (var key in changed_undeterminable) {
-				if (subscribed_keys.is_member (key)) {
-					// The client of this subscriber is interested in the key
-					undeterminable_keys.add (key);
-				}
-			}
-
-			// Check if we have something to send to the client
-			if (values_to_send.size () > 0 || undeterminable_keys.size > 0) {
-				emit_changed (values_to_send, undeterminable_keys);
 			}
 		}
 	}
