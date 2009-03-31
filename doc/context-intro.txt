@@ -1,0 +1,361 @@
+Context Framework
+=================
+
+Introduction
+------------
+
+The Context Framework provides a uniform, high level API to numerous
+context properties of the device.  While many of these context
+properties are available without the context framework, each of them
+has its own specific way of accessing it.  The context framework
+collects them all behind a uniform API, and applications thus have
+easy access to all of the context properties.
+
+The following lists some typical context properties:
+
+- Connectivity status of the device; whether it is connected to the
+  Internet and by what means.
+
+- Location; the name of the current city
+
+- Builtin sensors; orientation in space.
+
+- Current use; idle, plays media, web browsing.
+
+- Combined properties; current weather based on location and online
+  weather database.
+
+Applications access context properties via +DuiValueSpaceItems+ in the
+api:libduivaluespace[+DuiValueSpace+].
+
+The context framework is modular: context properties from multiple
+independent components are directly combined in the +DuiValueSpace+ API
+and applications can access them without needing to know who is
+ultimately providing them.
+
+The api:libduivaluespace[+DuiValueSpace+] API is intended to be
+general; other subsystems that communicate in terms of key/value pairs
+can use it as well.  The Settings framework is an obvious candidate.
+
+A component that wants to directly provide context properties needs to
+implement the relevant interfaces defined by the context framework.
+Specifically, such a component must put a object on the session or
+system D-Bus that implements the
+link:contextkit.html[+org.freedesktop.ContextKit+] interface and
+register that object with the context framework.
+
+In addition to information from multiple sources, the context
+framework is a provider of context properties itself: there is a
+_context daemon_ that collects information from low-level and legacy
+interfaces.  This context daemon is a good default location for
+implementing new context properties and for absorbing properties from
+existing subsystems that have aqcuired them by accident and would
+rather get rid of them.
+
+The concrete list of properties is ultimately defined by their
+providers, but the context framework is the central authority: the
+`official' list of context properties of the Maemo platform is defined
+and documented by the context framework.
+
+To summarize, the context framework contributes value to the Maemo
+platform in the following ways:
+
+- It implements and documents a high-level, uniform API to a set of
+  context properties that are provided by multiple components.
+
+- It defines and documents the concrete list of properties of the
+  Maemo platform.
+
+- It implements context properties that do not naturally belong to
+  other subsystems.
+
+- It provides a debugging and exploration tool for inspecting and
+  controlling context properties.
+
+Thus, the Context Framework does not drive the behavior of the system,
+it only provides the information that is needed for other components
+to decide for themselves.  However, the context properties are at a
+high level of abstraction and express the coarse grained states of the
+device. For example, the properties tell you whether it is completely
+idle, in passive use playing some media, or in active use.  They don't
+give a real-time view of CPU load.
+
+Getting started
+---------------
+
+To get started with using context properties, read the
+api:libduivaluespace[DuiValueSpace] documentation and have a look at
+the list of link:context-properties.html[context properties].  You can also
+start from the link:context-subscriber-example.html[context subscriber
+example].
+
+To get get started with providing properties, read the
+api:context-providers[libcontextprovider] documentation and have a
+look at the link:context-provider-example.html[context provider
+example].
+
+Interfaces 
+----------
+
+.+libduivaluespace+
+
+The DuiValueSpace class and friends.  Applications and other clients
+of context properties written in C++ should use this.  This API needs
+bindings for other platform languages, maybe including C.
+
+api:libduivaluespace[Documentation]
+
+.+context-providers+
+
+The interface to register providers of context properties.  A provider
+must implement the link:contextkit.html[+org.freedesktop.ContextKit+] D-Bus interface.
+
+link:context-providers.html[Documentation]
+
+.+org.freedesktop.ContextKit+
+
+The D-Bus interface that every context provider needs to implement.
+
+link:contextkit.html[Documentation]
+
+.+libcontextprovider+
+
+A convenience library for implementing the
+api:org.freedesktop.ContextKit.Manager[] D-Bus interface.
+
+link:reference/libcontextprovider/[Documentation]
+
+.+context-properties+
+
+The canonical list of context properties in the Maemo platform.  When
+a context property from the list is available, it must conform to its
+description there.
+
+link:context-properties.html[Documentation]
+
+
+System context
+--------------
+
+The context framework decouples context subscribers from context
+providers.
+
+[dotty,fig3.svg]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+digraph G {
+
+  node [shape=box, style=filled];
+
+  "Application 1" -> "Context Framework"
+  "Application 2" -> "Context Framework"
+  "Statusbar plugin" -> "Context Framework"
+
+  "Context Framework" -> "Sensor Framework"
+  "Context Framework" -> "Connectivity"
+  "Context Framework" -> "Location Framework"
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Architecture
+------------
+
+Context properties are collected from all providers that have
+registered themselves with the api:context-providers[] interface.  For
+each provider, this registration information includes the list of its
+properties with type information and a short description for each, and
+the D-Bus bus name where the provider can be reached.  Providers can
+be both on the session and on the system bus, and the registration
+information indicates which bus it is.
+
+This registration information is read by the +libduivaluespace+
+library and used by its +DuiValueSpace+ class to connect a requested
++DuiValueSpaceItem+ to the right bus name.
+
+The registration information is compiled into a _registry_ that is
+optimized for use by +DuiValueSpace+.  When the set of registered
+properties changes, the registry is recompiled by a command line
+utility provided by the context framework.  This will then trigger all
++DuiValueSpace+ instances to reload the registry information, and
+existing +DuiValueSpaceItems+ to be updated.
+
+When providers are installed from packages, recompilation of the
+registry happens automatically.  _Triggers_ in the Context Framework
+packages are used to run the command line utility at the right times.
+
++DuiValueSpace+ gracefully handles start, stop and restart of the
+providers. During system startup some applications may start to use
+the Context Framework before all providers are available. Properties
+become dynamically available in +DuiValueSpace+ as providers become
+available, and removed when providers are no longer available.
+
+[dotty,fig2.svg]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+digraph G {
+
+  node [shape=record, style=filled];
+
+  xml
+    [label="Static\nProperty List", shape=note];
+  registry
+    [label="Registry", shape=box];
+  app       
+    [label="{Application | libduivaluespace}"];
+  provider  
+    [label="Provider",shape=box];
+
+  provider -> xml
+  xml -> registry [label="update-context-properties"];
+  app -> registry
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Communication between a +DuiValueSpaceItem+ and the provider happens
+with the link:contextkit.html[+org.freedesktop.ContextKit+] interface.  This interface
+allows for bulk retrieval of property values, bulk subscriptions, and
+bulk change notification.
+
+The values of properties are represented to clients as a +QVariant+
+value.  Properties can have a special _null_ value when they are not
+available, either because they are not provided by any provider, or
+because the provider is not able to deliver a value.
+
+In the link:contextkit.html[+org.freedesktop.ContextKit+] interface, property values are
+represented as D-Bus values, which map nicely to ++QVariant++s (except
+for the _null_ value which is handled specially).
+
+Context providers need to implement the
+link:contextkit.html[+org.freedesktop.ContextKit+] interface.  They can do it directly,
+or with the help of the api:libcontextprovider[] convenience library.
+This library is used by the context daemon itself, which can serve as
+an extended example.
+
+Initially, at least the
+link:../subsys-connectivity/index.html[Connectivity Framework] and the
+link:../subsys-location/index.html[Location Framework] are expected to
+be context providers as described above.  Additional context
+properties are implemented by the _context daemon_ contained in the
+Context Framework.
+
+The following diagram shows the structural view in a typical scenario.
+
+[dotty,fig1.svg]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+digraph G {
+
+  node [shape=record, style=filled];
+
+  contextd  
+    [label="{libcontextprovider | Context Daemon }"];
+  app       
+    [label="{Application | libduivaluespace}"];
+  locfw
+    [label="{libcontextprovider | Location Framework}"];
+  confw
+    [label="{libcontextprovider | Connectivity Framework}"];
+  sensor
+    [label="Sensor", shape=box];
+
+  app -> contextd
+  contextd -> sensor [label = "Sensor API"];
+  contextd -> locfw [label=" org.freedesktop.ContextKit "];
+
+  app -> confw   [label=" org.freedesktop.ContextKit "];
+
+  app -> locfw
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Development support
+-------------------
+
+The Context Framework provides a graphical tool called the Context
+Commander to watch all available context properties.  This can be used
+to test context providers during development.
+
+In addition, the Context Commander can be used to force context
+properties of selected applications to arbitrary values.  This can be
+used to test the reaction of applications to context changes.
+
+The Context Commander runs on the device and either show its UI on the
+device itself or exports it to an external X11 server.  This way, the
+testing can be done without disturbing the display of the device
+itself.
+
+When started, the Context Commander takes control of all subscribers
+with their cooperation: when the
+"org.freedesktop.ContextKit.Commander" name appears on the session
+D-Bus, all DuiValueSpace instances redirect their subcription requests
+to it.
+
+Security considerations
+-----------------------
+
+Different context properties might need to have different access
+restrictions.  A context provider can implement these access
+restriction in whatever way works, but should preferrably use the
+existing features of the Security Framework.
+
+The Security Framework can control access per D-Bus bus connection.
+Thus, a given context provider should only implement properties with
+the same access rights and leave it to the Security Framework to allow
+or disallow connections to the provider as a whole.
+
+Source
+------
+
+.+libduivaluespace+
+
+Languages: C++
+
+Licenses: LGPL2.1
+
+Provided interfaces: libduivaluespace, context-providers
+
+Used interfaces: org.freedesktop.ContextKit, libcdb, libqt4-dbus, libqt4-xml, libqtcore4
+
+.+contextkit+
+
+Languages: C, Vala
+
+License: LGPL 2.1
+
+Provided interfaces: org.freedesktop.ContextKit, libcontextprovider, context-properties
+
+Used interfaces: libdbus, libgee, libglib
+
+.+context-commander+
+
+Languages: C++
+
+License: LGPL 2.1
+
+Provided interfaces: org.freedesktop.ContextKit
+
+Used interfaces: libduivaluespace, libqt4-dbus, libqt4-gui, libqt4-core
+
+.+context-provider-example+
+
+Languages: C
+
+License: LGPL 2.1
+
+Provided interfaces: Context.Example.* properties.
+
+Used interfaces: libcontextprovider, sysfs files for accelerometer and ambient light sensor
+
+.+context-subscriber-example+
+
+Languages: C++
+
+License: LGPL 2.1
+
+Provided interfaces: none.
+
+Used interfaces: Context.Example.* properties, libduivaluespace, libqt4-gui, libqt4-core
+
+Review comments
+---------------
+
+- Use UML for diagrams.
