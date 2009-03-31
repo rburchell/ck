@@ -23,52 +23,51 @@ using Gee;
 
 namespace ContextProvider {
 
-	public class Providers {
-		// List of providers
-		Gee.ArrayList<Provider> providers = new Gee.ArrayList<Provider> ();
+	public class Groups {
+		// List of groups
+		Gee.ArrayList<Group> groups = new Gee.ArrayList<Group> ();
 
-		// Valid keys provided by all providers
+		// Valid keys provided by all groups
 		public StringSet valid_keys {get; private set;}
 
-		internal Providers () {
+		internal Groups () {
 			valid_keys = new StringSet();
 		}
 
-		public void register (Provider provider) {
-			debug ("New provider registered: %s (%p)", provider.provided_keys().debug(), provider);
-			providers.add (provider);
-			valid_keys = new StringSet.union (valid_keys, provider.provided_keys());
+		public void register (Group group) {
+			//debug ("New group registered: %s (%p)", group.keys.debug(), group);
+			groups.add (group);
+			valid_keys = new StringSet.union (valid_keys, group.keys);
 		}
 
-		public void unregister (Provider provider) {
-			debug ("Provider unregistered: %s (%p)", provider.provided_keys().debug(), provider);
-			providers.remove (provider);
+		public void unregister (Group group) {
+			//debug ("Group unregistered: %s (%p)", group.keys.debug(), group);
+			groups.remove (group);
 			StringSet s = new StringSet();
 
 			/* a bit inefficient, but it'll do for now...
 			   TODO: make the stringset stuff not use ctors..
 			 */
-			foreach (var p in providers) {
-				s = new StringSet.union (s, p.provided_keys());
+			foreach (var g in groups) {
+				s = new StringSet.union (s, g.keys);
 			}
 			valid_keys = s;
 		}
 
 		public void first_subscribed(StringSet keys) {
-			foreach (var provider in providers) {
-				StringSet intersection = new StringSet.intersection (keys, provider.provided_keys());
-				if (intersection.size() > 0 ) {
-					provider.keys_subscribed (keys);
+			foreach (var group in groups) {
+				StringSet intersection = new StringSet.intersection (keys, group.keys);
+				if (intersection.size() > 0 && !group.subscribed) {
+					group.subscribe(true);
 				}
 			}
 		}
 
 		public void last_unsubscribed(StringSet keys_unsubscribed, StringSet keys_remaining) {
-			foreach (var provider in providers) {
-				StringSet intersection = new StringSet.intersection (keys_unsubscribed, provider.provided_keys());
+			foreach (var group in groups) {
+				StringSet intersection = new StringSet.intersection (keys_unsubscribed, group.keys);
 				if (intersection.size() > 0 ) {
-					StringSet intersection_remaining = new StringSet.intersection (keys_remaining, provider.provided_keys());
-					provider.keys_unsubscribed (intersection, intersection_remaining);
+					group.subscribe (false);
 				}
 			}
 		}

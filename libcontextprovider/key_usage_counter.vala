@@ -57,7 +57,7 @@ namespace ContextProvider {
 
 			if (first_subscribed_keys.size() > 0) {
 				// Signal that some new keys were subscribed to
-				Manager.get_instance().providers.first_subscribed (first_subscribed_keys);
+				Manager.get_instance().groups.first_subscribed (first_subscribed_keys);
 			}
 
 			subscribed_keys = new StringSet.union (subscribed_keys, first_subscribed_keys);
@@ -91,7 +91,7 @@ namespace ContextProvider {
 
 			if (last_unsubscribed_keys.size() > 0) {
 				// Signal that some keys are not subscribed to anymore
-				Manager.get_instance().providers.last_unsubscribed (last_unsubscribed_keys, subscribed_keys);
+				Manager.get_instance().groups.last_unsubscribed (last_unsubscribed_keys, subscribed_keys);
 			}
 
 		}
