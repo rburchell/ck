@@ -30,7 +30,7 @@ namespace ContextProvider {
 		// Valid keys provided by all groups
 		public StringSet valid_keys {get; private set;}
 
-		internal Groups () {
+		public Groups () {
 			valid_keys = new StringSet();
 		}
 
