@@ -86,8 +86,6 @@ tests_unit_tests_value_compare_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CON
 tests_unit_tests_value_compare_LDADD = $(CONTEXTD_LIBS)
 
 tests_unit_tests_group_VALASOURCES = \
-	libcontextprovider/group.vala				\
-	libcontextprovider/string_set.vala			\
 	tests/unit_tests/test_group.vala			\
 	$(NULL)
 
@@ -96,12 +94,13 @@ tests_unit_tests_group_SOURCES = \
 	$(tests_unit_tests_group_VALASOURCES:.vala=.h)		\
 	$(NULL)
 
-tests/unit_tests/group.vala.stamp: $(tests_unit_tests_group_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
+tests/unit_tests/group.vala.stamp: contextprovider.vapi $(tests_unit_tests_group_VALASOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
 	touch $@
 
+
 tests_unit_tests_group_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
-tests_unit_tests_group_LDADD = $(CONTEXTD_LIBS)
+tests_unit_tests_group_LDADD = $(CONTEXTD_LIBS) -L libcontextprovider.la
 
 
 
