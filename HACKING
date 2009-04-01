@@ -239,7 +239,8 @@ Then run all the steps in "Making a release tag" again, this time
 *including* git-make-dist.  Use the plain VERSION as the tag name.
 
 Then bump the version in configure.ac to by increasing the least
-significant component and add the "~unreleased" suffix again.
+significant component and add the "~unreleased" suffix again.  Use the
+commit message "Prepare VERSION".
 
 Push everything.  Don't forget to push the tags as well.  If you can't
 push at this time because you need to pull first, do that but be
