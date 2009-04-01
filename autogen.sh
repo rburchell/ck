@@ -1,13 +1,23 @@
 #!/bin/sh
-# Run this to generate all the initial makefiles, etc.
+set -e
 
-srcdir=`dirname $0`
-test -z "$srcdir" && srcdir=.
-
-PKG_NAME="contextd"
-
-REQUIRED_AUTOMAKE_VERSION=1.9
-
-. gnome-autogen.sh
+. tools/autogen-helpers.sh
 
 version_check valac VALAC 'valac' 0.7.0 "http://vala-project.org"
+
+autoreconf -i -f
+
+run_configure=true
+for arg in $*; do
+    case $arg in
+        --no-configure)
+            run_configure=false
+            ;;
+        *)
+            ;;
+    esac
+done
+
+if test $run_configure = true; then
+    ./configure "$@"
+fi

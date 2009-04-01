@@ -1,4 +1,6 @@
+AC_PREREQ([2.61])
 AC_INIT([ContextKit], [0.1.4~unreleased], [rob.taylor@codethink.co.uk], ContextKit)
+
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([-Wall dist-bzip2 tar-ustar 1.9])
