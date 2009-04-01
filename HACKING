@@ -25,6 +25,24 @@ separate branches.  Upstream development generally happens on the
 "pkg-master" into "master".  If you want to move changes from
 "pkg-master" back to "master", cherry-pick them.
 
+Documentation
+-------------
+
+Documentation is in HTML and generally distributed in the tarballs and
+distribution tags.  We do this so that recipients don't need all the
+crazy build tools that we use and still get some documentation.
+
+Thus, all documentation files should be added to EXTRA_DIST and
+MAINTAINERCLEANFILES.
+
+Since timestamps are not always preserved well enough when checking a
+distribution tag out of Git, it might happen that documentation is
+being regenerated also during a pure target build, and might fail.
+
+It's not yet totally clear how to cope with that: one approach is to
+have something autotool's "missing", another might be to touch all
+generated files during configure.  Let's see.
+
 Environments
 ------------
 
