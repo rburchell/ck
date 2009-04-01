@@ -77,18 +77,9 @@ $(ASYNC_INTROSPECT): introspect/async/%.xml: $(SPEC_FILES) $(tools_dir)/spec-to-
 
 html-local: $(DOCS)
 
-doc/contextkit.html: $(SPEC_FILES) spec/all.xml $(tools_dir)/doc-generator.xsl
-	install -d doc
-	$(XSLTPROC) $(tools_dir)/doc-generator.xsl $(top_srcdir)/spec/all.xml > $@
-
 context.valid.stamp: spec/context.xsd spec/context.xml
 	$(XMLLINT) $^ 
 	touch $@
-
-doc/context-properties.html: spec/context.xml tools/context2asciidoc.pl
-	install -d doc
-	$(top_srcdir)/tools/context2asciidoc.pl \
-          < $(top_srcdir)/spec/context.xml | asciidoc -f myfilter.conf -o $@ -
 
 # Cleaning and distributing
 
