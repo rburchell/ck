@@ -3,8 +3,6 @@
 
 #export DH_VERBOSE=1
 
-docdir=/usr/share/maemo-doc/
-
 Makefile:
 	./configure --prefix /usr --sysconfdir=/etc
 
@@ -32,13 +30,9 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	$(MAKE) DESTDIR=`pwd`/debian/tmp/ install
-	mkdir -p `pwd`/debian/tmp/$(docdir)/org.freedesktop.ContextKit
-	mkdir -p `pwd`/debian/tmp/$(docdir)/libcontextprovider
-	mkdir -p `pwd`/debian/tmp/$(docdir)/context-properties
-	cp -a doc/contextkit.html `pwd`/debian/tmp/$(docdir)/org.freedesktop.ContextKit/index.html
-	cp -a doc/reference/libcontextprovider/html/* `pwd`/debian/tmp/$(docdir)/libcontextprovider/
-	cp -a doc/context.html `pwd`/debian/tmp/$(docdir)/context-properties/
-
+	mkdir -p `pwd`/debian/tmp/usr/share/gtk-doc/html
+	rm -rf `pwd`/debian/tmp/usr/share/gtk-doc/html/libcontextprovider
+	cp -a doc/reference/libcontextprovider/html `pwd`/debian/tmp/usr/share/gtk-doc/html/libcontextprovider
 	dh_install --sourcedir=`pwd`/debian/tmp/
 
 binary-indep: build install

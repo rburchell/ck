@@ -41,7 +41,7 @@ Description: ContextKit daemon documentation
  ContextKit is a system for providing real-time context awareness to
  applications.
  .
- This package contains the D-Bus interface documentation.
+ This package contains the documentation.
 
 Package: libcontextprovider0
 Architecture: any
@@ -78,10 +78,3 @@ Description: Helper library for providers of context properties
  org.freedesktop.ContextKit D-Bus interface.
  .
  This package contains the documentation.
-
-Package: context-properties-doc
-Section: doc
-Architecture: all
-Description: Documentation of all context properties
- This package contains the documentation of all context properties
- of the Maemo platform.
