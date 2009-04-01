@@ -1,6 +1,6 @@
 SUBDIRS=reference
 
-htmldir = $(datadir)/doc/contextkit/
+htmldir = $(datadir)/doc/contextkit/html/
 html_ASCIIDOCS = context-intro.txt context-providers.txt
 
 # Support for html_ASCIIDOCS follows, do not touch.
