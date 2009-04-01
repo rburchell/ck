@@ -100,7 +100,7 @@ tests/unit_tests/group.vala.stamp: contextprovider.vapi $(tests_unit_tests_group
 
 
 tests_unit_tests_group_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
-tests_unit_tests_group_LDADD = $(CONTEXTD_LIBS) -L libcontextprovider.la
+tests_unit_tests_group_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
 
 
