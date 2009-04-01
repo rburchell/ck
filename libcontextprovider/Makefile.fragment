@@ -3,7 +3,7 @@ lib_LTLIBRARIES = libcontextprovider.la
 libcontextprovider_VALASOURCES_PRIV = \
 	libcontextprovider/dbus_interface.vala \
 	libcontextprovider/manager.vala \
-	libcontextprovider/providers.vala \
+	libcontextprovider/groups.vala \
 	libcontextprovider/key_usage_counter.vala \
 	libcontextprovider/subscriber.vala \
 	libcontextprovider/value_compare.vala \
