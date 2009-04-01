@@ -269,12 +269,19 @@ The only differences are:
    release_VERSION tags into a packaging branch.  Instead, you remove
    the ~unreleased suffix in debian/changelog.
 
+   VERY IMPORTANT: Update the date in the topmost debian/changelog
+   entry whenever you change it.
+
  - Instead of using "release_VERSION" for the tag, you use
    "pkg_VERSION-REVISION".
 
  - You use "VERSION-REVISION" for the distribution tag name.
    Git-make-dist will automatically include the debian/ directory in
    the distribution tag.
+
+ - When bumping the version post-release, you create a new, empty
+   entry in debian/changelog.  Make sure it has a valid signature line
+   so that packages can be build with it.
 
 Snapshots versus releases
 -------------------------
