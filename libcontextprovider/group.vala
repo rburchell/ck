@@ -12,7 +12,8 @@ namespace ContextProvider {
 		public void subscribe (bool subscribed) {
 			if (subscribed != this.subscribed) {
 				this.subscribed = subscribed;
-				callback (subscribed);
+				if (callback)
+					callback (subscribed);
 			}
 		}
 	}
