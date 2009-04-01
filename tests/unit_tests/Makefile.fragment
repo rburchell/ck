@@ -2,6 +2,7 @@ TEST_PROGS += \
 	tests/unit_tests/intset					\
 	tests/unit_tests/stringset				\
 	tests/unit_tests/value_compare				\
+	tests/unit_tests/group					\
 	$(NULL)
 
 noinst_PROGRAMS = $(TEST_PROGS)
@@ -10,6 +11,7 @@ BUILT_SOURCES += \
 	tests/unit_tests/intset.vala.stamp			\
 	tests/unit_tests/stringset.vala.stamp			\
 	tests/unit_tests/value_compare.vala.stamp		\
+	tests/unit_tests/group.vala.stamp		\
 	$(NULL)
 
 tests_unit_tests_intset_VAPISOURCES = \
@@ -83,6 +85,25 @@ tests/unit_tests/value_compare.vala.stamp: $(tests_unit_tests_value_compare_VALA
 tests_unit_tests_value_compare_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
 tests_unit_tests_value_compare_LDADD = $(CONTEXTD_LIBS)
 
+tests_unit_tests_group_VALASOURCES = \
+	libcontextprovider/group.vala				\
+	libcontextprovider/string_set.vala			\
+	tests/unit_tests/test_group.vala			\
+	$(NULL)
+
+tests_unit_tests_group_SOURCES = \
+	$(tests_unit_tests_group_VALASOURCES:.vala=.c)		\
+	$(tests_unit_tests_group_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests/unit_tests/group.vala.stamp: $(tests_unit_tests_group_VALASOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
+	touch $@
+
+tests_unit_tests_group_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_group_LDADD = $(CONTEXTD_LIBS)
+
+
 
 EXTRA_DIST += \
 	$(tests_unit_tests_intset_VALASOURCES)				\
@@ -96,6 +117,9 @@ EXTRA_DIST += \
 	$(tests_unit_tests_value_compare_VALASOURCES)			\
 	$(tests_unit_tests_value_compare_SOURCES)		\
 	tests/unit_tests/value_compare.vala.stamp			\
+	$(tests_unit_tests_group_VALASOURCES)			\
+	$(tests_unit_tests_group_SOURCES)		\
+	tests/unit_tests/group.vala.stamp			\
 	$(NULL)
 
 DISTCLEANFILES += \
@@ -106,6 +130,8 @@ MAINTAINERCLEANFILES += \
 	tests/unit_tests/intset.vala.stamp				\
 	$(tests_unit_tests_stringset_GENERATEDSOURCES)			\
 	tests/unit_tests/stringset.vala.stamp				\
-	$(tests_unit_tests_value_compare_SOURCES)				\
+	$(tests_unit_tests_value_compare_SOURCES)			\
 	tests/unit_tests/value_compare.vala.stamp			\
+	$(tests_unit_tests_group_SOURCES)			\
+	tests/unit_tests/group.vala.stamp			\
 	$(NULL)
