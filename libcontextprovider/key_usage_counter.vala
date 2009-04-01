@@ -24,12 +24,15 @@ using GLib;
 namespace ContextProvider {
 
 	public class KeyUsageCounter {
+		Groups groups;
 		// The number of subscribers for each key (over all subscriber objects)
 		Gee.HashMap<string, int> no_of_subscribers = new Gee.HashMap<string, int>(str_hash, str_equal);
 		public StringSet subscribed_keys { get; private set; }
 
-		public KeyUsageCounter() {
+
+		public KeyUsageCounter(Groups groups) {
 			subscribed_keys = new StringSet();
+			this.groups = groups;
 		}
 
 		public void add (StringSet keys) {
@@ -57,7 +60,7 @@ namespace ContextProvider {
 
 			if (first_subscribed_keys.size() > 0) {
 				// Signal that some new keys were subscribed to
-				Manager.get_instance().groups.first_subscribed (first_subscribed_keys);
+				groups.first_subscribed (first_subscribed_keys);
 			}
 
 			subscribed_keys = new StringSet.union (subscribed_keys, first_subscribed_keys);
@@ -91,7 +94,7 @@ namespace ContextProvider {
 
 			if (last_unsubscribed_keys.size() > 0) {
 				// Signal that some keys are not subscribed to anymore
-				Manager.get_instance().groups.last_unsubscribed (last_unsubscribed_keys, subscribed_keys);
+				groups.last_unsubscribed (last_unsubscribed_keys, subscribed_keys);
 			}
 
 		}
