@@ -1,10 +1,10 @@
 namespace ContextProvider {
 	public class Group {
-		public SubscriptionChangedCallback callback;
+		public SubscriptionChangedCallback? callback;
 		public StringSet keys;
 		public bool subscribed;
 
-		public Group (string[] keys, SubscriptionChangedCallback cb) {
+		public Group (string[] keys, SubscriptionChangedCallback? cb) {
 			this.keys = new StringSet.from_array(keys);
 			this.callback = cb;
 			this.subscribed = false;

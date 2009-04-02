@@ -26,8 +26,8 @@ namespace ContextProvider {
 	Manager? manager;
 
 	// Records whether the context_init function has been called
-	bool initialised = false;
-
+	internal bool initialised = false;
+	internal Manager? manager;
 	/**
 	 * context_provider_set_integer:
 	 * @key: name of key

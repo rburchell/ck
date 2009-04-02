@@ -28,7 +28,7 @@ namespace ContextProvider {
 		// Mapping client dbus names into subscription objects
 		Gee.HashMap<string, Subscriber> subscribers;
 
-		public Groups groups {get; private set;}
+		public GroupList group_list {get; private set;}
 		public KeyUsageCounter key_counter {get; private set;}
 
 		// NULL value means undetermined
@@ -42,8 +42,8 @@ namespace ContextProvider {
 
 		internal Manager() {
 			/*TODO, should manager own the key counter? */
-			this.groups = new Groups();
-			this.key_counter = new KeyUsageCounter(groups);
+			this.group_list = new GroupList();
+			this.key_counter = new KeyUsageCounter(group_list);
 			this.subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			this.values = new HashTable<string, Value?>(str_hash, str_equal);
 			// Note: Use session / system bus according to the configuration
@@ -135,7 +135,7 @@ namespace ContextProvider {
 			// Do not create a StringSet from the parameter "keys" as that would be add Quarks
 			StringSet checked_keys = new StringSet();
 			foreach (var key in keys) {
-				if (groups.valid_keys.is_member(key)) {
+				if (group_list.valid_keys.is_member(key)) {
 					checked_keys.add(key);
 				}
 			}
@@ -144,7 +144,7 @@ namespace ContextProvider {
 
 		/* Is called when the group sets new values to context properties */
 		public void property_value_change(string key, Value? value) {
-			if (groups.valid_keys.is_member (key) == false) {
+			if (group_list.valid_keys.is_member (key) == false) {
 				critical ("Key %s is not valid", key);
 			}
 			// ignore unchanged keys

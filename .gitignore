@@ -112,3 +112,8 @@ tests/unit_tests/test_value_compare.h
 tests/unit_tests/value_compare
 tests/unit_tests/value_compare.vala.stamp
 spec/context-provider-schema.html
+/doc/context-intro.html
+/doc/context-properties.html
+/doc/fig1.svg
+/doc/fig2.svg
+/doc/fig3.svg

@@ -30,9 +30,43 @@ void test_group_keys() {
 }
 
 
+void test_group_null_subscribe() {
+	string[] keys = {"a","b","c"};
+	Group g = new Group(keys, null);
+	g.subscribe(true);
+	g.subscribe(false);
+}
+
+class Tester {
+	public int subscribe_count = 0;
+	public void callback (bool subscribe) {
+		if (subscribe) {
+			subscribe_count++;
+		} else {
+			subscribe_count--;
+		}
+	}
+}
+
+void test_group_subscribe() {
+	string[] keys = {"a","b","c"};
+	Tester t = new Tester();
+	Group g = new Group(keys, t.callback);
+	g.subscribe(true);
+	assert (t.subscribe_count == 1);
+	g.subscribe(true);
+	assert (t.subscribe_count == 1);
+	g.subscribe(false);
+	assert (t.subscribe_count == 0);
+	g.subscribe(false);
+	assert (t.subscribe_count == 0);
+}
+
 public static void main (string[] args) {
        Test.init (ref args);
        Test.add_func("/contextkit/group/keys", test_group_keys);
+       Test.add_func("/contextkit/group/null_subscribe", test_group_null_subscribe);
+       Test.add_func("/contextkit/group/subscribe", test_group_subscribe);
        Test.run ();
 }
 

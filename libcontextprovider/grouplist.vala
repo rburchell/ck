@@ -23,14 +23,14 @@ using Gee;
 
 namespace ContextProvider {
 
-	public class Groups {
+	public class GroupList {
 		// List of groups
 		Gee.ArrayList<Group> groups = new Gee.ArrayList<Group> ();
 
 		// Valid keys provided by all groups
 		public StringSet valid_keys {get; private set;}
 
-		internal Groups () {
+		public GroupList () {
 			valid_keys = new StringSet();
 		}
 

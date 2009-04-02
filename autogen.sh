@@ -1,11 +1,27 @@
 #!/bin/sh
-# Run this to generate all the initial makefiles, etc.
+set -e
 
-srcdir=`dirname $0`
-test -z "$srcdir" && srcdir=.
+. tools/autogen-helpers.sh
 
-PKG_NAME="contextd"
+version_check valac VALAC 'valac' 0.7.0 "http://vala-project.org"
+version_check asciidoc ASCIIDOC 'asciidoc' 8.2.7 "http://www.methods.co.nz/asciidoc/"
+existence_check dot
+existence_check source-highlight
 
-REQUIRED_AUTOMAKE_VERSION=1.9
+autoreconf -i -f
 
-. gnome-autogen.sh
+run_configure=true
+for arg in $*; do
+    case $arg in
+        --no-configure)
+            run_configure=false
+            ;;
+        *)
+            ;;
+    esac
+done
+
+if test $run_configure = true; then
+    ./configure "$@"
+fi
+
