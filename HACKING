@@ -13,17 +13,33 @@ We don't use qmake, even for Qt programs or libraries.  Use pkg-config
 when you use Qt libraries and write explicit rules for invocations of
 tools like moc.  See the ContextCommander for an elaborate example.
 
-Packaging
----------
+Upstream and Packaging
+----------------------
 
-We separate 'upstream' code development and packaging for Maemo into
-separate branches.  Upstream development generally happens on the
-"master" branch, and packaging on the "pkg-master" branch.
+We separate 'upstream' code development on the one side and packaging
+for Maemo on the other.  Both happen on branches: a branch for
+upstream development is called "upstream branch" and doesn't havea
+debian/ directory in it; a branch with a debian/ directory is called a
+"packaging branch".
 
-"Master" is merged into "pkg-master" at controlled points in time.
-(See below "Making a release" for more details.)  Never merge
-"pkg-master" into "master".  If you want to move changes from
-"pkg-master" back to "master", cherry-pick them.
+A upstream branch is merged into a packahging branch at controlled
+points in time.  (See below "Making a release" for more details.)
+Never merge a packagin branch into upstream branch.  If you want to
+move changes from a packaging branch to a upstream branch, cherry-pick
+them.
+
+Feel free to make smallish changes to to the actual source or
+Makefiles in a packaging branch, but always with the intention of
+moving them to upstream in the immediate future.  Thus, you should
+isolate these changes into their own commits: never make a commit that
+includes changes to both files inside and outside of debian/.
+
+As explained below, only merge release tags into a packaging branch.
+If you need a fix from the upstream branch that is not in any release
+yet, cherry pick it to the packaging branch.
+
+The "master" branch is our main upstream branch, and "pkg-master" is
+the packaging branch that follows "master".
 
 Documentation
 -------------
@@ -40,8 +56,8 @@ distribution tag out of Git, it might happen that documentation is
 being regenerated also during a pure target build, and might fail.
 
 It's not yet totally clear how to cope with that: one approach is to
-have something autotool's "missing", another might be to touch all
-generated files during configure.  Let's see.
+have something like autotool's "missing", another might be to touch
+all 'interesting' files just before building.  Let's see.
 
 Environments
 ------------
@@ -159,17 +175,17 @@ leightweight tag would suffice.)
 Making a distribution tag
 -------------------------
 
-No generated file should be committed to a branch, but release tags
-should be buildable with "./configure && make" or "dpkg-buildpackage"
-right away after exporting them, without the need to run autogen.sh.
-The created Debian source package should be clean, and not contain any
-files that are not supposed to be distributed.
+No generated file should be committed to a branch, but distribution
+tags should be buildable with "./configure && make" or
+"dpkg-buildpackage" right away after exporting them, without the need
+to run autogen.sh.  The created Debian source package should be clean,
+and not contain any files that are not supposed to be distributed.
 
 In general, a tag should contain exactly the files that would be in a
 distribution tarball produced by "make dist".  In essence, we use tags
 in a VCS repository instead of the traditional tarballs.
 
-Note that release tags are usually created in the development
+Note that distribution tags are usually created in the development
 environment, outside of Scratchbox.
 
 Here is the general procedure:
@@ -191,7 +207,7 @@ Here is the general procedure:
   $ make
   $ make distcheck
 
-- Make the release tag with git-make-dist (in the tools/ directory).
+- Make the distribution tag with git-make-dist (in the tools/ directory).
 
   $ git-make-dist TAG
 
@@ -218,13 +234,13 @@ suffixes of the form "~unreleasedN".  Do this by changing the existing
 debian/changelog entry in place.  Do not create a new entry.
 
 As a rule, configure.ac in a upstream branch should always have a
-version number with a "~unreleased" suffix.  The release tags made
+version number with a "~unreleased" suffix.  The distribution tags made
 from a branch should never have a version number with a "~unreleased"
 suffix.
 
 Likewise, the topmost entry of the debian/changelog in a branch should
 always have a "~unreleased" suffix, and no other entry should have
-such a suffix.  A debian/changelog file in a release tag should not
+such a suffix.  A debian/changelog file in a distribution tag should not
 have a ~unreleased suffix.
 
 Also, the configure.ac file in a packaging branch should _not_ have a
@@ -244,7 +260,7 @@ packaging bits), remove the "~unreleased" suffix in configure.ac.  You
 can also increase the version more generally at this time, such as
 from 0.1.5~unreleased to 0.2.0.
 
-Then do all the steps listed in "Making a release tag" *except*
+Then do all the steps listed in "Making a distribution tag" *except*
 running git-make-dist.  Once the final "make distcheck" succeeds,
 commit the removal of the "~unreleased" suffix with the commit message
 "Released VERSION."  (VERSION is of course the version in configure.ac
@@ -253,7 +269,7 @@ without the ~unreleased suffix.)
 Then make a annotated tag with the name "release_VERSION" and the
 message "Released VERSION."
 
-Then run all the steps in "Making a release tag" again, this time
+Then run all the steps in "Making a distribution tag" again, this time
 *including* git-make-dist.  Use the plain VERSION as the tag name.
 
 Then bump the version in configure.ac to by increasing the least
