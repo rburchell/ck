@@ -4,6 +4,7 @@ TEST_PROGS += \
 	tests/unit_tests/value_compare				\
 	tests/unit_tests/group					\
 	tests/unit_tests/grouplist				\
+	tests/unit_tests/key_usage_counter				\
 	$(NULL)
 
 noinst_PROGRAMS = $(TEST_PROGS)
@@ -14,6 +15,7 @@ BUILT_SOURCES += \
 	tests/unit_tests/value_compare.vala.stamp		\
 	tests/unit_tests/group.vala.stamp		\
 	tests/unit_tests/grouplist.vala.stamp		\
+	tests/unit_tests/key_usage_counter.vala.stamp		\
 	$(NULL)
 
 tests_unit_tests_intset_VAPISOURCES = \
@@ -121,8 +123,21 @@ tests/unit_tests/grouplist.vala.stamp: contextprovider.vapi $(tests_unit_tests_g
 tests_unit_tests_grouplist_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
 tests_unit_tests_grouplist_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
+tests_unit_tests_key_usage_counter_VALASOURCES = \
+	tests/unit_tests/test_key_usage_counter.vala			\
+	$(NULL)
 
+tests_unit_tests_key_usage_counter_SOURCES = \
+	$(tests_unit_tests_key_usage_counter_VALASOURCES:.vala=.c)		\
+	$(tests_unit_tests_key_usage_counter_VALASOURCES:.vala=.h)		\
+	$(NULL)
 
+tests/unit_tests/key_usage_counter.vala.stamp: contextprovider.vapi $(tests_unit_tests_key_usage_counter_VALASOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+	touch $@
+
+tests_unit_tests_key_usage_counter_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_key_usage_counter_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
 EXTRA_DIST += \
 	$(tests_unit_tests_intset_VALASOURCES)				\
@@ -139,6 +154,9 @@ EXTRA_DIST += \
 	$(tests_unit_tests_group_VALASOURCES)			\
 	$(tests_unit_tests_group_SOURCES)		\
 	tests/unit_tests/group.vala.stamp			\
+	$(tests_unit_tests_key_usage_counter_VALASOURCES)			\
+	$(tests_unit_tests_key_usage_counter_SOURCES)		\
+	tests/unit_tests/key_usage_counter.vala.stamp			\
 	$(NULL)
 
 DISTCLEANFILES += \
@@ -153,4 +171,6 @@ MAINTAINERCLEANFILES += \
 	tests/unit_tests/value_compare.vala.stamp			\
 	$(tests_unit_tests_group_SOURCES)			\
 	tests/unit_tests/group.vala.stamp			\
+	$(tests_unit_tests_key_usage_counter_SOURCES)			\
+	tests/unit_tests/key_usage_counter.vala.stamp			\
 	$(NULL)

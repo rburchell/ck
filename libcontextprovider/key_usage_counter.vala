@@ -23,7 +23,22 @@ using GLib;
 
 namespace ContextProvider {
 
+	/**
+	 * SECTION:KeyUsageCounter
+	 * @short_description: A subscription counter for keys.
+	 * 
+	 * A data structure which tracks the number of subscriptions for 
+	 * keys.
+	 */
+
 	public class KeyUsageCounter {
+	/**
+	 * ContextProviderKeyUsageCounter
+	 *
+	 * A data structure which tracks the number of subscriptions for 
+	 * keys.
+     */
+
 		// The number of subscribers for each key (over all subscriber objects)
 		Gee.HashMap<string, int> no_of_subscribers = new Gee.HashMap<string, int>(str_hash, str_equal);
 		public StringSet subscribed_keys { get; private set; }
@@ -31,10 +46,17 @@ namespace ContextProvider {
 		public signal void keys_added (StringSet new_keys);
 		public signal void keys_removed (StringSet keys_removed, StringSet keys_remaining);
 
+		/**
+		 * Constructs a new KeyUsageCounter.
+		 */
 		public KeyUsageCounter() {
 			subscribed_keys = new StringSet();
 		}
 
+		/**
+		 * @key: a string
+		 * Increases the subscription count of the #key.
+		 */
 		public void add (StringSet keys) {
 			StringSet first_subscribed_keys = new StringSet();
 
@@ -65,6 +87,10 @@ namespace ContextProvider {
 			subscribed_keys = new StringSet.union (subscribed_keys, first_subscribed_keys);
 		}
 
+		/**
+		 * @key: a string
+		 * Decreases the subscription count of the #key.
+		 */
 		public void remove (StringSet keys) {
 			StringSet last_unsubscribed_keys = new StringSet();
 
@@ -98,6 +124,10 @@ namespace ContextProvider {
 
 		}
 
+		/**
+		 * @key: a string
+		 * Returns: The subscription count of the #key.
+		 */
 		public int number_of_subscribers (string key) {
 			if (no_of_subscribers.contains (key)) {
 				return no_of_subscribers.get (key);
