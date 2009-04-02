@@ -26,14 +26,14 @@ The following lists some typical context properties:
   weather database.
 
 Applications access context properties via +DuiValueSpaceItems+ in the
-api:libduivaluespace[+DuiValueSpace+].
+link:libduivaluespace[+DuiValueSpace+].
 
 The context framework is modular: context properties from multiple
 independent components are directly combined in the +DuiValueSpace+ API
 and applications can access them without needing to know who is
 ultimately providing them.
 
-The api:libduivaluespace[+DuiValueSpace+] API is intended to be
+The link:libduivaluespace[+DuiValueSpace+] API is intended to be
 general; other subsystems that communicate in terms of key/value pairs
 can use it as well.  The Settings framework is an obvious candidate.
 
@@ -84,13 +84,13 @@ Getting started
 ---------------
 
 To get started with using context properties, read the
-api:libduivaluespace[DuiValueSpace] documentation and have a look at
+link:libduivaluespace[DuiValueSpace] documentation and have a look at
 the list of link:context-properties.html[context properties].  You can also
 start from the link:context-subscriber-example.html[context subscriber
 example].
 
 To get get started with providing properties, read the
-api:context-providers[libcontextprovider] documentation and have a
+link:context-providers[libcontextprovider] documentation and have a
 look at the link:context-provider-example.html[context provider
 example].
 
@@ -103,7 +103,7 @@ The DuiValueSpace class and friends.  Applications and other clients
 of context properties written in C++ should use this.  This API needs
 bindings for other platform languages, maybe including C.
 
-api:libduivaluespace[Documentation]
+link:libduivaluespace[Documentation]
 
 .+context-providers+
 
@@ -121,9 +121,9 @@ link:contextkit.html[Documentation]
 .+libcontextprovider+
 
 A convenience library for implementing the
-api:org.freedesktop.ContextKit.Manager[] D-Bus interface.
+link:contextkit.html[org.freedesktop.ContextKit] D-Bus interface.
 
-link:reference/libcontextprovider/[Documentation]
+link:libcontextprovider[Documentation]
 
 .+context-properties+
 
@@ -161,8 +161,9 @@ Architecture
 ------------
 
 Context properties are collected from all providers that have
-registered themselves with the api:context-providers[] interface.  For
-each provider, this registration information includes the list of its
+registered themselves with the
+link:context-providers.html[+context-providers+] interface.  For each
+provider, this registration information includes the list of its
 properties with type information and a short description for each, and
 the D-Bus bus name where the provider can be reached.  Providers can
 be both on the session and on the system bus, and the registration
@@ -225,8 +226,9 @@ represented as D-Bus values, which map nicely to ++QVariant++s (except
 for the _null_ value which is handled specially).
 
 Context providers need to implement the
-link:contextkit.html[+org.freedesktop.ContextKit+] interface.  They can do it directly,
-or with the help of the api:libcontextprovider[] convenience library.
+link:contextkit.html[+org.freedesktop.ContextKit+] interface.  They
+can do it directly, or with the help of the
+link:libcontextprovider[+libcontextprovider+] convenience library.
 This library is used by the context daemon itself, which can serve as
 an extended example.
 
