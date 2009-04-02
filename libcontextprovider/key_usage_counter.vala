@@ -24,15 +24,15 @@ using GLib;
 namespace ContextProvider {
 
 	public class KeyUsageCounter {
-		GroupList group_list;
 		// The number of subscribers for each key (over all subscriber objects)
 		Gee.HashMap<string, int> no_of_subscribers = new Gee.HashMap<string, int>(str_hash, str_equal);
 		public StringSet subscribed_keys { get; private set; }
 
+		public signal void keys_added (StringSet new_keys);
+		public signal void keys_removed (StringSet keys_removed, StringSet keys_remaining);
 
-		public KeyUsageCounter(GroupList group_list) {
+		public KeyUsageCounter() {
 			subscribed_keys = new StringSet();
-			this.group_list = group_list;
 		}
 
 		public void add (StringSet keys) {
@@ -59,8 +59,7 @@ namespace ContextProvider {
 			}
 
 			if (first_subscribed_keys.size() > 0) {
-				// Signal that some new keys were subscribed to
-				group_list.first_subscribed (first_subscribed_keys);
+				emit keys_added (first_subscribed_keys);
 			}
 
 			subscribed_keys = new StringSet.union (subscribed_keys, first_subscribed_keys);
@@ -71,14 +70,14 @@ namespace ContextProvider {
 
 			foreach (var key in keys) {
 				if (no_of_subscribers.contains (key)) {
-					int old_value = no_of_subscribers.get (key);
+					int value = no_of_subscribers.get (key);
 
-					if (old_value >= 1) {
-						// Do not store negative values
-						no_of_subscribers.set (key, old_value - 1);
+					if (value >= 1) {
+						value--;
+						no_of_subscribers.set (key, value);
 					}
 
-					if (old_value <= 1) {
+					if (value == 0) {
 						// The last subscriber for this key unsubscribed
 						last_unsubscribed_keys.add (key);
 					}
@@ -94,7 +93,7 @@ namespace ContextProvider {
 
 			if (last_unsubscribed_keys.size() > 0) {
 				// Signal that some keys are not subscribed to anymore
-				group_list.last_unsubscribed (last_unsubscribed_keys, subscribed_keys);
+				emit keys_removed (last_unsubscribed_keys, subscribed_keys);
 			}
 
 		}
