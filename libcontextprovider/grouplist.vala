@@ -34,13 +34,13 @@ namespace ContextProvider {
 			valid_keys = new StringSet();
 		}
 
-		public void register (Group group) {
+		public void add (Group group) {
 			//debug ("New group registered: %s (%p)", group.keys.debug(), group);
 			groups.add (group);
 			valid_keys = new StringSet.union (valid_keys, group.keys);
 		}
 
-		public void unregister (Group group) {
+		public void remove (Group group) {
 			//debug ("Group unregistered: %s (%p)", group.keys.debug(), group);
 			groups.remove (group);
 			StringSet s = new StringSet();
