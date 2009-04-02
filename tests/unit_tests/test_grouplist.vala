@@ -29,23 +29,39 @@ void test_grouplist_add() {
 	Group g = new Group(keys, null);
 	gl.add(g);
 
-	debug (g.keys.debug());
-	debug (gl.valid_keys.debug());
 	assert (g.keys.is_subset_of(gl.valid_keys));
 
 	string[] keys2 = {"d","f","c"};
 	Group g2 = new Group(keys2, null);
 	gl.add(g2);
 
-	debug (g2.keys.debug());
-	debug (gl.valid_keys.debug());
 	assert (g2.keys.is_subset_of(gl.valid_keys));
+}
+
+void test_grouplist_remove() {
+	GroupList gl = new GroupList();
+
+	string[] keys = {"a","b","c"};
+	Group g = new Group(keys, null);
+	gl.add(g);
+
+	string[] keys2 = {"d","f","c"};
+	Group g2 = new Group(keys2, null);
+	gl.add(g2);
+
+	gl.remove(g);
+
+	assert (g2.keys.is_equal(gl.valid_keys));
+
+	gl.remove(g2);
+	assert(gl.valid_keys.size() == 0);
 }
 
 
 public static void main (string[] args) {
        Test.init (ref args);
-       Test.add_func("/contextkit/grouplist/register", test_grouplist_add);
+       Test.add_func("/contextkit/grouplist/add", test_grouplist_add);
+       Test.add_func("/contextkit/grouplist/remove", test_grouplist_remove);
        Test.run ();
 }
 
