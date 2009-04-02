@@ -3,6 +3,7 @@ TEST_PROGS += \
 	tests/unit_tests/stringset				\
 	tests/unit_tests/value_compare				\
 	tests/unit_tests/group					\
+	tests/unit_tests/grouplist				\
 	$(NULL)
 
 noinst_PROGRAMS = $(TEST_PROGS)
@@ -12,6 +13,7 @@ BUILT_SOURCES += \
 	tests/unit_tests/stringset.vala.stamp			\
 	tests/unit_tests/value_compare.vala.stamp		\
 	tests/unit_tests/group.vala.stamp		\
+	tests/unit_tests/grouplist.vala.stamp		\
 	$(NULL)
 
 tests_unit_tests_intset_VAPISOURCES = \
@@ -101,6 +103,24 @@ tests/unit_tests/group.vala.stamp: contextprovider.vapi $(tests_unit_tests_group
 
 tests_unit_tests_group_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
 tests_unit_tests_group_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
+
+tests_unit_tests_grouplist_VALASOURCES = \
+	tests/unit_tests/test_grouplist.vala			\
+	$(NULL)
+
+tests_unit_tests_grouplist_SOURCES = \
+	$(tests_unit_tests_grouplist_VALASOURCES:.vala=.c)		\
+	$(tests_unit_tests_grouplist_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests/unit_tests/grouplist.vala.stamp: contextprovider.vapi $(tests_unit_tests_grouplist_VALASOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+	touch $@
+
+
+tests_unit_tests_grouplist_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_grouplist_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
+
 
 
 
