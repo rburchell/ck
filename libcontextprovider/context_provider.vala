@@ -23,6 +23,8 @@ using Gee;
 
 namespace ContextProvider {
 
+	Manager? manager;
+
 	// Records whether the context_init function has been called
 	bool initialised = false;
 
@@ -131,10 +133,9 @@ namespace ContextProvider {
 
 			debug ("Creating new Manager D-Bus service");
 
-
-			Manager.set_bus_type (bus_type);
-
-			Manager manager = Manager.get_instance ();
+			// Create the Manager object and register it over DBus.
+			manager = new Manager ();
+			manager.set_bus_type (bus_type);
 
 			debug ("Registering new Manager D-Bus service");
 			var connection = DBus.Bus.get (bus_type);

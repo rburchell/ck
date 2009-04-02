@@ -38,18 +38,9 @@ namespace ContextProvider {
 		int subscriber_count = 0;
 
 		// Session / system bus option
-		static DBus.BusType busType = DBus.BusType.SESSION;
+		DBus.BusType busType = DBus.BusType.SESSION;
 
-		// Singleton implementation
-		private static Manager? instance;
-		public static Manager? get_instance() {
-			if (instance == null) {
-				instance = new Manager();
-			}
-			return instance;
-		}
-
-		private Manager() {
+		internal Manager() {
 			/*TODO, should manager own the key counter? */
 			this.groups = new Groups();
 			this.key_counter = new KeyUsageCounter(groups);
@@ -62,7 +53,7 @@ namespace ContextProvider {
 			bus.NameOwnerChanged += this.on_name_owner_changed;
 		}
 
-		public static void set_bus_type(DBus.BusType b) {
+		internal void set_bus_type(DBus.BusType b) {
 			busType = b;
 		}
 
