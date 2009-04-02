@@ -24,8 +24,8 @@ using Gee;
 namespace ContextProvider {
 
 	// Records whether the context_init function has been called
-	internal bool initialised = false;
-	internal Manager? manager;
+	internal Manager? manager = null;
+
 	/**
 	 * context_provider_set_integer:
 	 * @key: name of key
@@ -34,10 +34,11 @@ namespace ContextProvider {
 	 * Set a key to have an integer value of #value
 	 */
 	public void set_integer (string key, int value) {
-		assert (initialised == true);
+		assert (manager != null);
 
 		Value v = Value (typeof(int));
 		v.set_int (value);
+		manager.property_value_change (key, v);
 	}
 
 	/**
@@ -48,10 +49,11 @@ namespace ContextProvider {
 	 * Set a key to have an floating point value of #value
 	 */
 	public void set_double (string key, double value) {
-		assert (initialised == true);
+		assert (manager != null);
 
 		Value v = Value (typeof(double));
 		v.set_double (value);
+		manager.property_value_change (key, v);
 	}
 
 	/**
@@ -62,10 +64,11 @@ namespace ContextProvider {
 	 * Set a key to have an boolean value of #val
 	 */
 	public void set_boolean (string key, bool value) {
-		assert (initialised == true);
+		assert (manager != null);
 
 		Value v = Value (typeof(bool));
 		v.set_boolean (value);
+		manager.property_value_change (key, v);
 	}
 
 	/**
@@ -76,10 +79,11 @@ namespace ContextProvider {
 	 * Set a key to have an boolean value of #val
 	 */
 	public void set_string (string key, string value) {
-		assert (initialised == true);
+		assert (manager != null);
 
 		Value v = Value (typeof(string));
 		v.set_string (value);
+		manager.property_value_change (key, v);
 	}
 
 	/**
@@ -89,8 +93,9 @@ namespace ContextProvider {
 	 * Marks #key as not having a determinable value.
 	 */
 	public void set_null (string key) {
-		assert (initialised == true);
+		assert (manager != null);
 
+		manager.property_value_change (key, null);
 	}
 
 	/**
@@ -145,7 +150,6 @@ namespace ContextProvider {
 		}
 
 
-		initialised = true;
 		return true;
 	}
 
@@ -159,7 +163,9 @@ namespace ContextProvider {
 	 *
 	 */
 	public void install_group ([CCode (array_length = false, array_null_terminated = true)] string[] key_group, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
-		assert (initialised == true);
+		assert (manager != null);
+		Group g = new Group(key_group, clear_values_on_subscribe, subscription_changed_cb);
+		manager.group_list.add(g);
 	}
 
 	/**
@@ -172,7 +178,10 @@ namespace ContextProvider {
 	 *
 	 */
 	public void install_key(string key, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
-		assert (initialised == true);
+		assert (manager != null);
+		string[] key_group = {key};
+		Group g = new Group(key_group, clear_values_on_subscribe, subscription_changed_cb);
+		manager.group_list.add(g);
 	}
 
 
