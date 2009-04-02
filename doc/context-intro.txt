@@ -64,13 +64,20 @@ platform in the following ways:
   context properties that are provided by multiple components.
 
 - It defines and documents the concrete list of properties of the
-  Maemo platform.
+  Maemo platform.  This includes harmonizing the context ontology with
+  other industry efforts.
 
 - It implements context properties that do not naturally belong to
-  other subsystems.
+  other subsystems and coordinates the implementation of context
+  properties that do belong in specific subsystems.
 
 - It provides a debugging and exploration tool for inspecting and
   controlling context properties.
+
+- It tries to spear-head a rich, cross language value representation
+  that is useable across the whole platform and hopes to take away the
+  burdon of having to come up with such a thing everytime a dynamic
+  type system is needed.
 
 Thus, the Context Framework does not drive the behavior of the system,
 it only provides the information that is needed for other components
@@ -93,6 +100,59 @@ To get get started with providing properties, read the
 link:context-providers[documentation] for context providers and have a
 look at the link:context-provider-example.html[context provider
 example].
+
+The Context Framework for Context Providers
+-------------------------------------------
+
+The advantages of the Context Framework for application writers should
+be clear: they can access a rich set of useful contextual information
+with a simple API.
+
+The ultimate providers of this information, however, might feel that
+the context framework itself does not add significant value: after
+all, they already implement APIs to access all that information
+anyway.  Hooking into the Context Framework means a duplication of
+effort and the requirement to express everything as a value (instead
+of a general query/response API) might be unwelcome.
+
+However, we feel that the unified API and central maintenance of the
+list of core properties carries a lot of value, maybe more than is
+visible at first.
+
+- It makes using more contextual information trivial once you have
+  used your first property.
+
+- It makes it possible to expose present and future context
+  information in all kinds of places with a single effort.  Once the
+  context framework has been integrated into the Web runtime, into
+  Python, or into any language that people care about, no additional
+  effort is needed by anyone to track future developments of the
+  context properties.
+
+- It decouples context providers from consumers.  The context
+  framework makes it possible to move the implementation of a property
+  from one component to another without having to restart the
+  consumers.
+
+- It makes it worthwhile to develop sophisticated tools such as the
+  context commander.
+
+- It might allow some context providers to exit the "API business"
+  altogether.
+
+  If a piece of information is available in a corner of the system but
+  needed somewhere else, it is only human to see this as a nuisance
+  and cobble together a few D-Bus methods to access that information.
+
+  The context framework provides a good alternative in those cases.
+
+It is thus our opinion that the context framework provides enough
+value to justify pushing it into other peoples subsystems, even if
+that means duplicated efforts.
+
+Moreover, the effort needed to integrate with the context framework is
+low.
+
 
 Interfaces 
 ----------
@@ -150,12 +210,69 @@ digraph G {
   "Application 2" -> "Context Framework"
   "Statusbar plugin" -> "Context Framework"
 
+  "Central Policy" -> "Context Framework"
+  "Context Framework" -> "Central Policy"
+
   "Context Framework" -> "Sensor Framework"
   "Context Framework" -> "Connectivity"
   "Context Framework" -> "Location Framework"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Note that the central policy engine can be both a subscriber to and
+provider of context properties.  The policy engine will base its
+decisions (partly) on the current values of context properties and
+will publish (part of) its decisions as context properties.
+
+Most facts that need to be gathered as input for the policy engine can
+be communicted to it via the context framework.  If necessary,
+non-public context properties can be defined that (while visible to
+everyone who knows where to look) are not maintained as part of the
+list of core properties.
+
+Decisions of the policy engine can be communicated to cooperating
+applications and potentially even to enforcement points.  The set of
+values representable as context properties is quite rich so that
+hopefully all facts and decisions can be represented with them.
+
+Relation to Settings Framework
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Context Framework is related to the Settings Framework by the fact
+that both use the DuiValueSpace to expose their key/value pairs to
+applications.
+
+[dotty,fig4.svg]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+digraph G {
+
+  node [shape=box, style=filled];
+
+  "Application" -> "libduivaluespace"
+
+  "libduivaluespace" -> "Context Framework"
+  "libduivaluespace" -> "Settings Framework"
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This part of the architecture is not fully finalized yet.
+
+Languages other than C++
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The DuiValueSpace is a C++ API.  Other languages would need to wrap
+this API for their own use.  This can happen together with wrapping
+the rest of the DirectUI libraries.
+
+[dotty,fig5.svg]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+digraph G {
+
+  node [shape=box, style=filled];
+
+  "Python Application" -> "Python bindings for DuiValueSpace" -> "libduivaluespace"
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Architecture
 ------------
