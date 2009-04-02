@@ -54,7 +54,7 @@ namespace ContextProvider {
 			valid_keys = s;
 		}
 
-		public void first_subscribed(StringSet keys) {
+		public void first_subscribed(KeyUsageCounter? k, StringSet keys) {
 			foreach (var group in groups) {
 				StringSet intersection = new StringSet.intersection (keys, group.keys);
 				if (intersection.size() > 0) {
@@ -63,7 +63,7 @@ namespace ContextProvider {
 			}
 		}
 
-		public void last_unsubscribed(StringSet keys_unsubscribed, StringSet keys_remaining) {
+		public void last_unsubscribed(KeyUsageCounter? k, StringSet keys_unsubscribed, StringSet keys_remaining) {
 			foreach (var group in groups) {
 				StringSet group_remaining = new StringSet.intersection (keys_remaining, group.keys);
 				if (group_remaining.size() == 0) {

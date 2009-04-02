@@ -42,10 +42,14 @@ namespace ContextProvider {
 
 		internal Manager() {
 			/*TODO, should manager own the key counter? */
-			this.group_list = new GroupList();
-			this.key_counter = new KeyUsageCounter();
-			this.subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
-			this.values = new HashTable<string, Value?>(str_hash, str_equal);
+			group_list = new GroupList();
+			key_counter = new KeyUsageCounter();
+
+			key_counter.keys_added += group_list.first_subscribed;
+			key_counter.keys_removed += group_list.last_unsubscribed;
+			
+			subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
+			values = new HashTable<string, Value?>(str_hash, str_equal);
 			// Note: Use session / system bus according to the configuration
 			// (which can be changed via set_bus_type).
 			var connection = DBus.Bus.get (busType);

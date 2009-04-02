@@ -86,27 +86,27 @@ void test_grouplist_subscribe() {
 	StringSet keyset3 = new StringSet.from_array({"d","f","c"});
 	StringSet subscribedkeys = new StringSet();
 	subscribedkeys = new StringSet.union(subscribedkeys, keyset1);
-	gl.first_subscribed(keyset1); //"a","b","f"
+	gl.first_subscribed(null, keyset1); //"a","b","f"
 	assert (t1.subscribe_count == 1);
 	assert (t2.subscribe_count == 1);
 	subscribedkeys = new StringSet.union(subscribedkeys, keyset2);
-	gl.first_subscribed(keyset2); // "a","b","c","d","f"
+	gl.first_subscribed(null, keyset2); // "a","b","c","d","f"
 	assert (t1.subscribe_count == 1);
 	assert (t2.subscribe_count == 1);
 	subscribedkeys = new StringSet.difference(subscribedkeys, keyset3);
-	gl.last_unsubscribed(keyset3, subscribedkeys); // "a","b"
+	gl.last_unsubscribed(null, keyset3, subscribedkeys); // "a","b"
 	assert (t1.subscribe_count == 1);
 	assert (t2.subscribe_count == 0);
 	subscribedkeys = new StringSet.union(subscribedkeys, keyset3);
-	gl.first_subscribed(keyset3); // "a","b","c","d","f"
+	gl.first_subscribed(null, keyset3); // "a","b","c","d","f"
 	assert (t1.subscribe_count == 1);
 	assert (t2.subscribe_count == 1);
 	subscribedkeys = new StringSet.difference(subscribedkeys, keyset2);
-	gl.last_unsubscribed(keyset2, subscribedkeys); // "a", "b", "f"
+	gl.last_unsubscribed(null, keyset2, subscribedkeys); // "a", "b", "f"
 	assert (t1.subscribe_count == 1);
 	assert (t2.subscribe_count == 1);
 	subscribedkeys = new StringSet.difference(subscribedkeys, keyset1);
-	gl.last_unsubscribed(keyset1, subscribedkeys); //empty
+	gl.last_unsubscribed(null, keyset1, subscribedkeys); //empty
 	assert (t1.subscribe_count == 0);
 	assert (t2.subscribe_count == 0);
 }
