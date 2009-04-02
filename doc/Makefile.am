@@ -2,7 +2,7 @@ SUBDIRS=reference
 
 htmldir = $(datadir)/doc/contextkit/html/
 html_ASCIIDOCS = context-intro.txt context-providers.txt
-html_EXTRA = context-properties.html contextkit.html
+html_EXTRA = context-properties.html contextkit.html context-provider-schema.html
 
 MAINTAINERCLEANFILES = context-properties.html contextkit.html
 
@@ -22,6 +22,11 @@ XSLTPROC = xsltproc --xinclude --nonet
 contextkit.html: $(spec_dir)/all.xml $(SPEC_FILES) doc-generator.xsl
 	$(XSLTPROC) $(srcdir)/doc-generator.xsl $< > $@.tmp && mv $@.tmp $@
 
+# Creating docs from a XML schema
+
+context-provider-schema.html: $(spec_dir)/context.xsd
+	xsltproc --nonet --output $@ xs3p/xs3p.xsl $<
+
 # Support for html_ASCIIDOCS and html_EXTRA
 
 html_DATA = $(html_EXTRA) \
@@ -33,5 +38,5 @@ html-local: $(html_EXTRA) $(html_ASCIIDOCS:.txt=.html)
 %.html: %.txt
 	asciidoc -f myfilter.conf $^
 
-EXTRA_DIST = $(html_ASCIIDOCS) $(html_DATA)
+EXTRA_DIST = $(html_ASCIIDOCS) $(html_DATA) doc-generator.xsl xs3p
 MAINTAINERCLEANFILES += $(html_DATA)
