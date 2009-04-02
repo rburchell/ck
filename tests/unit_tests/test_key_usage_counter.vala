@@ -57,7 +57,55 @@ void test_add() {
 	// Expected result: the keys_added is emitted once 
 	// to notify that this key was subscribed to.
 	assert(added_count == 1);
-	assert(last_added_parameter.size() == 1);
+	assert(last_added_parameter.is_equal(new StringSet.from_array({"key.one"})));
+	assert(removed_count == 0);
+}
+
+void test_two_adds_and_remove() {
+	// Clear results
+	added_count = 0;
+	removed_count = 0;
+
+	// Setup
+	KeyUsageCounter kc = new KeyUsageCounter(); 
+	kc.keys_added += keys_added_slot;
+	kc.keys_removed += keys_removed_slot;
+
+	// Test:
+	// increase the count for one key
+	kc.add(new StringSet.from_array({"key.one"}));
+	// and increase it again
+	kc.add(new StringSet.from_array({"key.one"}));
+	// and then decrease it
+	kc.remove(new StringSet.from_array({"key.one"}));
+
+	// Expected result: the keys_added is emitted only once 
+	// to notify that this key was subscribed to.
+	assert(added_count == 1);
+	assert(last_added_parameter.is_equal(new StringSet.from_array({"key.one"})));
+	assert(removed_count == 0);
+}
+
+
+void test_two_adds() {
+	// Clear results
+	added_count = 0;
+	removed_count = 0;
+
+	// Setup
+	KeyUsageCounter kc = new KeyUsageCounter(); 
+	kc.keys_added += keys_added_slot;
+	kc.keys_removed += keys_removed_slot;
+
+	// Test:
+	// increase the count for one key
+	kc.add(new StringSet.from_array({"key.one"}));
+	// and increase it again
+	kc.add(new StringSet.from_array({"key.one"}));
+	
+	// Expected result: the keys_added is emitted only once 
+	// to notify that this key was subscribed to.
+	assert(added_count == 1);
 	assert(last_added_parameter.is_equal(new StringSet.from_array({"key.one"})));
 	assert(removed_count == 0);
 }
@@ -117,7 +165,9 @@ void test_remaining() {
 public static void main (string[] args) {
        Test.init (ref args);
        Test.add_func("/contextkit/key_usage_counter/test_add", test_add);
-       Test.add_func("/contextkit/key_usage_counter/test_add_and_remove", test_add_and_remove);
+       Test.add_func("/contextkit/key_usage_counter/test_two_adds", test_two_adds);
+	   Test.add_func("/contextkit/key_usage_counter/test_two_adds_and_remove", test_two_adds_and_remove);
+	   Test.add_func("/contextkit/key_usage_counter/test_add_and_remove", test_add_and_remove);
 	   Test.add_func("/contextkit/key_usage_counter/test_remaining", test_remaining);
        Test.run ();
 }
