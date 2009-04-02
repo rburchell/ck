@@ -8,10 +8,8 @@ MAINTAINERCLEANFILES = context-properties.html contextkit.html
 
 # Creating docs from a property declaration file
 
-tools_dir = $(top_srcdir)/tools
-
-context-properties.html: $(spec_dir)/context.xml $(tools_dir)/context2asciidoc.pl
-	$(toolsdir)/context2asciidoc.pl < $< | asciidoc -f myfilter.conf -o $@ -
+context-properties.html: $(spec_dir)/context.xml context2asciidoc.pl
+	$(srcdir)/context2asciidoc.pl < $< | asciidoc -f myfilter.conf -o $@ -
 
 # Creating docs from a DbusSpec
 
@@ -21,8 +19,8 @@ SPEC_FILES = $(addprefix $(spec_dir)/, \
 
 XSLTPROC = xsltproc --xinclude --nonet
 
-contextkit.html: $(spec_dir)/all.xml $(SPEC_FILES) $(tools_dir)/doc-generator.xsl
-	$(XSLTPROC) $(tools_dir)/doc-generator.xsl $< > $@.tmp && mv $@.tmp $@
+contextkit.html: $(spec_dir)/all.xml $(SPEC_FILES) doc-generator.xsl
+	$(XSLTPROC) $(srcdir)/doc-generator.xsl $< > $@.tmp && mv $@.tmp $@
 
 # Support for html_ASCIIDOCS and html_EXTRA
 

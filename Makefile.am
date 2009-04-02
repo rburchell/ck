@@ -34,11 +34,7 @@ BUILT_SOURCES = \
 	$(ASYNC_INTROSPECT) \
 	context.valid.stamp \
 	$(NULL)
-
-if CONTEXTKIT_BUILD_DOCS
-BUILT_SOURCES += $(DOCS)
-endif
-
+# Introspection
 
 SPEC_TOOLS = \
 	tools/doc-generator.xsl \
@@ -61,7 +57,6 @@ SPEC_FILES = \
 
 INTROSPECT = $(INTERFACES:spec/%.xml=introspect/%.xml)
 ASYNC_INTROSPECT = $(INTERFACES:spec/%.xml=introspect/async/%.xml)
-DOCS = doc/contextkit.html doc/context-properties.html
 
 tools_dir = $(top_srcdir)/tools
 
@@ -72,10 +67,6 @@ $(INTROSPECT): introspect/%.xml: spec/%.xml $(tools_dir)/spec-to-introspect.xsl
 $(ASYNC_INTROSPECT): introspect/async/%.xml: $(SPEC_FILES) $(tools_dir)/spec-to-introspect.xsl
 	install -d introspect/async
 	$(XSLTPROC) $(tools_dir)/spec-to-introspect.xsl $< | $(DROP_NAMESPACE) > $@
-
-# Docs
-
-html-local: $(DOCS)
 
 context.valid.stamp: spec/context.xsd spec/context.xml
 	$(XMLLINT) $^ 
