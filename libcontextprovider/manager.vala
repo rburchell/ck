@@ -43,7 +43,7 @@ namespace ContextProvider {
 		internal Manager() {
 			/*TODO, should manager own the key counter? */
 			this.group_list = new GroupList();
-			this.key_counter = new KeyUsageCounter(group_list);
+			this.key_counter = new KeyUsageCounter();
 			this.subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			this.values = new HashTable<string, Value?>(str_hash, str_equal);
 			// Note: Use session / system bus according to the configuration

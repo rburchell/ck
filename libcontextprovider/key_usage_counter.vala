@@ -59,7 +59,7 @@ namespace ContextProvider {
 			}
 
 			if (first_subscribed_keys.size() > 0) {
-				emit keys_added (first_subscribed_keys);
+				keys_added (first_subscribed_keys);
 			}
 
 			subscribed_keys = new StringSet.union (subscribed_keys, first_subscribed_keys);
@@ -81,7 +81,7 @@ namespace ContextProvider {
 						// The last subscriber for this key unsubscribed
 						last_unsubscribed_keys.add (key);
 					}
-					debug ("Subscriber count of %s is now %d", key, old_value - 1);
+					debug ("Subscriber count of %s is now %d", key, value);
 				}
 				else {
 					// This should not happen
@@ -93,7 +93,7 @@ namespace ContextProvider {
 
 			if (last_unsubscribed_keys.size() > 0) {
 				// Signal that some keys are not subscribed to anymore
-				emit keys_removed (last_unsubscribed_keys, subscribed_keys);
+				keys_removed (last_unsubscribed_keys, subscribed_keys);
 			}
 
 		}
