@@ -5,8 +5,11 @@ set -e
 
 version_check valac VALAC 'valac' 0.7.0 "http://vala-project.org"
 version_check asciidoc ASCIIDOC 'asciidoc' 8.2.7 "http://www.methods.co.nz/asciidoc/"
+existence_check gtkdocize   
 existence_check dot
 existence_check source-highlight
+
+gtkdocize
 
 autoreconf -i -f
 
