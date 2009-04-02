@@ -26,13 +26,13 @@ void test_grouplist_add() {
 	GroupList gl = new GroupList();
 
 	string[] keys = {"a","b","c"};
-	Group g = new Group(keys, null);
+	Group g = new Group(keys, false, null);
 	gl.add(g);
 
 	assert (g.keys.is_subset_of(gl.valid_keys));
 
 	string[] keys2 = {"d","f","c"};
-	Group g2 = new Group(keys2, null);
+	Group g2 = new Group(keys2, false, null);
 	gl.add(g2);
 
 	assert (g2.keys.is_subset_of(gl.valid_keys));
@@ -42,11 +42,11 @@ void test_grouplist_remove() {
 	GroupList gl = new GroupList();
 
 	string[] keys = {"a","b","c"};
-	Group g1 = new Group(keys, null);
+	Group g1 = new Group(keys, false, null);
 	gl.add(g1);
 
 	string[] keys2 = {"d","f","c"};
-	Group g2 = new Group(keys2, null);
+	Group g2 = new Group(keys2, false, null);
 	gl.add(g2);
 
 	gl.remove(g1);
@@ -73,12 +73,12 @@ void test_grouplist_subscribe() {
 
 	string[] keys = {"a","b","c"};
 	Tester t1 = new Tester();
-	Group g1 = new Group(keys, t1.callback);
+	Group g1 = new Group(keys, false, t1.callback);
 	gl.add(g1);
 
 	string[] keys2 = {"d","f","c"};
 	Tester t2 = new Tester();
-	Group g2 = new Group(keys2, t2.callback);
+	Group g2 = new Group(keys2, false, t2.callback);
 	gl.add(g2);
 
 	StringSet keyset1 = new StringSet.from_array({"a","b","f"});
