@@ -2,8 +2,8 @@ How to provide context properties
 =================================
 
 Any component can provide its own key/value pairs and make them appear
-in the api:libduivaluespace[+DuiValueSpace+] (and other interfaces
-that expose context properties).
+in the +DuiValueSpace+ (and other interfaces that expose context
+properties).
 
 As a provider of context properties, you need to drop one or more
 _property declaration_ files into +/usr/share/context-providers/+ to
@@ -16,20 +16,21 @@ can legally have.
 
 The property declaration files also inform the context framework how
 you want to be contacted.  Right now, you have to implement the
-api:org.freedesktop.ContextKit[] D-Bus interface, and register
-yourself on either the system or the session D-Bus with a suitable bus
-name.  The choice iof system or session bus and your bus name go into
-the property declaration file.
++org.freedesktop.ContextKit+ D-Bus interface, and register yourself on
+either the system or the session D-Bus with a suitable bus name.  The
+choice iof system or session bus and your bus name go into the
+property declaration file.
 
-The easiest way to implement the api:org.freedesktop.ContextKit[]
-interface is to use the api:libcontextprovider[] library.
+The easiest way to implement the +org.freedesktop.ContextKit+
+interface is to use the link:libcontextprovider[+libcontextprovider+]
+library.
 
 The property declaration file
 -----------------------------
 
 The property declaration file contains XML and must follow
-link:schema.html[this XML schema].  A simple example for the
-+Context.Example.Random+ property looks like this:
+link:context-provider-schema.html[this XML schema].  A simple example
+for the +Context.Example.Random+ property looks like this:
 
 [source,xml]
 ------------------
@@ -58,11 +59,11 @@ You need to be careful when choosing property name; see the
 "Guidelines for property providers" section for how to avoid
 conflicts.
 
-When providing properties from the api:context-properties[core list],
-you need to follow additional rules to make sure that your property
-declarations and the centrally maintained core list do not fall out of
-synch.  See the "Providing core properties" section for more about
-them.
+When providing properties from the link:context-properties.html[core
+list], you need to follow additional rules to make sure that your
+property declarations and the centrally maintained core list do not
+fall out of synch.  See the "Providing core properties" section for
+more about them.
 
 After installing a property declaration file into a directory +$dir+,
 you should usually execute +update-context-propoerties+ like so:

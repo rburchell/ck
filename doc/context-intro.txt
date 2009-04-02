@@ -90,7 +90,7 @@ start from the link:context-subscriber-example.html[context subscriber
 example].
 
 To get get started with providing properties, read the
-link:context-providers[libcontextprovider] documentation and have a
+link:context-providers[documentation] for context providers and have a
 look at the link:context-provider-example.html[context provider
 example].
 
