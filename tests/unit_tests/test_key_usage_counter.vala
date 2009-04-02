@@ -59,6 +59,10 @@ void test_add() {
 	assert(added_count == 1);
 	assert(last_added_parameter.is_equal(new StringSet.from_array({"key.one"})));
 	assert(removed_count == 0);
+	assert(kc.number_of_subscribers("key.one") == 1);
+	assert(kc.number_of_subscribers("key.two") == 0);
+	assert(kc.number_of_subscribers("key.three") == 0);
+
 }
 
 void test_two_adds_and_remove() {
@@ -84,6 +88,9 @@ void test_two_adds_and_remove() {
 	assert(added_count == 1);
 	assert(last_added_parameter.is_equal(new StringSet.from_array({"key.one"})));
 	assert(removed_count == 0);
+	assert(kc.number_of_subscribers("key.one") == 1);
+	assert(kc.number_of_subscribers("key.two") == 0);
+	assert(kc.number_of_subscribers("key.three") == 0);
 }
 
 
@@ -108,6 +115,10 @@ void test_two_adds() {
 	assert(added_count == 1);
 	assert(last_added_parameter.is_equal(new StringSet.from_array({"key.one"})));
 	assert(removed_count == 0);
+	assert(kc.number_of_subscribers("key.one") == 2);
+	assert(kc.number_of_subscribers("key.two") == 0);
+	assert(kc.number_of_subscribers("key.three") == 0);
+
 }
 
 void test_add_and_remove() {
@@ -134,6 +145,9 @@ void test_add_and_remove() {
 	assert(removed_count == 1);
 	assert(last_removed_parameter1.is_equal(new StringSet.from_array({"key.two"})));
 	assert(last_removed_parameter2.is_equal(new StringSet.from_array({})));
+	assert(kc.number_of_subscribers("key.one") == 0);
+	assert(kc.number_of_subscribers("key.two") == 0);
+	assert(kc.number_of_subscribers("key.three") == 0);
 }
 
 void test_remaining() {
@@ -160,6 +174,9 @@ void test_remaining() {
 	assert (removed_count == 1);
 	assert (last_removed_parameter1.is_equal(new StringSet.from_array({"key.two"})));
 	assert (last_removed_parameter2.is_equal(new StringSet.from_array({"key.three"})));
+	assert(kc.number_of_subscribers("key.one") == 0);
+	assert(kc.number_of_subscribers("key.two") == 0);
+	assert(kc.number_of_subscribers("key.three") == 1);
 }
 
 public static void main (string[] args) {
