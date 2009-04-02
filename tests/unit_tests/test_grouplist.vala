@@ -72,34 +72,41 @@ void test_grouplist_subscribe() {
 	GroupList gl = new GroupList();
 
 	string[] keys = {"a","b","c"};
-	Tester t1 = new Tester()
-	Group g1 = new Group(keys, t);
-	gl.add(g);
+	Tester t1 = new Tester();
+	Group g1 = new Group(keys, t1.callback);
+	gl.add(g1);
 
 	string[] keys2 = {"d","f","c"};
-	Tester t2 = new Tester()
-	Group g2 = new Group(keys2, t2);
+	Tester t2 = new Tester();
+	Group g2 = new Group(keys2, t2.callback);
 	gl.add(g2);
 
 	StringSet keyset1 = new StringSet.from_array({"a","b","f"});
 	StringSet keyset2 = new StringSet.from_array({"d","c"});
 	StringSet keyset3 = new StringSet.from_array({"d","f","c"});
-	gl.first_subscribed(keyset1);
+	StringSet subscribedkeys = new StringSet();
+	subscribedkeys = new StringSet.intersection(subscribedkeys, keyset1);
+	gl.first_subscribed(keyset1); //"a","b","f"
 	assert (t1.subscribe_count == 1);
 	assert (t2.subscribe_count == 1);
-	gl.first_subscribed(keyset2);
+	subscribedkeys = new StringSet.intersection(subscribedkeys, keyset2);
+	gl.first_subscribed(keyset2); // "a","b","c","d","f"
 	assert (t1.subscribe_count == 1);
 	assert (t2.subscribe_count == 1);
-	gl.last_unsubscribed(keyset3);
+	subscribedkeys = new StringSet.difference(subscribedkeys, keyset3);
+	gl.last_unsubscribed(keyset3, subscribedkeys); // 
 	assert (t1.subscribe_count == 1);
 	assert (t2.subscribe_count == 0);
+	subscribedkeys = new StringSet.intersection(subscribedkeys, keyset3);
 	gl.first_subscribed(keyset3);
 	assert (t1.subscribe_count == 1);
 	assert (t2.subscribe_count == 1);
-	gl.last_unsubscribed(keyset2);
+	subscribedkeys = new StringSet.difference(subscribedkeys, keyset2);
+	gl.last_unsubscribed(keyset2, subscribedkeys);
 	assert (t1.subscribe_count == 1);
 	assert (t2.subscribe_count == 1);
-	gl.last_unsubscribed(keyset1);
+	subscribedkeys = new StringSet.difference(subscribedkeys, keyset1);
+	gl.last_unsubscribed(keyset1, subscribedkeys);
 	assert (t1.subscribe_count == 0);
 	assert (t2.subscribe_count == 0);
 }
@@ -110,6 +117,7 @@ public static void main (string[] args) {
        Test.init (ref args);
        Test.add_func("/contextkit/grouplist/add", test_grouplist_add);
        Test.add_func("/contextkit/grouplist/remove", test_grouplist_remove);
+       Test.add_func("/contextkit/grouplist/subscribe", test_grouplist_subscribe);
        Test.run ();
 }
 
