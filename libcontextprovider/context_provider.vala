@@ -23,8 +23,6 @@ using Gee;
 
 namespace ContextProvider {
 
-	Manager? manager;
-
 	// Records whether the context_init function has been called
 	internal bool initialised = false;
 	internal Manager? manager;
