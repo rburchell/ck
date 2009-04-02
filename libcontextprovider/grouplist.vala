@@ -66,7 +66,7 @@ namespace ContextProvider {
 		public void last_unsubscribed(StringSet keys_unsubscribed, StringSet keys_remaining) {
 			foreach (var group in groups) {
 				StringSet intersection = new StringSet.intersection (keys_unsubscribed, group.keys);
-				if (intersection.size() > 0 ) {
+				if (intersection.size() > 0  && group.subscribed) {
 					group.subscribe (false);
 				}
 			}
