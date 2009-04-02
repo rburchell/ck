@@ -42,20 +42,68 @@ void test_grouplist_remove() {
 	GroupList gl = new GroupList();
 
 	string[] keys = {"a","b","c"};
-	Group g = new Group(keys, null);
-	gl.add(g);
+	Group g1 = new Group(keys, null);
+	gl.add(g1);
 
 	string[] keys2 = {"d","f","c"};
 	Group g2 = new Group(keys2, null);
 	gl.add(g2);
 
-	gl.remove(g);
+	gl.remove(g1);
 
 	assert (g2.keys.is_equal(gl.valid_keys));
 
 	gl.remove(g2);
 	assert(gl.valid_keys.size() == 0);
 }
+
+class Tester {
+	public int subscribe_count = 0;
+	public void callback (bool subscribe) {
+		if (subscribe) {
+			subscribe_count++;
+		} else {
+			subscribe_count--;
+		}
+	}
+}
+
+void test_grouplist_subscribe() {
+	GroupList gl = new GroupList();
+
+	string[] keys = {"a","b","c"};
+	Tester t1 = new Tester()
+	Group g1 = new Group(keys, t);
+	gl.add(g);
+
+	string[] keys2 = {"d","f","c"};
+	Tester t2 = new Tester()
+	Group g2 = new Group(keys2, t2);
+	gl.add(g2);
+
+	StringSet keyset1 = new StringSet.from_array({"a","b","f"});
+	StringSet keyset2 = new StringSet.from_array({"d","c"});
+	StringSet keyset3 = new StringSet.from_array({"d","f","c"});
+	gl.first_subscribed(keyset1);
+	assert (t1.subscribe_count == 1);
+	assert (t2.subscribe_count == 1);
+	gl.first_subscribed(keyset2);
+	assert (t1.subscribe_count == 1);
+	assert (t2.subscribe_count == 1);
+	gl.last_unsubscribed(keyset3);
+	assert (t1.subscribe_count == 1);
+	assert (t2.subscribe_count == 0);
+	gl.first_subscribed(keyset3);
+	assert (t1.subscribe_count == 1);
+	assert (t2.subscribe_count == 1);
+	gl.last_unsubscribed(keyset2);
+	assert (t1.subscribe_count == 1);
+	assert (t2.subscribe_count == 1);
+	gl.last_unsubscribed(keyset1);
+	assert (t1.subscribe_count == 0);
+	assert (t2.subscribe_count == 0);
+}
+
 
 
 public static void main (string[] args) {
