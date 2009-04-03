@@ -135,7 +135,8 @@ visible at first.
   consumers.
 
 - It makes it worthwhile to develop sophisticated tools such as the
-  context commander.
+  context commander and support for easy automated testing of context
+  subscribers and providers.
 
 - It might allow some context providers to exit the "API business"
   altogether.
