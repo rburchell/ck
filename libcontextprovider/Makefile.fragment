@@ -53,9 +53,10 @@ libcontextprovider/libcontextprovider.vala.stamp contextprovider.vapi: $(libcont
 	$(VALAC) -C --basedir $(top_srcdir)/libcontextprovider --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation --library contextprovider $^
 	touch libcontextprovider/libcontextprovider.vala.stamp
 
-libcontextprovider_la_CFLAGS = \
-			     $(CONTEXTD_CFLAGS) \
-			     $(NULL)
+libcontextprovider_la_CFLAGS =	\
+				-DG_LOG_DOMAIN=\"ContextKit\" \
+				$(CONTEXTD_CFLAGS) \
+				$(NULL)
 
 libcontextprovider_la_LIBADD = \
 			  $(CONTEXTD_LIBS) \
