@@ -169,11 +169,6 @@ tests_unit_tests_subscriber_SOURCES = \
 	libcontextprovider/intset.h					\
 	$(NULL)
 
-#tests/unit_tests/subscriber.vala.stamp: contextprovider.vapi $(tests_unit_tests_subscriber_VALASOURCES)
-#	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
-#	touch $@
-
-
 tests/unit_tests/subscriber.vala.stamp: $(tests_unit_tests_subscriber_VALASOURCES) $(tests_unit_tests_subscriber_VAPISOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
 	touch $@
@@ -217,6 +212,8 @@ MAINTAINERCLEANFILES += \
 	tests/unit_tests/value_compare.vala.stamp			\
 	$(tests_unit_tests_group_SOURCES)			\
 	tests/unit_tests/group.vala.stamp			\
+	$(tests_unit_tests_grouplist_SOURCES)			\
+	tests/unit_tests/grouplist.vala.stamp			\
 	$(tests_unit_tests_key_usage_counter_SOURCES)			\
 	tests/unit_tests/key_usage_counter.vala.stamp			\
 	$(tests_unit_tests_subscriber_GENERATEDSOURCES)			\
