@@ -5,6 +5,7 @@ TEST_PROGS += \
 	tests/unit_tests/group					\
 	tests/unit_tests/grouplist				\
 	tests/unit_tests/key_usage_counter				\
+	tests/unit_tests/subscriber				\
 	$(NULL)
 
 noinst_PROGRAMS = $(TEST_PROGS)
@@ -16,6 +17,7 @@ BUILT_SOURCES += \
 	tests/unit_tests/group.vala.stamp		\
 	tests/unit_tests/grouplist.vala.stamp		\
 	tests/unit_tests/key_usage_counter.vala.stamp		\
+	tests/unit_tests/subscriber.vala.stamp		\
 	$(NULL)
 
 tests_unit_tests_intset_VAPISOURCES = \
@@ -139,6 +141,46 @@ tests/unit_tests/key_usage_counter.vala.stamp: contextprovider.vapi $(tests_unit
 tests_unit_tests_key_usage_counter_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
 tests_unit_tests_key_usage_counter_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
+tests_unit_tests_subscriber_VAPISOURCES = \
+	libcontextprovider/intset.vapi				\
+	$(NULL)
+
+tests_unit_tests_subscriber_VALASOURCES = \
+	libcontextprovider/value_compare.vala				\
+	libcontextprovider/subscriber.vala				\
+	libcontextprovider/manager.vala				\
+	libcontextprovider/key_usage_counter.vala				\
+	libcontextprovider/string_set.vala				\
+	libcontextprovider/group.vala				\
+	libcontextprovider/grouplist.vala				\
+	libcontextprovider/dbus_interface.vala				\
+	libcontextprovider/context_provider.vala				\
+	tests/unit_tests/test_subscriber.vala			\
+	$(NULL)
+
+tests_unit_tests_subscriber_GENERATEDSOURCES = \
+	$(tests_unit_tests_subscriber_VALASOURCES:.vala=.c)		\
+	$(tests_unit_tests_subscriber_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests_unit_tests_subscriber_SOURCES = \
+	$(tests_unit_tests_subscriber_GENERATEDSOURCES)		\
+	libcontextprovider/intset.c					\
+	libcontextprovider/intset.h					\
+	$(NULL)
+
+#tests/unit_tests/subscriber.vala.stamp: contextprovider.vapi $(tests_unit_tests_subscriber_VALASOURCES)
+#	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+#	touch $@
+
+
+tests/unit_tests/subscriber.vala.stamp: $(tests_unit_tests_subscriber_VALASOURCES) $(tests_unit_tests_subscriber_VAPISOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+	touch $@
+
+tests_unit_tests_subscriber_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_subscriber_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
+
 EXTRA_DIST += \
 	$(tests_unit_tests_intset_VALASOURCES)				\
 	$(tests_unit_tests_intset_VAPISOURCES)				\
@@ -157,6 +199,10 @@ EXTRA_DIST += \
 	$(tests_unit_tests_key_usage_counter_VALASOURCES)			\
 	$(tests_unit_tests_key_usage_counter_SOURCES)		\
 	tests/unit_tests/key_usage_counter.vala.stamp			\
+	$(tests_unit_tests_subscriber_VALASOURCES)			\
+	$(tests_unit_tests_subscriber_VAPISOURCES)			\
+	$(tests_unit_tests_subscriber_GENERATEDSOURCES)		\
+	tests/unit_tests/subscriber.vala.stamp			\
 	$(NULL)
 
 DISTCLEANFILES += \
@@ -173,4 +219,6 @@ MAINTAINERCLEANFILES += \
 	tests/unit_tests/group.vala.stamp			\
 	$(tests_unit_tests_key_usage_counter_SOURCES)			\
 	tests/unit_tests/key_usage_counter.vala.stamp			\
+	$(tests_unit_tests_subscriber_GENERATEDSOURCES)			\
+	tests/unit_tests/subscriber.vala.stamp			\
 	$(NULL)
