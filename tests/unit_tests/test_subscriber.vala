@@ -202,6 +202,11 @@ void test_changing_value()
 	keyOneNewValue.set_int (-9);
 	s.on_value_changed ("key.one", keyOneNewValue);
 
+	// ... and the value for key.three as well (this key is not subscribed to)
+	Value keyThreeNewValue = Value(typeof(int));
+	keyThreeNewValue.set_int (88);
+	s.on_value_changed ("key.three", keyThreeNewValue);
+
 	Idle.add(stopper);
 	loop = new GLib.MainLoop(null, false);
 	loop.run();
