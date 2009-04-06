@@ -355,8 +355,18 @@ void test_changing_two_values()
 	assert (last_changed_undeterminable.length == 0);
 }
 
+
+void debug_null  (string? log_domain, LogLevelFlags log_level, string message)
+{
+}
+
 public static void main (string[] args) {
 	Test.init (ref args);
+
+	if (Test.quiet()) {
+		Log.set_handler ("ContextKit", LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.FLAG_RECURSION, debug_null);
+	}
+
 	Test.add_func ("/contextkit/subscriber/test_subscribe", test_subscribe);
 	Test.add_func ("/contextkit/subscriber/test_subscribe_twice", test_subscribe_twice);
 	Test.add_func ("/contextkit/subscriber/test_subscribe_invalid", test_subscribe_invalid);

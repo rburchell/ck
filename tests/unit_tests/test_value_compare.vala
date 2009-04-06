@@ -80,8 +80,18 @@ void test_value_compare_string() {
 
 
 
+void debug_null  (string? log_domain, LogLevelFlags log_level, string message)
+{
+}
+
+
 public static void main (string[] args) {
 	Test.init (ref args);
+
+	if (Test.quiet()) {
+		Log.set_handler ("ContextKit", LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.FLAG_RECURSION, debug_null);
+	}
+
 	Test.add_func("/contextkit/value_compare/null", test_value_compare_null);
 	Test.add_func("/contextkit/value_compare/int", test_value_compare_int);
 	Test.add_func("/contextkit/value_compare/bool", test_value_compare_bool);

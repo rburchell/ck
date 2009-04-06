@@ -19,6 +19,7 @@
  *
  */
 
+using GLib;
 using ContextProvider;
 
 void test_key_checking()
@@ -84,16 +85,21 @@ void test_get_subscriber()
 	// Setup
 	Manager manager = new Manager();
 
-	// Test: get subscriber twice, for different bus names
-	DBus.BusName name1 = new DBus.BusName(":1.2");
-	DBus.ObjectPath path1 = manager.GetSubscriber(name1);
+//	try {
+		// Test: get subscriber twice, for different bus names
+		DBus.BusName name1 = new DBus.BusName(":1.2");
+		DBus.ObjectPath path1 = manager.GetSubscriber(name1);
 
-	DBus.BusName name2 = new DBus.BusName(":1.12");
-	DBus.ObjectPath path2 = manager.GetSubscriber(name2);
+		DBus.BusName name2 = new DBus.BusName(":1.12");
+		DBus.ObjectPath path2 = manager.GetSubscriber(name2);
 
-	// Expected result: the object paths are paths for two first subscribers
-	assert (path1 == "/org/freedesktop/ContextKit/Subscribers/0");
-	assert (path2 == "/org/freedesktop/ContextKit/Subscribers/1");
+		// Expected result: the object paths are paths for two first subscribers
+		assert (path1 == "/org/freedesktop/ContextKit/Subscribers/0");
+		assert (path2 == "/org/freedesktop/ContextKit/Subscribers/1");
+/*	} catch (DBus.Error e) {
+		critical("%s", e.message);
+		assert(false);
+	}*/
 }
 
 void test_get_subscriber_twice()
@@ -101,18 +107,32 @@ void test_get_subscriber_twice()
 	// Setup
 	Manager manager = new Manager();
 
-	// Test: get subscriber twice, for the same bus name
-	DBus.BusName name1 = new DBus.BusName(":1.2");
-	DBus.ObjectPath path1 = manager.GetSubscriber(name1);
-	DBus.ObjectPath path2 = manager.GetSubscriber(name1);
+	//try {
+		// Test: get subscriber twice, for the same bus name
+		DBus.BusName name1 = new DBus.BusName(":1.2");
+		DBus.ObjectPath path1 = manager.GetSubscriber(name1);
+		DBus.ObjectPath path2 = manager.GetSubscriber(name1);
 
-	// Expected result: the object paths are the same
-	assert (path1 == "/org/freedesktop/ContextKit/Subscribers/0");
-	assert (path2 == "/org/freedesktop/ContextKit/Subscribers/0");
+		// Expected result: the object paths are the same
+		assert (path1 == "/org/freedesktop/ContextKit/Subscribers/0");
+		assert (path2 == "/org/freedesktop/ContextKit/Subscribers/0");
+	/*} catch (DBus.Error e) {
+		critical("%s", e.message);
+		assert(false);
+	}*/
+}
+
+void debug_null  (string? log_domain, LogLevelFlags log_level, string message)
+{
 }
 
 public static void main (string[] args) {
 	Test.init (ref args);
+
+	if (Test.quiet()) {
+		Log.set_handler ("ContextKit", LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.FLAG_RECURSION, debug_null);
+	}
+
 	Test.add_func ("/contextkit/manager/test_key_checking", test_key_checking);
 	Test.add_func ("/contextkit/manager/test_get_values", test_get_values);
 	Test.add_func ("/contextkit/manager/test_get_subscriber", test_get_subscriber);

@@ -179,8 +179,18 @@ void test_remaining() {
 	assert(kc.number_of_subscribers("key.three") == 1);
 }
 
+
+void debug_null  (string? log_domain, LogLevelFlags log_level, string message)
+{
+}
+
 public static void main (string[] args) {
 	Test.init (ref args);
+
+	if (Test.quiet()) {
+		Log.set_handler ("ContextKit", LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.FLAG_RECURSION, debug_null);
+	}
+
 	Test.add_func("/contextkit/key_usage_counter/test_add", test_add);
 	Test.add_func("/contextkit/key_usage_counter/test_two_adds", test_two_adds);
 	Test.add_func("/contextkit/key_usage_counter/test_two_adds_and_remove", test_two_adds_and_remove);
