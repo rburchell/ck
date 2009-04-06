@@ -114,10 +114,10 @@ void test_grouplist_subscribe() {
 
 
 public static void main (string[] args) {
-       Test.init (ref args);
-       Test.add_func("/contextkit/grouplist/add", test_grouplist_add);
-       Test.add_func("/contextkit/grouplist/remove", test_grouplist_remove);
-       Test.add_func("/contextkit/grouplist/subscribe", test_grouplist_subscribe);
-       Test.run ();
+	Test.init (ref args);
+	Test.add_func("/contextkit/grouplist/add", test_grouplist_add);
+	Test.add_func("/contextkit/grouplist/remove", test_grouplist_remove);
+	Test.add_func("/contextkit/grouplist/subscribe", test_grouplist_subscribe);
+	Test.run ();
 }
 

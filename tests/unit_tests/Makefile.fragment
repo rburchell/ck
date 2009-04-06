@@ -45,7 +45,7 @@ tests/unit_tests/intset.vala.stamp: $(tests_unit_tests_intset_VALASOURCES) $(tes
 	$(VALAC) -C --basedir $(top_srcdir) $^
 	touch $@
 
-tests_unit_tests_intset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_intset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_intset_LDADD = $(CONTEXTD_LIBS)
 
 tests_unit_tests_stringset_VAPISOURCES = \
@@ -72,7 +72,7 @@ tests/unit_tests/stringset.vala.stamp: $(tests_unit_tests_stringset_VALASOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
 	touch $@
 
-tests_unit_tests_stringset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_stringset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_stringset_LDADD = $(CONTEXTD_LIBS)
 
 
@@ -90,7 +90,7 @@ tests/unit_tests/value_compare.vala.stamp: $(tests_unit_tests_value_compare_VALA
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
 	touch $@
 
-tests_unit_tests_value_compare_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_value_compare_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_value_compare_LDADD = $(CONTEXTD_LIBS)
 
 tests_unit_tests_group_VALASOURCES = \
@@ -107,7 +107,7 @@ tests/unit_tests/group.vala.stamp: contextprovider.vapi $(tests_unit_tests_group
 	touch $@
 
 
-tests_unit_tests_group_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_group_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_group_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
 tests_unit_tests_grouplist_VALASOURCES = \
@@ -124,7 +124,7 @@ tests/unit_tests/grouplist.vala.stamp: contextprovider.vapi $(tests_unit_tests_g
 	touch $@
 
 
-tests_unit_tests_grouplist_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_grouplist_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_grouplist_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
 tests_unit_tests_key_usage_counter_VALASOURCES = \
@@ -140,7 +140,7 @@ tests/unit_tests/key_usage_counter.vala.stamp: contextprovider.vapi $(tests_unit
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
 	touch $@
 
-tests_unit_tests_key_usage_counter_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_key_usage_counter_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_key_usage_counter_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
 tests_unit_tests_subscriber_VAPISOURCES = \
@@ -175,7 +175,7 @@ tests/unit_tests/subscriber.vala.stamp: $(tests_unit_tests_subscriber_VALASOURCE
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
 	touch $@
 
-tests_unit_tests_subscriber_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_subscriber_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_subscriber_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
 tests_unit_tests_manager_VAPISOURCES = \
@@ -210,7 +210,7 @@ tests/unit_tests/manager.vala.stamp: $(tests_unit_tests_manager_VALASOURCES) $(t
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
 	touch $@
 
-tests_unit_tests_manager_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_manager_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_manager_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
 EXTRA_DIST += \

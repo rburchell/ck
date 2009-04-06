@@ -91,11 +91,11 @@ void test_group_clear_signal() {
 
 
 public static void main (string[] args) {
-       Test.init (ref args);
-       Test.add_func("/contextkit/group/keys", test_group_keys);
-       Test.add_func("/contextkit/group/null_subscribe", test_group_null_subscribe);
-       Test.add_func("/contextkit/group/subscribe", test_group_subscribe);
-       Test.add_func("/contextkit/group/clear_signal", test_group_clear_signal);
-       Test.run ();
+	Test.init (ref args);
+	Test.add_func("/contextkit/group/keys", test_group_keys);
+	Test.add_func("/contextkit/group/null_subscribe", test_group_null_subscribe);
+	Test.add_func("/contextkit/group/subscribe", test_group_subscribe);
+	Test.add_func("/contextkit/group/clear_signal", test_group_clear_signal);
+	Test.run ();
 }
 
