@@ -58,7 +58,7 @@ void test_subscribe()
 	manager.group_list.add(group);
 	KeyUsageCounter kc = new KeyUsageCounter();
 
-	Subscriber s = new Subscriber(manager, kc, 7); 
+	Subscriber s = new Subscriber(manager, kc, 7);
 	s.Changed += changed_handler;
 
 	// Test:
@@ -67,9 +67,9 @@ void test_subscribe()
 
 	// subscribe to a key
 	s.Subscribe({"key.three"}, out ret_values, out ret_undeterminable);
-	
+
 	// Expected result: the subscription count of the key
-	// increases. 
+	// increases.
 	assert(changed_count == 0);
 	assert(kc.number_of_subscribers("key.one") == 0);
 	assert(kc.number_of_subscribers("key.two") == 0);
@@ -87,9 +87,9 @@ void test_subscribe_twice()
 	manager.group_list.add(group);
 	KeyUsageCounter kc = new KeyUsageCounter();
 
-	Subscriber s = new Subscriber(manager, kc, 7); 
+	Subscriber s = new Subscriber(manager, kc, 7);
 	s.Changed += changed_handler;
-	
+
 	// Test:
 	HashTable<string, Value?> ret_values;
 	string[] ret_undeterminable;
@@ -97,7 +97,7 @@ void test_subscribe_twice()
 	// subscribe to a key
 	s.Subscribe({"key.three"}, out ret_values, out ret_undeterminable);
 	s.Subscribe({"key.three"}, out ret_values, out ret_undeterminable);
-	
+
 	// Expected result: the subscription count of the key
 	// is only 1, not 2.
 	assert(changed_count == 0);
@@ -117,16 +117,16 @@ void test_subscribe_invalid()
 	manager.group_list.add(group);
 	KeyUsageCounter kc = new KeyUsageCounter();
 
-	Subscriber s = new Subscriber(manager, kc, 7); 
+	Subscriber s = new Subscriber(manager, kc, 7);
 	s.Changed += changed_handler;
-	
+
 	// Test:
 	HashTable<string, Value?> ret_values;
 	string[] ret_undeterminable;
 
 	// subscribe to an invalid key
 	s.Subscribe({"key.invalid"}, out ret_values, out ret_undeterminable);
-		
+
 	// Expected result: the subscription count of the invalid key
 	// is still 0.
 	assert(changed_count == 0);
@@ -149,18 +149,18 @@ void test_subscribe_return_values()
 	// Set the value for the key "key.one"
 	Value keyOneValue = Value(typeof(int));
 	keyOneValue.set_int(111);
-	manager.property_value_change("key.one", keyOneValue); 
+	manager.property_value_change("key.one", keyOneValue);
 
-	Subscriber s = new Subscriber(manager, kc, 7); 
+	Subscriber s = new Subscriber(manager, kc, 7);
 	s.Changed += changed_handler;
-	
+
 	// Test:
 	HashTable<string, Value?> ret_values;
 	string[] ret_undeterminable;
 
     // subscribe to 3 keys: one has a value, one is undeterminable, and one is invalid
 	s.Subscribe({"key.one", "key.two", "key.invalid"}, out ret_values, out ret_undeterminable);
-	
+
 	// Expected result: the return values of Subscribe:
 	// The value for key.one
 	// key.two as undetermined
@@ -185,18 +185,18 @@ void test_changing_value()
 	// Set the value for the key "key.one"
 	Value keyOneValue = Value(typeof(int));
 	keyOneValue.set_int(111);
-	manager.property_value_change("key.one", keyOneValue); 
+	manager.property_value_change("key.one", keyOneValue);
 
-	Subscriber s = new Subscriber(manager, kc, 7); 
+	Subscriber s = new Subscriber(manager, kc, 7);
 	s.Changed += changed_handler;
-	
+
 	// Test:
 	HashTable<string, Value?> ret_values;
 	string[] ret_undeterminable;
 
-    // subscribe to 3 keys: one has a value, one is undeterminable, and one is invalid
+	// subscribe to 3 keys: one has a value, one is undeterminable, and one is invalid
 	s.Subscribe({"key.one", "key.two", "key.invalid"}, out ret_values, out ret_undeterminable);
-	
+
 	// make the value of key.one to change
 	Value keyOneNewValue = Value(typeof(int));
 	keyOneNewValue.set_int (-9);
@@ -210,7 +210,7 @@ void test_changing_value()
 	Idle.add(stopper);
 	loop = new GLib.MainLoop(null, false);
 	loop.run();
-	
+
 	// Expected result: we receive the changed signal with the values.
 	// The value for key.one
 	// no entries for other keys
@@ -233,25 +233,25 @@ void test_changing_to_undeterminable()
 	// Set the value for the key "key.one"
 	Value keyOneValue = Value(typeof(int));
 	keyOneValue.set_int(111);
-	manager.property_value_change("key.one", keyOneValue); 
+	manager.property_value_change("key.one", keyOneValue);
 
-	Subscriber s = new Subscriber(manager, kc, 7); 
+	Subscriber s = new Subscriber(manager, kc, 7);
 	s.Changed += changed_handler;
-	
+
 	// Test:
 	HashTable<string, Value?> ret_values;
 	string[] ret_undeterminable;
 
-    // subscribe to 3 keys: one has a value, one is undeterminable, and one is invalid
+	// subscribe to 3 keys: one has a value, one is undeterminable, and one is invalid
 	s.Subscribe({"key.one", "key.two", "key.invalid"}, out ret_values, out ret_undeterminable);
-	
+
 	// make the value of key.one to change to undeterminable
 	s.on_value_changed ("key.one", null);
 
 	Idle.add(stopper);
 	loop = new GLib.MainLoop(null, false);
 	loop.run();
-	
+
 	// Expected result: we receive the changed signal with the values.
 	// key.one as undeterminable
 	// no entries for other keys
@@ -274,18 +274,18 @@ void test_changing_to_determinable()
 	// Set the value for the key "key.one"
 	Value keyOneValue = Value(typeof(int));
 	keyOneValue.set_int(111);
-	manager.property_value_change("key.one", keyOneValue); 
+	manager.property_value_change("key.one", keyOneValue);
 
-	Subscriber s = new Subscriber(manager, kc, 7); 
+	Subscriber s = new Subscriber(manager, kc, 7);
 	s.Changed += changed_handler;
-	
+
 	// Test:
 	HashTable<string, Value?> ret_values;
 	string[] ret_undeterminable;
 
-    // subscribe to 3 keys: one has a value, one is undeterminable, and one is invalid
+	// subscribe to 3 keys: one has a value, one is undeterminable, and one is invalid
 	s.Subscribe({"key.one", "key.two", "key.invalid"}, out ret_values, out ret_undeterminable);
-	
+
 	// make the value of key.two to change from undeterminable to a value
 	Value keyTwoValue = Value(typeof(double));
 	keyTwoValue.set_double(-0.2);
@@ -294,7 +294,7 @@ void test_changing_to_determinable()
 	Idle.add(stopper);
 	loop = new GLib.MainLoop(null, false);
 	loop.run();
-	
+
 	// Expected result: we receive the changed signal with the values.
 	// The value for key.two
 	// no entries for other keys
@@ -317,22 +317,22 @@ void test_changing_two_values()
 	// Set the value for the key "key.one"
 	Value keyOneValue = Value(typeof(int));
 	keyOneValue.set_int(111);
-	manager.property_value_change("key.one", keyOneValue); 
+	manager.property_value_change("key.one", keyOneValue);
 	// and the value for the key "key.two"
 	Value keyTwoValue = Value(typeof(double));
 	keyTwoValue.set_double(-3.2);
-	manager.property_value_change("key.two", keyTwoValue); 
+	manager.property_value_change("key.two", keyTwoValue);
 
-	Subscriber s = new Subscriber(manager, kc, 7); 
+	Subscriber s = new Subscriber(manager, kc, 7);
 	s.Changed += changed_handler;
-	
+
 	// Test:
 	HashTable<string, Value?> ret_values;
 	string[] ret_undeterminable;
 
-    // subscribe to 3 keys: one has a value, one is undeterminable, and one is invalid
+	// subscribe to 3 keys: one has a value, one is undeterminable, and one is invalid
 	s.Subscribe({"key.one", "key.two", "key.invalid"}, out ret_values, out ret_undeterminable);
-	
+
 	// make the values of key.one and key.two to change
 	Value keyOneNewValue = Value(typeof(int));
 	keyOneNewValue.set_int(8);
@@ -344,7 +344,7 @@ void test_changing_two_values()
 	Idle.add(stopper);
 	loop = new GLib.MainLoop(null, false);
 	loop.run();
-	
+
 	// Expected result: we receive the changed signal with the values.
 	// The values for key.one and key.two
 	// no entries for other keys
@@ -356,14 +356,14 @@ void test_changing_two_values()
 }
 
 public static void main (string[] args) {
-       Test.init (ref args);
-       Test.add_func ("/contextkit/subscriber/test_subscribe", test_subscribe);
-       Test.add_func ("/contextkit/subscriber/test_subscribe_twice", test_subscribe_twice);
-	   Test.add_func ("/contextkit/subscriber/test_subscribe_invalid", test_subscribe_invalid);
-	   Test.add_func ("/contextkit/subscriber/test_subscribe_return_values", test_subscribe_return_values);
-	   Test.add_func ("/contextkit/subscriber/test_changing_value", test_changing_value);
-	   Test.add_func ("/contextkit/subscriber/test_changing_to_undeterminable", test_changing_to_undeterminable);
-	   Test.add_func ("/contextkit/subscriber/test_changing_to_determinable", test_changing_to_determinable);
-	   Test.add_func ("/contextkit/subscriber/test_changing_two_values", test_changing_two_values);
-       Test.run ();
+	Test.init (ref args);
+	Test.add_func ("/contextkit/subscriber/test_subscribe", test_subscribe);
+	Test.add_func ("/contextkit/subscriber/test_subscribe_twice", test_subscribe_twice);
+	Test.add_func ("/contextkit/subscriber/test_subscribe_invalid", test_subscribe_invalid);
+	Test.add_func ("/contextkit/subscriber/test_subscribe_return_values", test_subscribe_return_values);
+	Test.add_func ("/contextkit/subscriber/test_changing_value", test_changing_value);
+	Test.add_func ("/contextkit/subscriber/test_changing_to_undeterminable", test_changing_to_undeterminable);
+	Test.add_func ("/contextkit/subscriber/test_changing_to_determinable", test_changing_to_determinable);
+	Test.add_func ("/contextkit/subscriber/test_changing_two_values", test_changing_two_values);
+	Test.run ();
 }
