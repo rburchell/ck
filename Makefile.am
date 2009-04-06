@@ -34,6 +34,7 @@ BUILT_SOURCES = \
 	$(ASYNC_INTROSPECT) \
 	context.valid.stamp \
 	$(NULL)
+
 # Introspection
 
 SPEC_TOOLS = \
