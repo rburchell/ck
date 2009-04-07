@@ -1,18 +1,18 @@
 lib_LTLIBRARIES = libcontextprovider.la
 
 libcontextprovider_VALASOURCES_PRIV = \
-	libcontextprovider/dbus_interface.vala \
-	libcontextprovider/manager.vala \
-	libcontextprovider/grouplist.vala \
-	libcontextprovider/key_usage_counter.vala \
-	libcontextprovider/subscriber.vala \
-	libcontextprovider/value_compare.vala \
-	libcontextprovider/group.vala \
-	libcontextprovider/string_set.vala \
+	dbus_interface.vala \
+	manager.vala \
+	grouplist.vala \
+	key_usage_counter.vala \
+	subscriber.vala \
+	value_compare.vala \
+	group.vala \
+	string_set.vala \
 	$(NULL)
 
 libcontextprovider_VALASOURCES_PUB = \
-	libcontextprovider/context_provider.vala \
+	context_provider.vala \
 	$(NULL)
 
 libcontextprovider_VALASOURCES = \
@@ -21,7 +21,7 @@ libcontextprovider_VALASOURCES = \
 	$(NULL)
 
 libcontextprovider_VAPISOURCES = \
-	libcontextprovider/intset.vapi \
+	intset.vapi \
 	$(NULL)
 
 libcontextprovider_GENERATEDSOURCES_PRIV = \
@@ -41,17 +41,17 @@ libcontextprovider_GENERATEDSOURCES = \
 
 libcontextprovider_la_SOURCES = \
 	$(libcontextprovider_GENERATEDSOURCES_PRIV) \
-	libcontextprovider/intset.c \
-	libcontextprovider/intset.h \
+	intset.c \
+	intset.h \
 	$(NULL)
 
 libcontextproviderdir=$(includedir)/contextprovider
 
 libcontextprovider_HEADERS = $(libcontextprovider_GENERATEDSOURCES_PUB)
 
-libcontextprovider/libcontextprovider.vala.stamp contextprovider.vapi: $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
+libcontextprovider.vala.stamp contextprovider.vapi: $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
 	$(VALAC) -C --basedir $(top_srcdir)/libcontextprovider --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation --library contextprovider $^
-	touch libcontextprovider/libcontextprovider.vala.stamp
+	touch libcontextprovider.vala.stamp
 
 libcontextprovider_la_CFLAGS =	\
 				-DG_LOG_DOMAIN=\"ContextKit\" \
@@ -62,25 +62,25 @@ libcontextprovider_la_LIBADD = \
 			  $(CONTEXTD_LIBS) \
 			  $(NULL)
 
-EXTRA_DIST += \
+EXTRA_DIST = \
 	$(libcontextprovider_GENERATEDSOURCES) \
 	$(libcontextprovider_VALASOURCES) \
 	$(libcontextprovider_VAPISOURCES) \
-	libcontextprovider/libcontextprovider.vala.stamp \
+	libcontextprovider.vala.stamp \
 	contextprovider.vapi \
 	$(NULL)
 
-DISTCLEANFILES += \
-	libcontextprovider/*.gcno \
-	libcontextprovider/*.gcda \
+DISTCLEANFILES = \
+	*.gcno \
+	*.gcda \
 	$(NULL)
 
-MAINTAINERCLEANFILES += \
+MAINTAINERCLEANFILES = \
 	$(libcontextprovider_GENERATEDSOURCES) \
-	libcontextprovider/libcontextprovider.vala.stamp \
+	libcontextprovider.vala.stamp \
 	$(NULL)
 
-BUILT_SOURCES += \
-	libcontextprovider/libcontextprovider.vala.stamp \
+BUILT_SOURCES = \
+	libcontextprovider.vala.stamp \
 	$(NULL)
 
