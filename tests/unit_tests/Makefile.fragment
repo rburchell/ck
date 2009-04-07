@@ -228,6 +228,9 @@ EXTRA_DIST += \
 	$(tests_unit_tests_group_VALASOURCES)			\
 	$(tests_unit_tests_group_SOURCES)		\
 	tests/unit_tests/group.vala.stamp			\
+	$(tests_unit_tests_grouplist_VALASOURCES)			\
+	$(tests_unit_tests_grouplist_SOURCES)		\
+	tests/unit_tests/grouplist.vala.stamp			\
 	$(tests_unit_tests_key_usage_counter_VALASOURCES)			\
 	$(tests_unit_tests_key_usage_counter_SOURCES)		\
 	tests/unit_tests/key_usage_counter.vala.stamp			\
