@@ -51,10 +51,10 @@ AC_SUBST(LDFLAGS)
 # Coverage option
 ######################
 
-AC_ARG_ENABLE(debuggcov,
-	AS_HELP_STRING([--enable-debuggcov=@<:@no/yes/auto@:>@],
+AC_ARG_ENABLE(coverage,
+	AS_HELP_STRING([--enable-coverage=@<:@no/yes/auto@:>@],
 	[compile with coverage profiling and debug (gcc only)]),
-	enable_debuggcov=$enableval,enable_debuggcov=no)
+	enable_coverage=$enableval,enable_coverage=no)
 
 ######################
 # Debug option
@@ -74,9 +74,14 @@ PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQU
 # Flags for coverage measurement
 ##################################
 
-if test "x$enable_debuggcov" != "xno"; then   	
+if test "x$enable_coverage" != "xno"; then   	
 	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage -g -Wall"
 	CONTEXTD_LIBS="$CONTEXTD_LIBS -lgcov"
+	AC_CHECK_PROGS([HAVE_LCOV], [lcov],)
+	if test -z "$HAVE_LCOV"; then
+	  AC_MSG_ERROR([lcov is necessary for testing code coverage (http://ltp.sourceforge.net/coverage/lcov.php)])
+	fi
+
 fi
 
 ##################################
