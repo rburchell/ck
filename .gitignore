@@ -9,6 +9,7 @@ compile
 config.guess
 config.h
 config.h.in
+config.h.in~
 config.log
 config.status
 config.sub
@@ -120,3 +121,4 @@ tests/unit_tests/test_grouplist.[ch]
 tests/unit_tests/test_key_usage_counter.[ch]
 tests/unit_tests/test_manager.[ch]
 tests/unit_tests/test_subscriber.[ch]
+
