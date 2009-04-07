@@ -12,17 +12,18 @@ We use the autotools in their 'foreign' strictness plus pkg-config.
 We don't use qmake, even for Qt programs or libraries.  Use pkg-config
 when you use Qt libraries and write explicit rules for invocations of
 tools like moc.  See the ContextCommander for an elaborate example.
+[Soon]
 
 Upstream and Packaging
 ----------------------
 
 We separate 'upstream' code development on the one side and packaging
 for Maemo on the other.  Both happen on branches: a branch for
-upstream development is called "upstream branch" and doesn't havea
+upstream development is called "upstream branch" and doesn't have a
 debian/ directory in it; a branch with a debian/ directory is called a
 "packaging branch".
 
-A upstream branch is merged into a packahging branch at controlled
+A upstream branch is merged into a packaging branch at controlled
 points in time.  (See below "Making a release" for more details.)
 Never merge a packagin branch into upstream branch.  If you want to
 move changes from a packaging branch to a upstream branch, cherry-pick
@@ -116,7 +117,7 @@ environments.
    dpkg-buildpackage       (for Debianized sources)
 
  Note that things like running ./autogen.sh or more generally
- regenerating files that are contained in release tags is not
+ regenerating files that are contained in distribution tags is not
  supported in the compilation environment.
 
 Coding style
@@ -145,7 +146,7 @@ No generated file should be committed to a branch.  After checking out
 (or exporting) a branch, running "./autogen.sh" will get the tree into
 a shape where "./configure && make" or "dpkg-buildpackage" will work.
 
-Release tags are different, see below.
+Distribution tags are different, see below.
 
 ChangeLogs
 ----------
@@ -155,9 +156,7 @@ detailed log of the changes.  Likewise, debian/changelog does not
 record detailed changes, just the stuff that would go into an
 announcement.
 
-There is generally no NEWS file; the debian/changelog is used in its
-place.  Thus, debian/changelog talks about user visible changes to the
-whole source tree, not just the packaging bits.
+Upstream branches have a NEWS file that records user-visible changes.
 
 Marking fixed bugs
 ------------------
@@ -217,10 +216,11 @@ the contents of the created directory.
 Making releases
 ---------------
 
-Version numbers are bumped post-release: configure.ac always contains
-the version that is going to be released next with a "~unreleased"
-suffix and debian/changelog contains a prepared entry for the next
-release with a "~unreleased" suffix.
+Version numbers are bumped post-release and have a "~unreleased"
+suffix.  Thus, configure.ac always contains the version that is going
+to be released next (with a "~unreleased" suffix) and debian/changelog
+contains a prepared entry for the next release (with a "~unreleased"
+suffix).
 
 That suffix is there to make it clear that we are using the
 "post-release bump" schema.  It also reduces confusion when you create
@@ -272,22 +272,23 @@ message "Released VERSION."
 Then run all the steps in "Making a distribution tag" again, this time
 *including* git-make-dist.  Use the plain VERSION as the tag name.
 
-Then bump the version in configure.ac to by increasing the least
-significant component and add the "~unreleased" suffix again.  Use the
-commit message "Prepare VERSION".
+Then bump the version in configure.ac by increasing the least
+significant component and add the "~unreleased" suffix again.  Commit
+this with the message "Prepare VERSION" where VERSION is the new
+version without the "~unreleased" suffix.
 
 Push everything.  Don't forget to push the tags as well.  If you can't
 push at this time because you need to pull first, do that but be
-careful to merge the remote changes.  Do not use "git pull -rebase" at
-this time.
+careful to merge the remote changes.  Do not use "git pull --rebase"
+at this time.
 
 ** Merging a upstream release into a packaging branch.
 
 Merge the most recent "release_VERSION" tag into the packaging branch.
 Update the topmost debian/changelog entry (which has the ~unreleased
 suffix) to have version VERSION-1~unreleased, adding the text "New
-upstream release." and a summary of the changes compared to the last
-upstream release.
+upstream release.".  Add a summary of the changes compared to the last
+upstream release based on the NEWS file in the upstream release.
 
 Look for tags of the form "fixes_NNNNN" and copy their messages into
 debian/changelog.  [ This should be automated. ]
