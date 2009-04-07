@@ -3,7 +3,7 @@ using GLib;
 namespace ContextProvider {
 
 	/* All because GValue SUCKS. bring on GVariant */
-	bool value_compare (Value? v1, Value? v2) {
+	public bool value_compare (Value? v1, Value? v2) {
 		if (v1 == null && v2 == null)
 			return true;
 		if (v1 == null || v2 == null)

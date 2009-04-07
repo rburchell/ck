@@ -40,7 +40,7 @@ namespace ContextProvider {
 		// Session / system bus option
 		DBus.BusType busType = DBus.BusType.SESSION;
 
-		internal Manager() {
+		public Manager() {
 			/*TODO, should manager own the key counter? */
 			group_list = new GroupList();
 			key_counter = new KeyUsageCounter();
@@ -57,11 +57,11 @@ namespace ContextProvider {
 			bus.NameOwnerChanged += this.on_name_owner_changed;
 		}
 
-		internal void set_bus_type(DBus.BusType b) {
+		public void set_bus_type(DBus.BusType b) {
 			busType = b;
 		}
 
-		internal void get_internal (StringSet keyset, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
+		public void get_internal (StringSet keyset, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
 			// Note: Vala doesn't support += for parameters yet; using a temp array
 			properties = new HashTable<string, Value?>(str_hash, str_equal);
 			string[] undeterminable_keys_temp = {};
@@ -135,7 +135,7 @@ namespace ContextProvider {
 		/*
 		Checks which keys are valid and returns them.
 		*/
-		internal StringSet check_keys(string[] keys) {
+		public StringSet check_keys(string[] keys) {
 			// Do not create a StringSet from the parameter "keys" as that would be add Quarks
 			StringSet checked_keys = new StringSet();
 			foreach (var key in keys) {
