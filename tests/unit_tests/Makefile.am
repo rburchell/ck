@@ -44,7 +44,7 @@ test_intset_SOURCES = \
 	$(NULL)
 
 test_intset.vala.stamp: $(test_intset_VALASOURCES) $(test_intset_VAPISOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) $^
+	$(VALAC) -C -g --basedir $(top_srcdir) $^
 	touch $@
 
 test_intset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
@@ -71,7 +71,7 @@ test_stringset_SOURCES =					\
 	$(NULL)
 
 test_stringset.vala.stamp: $(test_stringset_VALASOURCES) $(test_stringset_VAPISOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
+	$(VALAC) -C -g --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
 	touch $@
 
 test_stringset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
@@ -89,7 +89,7 @@ test_value_compare_SOURCES = \
 	$(NULL)
 
 test_value_compare.vala.stamp: $(test_value_compare_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
+	$(VALAC) -C -g --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
 	touch $@
 
 test_value_compare_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
@@ -105,7 +105,7 @@ test_group_SOURCES = \
 	$(NULL)
 
 test_group.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider.vapi $(test_group_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+	$(VALAC) -C -g --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
 	touch $@
 
 
@@ -122,7 +122,7 @@ test_grouplist_SOURCES = \
 	$(NULL)
 
 test_grouplist.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider.vapi $(test_grouplist_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+	$(VALAC) -C -g --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
 	touch $@
 
 
@@ -139,7 +139,7 @@ test_key_usage_counter_SOURCES = \
 	$(NULL)
 
 test_key_usage_counter.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider.vapi $(test_key_usage_counter_VALASOURCES)
-	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+	$(VALAC) -C -g --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
 	touch $@
 
 test_key_usage_counter_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
