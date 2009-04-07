@@ -38,10 +38,7 @@ BUILT_SOURCES = \
 # Introspection
 
 SPEC_TOOLS = \
-	tools/doc-generator.xsl \
 	tools/spec-to-introspect.xsl \
-	tools/context2html.pl \
-	tools/context2asciidoc.pl \
 	$(NULL)
 
 
@@ -80,12 +77,13 @@ clean-local:
 	-rm -rf introspect
 
 EXTRA_DIST += \
-	$(DOCS) \
 	$(SPEC_FILES) \
 	spec/all.xml \
 	spec/context.xml \
 	spec/context.xsd \
 	$(SPEC_TOOLS) \
+	tools/git-make-dist \
+	tools/autogen-helpers.sh \
 	$(NULL)
 
 DISTCLEANFILES = \
