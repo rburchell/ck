@@ -75,8 +75,10 @@ PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQU
 ##################################
 
 if test "x$enable_coverage" != "xno"; then   	
-	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage -g -Wall"
+	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage"
 	CONTEXTD_LIBS="$CONTEXTD_LIBS -lgcov"
+	#FIXME: preserve non -Wall/-g/-O flags from users CFLAGS
+	CFLAGS="-Wall -g -O0"
 	AC_CHECK_PROGS([HAVE_LCOV], [lcov],)
 	if test -z "$HAVE_LCOV"; then
 	  AC_MSG_ERROR([lcov is necessary for testing code coverage (http://ltp.sourceforge.net/coverage/lcov.php)])
