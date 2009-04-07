@@ -1,4 +1,6 @@
-TEST_PROGS =							\
+include Makefile.gtester
+
+TEST_PROGS +=							\
 	test_intset						\
 	test_stringset						\
 	test_value_compare					\
@@ -213,7 +215,7 @@ test_manager.vala.stamp: $(test_manager_VALASOURCES) $(test_manager_VAPISOURCES)
 test_manager_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 test_manager_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider/libcontextprovider.la
 
-EXTRA_DIST =							\
+EXTRA_DIST +=							\
 	$(test_intset_VALASOURCES)				\
 	$(test_intset_VAPISOURCES)				\
 	$(test_intset_GENERATEDSOURCES)				\

@@ -81,8 +81,9 @@ if test "x$enable_coverage" != "xno"; then
 	if test -z "$HAVE_LCOV"; then
 	  AC_MSG_ERROR([lcov is necessary for testing code coverage (http://ltp.sourceforge.net/coverage/lcov.php)])
 	fi
-
 fi
+
+AM_CONDITIONAL(HAVE_COVERAGE, test "x$enable_coverage" != "xno")
 
 ##################################
 # Flags for debugging

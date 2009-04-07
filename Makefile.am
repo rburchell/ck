@@ -1,5 +1,3 @@
-include Makefile.decl
-
 NULL =
 
 # disable this for now. gtk-doc and non-recursive make don't play well together.
@@ -77,7 +75,7 @@ CLEANFILES = $(INTROSPECT) $(ASYNC_INTROSPECT) context.valid.stamp
 clean-local:
 	-rm -rf introspect
 
-EXTRA_DIST += \
+EXTRA_DIST = \
 	$(SPEC_FILES) \
 	spec/all.xml \
 	spec/context.xml \
@@ -106,4 +104,6 @@ version:
 
 .PHONEY: version
 
+if HAVE_COVERAGE
 include tools/lcov.am
+endif
