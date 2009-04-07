@@ -1,4 +1,4 @@
-TEST_PROGS += \
+TEST_PROGS = \
 	intset					\
 	stringset				\
 	value_compare				\
@@ -11,7 +11,7 @@ TEST_PROGS += \
 
 noinst_PROGRAMS = $(TEST_PROGS)
 
-BUILT_SOURCES += \
+BUILT_SOURCES = \
 	intset.vala.stamp			\
 	stringset.vala.stamp			\
 	value_compare.vala.stamp		\
@@ -23,7 +23,7 @@ BUILT_SOURCES += \
 	$(NULL)
 
 intset_VAPISOURCES = \
-	libcontextprovider/intset.vapi               \
+	../../libcontextprovider/intset.vapi               \
 	$(NULL)
 
 intset_VALASOURCES = \
@@ -37,8 +37,8 @@ intset_GENERATEDSOURCES = \
 
 intset_SOURCES = \
 	$(intset_GENERATEDSOURCES)		\
-	libcontextprovider/intset.c					\
-	libcontextprovider/intset.h					\
+	../../libcontextprovider/intset.c					\
+	../../libcontextprovider/intset.h					\
 	$(NULL)
 
 intset.vala.stamp: $(intset_VALASOURCES) $(intset_VAPISOURCES)
@@ -49,11 +49,11 @@ intset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DO
 intset_LDADD = $(CONTEXTD_LIBS)
 
 stringset_VAPISOURCES = \
-	libcontextprovider/intset.vapi				\
+	../../libcontextprovider/intset.vapi				\
 	$(NULL)
 
 stringset_VALASOURCES = \
-	libcontextprovider/string_set.vala				\
+	../../libcontextprovider/string_set.vala				\
 	stringset.vala				\
 	$(NULL)
 
@@ -64,8 +64,8 @@ stringset_GENERATEDSOURCES = \
 
 stringset_SOURCES = \
 	$(stringset_GENERATEDSOURCES)		\
-	libcontextprovider/intset.c					\
-	libcontextprovider/intset.h					\
+	../../libcontextprovider/intset.c					\
+	../../libcontextprovider/intset.h					\
 	$(NULL)
 
 stringset.vala.stamp: $(stringset_VALASOURCES) $(stringset_VAPISOURCES)
@@ -77,7 +77,7 @@ stringset_LDADD = $(CONTEXTD_LIBS)
 
 
 value_compare_VALASOURCES = \
-	libcontextprovider/value_compare.vala				\
+	../../libcontextprovider/value_compare.vala				\
 	test_value_compare.vala			\
 	$(NULL)
 
@@ -144,19 +144,19 @@ key_usage_counter_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
 key_usage_counter_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
 subscriber_VAPISOURCES = \
-	libcontextprovider/intset.vapi				\
+	../../libcontextprovider/intset.vapi				\
 	$(NULL)
 
 subscriber_VALASOURCES = \
-	libcontextprovider/value_compare.vala				\
-	libcontextprovider/subscriber.vala				\
-	libcontextprovider/manager.vala				\
-	libcontextprovider/key_usage_counter.vala				\
-	libcontextprovider/string_set.vala				\
-	libcontextprovider/group.vala				\
-	libcontextprovider/grouplist.vala				\
-	libcontextprovider/dbus_interface.vala				\
-	libcontextprovider/context_provider.vala				\
+	../../libcontextprovider/value_compare.vala				\
+	../../libcontextprovider/subscriber.vala				\
+	../../libcontextprovider/manager.vala				\
+	../../libcontextprovider/key_usage_counter.vala				\
+	../../libcontextprovider/string_set.vala				\
+	../../libcontextprovider/group.vala				\
+	../../libcontextprovider/grouplist.vala				\
+	../../libcontextprovider/dbus_interface.vala				\
+	../../libcontextprovider/context_provider.vala				\
 	test_subscriber.vala			\
 	$(NULL)
 
@@ -167,8 +167,8 @@ subscriber_GENERATEDSOURCES = \
 
 subscriber_SOURCES = \
 	$(subscriber_GENERATEDSOURCES)		\
-	libcontextprovider/intset.c					\
-	libcontextprovider/intset.h					\
+	../../libcontextprovider/intset.c					\
+	../../libcontextprovider/intset.h					\
 	$(NULL)
 
 subscriber.vala.stamp: $(subscriber_VALASOURCES) $(subscriber_VAPISOURCES)
@@ -179,19 +179,19 @@ subscriber_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LO
 subscriber_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
 manager_VAPISOURCES = \
-	libcontextprovider/intset.vapi				\
+	../../libcontextprovider/intset.vapi				\
 	$(NULL)
 
 manager_VALASOURCES = \
-	libcontextprovider/value_compare.vala				\
-	libcontextprovider/manager.vala				\
-	libcontextprovider/subscriber.vala				\
-	libcontextprovider/context_provider.vala				\
-	libcontextprovider/key_usage_counter.vala				\
-	libcontextprovider/string_set.vala				\
-	libcontextprovider/group.vala				\
-	libcontextprovider/grouplist.vala				\
-	libcontextprovider/dbus_interface.vala				\
+	../../libcontextprovider/value_compare.vala				\
+	../../libcontextprovider/manager.vala				\
+	../../libcontextprovider/subscriber.vala				\
+	../../libcontextprovider/context_provider.vala				\
+	../../libcontextprovider/key_usage_counter.vala				\
+	../../libcontextprovider/string_set.vala				\
+	../../libcontextprovider/group.vala				\
+	../../libcontextprovider/grouplist.vala				\
+	../../libcontextprovider/dbus_interface.vala				\
 	test_manager.vala			\
 	$(NULL)
 
@@ -202,8 +202,8 @@ manager_GENERATEDSOURCES = \
 
 manager_SOURCES = \
 	$(manager_GENERATEDSOURCES)		\
-	libcontextprovider/intset.c					\
-	libcontextprovider/intset.h					\
+	../../libcontextprovider/intset.c					\
+	../../libcontextprovider/intset.h					\
 	$(NULL)
 
 manager.vala.stamp: $(manager_VALASOURCES) $(manager_VAPISOURCES)
@@ -213,7 +213,7 @@ manager.vala.stamp: $(manager_VALASOURCES) $(manager_VAPISOURCES)
 manager_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 manager_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
-EXTRA_DIST += \
+EXTRA_DIST = \
 	$(intset_VALASOURCES)				\
 	$(intset_VAPISOURCES)				\
 	$(intset_GENERATEDSOURCES)			\
@@ -241,10 +241,10 @@ EXTRA_DIST += \
 	manager.vala.stamp			\
 	$(NULL)
 
-DISTCLEANFILES += \
+DISTCLEANFILES = \
 	$(NULL)
 
-MAINTAINERCLEANFILES += \
+MAINTAINERCLEANFILES = \
 	$(intset_GENERATEDSOURCES)			\
 	intset.vala.stamp				\
 	$(stringset_GENERATEDSOURCES)			\
