@@ -35,12 +35,13 @@ namespace ContextProvider {
 		HashTable<string, Value?> values;
 		static dynamic DBus.Object bus; // Needs to be stored so that we get the NameOwnerChanged
 
+		// Session / system bus option
+		DBus.BusType busType;
+
 		int subscriber_count = 0;
 
-		// Session / system bus option
-		DBus.BusType busType = DBus.BusType.SESSION;
-
-		public Manager() {
+		public Manager(DBus.BusType b = DBus.BusType.SESSION) {
+			busType = b;
 			/*TODO, should manager own the key counter? */
 			group_list = new GroupList();
 			key_counter = new KeyUsageCounter();
@@ -50,15 +51,12 @@ namespace ContextProvider {
 			
 			subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			values = new HashTable<string, Value?>(str_hash, str_equal);
-			// Note: Use session / system bus according to the configuration
-			// (which can be changed via set_bus_type).
+			
+			// Start listening to the NameOwnerChanged signal (of the correct bus)
+			// to know when the clients exit.
 			var connection = DBus.Bus.get (busType);
 			bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 			bus.NameOwnerChanged += this.on_name_owner_changed;
-		}
-
-		public void set_bus_type(DBus.BusType b) {
-			busType = b;
 		}
 
 		public void get_internal (StringSet keyset, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
