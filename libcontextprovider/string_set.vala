@@ -32,7 +32,7 @@ namespace ContextProvider {
 	 * All operations other than iteration are O(1)
 	 */
 
-	public class StringSet : GLib.Object {
+	internal class StringSet : GLib.Object {
 	/**
 	 * ContextProviderStringSet:
 	 *

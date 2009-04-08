@@ -24,7 +24,7 @@ using Gee;
 
 namespace ContextProvider {
 
-	public class Manager : GLib.Object, DBusManager {
+	internal class Manager : GLib.Object, DBusManager {
 		// Mapping client dbus names into subscription objects
 		Gee.HashMap<string, Subscriber> subscribers;
 

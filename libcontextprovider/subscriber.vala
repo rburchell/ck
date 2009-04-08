@@ -24,7 +24,7 @@ using Gee;
 
 namespace ContextProvider {
 
-	public class Subscriber : GLib.Object, DBusSubscriber {
+	internal class Subscriber : GLib.Object, DBusSubscriber {
 		Manager manager;
 		public DBus.ObjectPath object_path {get; set;}
 

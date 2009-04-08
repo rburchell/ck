@@ -31,7 +31,7 @@ namespace ContextProvider {
 	 * keys.
 	 */
 
-	public class KeyUsageCounter : GLib.Object {
+	internal class KeyUsageCounter : GLib.Object {
 	/**
 	 * ContextProviderKeyUsageCounter
 	 *
