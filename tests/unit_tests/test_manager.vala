@@ -78,6 +78,20 @@ void test_get_values()
 	assert (value_compare(properties.lookup("key.four"), keyFourValue) == true);
 	assert (undeterminable.length == 1);
 	assert (undeterminable[0] == "key.five");
+
+	//test sane behavior with bad key
+	/* need to figure how to deal with warnings and criticals properly with gtester
+	manager.property_value_change("key.six", null);
+	assert (properties.size() == 4);
+	assert (value_compare(properties.lookup("key.one"), keyOneValue) == true);
+	assert (value_compare(properties.lookup("key.two"), keyTwoValue) == true);
+	assert (value_compare(properties.lookup("key.three"), keyThreeValue) == true);
+	assert (value_compare(properties.lookup("key.four"), keyFourValue) == true);
+	assert (undeterminable.length == 1);
+	assert (undeterminable[0] == "key.five");
+	*/
+
+
 }
 
 void test_get_subscriber()
@@ -85,7 +99,7 @@ void test_get_subscriber()
 	// Setup
 	Manager manager = new Manager();
 
-//	try {
+	try {
 		// Test: get subscriber twice, for different bus names
 		DBus.BusName name1 = new DBus.BusName(":1.2");
 		DBus.ObjectPath path1 = manager.GetSubscriber(name1);
@@ -95,11 +109,13 @@ void test_get_subscriber()
 
 		// Expected result: the object paths are paths for two first subscribers
 		assert (path1 == "/org/freedesktop/ContextKit/Subscribers/0");
+		assert (manager.subscribers.contains (name1));
 		assert (path2 == "/org/freedesktop/ContextKit/Subscribers/1");
-/*	} catch (DBus.Error e) {
+		assert (manager.subscribers.contains (name2));
+	} catch (DBus.Error e) {
 		critical("%s", e.message);
 		assert(false);
-	}*/
+	}
 }
 
 void test_get_subscriber_twice()
@@ -107,7 +123,7 @@ void test_get_subscriber_twice()
 	// Setup
 	Manager manager = new Manager();
 
-	//try {
+	try {
 		// Test: get subscriber twice, for the same bus name
 		DBus.BusName name1 = new DBus.BusName(":1.2");
 		DBus.ObjectPath path1 = manager.GetSubscriber(name1);
@@ -116,12 +132,107 @@ void test_get_subscriber_twice()
 		// Expected result: the object paths are the same
 		assert (path1 == "/org/freedesktop/ContextKit/Subscribers/0");
 		assert (path2 == "/org/freedesktop/ContextKit/Subscribers/0");
-	/*} catch (DBus.Error e) {
+		assert (manager.subscribers.contains (name1));
+	} catch (DBus.Error e) {
 		critical("%s", e.message);
 		assert(false);
-	}*/
+	}
 }
 
+void test_drop_subscriber()
+{
+	// Setup
+	Manager manager = new Manager();
+
+	try {
+		// Test: get subscriber twice, for different bus names
+		DBus.BusName name1 = new DBus.BusName(":1.2");
+		DBus.ObjectPath path1 = manager.GetSubscriber(name1);
+
+		DBus.BusName name2 = new DBus.BusName(":1.12");
+		DBus.ObjectPath path2 = manager.GetSubscriber(name2);
+
+		assert (manager.subscribers.contains (name1));
+		assert (manager.subscribers.contains (name2));
+		manager.on_name_owner_changed(null, ":1.12", ":1.12", "");
+		assert (!manager.subscribers.contains (name2));
+		manager.on_name_owner_changed(null, ":1.2", ":1.12", "");
+		assert (!manager.subscribers.contains (name1));
+		assert (manager.subscribers.size == 0);
+
+	} catch (DBus.Error e) {
+		critical("%s", e.message);
+		assert(false);
+	}
+}
+
+
+
+int changed_count = 0;
+HashTable<string, Value?> last_changed_values;
+string[] last_changed_undeterminable;
+GLib.MainLoop loop;
+
+void changed_handler(Subscriber s, HashTable<string, Value?> values, string[] undeterminable_keys)
+{
+	//debug("changed");
+// Record that the signal was caught
+	++changed_count;
+
+	// Store the parameters
+	last_changed_values = new HashTable<string, Value?>(str_hash, str_equal);
+	foreach (var key in values.get_keys()) {
+		last_changed_values.insert(key, values.lookup(key));
+	}
+
+	last_changed_undeterminable = undeterminable_keys;
+}
+
+
+bool stopper()
+{
+	loop.quit ();
+	return false;
+}
+
+void test_subscriber_changes () {
+
+	try {
+		loop = new GLib.MainLoop(null, false);
+
+		// Setup
+		Manager manager = new Manager();
+		Group group = new Group({"key.one", "key.two", "key.three", "key.four", "key.five"}, false, null);
+		manager.group_list.add(group);
+
+		DBus.BusName name1 = new DBus.BusName(":1.2");
+		DBus.ObjectPath path1 = manager.GetSubscriber(name1);
+
+		Subscriber? s = manager.subscribers.get (name1);
+		assert (s != null);
+
+		HashTable<string, Value?> ret_values;
+		string[] ret_undeterminable;
+		s.Subscribe({"key.one", "key.two"}, out ret_values, out ret_undeterminable);
+
+		s.Changed += changed_handler;
+		// Test: set the values for the keys
+		Value keyOneValue = Value(typeof(int));
+		keyOneValue.set_int(123);
+		manager.property_value_change("key.one", keyOneValue);
+
+		Idle.add(stopper);
+		loop.run();
+
+		assert (changed_count == 1);
+		assert (last_changed_values.size() == 1);
+		assert (value_compare(last_changed_values.lookup ("key.one"), keyOneValue) == true);
+		assert (last_changed_undeterminable.length == 0);
+	} catch (DBus.Error e) {
+		critical("%s", e.message);
+		assert(false);
+	}
+}
 void debug_null  (string? log_domain, LogLevelFlags log_level, string message)
 {
 }
@@ -137,5 +248,7 @@ public static void main (string[] args) {
 	Test.add_func ("/contextkit/manager/test_get_values", test_get_values);
 	Test.add_func ("/contextkit/manager/test_get_subscriber", test_get_subscriber);
 	Test.add_func ("/contextkit/manager/test_get_subscriber_twice", test_get_subscriber_twice);
+	Test.add_func ("/contextkit/manager/test_drop_subscriber", test_drop_subscriber);
+	Test.add_func ("/contextkit/manager/test_subscriber_changes", test_subscriber_changes);
 	Test.run ();
 }

@@ -26,7 +26,7 @@ namespace ContextProvider {
 
 	internal class Manager : GLib.Object, DBusManager {
 		// Mapping client dbus names into subscription objects
-		Gee.HashMap<string, Subscriber> subscribers;
+		public Gee.HashMap<string, Subscriber> subscribers {get; private set;}
 
 		public GroupList group_list {get; private set;}
 		public KeyUsageCounter key_counter {get; private set;}
@@ -114,7 +114,7 @@ namespace ContextProvider {
 		/*
 		Listen to subscribers exiting.
 		*/
-		private void on_name_owner_changed (DBus.Object sender, string name, string old_owner, string new_owner) {
+		public void on_name_owner_changed (DBus.Object? sender, string name, string old_owner, string new_owner) {
 			debug("Got a NameOwnerChanged signal");
 			debug(name);
 			debug(old_owner);
@@ -147,7 +147,7 @@ namespace ContextProvider {
 		/* Is called when the group sets new values to context properties */
 		public void property_value_change(string key, Value? value) {
 			if (group_list.valid_keys.is_member (key) == false) {
-				critical ("Key %s is not valid", key);
+				warning ("Key %s is not valid", key);
 			}
 			// ignore unchanged keys
 			if (value_compare(values.lookup(key), value)) {
