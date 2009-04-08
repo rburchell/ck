@@ -29,8 +29,8 @@ namespace ContextProvider {
 		public DBus.ObjectPath object_path {get; set;}
 
 		// Keys subscribed to by this subscriber
-		StringSet subscribed_keys;
-		KeyUsageCounter key_counter;
+		public StringSet subscribed_keys {get; private set;}
+		public KeyUsageCounter key_counter {get; private set;}
 		HashTable<string, Value?> values_to_send;
 		bool idle_scheduled = false;
 
