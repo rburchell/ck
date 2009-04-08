@@ -6,7 +6,7 @@ lcov-report:
 		--output-file @top_builddir@/lcov.info.tmp \
 		--ignore-errors source
 	lcov --directory @top_srcdir@ --output-file @top_builddir@/lcov.info \
-		--remove @top_builddir@/lcov.info.tmp $(shell find @top_srcdir@ -name \*.vala | sed 's/.vala/.c/' | xargs -n1 basename) \
+		--remove @top_builddir@/lcov.info.tmp $(shell find @top_srcdir@ -name \*.vala | sed 's/.vala/.c/' | xargs -n1 basename) \*.vapi \
 		--ignore-errors source
 	rm @top_builddir@/lcov.info.tmp
 	$(mkdir_p) @top_builddir@/lcov.html
