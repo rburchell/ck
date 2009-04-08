@@ -51,7 +51,7 @@ namespace ContextProvider {
 			
 			subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			values = new HashTable<string, Value?>(str_hash, str_equal);
-			
+
 			// Start listening to the NameOwnerChanged signal (of the correct bus)
 			// to know when the clients exit.
 			var connection = DBus.Bus.get (busType);
