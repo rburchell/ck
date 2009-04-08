@@ -145,6 +145,7 @@ namespace ContextProvider {
 			connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 		} catch (DBus.Error e) {
 			debug ("Registration failed: %s", e.message);
+			manager = null;
 			return false;
 		}
 

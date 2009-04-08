@@ -40,7 +40,7 @@ namespace ContextProvider {
 
 		int subscriber_count = 0;
 
-		public Manager(DBus.BusType b = DBus.BusType.SESSION) {
+		public Manager(DBus.BusType b = DBus.BusType.SESSION) throws DBus.Error {
 			busType = b;
 			/*TODO, should manager own the key counter? */
 			group_list = new GroupList();
