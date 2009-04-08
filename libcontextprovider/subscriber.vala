@@ -64,6 +64,7 @@ namespace ContextProvider {
 
 			Changed (values_to_send, unavail);
 			values_to_send.remove_all();
+			idle_scheduled = false;
 			return false;
 		}
 
