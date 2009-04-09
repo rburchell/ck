@@ -52,11 +52,13 @@ void context_provider_intset_add (ContextProviderIntSet *set, guint element);
 gboolean context_provider_intset_remove (ContextProviderIntSet *set, guint element);
 gboolean context_provider_intset_is_member (const ContextProviderIntSet *set, guint element);
 
-gboolean context_provider_intset_is_subset_of (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
+gboolean context_provider_intset_is_subset (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
 gboolean context_provider_intset_is_disjoint (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
 
 void context_provider_intset_foreach (const ContextProviderIntSet *set, ContextProviderIntFunc func,
     gpointer userdata);
+GArray *context_provider_intset_to_array (const ContextProviderIntSet *set);
+ContextProviderIntSet *context_provider_intset_from_array (const GArray *array);
 
 guint context_provider_intset_size (const ContextProviderIntSet *set);
 

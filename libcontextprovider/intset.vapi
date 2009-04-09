@@ -9,6 +9,8 @@ namespace ContextProvider {
 		public IntSet ();
 		[CCode (cname = "context_provider_intset_sized_new")]
 		public IntSet.sized (uint size);
+		[CCode (cname = "context_provider_intset_from_array")]
+		public IntSet.from_array (GLib.Array array);
 		[CCode (cname = "context_provider_intset_intersection")]
 		public IntSet.intersection (IntSet left, IntSet right);
 		[CCode (cname = "context_provider_intset_symmetric_difference")]
@@ -38,6 +40,8 @@ namespace ContextProvider {
 		public bool remove (uint element);
 		[CCode (cname = "context_provider_intset_size")]
 		public uint size ();
+		[CCode (cname = "context_provider_intset_to_array")]
+		public weak GLib.Array to_array ();
 	}
 	[CCode (cheader_filename = "intset.h", is_value_type="1")]
 	public struct IntSetIter {
