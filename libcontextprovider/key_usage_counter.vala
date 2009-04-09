@@ -35,12 +35,12 @@ namespace ContextProvider {
 	/**
 	 * ContextProviderKeyUsageCounter
 	 *
-	 * A data structure which tracks the number of subscriptions for 
+	 * A data structure which tracks the number of subscriptions for
 	 * keys.
-     */
+	 */
 
 		// The number of subscribers for each key (over all subscriber objects)
-		Gee.HashMap<string, int> no_of_subscribers = new Gee.HashMap<string, int>(str_hash, str_equal);
+		internal Gee.HashMap<string, int> subscriber_count_table {get; private set;}
 		public StringSet subscribed_keys { get; private set; }
 
 		public signal void keys_added (StringSet new_keys);
@@ -51,6 +51,7 @@ namespace ContextProvider {
 		 */
 		public KeyUsageCounter() {
 			subscribed_keys = new StringSet();
+			subscriber_count_table = new Gee.HashMap<string, int>(str_hash, str_equal);
 		}
 
 		/**
@@ -61,9 +62,9 @@ namespace ContextProvider {
 			StringSet first_subscribed_keys = new StringSet();
 
 			foreach (var key in keys) {
-				if (no_of_subscribers.contains (key)) {
-					int old_value = no_of_subscribers.get (key);
-					no_of_subscribers.set (key, old_value + 1);
+				if (subscriber_count_table.contains (key)) {
+					int old_value = subscriber_count_table.get (key);
+					subscriber_count_table.set (key, old_value + 1);
 
 					if (old_value == 0) {
 						// This is the first subscribed to the key
@@ -73,7 +74,7 @@ namespace ContextProvider {
 					debug ("Subscriber count of %s is now %d", key, old_value + 1);
 				}
 				else { // Key name not present in the key table
-					no_of_subscribers.set (key, 1);
+					subscriber_count_table.set (key, 1);
 
 					first_subscribed_keys.add (key);
 					debug ("Subscriber count of %s is now %d", key, 1);
@@ -95,12 +96,12 @@ namespace ContextProvider {
 			StringSet last_unsubscribed_keys = new StringSet();
 
 			foreach (var key in keys) {
-				if (no_of_subscribers.contains (key)) {
-					int value = no_of_subscribers.get (key);
+				if (subscriber_count_table.contains (key)) {
+					int value = subscriber_count_table.get (key);
 
 					if (value >= 1) {
 						value--;
-						no_of_subscribers.set (key, value);
+						subscriber_count_table.set (key, value);
 					}
 
 					if (value == 0) {
@@ -129,8 +130,8 @@ namespace ContextProvider {
 		 * Returns: The subscription count of the #key.
 		 */
 		public int number_of_subscribers (string key) {
-			if (no_of_subscribers.contains (key)) {
-				return no_of_subscribers.get (key);
+			if (subscriber_count_table.contains (key)) {
+				return subscriber_count_table.get (key);
 			}
 			return 0;
 		}
