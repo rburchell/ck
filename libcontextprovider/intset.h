@@ -123,21 +123,6 @@ context_provider_intset_iter_init (ContextProviderIntSetIter *iter, const Contex
   iter->element = (guint)(-1);
 }
 
-/**
- * context_provider_intset_iter_init:
- * @iter: An integer set iterator to be reset.
- *
- * Reset the iterator @iter to the beginning. It must already be associated
- * with a set.
- */
-static inline void
-context_provider_intset_iter_reset (ContextProviderIntSetIter *iter)
-{
-  g_return_if_fail (iter != NULL);
-  g_return_if_fail (iter->set != NULL);
-  iter->element = (guint)(-1);
-}
-
 gboolean context_provider_intset_iter_next (ContextProviderIntSetIter *iter);
 
 G_END_DECLS
