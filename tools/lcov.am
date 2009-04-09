@@ -1,11 +1,14 @@
 lcov-reset:
-	lcov --directory @top_srcdir@ --zerocounters
+	lcov --base-directory=@top_srcdir@ --directory @top_srcdir@/libcontextprovider --zerocounters
 
 lcov-report:
-	lcov --directory @top_srcdir@ --capture \
+	lcov --directory @top_srcdir@/libcontextprovider \
+		 --capture \
 		--output-file @top_builddir@/lcov.info.tmp
-	lcov --directory @top_srcdir@ --output-file @top_builddir@/lcov.info \
-		--remove @top_builddir@/lcov.info.tmp $(shell find @top_srcdir@ -name \*.vala | sed 's/.vala/.c/' | xargs -n1 basename) \*.vapi \
+	lcov --directory @top_srcdir@/libcontextprovider \
+		--output-file @top_builddir@/lcov.info \
+		--remove @top_builddir@/lcov.info.tmp \
+		$(shell find @top_srcdir@ -name \*.vala | sed 's/.vala/.c/' | xargs -n1 basename) \*.vapi \
 		tests/unit_tests/\* \
 		/usr/include/\*
 	rm @top_builddir@/lcov.info.tmp
