@@ -107,11 +107,13 @@ AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libcontextprovider/Makefile])
+AC_CONFIG_FILES([spec/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([tests/unit_tests/Makefile])
 AC_CONFIG_FILES([doc/Makefile])
 AC_CONFIG_FILES([doc/reference/Makefile])
 AC_CONFIG_FILES([doc/reference/libcontextprovider/Makefile])
+AC_CONFIG_FILES([tools/Makefile])
 AC_CONFIG_FILES([contextprovider-1.0.pc])
 
 
