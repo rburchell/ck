@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libcontextprovider.la
 
-libcontextprovider_VALASOURCES_PRIV = \
+libcontextprovider_VALASOURCES = \
 	dbus_interface.vala \
 	manager.vala \
 	grouplist.vala \
@@ -9,15 +9,7 @@ libcontextprovider_VALASOURCES_PRIV = \
 	value_compare.vala \
 	group.vala \
 	string_set.vala \
-	$(NULL)
-
-libcontextprovider_VALASOURCES_PUB = \
 	context_provider.vala \
-	$(NULL)
-
-libcontextprovider_VALASOURCES = \
-	$(libcontextprovider_VALASOURCES_PRIV) \
-	$(libcontextprovider_VALASOURCES_PUB) \
 	$(NULL)
 
 libcontextprovider_VAPISOURCES = \
@@ -25,13 +17,12 @@ libcontextprovider_VAPISOURCES = \
 	$(NULL)
 
 libcontextprovider_GENERATEDSOURCES_PRIV = \
-	$(libcontextprovider_VALASOURCES_PRIV:.vala=.c) \
-	$(libcontextprovider_VALASOURCES_PRIV:.vala=.h) \
-	$(libcontextprovider_VALASOURCES_PUB:.vala=.c) \
+	$(libcontextprovider_VALASOURCES:.vala=.c) \
+	context_provider-internal.h \
 	$(NULL)
 
 libcontextprovider_GENERATEDSOURCES_PUB = \
-	$(libcontextprovider_VALASOURCES_PUB:.vala=.h) \
+	context_provider.h \
 	$(NULL)
 
 libcontextprovider_GENERATEDSOURCES = \
@@ -68,6 +59,7 @@ EXTRA_DIST = \
 	$(libcontextprovider_VAPISOURCES) \
 	libcontextprovider.vala.stamp \
 	contextprovider.vapi \
+	contextprovider-internal.vapi \
 	$(NULL)
 
 DISTCLEANFILES = \

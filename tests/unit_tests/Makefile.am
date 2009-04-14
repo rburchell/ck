@@ -33,10 +33,9 @@ test_intset_VALASOURCES =					\
 
 test_intset_SOURCES = \
 	$(test_intset_VALASOURCES:.vala=.c)			\
-	$(test_intset_VALASOURCES:.vala=.h)			\
 	$(NULL)
 
-test_intset.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider-internal.vapi   $(top_builddir)/libcontextprovider/intset.vapi $(test_intset_VALASOURCES)
+test_intset.vala.stamp: $(top_srcdir)/libcontextprovider/contextprovider-internal.vapi   $(top_srcdir)/libcontextprovider/intset.vapi $(test_intset_VALASOURCES)
 	$(VALAC) $(VALA_OPTIONS) $^
 	touch $@
 
@@ -49,10 +48,9 @@ test_stringset_VALASOURCES = \
 
 test_stringset_SOURCES =					\
 	$(test_stringset_VALASOURCES:.vala=.c)			\
-	$(test_stringset_VALASOURCES:.vala=.h)			\
 	$(NULL)
 
-test_stringset.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider-internal.vapi $(test_stringset_VALASOURCES)
+test_stringset.vala.stamp: $(top_srcdir)/libcontextprovider/contextprovider-internal.vapi $(test_stringset_VALASOURCES)
 	$(VALAC) $(VALA_OPTIONS) $^
 	touch $@
 
@@ -66,10 +64,9 @@ test_value_compare_VALASOURCES =				\
 
 test_value_compare_SOURCES = \
 	$(test_value_compare_VALASOURCES:.vala=.c)		\
-	$(test_value_compare_VALASOURCES:.vala=.h)		\
 	$(NULL)
 
-test_value_compare.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider-internal.vapi $(test_value_compare_VALASOURCES)
+test_value_compare.vala.stamp: $(top_srcdir)/libcontextprovider/contextprovider-internal.vapi $(test_value_compare_VALASOURCES)
 	$(VALAC) $(VALA_OPTIONS) $^
 	touch $@
 
@@ -82,10 +79,9 @@ test_group_VALASOURCES =					\
 
 test_group_SOURCES = \
 	$(test_group_VALASOURCES:.vala=.c)			\
-	$(test_group_VALASOURCES:.vala=.h)			\
 	$(NULL)
 
-test_group.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider-internal.vapi $(test_group_VALASOURCES)
+test_group.vala.stamp: $(top_srcdir)/libcontextprovider/contextprovider-internal.vapi $(test_group_VALASOURCES)
 	$(VALAC) $(VALA_OPTIONS) $^
 	touch $@
 
@@ -99,10 +95,9 @@ test_grouplist_VALASOURCES =					\
 
 test_grouplist_SOURCES = \
 	$(test_grouplist_VALASOURCES:.vala=.c)			\
-	$(test_grouplist_VALASOURCES:.vala=.h)			\
 	$(NULL)
 
-test_grouplist.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider-internal.vapi $(test_grouplist_VALASOURCES)
+test_grouplist.vala.stamp: $(top_srcdir)/libcontextprovider/contextprovider-internal.vapi $(test_grouplist_VALASOURCES)
 	$(VALAC) $(VALA_OPTIONS) $^
 	touch $@
 
@@ -116,10 +111,9 @@ test_key_usage_counter_VALASOURCES = \
 
 test_key_usage_counter_SOURCES = \
 	$(test_key_usage_counter_VALASOURCES:.vala=.c)		\
-	$(test_key_usage_counter_VALASOURCES:.vala=.h)		\
 	$(NULL)
 
-test_key_usage_counter.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider-internal.vapi $(test_key_usage_counter_VALASOURCES)
+test_key_usage_counter.vala.stamp: $(top_srcdir)/libcontextprovider/contextprovider-internal.vapi $(test_key_usage_counter_VALASOURCES)
 	$(VALAC) $(VALA_OPTIONS) $^
 	touch $@
 
@@ -132,10 +126,9 @@ test_subscriber_VALASOURCES =					\
 
 test_subscriber_SOURCES =					\
 	$(test_subscriber_VALASOURCES:.vala=.c)			\
-	$(test_subscriber_VALASOURCES:.vala=.h)			\
 	$(NULL)
 
-test_subscriber.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider-internal.vapi $(test_subscriber_VALASOURCES)
+test_subscriber.vala.stamp: $(top_srcdir)/libcontextprovider/contextprovider-internal.vapi $(test_subscriber_VALASOURCES)
 	$(VALAC) $(VALA_OPTIONS) $^
 	touch $@
 
@@ -148,10 +141,9 @@ test_manager_VALASOURCES =					\
 
 test_manager_SOURCES =						\
 	$(test_manager_VALASOURCES:.vala=.c)			\
-	$(test_manager_VALASOURCES:.vala=.h)			\
 	$(NULL)
 
-test_manager.vala.stamp: $(top_builddir)/libcontextprovider/contextprovider-internal.vapi $(test_manager_VALASOURCES)
+test_manager.vala.stamp: $(top_srcdir)/libcontextprovider/contextprovider-internal.vapi $(test_manager_VALASOURCES)
 	$(VALAC) $(VALA_OPTIONS) $^
 	touch $@
 
@@ -165,8 +157,8 @@ EXTRA_DIST +=							\
 	$(test_stringset_VALASOURCES)				\
 	$(test_stringset_SOURCES)				\
 	test_stringset.vala.stamp				\
-	$(value_compare_VALASOURCES)				\
-	$(value_compare_SOURCES)				\
+	$(test_value_compare_VALASOURCES)				\
+	$(test_value_compare_SOURCES)				\
 	test_value_compare.vala.stamp				\
 	$(test_group_VALASOURCES)				\
 	$(test_group_SOURCES)					\
