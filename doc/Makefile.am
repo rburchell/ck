@@ -38,5 +38,5 @@ html-local: $(html_EXTRA) $(html_ASCIIDOCS:.txt=.html)
 %.html: %.txt
 	asciidoc -f myfilter.conf $^
 
-EXTRA_DIST = $(html_ASCIIDOCS) $(html_DATA) doc-generator.xsl xs3p
+EXTRA_DIST = $(html_ASCIIDOCS) $(html_DATA) doc-generator.xsl xs3p context2asciidoc.pl
 MAINTAINERCLEANFILES += $(html_DATA)
