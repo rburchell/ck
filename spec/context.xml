@@ -128,101 +128,84 @@ The time of sun rise.
 The time of sun set.
 	</doc>
       </key>
-      <node name="Weather">
+      <key name="Weather" type="STRING">
 	<doc>
-Weather
-~~~~~~~
-
-The current weather.  (Right now, it's a set of properties, but we
-might unify this as a single property with a big dictionary as its
-value.  Or not.)  See http://www.ominous-valve.com/wx_codes.txt for
+The current weather.  See http://www.ominous-valve.com/wx_codes.txt for
 more information about codifying weather conditions.  We should lift
 something from there, if just for extra geek points.
-	</doc>
-	<key name="Condition" type="STRING">
-	  <doc>
++
+The value of the weather property is a dictionary with the following
+keys.  All keys are optional and additional keys might be present.
++
+- *Condition*
++
 The current weather condition, as a localized, human readable string.
 Examples are "Cloudy", "Raining", etc.
-	  </doc>
-	</key>
-	<key name="ConditionCode" type="STRING">
-	  <doc>
++
+- *ConditionCode*
++
 The current weather condition, as a symbolic string.  The set of
 symbols is to be defined, but it will be fixed and quite small so that
 you can provide an icon for each of them, etc.
-	  </doc>
-	</key>
-	<key name="Humidity" type="INT">
-	  <doc>
++
+- *Humidity*
++
 The relative humidity in percent.
-	  </doc>
-	</key>
-	<key name="Temperature" type="STRING">
-	  <doc>
++
+- *Temperature*
++
 The temperature as a localized string.  This string represents the
 temperature in the way preferred by the user.  Most often this means
 either degrees Celsius or degrees Fahrenheit, but it could be some
 other unit entirely.
-	  </doc>
-	</key>
-	<key name="TemperatureK" type="DOUBLE">
-	  <doc>
++
+- *TemperatureK*
++
 The temperature in Kelvin.
-	  </doc>
-	</key>
-	<key name="FeltTemperature" type="STRING">
-	  <doc>
++
+- *ApparentTemperature*
++
 The felt temperature as a localized string, analogous to Temperature.
-	  </doc>
-	</key>
-	<key name="FeltTemperatureK" type="DOUBLE">
-	  <doc>
++
+- *ApparentTemperatureK*
++
 The felt temperature in Kelvin.
-	  </doc>
-	</key>
-	<key name="DewPoint" type="DOUBLE">
-	  <doc>
++
+- *DewPoint*
++
 The dew point as a localized string, analogous to Temperature.
-	  </doc>
-	</key>
-	<key name="DewPointK" type="DOUBLE">
-	  <doc>
++
+- *DewPointK*
++
 The dew point in Kelvin.
-	  </doc>
-	</key>
-	<key name="Pressure" type="DOUBLE">
-	  <doc>
++
+- *Pressure*
++
 The atmospheric pressure in milli bar.
-	  </doc>
-	</key>
-	<key name="Precipitation" type="DOUBLE">
-	  <doc>
++
+- *Precipitation*
++
 The rain or snow fall in millimeter per square meter per hour (or some
 other more common unit).
-	  </doc>
-	</key>
-	<key name="Visibility" type="DOUBLE">
-	  <doc>
++
+- *Visibility*
++
 The visibility in meter.
-	  </doc>
-	</key>
-	<key name="WindSpeed" type="DOUBLE">
-	  <doc>
++
+- *WindSpeed*
++
 The wind speed in meters per second.
-	  </doc>
-	</key>
-	<key name="WindDirection" type="STRING">
-	  <doc>
++
+- *WindDirection*
++
 The wind direction as a localized string.  The direction is given in
 compass terms: North, South-West, etc.
-	  </doc>
-	</key>
-	<key name="WindDirectionD" type="INT">
-	  <doc>
++
+- *WindDirectionD*
++
 The wind direction in degrees.  North is 0, east is 90, etc.
-	  </doc>
-	</key>
-      </node> 
+	</doc>
+      </key>
     </node>
   </node>
 </properties>
