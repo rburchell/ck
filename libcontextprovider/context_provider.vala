@@ -122,9 +122,9 @@ namespace ContextProvider {
 	public bool init (DBus.BusType bus_type, string? bus_name) {
 
 		try {
+			var connection = DBus.Bus.get (bus_type);
+			dynamic DBus.Object bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 			if (bus_name != null) {
-				var connection = DBus.Bus.get (bus_type);
-				dynamic DBus.Object bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 				// try to register service in session bus
 				uint request_name_result = bus.RequestName (bus_name, (uint) 0);
 
@@ -138,10 +138,9 @@ namespace ContextProvider {
 
 			// Create the Manager object and register it over DBus.
 			manager = new Manager (bus_type);
+			bus.NameOwnerChanged += manager.on_name_owner_changed;
 
 			debug ("Registering new Manager D-Bus service");
-			var connection = DBus.Bus.get (bus_type);
-
 			connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 		} catch (DBus.Error e) {
 			debug ("Registration failed: %s", e.message);
