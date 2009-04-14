@@ -1,7 +1,7 @@
 SUBDIRS=reference
 
 htmldir = $(datadir)/doc/contextkit/html/
-html_ASCIIDOCS = context-intro.txt context-providers.txt
+html_ASCIIDOCS = context-intro.txt context-providers.txt context-types.txt
 html_EXTRA = context-properties.html contextkit.html context-provider-schema.html
 
 MAINTAINERCLEANFILES = context-properties.html contextkit.html
