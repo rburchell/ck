@@ -1,5 +1,5 @@
 namespace ContextProvider {
-	public class Group {
+	internal class Group : GLib.Object {
 		public SubscriptionChangedCallback? callback;
 		public StringSet keys;
 		bool subscribed;

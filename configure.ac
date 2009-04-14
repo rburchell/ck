@@ -1,5 +1,5 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.1.4~unreleased], [rob.taylor@codethink.co.uk], ContextKit)
+AC_INIT([ContextKit], [0.1.5~unreleased], [rob.taylor@codethink.co.uk], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
@@ -51,10 +51,10 @@ AC_SUBST(LDFLAGS)
 # Coverage option
 ######################
 
-AC_ARG_ENABLE(debuggcov,
-	AS_HELP_STRING([--enable-debuggcov=@<:@no/yes/auto@:>@],
+AC_ARG_ENABLE(coverage,
+	AS_HELP_STRING([--enable-coverage=@<:@no/yes/auto@:>@],
 	[compile with coverage profiling and debug (gcc only)]),
-	enable_debuggcov=$enableval,enable_debuggcov=no)
+	enable_coverage=$enableval,enable_coverage=no)
 
 ######################
 # Debug option
@@ -74,10 +74,18 @@ PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQU
 # Flags for coverage measurement
 ##################################
 
-if test "x$enable_debuggcov" != "xno"; then   	
-	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage -g -Wall"
+if test "x$enable_coverage" != "xno"; then   	
+	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage"
 	CONTEXTD_LIBS="$CONTEXTD_LIBS -lgcov"
+	#FIXME: preserve non -Wall/-g/-O flags from users CFLAGS
+	CFLAGS="-Wall -g -O0"
+	AC_CHECK_PROGS([HAVE_LCOV], [lcov],)
+	if test -z "$HAVE_LCOV"; then
+	  AC_MSG_ERROR([lcov is necessary for testing code coverage (http://ltp.sourceforge.net/coverage/lcov.php)])
+	fi
 fi
+
+AM_CONDITIONAL(HAVE_COVERAGE, test "x$enable_coverage" != "xno")
 
 ##################################
 # Flags for debugging
@@ -98,9 +106,14 @@ AC_SUBST(LOCATION_LIBS)
 AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
 
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([libcontextprovider/Makefile])
+AC_CONFIG_FILES([spec/Makefile])
+AC_CONFIG_FILES([tests/Makefile])
+AC_CONFIG_FILES([tests/unit_tests/Makefile])
 AC_CONFIG_FILES([doc/Makefile])
 AC_CONFIG_FILES([doc/reference/Makefile])
 AC_CONFIG_FILES([doc/reference/libcontextprovider/Makefile])
+AC_CONFIG_FILES([tools/Makefile])
 AC_CONFIG_FILES([contextprovider-1.0.pc])
 
 

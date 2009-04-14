@@ -28,7 +28,7 @@ GLib.MainLoop loop;
 
 void changed_handler(Subscriber s, HashTable<string, Value?> values, string[] undeterminable_keys)
 {
-	debug("changed");
+	//debug("changed");
 // Record that the signal was caught
 	++changed_count;
 
@@ -75,6 +75,49 @@ void test_subscribe()
 	assert(kc.number_of_subscribers("key.two") == 0);
 	assert(kc.number_of_subscribers("key.three") == 1);
 }
+
+void test_unsubscribe()
+{
+	// Clear results
+	changed_count = 0;
+
+	// Setup
+	Manager manager = new Manager();
+	Group group = new Group({"key.one", "key.two", "key.three"}, false, null);
+	manager.group_list.add(group);
+	KeyUsageCounter kc = new KeyUsageCounter();
+
+	Subscriber s = new Subscriber(manager, kc, 7);
+	s.Changed += changed_handler;
+
+	HashTable<string, Value?> ret_values;
+	string[] ret_undeterminable;
+
+	s.Subscribe({"key.three","key.one"}, out ret_values, out ret_undeterminable);
+
+	s.Unsubscribe({"key.three"});
+	assert (s.subscribed_keys.size() == 1 );
+	assert (kc.subscribed_keys.size() == 1 );
+	assert(kc.number_of_subscribers("key.one") == 1);
+	assert(kc.number_of_subscribers("key.two") == 0);
+	assert(kc.number_of_subscribers("key.three") == 0);
+
+	s.Unsubscribe({"key.one"});
+	assert (s.subscribed_keys.size() == 0 );
+	assert (kc.subscribed_keys.size() == 0 );
+	assert(kc.number_of_subscribers("key.one") == 0);
+	assert(kc.number_of_subscribers("key.two") == 0);
+	assert(kc.number_of_subscribers("key.three") == 0);
+
+
+	s.Unsubscribe({"key.three"});
+	assert (s.subscribed_keys.size() == 0 );
+	assert (kc.subscribed_keys.size() == 0 );
+	assert(kc.number_of_subscribers("key.one") == 0);
+	assert(kc.number_of_subscribers("key.two") == 0);
+	assert(kc.number_of_subscribers("key.three") == 0);
+}
+
 
 void test_subscribe_twice()
 {
@@ -371,6 +414,7 @@ public static void main (string[] args) {
 	Test.add_func ("/contextkit/subscriber/test_subscribe_twice", test_subscribe_twice);
 	Test.add_func ("/contextkit/subscriber/test_subscribe_invalid", test_subscribe_invalid);
 	Test.add_func ("/contextkit/subscriber/test_subscribe_return_values", test_subscribe_return_values);
+	Test.add_func ("/contextkit/subscriber/test_unsubscribe", test_unsubscribe);
 	Test.add_func ("/contextkit/subscriber/test_changing_value", test_changing_value);
 	Test.add_func ("/contextkit/subscriber/test_changing_to_undeterminable", test_changing_to_undeterminable);
 	Test.add_func ("/contextkit/subscriber/test_changing_to_determinable", test_changing_to_determinable);

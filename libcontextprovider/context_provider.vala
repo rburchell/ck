@@ -137,8 +137,7 @@ namespace ContextProvider {
 			debug ("Creating new Manager D-Bus service");
 
 			// Create the Manager object and register it over DBus.
-			manager = new Manager ();
-			manager.set_bus_type (bus_type);
+			manager = new Manager (bus_type);
 
 			debug ("Registering new Manager D-Bus service");
 			var connection = DBus.Bus.get (bus_type);
@@ -146,6 +145,7 @@ namespace ContextProvider {
 			connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 		} catch (DBus.Error e) {
 			debug ("Registration failed: %s", e.message);
+			manager = null;
 			return false;
 		}
 

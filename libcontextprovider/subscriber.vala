@@ -24,17 +24,17 @@ using Gee;
 
 namespace ContextProvider {
 
-	public class Subscriber : GLib.Object, DBusSubscriber {
+	internal class Subscriber : GLib.Object, DBusSubscriber {
 		Manager manager;
-		internal DBus.ObjectPath object_path {get; set;}
+		public DBus.ObjectPath object_path {get; set;}
 
 		// Keys subscribed to by this subscriber
-		StringSet subscribed_keys;
-		KeyUsageCounter key_counter;
+		public StringSet subscribed_keys {get; private set;}
+		public KeyUsageCounter key_counter {get; private set;}
 		HashTable<string, Value?> values_to_send;
 		bool idle_scheduled = false;
 
-		internal Subscriber (Manager manager, KeyUsageCounter key_counter, int id) {
+		public Subscriber (Manager manager, KeyUsageCounter key_counter, int id) {
 			string path = "/org/freedesktop/ContextKit/Subscribers/%d".printf (id);
 			this.object_path = new DBus.ObjectPath (path);
 			this.manager = manager;
@@ -52,7 +52,7 @@ namespace ContextProvider {
 		}
 
 		// Emit the Changed signal over DBus
-		internal bool emit_changed () {
+		public bool emit_changed () {
 			string[] unavail = {};
 
 			foreach (var i in values_to_send.get_keys()) {
@@ -64,6 +64,7 @@ namespace ContextProvider {
 
 			Changed (values_to_send, unavail);
 			values_to_send.remove_all();
+			idle_scheduled = false;
 			return false;
 		}
 
@@ -89,7 +90,7 @@ namespace ContextProvider {
 		}
 
 		/* Is called when the value of a property changes */
-		internal void on_value_changed(string key, Value? value) {
+		public void on_value_changed(string key, Value? value) {
 			if (subscribed_keys.is_member (key)) {
 				values_to_send.insert (key, value);
 				if (!idle_scheduled) {

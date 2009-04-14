@@ -52,13 +52,11 @@ void context_provider_intset_add (ContextProviderIntSet *set, guint element);
 gboolean context_provider_intset_remove (ContextProviderIntSet *set, guint element);
 gboolean context_provider_intset_is_member (const ContextProviderIntSet *set, guint element);
 
-gboolean context_provider_intset_is_subset (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
+gboolean context_provider_intset_is_subset_of (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
 gboolean context_provider_intset_is_disjoint (const ContextProviderIntSet *left, const ContextProviderIntSet *right);
 
 void context_provider_intset_foreach (const ContextProviderIntSet *set, ContextProviderIntFunc func,
     gpointer userdata);
-GArray *context_provider_intset_to_array (const ContextProviderIntSet *set);
-ContextProviderIntSet *context_provider_intset_from_array (const GArray *array);
 
 guint context_provider_intset_size (const ContextProviderIntSet *set);
 
@@ -120,21 +118,6 @@ context_provider_intset_iter_init (ContextProviderIntSetIter *iter, const Contex
 {
   g_return_if_fail (iter != NULL);
   iter->set = set;
-  iter->element = (guint)(-1);
-}
-
-/**
- * context_provider_intset_iter_init:
- * @iter: An integer set iterator to be reset.
- *
- * Reset the iterator @iter to the beginning. It must already be associated
- * with a set.
- */
-static inline void
-context_provider_intset_iter_reset (ContextProviderIntSetIter *iter)
-{
-  g_return_if_fail (iter != NULL);
-  g_return_if_fail (iter->set != NULL);
   iter->element = (guint)(-1);
 }
 

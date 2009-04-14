@@ -24,9 +24,9 @@ using Gee;
 
 namespace ContextProvider {
 
-	public class Manager : GLib.Object, DBusManager {
+	internal class Manager : GLib.Object, DBusManager {
 		// Mapping client dbus names into subscription objects
-		Gee.HashMap<string, Subscriber> subscribers;
+		public Gee.HashMap<string, Subscriber> subscribers {get; private set;}
 
 		public GroupList group_list {get; private set;}
 		public KeyUsageCounter key_counter {get; private set;}
@@ -35,12 +35,13 @@ namespace ContextProvider {
 		HashTable<string, Value?> values;
 		static dynamic DBus.Object bus; // Needs to be stored so that we get the NameOwnerChanged
 
+		// Session / system bus option
+		DBus.BusType busType;
+
 		int subscriber_count = 0;
 
-		// Session / system bus option
-		DBus.BusType busType = DBus.BusType.SESSION;
-
-		internal Manager() {
+		public Manager(DBus.BusType b = DBus.BusType.SESSION) throws DBus.Error {
+			busType = b;
 			/*TODO, should manager own the key counter? */
 			group_list = new GroupList();
 			key_counter = new KeyUsageCounter();
@@ -50,18 +51,15 @@ namespace ContextProvider {
 			
 			subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			values = new HashTable<string, Value?>(str_hash, str_equal);
-			// Note: Use session / system bus according to the configuration
-			// (which can be changed via set_bus_type).
+
+			// Start listening to the NameOwnerChanged signal (of the correct bus)
+			// to know when the clients exit.
 			var connection = DBus.Bus.get (busType);
 			bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 			bus.NameOwnerChanged += this.on_name_owner_changed;
 		}
 
-		internal void set_bus_type(DBus.BusType b) {
-			busType = b;
-		}
-
-		internal void get_internal (StringSet keyset, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
+		public void get_internal (StringSet keyset, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {
 			// Note: Vala doesn't support += for parameters yet; using a temp array
 			properties = new HashTable<string, Value?>(str_hash, str_equal);
 			string[] undeterminable_keys_temp = {};
@@ -116,7 +114,7 @@ namespace ContextProvider {
 		/*
 		Listen to subscribers exiting.
 		*/
-		private void on_name_owner_changed (DBus.Object sender, string name, string old_owner, string new_owner) {
+		public void on_name_owner_changed (DBus.Object? sender, string name, string old_owner, string new_owner) {
 			debug("Got a NameOwnerChanged signal");
 			debug(name);
 			debug(old_owner);
@@ -135,7 +133,7 @@ namespace ContextProvider {
 		/*
 		Checks which keys are valid and returns them.
 		*/
-		internal StringSet check_keys(string[] keys) {
+		public StringSet check_keys(string[] keys) {
 			// Do not create a StringSet from the parameter "keys" as that would be add Quarks
 			StringSet checked_keys = new StringSet();
 			foreach (var key in keys) {
@@ -149,7 +147,7 @@ namespace ContextProvider {
 		/* Is called when the group sets new values to context properties */
 		public void property_value_change(string key, Value? value) {
 			if (group_list.valid_keys.is_member (key) == false) {
-				critical ("Key %s is not valid", key);
+				warning ("Key %s is not valid", key);
 			}
 			// ignore unchanged keys
 			if (value_compare(values.lookup(key), value)) {

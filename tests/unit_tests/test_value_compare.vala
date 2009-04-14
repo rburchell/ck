@@ -78,6 +78,17 @@ void test_value_compare_string() {
 	assert(value_compare(v1,v2));
 }
 
+void test_value_compare_unknown() {
+	Value v1 = Value (typeof(uchar));
+	v1.set_uchar ('a');
+	Value v2 = Value (typeof(uchar));
+	v2.set_uchar ('b');
+	assert(!value_compare(v1,v2));
+
+	v2.set_uchar ('a');
+	assert(!value_compare(v1,v2));
+}
+
 
 
 void debug_null  (string? log_domain, LogLevelFlags log_level, string message)
@@ -97,6 +108,7 @@ public static void main (string[] args) {
 	Test.add_func("/contextkit/value_compare/bool", test_value_compare_bool);
 	Test.add_func("/contextkit/value_compare/double", test_value_compare_double);
 	Test.add_func("/contextkit/value_compare/string", test_value_compare_string);
+	Test.add_func("/contextkit/value_compare/unknown", test_value_compare_unknown);
 	Test.run ();
 }
 

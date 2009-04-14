@@ -23,7 +23,7 @@ using Gee;
 
 namespace ContextProvider {
 
-	public class GroupList {
+	internal class GroupList : GLib.Object {
 		// List of groups
 		Gee.ArrayList<Group> groups = new Gee.ArrayList<Group> ();
 
