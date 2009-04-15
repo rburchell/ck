@@ -35,7 +35,7 @@ test_intset_SOURCES = \
 	$(test_intset_VALASOURCES:.vala=.c)			\
 	$(NULL)
 
-test_intset.vala.stamp: $(top_srcdir)/libcontextprovider/contextprovider-internal.vapi   $(top_srcdir)/libcontextprovider/intset.vapi $(test_intset_VALASOURCES)
+test_intset.vala.stamp: $(top_srcdir)/libcontextprovider/contextprovider-internal.vapi  $(test_intset_VALASOURCES)
 	$(VALAC) $(VALA_OPTIONS) $^
 	touch $@
 

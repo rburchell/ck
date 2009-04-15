@@ -10,10 +10,7 @@ libcontextprovider_VALASOURCES = \
 	group.vala \
 	string_set.vala \
 	context_provider.vala \
-	$(NULL)
-
-libcontextprovider_VAPISOURCES = \
-	intset.vapi \
+	intset_binding.vala \
 	$(NULL)
 
 libcontextprovider_GENERATEDSOURCES_PRIV = \
@@ -40,7 +37,7 @@ libcontextproviderdir=$(includedir)/contextprovider
 
 libcontextprovider_HEADERS = $(libcontextprovider_GENERATEDSOURCES_PUB)
 
-libcontextprovider.vala.stamp contextprovider.vapi: $(libcontextprovider_VALASOURCES) $(libcontextprovider_VAPISOURCES)
+libcontextprovider.vala.stamp contextprovider.vapi: $(libcontextprovider_VALASOURCES)
 	$(VALAC) -C -g --basedir $(top_srcdir)/libcontextprovider --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation --library contextprovider --header context_provider.h --internal-header context_provider-internal.h --internal-vapi contextprovider-internal.vapi $^
 	touch libcontextprovider.vala.stamp
 
@@ -56,7 +53,6 @@ libcontextprovider_la_LIBADD = \
 EXTRA_DIST = \
 	$(libcontextprovider_GENERATEDSOURCES) \
 	$(libcontextprovider_VALASOURCES) \
-	$(libcontextprovider_VAPISOURCES) \
 	libcontextprovider.vala.stamp \
 	contextprovider.vapi \
 	contextprovider-internal.vapi \

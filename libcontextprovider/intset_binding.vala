@@ -4,50 +4,50 @@
 namespace ContextProvider {
 	[Compact]
 	[CCode (copy_function = "context_provider_intset_copy", free_function = "context_provider_intset_destroy", cheader_filename = "intset.h")]
-	public class IntSet {
+	internal extern class IntSet {
 		[CCode (cname = "context_provider_intset_new", has_construct_function = false)]
-		public IntSet ();
+		public extern IntSet ();
 		[CCode (cname = "context_provider_intset_sized_new")]
-		public IntSet.sized (uint size);
+		public extern IntSet.sized (uint size);
 		[CCode (cname = "context_provider_intset_intersection")]
-		public IntSet.intersection (IntSet left, IntSet right);
+		public extern IntSet.intersection (IntSet left, IntSet right);
 		[CCode (cname = "context_provider_intset_symmetric_difference")]
-		public IntSet.symmetric_difference (IntSet left, IntSet right);
+		public extern IntSet.symmetric_difference (IntSet left, IntSet right);
 		[CCode (cname = "context_provider_intset_difference")]
-		public IntSet.difference (IntSet left, IntSet right);
+		public extern IntSet.difference (IntSet left, IntSet right);
 		[CCode (cname = "context_provider_intset_union")]
-		public IntSet.union (IntSet left, IntSet right);
+		public extern IntSet.union (IntSet left, IntSet right);
 
 		[CCode (cname = "context_provider_intset_add")]
-		public void add (uint element);
+		public extern void add (uint element);
 		[CCode (cname = "context_provider_intset_clear")]
-		public void clear ();
+		public extern void clear ();
 		[CCode (cname = "context_provider_intset_dump")]
-		public weak string dump ();
+		public extern weak string dump ();
 		[CCode (cname = "context_provider_intset_foreach")]
-		public void @foreach (IntFunc func, void* userdata);
+		public extern void @foreach (IntFunc func, void* userdata);
 		[CCode (cname = "context_provider_intset_is_equal")]
-		public bool is_equal (IntSet right);
+		public extern bool is_equal (IntSet right);
 		[CCode (cname = "context_provider_intset_is_member")]
-		public bool is_member (uint element);
+		public extern bool is_member (uint element);
 		[CCode (cname = "context_provider_intset_is_subset_of")]
-		public bool is_subset_of (IntSet right);
+		public extern bool is_subset_of (IntSet right);
 		[CCode (cname = "context_provider_intset_is_disjoint")]
-		public bool is_disjoint (IntSet right);
+		public extern bool is_disjoint (IntSet right);
 		[CCode (cname = "context_provider_intset_remove")]
-		public bool remove (uint element);
+		public extern bool remove (uint element);
 		[CCode (cname = "context_provider_intset_size")]
-		public uint size ();
+		public extern uint size ();
 	}
 	[CCode (cheader_filename = "intset.h", is_value_type="1")]
-	public struct IntSetIter {
+	internal extern struct IntSetIter {
 		[CCode (cname = "context_provider_intset_iter_init")]
-		public IntSetIter (IntSet? set);
-		public weak IntSet? set;
-		public uint element;
+		public extern IntSetIter (IntSet? set);
+		public extern weak IntSet? set;
+		public extern uint element;
 		[CCode (cname = "context_provider_intset_iter_next")]
-		public bool next ();
+		public extern bool next ();
 	}
 	[CCode (cheader_filename = "intset.h")]
-	public static delegate void IntFunc (uint i, void* userdata);
+	internal extern static delegate void IntFunc (uint i, void* userdata);
 }

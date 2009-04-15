@@ -103,7 +103,9 @@ namespace ContextProvider {
 	 * @subscribe: TRUE if the group was subscribed to or FALSE if unsubscribed from
 	 * @user_data: the user data passed in #context_provider_install
 	 *
-	 * Type definition for a function that will be called back when a group is first subscribed to
+	 * Type definition for a function that will be called back when
+	 * the first key or keys in a group become subscribed or when
+	 * all the keys in the group have become unsubscribed.
 	 */
 	public delegate void SubscriptionChangedCallback(bool subscribe);
 
@@ -156,11 +158,12 @@ namespace ContextProvider {
 	/**
 	 * context_provider_install_group:
 	 * @key_group: a NULL-terminated array of context key names
-	 * @clear_values_on_subscribe: if TRUE then the keys in this group will be reset to null
-	 * 	when the group is first subscribed to after being unsubscribed from.
-	 * @subscription_changed_cb: a #ContextProviderSubscriptionChangedCallback to be called when a key is first subscribed to
+	 * @clear_values_on_subscribe: if TRUE then the keys in this group will
+	 * be reset to null when the group is first subscribed to after being
+	 * unsubscribed from.
+	 * @subscription_changed_cb: a #ContextProviderSubscriptionChangedCallback to be called when the subscription status changes on this group
 	 * @subscription_changed_cb_target: user data to pass to #subscription_changed_cb
-	 *
+	 * 
 	 */
 	public void install_group ([CCode (array_length = false, array_null_terminated = true)] string[] key_group, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
 		assert (manager != null);
@@ -171,9 +174,9 @@ namespace ContextProvider {
 	/**
 	 * context_provider_install_key:
 	 * @key: a context key name
-	 * @clear_values_on_subscribe: if TRUE then the keys in this group will be reset to null
-	 * 	when the group is first subscribed to after being unsubscribed from.
-	 * @subscription_changed_cb: a #ContextProviderSubscriptionChangedCallback to be called when a key is first subscribed to
+	 * @clear_values_on_subscribe: if TRUE then this key will be reset to null
+	 *	when first subscribed to after being unsubscribed from.
+	 * @subscription_changed_cb: a #ContextProviderSubscriptionChangedCallback to be called when the subscription status changes on this key
 	 * @subscription_changed_cb_target: user data to pass to #subscription_changed_cb
 	 *
 	 */

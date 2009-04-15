@@ -106,21 +106,6 @@ struct _ContextProviderIntSetIter
  */
 #define CONTEXT_PROVIDER_INTSET_ITER_INIT(set) { (set), (guint)(-1) }
 
-/**
- * context_provider_intset_iter_init:
- * @iter: An integer set iterator to be initialized.
- * @set: An integer set to be used by that iterator
- *
- * Reset the iterator @iter to the beginning and make it iterate over @set.
- */
-static inline void
-context_provider_intset_iter_init (ContextProviderIntSetIter *iter, const ContextProviderIntSet *set)
-{
-  g_return_if_fail (iter != NULL);
-  iter->set = set;
-  iter->element = (guint)(-1);
-}
-
 gboolean context_provider_intset_iter_next (ContextProviderIntSetIter *iter);
 
 G_END_DECLS
