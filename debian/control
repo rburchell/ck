@@ -17,17 +17,17 @@ Standards-Version: 3.8.0
 Package: contextkit
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: ContextKit daemon
+Description: A framework for collecting contextual information
  ContextKit is a system for providing real-time context awareness to
  applications.
  .
- This package provides the session-activated dbus daemon.
+ This package provides the session-activated D-Bus daemon.
 
 Package: contextkit-dbg
 Priority: extra
 Architecture: any
 Depends: contextkit (= ${binary:Version})
-Description: ContextKit daemon debug symbols
+Description: A framework for collecting contextual information
  ContextKit is a system for providing real-time context awareness to
  applications.
  .
@@ -37,7 +37,7 @@ Package: contextkit-doc
 Section: doc
 Architecture: all
 Provides: org-freedesktop-contextkit-doc
-Description: ContextKit daemon documentation
+Description: A framework for collecting contextual information
  ContextKit is a system for providing real-time context awareness to
  applications.
  .
