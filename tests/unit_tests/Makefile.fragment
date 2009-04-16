@@ -3,6 +3,10 @@ TEST_PROGS += \
 	tests/unit_tests/stringset				\
 	tests/unit_tests/value_compare				\
 	tests/unit_tests/group					\
+	tests/unit_tests/grouplist				\
+	tests/unit_tests/key_usage_counter				\
+	tests/unit_tests/subscriber				\
+	tests/unit_tests/manager				\
 	$(NULL)
 
 noinst_PROGRAMS = $(TEST_PROGS)
@@ -12,6 +16,10 @@ BUILT_SOURCES += \
 	tests/unit_tests/stringset.vala.stamp			\
 	tests/unit_tests/value_compare.vala.stamp		\
 	tests/unit_tests/group.vala.stamp		\
+	tests/unit_tests/grouplist.vala.stamp		\
+	tests/unit_tests/key_usage_counter.vala.stamp		\
+	tests/unit_tests/subscriber.vala.stamp		\
+	tests/unit_tests/manager.vala.stamp		\
 	$(NULL)
 
 tests_unit_tests_intset_VAPISOURCES = \
@@ -37,7 +45,7 @@ tests/unit_tests/intset.vala.stamp: $(tests_unit_tests_intset_VALASOURCES) $(tes
 	$(VALAC) -C --basedir $(top_srcdir) $^
 	touch $@
 
-tests_unit_tests_intset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_intset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_intset_LDADD = $(CONTEXTD_LIBS)
 
 tests_unit_tests_stringset_VAPISOURCES = \
@@ -64,7 +72,7 @@ tests/unit_tests/stringset.vala.stamp: $(tests_unit_tests_stringset_VALASOURCES)
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
 	touch $@
 
-tests_unit_tests_stringset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_stringset_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_stringset_LDADD = $(CONTEXTD_LIBS)
 
 
@@ -82,7 +90,7 @@ tests/unit_tests/value_compare.vala.stamp: $(tests_unit_tests_value_compare_VALA
 	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 $^
 	touch $@
 
-tests_unit_tests_value_compare_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_value_compare_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_value_compare_LDADD = $(CONTEXTD_LIBS)
 
 tests_unit_tests_group_VALASOURCES = \
@@ -99,10 +107,111 @@ tests/unit_tests/group.vala.stamp: contextprovider.vapi $(tests_unit_tests_group
 	touch $@
 
 
-tests_unit_tests_group_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS)
+tests_unit_tests_group_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
 tests_unit_tests_group_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
+tests_unit_tests_grouplist_VALASOURCES = \
+	tests/unit_tests/test_grouplist.vala			\
+	$(NULL)
 
+tests_unit_tests_grouplist_SOURCES = \
+	$(tests_unit_tests_grouplist_VALASOURCES:.vala=.c)		\
+	$(tests_unit_tests_grouplist_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests/unit_tests/grouplist.vala.stamp: contextprovider.vapi $(tests_unit_tests_grouplist_VALASOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+	touch $@
+
+
+tests_unit_tests_grouplist_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
+tests_unit_tests_grouplist_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
+
+tests_unit_tests_key_usage_counter_VALASOURCES = \
+	tests/unit_tests/test_key_usage_counter.vala			\
+	$(NULL)
+
+tests_unit_tests_key_usage_counter_SOURCES = \
+	$(tests_unit_tests_key_usage_counter_VALASOURCES:.vala=.c)		\
+	$(tests_unit_tests_key_usage_counter_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests/unit_tests/key_usage_counter.vala.stamp: contextprovider.vapi $(tests_unit_tests_key_usage_counter_VALASOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+	touch $@
+
+tests_unit_tests_key_usage_counter_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
+tests_unit_tests_key_usage_counter_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
+
+tests_unit_tests_subscriber_VAPISOURCES = \
+	libcontextprovider/intset.vapi				\
+	$(NULL)
+
+tests_unit_tests_subscriber_VALASOURCES = \
+	libcontextprovider/value_compare.vala				\
+	libcontextprovider/subscriber.vala				\
+	libcontextprovider/manager.vala				\
+	libcontextprovider/key_usage_counter.vala				\
+	libcontextprovider/string_set.vala				\
+	libcontextprovider/group.vala				\
+	libcontextprovider/grouplist.vala				\
+	libcontextprovider/dbus_interface.vala				\
+	libcontextprovider/context_provider.vala				\
+	tests/unit_tests/test_subscriber.vala			\
+	$(NULL)
+
+tests_unit_tests_subscriber_GENERATEDSOURCES = \
+	$(tests_unit_tests_subscriber_VALASOURCES:.vala=.c)		\
+	$(tests_unit_tests_subscriber_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests_unit_tests_subscriber_SOURCES = \
+	$(tests_unit_tests_subscriber_GENERATEDSOURCES)		\
+	libcontextprovider/intset.c					\
+	libcontextprovider/intset.h					\
+	$(NULL)
+
+tests/unit_tests/subscriber.vala.stamp: $(tests_unit_tests_subscriber_VALASOURCES) $(tests_unit_tests_subscriber_VAPISOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+	touch $@
+
+tests_unit_tests_subscriber_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
+tests_unit_tests_subscriber_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
+
+tests_unit_tests_manager_VAPISOURCES = \
+	libcontextprovider/intset.vapi				\
+	$(NULL)
+
+tests_unit_tests_manager_VALASOURCES = \
+	libcontextprovider/value_compare.vala				\
+	libcontextprovider/manager.vala				\
+	libcontextprovider/subscriber.vala				\
+	libcontextprovider/context_provider.vala				\
+	libcontextprovider/key_usage_counter.vala				\
+	libcontextprovider/string_set.vala				\
+	libcontextprovider/group.vala				\
+	libcontextprovider/grouplist.vala				\
+	libcontextprovider/dbus_interface.vala				\
+	tests/unit_tests/test_manager.vala			\
+	$(NULL)
+
+tests_unit_tests_manager_GENERATEDSOURCES = \
+	$(tests_unit_tests_manager_VALASOURCES:.vala=.c)		\
+	$(tests_unit_tests_manager_VALASOURCES:.vala=.h)		\
+	$(NULL)
+
+tests_unit_tests_manager_SOURCES = \
+	$(tests_unit_tests_manager_GENERATEDSOURCES)		\
+	libcontextprovider/intset.c					\
+	libcontextprovider/intset.h					\
+	$(NULL)
+
+tests/unit_tests/manager.vala.stamp: $(tests_unit_tests_manager_VALASOURCES) $(tests_unit_tests_manager_VAPISOURCES)
+	$(VALAC) -C --basedir $(top_srcdir) --vapidir=$(top_srcdir)/vapi --pkg gee-1.0 --pkg dbus-glib-1 $^
+	touch $@
+
+tests_unit_tests_manager_CFLAGS = -I$(top_srcdir)/libcontextprovider $(CONTEXTD_CFLAGS) -DG_LOG_DOMAIN=\"ContextKit\"
+tests_unit_tests_manager_LDADD = $(CONTEXTD_LIBS) $(top_builddir)/libcontextprovider.la
 
 EXTRA_DIST += \
 	$(tests_unit_tests_intset_VALASOURCES)				\
@@ -119,6 +228,20 @@ EXTRA_DIST += \
 	$(tests_unit_tests_group_VALASOURCES)			\
 	$(tests_unit_tests_group_SOURCES)		\
 	tests/unit_tests/group.vala.stamp			\
+	$(tests_unit_tests_grouplist_VALASOURCES)			\
+	$(tests_unit_tests_grouplist_SOURCES)		\
+	tests/unit_tests/grouplist.vala.stamp			\
+	$(tests_unit_tests_key_usage_counter_VALASOURCES)			\
+	$(tests_unit_tests_key_usage_counter_SOURCES)		\
+	tests/unit_tests/key_usage_counter.vala.stamp			\
+	$(tests_unit_tests_subscriber_VALASOURCES)			\
+	$(tests_unit_tests_subscriber_VAPISOURCES)			\
+	$(tests_unit_tests_subscriber_GENERATEDSOURCES)		\
+	tests/unit_tests/subscriber.vala.stamp			\
+	$(tests_unit_tests_manager_VALASOURCES)			\
+	$(tests_unit_tests_manager_VAPISOURCES)			\
+	$(tests_unit_tests_manager_GENERATEDSOURCES)		\
+	tests/unit_tests/manager.vala.stamp			\
 	$(NULL)
 
 DISTCLEANFILES += \
@@ -133,4 +256,12 @@ MAINTAINERCLEANFILES += \
 	tests/unit_tests/value_compare.vala.stamp			\
 	$(tests_unit_tests_group_SOURCES)			\
 	tests/unit_tests/group.vala.stamp			\
+	$(tests_unit_tests_grouplist_SOURCES)			\
+	tests/unit_tests/grouplist.vala.stamp			\
+	$(tests_unit_tests_key_usage_counter_SOURCES)			\
+	tests/unit_tests/key_usage_counter.vala.stamp			\
+	$(tests_unit_tests_subscriber_GENERATEDSOURCES)			\
+	tests/unit_tests/subscriber.vala.stamp			\
+	$(tests_unit_tests_manager_GENERATEDSOURCES)			\
+	tests/unit_tests/manager.vala.stamp			\
 	$(NULL)

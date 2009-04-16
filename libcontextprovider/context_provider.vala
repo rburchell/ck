@@ -24,8 +24,8 @@ using Gee;
 namespace ContextProvider {
 
 	// Records whether the context_init function has been called
-	internal bool initialised = false;
-	internal Manager? manager;
+	internal Manager? manager = null;
+
 	/**
 	 * context_provider_set_integer:
 	 * @key: name of key
@@ -34,10 +34,11 @@ namespace ContextProvider {
 	 * Set a key to have an integer value of #value
 	 */
 	public void set_integer (string key, int value) {
-		assert (initialised == true);
+		assert (manager != null);
 
 		Value v = Value (typeof(int));
 		v.set_int (value);
+		manager.property_value_change (key, v);
 	}
 
 	/**
@@ -48,10 +49,11 @@ namespace ContextProvider {
 	 * Set a key to have an floating point value of #value
 	 */
 	public void set_double (string key, double value) {
-		assert (initialised == true);
+		assert (manager != null);
 
 		Value v = Value (typeof(double));
 		v.set_double (value);
+		manager.property_value_change (key, v);
 	}
 
 	/**
@@ -62,10 +64,11 @@ namespace ContextProvider {
 	 * Set a key to have an boolean value of #val
 	 */
 	public void set_boolean (string key, bool value) {
-		assert (initialised == true);
+		assert (manager != null);
 
 		Value v = Value (typeof(bool));
 		v.set_boolean (value);
+		manager.property_value_change (key, v);
 	}
 
 	/**
@@ -76,10 +79,11 @@ namespace ContextProvider {
 	 * Set a key to have an boolean value of #val
 	 */
 	public void set_string (string key, string value) {
-		assert (initialised == true);
+		assert (manager != null);
 
 		Value v = Value (typeof(string));
 		v.set_string (value);
+		manager.property_value_change (key, v);
 	}
 
 	/**
@@ -89,8 +93,9 @@ namespace ContextProvider {
 	 * Marks #key as not having a determinable value.
 	 */
 	public void set_null (string key) {
-		assert (initialised == true);
+		assert (manager != null);
 
+		manager.property_value_change (key, null);
 	}
 
 	/**
@@ -98,7 +103,9 @@ namespace ContextProvider {
 	 * @subscribe: TRUE if the group was subscribed to or FALSE if unsubscribed from
 	 * @user_data: the user data passed in #context_provider_install
 	 *
-	 * Type definition for a function that will be called back when a group is first subscribed to
+	 * Type definition for a function that will be called back when
+	 * the first key or keys in a group become subscribed or when
+	 * all the keys in the group have become unsubscribed.
 	 */
 	public delegate void SubscriptionChangedCallback(bool subscribe);
 
@@ -117,9 +124,9 @@ namespace ContextProvider {
 	public bool init (DBus.BusType bus_type, string? bus_name) {
 
 		try {
+			var connection = DBus.Bus.get (bus_type);
+			dynamic DBus.Object bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 			if (bus_name != null) {
-				var connection = DBus.Bus.get (bus_type);
-				dynamic DBus.Object bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 				// try to register service in session bus
 				uint request_name_result = bus.RequestName (bus_name, (uint) 0);
 
@@ -131,49 +138,52 @@ namespace ContextProvider {
 
 			debug ("Creating new Manager D-Bus service");
 
-
-			Manager.set_bus_type (bus_type);
-
-			Manager manager = Manager.get_instance ();
+			// Create the Manager object and register it over DBus.
+			manager = new Manager (bus_type);
+			bus.NameOwnerChanged += manager.on_name_owner_changed;
 
 			debug ("Registering new Manager D-Bus service");
-			var connection = DBus.Bus.get (bus_type);
-
 			connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 		} catch (DBus.Error e) {
 			debug ("Registration failed: %s", e.message);
+			manager = null;
 			return false;
 		}
 
 
-		initialised = true;
 		return true;
 	}
 
 	/**
 	 * context_provider_install_group:
 	 * @key_group: a NULL-terminated array of context key names
-	 * @clear_values_on_subscribe: if TRUE then the keys in this group will be reset to null
-	 * 	when the group is first subscribed to after being unsubscribed from.
-	 * @subscription_changed_cb: a #ContextProviderSubscriptionChangedCallback to be called when a key is first subscribed to
+	 * @clear_values_on_subscribe: if TRUE then the keys in this group will
+	 * be reset to null when the group is first subscribed to after being
+	 * unsubscribed from.
+	 * @subscription_changed_cb: a #ContextProviderSubscriptionChangedCallback to be called when the subscription status changes on this group
 	 * @subscription_changed_cb_target: user data to pass to #subscription_changed_cb
-	 *
+	 * 
 	 */
 	public void install_group ([CCode (array_length = false, array_null_terminated = true)] string[] key_group, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
-		assert (initialised == true);
+		assert (manager != null);
+		Group g = new Group(key_group, clear_values_on_subscribe, subscription_changed_cb);
+		manager.group_list.add(g);
 	}
 
 	/**
 	 * context_provider_install_key:
 	 * @key: a context key name
-	 * @clear_values_on_subscribe: if TRUE then the keys in this group will be reset to null
-	 * 	when the group is first subscribed to after being unsubscribed from.
-	 * @subscription_changed_cb: a #ContextProviderSubscriptionChangedCallback to be called when a key is first subscribed to
+	 * @clear_values_on_subscribe: if TRUE then this key will be reset to null
+	 *	when first subscribed to after being unsubscribed from.
+	 * @subscription_changed_cb: a #ContextProviderSubscriptionChangedCallback to be called when the subscription status changes on this key
 	 * @subscription_changed_cb_target: user data to pass to #subscription_changed_cb
 	 *
 	 */
 	public void install_key(string key, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
-		assert (initialised == true);
+		assert (manager != null);
+		string[] key_group = {key};
+		Group g = new Group(key_group, clear_values_on_subscribe, subscription_changed_cb);
+		manager.group_list.add(g);
 	}
 
 

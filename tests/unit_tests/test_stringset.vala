@@ -66,6 +66,8 @@ void test_stringset_remove () {
 	assert (!stringset.is_member ("C"));
 	assert (!stringset.is_member ("D"));
 	assert (!stringset.is_member ("E"));
+	//test removal of something we don't know about
+	stringset.remove("badger");
 }
 
 void test_stringset_clear () {

@@ -1,0 +1,124 @@
+A high-level type system for the Free Desktops
+==============================================
+
+Desktop environments are not just for starting applications anymore.
+Data is flowing freely between well-integrated components, and the
+easier data flows, the better the integration of the components.
+
+Not all components are written in the same programming language, of
+course, and when letting data flow between, it needs to be represented
+in many different ways.  For example, GConf stores values differently
+than they travel over D-Bus, which is different again from how they
+are passed as GValues to signal handlers, which is different from how
+Perl wants to store it.
+
+The desktop environment is heading towards a cooperative, dynamic
+environment, and it needs a rich and strong type system to tie its
+components together.  Sending lines of text over pipes and matching
+them against ad-hoc regular expressions just doesn't cut it.
+
+In an attempt to define such a common type system, this document
+collects many different systems for representing values, and unifies
+them by mapping the common dynamic type system into them.
+
+The common type system defined here is rich enough to represent any
+reasonable value; it's roughly equivalent to what dynamic languages
+like Perl and Python have.
+
+But it goes one step further: it allows the definition of new
+abstract, intentional types.  Intentional types give additional
+information about a value that is not available from the
+representation alone.
+
+For example, a integer can be used to denote a point in time by saying
+that it is the number of seconds since a certain epoch.  All places
+that interact with such a value need to agree on this intention.
+
+This agreement can happen informally, via documentation or just plain
+common sense.  Nothing wrong with that.  It is, however, also helpful
+to formalize this so that documentation can be precise without much
+extra effort, up to a level where the machine itself is able to check
+whether everybody agrees on the intentional types.
+
+The age old conflict between static and dynamic types also matters
+here: how much type information should be associated with the values
+themselves?  The boundary is exactly between intentional and
+representational types.  Intentional types are those that only the
+programmer or compiler know about, representational types are those
+that are only known at run-time.
+
+In a completely statically typed language, we only have raw bytes at
+run-time without any representational type information.  All parts of
+the program need to agree that the intention is for those four bytes
+over there to be used as a 32-bit integer.  Statically typed programs
+are littered with declarations of intentional types, and language
+processors use them to (more or less) check program consistency and to
+select the right division instruction based on whether the four bytes
+over there are intended to be a signed number or an unsigned one.
+
+In a dynamically typed language, values carry a lot of
+representational type information.  Code can easily be polymorphic and
+do different things depending on whether a value is an integer or a
+string.  It can also defer consistency checks to the run-time, which
+is more robust than doing it at compile time, but doesn't go as far
+since intentional types are not available.  Dynamic languages often
+don't have any means to declare intentional types for the benefit of
+the compiler; they only exist in the head of the programmer who
+expresses them by selecting the right operation manually.  (For
+example, if a string is intended to be a URL, you need to use
+'utils.net.web.url.get_scheme (url)' explicitly.  If the intentional
+type could have been declared in the language, it could have selected
+the right function automatically from just 'url.scheme'.)
+
+Thus, and coming back to the ground now, we define a concrete type
+system here with a rich representational part and a lightweight and
+flexible intentional part.
+
+For the representational part, we define how it is implemented for a
+number of existing value systems.  For the intentional part, we define
+how it can be translated into a number of languages that support
+static type declarations.
+
+We also give a list of common intentional types.
+
+This document then has three dimensions of extensibility:
+
+- A new value system can be added by defining how the representational
+  part of the common type system maps to it.
+
+- A new static language can be added by defining how intentional types
+  are implemented in it, and by implementing all common intentional
+  types.
+
+- A new common intentional type can be added by defining it and
+  implementing it in all supported static languages.
+
+The representational part of the common type system is not supposed to
+be change routinely.
+
+
+Representational types
+----------------------
+
+For QVariant, D-Bus messages, GValue, GConfValue, GVariant, Python,
+Perl, JavaScript, Java, C#, GKeyFile, XML, JSON, YAML, C, C++, Vala,
+Nepomuk ontologies, SQL, SparQL.
+
+Intentional types are used to disambiguate if needed.  I.e., different
+values can be mapped to a common representation, as long as the
+intentional types can disambiguate.  Hmm, does that mean intentional
+types are non-optional?
+
+Intentional types
+-----------------
+
+The "intentional type" type is an intentional type itself, it is not
+representational.  (It's permissive values are all strings that are
+the name of an intentional type).
+
+Intentional types can not be deduced from values, they must come from
+somewhere else.
+
+A name, a description of the permissible representational values, and
+documentation, plus implementation in C, C++, Java, C#, Vala.  The
+description of permissible values gives guidance 

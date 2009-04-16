@@ -23,7 +23,7 @@ using Gee;
 
 namespace ContextProvider {
 
-	public class GroupList {
+	internal class GroupList : GLib.Object {
 		// List of groups
 		Gee.ArrayList<Group> groups = new Gee.ArrayList<Group> ();
 
@@ -34,13 +34,13 @@ namespace ContextProvider {
 			valid_keys = new StringSet();
 		}
 
-		public void register (Group group) {
+		public void add (Group group) {
 			//debug ("New group registered: %s (%p)", group.keys.debug(), group);
 			groups.add (group);
 			valid_keys = new StringSet.union (valid_keys, group.keys);
 		}
 
-		public void unregister (Group group) {
+		public void remove (Group group) {
 			//debug ("Group unregistered: %s (%p)", group.keys.debug(), group);
 			groups.remove (group);
 			StringSet s = new StringSet();
@@ -54,19 +54,19 @@ namespace ContextProvider {
 			valid_keys = s;
 		}
 
-		public void first_subscribed(StringSet keys) {
+		public void first_subscribed(KeyUsageCounter? k, StringSet keys) {
 			foreach (var group in groups) {
 				StringSet intersection = new StringSet.intersection (keys, group.keys);
-				if (intersection.size() > 0 && !group.subscribed) {
+				if (intersection.size() > 0) {
 					group.subscribe(true);
 				}
 			}
 		}
 
-		public void last_unsubscribed(StringSet keys_unsubscribed, StringSet keys_remaining) {
+		public void last_unsubscribed(KeyUsageCounter? k, StringSet keys_unsubscribed, StringSet keys_remaining) {
 			foreach (var group in groups) {
-				StringSet intersection = new StringSet.intersection (keys_unsubscribed, group.keys);
-				if (intersection.size() > 0 ) {
+				StringSet group_remaining = new StringSet.intersection (keys_remaining, group.keys);
+				if (group_remaining.size() == 0) {
 					group.subscribe (false);
 				}
 			}

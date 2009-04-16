@@ -24,7 +24,7 @@ using ContextProvider;
 
 void test_group_keys() {
 	string[] keys = {"a","b","c"};
-	Group g = new Group(keys, null);
+	Group g = new Group(keys, false, null);
 	StringSet keyset = new StringSet.from_array(keys);
 	assert (keyset.is_equal(g.keys));
 }
@@ -32,13 +32,16 @@ void test_group_keys() {
 
 void test_group_null_subscribe() {
 	string[] keys = {"a","b","c"};
-	Group g = new Group(keys, null);
+	Group g = new Group(keys, false, null);
 	g.subscribe(true);
 	g.subscribe(false);
 }
 
 class Tester {
 	public int subscribe_count = 0;
+	public bool clear_signal_emitted = false;
+	public StringSet? cleared_keys = null;
+
 	public void callback (bool subscribe) {
 		if (subscribe) {
 			subscribe_count++;
@@ -46,12 +49,16 @@ class Tester {
 			subscribe_count--;
 		}
 	}
+	public void clear_signal (Group g, StringSet keys) {
+		cleared_keys = keys;
+		clear_signal_emitted = true;
+	}
 }
 
 void test_group_subscribe() {
 	string[] keys = {"a","b","c"};
 	Tester t = new Tester();
-	Group g = new Group(keys, t.callback);
+	Group g = new Group(keys, false, t.callback);
 	g.subscribe(true);
 	assert (t.subscribe_count == 1);
 	g.subscribe(true);
@@ -62,11 +69,33 @@ void test_group_subscribe() {
 	assert (t.subscribe_count == 0);
 }
 
+void test_group_clear_signal() {
+	string[] keys = {"a","b","c"};
+	Tester t = new Tester();
+	Group g = new Group(keys, true, t.callback);
+	StringSet check_keys  = new StringSet.from_array(keys);
+
+	g.clear_values += t.clear_signal;
+
+	g.subscribe(true);
+	assert (t.clear_signal_emitted);
+	assert (t.cleared_keys.is_equal(check_keys));
+	t.clear_signal_emitted = false;
+	g.subscribe(true);
+	assert (!t.clear_signal_emitted);
+	g.subscribe(false);
+	assert (!t.clear_signal_emitted);
+	g.subscribe(false);
+	assert (!t.clear_signal_emitted);
+}
+
+
 public static void main (string[] args) {
-       Test.init (ref args);
-       Test.add_func("/contextkit/group/keys", test_group_keys);
-       Test.add_func("/contextkit/group/null_subscribe", test_group_null_subscribe);
-       Test.add_func("/contextkit/group/subscribe", test_group_subscribe);
-       Test.run ();
+	Test.init (ref args);
+	Test.add_func("/contextkit/group/keys", test_group_keys);
+	Test.add_func("/contextkit/group/null_subscribe", test_group_null_subscribe);
+	Test.add_func("/contextkit/group/subscribe", test_group_subscribe);
+	Test.add_func("/contextkit/group/clear_signal", test_group_clear_signal);
+	Test.run ();
 }
 

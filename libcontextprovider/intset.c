@@ -226,7 +226,7 @@ context_provider_intset_is_subset_of (const ContextProviderIntSet *left, const C
   guint offset;
   gboolean ret = TRUE;
 
-  if (right->size > left->size) {
+  if (left->size > right->size) {
     return FALSE;
   } else {
     for (offset = 0; offset < right->size; offset++) {
@@ -289,75 +289,6 @@ context_provider_intset_foreach (const ContextProviderIntSet *set, ContextProvid
           }
     }
 }
-
-
-static void
-addint (guint i, gpointer data)
-{
-  GArray *array = (GArray *) data;
-  g_array_append_val (array, i);
-}
-
-/**
- * context_provider_intset_to_array:
- * @set: set to convert
- *
- * <!--Returns: says it all-->
- *
- * Returns: a GArray of guint (which must be freed by the caller) containing
- * the same integers as @set.
- */
-GArray *
-context_provider_intset_to_array (const ContextProviderIntSet *set)
-{
-  GArray *array;
-
-  g_return_val_if_fail (set != NULL, NULL);
-
-  array = g_array_new (FALSE, TRUE, sizeof (guint));
-
-  context_provider_intset_foreach (set, addint, array);
-
-  return array;
-}
-
-
-/**
- * context_provider_intset_from_array:
- * @array: An array of guint
- *
- * <!--Returns: says it all-->
- *
- * Returns: A set containing the same integers as @array.
- */
-
-ContextProviderIntSet *
-context_provider_intset_from_array (const GArray *array)
-{
-  ContextProviderIntSet *set;
-  guint max, i;
-
-  g_return_val_if_fail (array != NULL, NULL);
-
-  /* look at the 1st, last and middle values in the array to get an
-   * approximation of the largest */
-  max = 0;
-  if (array->len > 0)
-    max = g_array_index (array, guint, 0);
-  if (array->len > 1)
-    max = MAX (max, g_array_index (array, guint, array->len - 1));
-  if (array->len > 2)
-    max = MAX (max, g_array_index (array, guint, (array->len - 1) >> 1));
-  set = _context_provider_intset_new_with_size (1 + (max >> 5));
-
-  for (i = 0; i < array->len; i++)
-    {
-      context_provider_intset_add (set, g_array_index (array, guint, i));
-    }
-
-  return set;
-}
-
 
 /**
  * context_provider_intset_size:
@@ -648,6 +579,22 @@ context_provider_intset_dump (const ContextProviderIntSet *set)
   context_provider_intset_foreach (set, _dump_foreach, tmp);
   return g_string_free (tmp, FALSE);
 }
+
+/**
+ * context_provider_intset_iter_init:
+ * @iter: An integer set iterator to be initialized.
+ * @set: An integer set to be used by that iterator
+ *
+ * Reset the iterator @iter to the beginning and make it iterate over @set.
+ */
+inline void
+context_provider_intset_iter_init (ContextProviderIntSetIter *iter, const ContextProviderIntSet *set)
+{
+  g_return_if_fail (iter != NULL);
+  iter->set = set;
+  iter->element = (guint)(-1);
+}
+
 
 /**
  * context_provider_intset_iter_next:
