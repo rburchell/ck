@@ -54,9 +54,6 @@ namespace ContextProvider {
 
 			// Start listening to the NameOwnerChanged signal (of the correct bus)
 			// to know when the clients exit.
-			var connection = DBus.Bus.get (busType);
-			bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
-			bus.NameOwnerChanged += this.on_name_owner_changed;
 		}
 
 		public void get_internal (StringSet keyset, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {

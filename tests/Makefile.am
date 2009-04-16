@@ -1,1 +1,1 @@
-SUBDIRS = unit_tests
+SUBDIRS = unit_tests python-test-library
