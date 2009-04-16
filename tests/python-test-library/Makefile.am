@@ -21,8 +21,6 @@ check-dbus:
 		sh testfw/with-session-bus.sh \
 				--sleep=$$sleep \
 				--config-file=testfw/tmp-session-bus.conf \
-				--sleep=$$sleep \
-				--config-file=testfw/tmp-session-bus.conf \
 				-- $(MAKE) check-TESTS \
 				TESTS="$(DBUS_TESTS)" \
 				TESTS_ENVIRONMENT="CONTEXT_EXAMPLE_SYSFS_LOCATION=$$TMPSYSFS $(TESTS_ENVIRONMENT) $(TEST_PYTHON)"; \
