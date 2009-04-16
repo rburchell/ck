@@ -18,7 +18,7 @@ check-dbus:
 		export CONTEXT_EXAMPLE_SYSFS_LOCATION; \
 		sleep=$(CHECK_DBUS_SLEEP); \
 		echo "CONTEXT_EXAMPLE_SYSFS_LOCATION: $$CONTEXT_EXAMPLE_SYSFS_LOCATION"; \
-		sh $(srcdir)/testfw/with-session-bus.sh \
+		sh testfw/with-session-bus.sh \
 				--sleep=$$sleep \
 				--config-file=testfw/tmp-session-bus.conf \
 				--sleep=$$sleep \

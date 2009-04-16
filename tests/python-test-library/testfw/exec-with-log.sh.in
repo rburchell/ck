@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd "@abs_top_builddir@/tests/dbus/tools"
+cd "@abs_top_builddir@/tests/python-test-library/testfw"
 
 ulimit -c unlimited
 exec >> testing.log 2>&1
@@ -12,7 +12,7 @@ if test -n "$TEST_VALGRIND"; then
         WRAPPER="$WRAPPER --show-reachable=yes"
         WRAPPER="$WRAPPER --gen-suppressions=all"
         WRAPPER="$WRAPPER --child-silent-after-fork=yes"
-        WRAPPER="$WRAPPER --suppressions=@abs_top_srcdir@/tests/dbus/tools/glib.supp"
+        WRAPPER="$WRAPPER --suppressions=@abs_top_srcdir@/tests/python-test-library/testfw/glib.supp"
 fi
 
 export G_DEBUG=fatal-warnings" ${G_DEBUG}"
