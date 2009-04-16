@@ -27,7 +27,17 @@ import gobject
 class FakeProvider (dbus.service.Object):
 
     # Callback functions for libcontextd
-    def py_subscription_changed_cb (self, ss, d):
+    def py_subscription_changed_cb (self, subscribe, d):
+        print "I am Callback"
+        print "subscribe value: %d " %subscribe
+    
+        if subscribe:
+            cp.ContextProvider.set_string("test.log", "Subscribed")
+        else:
+            cp.ContextProvider.set_string("test.log", "Unsubscribed")
+            
+        
+    def py_dummy_cb (self, subscribe, d):
         pass
     
     # Initializing the provider object
@@ -55,16 +65,19 @@ class FakeProvider (dbus.service.Object):
 
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
-    def DoSubscribe(self):
-        print "Provider: Executing Subscription"
+    def DoInstall(self):
+        print "Provider: Executing Installation for a group"
         self.subscription_changed_cb = cp.ContextProvider.SUBSCRIPTION_CHANGED_CALLBACK(self.py_subscription_changed_cb)
+        self.dummy_cb = cp.ContextProvider.SUBSCRIPTION_CHANGED_CALLBACK(self.py_dummy_cb)
+        
         p = cp.ContextProvider.install_group(["test.double", "test.int", "test.bool",
                                  "test.string"], 1, self.subscription_changed_cb, None)
+        p_other = cp.ContextProvider.install_group(["test.log"], 1, self.dummy_cb, None)
     
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
-    def DoSubscribeKey(self):
-        print "Provider: Executing Subscription"
+    def DoInstallKey(self):
+        print "Provider: Executing Installation for key"
         self.subscription_changed_cb = cp.ContextProvider.SUBSCRIPTION_CHANGED_CALLBACK(self.py_subscription_changed_cb)
         p = cp.ContextProvider.install_key("test.single.int", 1, self.subscription_changed_cb, None)
             
