@@ -1,1 +1,18 @@
-This is a prototype for a service that provide contextual awareness to other applications.
+This is ContextKit, a framework for collecting contextual
+information from the bowels of the system, cleaning them up
+and offering them through a simple API.
+
+The ContextKit consists of:
+
+- libcontextprovider, a convenience library to export 
+  contextual properties to the rest of the system.
+
+- user documentation including a list of standard context properties
+
+In the future, the following components will be added:
+
+- contextd, daemon for combining and refining contextual information
+
+- libcontextsubscriber, a library implementing 
+  the simple API for accessing the contextual information.
+
