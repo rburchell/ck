@@ -1,35 +1,6 @@
-exec-with-log.sh: exec-with-log.sh.in
-	sed -e "s|[@]abs_top_builddir[@]|@abs_top_builddir@|g" \
-		-e "s|[@]abs_top_srcdir[@]|@abs_top_srcdir@|g" $< > $@
-	chmod +x $@
-
-%.conf: %.conf.in
-	sed -e "s|[@]abs_top_builddir[@]|@abs_top_builddir@|g"  \
-	    -e "s|[@]abs_top_srcdir[@]|@abs_top_srcdir@|g" $< > $@
-
-# We don't use the full filename for the .in because > 99 character filenames
-# in tarballs are non-portable (and automake 1.8 doesn't let us build
-# non-archaic tarballs)
-com.nokia.ContextProviderExample.service: example.service.in
-	sed -e "s|[@]abs_top_builddir[@]|@abs_top_builddir@|g" $< > $@
-
-# D-Bus service file for testing
-service_in_files = example.service.in
-service_files = com.nokia.ContextProviderExample.service
-
-# D-Bus config file for testing
-conf_in_files = tmp-session-bus.conf.in tmp-system-bus.conf.in
-conf_files = $(conf_in_files:.conf.in=.conf)
-
-BUILT_SOURCES = $(service_files) $(conf_files) exec-with-log.sh
+NULL =
 
 EXTRA_DIST = \
-	$(service_in_files) \
-	$(conf_in_files) \
-	exec-with-log.sh.in \
-	with-session-bus.sh \
-	with-system-bus.sh
-
-CLEANFILES = \
-    $(BUILT_SOURCES) \
-    testing.log
+	git-make-dist \
+	autogen-helpers.sh \
+	$(NULL)
