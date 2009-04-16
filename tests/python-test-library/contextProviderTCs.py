@@ -117,7 +117,7 @@ def testInexistentProperty(q,bus):
     assert(not ('test.inexistent' in vals))
     assert(len(unavail) == 1)
     assert('test.bool' in unavail)
-    propertiesToSend = {"test.bool" : True}
+    propertiesToSend = {"test.bool" : True, "test.inexistent" : 1}
     undeterminedToSend = []
     provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
     q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', args = [{u'test.bool': True}, []]) 
