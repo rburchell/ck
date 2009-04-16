@@ -98,7 +98,56 @@ def test(q,bus):
     undeterminedToSend = []
     provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
     q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', args = [{u'test.int': 1}, []])
+
+def testUndeterminable(q,bus):
+    manager = get_manager(bus, busname)
+    subscriber_path = manager.GetSubscriber()
+    assert (subscriber_path != "")
+    subscriber = get_subscriber(bus, busname, subscriber_path)
+    vals,unavail = subscriber.Subscribe(['test.int','test.double'])
+    assert(len(unavail) == 1)
+    propertiesToSend = {"test.int" : -8}
+    undeterminedToSend = []
+    provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
+    q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', args = [{u'test.int': -8}, [u'test.double']])
+
+def testUnsubscribe(q,bus):
+    manager = get_manager(bus, busname)
+    subscriber_path = manager.GetSubscriber()
+    assert (subscriber_path != "")
+    subscriber = get_subscriber(bus, busname, subscriber_path)
+    vals,unavail = subscriber.Subscribe(['test.double'])
+    assert(len(unavail) == 1)
+    propertiesToSend = {"test.double" : 8.0}
+    undeterminedToSend = []
+    provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
+    q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', args = [{u'test.double': 8.0}, []]) 
+    provider_iface.Unsubscribe(['test.double'])
+    q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', args = [{}, [u'test.double']])
+
+def testInexistantProperty(q,bus):
+    manager = get_manager(bus, busname)
+    subscriber_path = manager.GetSubscriber()
+    assert (subscriber_path != "")
+    subscriber = get_subscriber(bus, busname, subscriber_path)
+    vals,unavail = subscriber.Subscribe(['test.inexistant','test.bool'])
+    assert(len(unavail) == 1)
+    propertiesToSend = {"test.bool" : True}
+    undeterminedToSend = []
+    provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
+    q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', args = [{u'test.bool': True}, []]) 
+    
+def testTypes(q,bus):
+    manager = get_manager(bus, busname)
+    subscriber_path = manager.GetSubscriber()
+    assert (subscriber_path != "")
+    subscriber = get_subscriber(bus, busname, subscriber_path)
+    vals,unavail = subscriber.Subscribe(['test.int','test.double','test.string'])
+    propertiesToSend = {"test.int" : -8, "test.double" : 0.2, "test.string" : "foo"}
+    undeterminedToSend = []
+    provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
+    q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', args = [{u'test.int': -8, u'test.double': 0.2 ,u'test.string': "foo"}, [u'test.bool']])
  
 if __name__ == '__main__':
     startUp()
-    exec_test(test)
+    exec_tests([test,testTypes])

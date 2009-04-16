@@ -115,3 +115,4 @@ tests/unit_tests/test_stringset.[ch]
 tests/unit_tests/test_value_compare
 tests/unit_tests/test_value_compare.vala.stamp
 tests/unit_tests/test_value_compare.[ch]
+.project
