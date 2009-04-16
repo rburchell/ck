@@ -59,6 +59,7 @@ def setUp():
     sleep(0.5)
 
 def testInstallGroup(q,bus):
+    print "testInstallGroup"
     provider_iface.DoInstall()
     manager = get_manager(bus, busname)
     subscriber_path = manager.GetSubscriber()
@@ -74,6 +75,7 @@ def testInstallGroup(q,bus):
     q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', args = [{u'test.int': 1}, []])
 
 def testUndeterminable(q,bus):
+    print "testUndeterminable"
     manager = get_manager(bus, busname)
     subscriber_path = manager.GetSubscriber()
     assert (subscriber_path != "")
@@ -138,6 +140,7 @@ def testTypes(q,bus):
     provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
     q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', 
              args = [{u'test.int': -8, u'test.double': 0.2 ,u'test.string': "foo", u'test.bool': False}, []])
+    subscriber.Unsubscribe(['test.int','test.double','test.string','test.bool'])
 
 def testCallback(q,bus):
     print "testCallback"
@@ -147,30 +150,30 @@ def testCallback(q,bus):
     subscriber = get_subscriber(bus, busname, subscriber_path)
     vals,unavail = subscriber.Subscribe(['test.log','test.string'])
     assert(vals['test.log']=="Subscribed")
-    #subscriber.Unsubscribe(['test.string'])
-    #q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', 
-    #         args = [{u'test.log': "1"}, []])
+    subscriber.Unsubscribe(['test.string'])
+    q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', 
+             args = [{u'test.log': "Unsubscribed"}, []])
     
 
-#def testInstallKey(q,bus):
-#    provider_iface.DoInstallKey()
-#    manager = get_manager(bus, busname)
-#    subscriber_path = manager.GetSubscriber()
-#    assert (subscriber_path != "")
-#    subscriber = get_subscriber(bus, busname, subscriber_path)
-#    vals,unavail = subscriber.Subscribe(['test.single.int'])
-#    assert(len(vals.keys()) == 0)
-#    assert(len(unavail) == 1)
-#    assert(unavail[0] == 'test.single.int')
-#    propertiesToSend = {"test.single.int" : 1}
-#    undeterminedToSend = []
-#    provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
-#    q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', args = [{u'test.single.int': 1}, []])
+def testInstallKey(q,bus):
+    provider_iface.DoInstallKey()
+    manager = get_manager(bus, busname)
+    subscriber_path = manager.GetSubscriber()
+    assert (subscriber_path != "")
+    subscriber = get_subscriber(bus, busname, subscriber_path)
+    vals,unavail = subscriber.Subscribe(['test.single.int'])
+    assert(len(vals.keys()) == 0)
+    assert(len(unavail) == 1)
+    assert(unavail[0] == 'test.single.int')
+    propertiesToSend = {"test.single.int" : 1}
+    undeterminedToSend = []
+    provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
+    q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber',
+              args = [{u'test.single.int': 1}, []])
 
  
 if __name__ == '__main__':
     setUp()
-#    exec_tests([testInstallGroup,testUndeterminable,testUnsubscribe,testInexistentProperty, 
-#                testTypes,testCallback,testInstallKey])
     exec_tests([testInstallGroup,testUndeterminable,testInexistentProperty,testUnsubscribe, 
-                testTypes,testCallback])
+                testTypes,testCallback,testInstallKey])
+    provider_iface.Exit()

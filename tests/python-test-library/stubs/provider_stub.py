@@ -28,15 +28,11 @@ class FakeProvider (dbus.service.Object):
 
     # Callback functions for libcontextd
     def py_subscription_changed_cb (self, subscribe, d):
-        print "I am Callback"
-        print "subscribe value: %d " %subscribe
-    
         if subscribe:
             cp.ContextProvider.set_string("test.log", "Subscribed")
         else:
             cp.ContextProvider.set_string("test.log", "Unsubscribed")
-            
-        
+                    
     def py_dummy_cb (self, subscribe, d):
         pass
     
