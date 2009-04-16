@@ -1,5 +1,7 @@
 DBUS_TESTS = contextProviderTCs.py
 
+TESTS =
+
 TESTS_ENVIRONMENT = \
         PYTHONPATH=@abs_top_srcdir@/tests/dbus:@abs_top_builddir@/tests/python-test-library
 
@@ -18,9 +20,9 @@ check-dbus:
         echo "CONTEXT_EXAMPLE_SYSFS_LOCATION: $$CONTEXT_EXAMPLE_SYSFS_LOCATION"; \
         sh $(srcdir)/testfw/with-session-bus.sh \
                 --sleep=$$sleep \
-                --config-file=tools/tmp-session-bus.conf \
+                --config-file=testfw/tmp-session-bus.conf \
                 --sleep=$$sleep \
-                --config-file=tools/tmp-session-bus.conf \
+                --config-file=testfw/tmp-session-bus.conf \
                 -- $(MAKE) check-TESTS \
                 TESTS="$(DBUS_TESTS)" \
                 TESTS_ENVIRONMENT="CONTEXT_EXAMPLE_SYSFS_LOCATION=$$TMPSYSFS $(TESTS_ENVIRONMENT) $(TEST_PYTHON)"; \
