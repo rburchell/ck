@@ -76,8 +76,17 @@ flexible intentional part.
 
 For the representational part, we define how it is implemented for a
 number of existing value systems.  For the intentional part, we define
-how it can be translated into a number of languages that support
-static type declarations.
+how it can be translated into a number of languages, both those with
+static type declaration and those where intent is expressed by
+manually selecting the right operations.
+
+Intentional types are not optional; they are generally needed to make
+sense of values.  If a intentional type needs to be determined at
+run-time (in debugging tools, say), there must be some way to find it.
+This means that declaration languages like D-Bus introspection and
+GConf schemas need to be extended to support our intentional types.
+Thus, purely declarative languages like these are also included in our
+list of supported languages.
 
 We also give a list of common intentional types.
 
@@ -86,28 +95,146 @@ This document then has three dimensions of extensibility:
 - A new value system can be added by defining how the representational
   part of the common type system maps to it.
 
-- A new static language can be added by defining how intentional types
-  are implemented in it, and by implementing all common intentional
-  types.
+- A new language can be added by defining how intentional types are
+  implemented in it, and by implementing all common intentional types.
 
 - A new common intentional type can be added by defining it and
-  implementing it in all supported static languages.
+  implementing it in all languages.
 
 The representational part of the common type system is not supposed to
-be change routinely.
+change frequently, but adding a new intentional type should be
+considered routine.
+
+The representation part of the common type system is restricted by the
+lowest common denominator of all the value system implementations that
+we want to address.  We don't want to distort the existing value
+systems too much, and force people to write code that feels unnatural
+in that language.
+
+For example, not all value systems can directly represent complex
+numbers or multiple precision integers, but any grown up type system
+should include them.  We solve this conflict by relying on the
+intentional types: Instead of grafting complex numbers onto every
+value system, we define both a representational and intentional type
+for them.  Value systems that can represent complex numbers will do
+so, and for the rest we need to use the intentional types to recover
+the lost type information.
+
+Currently supported value systems: QVariant, D-Bus messages, GValue,
+GConfValue, GVariant, Python values, Perl values, JavaScript values,
+GKeyFile, XML, JSON, YAML, Nepomuk ontologies, SQL, SparQL.
+
+Currently supported languages: Python, Perl, JavaScript, Java, C#, C++
+with QVariant, C with D-Bus/GValue/GConfValue/GVariant, Vala, D-Bus
+introspection, D-Bus IDL (didl), GConf schema.
 
 
 Representational types
 ----------------------
 
-For QVariant, D-Bus messages, GValue, GConfValue, GVariant, Python,
-Perl, JavaScript, Java, C#, GKeyFile, XML, JSON, YAML, C, C++, Vala,
-Nepomuk ontologies, SQL, SparQL.
+- null
 
-Intentional types are used to disambiguate if needed.  I.e., different
-values can be mapped to a common representation, as long as the
-intentional types can disambiguate.  Hmm, does that mean intentional
-types are non-optional?
+  The null value
+
+  QVariant:   QVariant::Null
+  D-Bus:      '()'
+  GValue:     G_TYPE_NONE
+  GConf:      empty GCONF_VALUE_LIST with type GCONF_VALUE_BOOL
+  GVariant:   '()'
+
+- bool
+
+  A boolean
+
+  QVariant:   QVariant::Bool
+  D-Bus:      'b'
+  GValue:     G_TYPE_BOOLEAN
+  GConf:      GCONF_VALUE_BOOL
+  GVariant:   'b'
+
+- int32
+
+  Signed 32 bit integer
+
+  QVariant:   QVariant::Int
+  D-Bus:      'i'
+  GValue:     G_TYPE_INT
+  GConf:      GCONF_VALUE_INT
+  GVariant:   'i'
+
+- int64
+
+  Signed 64 bit integer
+
+  QVariant:   QVariant::LongLong
+  D-Bus:      'x'
+  GValue:     G_TYPE_INT64
+  GConf:      GCONF_VALUE_INT or GCONF_VALUE_DOUBLE
+  GVariant:   'x'
+
+- uint32
+
+  Unsigned 32 bit integer
+
+  QVariant:   QVariant::UInt
+  D-Bus:      'u'
+  GValue:     G_TYPE_UINT
+  GConf:      GCONF_VALUE_INT or GCONF_VALUE_DOUBLE
+  GVariant:   'u'
+
+- uint64
+
+  Unsigned 64 bit integer
+
+  QVariant:   QVariant::ULongLong
+  D-Bus:      't'
+  GValue:     G_TYPE_UINT64
+  GConf:      GCONF_VALUE_INT or GCONF_VALUE_DOUBLE
+  GVariant:   't'
+
+- double
+
+  Double precision floating point number
+
+  QVariant:   QVariant::Double
+  D-Bus:      'd'
+  GValue:     G_TYPE_DOUBLE 
+  GConf:      GCONF_VALUE_DOUBLE
+  GVariant:   'd'
+
+- string
+
+  String of Unicode code points
+
+  QVariant:   QVariant::QString
+  D-Bus:      's'
+  GValue:     G_TYPE_STRING
+  GConf:      GCONF_VALUE_STRING, UTF-8.
+  GVariant:   's'
+
+- sequence
+
+  Sequence of values
+
+  QVariant:   QVariant::List
+  D-Bus:      'av'
+  GValue:     G_TYPE_POINTER pointing to a GSList of GValues.
+              (XXX - find something better, must be somewhere.)
+  GConf:      GCONF_VALUE_LIST or chained GCONF_VALUE_PAIRs
+  GVariant:   'av'
+
+- map
+
+  Mapping from strings to values, with no duplicated keys.
+
+  QVariant:   QVariant::Map
+  D-Bus:      'a{sv}'
+  GValue:     G_TYPE_HASH_TABLE
+  GConf:      Chain of GCONF_VALUE_PAIRs,
+              with the cars being a pair of GCONF_VALUE_STRING and an
+              arbitrary value.
+  GVariant:   'a{sv}'
+
 
 Intentional types
 -----------------
@@ -121,4 +248,4 @@ somewhere else.
 
 A name, a description of the permissible representational values, and
 documentation, plus implementation in C, C++, Java, C#, Vala.  The
-description of permissible values gives guidance 
+description of permissible values gives guidance
