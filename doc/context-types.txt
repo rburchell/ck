@@ -3,14 +3,14 @@ A high-level type system for the Free Desktops
 
 Desktop environments are not just for starting applications anymore.
 Data is flowing freely between well-integrated components, and the
-easier data flows, the better the integration of the components.
+easier the data flows, the better the integration of the components.
 
 Not all components are written in the same programming language, of
-course, and when letting data flow between, it needs to be represented
-in many different ways.  For example, GConf stores values differently
-than they travel over D-Bus, which is different again from how they
-are passed as GValues to signal handlers, which is different from how
-Perl wants to store it.
+course, and when letting data flow between them, it needs to be
+represented in many different ways.  For example, GConf stores values
+differently than they travel over D-Bus, which is different again from
+how they are passed as GValues to signal handlers, which is different
+from how Perl wants to store it.
 
 The desktop environment is heading towards a cooperative, dynamic
 environment, and it needs a rich and strong type system to tie its
@@ -25,7 +25,7 @@ The common type system defined here is rich enough to represent any
 reasonable value; it's roughly equivalent to what dynamic languages
 like Perl and Python have.
 
-But it goes one step further: it allows the definition of new
+But it goes one crucial step further: it allows the definition of new
 abstract, intentional types.  Intentional types give additional
 information about a value that is not available from the
 representation alone.
@@ -40,8 +40,8 @@ to formalize this so that documentation can be precise without much
 extra effort, up to a level where the machine itself is able to check
 whether everybody agrees on the intentional types.
 
-The age old conflict between static and dynamic types also matters
-here: how much type information should be associated with the values
+The age old battle between static and dynamic types also matters here:
+how much type information should be associated with the values
 themselves?  The boundary is exactly between intentional and
 representational types.  Intentional types are those that only the
 programmer or compiler know about, representational types are those
@@ -59,16 +59,17 @@ over there are intended to be a signed number or an unsigned one.
 In a dynamically typed language, values carry a lot of
 representational type information.  Code can easily be polymorphic and
 do different things depending on whether a value is an integer or a
-string.  It can also defer consistency checks to the run-time, which
-is more robust than doing it at compile time, but doesn't go as far
-since intentional types are not available.  Dynamic languages often
-don't have any means to declare intentional types for the benefit of
-the compiler; they only exist in the head of the programmer who
-expresses them by selecting the right operation manually.  (For
-example, if a string is intended to be a URL, you need to use
-'utils.net.web.url.get_scheme (url)' explicitly.  If the intentional
-type could have been declared in the language, it could have selected
-the right function automatically from just 'url.scheme'.)
+string.  It can also perform consistency checks at run-time, which is
+more robust than doing it at compile time, but doesn't go as far since
+intentional types are not available.
+
+Dynamic languages often don't have any means to declare intentional
+types for the benefit of the compiler; they only exist in the head of
+the programmer who expresses them by selecting the right operation
+manually.  For example, if a string is intended to be a URL, you need
+to use 'utils.net.web.url.get_scheme (url)' explicitly.  If the
+intentional type could have been declared in the language, it could
+have selected the right function automatically from just 'url.scheme()'.
 
 Thus, and coming back to the ground now, we define a concrete type
 system here with a rich representational part and a lightweight and
@@ -77,18 +78,22 @@ flexible intentional part.
 For the representational part, we define how it is implemented for a
 number of existing value systems.  For the intentional part, we define
 how it can be translated into a number of languages, both those with
-static type declaration and those where intent is expressed by
+static type declaration and those where intent is mainly expressed by
 manually selecting the right operations.
 
 Intentional types are not optional; they are generally needed to make
-sense of values.  If a intentional type needs to be determined at
-run-time (in debugging tools, say), there must be some way to find it.
-This means that declaration languages like D-Bus introspection and
-GConf schemas need to be extended to support our intentional types.
-Thus, purely declarative languages like these are also included in our
-list of supported languages.
+sense of values.  A programmer learns about them by reading
+documentation; if a debugging tool needs to find out a intentional
+type at run-time, there must be some way to find it.
 
-We also give a list of common intentional types.
+This means that declaration languages like D-Bus introspection
+facilities and GConf schemas need to be extended to support our
+intentional types.  Thus, purely declarative languages like these are
+also included in our list of supported languages.
+
+[ Insert example here. ]
+
+We also give a list of common intentional types, of course.
 
 This document then has three dimensions of extensibility:
 
@@ -107,40 +112,51 @@ considered routine.
 
 The representation part of the common type system is restricted by the
 lowest common denominator of all the value system implementations that
-we want to address.  We don't want to distort the existing value
+we want to include.  We don't want to distort the existing value
 systems too much, and force people to write code that feels unnatural
-in that language.
+for them.
 
 For example, not all value systems can directly represent complex
 numbers or multiple precision integers, but any grown up type system
 should include them.  We solve this conflict by relying on the
 intentional types: Instead of grafting complex numbers onto every
-value system, we define both a representational and intentional type
-for them.  Value systems that can represent complex numbers will do
-so, and for the rest we need to use the intentional types to recover
-the lost type information.
+value system, we only define a intentional type for them.
 
 Currently supported value systems: QVariant, D-Bus messages, GValue,
 GConfValue, GVariant, Python values, Perl values, JavaScript values,
-GKeyFile, XML, JSON, YAML, Nepomuk ontologies, SQL, SparQL.
+GKeyFile, JSON, YAML, Nepomuk ontologies, SQL, SparQL.
 
 Currently supported languages: Python, Perl, JavaScript, Java, C#, C++
 with QVariant, C with D-Bus/GValue/GConfValue/GVariant, Vala, D-Bus
-introspection, D-Bus IDL (didl), GConf schema.
+introspection, D-Bus IDL (didl), GConf schema, our own XML schema.
 
 
 Representational types
 ----------------------
 
+Whenever there is a choice of representation in the following table,
+it should be taken to mean: Represent the value with the first
+alternative in the list that is possible, even if that loses
+precision.
+
+For example, a 64 bit signed integer is represented in GConf as a
+"int" if it fits, and as a "double" if not.  It will always fit into a
+double, but it might mean chopping off some low bits.
+
 - null
 
-  The null value
+  The null value.
+
+  [ Not sure about this at all.  Need to review existing D-Bus
+    bindings to Perl etc.]
 
   QVariant:   QVariant::Null
   D-Bus:      '()'
   GValue:     G_TYPE_NONE
   GConf:      empty GCONF_VALUE_LIST with type GCONF_VALUE_BOOL
   GVariant:   '()'
+  Perl:       undef
+  Python 2:   None
 
 - bool
 
@@ -151,6 +167,8 @@ Representational types
   GValue:     G_TYPE_BOOLEAN
   GConf:      GCONF_VALUE_BOOL
   GVariant:   'b'
+  Perl:       number, 0 or 1.
+  Python 2:   number, 0 or 1.
 
 - int32
 
@@ -161,6 +179,8 @@ Representational types
   GValue:     G_TYPE_INT
   GConf:      GCONF_VALUE_INT
   GVariant:   'i'
+  Perl:       number
+  Python 2:   int
 
 - int64
 
@@ -171,6 +191,8 @@ Representational types
   GValue:     G_TYPE_INT64
   GConf:      GCONF_VALUE_INT or GCONF_VALUE_DOUBLE
   GVariant:   'x'
+  Perl:       number
+  Python 2:   int or long
 
 - uint32
 
@@ -181,6 +203,8 @@ Representational types
   GValue:     G_TYPE_UINT
   GConf:      GCONF_VALUE_INT or GCONF_VALUE_DOUBLE
   GVariant:   'u'
+  Perl:       number
+  Python 2:   int or long
 
 - uint64
 
@@ -191,6 +215,8 @@ Representational types
   GValue:     G_TYPE_UINT64
   GConf:      GCONF_VALUE_INT or GCONF_VALUE_DOUBLE
   GVariant:   't'
+  Perl:       number
+  Python 2:   int or long
 
 - double
 
@@ -201,6 +227,8 @@ Representational types
   GValue:     G_TYPE_DOUBLE 
   GConf:      GCONF_VALUE_DOUBLE
   GVariant:   'd'
+  Perl:       number
+  Python 2:   double
 
 - string
 
@@ -211,6 +239,8 @@ Representational types
   GValue:     G_TYPE_STRING
   GConf:      GCONF_VALUE_STRING, UTF-8.
   GVariant:   's'
+  Perl:       string
+  Python 2:   unicode
 
 - sequence
 
@@ -222,6 +252,8 @@ Representational types
               (XXX - find something better, must be somewhere.)
   GConf:      GCONF_VALUE_LIST or chained GCONF_VALUE_PAIRs
   GVariant:   'av'
+  Perl:       array
+  Python 2:   list
 
 - map
 
@@ -229,11 +261,13 @@ Representational types
 
   QVariant:   QVariant::Map
   D-Bus:      'a{sv}'
-  GValue:     G_TYPE_HASH_TABLE
+  GValue:     G_TYPE_HASH_TABLE (?)
   GConf:      Chain of GCONF_VALUE_PAIRs,
               with the cars being a pair of GCONF_VALUE_STRING and an
               arbitrary value.
   GVariant:   'a{sv}'
+  Perl:       hash
+  Python:     dict
 
 
 Intentional types
