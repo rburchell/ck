@@ -435,6 +435,8 @@ Provided interfaces: libduivaluespace, context-providers
 
 Used interfaces: org.freedesktop.ContextKit, libcdb, libqt4-dbus, libqt4-xml, libqtcore4
 
+Sources: https://dvcs.projects.maemo.org/git/?p=DuiValueSpace
+
 .+contextkit+
 
 Languages: C, Vala
@@ -444,6 +446,8 @@ License: LGPL 2.1
 Provided interfaces: org.freedesktop.ContextKit, libcontextprovider, context-properties
 
 Used interfaces: libdbus, libgee, libglib
+
+Sources: https://dvcs.projects.maemo.org/git/?p=ContextKit
 
 .+context-commander+
 
@@ -455,6 +459,8 @@ Provided interfaces: org.freedesktop.ContextKit
 
 Used interfaces: libduivaluespace, libqt4-dbus, libqt4-gui, libqt4-core
 
+Sources: https://dvcs.projects.maemo.org/git/?p=ContextCommander
+
 .+context-provider-example+
 
 Languages: C
@@ -465,6 +471,8 @@ Provided interfaces: Context.Example.* properties.
 
 Used interfaces: libcontextprovider, sysfs files for accelerometer and ambient light sensor
 
+Sources: https://dvcs.projects.maemo.org/git/?p=ContextProviderExample
+
 .+context-subscriber-example+
 
 Languages: C++
@@ -474,6 +482,8 @@ License: LGPL 2.1
 Provided interfaces: none.
 
 Used interfaces: Context.Example.* properties, libduivaluespace, libqt4-gui, libqt4-core
+
+Sources: https://dvcs.projects.maemo.org/git/?p=ContextSubscriberExample
 
 Review comments
 ---------------
