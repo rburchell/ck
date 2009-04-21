@@ -143,6 +143,9 @@ For example, a 64 bit signed integer is represented in GConf as a
 "int" if it fits, and as a "double" if not.  It will always fit into a
 double, but it might mean chopping off some low bits.
 
+The XML value system is a new invention of this document.  It will
+eventually get its own schema and namespace, of course.
+
 - null
 
   The null value.
@@ -157,6 +160,7 @@ double, but it might mean chopping off some low bits.
   GVariant:   '()'
   Perl:       undef
   Python 2:   None
+  XML:        <null/>
 
 - bool
 
@@ -169,6 +173,7 @@ double, but it might mean chopping off some low bits.
   GVariant:   'b'
   Perl:       number, 0 or 1.
   Python 2:   number, 0 or 1.
+  XML:        <true/>  or  <false/>
 
 - int32
 
@@ -181,6 +186,7 @@ double, but it might mean chopping off some low bits.
   GVariant:   'i'
   Perl:       number
   Python 2:   int
+  XML:        <i v="12345">
 
 - int64
 
@@ -193,6 +199,7 @@ double, but it might mean chopping off some low bits.
   GVariant:   'x'
   Perl:       number
   Python 2:   int or long
+  XML:        <x v="12345">
 
 - uint32
 
@@ -205,6 +212,7 @@ double, but it might mean chopping off some low bits.
   GVariant:   'u'
   Perl:       number
   Python 2:   int or long
+  XML:        <u v="12345">
 
 - uint64
 
@@ -217,6 +225,7 @@ double, but it might mean chopping off some low bits.
   GVariant:   't'
   Perl:       number
   Python 2:   int or long
+  XML:        <t v="12345">
 
 - double
 
@@ -229,6 +238,7 @@ double, but it might mean chopping off some low bits.
   GVariant:   'd'
   Perl:       number
   Python 2:   double
+  XML:        <d v="12345.67">
 
 - string
 
@@ -241,6 +251,7 @@ double, but it might mean chopping off some low bits.
   GVariant:   's'
   Perl:       string
   Python 2:   unicode
+  XML:        <s v="abcde">
 
 - sequence
 
@@ -254,6 +265,7 @@ double, but it might mean chopping off some low bits.
   GVariant:   'av'
   Perl:       array
   Python 2:   list
+  XML:        <a>VAL...</a>
 
 - map
 
@@ -268,18 +280,100 @@ double, but it might mean chopping off some low bits.
   GVariant:   'a{sv}'
   Perl:       hash
   Python:     dict
+  XML:        <m>ENTRY...</m>  where ENTRY is <e k="abcde">VAL</e>
 
 
 Intentional types
 -----------------
 
-The "intentional type" type is an intentional type itself, it is not
-representational.  (It's permissive values are all strings that are
-the name of an intentional type).
+The most important part of a intentional type definition is its
+documentation.  The documentation is the thing that explains the
+intent to programmers, so that they can 'reify' the abstract
+intentional type into concrete code.  For example, by reading the
+documentation, they know how to write a C++ class for the intentional
+type and add useful methods to it, or how to write a UI widget that
+allows displaying and maybe high-level editing of values of that type.
 
-Intentional types can not be deduced from values, they must come from
-somewhere else.
+The documentation should basically be a description of the set of
+values that are permissible for this type (using other already defined
+intentional types or the representational types from above), and what
+they mean.  For example, the "calendar-time" type could say that only
+"uint64" values are allowed, and that they are the number of
+nano-seconds since midnight January 1, UTC.
 
-A name, a description of the permissible representational values, and
-documentation, plus implementation in C, C++, Java, C#, Vala.  The
-description of permissible values gives guidance
+Another example are enumerations: the documentation of
+"compass-direction" can say that the value is one of the four "int32"
+values 0, 90, 180, 270 where 0 means North, 90 means East, etc.
+
+Intentional types can have names, so that you can refer to them in the
+documentation of other types.  Names are optional however: if you use
+a type in only one place, you can write its definition right there,
+without having to give it a name.
+
+If you intend a type to be used in many places (such as the types
+defined here later on), you should give it a name, oif course.  You
+can also give it parameters: when other people refer to your type,
+they have to provide values for these parameters.
+
+Every intentional type definition specifies the "base" for itself, by
+referring to another intentional type.  This base can be used to make
+the documentation a bit more formal.  For example, the documentation
+for the "compass-direction" type would not need to explicitly say that
+the numbers are "int32"s; it would just declare its base to be
+"int32".
+
+  <type name="int32">
+    <doc>
+      A int32 value.
+    </doc>
+  </type>
+
+  <type name="int64">
+    <doc>
+      A int64 value.
+    </doc>
+  </type>
+
+  etc.
+
+  <type name="string">
+    <doc>
+      A string value.
+    </doc>
+  </type>
+
+  <type name="sequence">
+    <par name="min" type="int32">
+    <par name="max" type="int32">
+    <doc>
+      A sequence of arbitrary values, with the gien minimum and maximum 
+      length.
+    </doc>
+  </type>
+
+  <type name="uniform-sequence">
+    <par name="min" type="int32">
+    <par name="max" type="int32">
+    <par name="type" type="type">
+    <doc>
+      A sequence of values of the given type, with the given minimum and maximum 
+      length.
+    </doc>
+  </type>
+
+  <type name="geoloc">
+    <doc>
+      A sequence of two or three doubles giving a geographical location.
+      The first number is latitude, the second longitude, both in degrees.
+      If a third number is present, it is the altitude in meters.
+    </doc>
+    <base>
+      <uniform-sequence min="2" max="3" type="double"/>
+    </base>
+  </type>
+
+  <type name="type">
+    <doc>
+      A intentional type.  ...
+    </doc>
+  </type>
