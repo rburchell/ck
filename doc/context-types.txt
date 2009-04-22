@@ -143,9 +143,6 @@ For example, a 64 bit signed integer is represented in GConf as a
 "int" if it fits, and as a "double" if not.  It will always fit into a
 double, but it might mean chopping off some low bits.
 
-The XML value system is a new invention of this document.  It will
-eventually get its own schema and namespace, of course.
-
 - null
 
   The null value.
@@ -160,7 +157,7 @@ eventually get its own schema and namespace, of course.
   GVariant:   '()'
   Perl:       undef
   Python 2:   None
-  XML:        <null/>
+  CL:         nil
 
 - bool
 
@@ -173,7 +170,7 @@ eventually get its own schema and namespace, of course.
   GVariant:   'b'
   Perl:       number, 0 or 1.
   Python 2:   number, 0 or 1.
-  XML:        <true/>  or  <false/>
+  CL:         nil or t
 
 - int32
 
@@ -186,7 +183,7 @@ eventually get its own schema and namespace, of course.
   GVariant:   'i'
   Perl:       number
   Python 2:   int
-  XML:        <i v="12345">
+  CL:         number
 
 - int64
 
@@ -199,7 +196,7 @@ eventually get its own schema and namespace, of course.
   GVariant:   'x'
   Perl:       number
   Python 2:   int or long
-  XML:        <x v="12345">
+  CL:         number
 
 - uint32
 
@@ -212,7 +209,7 @@ eventually get its own schema and namespace, of course.
   GVariant:   'u'
   Perl:       number
   Python 2:   int or long
-  XML:        <u v="12345">
+  CL:         number
 
 - uint64
 
@@ -225,7 +222,7 @@ eventually get its own schema and namespace, of course.
   GVariant:   't'
   Perl:       number
   Python 2:   int or long
-  XML:        <t v="12345">
+  CL:         number
 
 - double
 
@@ -238,7 +235,7 @@ eventually get its own schema and namespace, of course.
   GVariant:   'd'
   Perl:       number
   Python 2:   double
-  XML:        <d v="12345.67">
+  CL:         number
 
 - string
 
@@ -251,7 +248,7 @@ eventually get its own schema and namespace, of course.
   GVariant:   's'
   Perl:       string
   Python 2:   unicode
-  XML:        <s v="abcde">
+  CL:         string
 
 - sequence
 
@@ -265,7 +262,7 @@ eventually get its own schema and namespace, of course.
   GVariant:   'av'
   Perl:       array
   Python 2:   list
-  XML:        <a>VAL...</a>
+  CL:	      list
 
 - map
 
@@ -280,7 +277,62 @@ eventually get its own schema and namespace, of course.
   GVariant:   'a{sv}'
   Perl:       hash
   Python:     dict
-  XML:        <m>ENTRY...</m>  where ENTRY is <e k="abcde">VAL</e>
+  CL:	      alist
+
+A mini-DOM
+----------
+
+The representational types can be used as a mini-DOM for a small
+subset of XML.  This is useful when the small subset suffices but you
+still want to be enterprise ready.  Intentional type definitions use
+this subset, for example, and are thus easily handled at run-time.
+
+Converting a piece of XML produces two things: a 'tag' and a 'value'.
+The tag is a string or null, and the value is either a string or a
+map, according to the following rules:
+
+  TEXT                -> tag: null, value: TEXT
+  <foo>TEXT</foo>     -> tag: foo, value: TEXT
+  <foo>ELT...</foo>   -> no ELT must be TEXT
+                         tag: foo, value: map from the
+                         tags of the ELTs to their values.
+  <foo attr="TEXT">ELT...</foo>
+                    -> equivalent to <foo><attr>TEXT</attr>ELT...</foo>
+
+Examples, showing how XML maps to Python and to Common Lisp.
+
+  <foo>bar</foo>
+  => ('foo', 'bar')
+  => (foo bar)
+
+  <foo>
+    <bar>Hi</bar>
+  </foo>
+  => ('foo', {'bar': 'Hi'})
+  => (foo (bar "Hi"))
+
+  <foo bar="Hi"/>
+  => ('foo', {'bar': 'Hi'})   (Same thing)
+  => (foo (bar "Hi"))
+
+  <contact online="true">
+    <name>
+      <first>Foo</foo>
+      <last>Bar</last>
+    </name>
+  </contact>
+  => ('contact', {'online': 'true',
+     		  'name': {'first': 'Foo',
+                           'last': 'Bar'}})
+  => (contact (online "true")
+              (name (first "Foo")
+	            (last "Bar")))
+
+  <cat>
+    dog
+    <ernie>bert</ernie>
+  </cat>
+  => ERROR: dog has no tag.
 
 
 Intentional types
@@ -295,11 +347,11 @@ type and add useful methods to it, or how to write a UI widget that
 allows displaying and maybe high-level editing of values of that type.
 
 The documentation should basically be a description of the set of
-values that are permissible for this type (using other already defined
-intentional types or the representational types from above), and what
-they mean.  For example, the "calendar-time" type could say that only
-"uint64" values are allowed, and that they are the number of
-nano-seconds since midnight January 1, UTC.
+values that are permissible for this type (by referring to other
+already defined intentional types or the representational types from
+above), and what they mean.  For example, the "calendar-time" type
+could say that only "uint64" values are allowed, and that they are the
+number of nano-seconds since midnight January 1, UTC.
 
 Another example are enumerations: the documentation of
 "compass-direction" can say that the value is one of the four "int32"
@@ -311,9 +363,13 @@ a type in only one place, you can write its definition right there,
 without having to give it a name.
 
 If you intend a type to be used in many places (such as the types
-defined here later on), you should give it a name, oif course.  You
-can also give it parameters: when other people refer to your type,
-they have to provide values for these parameters.
+defined here later on), you should give it a name, of course.
+
+When other people refer to your type, they can provide a set of
+parameters to specialize it.  You should document which parameters are
+meaningful and what they do, of course.  You should also formally
+declare which paramaters are valid.  [ XXX - explain 'rest' parameter
+and how they are passed on to the base type. ]
 
 Every intentional type definition specifies the "base" for itself, by
 referring to another intentional type.  This base can be used to make
@@ -322,46 +378,123 @@ for the "compass-direction" type would not need to explicitly say that
 the numbers are "int32"s; it would just declare its base to be
 "int32".
 
-  <type name="int32">
+This simple form of inheritance allows one to write generic code for a
+base type
+
+
+In a context where a type is expected:
+
+  NAME                       - refers to type named NAME
+  <NAME>PARM...</NAME>       - refers to type named NAME, specialized
+                               with PARM...
+  <typedef>ELT...</typedef>  - anonymous type with inline definition
+
+Attributes for type definitions:
+
+  name  - the name (string)
+  parms - valid paramaters (map from parm name to map of ...)
+  doc   - documentation (either string, or a map language code -> string)
+  base  - the base type (type)
+  
+Fundamental types:
+
+  <typedef name="int32">
     <doc>
       A int32 value.
     </doc>
-  </type>
+  </typedef>
 
-  <type name="int64">
+  <typedef name="int64">
     <doc>
       A int64 value.
     </doc>
-  </type>
+  </typedef>
 
   etc.
 
-  <type name="string">
+  <typedef name="string">
     <doc>
       A string value.
     </doc>
-  </type>
+  </typedef>
 
-  <type name="sequence">
-    <par name="min" type="int32">
-    <par name="max" type="int32">
+  <typedef name="sequence">
+    <params>
+      <min doc="Minimum length"/>
+      <max doc="Maximum length"/>
+    <params>
     <doc>
-      A sequence of arbitrary values, with the gien minimum and maximum 
-      length.
+      A sequence of arbitrary values, with the minimum and maximum 
+      length given by the "min" and "max" parameters, respectively.
     </doc>
-  </type>
+  </typedef>
 
-  <type name="uniform-sequence">
-    <par name="min" type="int32">
-    <par name="max" type="int32">
-    <par name="type" type="type">
+  <typedef name="map">
+    <params>
+      <keys doc="Allowed keys"/>
+    </params>
     <doc>
-      A sequence of values of the given type, with the given minimum and maximum 
-      length.
+      A map.  If given, the "keys" parameter determines which keys are
+      allowed.  The "keys" parameter should be a map itself, from key
+      names to a map with the attributes of the key.  Attributes of a
+      key are "doc" and "type".
     </doc>
-  </type>
+  </typedef>
 
-  <type name="geoloc">
+Useful generic types
+
+  <typedef name="integer">
+    <params>
+      <min doc="Lower bound"/>
+      <max doc="Upper bound"/>
+    </params>
+    <doc>
+      A integer, represented as any of the numeric types.  If the value 
+      is a "double", it is rounded to an integer, but necessarily to
+      the nearest.  The "min" and "max" parameters, when given, constrain 
+      the range of the integer.
+    </doc>
+  </typedef>
+
+  <typedef name="uniform-sequence">
+    <params>
+      <min doc="Minimum length"/>
+      <max doc="Maximum length"/>
+      <type doc="Type of the elements"/>
+    </params>
+    <doc>
+      A sequence of values of the given type, with the 
+      minimum and maximum length given by the "min" and "max" parameters.
+      The type of all elements is given by the "type" parameter.
+    </doc>
+    <base>sequence</base>
+  </typedef>
+
+  <typedef name="string-enum">
+    <parms>
+      <rest doc="The possible values">
+    </parms>
+    <doc>
+      This is the base type for enumerations of fixed strings.  The
+      parameters describe the possible values.  Each parameter is a
+      map from the string to a map with might have a "doc" entry.
+    </doc>
+  </typedef>
+
+  <typedef name="int-enum">
+    <parms>
+      <rest doc="The possible values">
+    </parms>
+    <doc>
+      This is the base type for enumerations of fixed integers.  The
+      parameters describe the possible values.  Each parameter is a
+      map from a symbol string to a map with a "val" entry.
+    </doc>
+  </typedef>
+
+Specific types
+
+  <typedef name="geoloc">
     <doc>
       A sequence of two or three doubles giving a geographical location.
       The first number is latitude, the second longitude, both in degrees.
@@ -370,10 +503,81 @@ the numbers are "int32"s; it would just declare its base to be
     <base>
       <uniform-sequence min="2" max="3" type="double"/>
     </base>
-  </type>
+  </typedef>
 
-  <type name="type">
+  <typedef name="temperature"
+        base="double"
+	doc="A temperature in Kelvin."/>
+
+  <typedef name="screen-edge">
     <doc>
-      A intentional type.  ...
+      Indicates an edge of a rectangular screen, relative to
+      the natural orientation of the video hardware driving it.
+      It can be one of the four strings "top", "left", "right",
+      and "bottom".
     </doc>
-  </type>
+    <base>
+      <string-enum>
+	<top/> <left/> <right/> <bottom/>
+      </string-enum>
+    </base>
+  </typedef>
+
+  <typedef name="screen-edge-ints">
+    <doc>
+      Indicates an edge of a rectangular screen, relative to
+      the natural orientation of the video hardware driving it.
+      It can be one of the four values "top", "left", "right",
+      and "bottom", encoded as an integer.
+    </doc>
+    <base>
+      <int-enum>
+	<top val="0"/> <left val="1"/> <right val="2"/> <bottom val="3"/>
+      </string-enum>
+    </base>
+  </typedef>
+
+  <typedef name="energy" base="double">
+    <doc>
+      An amount of energy, in Watt-hours.
+    </doc>
+  </typedef>
+
+  <typedef name="duration" base="double">
+    <doc>
+      A time duration, in seconds.
+    </doc>
+  </typedef>
+
+Intentional types and context properties
+----------------------------------------
+
+  <key name="TopEdge" type="screen-edge">
+    <doc>
+      Blah blah.
+    </doc>
+  </key>
+
+  <key name="TopEdge">
+    <type>
+      <string-enum>
+	<top/> <left/> <right/> <bottom/>
+      </string-enum>
+    </type>    
+    <doc>
+      Blah blah.
+    </doc>
+  </key>
+
+  <key name="TopEdge">
+    <type>
+      <typedef>
+        <doc/>
+        <base/>
+      </typedef>
+    </type>    
+    <doc>
+      Blah blah.
+    </doc>
+  </key>
+
