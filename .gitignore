@@ -15,7 +15,7 @@ config.status
 config.sub
 configure
 context.valid.stamp
-contextd
+contextd/contextd
 depcomp
 doc/context.html
 doc/contextkit.html
