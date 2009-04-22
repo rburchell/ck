@@ -72,6 +72,9 @@ libcontextprovider/subscriber.[ch]
 libcontextprovider/context_provider.[ch]
 libcontextprovider/grouplist.[ch]
 libcontextprovider/group.[ch]
+contextd/main.[ch]
+contextd/plugin.[ch]
+contextd/hal_plugin.[ch]
 m4/gtk-doc.m4
 contextprovider-1.0.pc
 doc/context-providers.html
