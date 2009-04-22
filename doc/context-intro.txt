@@ -16,7 +16,7 @@ The following lists some typical context properties:
 - Connectivity status of the device; whether it is connected to the
   Internet and by what means.
 
-- Location; the name of the current city
+- Location; the name of the current city.
 
 - Builtin sensors; orientation in space.
 
@@ -48,7 +48,7 @@ In addition to information from multiple sources, the context
 framework is a provider of context properties itself: there is a
 _context daemon_ that collects information from low-level and legacy
 interfaces.  This context daemon is a good default location for
-implementing new context properties and for absorbing properties from
+implementing context properties and for absorbing properties from
 existing subsystems that have aqcuired them by accident and would
 rather get rid of them.
 
@@ -73,11 +73,6 @@ platform in the following ways:
 
 - It provides a debugging and exploration tool for inspecting and
   controlling context properties.
-
-- It tries to spear-head a rich, cross language value representation
-  that is useable across the whole platform and hopes to take away the
-  burdon of having to come up with such a thing everytime a dynamic
-  type system is needed.
 
 Thus, the Context Framework does not drive the behavior of the system,
 it only provides the information that is needed for other components
@@ -330,18 +325,19 @@ digraph G {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Communication between a +DuiValueSpaceItem+ and the provider happens
-with the link:contextkit.html[+org.freedesktop.ContextKit+] interface.  This interface
-allows for bulk retrieval of property values, bulk subscriptions, and
-bulk change notification.
+with the link:contextkit.html[+org.freedesktop.ContextKit+] interface.
+This interface allows for bulk retrieval of property values, bulk
+subscriptions, and bulk change notification.
 
 The values of properties are represented to clients as a +QVariant+
 value.  Properties can have a special _null_ value when they are not
 available, either because they are not provided by any provider, or
 because the provider is not able to deliver a value.
 
-In the link:contextkit.html[+org.freedesktop.ContextKit+] interface, property values are
-represented as D-Bus values, which map nicely to ++QVariant++s (except
-for the _null_ value which is handled specially).
+In the link:contextkit.html[+org.freedesktop.ContextKit+] interface,
+property values are represented as D-Bus values, which map nicely to
+++QVariant++s (except for the _null_ value which is handled
+specially).
 
 Context providers need to implement the
 link:contextkit.html[+org.freedesktop.ContextKit+] interface.  They
@@ -350,12 +346,10 @@ link:libcontextprovider[+libcontextprovider+] convenience library.
 This library is used by the context daemon itself, which can serve as
 an extended example.
 
-Initially, at least the
-link:../subsys-connectivity/index.html[Connectivity Framework] and the
-link:../subsys-location/index.html[Location Framework] are expected to
-be context providers as described above.  Additional context
-properties are implemented by the _context daemon_ contained in the
-Context Framework.
+The Connectivity Framework and the Sensor Framework are expected to be
+context providers as described above.  Additional context properties,
+such as those related to the Location Framework, are implemented by
+the _context daemon_ contained in the Context Framework.
 
 The following diagram shows the structural view in a typical scenario.
 
@@ -367,22 +361,24 @@ digraph G {
 
   contextd  
     [label="{libcontextprovider | Context Daemon }"];
+  libgeo
+    [label="libgeo", shape=box];
   app       
     [label="{Application | libduivaluespace}"];
-  locfw
-    [label="{libcontextprovider | Location Framework}"];
+  sensfw
+    [label="{libcontextprovider | Sensor Framework}"];
   confw
     [label="{libcontextprovider | Connectivity Framework}"];
-  sensor
-    [label="Sensor", shape=box];
+  npe
+    [label="NPE", shape=box];
 
   app -> contextd
-  contextd -> sensor [label = "Sensor API"];
-  contextd -> locfw [label=" org.freedesktop.ContextKit "];
+  contextd -> libgeo -> npe;
+  contextd -> sensfw [label=" org.freedesktop.ContextKit "];
 
   app -> confw   [label=" org.freedesktop.ContextKit "];
 
-  app -> locfw
+  app -> sensfw
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -484,8 +480,3 @@ Provided interfaces: none.
 Used interfaces: Context.Example.* properties, libduivaluespace, libqt4-gui, libqt4-core
 
 Sources: https://dvcs.projects.maemo.org/git/?p=ContextSubscriberExample
-
-Review comments
----------------
-
-- Use UML for diagrams.
