@@ -7,6 +7,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
 	libcontextprovider \
+	contextd \
 	spec \
 	tests \
 	doc \

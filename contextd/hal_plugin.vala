@@ -23,8 +23,8 @@ namespace Plugins {
 
 	internal class HalPlugin : GLib.Object, ContextD.Plugin {
 
-		private Hal.Context context;
-		private string[] listenedDevices;
+		private static Hal.Context? context;
+		private static string[] listenedDevices;
 
 		private const string propertyChargeLevel = "battery.charge_level.percentage";
 		private const string propertyIsCharging = "battery.rechargeable.is_charging";
@@ -54,9 +54,9 @@ namespace Plugins {
 
 
 		// Constants for computation
-		private int thresholdForLow = 10;
+		private static const int thresholdForLow = 10;
 
-		HalPlugin () {
+		internal HalPlugin () {
 			listenedDevices = {};
 		}
 
@@ -159,15 +159,14 @@ namespace Plugins {
 			listenedDevices = {};
 		}
 		
-		private void property_modified (Hal.Context ctx, string udi, string key, bool is_removed, bool is_added) {
+		private static void property_modified (Hal.Context ctx, string udi, string key, bool is_removed, bool is_added) {
 			debug ("Property modified: %s, %s", udi, key);
 
 			read_properties_one_device (udi);
-
 		}
 
 
-		private void read_properties_one_device (string udi) {
+		private static void read_properties_one_device (string udi) {
 
 			// Get ChargePercentage
 			bool percentageKnown = false;
