@@ -30,7 +30,7 @@ namespace Plugins {
 		private const string propertyIsCharging = "battery.rechargeable.is_charging";
 		private const string propertyIsDischarging = "battery.rechargeable.is_discharging";
 
-		private const string keyChargeLevel = "Context.Battery.ChargeLevel"; 
+		private const string keyChargePercentage = "Context.Battery.ChargePercentage"; 
 		/* Type: Integer from [0, 100]
 		   Definition: True iff at least one battery is discharging.
 		*/
@@ -98,7 +98,7 @@ namespace Plugins {
 			}				
 
 			// Finally, install the plugin with libcontextprovider. 
-			string[] keys = {"Context.Battery.Status", "Context.Battery.TimeLeft", "Context.Battery.ChargePercentage"};
+			string[] keys = {keyChargePercentage, keyOnBattery, keyLowBattery};
 			ContextProvider.install_group(keys, true, this.subscription_changed);
 
 			return true;
@@ -178,12 +178,12 @@ namespace Plugins {
 		
 				if (error.is_set()) {
 					debug ("Error: querying property %s failed", propertyChargeLevel);
-					ContextProvider.set_null (keyChargeLevel);
+					ContextProvider.set_null (keyChargePercentage);
 
 				} else {
 					debug ("Read property: %s %d", propertyChargeLevel, percentage);
 					percentageKnown = true;
-					ContextProvider.set_integer (keyChargeLevel, percentage);
+					ContextProvider.set_integer (keyChargePercentage, percentage);
 				}
 			}
 
