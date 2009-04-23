@@ -15,10 +15,8 @@ contextd_SOURCES = \
 	$(NULL)
 
 # FIXME: Remove the hal.vapi once the official version includes the needed functions
-#$(VALAC) -C -g --basedir $(top_srcdir)/contextd --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --pkg hal --disable-dbus-transformation $^ posix.vapi $(top_srcdir)/libcontextprovider/contextprovider.vapi
-
-contextd.vala.stamp: $(contextd_VALASOURCES)
-	$(VALAC) -C -g --basedir $(top_srcdir)/contextd --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^ ../vapi/posix.vapi $(top_srcdir)/libcontextprovider/contextprovider.vapi hal.vapi
+contextd.vala.stamp: $(top_srcdir)/vapi/posix.vapi hal.vapi $(top_srcdir)/libcontextprovider/contextprovider.vapi $(contextd_VALASOURCES)
+	$(VALAC) -C -g --basedir $(top_srcdir)/contextd --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
 	touch contextd.vala.stamp
 
 contextd_CFLAGS = \
