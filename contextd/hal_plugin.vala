@@ -23,31 +23,42 @@ namespace Plugins {
 
 	internal class HalPlugin : GLib.Object, ContextD.Plugin {
 
+
+		private struct BatteryInfo {
+			public int percentage;
+			public bool percentageKnown;
+			public int charge;
+			public bool chargeKnown;
+			public int lastFull;
+			public bool lastFullKnown;
+			public int rate;
+			public bool rateKnown;
+			public int lastNonzeroRate;
+			public bool charging;
+			public bool chargingKnown;
+			public bool discharging;
+			public bool dischargingKnown;
+		}
+
+		private static Gee.HashMap<string, BatteryInfo?> batteries;
+
 		private static Hal.Context? context;
-		private static string[] listenedDevices;
 
-		private const string propertyChargeLevel = "battery.charge_level.percentage";
-		private const string propertyIsCharging = "battery.rechargeable.is_charging";
-		private const string propertyIsDischarging = "battery.rechargeable.is_discharging";
+		// Property names used by HAL
+		private const string halPercentage = "battery.charge_level.percentage";
+		private const string halCharge = "battery.charge_level.current";
+		private const string halLastFull = "battery.charge_level.last_full";
+		private const string halRate = "battery.charge_level.rate";
 
+		private const string halCharging = "battery.rechargeable.is_charging";
+		private const string halDischarging = "battery.rechargeable.is_discharging";
+
+		// Context keys provided by this plugin
 		private const string keyChargePercentage = "Context.Battery.ChargePercentage"; 
-		/* Type: Integer from [0, 100]
-		   Definition: True iff at least one battery is discharging.
-		*/
-
 		private const string keyOnBattery = "Context.Battery.OnBattery"; 
-		/* Type: Boolean
-		   Definition: True iff at least one battery is discharging.
-		*/
-
 		private const string keyLowBattery = "Context.Battery.LowBattery"; 
-		/* Type: Boolean
-		   Definition: True iff OnBattery is true and the charge percentages
-		   of all batteries are below 10.
-		*/
 
-		private const string keyIsCharging = "Context.Battery.OnBattery"; 
-		private const string keyTimeLeft = "Context.Battery.TimeLeft"; 
+		private const string keyTimeUntilLow = "Context.Battery.TimeUntilLow"; 
 		private const string keyTimeUntilFull = "Context.Battery.TimeUntilFull"; 
 
 		// TODO: Define and implement these
@@ -57,7 +68,7 @@ namespace Plugins {
 		private static const int thresholdForLow = 10;
 
 		internal HalPlugin () {
-			listenedDevices = {};
+			batteries = new Gee.HashMap<string, BatteryInfo?>(str_hash, str_equal);
 		}
 
 		~HalPlugin () {
@@ -98,7 +109,7 @@ namespace Plugins {
 			}				
 
 			// Finally, install the plugin with libcontextprovider. 
-			string[] keys = {keyChargePercentage, keyOnBattery, keyLowBattery};
+			string[] keys = {keyChargePercentage, keyOnBattery, keyLowBattery, keyTimeUntilLow, keyTimeUntilFull};
 			ContextProvider.install_group(keys, true, this.subscription_changed);
 
 			return true;
@@ -130,90 +141,161 @@ namespace Plugins {
 				return;
 			}
 
-			foreach (var deviceName in deviceNames) {
-				debug ("Found device %s", deviceName);
+			foreach (var udi in deviceNames) {
+				debug ("Found device %s", udi);
 
 				// Start listening to property changes
-				bool success = context.device_add_property_watch (deviceName, ref error);
+				bool success = context.device_add_property_watch (udi, ref error);
 				
 				if (!success || error.is_set()) {
 					debug ("Error: adding property watch failed");
-					continue;
 				}
 
-				listenedDevices += deviceName;
+				// Read initial values
+				BatteryInfo info = BatteryInfo();
+				readIntProperty (udi, halPercentage, ref info.percentage, ref info.percentageKnown);
+				readIntProperty (udi, halCharge, ref info.charge, ref info.chargeKnown);
+				readIntProperty (udi, halLastFull, ref info.lastFull, ref info.lastFullKnown);
+				readIntProperty (udi, halRate, ref info.rate, ref info.rateKnown);
+				// If we got an informative rate (known and >0), record it
+				// for future use.
+				if (info.rateKnown && info.rate > 0) {
+					info.lastNonzeroRate = info.rate;
+				}
+				readBoolProperty (udi, halCharging, ref info.charging, ref info.chargingKnown);
+				readBoolProperty (udi, halDischarging, ref info.discharging, ref info.dischargingKnown);
+				batteries.set (udi, info);
 			}
-
-			if (listenedDevices.length == 1) {
-				read_properties_one_device (listenedDevices[0]);
-			}
+			calculateProperties ();
 		}
 
+		// Stops listening property modifications
 		private void stop_listening_devices () {
 			
-			foreach (var deviceName in listenedDevices) {
+			foreach (var udi in batteries.get_keys ()) {
 				DBus.RawError error = DBus.RawError ();
-				context.device_remove_property_watch (deviceName, ref error);
+				context.device_remove_property_watch (udi, ref error);
 			}
 		
-			listenedDevices = {};
+			batteries.clear ();
 		}
 		
+		// Is called when HAL notifies us that a property has changed
 		private static void property_modified (Hal.Context ctx, string udi, string key, bool is_removed, bool is_added) {
 			debug ("Property modified: %s, %s", udi, key);
 
-			read_properties_one_device (udi);
+			BatteryInfo info = batteries.get (udi);
+
+			if (key == halPercentage) {
+				readIntProperty(udi, key, ref info.percentage, ref info.percentageKnown);
+			}
+			else if (key == halCharge) {
+				readIntProperty(udi, key, ref info.charge, ref info.chargeKnown);
+			}
+			else if (key == halLastFull) {
+				readIntProperty(udi, key, ref info.lastFull, ref info.lastFullKnown);
+			}
+			else if (key == halRate) {
+				readIntProperty(udi, key, ref info.rate, ref info.rateKnown);
+				// If we got an informative rate (known and >0), record it
+				// for future use.
+				if (info.rateKnown && info.rate > 0) {
+					info.lastNonzeroRate = info.rate;
+				}
+			}
+			else if (key == halCharging) {
+				readBoolProperty(udi, key, ref info.charging, ref info.chargingKnown);
+			}
+			else if (key == halDischarging) {
+				readBoolProperty(udi, key, ref info.discharging, ref info.dischargingKnown);
+			}
+			else {
+				// Property not interesting for us
+				return;
+			}
+
+			calculateProperties ();
 		}
 
-
-		private static void read_properties_one_device (string udi) {
-
-			// Get ChargePercentage
-			bool percentageKnown = false;
-			int percentage;
-			{
+		// Reads an int property from libhal and records whether it was successful
+		private static void readIntProperty(string udi, string property, ref int value, ref bool success) {
+				success = false;
 				DBus.RawError error = DBus.RawError ();
-			
-				percentage = context.device_get_property_int(udi, propertyChargeLevel, ref error);
+
+				value = context.device_get_property_int(udi, property, ref error);
 		
 				if (error.is_set()) {
-					debug ("Error: querying property %s failed", propertyChargeLevel);
-					ContextProvider.set_null (keyChargePercentage);
-
+					debug ("Error: querying property %s failed", property);
 				} else {
-					debug ("Read property: %s %d", propertyChargeLevel, percentage);
-					percentageKnown = true;
-					ContextProvider.set_integer (keyChargePercentage, percentage);
+					debug ("Read property: %s %d", property, value);
+					success = true;
 				}
-			}
+		}
 
-			// Get OnBattery
-			bool discharging;
-			bool dischargingKnown = false;
-			{
+		// Reads a bool property from libhal and records whether it was successful
+		private static void readBoolProperty(string udi, string property, ref bool value, ref bool success) {
+				success = false;
 				DBus.RawError error = DBus.RawError ();
-				discharging = context.device_get_property_bool(udi, propertyIsDischarging, ref error);
+
+				value = context.device_get_property_bool(udi, property, ref error);
 		
 				if (error.is_set()) {
-					debug ("Error querying property %s", propertyIsCharging);
-					ContextProvider.set_null (keyOnBattery);
+					debug ("Error: querying property %s failed", property);
 				} else {
-					debug ("Read property: %s %s", propertyIsCharging, (discharging ? "true" : "false"));
-					dischargingKnown = true;
-					ContextProvider.set_boolean (keyOnBattery, discharging);
+					debug ("Read property: %s %s", property, value ? "true" : "false");
+					success = true;
 				}
+		}
+		
+		// Calculates the values of the context properties and declares them
+		// using the libcontextprovider. The current implementation assumes that
+		// there is only one battery. If support for multiple batteries is needed,
+		// we need to define more specifically when to set the properties unknown,
+		// e.g. is the average charge level unknown if one of the charge levels 
+		// is unknown or only when all of them are unknown.
+		private static void calculateProperties () {
+
+			debug ("Calculating properties");
+			if (batteries.size != 1) {
+				debug ("Not supported: no batteries / more than one battery");
 			}
 
-			// Get LowBattery
-			if (dischargingKnown && discharging == false) {
+			var udis = batteries.get_keys ();
+
+			string udi = "";
+			foreach (var temp in batteries.get_keys ()) {
+				debug ("we have battery %s", temp);
+				udi = temp;
+			}
+
+			BatteryInfo info = batteries.get (udi);
+
+			// Compute ChargePercentage
+			if (info.percentageKnown == false) {
+				ContextProvider.set_null (keyChargePercentage);
+			}
+			else {
+				ContextProvider.set_integer (keyChargePercentage, info.percentage);
+			}
+
+			// Compute OnBattery
+			if (info.dischargingKnown == false) {
+				ContextProvider.set_null (keyOnBattery);
+			}
+			else {
+				ContextProvider.set_boolean (keyOnBattery, info.discharging);
+			}
+
+			// Compute LowBattery
+			if (info.dischargingKnown && info.discharging == false) {
 				// Not on battery -> low battery is false
 				ContextProvider.set_boolean (keyLowBattery, false);
 			}
-			else if (percentageKnown && percentage >= thresholdForLow) {
+			else if (info.percentageKnown && info.percentage >= thresholdForLow) {
 				// Percentage high enough -> low battery is false
 				ContextProvider.set_boolean (keyLowBattery, false);
 			}
-			else if (dischargingKnown && discharging == true && percentageKnown && percentage < thresholdForLow) {
+			else if (info.dischargingKnown && info.discharging == true && info.percentageKnown && info.percentage < thresholdForLow) {
 				// Discharging and percentage is low
 				ContextProvider.set_boolean (keyLowBattery, true);
 			}
@@ -221,6 +303,28 @@ namespace Plugins {
 				// We don't have enough information to compute
 				ContextProvider.set_null (keyLowBattery);
 			}
+			// Note that the logic of LowBattery is different when there are 
+			// multiple devices:
+			// we need to check against the "global" OnBattery (if some device
+			// is on battery) and not the OnBattery of this particular device.
+
+			// Compute TimeUntilLow
+			int rateUsed = 0;
+			if (info.rateKnown && info.rate > 0) {
+				rateUsed = info.rate;
+			}
+			else if (info.lastNonzeroRate > 0) {
+				rateUsed = info.lastNonzeroRate;
+			}
+			if (rateUsed > 0 && info.chargeKnown && info.lastFullKnown) {
+				double timeUntilLow = (info.charge - thresholdForLow / 100.0 * info.lastFull) / rateUsed;
+
+				ContextProvider.set_integer (keyTimeUntilLow, (int) timeUntilLow);
+			}
+			else {
+				ContextProvider.set_null (keyTimeUntilLow);
+			}
+
 		}
 	}
 }
