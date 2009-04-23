@@ -20,7 +20,14 @@
  */
 
 namespace ContextD {
-
+	// The interface for Plugins. Each plugin must implement the initialization
+	// it needs inside the install method. At minimum, inside install, it must
+	// call install_group or install_key of the ContextProvider libary, to
+	// declare the keys it provides. The plugin can choose the other parameters
+	// passed, e.g., whether keys should be set to Unknown if nobody is subscribed
+	// to them.
+	// The install function of the plugin is called in main, after creating the
+	// main loop but before entering it.
 	internal interface Plugin : GLib.Object {
 		internal abstract bool install();
 	}

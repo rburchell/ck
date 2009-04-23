@@ -26,11 +26,10 @@ namespace ContextD {
 		private static Gee.ArrayList<Plugin> plugins;
 		private static GLib.MainLoop loop;	
 
-		private void install_plugins () {
-
-			// Command all plugins to install themselves.
-			// Each plugin knows which keys it provides and
-			// what parameters need to be passed to ContextProvider.install.
+		// Command all plugins to install themselves.
+		// Each plugin knows which keys it provides and
+		// what parameters need to be passed to ContextProvider.install.
+		private static void install_plugins () {
 			foreach (var plugin in plugins) {
 				plugin.install ();
 			}
@@ -41,21 +40,8 @@ namespace ContextD {
 			loop.quit();
 		}
 
-		private void run () {
-			loop = new MainLoop (null, false);
-			stdout.printf ("contextd starting");
-			
-			// Start using the licontextprovider
-			ContextProvider.init(DBus.BusType.SESSION, "org.freedesktop.ContextKit");
-
-			// Install all plugins
-			install_plugins ();
-
-			Posix.Signal.set_handler (Posix.Signal.QUIT, exit);
-			loop.run ();
-		}
-
 		static int main (string[] args) {
+			stdout.printf ("contextd starting");
 			
 			// Define the set of plugins
 			plugins = new Gee.ArrayList<Plugin> ();
@@ -64,8 +50,19 @@ namespace ContextD {
 			// TODO: define the used plugins based on which
 			// resources are detected during configure phase.
 
-			var main = new Main ();
-			main.run ();
+			loop = new MainLoop (null, false);
+			
+			// Start using the ContextProvider library
+			ContextProvider.init(DBus.BusType.SESSION, "org.freedesktop.ContextKit");
+
+			// Install all plugins
+			install_plugins ();
+
+			// Set signal handler for the QUIT signal
+			Posix.Signal.set_handler (Posix.Signal.QUIT, exit);
+
+			loop.run ();
+
 			return 0;
 		}
 	}
