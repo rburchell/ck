@@ -22,6 +22,7 @@
 namespace Plugins {
 	internal class HalPlugin : GLib.Object, ContextD.Plugin {
 
+		// A struct for storing the information read from HAL
 		private struct BatteryInfo {
 			public int percentage;
 			public bool percentageKnown;
@@ -59,9 +60,6 @@ namespace Plugins {
 		private const string keyTimeUntilLow = "Context.Battery.TimeUntilLow"; 
 		private const string keyTimeUntilFull = "Context.Battery.TimeUntilFull"; 
 
-		// TODO: Define and implement these
-
-
 		// Constants for computation
 		private static const int thresholdForLow = 10;
 
@@ -69,9 +67,9 @@ namespace Plugins {
 			batteries = new Gee.HashMap<string, BatteryInfo?>(str_hash, str_equal);
 		}
 
-		~HalPlugin () {
-		}
-		
+		// Provides implementation for the function in the Plugin interface.
+		// Initialites collaboration with HAL and install the context keys
+		// with the ContextProvider library.
 		bool install() {
 
 			// Initialize collaboration with HAL
@@ -112,8 +110,9 @@ namespace Plugins {
 			return true;
 		}
 
+		// Is called by the ContextProvider library when clients subscribe to /
+		// unsubscribe from the keys provided by this plugin.
 		private void subscription_changed (bool subscribe) {
-
 			if (subscribe) {
 				start_listening_devices ();
 			}
@@ -122,6 +121,8 @@ namespace Plugins {
 			}
 		}
 
+		// Reads the battery device information from HAL and starts listening to
+		// chages.
 		private void start_listening_devices () {
 		
 			// Read which battery devices are present
@@ -176,7 +177,7 @@ namespace Plugins {
 			calculateProperties ();
 		}
 
-		// Stops listening property modifications
+		// Stops listening to changes in battery devices
 		private void stop_listening_devices () {
 			
 			foreach (var udi in batteries.get_keys ()) {
@@ -277,12 +278,9 @@ namespace Plugins {
 				return;
 			}
 
-			var udis = batteries.get_keys ();
-
-			string udi = "";
-			foreach (var temp in batteries.get_keys ()) {
-				udi = temp;
-			}
+			var iterator = batteries.get_keys ().iterator ();
+			iterator.next();
+			string udi = iterator.get();
 
 			BatteryInfo info = batteries.get (udi);
 
@@ -361,7 +359,6 @@ namespace Plugins {
 			else {
 				ContextProvider.set_null (keyTimeUntilFull);
 			}
-
 		}
 	}
 }
