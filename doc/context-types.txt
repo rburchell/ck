@@ -93,7 +93,10 @@ facilities and GConf schemas need to be extended to support our
 intentional types.  Thus, purely declarative languages like these are
 also included in our list of supported languages.
 
-[ Insert example here. ]
+[source,C]
+----
+/* Witty example here. */
+----
 
 We also give a list of common intentional types, of course.
 
