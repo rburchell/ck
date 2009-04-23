@@ -98,6 +98,33 @@ string.
 	</doc>
       </key>
     </node>
+    <node name="Battery">
+      <doc>
+Battery
+-------
+
+Information about the batteries of the device.
+      </doc>
+      <key name="ChargePercentage" type="INT">
+        <doc>
+The average charge level of the currently connected batteries. 
+Expressed as percentage of the maximum charge level.
+        </doc>
+      </key>
+      <key name="OnBattery" type="TRUTH">
+	<doc>
+Whether or not the device is currently running on battery power,
+i.e., whether at least one of its batteries is currently discharging.
+	</doc>
+      </key>
+      <key name="LowBattery" type="TRUTH">
+	<doc>
+Whether or not the device is currently running on low battery power.
+True if OnBattery is true and the charge levels of all 
+batteries are below 10%.
+	</doc>
+      </key>
+    </node>
     <node name="Connectivity">
       <doc>
 Network connectivity
