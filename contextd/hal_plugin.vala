@@ -42,7 +42,7 @@ namespace Plugins {
 
 		private static Gee.HashMap<string, BatteryInfo?> batteries;
 
-		private static Hal.Context? context;
+		private static Hal.Context? halContext;
 
 		// Property names used by HAL
 		private const string halPercentage = "battery.charge_level.percentage";
@@ -77,12 +77,12 @@ namespace Plugins {
 		bool install() {
 
 			// Initialize collaboration with HAL
-			context = new Hal.Context ();
+			halContext = new Hal.Context ();
 
 
 			DBus.RawError error = DBus.RawError();
 			var connection = DBus.RawBus.get(DBus.BusType.SYSTEM, ref error);
-			bool success = context.set_dbus_connection(connection);
+			bool success = halContext.set_dbus_connection(connection);
 
 			if (!success) {
 				debug ("Error: initializing HAL failed");
@@ -94,14 +94,14 @@ namespace Plugins {
 			error = DBus.RawError();
 
 			// Note: this needs to be called after the dbus connection is set
-			context.init (ref error);
+			halContext.init (ref error);
 			if (error.is_set ()) {
 				debug ("Error: initializing HAL failed");
 				return false;
 			}
 
 			// Set the callback which is called when device properties are modified
-			success = context.set_device_property_modified (property_modified);
+			success = halContext.set_device_property_modified (property_modified);
 
 			if (!success) {
 				debug ("Error: initializing HAL failed");
@@ -129,7 +129,7 @@ namespace Plugins {
 		
 			// Read which battery devices are present
 			DBus.RawError error = DBus.RawError ();
-			var deviceNames = context.find_device_by_capability("battery", ref error);
+			var deviceNames = halContext.find_device_by_capability("battery", ref error);
 	
 			if (error.is_set()) {
 				debug ("Error: finding devices failed");
@@ -145,7 +145,7 @@ namespace Plugins {
 				debug ("Found device %s", udi);
 
 				// Start listening to property changes
-				bool success = context.device_add_property_watch (udi, ref error);
+				bool success = halContext.device_add_property_watch (udi, ref error);
 				
 				if (!success || error.is_set()) {
 					debug ("Error: adding property watch failed");
@@ -174,7 +174,7 @@ namespace Plugins {
 			
 			foreach (var udi in batteries.get_keys ()) {
 				DBus.RawError error = DBus.RawError ();
-				context.device_remove_property_watch (udi, ref error);
+				halContext.device_remove_property_watch (udi, ref error);
 			}
 		
 			batteries.clear ();
@@ -214,6 +214,7 @@ namespace Plugins {
 				return;
 			}
 
+			batteries.set (udi, info);
 			calculateProperties ();
 		}
 
@@ -222,7 +223,7 @@ namespace Plugins {
 				success = false;
 				DBus.RawError error = DBus.RawError ();
 
-				value = context.device_get_property_int(udi, property, ref error);
+				value = halContext.device_get_property_int(udi, property, ref error);
 		
 				if (error.is_set()) {
 					debug ("Error: querying property %s failed", property);
@@ -237,7 +238,7 @@ namespace Plugins {
 				success = false;
 				DBus.RawError error = DBus.RawError ();
 
-				value = context.device_get_property_bool(udi, property, ref error);
+				value = halContext.device_get_property_bool(udi, property, ref error);
 		
 				if (error.is_set()) {
 					debug ("Error: querying property %s failed", property);
@@ -264,25 +265,32 @@ namespace Plugins {
 
 			string udi = "";
 			foreach (var temp in batteries.get_keys ()) {
-				debug ("we have battery %s", temp);
+				debug ("battery %s", temp);
 				udi = temp;
 			}
 
 			BatteryInfo info = batteries.get (udi);
 
+
+			debug ("%d %d %d %d %s %s", info.percentage, info.charge, info.rate, info.lastFull, info.charging? "true" : "false", info.discharging? "true" : "false");
+
 			// Compute ChargePercentage
 			if (info.percentageKnown == false) {
+				debug ("percentage unknown");
 				ContextProvider.set_null (keyChargePercentage);
 			}
 			else {
+				debug ("percentage %d",info.percentage);
 				ContextProvider.set_integer (keyChargePercentage, info.percentage);
 			}
 
 			// Compute OnBattery
 			if (info.dischargingKnown == false) {
+				debug ("onbattery unknown");
 				ContextProvider.set_null (keyOnBattery);
 			}
 			else {
+				debug ("onbattery %s", info.discharging ? "true" : "false");
 				ContextProvider.set_boolean (keyOnBattery, info.discharging);
 			}
 
