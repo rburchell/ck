@@ -124,6 +124,22 @@ True if OnBattery is true and the charge levels of all
 batteries are below 10%.
 	</doc>
       </key>
+      <key name="IsCharging" type="TRUTH">
+	<doc>
+Whether or not the device is currently charging at least one of its batteries.
+	</doc>
+      </key>
+      <key name="TimeUntilLow" type="INT">
+	<doc>
+Estimates the time that the device can run on battery before the property 
+OnLowBattery becomes true. In seconds.
+	</doc>
+      </key>
+      <key name="TimeUntilFull" type="INT">
+	<doc>
+Estimates the needed charging time of the device. In seconds.
+	</doc>
+      </key>
     </node>
     <node name="Connectivity">
       <doc>

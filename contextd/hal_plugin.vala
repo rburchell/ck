@@ -54,6 +54,7 @@ namespace Plugins {
 		private const string keyChargePercentage = "Context.Battery.ChargePercentage"; 
 		private const string keyOnBattery = "Context.Battery.OnBattery"; 
 		private const string keyLowBattery = "Context.Battery.LowBattery"; 
+		private const string keyIsCharging = "Context.Battery.IsCharging"; 
 
 		private const string keyTimeUntilLow = "Context.Battery.TimeUntilLow"; 
 		private const string keyTimeUntilFull = "Context.Battery.TimeUntilFull"; 
@@ -81,7 +82,7 @@ namespace Plugins {
 			bool success = halContext.set_dbus_connection(connection);
 
 			if (!success) {
-				debug ("Error: initializing HAL failed");
+				warning ("Error: initializing HAL failed");
 				return false;
 			}				
 
@@ -92,7 +93,7 @@ namespace Plugins {
 			// Note: this needs to be called after the dbus connection is set
 			halContext.init (ref error);
 			if (error.is_set ()) {
-				debug ("Error: initializing HAL failed");
+				warning ("Error: initializing HAL failed");
 				return false;
 			}
 
@@ -100,12 +101,12 @@ namespace Plugins {
 			success = halContext.set_device_property_modified (property_modified);
 
 			if (!success) {
-				debug ("Error: initializing HAL failed");
+				warning ("Error: initializing HAL failed");
 				return false;
 			}				
 
 			// Finally, install the plugin with libcontextprovider. 
-			string[] keys = {keyChargePercentage, keyOnBattery, keyLowBattery, keyTimeUntilLow, keyTimeUntilFull};
+			string[] keys = {keyChargePercentage, keyOnBattery, keyLowBattery, keyIsCharging, keyTimeUntilLow, keyTimeUntilFull};
 			ContextProvider.install_group(keys, true, this.subscription_changed);
 
 			return true;
@@ -128,23 +129,21 @@ namespace Plugins {
 			var deviceNames = halContext.find_device_by_capability("battery", ref error);
 	
 			if (error.is_set()) {
-				debug ("Error: finding devices failed");
+				warning ("Warning: finding devices failed");
 				return;
 			}
 
 			if (deviceNames == null) {
-				debug ("Error: finding devices failed");
+				warning ("Warning: finding devices failed");
 				return;
 			}
 
 			foreach (var udi in deviceNames) {
-				debug ("Found device %s", udi);
-
 				// Start listening to property changes
 				bool success = halContext.device_add_property_watch (udi, ref error);
 				
 				if (!success || error.is_set()) {
-					debug ("Error: adding property watch failed");
+					warning ("Warning: adding property watch failed");
 				}
 
 				// Read initial values
@@ -190,7 +189,7 @@ namespace Plugins {
 		
 		// Is called when HAL notifies us that a property has changed
 		private static void property_modified (Hal.Context ctx, string udi, string key, bool is_removed, bool is_added) {
-			debug ("Property modified: %s, %s", udi, key);
+			// debug ("Property modified: %s, %s", udi, key);
 
 			BatteryInfo info = batteries.get (udi);
 
@@ -244,9 +243,9 @@ namespace Plugins {
 				value = halContext.device_get_property_int(udi, property, ref error);
 		
 				if (error.is_set()) {
-					debug ("Error: querying property %s failed", property);
+					warning ("Warning: querying property %s failed", property);
 				} else {
-					debug ("Read property: %s %d", property, value);
+					// debug ("Read property: %s %d", property, value);
 					success = true;
 				}
 		}
@@ -259,9 +258,9 @@ namespace Plugins {
 				value = halContext.device_get_property_bool(udi, property, ref error);
 		
 				if (error.is_set()) {
-					debug ("Error: querying property %s failed", property);
+					warning ("Warning: querying property %s failed", property);
 				} else {
-					debug ("Read property: %s %s", property, value ? "true" : "false");
+					// debug ("Read property: %s %s", property, value ? "true" : "false");
 					success = true;
 				}
 		}
@@ -273,42 +272,33 @@ namespace Plugins {
 		// e.g. is the average charge level unknown if one of the charge levels 
 		// is unknown or only when all of them are unknown.
 		private static void calculateProperties () {
-
-			debug ("Calculating properties");
 			if (batteries.size != 1) {
-				debug ("Not supported: no batteries / more than one battery");
+				warning ("Warning: no batteries / more than one battery");
+				return;
 			}
 
 			var udis = batteries.get_keys ();
 
 			string udi = "";
 			foreach (var temp in batteries.get_keys ()) {
-				debug ("battery %s", temp);
 				udi = temp;
 			}
 
 			BatteryInfo info = batteries.get (udi);
 
-
-			debug ("%d %d %d %d %s %s", info.percentage, info.charge, info.lastNonzeroChargingRate, info.lastFull, info.charging? "true" : "false", info.discharging? "true" : "false");
-
 			// Compute ChargePercentage
 			if (info.percentageKnown == false) {
-				debug ("percentage unknown");
 				ContextProvider.set_null (keyChargePercentage);
 			}
 			else {
-				debug ("percentage %d",info.percentage);
 				ContextProvider.set_integer (keyChargePercentage, info.percentage);
 			}
 
 			// Compute OnBattery
 			if (info.dischargingKnown == false) {
-				debug ("onbattery unknown");
 				ContextProvider.set_null (keyOnBattery);
 			}
 			else {
-				debug ("onbattery %s", info.discharging ? "true" : "false");
 				ContextProvider.set_boolean (keyOnBattery, info.discharging);
 			}
 
@@ -333,6 +323,15 @@ namespace Plugins {
 			// multiple devices:
 			// we need to check against the "global" OnBattery (if some device
 			// is on battery) and not the OnBattery of this particular device.
+
+			// Compute IsCharging
+			if (info.chargingKnown == false) {
+				ContextProvider.set_null (keyIsCharging);
+			}
+			else {
+				ContextProvider.set_boolean (keyIsCharging, info.charging);
+			}
+
 
 			// Compute TimeUntilLow
 			if (info.lastNonzeroDischargingRate > 0 && info.chargeKnown && info.lastFullKnown) {

@@ -50,8 +50,8 @@ namespace ContextD {
 
 			// Install all plugins
 			install_plugins ();
-			
-			//Posix.Signal.set_handler (Posix.Signal.QUIT, exit);
+
+			Posix.Signal.set_handler (Posix.Signal.QUIT, exit);
 			loop.run ();
 		}
 
