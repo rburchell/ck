@@ -20,9 +20,7 @@
  */
 
 namespace Plugins {
-
 	internal class HalPlugin : GLib.Object, ContextD.Plugin {
-
 
 		private struct BatteryInfo {
 			public int percentage;
@@ -31,9 +29,8 @@ namespace Plugins {
 			public bool chargeKnown;
 			public int lastFull;
 			public bool lastFullKnown;
-			public int rate;
-			public bool rateKnown;
-			public int lastNonzeroRate;
+			public int lastNonzeroChargingRate;
+			public int lastNonzeroDischargingRate;
 			public bool charging;
 			public bool chargingKnown;
 			public bool discharging;
@@ -79,7 +76,6 @@ namespace Plugins {
 			// Initialize collaboration with HAL
 			halContext = new Hal.Context ();
 
-
 			DBus.RawError error = DBus.RawError();
 			var connection = DBus.RawBus.get(DBus.BusType.SYSTEM, ref error);
 			bool success = halContext.set_dbus_connection(connection);
@@ -89,7 +85,7 @@ namespace Plugins {
 				return false;
 			}				
 
-			connection.setup_with_main (null); // Note: check
+			connection.setup_with_main (null);
 
 			error = DBus.RawError();
 
@@ -156,14 +152,26 @@ namespace Plugins {
 				readIntProperty (udi, halPercentage, ref info.percentage, ref info.percentageKnown);
 				readIntProperty (udi, halCharge, ref info.charge, ref info.chargeKnown);
 				readIntProperty (udi, halLastFull, ref info.lastFull, ref info.lastFullKnown);
-				readIntProperty (udi, halRate, ref info.rate, ref info.rateKnown);
-				// If we got an informative rate (known and >0), record it
-				// for future use.
-				if (info.rateKnown && info.rate > 0) {
-					info.lastNonzeroRate = info.rate;
-				}
 				readBoolProperty (udi, halCharging, ref info.charging, ref info.chargingKnown);
 				readBoolProperty (udi, halDischarging, ref info.discharging, ref info.dischargingKnown);
+
+				int rate = 0;
+				bool rateKnown = false;
+				readIntProperty (udi, halRate, ref rate, ref rateKnown);
+				// If we got an informative rate (known and >0), record it
+				// for future use.
+				if (rateKnown && rate > 0) {
+
+					if (info.chargingKnown && info.charging) {
+						info.lastNonzeroChargingRate = rate;
+					}
+
+					if (info.dischargingKnown && info.discharging) {
+						info.lastNonzeroDischargingRate = rate;
+					}
+					
+				}
+
 				batteries.set (udi, info);
 			}
 			calculateProperties ();
@@ -195,19 +203,29 @@ namespace Plugins {
 			else if (key == halLastFull) {
 				readIntProperty(udi, key, ref info.lastFull, ref info.lastFullKnown);
 			}
-			else if (key == halRate) {
-				readIntProperty(udi, key, ref info.rate, ref info.rateKnown);
+			else if (key == halRate || key == halCharging || key == halDischarging) {
+				// The information about charging / discharging and the rate are
+				// coupled together, so, read them all at once.
+
+				readBoolProperty(udi, halCharging, ref info.charging, ref info.chargingKnown);
+				readBoolProperty(udi, halDischarging, ref info.discharging, ref info.dischargingKnown);
+
+				int rate = 0;
+				bool rateKnown = false;
+				readIntProperty (udi, halRate, ref rate, ref rateKnown);
 				// If we got an informative rate (known and >0), record it
 				// for future use.
-				if (info.rateKnown && info.rate > 0) {
-					info.lastNonzeroRate = info.rate;
+				if (rateKnown && rate > 0) {
+
+					if (info.chargingKnown && info.charging) {
+						info.lastNonzeroChargingRate = rate;
+					}
+
+					if (info.dischargingKnown && info.discharging) {
+						info.lastNonzeroDischargingRate = rate;
+					}
+					
 				}
-			}
-			else if (key == halCharging) {
-				readBoolProperty(udi, key, ref info.charging, ref info.chargingKnown);
-			}
-			else if (key == halDischarging) {
-				readBoolProperty(udi, key, ref info.discharging, ref info.dischargingKnown);
 			}
 			else {
 				// Property not interesting for us
@@ -272,7 +290,7 @@ namespace Plugins {
 			BatteryInfo info = batteries.get (udi);
 
 
-			debug ("%d %d %d %d %s %s", info.percentage, info.charge, info.rate, info.lastFull, info.charging? "true" : "false", info.discharging? "true" : "false");
+			debug ("%d %d %d %d %s %s", info.percentage, info.charge, info.lastNonzeroChargingRate, info.lastFull, info.charging? "true" : "false", info.discharging? "true" : "false");
 
 			// Compute ChargePercentage
 			if (info.percentageKnown == false) {
@@ -317,20 +335,32 @@ namespace Plugins {
 			// is on battery) and not the OnBattery of this particular device.
 
 			// Compute TimeUntilLow
-			int rateUsed = 0;
-			if (info.rateKnown && info.rate > 0) {
-				rateUsed = info.rate;
-			}
-			else if (info.lastNonzeroRate > 0) {
-				rateUsed = info.lastNonzeroRate;
-			}
-			if (rateUsed > 0 && info.chargeKnown && info.lastFullKnown) {
-				double timeUntilLow = (info.charge - thresholdForLow / 100.0 * info.lastFull) / rateUsed;
+			if (info.lastNonzeroDischargingRate > 0 && info.chargeKnown && info.lastFullKnown) {
+				double timeUntilLow = (1.0 * info.charge - thresholdForLow / 100.0 * info.lastFull) / info.lastNonzeroDischargingRate;
+
+				timeUntilLow *= 60; // conversion to minutes
+				timeUntilLow = Math.round(timeUntilLow); // round to nearest minute
+				timeUntilLow *= 60; // conversion to seconds
 
 				ContextProvider.set_integer (keyTimeUntilLow, (int) timeUntilLow);
 			}
 			else {
 				ContextProvider.set_null (keyTimeUntilLow);
+			}
+
+			// Compute TimeUntilFull
+			if (info.lastNonzeroChargingRate > 0 && info.chargeKnown && info.lastFullKnown) {
+				double timeUntilFull = (1.0 * info.lastFull - info.charge) / info.lastNonzeroChargingRate; 
+
+				timeUntilFull *= 60; // conversion to minutes
+				timeUntilFull = Math.round(timeUntilFull); // round to nearest minute
+				timeUntilFull *= 60; // conversion to seconds
+
+
+				ContextProvider.set_integer (keyTimeUntilFull, (int) timeUntilFull);
+			}
+			else {
+				ContextProvider.set_null (keyTimeUntilFull);
 			}
 
 		}

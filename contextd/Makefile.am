@@ -30,6 +30,7 @@ contextd_LDADD = \
 	$(CONTEXTD_LIBS) \
 	-L../libcontextprovider/.libs \
 	-lcontextprovider \
+	-lm \
 	$(NULL)
 
 EXTRA_DIST = \
