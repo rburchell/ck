@@ -191,7 +191,7 @@ namespace Plugins {
 		
 		// Is called when HAL notifies us that a property has changed
 		private static void property_modified (Hal.Context ctx, string udi, string key, bool is_removed, bool is_added) {
-			debug ("Property modified: %s, %s", udi, key);
+			// debug ("Property modified: %s, %s", udi, key);
 
 			if (batteries.get_keys().contains(udi) == false) {
 				warning("Received changed properties from an unknown device %s", udi);

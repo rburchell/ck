@@ -29,16 +29,18 @@ namespace Hal {
 
 	public const string mockUdi = "mock.udi";
 
-
+	// Values stored in the mock implementation
 	Gee.HashMap<string, int> intProperties;
-
+	Gee.HashMap<string, bool> boolProperties;
 
 	// Functions to be used by the test program
 	public void initializeMock() {
 		intProperties = new Gee.HashMap<string, int>(str_hash, str_equal);
+		boolProperties = new Gee.HashMap<string, bool>(str_hash, str_equal);
 	}
 
-
+	// Sets the value of a property in the mock implementation.
+	// If callTheCallback is true, also notifies the client of the change.
 	public void changePropertyInt(string key, int value, bool callTheCallback) {
 
 		intProperties.set(key, value);
@@ -47,7 +49,15 @@ namespace Hal {
 		}
 	} 
 
+	// Sets the value of a property in the mock implementation.
+	// If callTheCallback is true, also notifies the client of the change.
+	public void changePropertyBool(string key, bool value, bool callTheCallback) {
 
+		boolProperties.set(key, value);
+		if (callTheCallback) {
+			propertyModifiedCallback(contextUsedByPlugin, mockUdi, key, false, false);
+		}
+	} 
 
 	public class Context {
 		public static delegate void DevicePropertyModified (Context ctx, string udi, string key, bool is_removed, bool is_added);
@@ -73,7 +83,6 @@ namespace Hal {
 			
 			// Store the callback so that the test can command the mock implementation
 			// to call it
-			debug ("callback set");
 			propertyModifiedCallback = _callback;
 
 			return true;
@@ -85,12 +94,11 @@ namespace Hal {
 		}
 
 		public int device_get_property_int (string udi, string key, ref DBus.RawError error) {
-			debug("getting int property %s", key);
-return intProperties.get (key);
+			return intProperties.get (key);
 		}
 
 		public bool device_get_property_bool (string udi, string key, ref DBus.RawError error) {
-			return false;
+			return boolProperties.get (key);
 		}
 
 		public bool device_add_property_watch (string udi, ref DBus.RawError error) {

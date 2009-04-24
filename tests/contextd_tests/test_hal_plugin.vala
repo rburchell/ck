@@ -33,8 +33,6 @@ const string keyIsCharging = "Context.Battery.IsCharging";
 const string keyTimeUntilLow = "Context.Battery.TimeUntilLow"; 
 const string keyTimeUntilFull = "Context.Battery.TimeUntilFull"; 
 
-
-
 void test_install() {
 	// Setup
 	ContextProvider.initializeMock();
@@ -66,6 +64,8 @@ void test_chargepercentage () {
 	Hal.changePropertyInt (halCharge, 100, false);
 	Hal.changePropertyInt (halLastFull, 200, false);
 	Hal.changePropertyInt (halRate, 0, false);
+	Hal.changePropertyBool (halCharging, false, false);
+	Hal.changePropertyBool (halDischarging, false, false);
 
 	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
 	plugin.install ();
@@ -74,14 +74,43 @@ void test_chargepercentage () {
 
 	ContextProvider.resetValues ();
 	// Test
-	// Command libhal mock implementation to send a changed charge percentage
+	// Command libhal mock implementation to change a value
+	// of a property and to notify the client of the change
 	Hal.changePropertyInt(halPercentage, 53, true);
 
 	// Expected results: 
 	Gee.HashMap<string, int> intValues = ContextProvider.intValues;
 	assert (intValues.get_keys().contains(keyChargePercentage));
 	assert (intValues.get(keyChargePercentage) == 53);
-	
+}
+
+void test_onbattery () {
+	// Setup
+	ContextProvider.initializeMock ();
+	Hal.initializeMock ();
+	// Set the initial values for the properties
+	Hal.changePropertyInt (halPercentage, 50, false);
+	Hal.changePropertyInt (halCharge, 100, false);
+	Hal.changePropertyInt (halLastFull, 200, false);
+	Hal.changePropertyInt (halRate, 0, false);
+	Hal.changePropertyBool (halCharging, false, false);
+	Hal.changePropertyBool (halDischarging, false, false);
+
+	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
+	plugin.install ();
+	// tell the plugin that someone is listening
+	ContextProvider.callSubscriptionCallback(true);
+
+	ContextProvider.resetValues ();
+	// Test
+	// Command libhal mock implementation to change a value
+	// of a property and to notify the client of the change
+	Hal.changePropertyBool(halDischarging, true, true);
+
+	// Expected results: 
+	Gee.HashMap<string, bool> boolValues = ContextProvider.boolValues;
+	assert (boolValues.get_keys().contains(keyOnBattery));
+	assert (boolValues.get(keyOnBattery) == true);
 }
 
 
@@ -98,5 +127,6 @@ public static void main (string[] args) {
 
 	Test.add_func("/contextd/hal_plugin/test_install", test_install);
 	Test.add_func("/contextd/hal_plugin/test_chargepercentage", test_chargepercentage);
+	Test.add_func("/contextd/hal_plugin/test_onbattery", test_onbattery);
 	Test.run ();
 }
