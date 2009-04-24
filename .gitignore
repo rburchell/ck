@@ -119,4 +119,11 @@ tests/unit_tests/test_stringset.[ch]
 tests/unit_tests/test_value_compare
 tests/unit_tests/test_value_compare.vala.stamp
 tests/unit_tests/test_value_compare.[ch]
+tests/contextd_tests/test_hal_plugin
+tests/contextd_tests/test_hal_plugin.[ch]
+tests/contextd_tests/test_hal_plugin.vala.stamp
+tests/contextd_tests/libhal.c
+tests/contextd_tests/context_provider.c
+tests/contextd_tests/plugin.c
+tests/contextd_tests/hal_plugin.c
 .project
