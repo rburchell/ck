@@ -23,10 +23,17 @@ using Gee;
 
 namespace ContextProvider {
 
+	public string log;
+
+	// Mocked functions
 	public void set_integer (string key, int value) {
+		string newLog = "set_integer(%s,%d)".printf(key, value);
+		log += newLog;
 	}
 
 	public void set_double (string key, double value) {
+		string newLog = "set_double(%s,%f)".printf(key, value);
+		log += newLog;
 	}
 
 	public void set_boolean (string key, bool value) {
