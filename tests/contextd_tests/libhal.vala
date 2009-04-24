@@ -32,11 +32,15 @@ namespace Hal {
 	// Values stored in the mock implementation
 	Gee.HashMap<string, int> intProperties;
 	Gee.HashMap<string, bool> boolProperties;
+	
+	// Hidden properties. If the client tries to query these, it gets an error.
+	Gee.HashSet<string> hiddenProperties;
 
 	// Functions to be used by the test program
 	public void initializeMock() {
 		intProperties = new Gee.HashMap<string, int>(str_hash, str_equal);
 		boolProperties = new Gee.HashMap<string, bool>(str_hash, str_equal);
+		hiddenProperties = new Gee.HashSet<string>(str_hash, str_equal);
 	}
 
 	// Sets the value of a property in the mock implementation.
@@ -94,10 +98,19 @@ namespace Hal {
 		}
 
 		public int device_get_property_int (string udi, string key, ref DBus.RawError error) {
+			if (hiddenProperties.contains (key)) {
+				error.name = "property hidden";
+				return 0;
+			}
 			return intProperties.get (key);
 		}
 
 		public bool device_get_property_bool (string udi, string key, ref DBus.RawError error) {
+			
+			if (hiddenProperties.contains (key)) {
+				error.name = "property hidden";
+				return false;
+			}
 			return boolProperties.get (key);
 		}
 

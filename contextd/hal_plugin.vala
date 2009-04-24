@@ -250,7 +250,7 @@ namespace Plugins {
 				value = halContext.device_get_property_int(udi, property, ref error);
 		
 				if (error.is_set()) {
-					warning ("reading property %s failed", property);
+					debug ("reading property %s failed", property);
 				} else {
 					// debug ("Read property: %s %d", property, value);
 					success = true;
@@ -265,7 +265,7 @@ namespace Plugins {
 				value = halContext.device_get_property_bool(udi, property, ref error);
 		
 				if (error.is_set()) {
-					warning ("reading property %s failed", property);
+					debug ("reading property %s failed", property);
 				} else {
 					// debug ("Read property: %s %s", property, value ? "true" : "false");
 					success = true;

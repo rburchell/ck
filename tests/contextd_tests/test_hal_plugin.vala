@@ -379,6 +379,34 @@ void test_irrelevantchange () {
 	assert(ContextProvider.unknownValues.size == 0);
 }
 
+void test_unknown () {
+	// Setup
+	ContextProvider.initializeMock ();
+	Hal.initializeMock ();
+	// Set the initial values for the properties
+	Hal.changePropertyInt (halPercentage, 50, false);
+	Hal.changePropertyInt (halCharge, 100, false);
+	Hal.changePropertyInt (halLastFull, 200, false);
+	Hal.changePropertyInt (halRate, 0, false);
+	Hal.changePropertyBool (halCharging, false, false);
+	Hal.changePropertyBool (halDischarging, false, false);
+
+	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
+	plugin.install ();
+	// tell the plugin that someone is listening
+	ContextProvider.callSubscriptionCallback(true);
+
+	// Test
+	// Hide a property and notify the client that it was modified
+	Hal.hiddenProperties.add (halPercentage);
+	Hal.changePropertyInt (halPercentage, 50, true);
+
+	// Expected results:
+	Gee.HashSet<string> unknownValues = ContextProvider.unknownValues;
+	assert (unknownValues.contains(keyChargePercentage));
+}
+
+
 
 void debug_null  (string? log_domain, LogLevelFlags log_level, string message)
 {
@@ -400,5 +428,6 @@ public static void main (string[] args) {
 	Test.add_func("/contextd/hal_plugin/test_timeuntillow", test_timeuntillow);
 	Test.add_func("/contextd/hal_plugin/test_timeuntilfull", test_timeuntilfull);
 	Test.add_func("/contextd/hal_plugin/test_irrelevantchange", test_irrelevantchange);
+	Test.add_func("/contextd/hal_plugin/test_unknown", test_unknown);
 	Test.run ();
 }
