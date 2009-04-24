@@ -178,7 +178,96 @@ void test_lowbattery () {
 	boolValues = ContextProvider.boolValues;
 	assert (boolValues.get_keys().contains(keyLowBattery));
 	assert (boolValues.get(keyLowBattery) == false);
+}
 
+void test_ischarging () {
+	// Setup
+	ContextProvider.initializeMock ();
+	Hal.initializeMock ();
+	// Set the initial values for the properties
+	Hal.changePropertyInt (halPercentage, 50, false);
+	Hal.changePropertyInt (halCharge, 100, false);
+	Hal.changePropertyInt (halLastFull, 200, false);
+	Hal.changePropertyInt (halRate, 0, false);
+	Hal.changePropertyBool (halCharging, false, false);
+	Hal.changePropertyBool (halDischarging, false, false);
+
+	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
+	plugin.install ();
+	// tell the plugin that someone is listening
+	ContextProvider.callSubscriptionCallback(true);
+
+	// Test
+	// Command libhal mock implementation to change a value
+	// of a property and to notify the client of the change
+	ContextProvider.resetValues ();
+	Hal.changePropertyBool(halCharging, true, true);
+
+	// Expected results:
+	Gee.HashMap<string, bool> boolValues = ContextProvider.boolValues;
+	assert (boolValues.get_keys().contains(keyIsCharging));
+	assert (boolValues.get(keyIsCharging) == true);
+
+	// Test
+	// Command libhal mock implementation to change a value
+	// of a property and to notify the client of the change
+	ContextProvider.resetValues ();
+	Hal.changePropertyBool(halCharging, false, true);
+
+	// Expected results:
+	boolValues = ContextProvider.boolValues;
+	assert (boolValues.get_keys().contains(keyIsCharging));
+	assert (boolValues.get(keyIsCharging) == false);
+}
+
+void test_timeuntillow () {
+	// Setup
+	ContextProvider.initializeMock ();
+	Hal.initializeMock ();
+	// Set the initial values for the properties
+	Hal.changePropertyInt (halPercentage, 50, false);
+	Hal.changePropertyInt (halCharge, 100, false);
+	Hal.changePropertyInt (halLastFull, 200, false);
+	Hal.changePropertyInt (halRate, 0, false);
+	Hal.changePropertyBool (halCharging, false, false);
+	Hal.changePropertyBool (halDischarging, false, false);
+
+	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
+	plugin.install ();
+	// tell the plugin that someone is listening
+	ContextProvider.callSubscriptionCallback(true);
+
+	// Test
+	// Command libhal mock implementation to change a value
+	// of a property and to notify the client of the change
+	ContextProvider.resetValues ();
+	Hal.changePropertyBool(halDischarging, true, true);
+	Hal.changePropertyInt(halCharge, 7000, true);
+	Hal.changePropertyInt(halLastFull, 10000, true);
+	Hal.changePropertyInt(halRate, 1000, true);
+
+	// Expected results:
+	Gee.HashMap<string, int> intValues = ContextProvider.intValues;
+	assert (intValues.get_keys().contains(keyTimeUntilLow));
+	debug("was: %d", intValues.get(keyTimeUntilLow));
+
+	// Takes 6 hours to reach battery 10%
+	assert (intValues.get(keyTimeUntilLow) == 6 * 3600);
+
+	// Test
+	// Command libhal mock implementation to change a value
+	// of a property and to notify the client of the change
+	ContextProvider.resetValues ();
+	Hal.changePropertyBool(halDischarging, true, true);
+	Hal.changePropertyInt(halCharge, 5, true); // Already low!
+	Hal.changePropertyInt(halLastFull, 100, true);
+	Hal.changePropertyInt(halRate, 3, true);
+
+	// Expected results:
+	intValues = ContextProvider.intValues;
+	assert (intValues.get_keys().contains(keyTimeUntilLow));
+	debug("was: %d", intValues.get(keyTimeUntilLow));
+	assert (intValues.get(keyTimeUntilLow) == 0);
 }
 
 
@@ -197,5 +286,7 @@ public static void main (string[] args) {
 	Test.add_func("/contextd/hal_plugin/test_chargepercentage", test_chargepercentage);
 	Test.add_func("/contextd/hal_plugin/test_onbattery", test_onbattery);
 	Test.add_func("/contextd/hal_plugin/test_lowbattery", test_lowbattery);
+	Test.add_func("/contextd/hal_plugin/test_ischarging", test_ischarging);
+	Test.add_func("/contextd/hal_plugin/test_timeuntillow", test_timeuntillow);
 	Test.run ();
 }

@@ -341,6 +341,9 @@ namespace Plugins {
 			if (info.lastNonzeroDischargingRate > 0 && info.chargeKnown && info.lastFullKnown) {
 				double timeUntilLow = (1.0 * info.charge - thresholdForLow / 100.0 * info.lastFull) / info.lastNonzeroDischargingRate;
 
+				// If the battery is already low, set to 0.
+				if (timeUntilLow < 0) timeUntilLow = 0;
+
 				timeUntilLow *= 60; // conversion to minutes
 				timeUntilLow = Math.round(timeUntilLow); // round to nearest minute
 				timeUntilLow *= 60; // conversion to seconds
