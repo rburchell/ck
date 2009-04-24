@@ -42,7 +42,7 @@ void test_install() {
 	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
 	bool success = plugin.install ();
 
-	// Expected results: 
+	// Expected results:
 	// the installation succeeded
 	assert (success == true);
 	// the plugin declares the correct keys
@@ -101,16 +101,84 @@ void test_onbattery () {
 	// tell the plugin that someone is listening
 	ContextProvider.callSubscriptionCallback(true);
 
-	ContextProvider.resetValues ();
 	// Test
 	// Command libhal mock implementation to change a value
 	// of a property and to notify the client of the change
+	ContextProvider.resetValues ();
 	Hal.changePropertyBool(halDischarging, true, true);
 
-	// Expected results: 
+	// Expected results:
 	Gee.HashMap<string, bool> boolValues = ContextProvider.boolValues;
 	assert (boolValues.get_keys().contains(keyOnBattery));
 	assert (boolValues.get(keyOnBattery) == true);
+
+	// Test
+	// Command libhal mock implementation to change a value
+	// of a property and to notify the client of the change
+	ContextProvider.resetValues ();
+	Hal.changePropertyBool(halDischarging, false, true);
+
+	// Expected results:
+	boolValues = ContextProvider.boolValues;
+	assert (boolValues.get_keys().contains(keyOnBattery));
+	assert (boolValues.get(keyOnBattery) == false);
+}
+
+void test_lowbattery () {
+	// Setup
+	ContextProvider.initializeMock ();
+	Hal.initializeMock ();
+	// Set the initial values for the properties
+	Hal.changePropertyInt (halPercentage, 50, false);
+	Hal.changePropertyInt (halCharge, 100, false);
+	Hal.changePropertyInt (halLastFull, 200, false);
+	Hal.changePropertyInt (halRate, 0, false);
+	Hal.changePropertyBool (halCharging, false, false);
+	Hal.changePropertyBool (halDischarging, false, false);
+
+	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
+	plugin.install ();
+	// tell the plugin that someone is listening
+	ContextProvider.callSubscriptionCallback(true);
+
+	// Test
+	// Command libhal mock implementation to change a value
+	// of a property and to notify the client of the change
+	ContextProvider.resetValues ();
+	Hal.changePropertyBool (halDischarging, true, true);
+	Hal.changePropertyInt(halPercentage, 5, true);
+	// Note: if we set more than one properties, we need to call the
+	// property_modified callback for both of them (last parameter: true)
+
+	// Expected results:
+	Gee.HashMap<string, bool> boolValues = ContextProvider.boolValues;
+	assert (boolValues.get_keys().contains(keyLowBattery));
+	assert (boolValues.get(keyLowBattery) == true);
+
+	// Test
+	// Command libhal mock implementation to change a value
+	// of a property and to notify the client of the change
+	ContextProvider.resetValues ();
+	Hal.changePropertyBool (halDischarging, true, false);
+	Hal.changePropertyInt(halPercentage, 15, true);
+
+	// Expected results:
+	boolValues = ContextProvider.boolValues;
+	assert (boolValues.get_keys().contains(keyLowBattery));
+	assert (boolValues.get(keyLowBattery) == false);
+
+	// Test
+	// Command libhal mock implementation to change a value
+	// of a property and to notify the client of the change
+	ContextProvider.resetValues ();
+	Hal.changePropertyBool (halDischarging, false, true);
+	Hal.changePropertyInt(halPercentage, 5, true);
+
+	// Expected results:
+	boolValues = ContextProvider.boolValues;
+	assert (boolValues.get_keys().contains(keyLowBattery));
+	assert (boolValues.get(keyLowBattery) == false);
+
 }
 
 
@@ -128,5 +196,6 @@ public static void main (string[] args) {
 	Test.add_func("/contextd/hal_plugin/test_install", test_install);
 	Test.add_func("/contextd/hal_plugin/test_chargepercentage", test_chargepercentage);
 	Test.add_func("/contextd/hal_plugin/test_onbattery", test_onbattery);
+	Test.add_func("/contextd/hal_plugin/test_lowbattery", test_lowbattery);
 	Test.run ();
 }
