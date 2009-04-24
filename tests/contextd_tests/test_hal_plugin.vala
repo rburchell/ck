@@ -55,6 +55,38 @@ void test_install() {
 	assert (keys.contains (keyTimeUntilFull));
 }
 
+void test_startsubscribing() {
+	// Setup
+	ContextProvider.initializeMock ();
+	Hal.initializeMock ();
+	// Set the initial values for the properties
+	Hal.changePropertyInt (halPercentage, 20, false);
+	Hal.changePropertyInt (halCharge, 60, false);
+	Hal.changePropertyInt (halLastFull, 300, false);
+	Hal.changePropertyInt (halRate, 10, false);
+	Hal.changePropertyBool (halCharging, true, false);
+	Hal.changePropertyBool (halDischarging, false, false);
+	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
+	plugin.install ();
+
+	ContextProvider.resetValues ();
+
+	// Test
+	// tell the plugin that someone is listening
+	ContextProvider.callSubscriptionCallback(true);
+
+	// Expected result: the initial values for all keys are set
+	Gee.HashMap<string, int> intValues = ContextProvider.intValues;
+	assert (intValues.get_keys().contains(keyChargePercentage));
+	assert (intValues.get_keys().contains(keyTimeUntilFull));
+	Gee.HashMap<string, bool> boolValues = ContextProvider.boolValues;
+	assert (boolValues.get_keys().contains(keyOnBattery));
+	assert (boolValues.get_keys().contains(keyLowBattery));
+	assert (boolValues.get_keys().contains(keyIsCharging));
+	Gee.HashSet<string> unknownValues = ContextProvider.unknownValues;
+	assert (unknownValues.contains(keyTimeUntilLow));
+}
+
 void test_chargepercentage () {
 	// Setup
 	ContextProvider.initializeMock ();
@@ -65,7 +97,7 @@ void test_chargepercentage () {
 	Hal.changePropertyInt (halLastFull, 200, false);
 	Hal.changePropertyInt (halRate, 0, false);
 	Hal.changePropertyBool (halCharging, false, false);
-	Hal.changePropertyBool (halDischarging, false, false);
+	Hal.changePropertyBool (halDischarging, true, false);
 
 	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
 	plugin.install ();
@@ -314,6 +346,39 @@ void test_timeuntilfull () {
 	assert (intValues.get(keyTimeUntilFull) == 0);
 }
 
+void test_irrelevantchange () {
+	// Setup
+	ContextProvider.initializeMock ();
+	Hal.initializeMock ();
+	// Set the initial values for the properties
+	Hal.changePropertyInt (halPercentage, 50, false);
+	Hal.changePropertyInt (halCharge, 100, false);
+	Hal.changePropertyInt (halLastFull, 200, false);
+	Hal.changePropertyInt (halRate, 0, false);
+	Hal.changePropertyBool (halCharging, false, false);
+	Hal.changePropertyBool (halDischarging, false, false);
+
+	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
+	plugin.install ();
+	// tell the plugin that someone is listening
+	ContextProvider.callSubscriptionCallback(true);
+
+	// Test
+	// Command libhal mock implementation to change two irrelevant values
+	// of a property and to notify the client of the change
+	ContextProvider.resetValues ();
+	Hal.changePropertyBool("irrelevant", true, true);
+	Hal.changePropertyInt("another_irrelevant", 42, true);
+
+	// Expected results:
+	// no changes were received
+	assert(ContextProvider.intValues.get_keys().size == 0);
+	assert(ContextProvider.doubleValues.get_keys().size == 0);
+	assert(ContextProvider.stringValues.get_keys().size == 0);
+	assert(ContextProvider.boolValues.get_keys().size == 0);
+	assert(ContextProvider.unknownValues.size == 0);
+}
+
 
 void debug_null  (string? log_domain, LogLevelFlags log_level, string message)
 {
@@ -327,11 +392,13 @@ public static void main (string[] args) {
 	}
 
 	Test.add_func("/contextd/hal_plugin/test_install", test_install);
+	Test.add_func("/contextd/hal_plugin/test_startsubscribing", test_startsubscribing);
 	Test.add_func("/contextd/hal_plugin/test_chargepercentage", test_chargepercentage);
 	Test.add_func("/contextd/hal_plugin/test_onbattery", test_onbattery);
 	Test.add_func("/contextd/hal_plugin/test_lowbattery", test_lowbattery);
 	Test.add_func("/contextd/hal_plugin/test_ischarging", test_ischarging);
 	Test.add_func("/contextd/hal_plugin/test_timeuntillow", test_timeuntillow);
 	Test.add_func("/contextd/hal_plugin/test_timeuntilfull", test_timeuntilfull);
+	Test.add_func("/contextd/hal_plugin/test_irrelevantchange", test_irrelevantchange);
 	Test.run ();
 }
