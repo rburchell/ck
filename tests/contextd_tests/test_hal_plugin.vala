@@ -379,7 +379,36 @@ void test_irrelevantchange () {
 	assert(ContextProvider.unknownValues.size == 0);
 }
 
-void test_unknown () {
+void test_unknownchargepercentage () {
+	// Setup
+	ContextProvider.initializeMock ();
+	Hal.initializeMock ();
+	// Set the initial values for the properties
+	Hal.changePropertyInt (halPercentage, 50, false);
+	Hal.changePropertyInt (halCharge, 100, false);
+	Hal.changePropertyInt (halLastFull, 200, false);
+	Hal.changePropertyInt (halRate, 0, false);
+	Hal.changePropertyBool (halCharging, false, false);
+	Hal.changePropertyBool (halDischarging, true, false);
+
+	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
+	plugin.install ();
+	// tell the plugin that someone is listening
+	ContextProvider.callSubscriptionCallback(true);
+
+	// Test
+	// Hide a property and notify the client that it was modified
+	Hal.hiddenProperties.add (halPercentage);
+	Hal.changePropertyInt (halPercentage, 50, true);
+
+	// Expected results:
+	Gee.HashSet<string> unknownValues = ContextProvider.unknownValues;
+	assert (unknownValues.contains(keyChargePercentage));
+	assert (unknownValues.contains(keyLowBattery)); 
+	// note: because discharging = true, this goes unknown as well
+}
+
+void test_unknownonbattery () {
 	// Setup
 	ContextProvider.initializeMock ();
 	Hal.initializeMock ();
@@ -398,12 +427,39 @@ void test_unknown () {
 
 	// Test
 	// Hide a property and notify the client that it was modified
-	Hal.hiddenProperties.add (halPercentage);
-	Hal.changePropertyInt (halPercentage, 50, true);
+	Hal.hiddenProperties.add (halDischarging);
+	Hal.changePropertyBool (halDischarging, false, true);
 
 	// Expected results:
 	Gee.HashSet<string> unknownValues = ContextProvider.unknownValues;
-	assert (unknownValues.contains(keyChargePercentage));
+	assert (unknownValues.contains(keyOnBattery));
+}
+
+void test_unknownischarging () {
+	// Setup
+	ContextProvider.initializeMock ();
+	Hal.initializeMock ();
+	// Set the initial values for the properties
+	Hal.changePropertyInt (halPercentage, 50, false);
+	Hal.changePropertyInt (halCharge, 100, false);
+	Hal.changePropertyInt (halLastFull, 200, false);
+	Hal.changePropertyInt (halRate, 0, false);
+	Hal.changePropertyBool (halCharging, false, false);
+	Hal.changePropertyBool (halDischarging, false, false);
+
+	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
+	plugin.install ();
+	// tell the plugin that someone is listening
+	ContextProvider.callSubscriptionCallback(true);
+
+	// Test
+	// Hide a property and notify the client that it was modified
+	Hal.hiddenProperties.add (halCharging);
+	Hal.changePropertyBool (halCharging, false, true);
+
+	// Expected results:
+	Gee.HashSet<string> unknownValues = ContextProvider.unknownValues;
+	assert (unknownValues.contains(keyIsCharging));
 }
 
 
@@ -416,7 +472,7 @@ public static void main (string[] args) {
 	Test.init (ref args);
 
 	if (Test.quiet()) {
-		//Log.set_handler ("ContextKit", LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.FLAG_RECURSION, debug_null);
+		Log.set_handler ("ContextKit", LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.FLAG_RECURSION, debug_null);
 	}
 
 	Test.add_func("/contextd/hal_plugin/test_install", test_install);
@@ -428,6 +484,8 @@ public static void main (string[] args) {
 	Test.add_func("/contextd/hal_plugin/test_timeuntillow", test_timeuntillow);
 	Test.add_func("/contextd/hal_plugin/test_timeuntilfull", test_timeuntilfull);
 	Test.add_func("/contextd/hal_plugin/test_irrelevantchange", test_irrelevantchange);
-	Test.add_func("/contextd/hal_plugin/test_unknown", test_unknown);
+	Test.add_func("/contextd/hal_plugin/test_unknownchargepercentage", test_unknownchargepercentage);
+	Test.add_func("/contextd/hal_plugin/test_unknownonbattery", test_unknownonbattery);
+	Test.add_func("/contextd/hal_plugin/test_unknownischarging", test_unknownischarging);
 	Test.run ();
 }
