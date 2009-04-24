@@ -80,7 +80,7 @@ namespace Plugins {
 			bool success = halContext.set_dbus_connection(connection);
 
 			if (!success) {
-				warning ("Error: initializing HAL failed");
+				warning ("initializing HAL failed");
 				return false;
 			}				
 
@@ -91,7 +91,7 @@ namespace Plugins {
 			// Note: this needs to be called after the dbus connection is set
 			halContext.init (ref error);
 			if (error.is_set ()) {
-				warning ("Error: initializing HAL failed");
+				warning ("initializing HAL failed");
 				return false;
 			}
 
@@ -99,7 +99,7 @@ namespace Plugins {
 			success = halContext.set_device_property_modified (property_modified);
 
 			if (!success) {
-				warning ("Error: initializing HAL failed");
+				warning ("initializing HAL failed");
 				return false;
 			}				
 
@@ -130,21 +130,22 @@ namespace Plugins {
 			var deviceNames = halContext.find_device_by_capability("battery", ref error);
 	
 			if (error.is_set()) {
-				warning ("Warning: finding devices failed");
+				warning ("finding devices failed");
 				return;
 			}
 
 			if (deviceNames == null) {
-				warning ("Warning: finding devices failed");
+				warning ("finding devices failed");
 				return;
 			}
 
 			foreach (var udi in deviceNames) {
+				// debug ("found device %s", udi);
 				// Start listening to property changes
 				bool success = halContext.device_add_property_watch (udi, ref error);
 				
 				if (!success || error.is_set()) {
-					warning ("Warning: adding property watch failed");
+					warning ("adding property watch failed");
 				}
 
 				// Read initial values
@@ -190,7 +191,12 @@ namespace Plugins {
 		
 		// Is called when HAL notifies us that a property has changed
 		private static void property_modified (Hal.Context ctx, string udi, string key, bool is_removed, bool is_added) {
-			// debug ("Property modified: %s, %s", udi, key);
+			debug ("Property modified: %s, %s", udi, key);
+
+			if (batteries.get_keys().contains(udi) == false) {
+				warning("Received changed properties from an unknown device %s", udi);
+				return;
+			}
 
 			BatteryInfo info = batteries.get (udi);
 
@@ -244,7 +250,7 @@ namespace Plugins {
 				value = halContext.device_get_property_int(udi, property, ref error);
 		
 				if (error.is_set()) {
-					warning ("Warning: querying property %s failed", property);
+					warning ("reading property %s failed", property);
 				} else {
 					// debug ("Read property: %s %d", property, value);
 					success = true;
@@ -259,7 +265,7 @@ namespace Plugins {
 				value = halContext.device_get_property_bool(udi, property, ref error);
 		
 				if (error.is_set()) {
-					warning ("Warning: querying property %s failed", property);
+					warning ("reading property %s failed", property);
 				} else {
 					// debug ("Read property: %s %s", property, value ? "true" : "false");
 					success = true;
@@ -274,7 +280,7 @@ namespace Plugins {
 		// is unknown or only when all of them are unknown.
 		private static void calculateProperties () {
 			if (batteries.size != 1) {
-				warning ("Warning: no batteries / more than one battery");
+				warning ("no batteries / more than one battery");
 				return;
 			}
 

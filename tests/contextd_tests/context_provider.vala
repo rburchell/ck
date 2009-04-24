@@ -24,42 +24,63 @@
 namespace ContextProvider {
 
 	// Variables for logging etc.
-	// Made public so that the test program can access them.
-	public Gee.HashSet<string> providedKeys;
-	public string log;
+	public static Gee.HashSet<string> providedKeys;
+	
+	public static Gee.HashMap<string, int> intValues;
+	public static Gee.HashMap<string, double?> doubleValues;
+	public static Gee.HashMap<string, bool> boolValues;
+	public static Gee.HashMap<string, string> stringValues;
+	public static Gee.HashSet<string> unknownValues;
 
+	// Note: dummy assumption: only one callback is needed
+	SubscriptionChangedCallback subscriptionCallback;
 
-	// Initializes this mock implementation. To be called in tests.
+	// Functions to be called by the test program:
+
+	// Initializes this mock implementation.
 	public void initializeMock() {
-		log = "";
+		
 		providedKeys = new Gee.HashSet<string>(str_hash, str_equal);
+		
+		intValues = new Gee.HashMap<string, int>(str_hash, str_equal);
+		doubleValues = new Gee.HashMap<string, double?>(str_hash, str_equal);
+		boolValues = new Gee.HashMap<string, bool>(str_hash, str_equal);
+		stringValues = new Gee.HashMap<string, string>(str_hash, str_equal);
+		unknownValues = new Gee.HashSet<string>(str_hash, str_equal);
 	}
 
-	public Gee.HashSet<string> getProvidedKeys() {
-		return providedKeys;
+	public void resetValues () {
+		intValues.clear ();
+		doubleValues.clear ();
+		boolValues.clear ();
+		stringValues.clear ();
+		unknownValues.clear ();
 	}
 
+	public void callSubscriptionCallback(bool subscribe) {
+		subscriptionCallback(subscribe);
+	}
 
-	// Mocked functions
+	// Mocked functions:
+
 	public void set_integer (string key, int value) {
-		string newLog = "set_integer(%s,%d)".printf(key, value);
-		log += newLog;
+		intValues.set(key, value);
 	}
 
 	public void set_double (string key, double value) {
-		string newLog = "set_double(%s,%f)".printf(key, value);
-		log += newLog;
+		doubleValues.set(key, value);
 	}
 
 	public void set_boolean (string key, bool value) {
-		string newLog = "set_double(%s,%s)".printf(key, value ? "true" : "false");
-		log += newLog;
+		boolValues.set(key, value);
 	}
 
 	public void set_string (string key, string value) {
+		stringValues.set(key, value);
 	}
 
 	public void set_null (string key) {
+		unknownValues.add(key);
 	}
 
 	public delegate void SubscriptionChangedCallback(bool subscribe);
@@ -68,9 +89,11 @@ namespace ContextProvider {
 		foreach (var key in key_group) {
 			providedKeys.add(key);
 		}
+		subscriptionCallback = subscription_changed_cb;
 	}
 
 	public void install_key(string key, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
 		providedKeys.add(key);
+		subscriptionCallback = subscription_changed_cb;
 	}
 }
