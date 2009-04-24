@@ -21,13 +21,23 @@
 
 void test_install() {
 	// Setup
-	
+	ContextProvider.initializeMock();
+
 	// Test
 	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
 	bool success = plugin.install ();
 
-	// Expected results: the installation succeeded
+	// Expected results: 
+	// the installation succeeded
 	assert (success == true);
+	// the plugin declares the correct keys
+	Gee.HashSet<string> keys = ContextProvider.getProvidedKeys ();
+	assert (keys.contains ("Context.Battery.ChargePercentage"));
+	assert (keys.contains ("Context.Battery.OnBattery"));
+	assert (keys.contains ("Context.Battery.LowBattery"));
+	assert (keys.contains ("Context.Battery.IsCharging"));
+	assert (keys.contains ("Context.Battery.TimeUntilLow"));
+	assert (keys.contains ("Context.Battery.TimeUntilFull"));
 }
 
 void debug_null  (string? log_domain, LogLevelFlags log_level, string message)

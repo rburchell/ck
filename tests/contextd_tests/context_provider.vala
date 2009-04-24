@@ -19,11 +19,26 @@
  *
  */
 
-using Gee;
+/* This is a mock implementation to be used in tests. */
 
 namespace ContextProvider {
 
+	// Variables for logging etc.
+	// Made public so that the test program can access them.
+	public Gee.HashSet<string> providedKeys;
 	public string log;
+
+
+	// Initializes this mock implementation. To be called in tests.
+	public void initializeMock() {
+		log = "";
+		providedKeys = new Gee.HashSet<string>(str_hash, str_equal);
+	}
+
+	public Gee.HashSet<string> getProvidedKeys() {
+		return providedKeys;
+	}
+
 
 	// Mocked functions
 	public void set_integer (string key, int value) {
@@ -37,6 +52,8 @@ namespace ContextProvider {
 	}
 
 	public void set_boolean (string key, bool value) {
+		string newLog = "set_double(%s,%s)".printf(key, value ? "true" : "false");
+		log += newLog;
 	}
 
 	public void set_string (string key, string value) {
@@ -48,8 +65,12 @@ namespace ContextProvider {
 	public delegate void SubscriptionChangedCallback(bool subscribe);
 
 	public void install_group ([CCode (array_length = false, array_null_terminated = true)] string[] key_group, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
+		foreach (var key in key_group) {
+			providedKeys.add(key);
+		}
 	}
 
 	public void install_key(string key, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
+		providedKeys.add(key);
 	}
 }
