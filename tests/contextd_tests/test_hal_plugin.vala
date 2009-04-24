@@ -472,7 +472,7 @@ public static void main (string[] args) {
 	Test.init (ref args);
 
 	if (Test.quiet()) {
-		Log.set_handler ("ContextKit", LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.FLAG_RECURSION, debug_null);
+		Log.set_handler ("", LogLevelFlags.LEVEL_DEBUG | LogLevelFlags.FLAG_RECURSION, debug_null);
 	}
 
 	Test.add_func("/contextd/hal_plugin/test_install", test_install);

@@ -27,7 +27,7 @@ namespace ContextD {
 	// passed, e.g., whether keys should be set to Unknown if nobody is subscribed
 	// to them.
 	// The install function of the plugin is called in main, after creating the
-	// main loop but before entering it.
+	// main loop and initializing ContextProvider but before entering the main loop.
 	internal interface Plugin : GLib.Object {
 		internal abstract bool install();
 	}
