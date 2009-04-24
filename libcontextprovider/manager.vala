@@ -33,7 +33,7 @@ namespace ContextProvider {
 
 		// NULL value means undetermined
 		HashTable<string, Value?> values;
-		static dynamic DBus.Object bus; // Needs to be stored so that we get the NameOwnerChanged
+		dynamic DBus.Object bus; // Needs to be stored so that we get the NameOwnerChanged
 
 		// Session / system bus option
 		DBus.BusType busType;

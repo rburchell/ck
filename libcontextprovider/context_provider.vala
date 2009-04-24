@@ -155,6 +155,18 @@ namespace ContextProvider {
 	}
 
 	/**
+	 * context_provider_stop:
+	 *
+	 * Stop providing context and free up all resources.
+	 *
+	 * Closes down ContextProvider and frees up all resources.
+	 */
+	public void stop () {
+		manager = null;
+	}
+
+
+	/**
 	 * context_provider_install_group:
 	 * @key_group: a NULL-terminated array of context key names
 	 * @clear_values_on_subscribe: if TRUE then the keys in this group will
