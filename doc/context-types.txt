@@ -833,11 +833,11 @@ C++ with QVariant
 Types should be compatible with C and have the same names.
 
 - geoloc
-
++
   struct DGeoLoc {
     double latitude;
     double longitude;
-    double altitude; // -1 if unknown.
+    double altitude; // NaN if unknown.
 
     DGeoLoc();
     DGeoLoc(double, double);
@@ -846,8 +846,8 @@ Types should be compatible with C and have the same names.
     DGeoLoc (QVariant);
     operator QVariant ();
   };
-
-  Registered as "DGeoLoc" with QMetaType.
++
+Registered as "DGeoLoc" with QMetaType.
 
 - rest identical with C, except "type", hmm...
 
