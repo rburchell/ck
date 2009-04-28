@@ -25,7 +25,7 @@ namespace ContextProvider {
 
 	// Records whether the context_init function has been called
 	internal Manager? manager = null;
-
+	internal dynamic DBus.Object? bus = null;
 	/**
 	 * context_provider_set_integer:
 	 * @key: name of key
@@ -125,7 +125,7 @@ namespace ContextProvider {
 
 		try {
 			var connection = DBus.Bus.get (bus_type);
-			dynamic DBus.Object bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
+			bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
 			if (bus_name != null) {
 				// try to register service in session bus
 				uint request_name_result = bus.RequestName (bus_name, (uint) 0);
@@ -163,6 +163,7 @@ namespace ContextProvider {
 	 */
 	public void stop () {
 		manager = null;
+		bus = null;
 	}
 
 
