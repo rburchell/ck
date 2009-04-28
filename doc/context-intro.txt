@@ -334,6 +334,10 @@ value.  Properties can have a special _null_ value when they are not
 available, either because they are not provided by any provider, or
 because the provider is not able to deliver a value.
 
+It is expected that eventually the statusbar plugins, such as the
+battery charge monitor and the connectivity indicators, exclusively
+use the context properties to retrieve the information they display.
+
 In the link:contextkit.html[+org.freedesktop.ContextKit+] interface,
 property values are represented as D-Bus values, which map nicely to
 ++QVariant++s (except for the _null_ value which is handled
@@ -365,12 +369,16 @@ digraph G {
     [label="libgeo", shape=box];
   app       
     [label="{Application | libduivaluespace}"];
+  status       
+    [label="{Battery Status Plugin | libduivaluespace}"];
   sensfw
-    [label="{libcontextprovider | Sensor Framework}"];
+    [label="{libcontextprovider | sensord}"];
   confw
     [label="{libcontextprovider | Connectivity Framework}"];
   npe
     [label="NPE", shape=box];
+  hal
+    [label="HAL", shape=box];
 
   app -> contextd
   contextd -> libgeo -> npe;
@@ -379,6 +387,8 @@ digraph G {
   app -> confw   [label=" org.freedesktop.ContextKit "];
 
   app -> sensfw
+
+  status -> contextd -> hal
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
