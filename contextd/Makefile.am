@@ -27,7 +27,7 @@ contextd.vala.stamp: $(top_srcdir)/vapi/hal.vapi $(top_srcdir)/vapi/posix.vapi $
 
 contextd_CFLAGS = \
 	$(CONTEXTD_CFLAGS) \
-	-I$(top_builddir)/libcontextprovider \
+	-I$(top_srcdir)/libcontextprovider \
 	$(NULL)
 
 contextd_LDADD = \
