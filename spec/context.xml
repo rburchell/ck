@@ -23,7 +23,15 @@ Display screens
 
 These properties talk about the display screens of the device.
     </doc>
-    <key name="TopEdge" type="STRING">
+    <key name="TopEdge" type="string-enum">
+      <!-- type
+	<string-enum>
+	  <top/>
+	  <bottom/>
+	  <left/>
+	  <right/>
+	</string-enum>
+      /type -->
       <doc>
 The edge of the main display screen where the user expects
 the top-most UI elements to be.  Possible values are the
@@ -32,7 +40,7 @@ the edges of the screen in its normal orientation as defined
 by the graphics hardware.  _(stable)_
       </doc>
     </key>
-    <key name="IsCovered" type="TRUTH">
+    <key name="IsCovered" type="bool">
       <doc>
 Whether or not the main display screen is covered and can thus not be
 seen by the user.  This might mean that the device is laying face down
@@ -48,40 +56,40 @@ Location
 Best effort location information. If any of the keys are not
 appliciable to the current location, they will be unavailable.
     </doc>
-    <key name="Latitude" type="DOUBLE">
+    <key name="Latitude" type="double">
       <doc>The latitude of the current position in degrees.</doc>
     </key>
-    <key name="Longitude" type="DOUBLE">
+    <key name="Longitude" type="double">
       <doc>The longitude of the current position in degrees.</doc>
     </key>
-    <key name="Altitide" type="DOUBLE">
+    <key name="Altitude" type="double">
       <doc>The altitude of the current position in meters.</doc>
     </key>
-    <key name="Street" type="STRING">
+    <key name="Street" type="string">
       <doc>The street nearest the location of the device.</doc>
     </key>
-    <key name="PostalCode" type="STRING">
+    <key name="PostalCode" type="string">
       <doc>The postcode of the location of the device.</doc>
     </key>
-    <key name="Area" type="STRING">
+    <key name="Area" type="string">
       <doc>The name of the local area where the device is, for example a neighborhood or campus.</doc>
     </key>
-    <key name="Locality" type="STRING">
+    <key name="Locality" type="string">
       <doc>The name of the village, town or city where the device is.</doc>
     </key>
-    <key name="Region" type="STRING">
+    <key name="Region" type="string">
       <doc>The administrative region which contains the location of the device.</doc>
     </key>
-    <key name="Country" type="STRING">
+    <key name="Country" type="string">
       <doc>The country which contains the location of the device.</doc>
     </key>
-    <key name="CountryCode" type="STRING">
+    <key name="CountryCode" type="string">
       <doc>The ISO 3166 two letter country code of the country which contains the location of the device.</doc>
     </key>
-    <key name="Continent" type="STRING">
+    <key name="Continent" type="string">
       <doc>The localized name of the current continent, as a string.</doc>
     </key>
-    <key name="Planet" type="STRING">
+    <key name="Planet" type="string">
       <doc>The localized name of the current planet (or dwarf planet), as a string.</doc>
     </key>
   </node>
@@ -92,6 +100,11 @@ Network connectivity
 
 Information about the network connectivity of the device.
     </doc>
+    <key name="SignalStrength" type="percentage">
+      <doc>
+	The strength of the radio connection.
+      </doc>
+    </key>
   </node>
   <node name="Environment">
     <doc>
@@ -100,22 +113,48 @@ Environment
 
 Information about the environment the device is in.
     </doc>
-    <key name="IsDark" type="TRUTH">
+    <key name="IsDark" type="bool">
       <doc>
 Whether or not it is dark.
       </doc>
     </key>
-    <key name="SunRise" type="INT">
+    <key name="SunRise" type="time">
       <doc>
 The time of sun rise.
       </doc>
     </key>
-    <key name="SunSet" type="INT">
+    <key name="SunSet" type="time">
       <doc>
 The time of sun set.
       </doc>
     </key>
-    <key name="Weather" type="STRING">
+    <key name="Weather" type="map">
+      <!-- type
+	<map>
+	  <allowed-keys>
+	    <Condition type="string">
+	      <doc>
+The current weather condition, as a localized, human readable string.
+Examples are "Cloudy", "Raining", etc.
+	      </doc>
+	    </Condition>
+	    <ConditionCode>
+	      <type>
+		<string-enum>
+		  <cloudy/>
+		  ...
+		</string-enum>
+	      </type>
+	      <doc>
+The current weather condition, as a symbolic string.  The set of
+symbols is to be defined, but it will be fixed and quite small so that
+you can provide an icon for each of them, etc.
+	      </doc>
+	    </ConditionCode>
+	    ...
+	  </allowed-keys>
+	</map>
+      /type -->
       <doc>
 The current weather.  See http://www.ominous-valve.com/wx_codes.txt for
 more information about codifying weather conditions.  We should lift
