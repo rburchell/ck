@@ -1,16 +1,31 @@
 lcov-reset:
 	lcov --base-directory=@top_srcdir@ --directory @top_srcdir@/libcontextprovider --zerocounters
+	lcov --base-directory=@top_srcdir@ --directory @top_srcdir@/contextd --zerocounters
 
 lcov-report:
 	lcov --directory @top_srcdir@/libcontextprovider \
 		 --capture \
 		--output-file @top_builddir@/lcov.info.tmp
+
+	lcov --directory @top_srcdir@/tests/contextd_tests \
+		-b @top_srcdir@/contextd --capture \
+		--output-file @top_builddir@/lcov.contextd.info.tmp
+
 	lcov --directory @top_srcdir@/libcontextprovider \
-		--output-file @top_builddir@/lcov.info \
+		--output-file @top_builddir@/lcov.info.tmp \
 		--remove @top_builddir@/lcov.info.tmp \
 		$(shell find @top_srcdir@ -name \*.vala | sed 's/.vala/.c/' | xargs -n1 basename) \*.vapi \
 		/usr/include/\*
+
+	lcov --directory @top_srcdir@/tests/contextd_tests \
+		--output-file @top_builddir@/lcov.contextd.info.tmp \
+		--remove @top_builddir@/lcov.contextd.info.tmp \
+		$(shell find @top_srcdir@ -name \*.vala | sed 's/.vala/.c/' | xargs -n1 basename) \*.vapi context_provider.vala test_hal_plugin.vala libhal.vala \
+		/usr/include/\*
+
+	lcov --add-tracefile lcov.contextd.info.tmp --add-tracefile lcov.info.tmp -o lcov.info
 	rm @top_builddir@/lcov.info.tmp
+	rm @top_builddir@/lcov.contextd.info.tmp
 	$(mkdir_p) @top_builddir@/lcov.html
 	git_commit=`GIT_DIR=@top_srcdir@/.git git log -1 --pretty=format:%h 2>/dev/null`;\
 	genhtml --title "@PACKAGE_STRING@ $$git_commit" \

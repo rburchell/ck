@@ -68,7 +68,7 @@ AC_ARG_ENABLE(debug,
 GLIB_REQUIRED=2.12.0
 GEE_REQUIRED=0.1.3
 
-PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED dbus-glib-1 gee-1.0 >=  $GEE_REQUIRED)
+PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED dbus-glib-1 gee-1.0 >=  $GEE_REQUIRED hal)
 
 ##################################
 # Flags for coverage measurement
@@ -107,9 +107,11 @@ AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libcontextprovider/Makefile])
+AC_CONFIG_FILES([contextd/Makefile])
 AC_CONFIG_FILES([spec/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([tests/unit_tests/Makefile])
+AC_CONFIG_FILES([tests/contextd_tests/Makefile])
 AC_CONFIG_FILES([tests/python-test-library/Makefile])
 AC_CONFIG_FILES([tests/python-test-library/testfw/Makefile])
 AC_CONFIG_FILES([doc/Makefile])

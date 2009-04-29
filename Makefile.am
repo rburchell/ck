@@ -7,6 +7,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
 	libcontextprovider \
+	contextd \
 	spec \
 	tests \
 	doc \
@@ -16,10 +17,10 @@ SUBDIRS = \
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextprovider-1.0.pc
 
-clean-gcov:
-	find -name "*.gcov" | xargs rm -f || true
-	find -name "*.gcno" | xargs rm -f || true
-	find -name "*.gcda" | xargs rm -f || true
+DISTCLEANFILES = \
+	lcov.info \
+	lcov.html \
+	$(NULL)
 
 version:
 	@echo @VERSION@
