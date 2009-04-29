@@ -32,6 +32,8 @@ namespace Hal {
 	// Values stored in the mock implementation
 	Gee.HashMap<string, int> intProperties;
 	Gee.HashMap<string, bool> boolProperties;
+	public bool propertyWatchAdded;
+	public bool propertyWatchRemoved;
 	
 	// Hidden properties. If the client tries to query these, it gets an error.
 	Gee.HashSet<string> hiddenProperties;
@@ -41,6 +43,9 @@ namespace Hal {
 		intProperties = new Gee.HashMap<string, int>(str_hash, str_equal);
 		boolProperties = new Gee.HashMap<string, bool>(str_hash, str_equal);
 		hiddenProperties = new Gee.HashSet<string>(str_hash, str_equal);
+
+		propertyWatchAdded = false;
+		propertyWatchRemoved = false;
 	}
 
 	// Sets the value of a property in the mock implementation.
@@ -115,10 +120,17 @@ namespace Hal {
 		}
 
 		public bool device_add_property_watch (string udi, ref DBus.RawError error) {
+			if (udi == mockUdi) {
+				propertyWatchAdded = true;
+			}
 			return true;
 		}
 
 		public bool device_remove_property_watch (string udi, ref DBus.RawError error) {
+			if (udi == mockUdi) {
+				debug ("removing property watch");
+				propertyWatchRemoved = true;
+			}
 			return true;
 		}
 	}

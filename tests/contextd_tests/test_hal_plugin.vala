@@ -85,6 +85,37 @@ void test_startsubscribing() {
 	assert (boolValues.get_keys().contains(keyIsCharging));
 	Gee.HashSet<string> unknownValues = ContextProvider.unknownValues;
 	assert (unknownValues.contains(keyTimeUntilLow));
+	// And the hal plugin started listening for property changes of the battery
+	assert (Hal.propertyWatchAdded == true);
+	assert (Hal.propertyWatchRemoved == false);
+}
+
+void test_stopsubscribing() {
+	// Setup
+	ContextProvider.initializeMock ();
+	Hal.initializeMock ();
+	// Set the initial values for the properties
+	Hal.changePropertyInt (halPercentage, 20, false);
+	Hal.changePropertyInt (halCharge, 60, false);
+	Hal.changePropertyInt (halLastFull, 300, false);
+	Hal.changePropertyInt (halRate, 10, false);
+	Hal.changePropertyBool (halCharging, true, false);
+	Hal.changePropertyBool (halDischarging, false, false);
+	Plugins.HalPlugin plugin = new Plugins.HalPlugin();
+	plugin.install ();
+
+	ContextProvider.resetValues ();
+
+	// Test
+	// tell the plugin that someone is listening
+	ContextProvider.callSubscriptionCallback(true);
+	// and that nobody is listening any more
+	ContextProvider.callSubscriptionCallback(false);
+
+	// Expected result: 
+	// The hal plugin stopped listening for property changes of the battery
+	assert (Hal.propertyWatchAdded == true);
+	assert (Hal.propertyWatchRemoved == true);
 }
 
 void test_chargepercentage () {
@@ -477,6 +508,7 @@ public static void main (string[] args) {
 
 	Test.add_func("/contextd/hal_plugin/test_install", test_install);
 	Test.add_func("/contextd/hal_plugin/test_startsubscribing", test_startsubscribing);
+	Test.add_func("/contextd/hal_plugin/test_stopsubscribing", test_stopsubscribing);
 	Test.add_func("/contextd/hal_plugin/test_chargepercentage", test_chargepercentage);
 	Test.add_func("/contextd/hal_plugin/test_onbattery", test_onbattery);
 	Test.add_func("/contextd/hal_plugin/test_lowbattery", test_lowbattery);
