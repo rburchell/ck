@@ -3,9 +3,6 @@ bin_PROGRAMS = contextd
 contextddir = $(datadir)/context-providers
 contextd_DATA = contextd.xml
 
-install-data-local:
-	-update-context-providers $(contextddir)
-
 contextd_VALASOURCES = \
 	main.vala \
 	plugin.vala \
