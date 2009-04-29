@@ -23,7 +23,7 @@ namespace Plugins {
 	internal class HalPlugin : GLib.Object, ContextD.Plugin {
 
 		// A struct for storing the information read from HAL
-		private struct BatteryInfo {
+		private class BatteryInfo {
 			public int percentage;
 			public bool percentageKnown;
 			public int charge;
@@ -149,7 +149,7 @@ namespace Plugins {
 				}
 
 				// Read initial values
-				BatteryInfo info = BatteryInfo();
+				BatteryInfo info = new BatteryInfo();
 				readIntProperty (udi, halPercentage, ref info.percentage, ref info.percentageKnown);
 				readIntProperty (udi, halCharge, ref info.charge, ref info.chargeKnown);
 				readIntProperty (udi, halLastFull, ref info.lastFull, ref info.lastFullKnown);
@@ -238,7 +238,6 @@ namespace Plugins {
 				return;
 			}
 
-			batteries.set (udi, info);
 			calculateProperties ();
 		}
 
