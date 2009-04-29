@@ -1,5 +1,11 @@
 bin_PROGRAMS = contextd
 
+contextddir = $(datadir)/context-providers
+contextd_DATA = contextd.xml
+
+install-data-local:
+	-update-context-providers $(contextddir)
+
 contextd_VALASOURCES = \
 	main.vala \
 	plugin.vala \
@@ -33,6 +39,7 @@ contextd_LDADD = \
 EXTRA_DIST = \
 	$(contextd_GENERATEDSOURCES) \
 	$(contextd_VALASOURCES) \
+	contextd.xml \
 	contextd.vala.stamp \
 	$(NULL)
 
