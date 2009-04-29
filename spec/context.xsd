@@ -144,6 +144,14 @@
       <enumeration value="DOUBLE"/>
       <enumeration value="STRING"/>
       <enumeration value="TRUTH"/>
+      <enumeration value="int32"/>
+      <enumeration value="double"/>
+      <enumeration value="string"/>
+      <enumeration value="bool"/>
+      <enumeration value="time"/>
+      <enumeration value="percentage"/>
+      <enumeration value="map"/>
+      <enumeration value="string-enum"/>
     </restriction>
   </simpleType>
 </schema>
