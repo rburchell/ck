@@ -124,7 +124,7 @@ namespace Plugins {
 		// Reads the battery device information from HAL and starts listening to
 		// chages.
 		private void start_listening_devices () {
-		
+
 			// Read which battery devices are present
 			DBus.RawError error = DBus.RawError ();
 			var deviceNames = halContext.find_device_by_capability("battery", ref error);
@@ -170,7 +170,6 @@ namespace Plugins {
 					if (info.dischargingKnown && info.discharging) {
 						info.lastNonzeroDischargingRate = rate;
 					}
-					
 				}
 
 				batteries.set (udi, info);
@@ -180,15 +179,13 @@ namespace Plugins {
 
 		// Stops listening to changes in battery devices
 		private void stop_listening_devices () {
-			
 			foreach (var udi in batteries.get_keys ()) {
 				DBus.RawError error = DBus.RawError ();
 				halContext.device_remove_property_watch (udi, ref error);
 			}
-		
 			batteries.clear ();
 		}
-		
+
 		// Is called when HAL notifies us that a property has changed
 		private static void property_modified (Hal.Context ctx, string udi, string key, bool is_removed, bool is_added) {
 			// debug ("Property modified: %s, %s", udi, key);
@@ -230,7 +227,6 @@ namespace Plugins {
 					if (info.dischargingKnown && info.discharging) {
 						info.lastNonzeroDischargingRate = rate;
 					}
-					
 				}
 			}
 			else {
@@ -247,7 +243,7 @@ namespace Plugins {
 				DBus.RawError error = DBus.RawError ();
 
 				value = halContext.device_get_property_int(udi, property, ref error);
-		
+
 				if (error.is_set()) {
 					debug ("reading property %s failed", property);
 				} else {
@@ -262,7 +258,7 @@ namespace Plugins {
 				DBus.RawError error = DBus.RawError ();
 
 				value = halContext.device_get_property_bool(udi, property, ref error);
-		
+
 				if (error.is_set()) {
 					debug ("reading property %s failed", property);
 				} else {
@@ -270,7 +266,7 @@ namespace Plugins {
 					success = true;
 				}
 		}
-		
+
 		// Calculates the values of the context properties and declares them
 		// using the libcontextprovider. The current implementation assumes that
 		// there is only one battery. If support for multiple batteries is needed,
@@ -338,6 +334,24 @@ namespace Plugins {
 
 			// Compute TimeUntilLow
 			if (info.lastNonzeroDischargingRate > 0 && info.chargeKnown && info.lastFullKnown) {
+
+				/* Calculation:
+				   We know the current charge level and how fast the battery is
+				   discharging.
+
+				   The charge threshold for low battery is:
+				   thresholdForLow / 100 * lastFull.
+				   (The unit for thresholdForLow is percentages, e.g. 10.)
+
+				   We calculate how long it takes for the battery to reach that level
+				   if it continues to discharge at the same rate.
+
+				   The charge that the battery can consume before going low is
+				   info.charge - thresholdForLow / 100.0 * info.lastFull
+
+				   And the estimated time is that divided by the discharging rate.
+				*/
+
 				double timeUntilLow = (1.0 * info.charge - thresholdForLow / 100.0 * info.lastFull) / info.lastNonzeroDischargingRate;
 
 				// If the battery is already low, set to 0.
@@ -355,12 +369,21 @@ namespace Plugins {
 
 			// Compute TimeUntilFull
 			if (info.lastNonzeroChargingRate > 0 && info.chargeKnown && info.lastFullKnown) {
+				/* Calculation:
+				   We know the current charge level and how fast the battery is
+				   charging.
+
+				   The charge estimation for the full battery is lastFull.
+
+				   We calculate how long it takes for the battery to reach that level
+				   if it continues to charge at the same rate.
+				*/
+
 				double timeUntilFull = (1.0 * info.lastFull - info.charge) / info.lastNonzeroChargingRate; 
 
 				timeUntilFull *= 60; // conversion to minutes
 				timeUntilFull = Math.round(timeUntilFull); // round to nearest minute
 				timeUntilFull *= 60; // conversion to seconds
-
 
 				ContextProvider.set_integer (keyTimeUntilFull, (int) timeUntilFull);
 			}
