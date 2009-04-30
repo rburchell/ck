@@ -26,12 +26,12 @@ const string halRate = "battery.charge_level.rate";
 const string halCharging = "battery.rechargeable.is_charging";
 const string halDischarging = "battery.rechargeable.is_discharging";
 
-const string keyChargePercentage = "Battery.ChargePercentage"; 
-const string keyOnBattery = "Battery.OnBattery"; 
-const string keyLowBattery = "Battery.LowBattery"; 
-const string keyIsCharging = "Battery.IsCharging"; 
-const string keyTimeUntilLow = "Battery.TimeUntilLow"; 
-const string keyTimeUntilFull = "Battery.TimeUntilFull"; 
+const string keyChargePercentage = "Context.Battery.ChargePercentage"; 
+const string keyOnBattery = "Context.Battery.OnBattery"; 
+const string keyLowBattery = "Context.Battery.LowBattery"; 
+const string keyIsCharging = "Context.Battery.IsCharging"; 
+const string keyTimeUntilLow = "Context.Battery.TimeUntilLow"; 
+const string keyTimeUntilFull = "Context.Battery.TimeUntilFull"; 
 
 void test_install() {
 	// Setup
