@@ -41,7 +41,7 @@ EXTRA_DIST = \
 	$(contextd_VALASOURCES) \
 	contextd.xml \
 	contextd.vala.stamp \
-	org.freedesktop.ContextKit.context.service \
+	org.freedesktop.ContextKit.contextd.service \
 	$(NULL)
 
 DISTCLEANFILES = \
