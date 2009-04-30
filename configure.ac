@@ -119,7 +119,7 @@ AC_CONFIG_FILES([doc/reference/Makefile])
 AC_CONFIG_FILES([doc/reference/libcontextprovider/Makefile])
 AC_CONFIG_FILES([tools/Makefile])
 AC_CONFIG_FILES([contextprovider-1.0.pc])
-
+AC_CONFIG_FILES([contextd/org.freedesktop.ContextKit.contextd.service])
 
 AC_OUTPUT
 

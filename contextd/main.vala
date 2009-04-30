@@ -53,7 +53,7 @@ namespace ContextD {
 			loop = new MainLoop (null, false);
 			
 			// Start using the ContextProvider library
-			ContextProvider.init(DBus.BusType.SESSION, "org.freedesktop.ContextKit");
+			ContextProvider.init(DBus.BusType.SESSION, "org.freedesktop.ContextKit.contextd");
 
 			// Install all plugins
 			install_plugins ();

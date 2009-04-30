@@ -3,6 +3,9 @@ bin_PROGRAMS = contextd
 contextddir = $(datadir)/context-providers
 contextd_DATA = contextd.xml
 
+servicedir = $(datadir)/dbus-1/services
+service_DATA = org.freedesktop.ContextKit.contextd.service
+
 contextd_VALASOURCES = \
 	main.vala \
 	plugin.vala \
@@ -38,6 +41,7 @@ EXTRA_DIST = \
 	$(contextd_VALASOURCES) \
 	contextd.xml \
 	contextd.vala.stamp \
+	org.freedesktop.ContextKit.context.service \
 	$(NULL)
 
 DISTCLEANFILES = \

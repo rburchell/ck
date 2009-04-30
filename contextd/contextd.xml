@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<provider bus="session" service="org.freedesktop.ContextKit">
+<provider bus="session" service="org.freedesktop.ContextKit.contextd">
   <node name="Context">
     <node name="Battery">
       <key name="ChargePercentage" type="INT"></key>
