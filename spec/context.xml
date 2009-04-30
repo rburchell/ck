@@ -16,7 +16,8 @@ change for some time still.  Only the ones explicitly marked as stable
 should be used for now.
 
   </doc>
-  <node name="Screen">
+  <node name="Context">
+   <node name="Screen">
     <doc>
 Display screens
 ---------------
@@ -276,4 +277,5 @@ The wind direction in degrees.  North is 0, east is 90, etc.
       </doc>
     </key>
   </node>
+ </node>
 </properties>
