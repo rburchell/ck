@@ -52,13 +52,13 @@ namespace Plugins {
 		private const string halDischarging = "battery.rechargeable.is_discharging";
 
 		// Context keys provided by this plugin
-		private const string keyChargePercentage = "Battery.ChargePercentage"; 
-		private const string keyOnBattery = "Battery.OnBattery"; 
-		private const string keyLowBattery = "Battery.LowBattery"; 
-		private const string keyIsCharging = "Battery.IsCharging"; 
+		private const string keyChargePercentage = "Context.Battery.ChargePercentage"; 
+		private const string keyOnBattery = "Context.Battery.OnBattery"; 
+		private const string keyLowBattery = "Context.Battery.LowBattery"; 
+		private const string keyIsCharging = "Context.Battery.IsCharging"; 
 
-		private const string keyTimeUntilLow = "Battery.TimeUntilLow"; 
-		private const string keyTimeUntilFull = "Battery.TimeUntilFull"; 
+		private const string keyTimeUntilLow = "Context.Battery.TimeUntilLow"; 
+		private const string keyTimeUntilFull = "Context.Battery.TimeUntilFull"; 
 
 		// Constants for computation
 		private static const int thresholdForLow = 10;
