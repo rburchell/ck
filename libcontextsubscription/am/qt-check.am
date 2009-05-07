@@ -1,0 +1,41 @@
+# if you include this file, you have to declare CLEANFILES, LDADD,
+# check_LIBRARIES in your Makefile.am before inclusion
+
+# handling of QT_TOMOC_CPP and QT_TOMOC_H files
+#   %.h mocced will be moc_%_h.cpp
+# %.cpp mocced will be moc_%_cpp.cpp
+
+QT_CXXMOCS = $(QT_TOMOC_CPP:%.cpp=moc_%_cpp.cpp)
+QT_HMOCS = $(QT_TOMOC_H:%.h=moc_%_h.cpp)
+
+# handling of SOURCE_H files
+
+# they will be looked up in the $(top_srcdir)/src directory, but will
+# be mocced to here (the current test directory) as mocmock_%_h.cpp
+# and eventually will be compiled to an object here
+QT_HMOCS += $(SOURCE_H:%.h=mocmock_%_h.cpp)
+
+# from the moc{,mock}_*_h.cpp files a library called libmocs.a is created
+check_LIBRARIES += libmocs.a
+nodist_libmocs_a_SOURCES = $(QT_HMOCS)
+nodist_libmocs_a_OBJECTS = $(nodist_libmocs_a_SOURCES:%.cpp=%.o)
+
+# and added to build
+LDADD += libmocs.a
+
+# cleanup
+CLEANFILES += $(QT_FORMS:%.ui=ui_%.h) $(QT_HMOCS) $(QT_CXXMOCS)
+
+# it is important, to write $(srcdir) before original source files,
+# and never write that prefix before generated source files!
+ui_%.h: $(srcdir)/%.ui
+	$(UIC) $< -o $@
+
+moc_%_h.cpp: $(srcdir)/%.h
+	$(MOC) $< -o $@
+
+moc_%_cpp.cpp: $(srcdir)/%.cpp
+	$(MOC) $< -o $@
+
+mocmock_%_h.cpp: $(top_srcdir)/src/%.h
+	$(MOC) $< -o $@
