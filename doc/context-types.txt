@@ -302,8 +302,8 @@ and these two pieces are equivalent
   <foo bar="12"/>   ==   <foo><bar>12</bar></foo>
 
 The first limitation is quite severe, and we should maybe find ways to
-distinguish lists from maps.  The second limitation is considered a
-feature.
+distinguish lists from maps, or just handle lists in the parser API.
+The second limitation is considered a feature.
 
 Converting a piece of XML produces two things: a 'tag' and a 'value'.
 The tag is a string or null, and the value is either a string or a
@@ -601,13 +601,13 @@ Generic types
     </doc>
   </type>
 
-  <type name="number">
+  <type name="number" base="value">
     <doc>
       A number, represented as either a "int32", "uint32", "int64", "uint64", or "double".
     </doc>
   </type>
 
-  <type name="integer">
+  <type name="integer" base="number">
     <params>
       <min doc="Lower bound"/>
       <max doc="Upper bound"/>
@@ -620,7 +620,7 @@ Generic types
     </doc>
   </type>
 
-  <type name="uniform-list">
+  <type name="uniform-list" base="list">
     <params>
       <min doc="Minimum length"/>
       <max doc="Maximum length"/>
@@ -631,10 +631,9 @@ Generic types
       minimum and maximum length given by the "min" and "max" parameters.
       The type of all elements is given by the "type" parameter.
     </doc>
-    <base>list</base>
   </type>
 
-  <type name="string-enum">
+  <type name="string-enum" base="string">
     <parms>
       <rest doc="The possible values">
     </parms>
@@ -647,7 +646,7 @@ Generic types
     </doc>
   </type>
 
-  <type name="int-enum">
+  <type name="int-enum" base="int32">
     <parms>
       <rest doc="The possible values">
     </parms>
@@ -727,7 +726,13 @@ Specific types
 
   <type name="energy" base="double">
     <doc>
-      An amount of energy, in Watt-hours.
+      An amount of energy, in Joule.
+    </doc>
+  </type>
+
+  <type name="power" base="double">
+    <doc>
+      A power, in Watt.
     </doc>
   </type>
 
@@ -738,7 +743,7 @@ Specific types
     </doc>
   </type>
 
-  <type name="duration" base="int64">
+  <type name="duration" base="uint64">
     <doc>
       A time duration, in nano-seconds.
     </doc>
