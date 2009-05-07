@@ -1,10 +1,11 @@
 lib_LTLIBRARIES = libcontextsubscriber.la
 
-libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
-	  contextproperty.h contextproperty_priv.h keymanager.cpp	\
-	  keymanager.h propertyhandle.cpp propertyhandle.h		\
-	  subscriberiface_p.h manageriface_p.h manageriface.cpp		\
-	  subscriberiface.cpp
+libcontextsubscriber_la_SOURCES = contextproperty.cpp			    \
+	  contextproperty.h contextproperty_priv.h keymanager.cpp	    \
+	  keymanager.h propertyhandle.cpp propertyhandle.h		        \
+	  subscriberiface_p.h manageriface_p.h manageriface.cpp		    \
+	  subscriberiface.cpp contextpropertymeta.cpp                   \
+      contextpropertymeta.h contextregistry.cpp contextregistry.h
 
 AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
 
