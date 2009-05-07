@@ -22,7 +22,6 @@ AC_ARG_WITH([doxygen],
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_LIBTOOL
-AC_PROG_RANLIB
 AM_PATH_PYTHON
 AC_CHECK_PROGS([BC], [bc])
 AS_IF([test "$with_coverage" = yes -o \( "$with_coverage" = "" -a "$withm_coverage" = yes \)],
@@ -60,8 +59,11 @@ RCC=`pkg-config QtCore --variable=exec_prefix`/bin/rcc
 AC_CHECK_FILE([$RCC], [],
    AC_MSG_ERROR([Can't find rcc compiler: $RCC]))
 AC_SUBST([RCC])
-CXXFLAGS="$CXXFLAGS $Qt_CFLAGS"
-LIBS="$LIBS $Qt_LIBS"
+PKG_CHECK_MODULES([gconf], [gconf-2.0])
+
+
+CXXFLAGS="$CXXFLAGS $Qt_CFLAGS $gconf_CFLAGS"
+LIBS="$LIBS $Qt_LIBS $gconf_LIBS"
 PKG_CHECK_MODULES([QtTest], [QtTest])
 
 #AC_CONFIG_HEADER([config.h])
@@ -83,7 +85,6 @@ AC_OUTPUT
 #			  tests/subscriber/Makefile
 #			  tests/boolvariant/Makefile
 #			  tests/commandmodel/Makefile
-#			  tests/duiitemlistener/Makefile
 #			  tests/manager/Makefile
 #			  tests/inspectmodel/Makefile
 #			  debian-devel/control debian-devel/rules])

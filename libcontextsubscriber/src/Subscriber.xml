@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node name="/" xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0">
+  <interface name="org.freedesktop.ContextKit.Subscriber" >
+
+    <method name="Subscribe">
+      <tp:docstring>
+        Subscribe to one or more keys
+      </tp:docstring>
+
+      <arg name="keys" type="as" direction="in">
+        <tp:docstring>
+          An array of the keys to subscribe to.
+        </tp:docstring>
+      </arg>
+
+      <arg name="values" type="a{sv}" tp:type="Value_Set" direction="out">
+        <tp:docstring>
+          A Value_Set mapping the requested keys to their current values.
+        </tp:docstring>
+      </arg>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="ValueSetMap"/>
+      <arg name="undeterminable_keys" type="as"  direction="out">
+        <tp:docstring>
+          An array of keys which we couldn't determine the values for.
+        </tp:docstring>
+      </arg>
+    </method>
+
+    <signal name="Changed" >
+      <arg name="values" type="a{sv}" tp:type="Value_Set" >
+        <tp:docstring >
+          A Value_Set mapping the changed keys to their values.
+        </tp:docstring>
+      </arg>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="ValueSetMap"/>
+      <arg name="undeterminable_keys" type="as" >
+        <tp:docstring>
+          An array of keys which we can no longer determine the values for.
+        </tp:docstring>
+      </arg>
+    </signal>
+
+    <method name="Unsubscribe" >
+      <tp:docstring >
+        Unsubscribe from one or more keys
+      </tp:docstring>
+
+      <arg name="keys" type="as" direction="in">
+        <tp:docstring>
+          An array of the keys to unsubscribe from.
+        </tp:docstring>
+      </arg>
+    </method>
+
+  </interface>
+</node>

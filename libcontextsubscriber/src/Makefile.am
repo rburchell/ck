@@ -1,6 +1,12 @@
 lib_LTLIBRARIES = libcontextsubscriber.la
 
-libcontextsubscriber_la_SOURCES = testclass.h testclass.cpp
+libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
+	  contextproperty.h contextproperty_priv.h keymanager.cpp	\
+	  keymanager.h propertyhandle.cpp propertyhandle.h		\
+	  subscriberiface_p.h manageriface_p.h manageriface.cpp		\
+	  subscriberiface.cpp
+
+AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
 
 # you have to add your ui designer designed forms here
 # QT_FORMS = commandview.ui
@@ -19,7 +25,7 @@ QT_TOMOC_H = $(filter %.h, $(libcontextsubscriber_la_SOURCES))
 
 # if you have to moc a cpp file, don't forget to mention the extra dependency
 # QT_TOMOC_CXX = signallingmapunittest.cpp
-testclass.o: moc_testclass_cpp.cpp
+#testclass.o: moc_testclass_cpp.cpp
 
 # finally, do the moccing
 include $(top_srcdir)/am/qt.am
