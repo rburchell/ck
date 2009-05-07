@@ -1,17 +1,17 @@
 #SUBDIRS = src tests doc
-SUBDIRS = src
+SUBDIRS = src tests
 
-#check-sum:
-#	make -C tests/ check-sum
+check-sum:
+	make -C tests/ check-sum
 
-#covoptioncheck:
-#	@if test "$(GCOV)" = "" ; then \
-#		echo "Didn't configured for coverage, please rerun configure with --with-coverage"; \
-#		exit 1; \
-#	fi
+covoptioncheck:
+	@if test "$(GCOV)" = "" ; then \
+		echo "Didn't configured for coverage, please rerun configure with --with-coverage"; \
+		exit 1; \
+	fi
 
-#coverage: covoptioncheck
-#	make -C tests/ coverage
+coverage: covoptioncheck
+	make -C tests/ coverage
 
 #deb:
 #	rm -rf debian/
@@ -27,4 +27,4 @@ SUBDIRS = src
 #	sudo dpkg -i ../@PACKAGE@-devel_0~devel_`dpkg-architecture | grep BUILD_ARCH= | cut -d= -f2`.deb
 
 #.PHONY: covoptioncheck coverage check-sum deb debinst
-#.PHONY: covoptioncheck coverage check-sum
+.PHONY: covoptioncheck coverage check-sum

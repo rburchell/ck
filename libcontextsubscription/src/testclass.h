@@ -8,7 +8,8 @@ class TestClass : public QObject
     Q_OBJECT
 
 public:
-    TestClass(void);
+    TestClass() : QObject() {}; 
+    bool testMe(void);
 };
 
 #endif // TESTCLASS_H

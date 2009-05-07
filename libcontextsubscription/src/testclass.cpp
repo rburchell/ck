@@ -1,7 +1,7 @@
 #include "testclass.h"
 
-TestClass::TestClass(void)
+bool TestClass::testMe(void)
 {
-    // I'm so empty...
+    return true;
 }
 

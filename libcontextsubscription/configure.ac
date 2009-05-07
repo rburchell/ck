@@ -66,7 +66,7 @@ PKG_CHECK_MODULES([QtTest], [QtTest])
 
 #AC_CONFIG_HEADER([config.h])
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile tests/Makefile tests/testclass/Makefile])
 
 AC_OUTPUT
 
