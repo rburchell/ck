@@ -1,4 +1,4 @@
-AC_INIT([libcontextsubscription], [0.1], [marius.vollmer@nokia.com])
+AC_INIT([libcontextsubscriber], [0.1], [marius.vollmer@nokia.com])
 AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
