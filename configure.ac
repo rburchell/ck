@@ -105,6 +105,8 @@ AC_SUBST(LOCATION_LIBS)
 
 AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
 
+AC_CONFIG_SUBDIRS([libcontextsubscription])
+
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libcontextprovider/Makefile])
 AC_CONFIG_FILES([contextd/Makefile])
