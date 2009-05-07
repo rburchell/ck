@@ -1,0 +1,10 @@
+m4/
+
+libmocs.a
+libmock.a
+*.o
+moc_*.cpp
+mock_*.cpp
+mocmock_*.cpp
+
+tests/testclass/testclassunittest
