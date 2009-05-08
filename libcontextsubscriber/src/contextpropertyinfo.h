@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Nokia Corporation.
+ * Copyright (C) 2008 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,36 +19,32 @@
  *
  */
 
-#include "contextpropertymeta.h"
+#ifndef CONTEXTPROPERTYINFO_H
+#define CONTEXTPROPERTYINFO_H
 
-ContextPropertyMeta::ContextPropertyMeta(const QString &key, QObject *parent)
-    : QObject(parent)
-{
-}
+#include <QVariant>
+#include <QStringList>
+#include <QObject>
 
-QString ContextPropertyMeta::key() const
+class ContextPropertyInfo : public QObject
 {
-    return QString("");
-}
+    Q_OBJECT
 
-QString ContextPropertyMeta::doc() const
-{
-    return QString("");
-}
+public:
+    explicit ContextPropertyInfo(const QString &key, QObject *parent = 0);
 
-QString ContextPropertyMeta::type() const
-{
-    return QString("");
-}
+    virtual ~ContextPropertyInfo() {}
 
-QString ContextPropertyMeta::providerDBusName() const
-{
-    return QString("");
-}
+    QString key() const;
+    QString doc() const;
+    QString type() const;
+    
+    QString providerDBusName() const;
+    // DBusBusType providerDBusType() const;
 
-/*
-DBusBusType ContextPropertyMeta::providerDBusType() const
-{
-    return DBUS_BUS_SESSION;
-}
-*/
+signals:
+    void providerChanged(QString newProvider);
+    void typeChanged(QString newType);
+};
+
+#endif // CONTEXTPROPERTYINFO_H

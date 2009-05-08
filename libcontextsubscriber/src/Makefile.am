@@ -4,8 +4,9 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			    \
 	  contextproperty.h contextproperty_priv.h keymanager.cpp	    \
 	  keymanager.h propertyhandle.cpp propertyhandle.h		        \
 	  subscriberiface_p.h manageriface_p.h manageriface.cpp		    \
-	  subscriberiface.cpp contextpropertymeta.cpp                   \
-      contextpropertymeta.h contextregistry.cpp contextregistry.h
+	  subscriberiface.cpp contextpropertyinfo.cpp                   \
+      contextpropertyinfo.h contextregistryinfo.cpp                 \
+      contextregistryinfo.h
 
 AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
 

@@ -19,21 +19,21 @@
  *
  */
 
-#ifndef CONTEXTREGISTRY_H
-#define CONTEXTREGISTRY_H
+#ifndef CONTEXTREGISTRYINFO_H
+#define CONTEXTREGISTRYINFO_H
 
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
 #include <QMutex>
 
-class ContextRegistry : public QObject
+class ContextRegistryInfo : public QObject
 {
     Q_OBJECT 
 
 public:
 
-    static ContextRegistry* instance()
+    static ContextRegistryInfo* instance()
     {
       static QMutex mutex;
       if (!registryInstance)
@@ -41,7 +41,7 @@ public:
           mutex.lock();
  
           if (! registryInstance)
-              registryInstance = new ContextRegistry;
+              registryInstance = new ContextRegistryInfo;
  
           mutex.unlock();
       }
@@ -54,12 +54,12 @@ public:
     QList<QString> listProviders() const;
 
 private:
-    ContextRegistry() {};
-    ContextRegistry(const ContextRegistry&);
+    ContextRegistryInfo() {};
+    ContextRegistryInfo(const ContextRegistryInfo&);
 
-    ContextRegistry& operator=(const ContextRegistry&);
+    ContextRegistryInfo& operator=(const ContextRegistryInfo&);
     
-    static ContextRegistry* registryInstance;
+    static ContextRegistryInfo* registryInstance;
 
 signals:
     void keysChanged(QStringList currentKeys);

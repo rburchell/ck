@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2008, 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,21 +19,36 @@
  *
  */
 
-#include "contextregistry.h"
+#include "contextpropertyinfo.h"
 
-ContextRegistry* ContextRegistry::registryInstance = NULL;
-
-QList<QString> ContextRegistry::listKeys() const
+ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
+    : QObject(parent)
 {
-    return QList<QString> ();
 }
 
-QList<QString> ContextRegistry::listKeys(QString providername) const
+QString ContextPropertyInfo::key() const
 {
-    return QList<QString> ();
+    return QString("");
 }
 
-QList<QString> ContextRegistry::listProviders() const
+QString ContextPropertyInfo::doc() const
 {
-    return QList<QString> ();
+    return QString("");
 }
+
+QString ContextPropertyInfo::type() const
+{
+    return QString("");
+}
+
+QString ContextPropertyInfo::providerDBusName() const
+{
+    return QString("");
+}
+
+/*
+DBusBusType ContextPropertyMeta::providerDBusType() const
+{
+    return DBUS_BUS_SESSION;
+}
+*/
