@@ -22,9 +22,9 @@
 #ifndef CONTEXTPROPERTY_H
 #define CONTEXTPROPERTY_H
 
-#include <QVariant>
-#include <QStringList>
 #include <QObject>
+#include <QVariant>
+#include <QString>
 
 class ContextPropertyPrivate;
 
@@ -41,30 +41,25 @@ public:
     QString key() const;
     QVariant value(const QVariant &def) const;
     QVariant value() const;
-    QString type() const;
-    QString description() const;
 
-    void set(const QVariant &val);
+    //ContextPropertyInfo info() const; //FIXME: enable when appropriate
 
     void subscribe () const;
     void unsubscribe () const;
 
-    void wait_for_subscription () const;
+    void waitForSubscription () const;
 
     ContextProperty(const ContextProperty &other, QObject *parent = 0);
     ContextProperty &operator=(const ContextProperty&);
 
-    static QList<QString> listKeys();
-    QString providerName() const;
-
     // This function should only be called by the Commander.
     // It sets all the ContextProperty instances immune to commanding.
-    static void iAmCommander();
+    static void ignoreCommander();
+
+    static void setTypeCheck(bool typeCheck);
 
 signals:
-    void contentsChanged();
     void valueChanged();
-    void providerChanged();
 
 private:
     ContextPropertyPrivate *priv;

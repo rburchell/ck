@@ -19,6 +19,11 @@
  *
  */
 
+#include "contextproperty.h"
+#include "contextproperty_priv.h"
+#include "propertyhandle.h"
+#include "keymanager.h"
+
 #include <strings.h>
 #include <QByteArray>
 #include <QObject>
@@ -30,10 +35,6 @@
 #include <QString>
 #include <QVarLengthArray>
 
-#include "contextproperty.h"
-#include "contextproperty_priv.h"
-#include "propertyhandle.h"
-#include "keymanager.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // define ContextProperty
@@ -286,16 +287,6 @@ QVariant ContextProperty::value() const
 
 /*!
 
-  Sets the current value of this item.  Not all items can be modified.
-  Contextual properties are read-only, for example.
- */
-void ContextProperty::set(const QVariant &val)
-{
-    priv->handle->setValue(val);
-}
-
-/*!
-
    Returns the current value of this item.
 
    \param def Returned if the current value is \c null.
@@ -309,29 +300,12 @@ QVariant ContextProperty::value(const QVariant &def) const
         return val;
 }
 
-
-/*!
-   Returns the type of this item as defined in the registry.
- */
-QString ContextProperty::type() const
-{
-    return priv->handle->typeName;
-}
-
-
-/*!
-   Returns the description of this item.
- */
-QString ContextProperty::description() const
-{
-    return priv->handle->description;
-}
 /*!
 
    Subscribe to the key of this item, if it isn't subscribed already.
 
    Subscription is not guaranteed to be complete immediately.  If you
-   need to wait for it to be complete, use wait_for_subscription().
+   need to wait for it to be complete, use waitForSubscription().
  */
 void ContextProperty::subscribe() const
 {
@@ -385,7 +359,7 @@ void ContextProperty::unsubscribe() const
    unsubscribed) does nothing.
 
  */
-void ContextProperty::wait_for_subscription() const
+void ContextProperty::waitForSubscription() const
 {
     if (!priv->subscribed)
         return;
@@ -396,31 +370,10 @@ void ContextProperty::wait_for_subscription() const
 
 /*!
 
-   List the available context properties.
-
- */
-QList<QString> ContextProperty::listKeys()
-{
-    return KeyManager::listKeys();
-}
-
-/*!
-
    This function should only be used by the Context Commander.
 
  */
-void ContextProperty::iAmCommander()
+void ContextProperty::ignoreCommander()
 {
     PropertyManager::instance()->disableCommanding();
 }
-
-/*!
-
-   Get the dbus name and bus type of the provider of this property.
-
- */
-QString ContextProperty::providerName() const
-{
-    return priv->handle->providerName();
-}
-
