@@ -19,31 +19,21 @@
  *
  */
 
-#ifndef INFOXMLBACKEND_H
-#define INFOXMLBACKEND_H
+#ifndef INFOXMLKEYSFINDER_H
+#define INFOXMLKEYSFINDER_H
 
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include <QMutex>
-#include <QFileInfo>
-#include "infobackend.h"
+#include <QXmlDefaultHandler>
 
-class InfoXmlBackend : public InfoBackend
+class InfoXmlKeysFinder : public QXmlDefaultHandler
 {
-    Q_OBJECT 
-
 public:
-    explicit InfoXmlBackend(QObject *parent = 0);
+    virtual bool startDocument();
+    virtual bool startElement(const QString&, const QString&, const QString &name, const QXmlAttributes &attrs);
 
-    virtual QString name() const;
-
-private:
-    QHash <QString, QString> keyToXmlFileHash;
-
-    QString registryPath() const;
-    void regenerateKeyToXmlMappings();
-    void readKeysFromXmlToHash(const QFileInfo &f);
+    QStringList keys;
 };
 
-#endif // INFOXMLBACKEND_H
+#endif // INFOXMLKEYSFINDER_H

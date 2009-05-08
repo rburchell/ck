@@ -13,3 +13,4 @@ Makefile
 
 /tests/testclass/testclassunittest
 /cli/context-cli
+/src/infoxmlbackendconfig.h

@@ -7,7 +7,8 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  subscriberiface.cpp contextpropertyinfo.cpp			\
 	  contextpropertyinfo.h contextregistryinfo.cpp			\
 	  contextregistryinfo.h infobackend.h infobackend.cpp           \
-	  infoxmlbackend.h infoxmlbackend.cpp
+	  infoxmlbackend.h infoxmlbackend.cpp infoxmlbackendconfig.h    \
+	  infoxmlkeysfinder.h infoxmlkeysfinder.cpp
 
 AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
 

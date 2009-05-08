@@ -19,31 +19,30 @@
  *
  */
 
-#ifndef INFOXMLBACKEND_H
-#define INFOXMLBACKEND_H
+#include "infoxmlkeysfinder.h"
+#include <QDebug>
 
-#include <QVariant>
-#include <QStringList>
-#include <QObject>
-#include <QMutex>
-#include <QFileInfo>
-#include "infobackend.h"
-
-class InfoXmlBackend : public InfoBackend
+bool InfoXmlKeysFinder::startDocument()
 {
-    Q_OBJECT 
+    keys.clear();
+}
 
-public:
-    explicit InfoXmlBackend(QObject *parent = 0);
+bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QString &name, const QXmlAttributes &attrs)
+{
+    // FIXME Dumb for now. Do some more logic checks to make sure the
+    // xml is actually a valid one.
 
-    virtual QString name() const;
+    if (name == "key") {
+        for (int i = 0; i< attrs.count(); i++) {
+            if (attrs.localName( i ) == "name") {
+                // Put the key info the list
+                QString fullKeyName = "Context." + attrs.value(i);
+                keys << fullKeyName;
+                qDebug() << "Read key" << fullKeyName;
+                return true;
+            }
+        }
+    }
 
-private:
-    QHash <QString, QString> keyToXmlFileHash;
-
-    QString registryPath() const;
-    void regenerateKeyToXmlMappings();
-    void readKeysFromXmlToHash(const QFileInfo &f);
-};
-
-#endif // INFOXMLBACKEND_H
+    return true;
+}
