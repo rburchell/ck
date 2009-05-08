@@ -1,6 +1,6 @@
 bin_PROGRAMS = context-cli
 
-context_cli_SOURCES = context-cli.cpp
+context_cli_SOURCES = context-cli.cpp sconnect.h propertylistener.h propertylistener.cpp
 
 AM_CXXFLAGS = -I../src
 
@@ -26,6 +26,8 @@ QT_TOMOC_H = $(filter %.h, $(context_cli_SOURCES))
 
 ../src/libcontextsubscriber.la:
 	$(MAKE) -C ../src libcontextsubscriber.la
-	
+
+.PHONY: ../src/libcontextsubscriber.la
+
 # finally, do the moccing
 include $(top_srcdir)/am/qt.am
