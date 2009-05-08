@@ -19,32 +19,21 @@
  *
  */
 
-#ifndef CONTEXTPROPERTYMETA_H
-#define CONTEXTPROPERTYMETA_H
+#include "contextregistryinfo.h"
 
-#include <QVariant>
-#include <QStringList>
-#include <QObject>
+ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
 
-class ContextPropertyMeta : public QObject
+QList<QString> ContextRegistryInfo::listKeys() const
 {
-    Q_OBJECT
+    return QList<QString> ();
+}
 
-public:
-    explicit ContextPropertyMeta(const QString &key, QObject *parent = 0);
+QList<QString> ContextRegistryInfo::listKeys(QString providername) const
+{
+    return QList<QString> ();
+}
 
-    virtual ~ContextPropertyMeta() {}
-
-    QString key() const;
-    QString doc() const;
-    QString type() const;
-    
-    QString providerDBusName() const;
-    // DBusBusType providerDBusType() const;
-
-signals:
-    void providerChanged(QString newProvider);
-    void typeChanged(QString newType);
-};
-
-#endif // CONTEXTPROPERTYMETA_H
+QList<QString> ContextRegistryInfo::listProviders() const
+{
+    return QList<QString> ();
+}
