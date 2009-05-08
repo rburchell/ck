@@ -212,7 +212,7 @@ void PropertyProvider::subscribe(PropertyHandle* prop)
 
     if (prop->value.type() != prop->type)
         prop->value = QVariant(prop->type);
-    changeValues(reply.value(), unknowns);
+    changeValues(reply.value(), unknowns, true);
 }
 
 /// Unsubscribes from contextd DBUS notifications for property \a prop.
@@ -235,9 +235,11 @@ void PropertyProvider::unsubscribe(PropertyHandle* prop)
     qDebug() << "unsubscribed from " << prop->key << " via provider: " << dbusServiceString;
 }
 
+
 /// Slot, handling changed values coming from contextd over DBUS.
 void PropertyProvider::changeValues(const ValueSetMap& values,
-                                    const QStringList& unknowns)
+                                    const QStringList& unknowns,
+                                    const bool processingSubscription)
 {
     const QHash<QString, PropertyHandle*> &properties =
         PropertyManager::instance()->properties;
@@ -262,7 +264,7 @@ void PropertyProvider::changeValues(const ValueSetMap& values,
             if (h->value == v && h->value.isNull() == v.isNull()) {
                 // The DBus message contains the current value of the property
                 // Value shouldn't be changed
-                qWarning() << "PROVIDER ERROR: Received unnecessary DBUS signal for property" << key;
+                if (!processingSubscription) qWarning() << "PROVIDER ERROR: Received unnecessary DBUS signal for property" << key;
             }
             else {
                 h->value = v;
@@ -290,7 +292,7 @@ void PropertyProvider::changeValues(const ValueSetMap& values,
         }
 
         if (h->value == QVariant(h->type) && h->value.isNull() == true) {
-            qWarning() << "PROVIDER ERROR: Received unnecessary DBUS signal for property" << key;
+            if (!processingSubscription) qWarning() << "PROVIDER ERROR: Received unnecessary DBUS signal for property" << key;
         }
         else {
             h->value = QVariant(h->type); // Note: Null but typed QVariant
