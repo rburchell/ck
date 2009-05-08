@@ -100,7 +100,7 @@ private:
     QString dbusServiceString; ///< The DBUS service name of the provider (stored for debuging purposes)
 
 private slots:
-    void changeValues(const ValueSetMap& values, const QStringList& unknowns,
+    void changeValues(const DBusVariantMap& values, const QStringList& unknowns,
                       const bool processingSubscription = false);
 
     friend class PropertyManager;

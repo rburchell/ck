@@ -129,7 +129,7 @@ QString PropertyHandle::providerName() const
 /// you, no need to (and can't) call this constructor.
 PropertyProvider::PropertyProvider (int bus_kind, const QString& bus_name)
 {
-    qDBusRegisterMetaType<ValueSetMap>();
+    qDBusRegisterMetaType<DBusVariantMap>();
 
     subscriber = NULL;
 
@@ -177,9 +177,9 @@ PropertyProvider::PropertyProvider (int bus_kind, const QString& bus_name)
 
     // we can keep this connected all the time
     connect(subscriber,
-            SIGNAL(Changed(ValueSetMap, const QStringList &)),
+            SIGNAL(Changed(DBusVariantMap, const QStringList &)),
             this,
-            SLOT(changeValues(const ValueSetMap &, const QStringList &)));
+            SLOT(changeValues(const DBusVariantMap &, const QStringList &)));
 }
 
 /// Returns the dbus name and bus type of the provider
@@ -200,7 +200,7 @@ void PropertyProvider::subscribe(PropertyHandle* prop)
         return;
     }
 
-    QDBusReply<ValueSetMap> reply = subscriber->Subscribe(keys, unknowns);
+    QDBusReply<DBusVariantMap> reply = subscriber->Subscribe(keys, unknowns);
     if (!reply.isValid()) {
         qCritical() << "subscribe: bad reply from provider " << dbusServiceString
                     << ": " << reply.error();
@@ -237,7 +237,7 @@ void PropertyProvider::unsubscribe(PropertyHandle* prop)
 
 
 /// Slot, handling changed values coming from contextd over DBUS.
-void PropertyProvider::changeValues(const ValueSetMap& values,
+void PropertyProvider::changeValues(const DBusVariantMap& values,
                                     const QStringList& unknowns,
                                     const bool processingSubscription)
 {

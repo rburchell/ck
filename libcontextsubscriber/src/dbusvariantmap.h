@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef __VALUESETMAPTYPE
-#define __VALUESETMAPTYPE
+#ifndef DBUSVARIANTMAP_H
+#define DBUSVARIANTMAP_H
 
 #include <QtCore/QMetaType>
 #include <QtCore/QMap>
@@ -31,10 +31,10 @@
 // the Q_DECLARE_METATYPE system, please stay with the inheritance
 
 // a{sv}
-struct ValueSetMap : public QMap<QString, QDBusVariant>
+struct DBusVariantMap : public QMap<QString, QDBusVariant>
 {
 };
 
-Q_DECLARE_METATYPE(ValueSetMap);
+Q_DECLARE_METATYPE(DBusVariantMap);
 
-#endif // __VALUESETMAPTYPE
+#endif // DBUSVARIANTMAP_H

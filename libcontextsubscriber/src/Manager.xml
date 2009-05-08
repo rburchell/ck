@@ -16,7 +16,7 @@
           A Value_Set mapping the requested keys to their values.
         </tp:docstring>
       </arg>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="ValueSetMap"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="DBusVariantMap"/>
       <arg name="undeterminable_keys" type="as"  direction="out">
         <tp:docstring>
           An array of keys which we couldn't determine the values for.
