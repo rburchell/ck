@@ -314,10 +314,6 @@ void ContextProperty::subscribe() const
 
     QObject::connect(priv->handle, SIGNAL(handleChanged()),
                      this, SIGNAL(valueChanged()));
-    QObject::connect(priv->handle, SIGNAL(handleChanged()),
-                     this, SIGNAL(contentsChanged()));
-    QObject::connect(priv->handle, SIGNAL(providerChanged()),
-                     this, SIGNAL(providerChanged()));
     priv->handle->subscribe();
     priv->subscribed = true;
 }
