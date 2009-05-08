@@ -20,10 +20,24 @@
  */
 
 #include "infobackend.h"
+#include "infoxmlbackend.h"
 
-InfoBackend::InfoBackend(QObject *parent)
-    : QObject(parent)
+InfoBackend* InfoBackend::backendInstance = NULL;
+
+InfoBackend* InfoBackend::instance()
 {
+    static QMutex mutex;
+    if (!backendInstance)
+    {
+        mutex.lock();
+
+        if (! backendInstance)
+            backendInstance = new InfoXmlBackend; // For now hard-coded...
+ 
+        mutex.unlock();
+    }
+ 
+    return backendInstance;
 }
 
 

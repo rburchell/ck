@@ -34,6 +34,8 @@ class InfoXmlBackend : public InfoBackend
 
 public:
     explicit InfoXmlBackend(QObject *parent = 0);
+
+    virtual QString name() const;
 };
 
 #endif // INFOXMLBACKEND_H

@@ -32,7 +32,19 @@ class InfoBackend : public QObject
     Q_OBJECT 
 
 public:
-    explicit InfoBackend(QObject *parent = 0);
+
+    static InfoBackend* instance();
+    virtual QString name() const = 0;
+
+private:
+    InfoBackend(QObject *parent = 0) : QObject(parent) {};
+    InfoBackend(const InfoBackend&);
+
+    InfoBackend& operator=(const InfoBackend&);
+    
+    static InfoBackend* backendInstance;
+    
+    friend class InfoXmlBackend;
 };
 
 #endif // INFOBACKEND_H

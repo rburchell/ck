@@ -26,4 +26,8 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
 {
 }
 
+QString InfoXmlBackend::name() const
+{
+    return QString("xml backend");
+}
 
