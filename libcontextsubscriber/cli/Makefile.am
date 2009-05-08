@@ -9,10 +9,6 @@ AM_CXXFLAGS = -I../src
 # and for every form you have to specify the objects which are dependent on that
 # commandview.$(OBJEXT): ui_commandview.h
 
-CLEANFILES =
-LDADD = ../src/libcontextsubscriber.la
-noinst_LIBRARIES = 
-
 # you can moc every header if you want to be fool proof
 QT_TOMOC_H = $(filter %.h, $(context_cli_SOURCES))
 
@@ -24,10 +20,14 @@ QT_TOMOC_H = $(filter %.h, $(context_cli_SOURCES))
 #testclass1.o: moc_testclass1_cpp.cpp
 #testclass2.o: moc_testclass2_cpp.cpp
 
+# finally, do the moccing
+CLEANFILES =
+include $(top_srcdir)/am/qt.am
+context_cli_DEPENDENCIES = $(qt_mocobjects) ../src/libcontextsubscriber.la
+context_cli_LDADD = $(qt_mocobjects) ../src/libcontextsubscriber.la
+
+# library dependency hack for seamless make in cli/
 ../src/libcontextsubscriber.la:
 	$(MAKE) -C ../src libcontextsubscriber.la
 
 .PHONY: ../src/libcontextsubscriber.la
-
-# finally, do the moccing
-include $(top_srcdir)/am/qt.am

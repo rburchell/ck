@@ -15,11 +15,10 @@ AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
 # and for every form you have to specify the objects which are dependent on that
 # commandview.$(OBJEXT): ui_commandview.h
 
-LIBS = -lcdb libmocs.a
+LIBS += -lcdb
 
-CLEANFILES =
-LDADD = 
-noinst_LIBRARIES = 
+# LDADD = 
+# noinst_LIBRARIES = 
 
 # you can moc every header if you want to be fool proof
 QT_TOMOC_H = $(filter %.h, $(libcontextsubscriber_la_SOURCES))
@@ -32,4 +31,7 @@ QT_TOMOC_H = $(filter %.h, $(libcontextsubscriber_la_SOURCES))
 #testclass.o: moc_testclass_cpp.cpp
 
 # finally, do the moccing
+CLEANFILES =
 include $(top_srcdir)/am/qt.am
+libcontextsubscriber_la_DEPENDENCIES = $(qt_mocobjects)
+libcontextsubscriber_la_LIBADD = $(qt_mocobjects)
