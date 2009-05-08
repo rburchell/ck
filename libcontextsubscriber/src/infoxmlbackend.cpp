@@ -33,7 +33,7 @@
 InfoXmlBackend::InfoXmlBackend(QObject *parent)
     : InfoBackend(parent)
 {
-    regenerateKeyToXmlMappings();
+	regenerateKeyDataList();
 }
 
 QString InfoXmlBackend::name() const
@@ -41,11 +41,20 @@ QString InfoXmlBackend::name() const
     return QString("xml backend");
 }
 
+QStringList InfoXmlBackend::listKeys() const
+{
+	QStringList list;
+    for (int i = 0; i < keyDataList.size(); i++)
+		list << keyDataList.at(i).name;
+		
+	return list;
+}
+
 /* Private */
 
-void InfoXmlBackend::regenerateKeyToXmlMappings()
+void InfoXmlBackend::regenerateKeyDataList()
 {
-    keyToXmlFileHash.clear();
+    keyDataList.clear();
 
     qDebug() << "Re-reading xml contents from" << registryPath();
 
@@ -67,11 +76,11 @@ void InfoXmlBackend::regenerateKeyToXmlMappings()
     QFileInfoList list = dir.entryInfoList();
     for (int i = 0; i < list.size(); ++i) {
         QFileInfo f = list.at(i);
-        readKeysFromXmlToHash(f);
+		readKeyDataFromXml(f);
     }
 }
 
-void InfoXmlBackend::readKeysFromXmlToHash(const QFileInfo &finfo)
+void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
 {
     qDebug() << "Reading keys from" << finfo.filePath();
 
@@ -83,9 +92,7 @@ void InfoXmlBackend::readKeysFromXmlToHash(const QFileInfo &finfo)
     reader.setContentHandler(&handler);
     reader.parse(source);
 
-    // Now put all the keys obtained by our parser into the hash
-    for (int i = 0; i < handler.keys.size(); i++)
-        keyToXmlFileHash.insert(handler.keys.at(i), finfo.filePath());
+	keyDataList += handler.keyDataList;
 }
 
 QString InfoXmlBackend::registryPath() const

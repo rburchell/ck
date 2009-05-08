@@ -26,6 +26,7 @@
 #include <QStringList>
 #include <QObject>
 #include <QXmlDefaultHandler>
+#include "infokeydata.h"
 
 class InfoXmlKeysFinder : public QXmlDefaultHandler
 {
@@ -33,7 +34,7 @@ public:
     virtual bool startDocument();
     virtual bool startElement(const QString&, const QString&, const QString &name, const QXmlAttributes &attrs);
 
-    QStringList keys;
+    QList <InfoKeyData> keyDataList;
 };
 
 #endif // INFOXMLKEYSFINDER_H

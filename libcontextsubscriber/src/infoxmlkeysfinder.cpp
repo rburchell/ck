@@ -24,7 +24,7 @@
 
 bool InfoXmlKeysFinder::startDocument()
 {
-    keys.clear();
+    keyDataList.clear();
 }
 
 bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QString &name, const QXmlAttributes &attrs)
@@ -37,8 +37,10 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
             if (attrs.localName( i ) == "name") {
                 // Put the key info the list
                 QString fullKeyName = "Context." + attrs.value(i);
-                keys << fullKeyName;
+				InfoKeyData data;
+				data.name = fullKeyName;
                 qDebug() << "Read key" << fullKeyName;
+				keyDataList << data;
                 return true;
             }
         }

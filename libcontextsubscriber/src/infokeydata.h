@@ -19,33 +19,17 @@
  *
  */
 
-#ifndef INFOXMLBACKEND_H
-#define INFOXMLBACKEND_H
+#ifndef INFOKEYDATA_H
+#define INFOKEYDATA_H
 
-#include <QVariant>
-#include <QStringList>
-#include <QObject>
-#include <QMutex>
-#include <QFileInfo>
-#include "infobackend.h"
-#include "infokeydata.h"
+#include <QString>
 
-class InfoXmlBackend : public InfoBackend
+struct InfoKeyData
 {
-    Q_OBJECT 
-
-public:
-    explicit InfoXmlBackend(QObject *parent = 0);
-
-    virtual QString name() const;
-	virtual QStringList listKeys() const;
-
-private:
-	QList <InfoKeyData> keyDataList;
-
-    QString registryPath() const;
-    void regenerateKeyDataList();
-    void readKeyDataFromXml(const QFileInfo &f);
+	QString name;
+	QString type;
+	QString doc;
+	QString provider;
 };
 
-#endif // INFOXMLBACKEND_H
+#endif // INFOKEYDATA_H

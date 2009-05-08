@@ -35,6 +35,7 @@ public:
 
     static InfoBackend* instance();
     virtual QString name() const = 0;
+	virtual QStringList listKeys() const = 0;
 
 private:
     InfoBackend(QObject *parent = 0) : QObject(parent) {};
