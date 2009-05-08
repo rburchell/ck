@@ -14,6 +14,8 @@ AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
 # and for every form you have to specify the objects which are dependent on that
 # commandview.$(OBJEXT): ui_commandview.h
 
+LIBS = -lcdb libmocs.a
+
 CLEANFILES =
 LDADD = 
 noinst_LIBRARIES = 

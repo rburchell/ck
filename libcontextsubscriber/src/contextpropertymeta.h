@@ -33,7 +33,7 @@ class ContextPropertyMeta : public QObject
 public:
     explicit ContextPropertyMeta(const QString &key, QObject *parent = 0);
 
-    virtual ~ContextPropertyMeta();
+    virtual ~ContextPropertyMeta() {}
 
     QString key() const;
     QString doc() const;

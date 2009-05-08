@@ -1,10 +1,15 @@
-m4/
+/m4/
 
 libmocs.a
 libmock.a
 *.o
+*.la
+*.a
 moc_*.cpp
 mock_*.cpp
 mocmock_*.cpp
 
-tests/testclass/testclassunittest
+Makefile
+
+/tests/testclass/testclassunittest
+/cli/context-cli

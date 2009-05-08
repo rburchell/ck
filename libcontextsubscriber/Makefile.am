@@ -1,7 +1,7 @@
 #SUBDIRS = src tests doc
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = src tests
+SUBDIRS = src tests cli
 
 check-sum:
 	make -C tests/ check-sum
