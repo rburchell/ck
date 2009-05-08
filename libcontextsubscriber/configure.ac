@@ -59,11 +59,9 @@ RCC=`pkg-config QtCore --variable=exec_prefix`/bin/rcc
 AC_CHECK_FILE([$RCC], [],
    AC_MSG_ERROR([Can't find rcc compiler: $RCC]))
 AC_SUBST([RCC])
-PKG_CHECK_MODULES([gconf], [gconf-2.0])
 
-
-CXXFLAGS="$CXXFLAGS $Qt_CFLAGS $gconf_CFLAGS"
-LIBS="$LIBS $Qt_LIBS $gconf_LIBS"
+CXXFLAGS="$CXXFLAGS $Qt_CFLAGS"
+LIBS="$LIBS $Qt_LIBS"
 PKG_CHECK_MODULES([QtTest], [QtTest])
 
 #AC_CONFIG_HEADER([config.h])
