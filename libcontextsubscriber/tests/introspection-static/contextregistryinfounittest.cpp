@@ -9,6 +9,7 @@ class ContextRegistryInfoUnitTest : public QObject
 private slots:
     void listKeys();
     void listKeysForProvider();
+    void listProviders();
 };
 
 void ContextRegistryInfoUnitTest::listKeys()
@@ -57,6 +58,29 @@ void ContextRegistryInfoUnitTest::listKeysForProvider()
 
     QCOMPARE(expectedKeys.size(), 0);
     QCOMPARE(context->listKeys("Something.that.doesnt.exist").size(), 0);
+}
+
+void ContextRegistryInfoUnitTest::listProviders()
+{
+    // FIXME Put in fixture setup
+    setenv("CONTEXT_PROVIDERS", "./", 0);
+
+    ContextRegistryInfo *context = ContextRegistryInfo::instance();
+    QVERIFY(context != NULL);
+
+    QList <QString> list = context->listProviders();
+    QCOMPARE(list.size(), 2);
+
+    QList <QString> expectedProviders;
+    expectedProviders << "org.freedesktop.ContextKit.contextd1";
+    expectedProviders << "org.freedesktop.ContextKit.contextd2";
+
+    foreach (QString key, list) {
+        if (expectedProviders.contains(key))
+            expectedProviders.removeAll(key);
+    }
+
+    QCOMPARE(expectedProviders.size(), 0);
 }
 
 QTEST_MAIN(ContextRegistryInfoUnitTest);

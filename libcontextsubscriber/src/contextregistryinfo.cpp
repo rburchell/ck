@@ -36,5 +36,5 @@ QList<QString> ContextRegistryInfo::listKeys(QString providername) const
 
 QList<QString> ContextRegistryInfo::listProviders() const
 {
-    return QList<QString> ();
+    return InfoBackend::instance()->listProviders();
 }

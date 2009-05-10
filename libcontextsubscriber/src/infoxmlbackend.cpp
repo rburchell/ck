@@ -67,6 +67,20 @@ QList<QString> InfoXmlBackend::listKeys(QString providername) const
     return list;
 }
 
+QList<QString> InfoXmlBackend::listProviders() const
+{
+    // Again -- slow. 
+    QList <QString> list;
+
+    foreach (QString key, keyDataHash.keys()) {
+        QString provider = keyDataHash.value(key).provider;
+        if (! list.contains(provider))
+            list << provider;
+    }
+
+    return list;
+}
+
 QString InfoXmlBackend::typeForKey(QString key) const
 {
     if (! keyDataHash.contains(key))
