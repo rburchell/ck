@@ -1,4 +1,4 @@
-SUBDIRS = testclass
+SUBDIRS = testclass introspection-static
 
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \

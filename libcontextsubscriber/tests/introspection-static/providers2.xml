@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<provider bus="session" service="org.freedesktop.ContextKit.contextd">
+  <key name="Battery.Charging">
+    <type>TRUTH</type>
+    <doc>
+        This is true when battery is charging
+    </doc>
+  </key>
+</provider>

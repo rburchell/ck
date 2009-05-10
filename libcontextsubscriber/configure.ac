@@ -71,7 +71,8 @@ AC_CONFIG_FILES([Makefile
          src/infoxmlbackendconfig.h
 		 cli/Makefile
 		 tests/Makefile
-		 tests/testclass/Makefile])
+		 tests/testclass/Makefile
+         tests/introspection-static/Makefile])
 
 AC_OUTPUT
 
