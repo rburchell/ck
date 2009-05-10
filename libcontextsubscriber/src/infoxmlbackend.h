@@ -39,6 +39,7 @@ public:
 
     virtual QString name() const;
 	virtual QStringList listKeys() const;
+    virtual QList<QString> listKeys(QString providername) const;
     virtual QString typeForKey(QString key) const;
     virtual QString docForKey(QString key) const;
     virtual QString providerForKey(QString key) const;

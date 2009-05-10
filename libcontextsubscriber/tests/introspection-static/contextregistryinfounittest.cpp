@@ -8,29 +8,55 @@ class ContextRegistryInfoUnitTest : public QObject
 
 private slots:
     void listKeys();
+    void listKeysForProvider();
 };
 
 void ContextRegistryInfoUnitTest::listKeys()
 {
+    // FIXME Put in fixture setup
     setenv("CONTEXT_PROVIDERS", "./", 0);
 
     ContextRegistryInfo *context = ContextRegistryInfo::instance();
     QVERIFY(context != NULL);
 
     QList <QString> list = context->listKeys();
-    QVERIFY(list.size() == 3);
+    QCOMPARE(list.size(), 3);
 
-    QList <QString> expectedProviders;
-    expectedProviders << "Context.Battery.ChargePercentage";
-    expectedProviders << "Context.Battery.LowBattery";
-    expectedProviders << "Context.Battery.Charging";
+    QList <QString> expectedKeys;
+    expectedKeys << "Context.Battery.ChargePercentage";
+    expectedKeys << "Context.Battery.LowBattery";
+    expectedKeys << "Context.Battery.Charging";
 
     foreach (QString key, list) {
-        if (expectedProviders.contains(key))
-            expectedProviders.removeAll(key);
+        if (expectedKeys.contains(key))
+            expectedKeys.removeAll(key);
     }
 
-    QVERIFY(expectedProviders.size() == 0);
+    QCOMPARE(expectedKeys.size(), 0);
+}
+
+void ContextRegistryInfoUnitTest::listKeysForProvider()
+{
+    // FIXME Put in fixture setup
+    setenv("CONTEXT_PROVIDERS", "./", 0);
+
+    ContextRegistryInfo *context = ContextRegistryInfo::instance();
+    QVERIFY(context != NULL);
+
+    QList <QString> list = context->listKeys("org.freedesktop.ContextKit.contextd1");
+    QCOMPARE(list.size(), 2);
+
+    QList <QString> expectedKeys;
+    expectedKeys << "Context.Battery.ChargePercentage";
+    expectedKeys << "Context.Battery.LowBattery";
+
+    foreach (QString key, list) {
+        if (expectedKeys.contains(key))
+            expectedKeys.removeAll(key);
+    }
+
+    QCOMPARE(expectedKeys.size(), 0);
+    QCOMPARE(context->listKeys("Something.that.doesnt.exist").size(), 0);
 }
 
 QTEST_MAIN(ContextRegistryInfoUnitTest);

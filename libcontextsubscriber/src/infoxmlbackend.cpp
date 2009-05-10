@@ -53,6 +53,20 @@ QStringList InfoXmlBackend::listKeys() const
 	return list;
 }
 
+QList<QString> InfoXmlBackend::listKeys(QString providername) const
+{
+    // This is slow and not nice, but we're an xml backend and 
+    // we can afford to not be the first in the run
+   	QStringList list;
+
+    foreach (QString key, keyDataHash.keys()) {
+        if (keyDataHash.value(key).provider == providername)
+            list << keyDataHash.value(key).name;
+    }
+
+    return list;
+}
+
 QString InfoXmlBackend::typeForKey(QString key) const
 {
     if (! keyDataHash.contains(key))
