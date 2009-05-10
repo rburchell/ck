@@ -20,12 +20,13 @@
  */
 
 #include "contextregistryinfo.h"
+#include "infobackend.h"
 
 ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
 
 QList<QString> ContextRegistryInfo::listKeys() const
 {
-    return QList<QString> ();
+    return InfoBackend::instance()->listKeys();
 }
 
 QList<QString> ContextRegistryInfo::listKeys(QString providername) const
