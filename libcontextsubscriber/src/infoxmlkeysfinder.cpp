@@ -24,27 +24,124 @@
 
 bool InfoXmlKeysFinder::startDocument()
 {
-    keyDataList.clear();
+    keyDataHash.clear();
+	inProvider = false;
+	inKey = false;
+    inKeyType = false;
+    inKeyDoc = false;
 }
 
 bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QString &name, const QXmlAttributes &attrs)
 {
-    // FIXME Dumb for now. Do some more logic checks to make sure the
-    // xml is actually a valid one.
+    // <provider> ...
+    if (inProvider == false && name == "provider") {
+		inProvider = true;
+        currentProvider = getAttrValue(attrs, "service");
+		return true;
+	}
 
-    if (name == "key") {
-        for (int i = 0; i< attrs.count(); i++) {
-            if (attrs.localName( i ) == "name") {
-                // Put the key info the list
-                QString fullKeyName = "Context." + attrs.value(i);
-				InfoKeyData data;
-				data.name = fullKeyName;
-                qDebug() << "Read key" << fullKeyName;
-				keyDataList << data;
-                return true;
-            }
-        }
+    // <key> ...
+    if (inKey == false && inProvider == true && name == "key") {
+	    // Reset all potential key data
+        currentKeyName = "";
+        currentKeyType = "";
+        currentKeyDoc = "";
+	    
+        QString keyName = getAttrValue(attrs, "name");
+		if (keyName != "")
+			currentKeyName = "Context." + keyName;
+
+        inKey = true;
+       		
+		return true;
+    }
+
+    // <type> ...
+    if (inKeyType == false && inKey == true && name == "type") {
+        currentKeyType = ""; // Reset type data
+		return true;
+    }
+
+    // <type> ...
+    if (inKeyDoc == false && inKey == true && name == "doc") {
+        currentKeyDoc = ""; // Reset doc data
+		return true;
     }
 
     return true;
+}
+
+bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString &name)
+{
+    // ... </provider>
+    if (inProvider == true && name == "provider") {        
+        inProvider = false;
+        inKey = false;
+        inKeyDoc = false;
+        inKeyType = false;
+        return true;
+    } 
+
+    // ... </key>
+    if (inKey == true && name == "key") {
+        // If at least name is ok, add to list
+        if (currentKeyName != "") {
+            qDebug() << "Got key:" << currentKeyName;
+
+            InfoKeyData data;
+            data.name = currentKeyName;
+            data.type = currentKeyType;
+            data.doc = currentKeyDoc;
+            data.provider = currentProvider;
+            keyDataHash.insert(currentKeyName, data);
+        }
+
+        inKey = false;
+        inKeyDoc = false;
+        inKeyType = false;
+        return true;
+    } 
+
+    // ... </doc>
+    if (inKeyDoc == true && name == "doc") {
+        inKeyDoc = false;
+        return true;
+    } 
+
+    // ... </type>
+    if (inKeyType == true && name == "type") {
+        inKeyType = false;
+        return true;
+    }
+
+    return true;
+}
+
+bool InfoXmlKeysFinder::characters(const QString &chars)
+{
+    // <type> CHARS ...
+    if (inKeyType == true) {
+        currentKeyType += chars;
+        return true;
+    }
+
+    // <doc> CHARS ...
+    if (inKeyDoc == true) {
+        currentKeyDoc += chars;
+        return true;
+    }
+
+    return true;
+}
+
+/* Private */
+
+QString InfoXmlKeysFinder::getAttrValue(const QXmlAttributes &attrs, const QString &attrName)
+{
+	for (int i = 0; i< attrs.count(); i++) {
+     	if (attrs.localName(i) == attrName) 
+			return attrs.value(i);
+	}
+	
+	return "";
 }

@@ -44,8 +44,11 @@ QString InfoXmlBackend::name() const
 QStringList InfoXmlBackend::listKeys() const
 {
 	QStringList list;
-    for (int i = 0; i < keyDataList.size(); i++)
-		list << keyDataList.at(i).name;
+
+    // FIXME Hmm, we could return just the keyDataHash.keys itself here...
+    foreach (QString key, keyDataHash.keys()) {
+        list << keyDataHash.value(key).name;
+    }
 		
 	return list;
 }
@@ -54,7 +57,7 @@ QStringList InfoXmlBackend::listKeys() const
 
 void InfoXmlBackend::regenerateKeyDataList()
 {
-    keyDataList.clear();
+    keyDataHash.clear();
 
     qDebug() << "Re-reading xml contents from" << registryPath();
 
@@ -92,7 +95,7 @@ void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
     reader.setContentHandler(&handler);
     reader.parse(source);
 
-	keyDataList += handler.keyDataList;
+    keyDataHash.unite(handler.keyDataHash);
 }
 
 QString InfoXmlBackend::registryPath() const

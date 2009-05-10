@@ -41,7 +41,7 @@ public:
 	virtual QStringList listKeys() const;
 
 private:
-	QList <InfoKeyData> keyDataList;
+	QHash <QString, InfoKeyData> keyDataHash;
 
     QString registryPath() const;
     void regenerateKeyDataList();

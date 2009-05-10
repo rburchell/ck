@@ -33,8 +33,23 @@ class InfoXmlKeysFinder : public QXmlDefaultHandler
 public:
     virtual bool startDocument();
     virtual bool startElement(const QString&, const QString&, const QString &name, const QXmlAttributes &attrs);
+    virtual bool endElement(const QString&, const QString&, const QString &name);
+    virtual bool characters(const QString &ch);
 
-    QList <InfoKeyData> keyDataList;
+    QHash <QString, InfoKeyData> keyDataHash;
+
+private:
+	bool inProvider;
+	bool inKey;
+    bool inKeyType;
+    bool inKeyDoc;
+
+	QString currentProvider;
+	QString currentKeyName;
+	QString currentKeyType;
+	QString currentKeyDoc;
+	
+	QString getAttrValue(const QXmlAttributes &attrs, const QString &attrName);
 };
 
 #endif // INFOXMLKEYSFINDER_H
