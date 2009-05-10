@@ -53,6 +53,30 @@ QStringList InfoXmlBackend::listKeys() const
 	return list;
 }
 
+QString InfoXmlBackend::typeForKey(QString key) const
+{
+    if (! keyDataHash.contains(key))
+        return "";
+
+    return keyDataHash.value(key).type;
+}
+
+QString InfoXmlBackend::docForKey(QString key) const
+{
+    if (! keyDataHash.contains(key))
+        return "";
+
+    return keyDataHash.value(key).doc;
+}
+
+QString InfoXmlBackend::providerForKey(QString key) const
+{
+    if (! keyDataHash.contains(key))
+        return "";
+
+    return keyDataHash.value(key).provider;
+}
+
 /* Private */
 
 void InfoXmlBackend::regenerateKeyDataList()
