@@ -20,30 +20,32 @@
  */
 
 #include "contextpropertyinfo.h"
+#include "infobackend.h"
 
 ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
     : QObject(parent)
 {
+    keyName = key;
 }
 
 QString ContextPropertyInfo::key() const
 {
-    return QString("");
+    return keyName;
 }
 
 QString ContextPropertyInfo::doc() const
 {
-    return QString("");
+    return InfoBackend::instance()->docForKey(keyName);
 }
 
 QString ContextPropertyInfo::type() const
 {
-    return QString("");
+    return InfoBackend::instance()->typeForKey(keyName);
 }
 
 QString ContextPropertyInfo::providerDBusName() const
 {
-    return QString("");
+    return InfoBackend::instance()->providerForKey(keyName);
 }
 
 /*

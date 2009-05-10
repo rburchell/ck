@@ -42,6 +42,9 @@ public:
     QString providerDBusName() const;
     // DBusBusType providerDBusType() const;
 
+private:
+    QString keyName;
+
 signals:
     void providerChanged(QString newProvider);
     void typeChanged(QString newType);
