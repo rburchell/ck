@@ -72,8 +72,8 @@ AC_CONFIG_FILES([Makefile
 		 cli/Makefile
 		 tests/Makefile
 		 tests/testclass/Makefile
-         tests/xml-introspection-static/Makefile])
-
+         tests/xml-introspection-static/Makefile
+         tests/xml-introspection-dynamic/Makefile])
 AC_OUTPUT
 
 # Checks for header files.
