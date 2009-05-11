@@ -22,7 +22,8 @@ void ContextRegistryInfoUnitTest::basicChange()
     QFile::remove("providers.xml");
     QFile::copy("providers1v2.xml.src", "providers.xml");
     QTest::qWait(500);
-   
+
+    QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
     QCOMPARE(args.at(0).toList().size(), 3);
 
@@ -30,7 +31,6 @@ void ContextRegistryInfoUnitTest::basicChange()
     QStringList newKeys = context->listKeys();
     QVERIFY(newKeys.contains("Context.Battery.AboutToExplode"));
 }
-
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
 {
