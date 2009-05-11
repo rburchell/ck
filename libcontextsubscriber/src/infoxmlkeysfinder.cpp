@@ -58,12 +58,14 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
 
     // <type> ...
     if (inKeyType == false && inKey == true && name == "type") {
+        inKeyType = true;
         currentKeyType = ""; // Reset type data
 		return true;
     }
 
-    // <type> ...
+    // <doc> ...
     if (inKeyDoc == false && inKey == true && name == "doc") {
+        inKeyDoc = true;
         currentKeyDoc = ""; // Reset doc data
 		return true;
     }
@@ -121,13 +123,13 @@ bool InfoXmlKeysFinder::characters(const QString &chars)
 {
     // <type> CHARS ...
     if (inKeyType == true) {
-        currentKeyType += chars;
+        currentKeyType += chars.trimmed();
         return true;
     }
 
     // <doc> CHARS ...
     if (inKeyDoc == true) {
-        currentKeyDoc += chars;
+        currentKeyDoc += chars.trimmed();
         return true;
     }
 
