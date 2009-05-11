@@ -22,12 +22,12 @@
 #ifndef CONTEXTPROPERTY_PRIV_H
 #define CONTEXTPROPERTY_PRIV_H
 
-#include "contextproperty.h"
-#include "keymanager.h"
+class PropertyHandle;
+class ContextProperty;
 
 struct ContextPropertyPrivate
 {
-    KeyHandle *handle; ///< The common handle behind this context property
+    PropertyHandle *handle; ///< The common handle behind this context property
     ContextProperty *pubInterface;
     bool subscribed; ///< True, if we are subscribed to the handle behind us
 };

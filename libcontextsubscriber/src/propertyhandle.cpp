@@ -41,7 +41,7 @@
 /// Constructs a new instance. ContextProperty creates the handles, you
 /// don't have to (and can't) call this constructor ever.
 PropertyHandle::PropertyHandle(const QString& key)
-    : KeyHandle(key), provider(NULL), type(QVariant::Invalid), subscribeCount(0)
+    : key(key), provider(NULL), type(QVariant::Invalid), subscribeCount(0)
 {
     update_provider();
 }
@@ -95,7 +95,7 @@ void PropertyHandle::update_provider()
             provider = new_provider;
             if (provider)
                 provider->subscribe(this);
-            emit providerChanged();
+            // emit providerChanged();
         } else
             provider = new_provider;
     } else
@@ -204,8 +204,8 @@ void PropertyProvider::subscribe(PropertyHandle* prop)
     if (!reply.isValid()) {
         qCritical() << "subscribe: bad reply from provider " << dbusServiceString
                     << ": " << reply.error();
-        prop->value.clear();
-        emit prop->handleChanged();
+        prop->value.clear(); // FIXME: Should this be changed?
+        //emit prop->handleChanged();
     }
 
     qDebug() << "subscribed to " << prop->key << " via provider " << dbusServiceString;
@@ -268,13 +268,13 @@ void PropertyProvider::changeValues(const DBusVariantMap& values,
             }
             else {
                 h->value = v;
-                emit h->handleChanged();
+                emit h->valueChanged();
             }
         }
         else {
             qWarning() << "Type mismatch for:" << key << v.type() << "!=" << h->type;
             h->value.clear();
-            emit h->handleChanged();
+            emit h->valueChanged();
         }
     }
 
@@ -296,7 +296,7 @@ void PropertyProvider::changeValues(const DBusVariantMap& values,
         }
         else {
             h->value = QVariant(h->type); // Note: Null but typed QVariant
-            emit h->handleChanged();
+            emit h->valueChanged();
         }
     }
 }

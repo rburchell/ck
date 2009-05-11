@@ -31,7 +31,6 @@
 #include <cdb.h>
 #include <QFileSystemWatcher>
 
-#include "keymanager.h"
 #include "subscriberiface_p.h"
 
 /* Handling context properties and their providers.
@@ -57,7 +56,7 @@ class PropertyHandle;
 class PropertyProvider;
 class PropertyManager;
 
-class PropertyHandle : public KeyHandle
+class PropertyHandle : public QObject
 {
     Q_OBJECT
 
@@ -67,6 +66,16 @@ public:
     bool subscribed() const;
 
     QString providerName() const;
+
+    QString key;
+    QVariant value;
+
+    // TODO: Remove these when introspection is ready
+    QString typeName; ///< Type name of this property.
+    QString description; ///< Documentation describing this property.
+
+signals:
+    void valueChanged();
 
 private:
     PropertyHandle(const QString& key);
@@ -79,7 +88,6 @@ private:
 
     friend class PropertyProvider;
     friend class PropertyManager;
-
 };
 
 class PropertyProvider : public QObject

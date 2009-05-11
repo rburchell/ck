@@ -22,7 +22,6 @@
 #include "contextproperty.h"
 #include "contextproperty_priv.h"
 #include "propertyhandle.h"
-#include "keymanager.h"
 
 #include <strings.h>
 #include <QByteArray>
@@ -204,7 +203,7 @@ void ContextProperty::init(const QString &key)
     priv = new ContextPropertyPrivate;
 
     priv->pubInterface = this;
-    priv->handle = KeyManager::getHandle(key);
+    priv->handle = PropertyManager::instance()->getHandle(key);
     priv->subscribed = false;
 
     subscribe();
@@ -312,7 +311,7 @@ void ContextProperty::subscribe() const
     if (priv->subscribed)
         return;
 
-    QObject::connect(priv->handle, SIGNAL(handleChanged()),
+    QObject::connect(priv->handle, SIGNAL(valueChanged()),
                      this, SIGNAL(valueChanged()));
     priv->handle->subscribe();
     priv->subscribed = true;
