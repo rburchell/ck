@@ -1,25 +1,18 @@
 #include <QtTest/QtTest>
 #include <QtCore>
 #include "contextregistryinfo.h"
+#include "contextregistryinfounittest.h"
 
-class ContextRegistryInfoUnitTest : public QObject
+void ContextRegistryInfoUnitTest::initTestCase()
 {
-    Q_OBJECT
+    setenv("CONTEXT_PROVIDERS", "./", 0);
 
-private slots:
-    void listKeys();
-    void listKeysForProvider();
-    void listProviders();
-};
+    context = ContextRegistryInfo::instance();
+    QVERIFY(context != NULL);
+}
 
 void ContextRegistryInfoUnitTest::listKeys()
 {
-    // FIXME Put in fixture setup
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-
-    ContextRegistryInfo *context = ContextRegistryInfo::instance();
-    QVERIFY(context != NULL);
-
     QList <QString> list = context->listKeys();
     QCOMPARE(list.size(), 3);
 
@@ -38,12 +31,6 @@ void ContextRegistryInfoUnitTest::listKeys()
 
 void ContextRegistryInfoUnitTest::listKeysForProvider()
 {
-    // FIXME Put in fixture setup
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-
-    ContextRegistryInfo *context = ContextRegistryInfo::instance();
-    QVERIFY(context != NULL);
-
     QList <QString> list = context->listKeys("org.freedesktop.ContextKit.contextd1");
     QCOMPARE(list.size(), 2);
 
@@ -62,12 +49,6 @@ void ContextRegistryInfoUnitTest::listKeysForProvider()
 
 void ContextRegistryInfoUnitTest::listProviders()
 {
-    // FIXME Put in fixture setup
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-
-    ContextRegistryInfo *context = ContextRegistryInfo::instance();
-    QVERIFY(context != NULL);
-
     QList <QString> list = context->listProviders();
     QCOMPARE(list.size(), 2);
 
@@ -83,5 +64,4 @@ void ContextRegistryInfoUnitTest::listProviders()
     QCOMPARE(expectedProviders.size(), 0);
 }
 
-QTEST_MAIN(ContextRegistryInfoUnitTest);
 #include "moc_contextregistryinfounittest_cpp.cpp"
