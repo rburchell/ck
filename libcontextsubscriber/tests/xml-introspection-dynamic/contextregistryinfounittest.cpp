@@ -9,7 +9,7 @@ void ContextRegistryInfoUnitTest::initTestCase()
     QFile::remove("providers.xml");
 
     // Create initial state
-    QFile::copy("providers1.xml.src", "providers.xml");
+    QFile::copy("providers1v1.xml.src", "providers.xml");
 
     context = ContextRegistryInfo::instance();
     QVERIFY(context != NULL);
@@ -20,7 +20,7 @@ void ContextRegistryInfoUnitTest::basicChange()
     QSignalSpy spy(context, SIGNAL(keysChanged(QStringList)));
 
     QFile::remove("providers.xml");
-    QFile::copy("providers2.xml.src", "providers.xml");
+    QFile::copy("providers1v2.xml.src", "providers.xml");
     QTest::qWait(500);
    
     QList<QVariant> args = spy.takeFirst();
