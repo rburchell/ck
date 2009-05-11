@@ -46,7 +46,7 @@ AS_IF([test "$with_doxygen" = yes -o \( "$with_doxygen" = "" -a "$withm_doxygen"
 	    [AC_MSG_NOTICE([Doxygen not enabled, enable it with --with-doxygen])])
 
 # Checks for libraries.
-PKG_CHECK_MODULES([Qt], [QtCore QtGui QtDBus])
+PKG_CHECK_MODULES([Qt], [QtCore QtGui QtDBus QtXml])
 MOC=`pkg-config QtCore --variable=moc_location`
 AC_CHECK_FILE([$MOC], [],
    AC_MSG_ERROR([Can't find moc compiler: $MOC]))

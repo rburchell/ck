@@ -26,6 +26,8 @@
 #include <QStringList>
 #include <QObject>
 #include <QXmlDefaultHandler>
+#include <QHash>
+#include <QString>
 #include "infokeydata.h"
 
 class InfoXmlKeysFinder : public QXmlDefaultHandler

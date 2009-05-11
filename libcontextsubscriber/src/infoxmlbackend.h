@@ -27,6 +27,8 @@
 #include <QObject>
 #include <QMutex>
 #include <QFileInfo>
+#include <QString>
+#include <QHash>
 #include "infobackend.h"
 #include "infokeydata.h"
 
