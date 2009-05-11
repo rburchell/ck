@@ -1,21 +1,7 @@
 #include <QtTest/QtTest>
 #include <QtCore>
 #include "contextregistryinfo.h"
-
-class ContextRegistryInfoUnitTest : public QObject
-{
-    Q_OBJECT
-
-private:
-    ContextRegistryInfo *context;
-
-private slots:
-    void initTestCase();
-    void listKeys();
-    void listKeysForProvider();
-    void listProviders();
-
-};
+#include "contextregistryinfounittest.h"
 
 void ContextRegistryInfoUnitTest::initTestCase()
 {
@@ -78,5 +64,4 @@ void ContextRegistryInfoUnitTest::listProviders()
     QCOMPARE(expectedProviders.size(), 0);
 }
 
-QTEST_MAIN(ContextRegistryInfoUnitTest);
 #include "moc_contextregistryinfounittest_cpp.cpp"
