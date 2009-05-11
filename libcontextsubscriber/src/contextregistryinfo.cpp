@@ -24,6 +24,27 @@
 
 ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
 
+/* Public */
+
+ContextRegistryInfo* ContextRegistryInfo::instance()
+{
+    static QMutex mutex;
+    if (!registryInstance)
+    {
+        mutex.lock();
+ 
+        if (! registryInstance) {
+            registryInstance = new ContextRegistryInfo;
+            connect(InfoBackend::instance(), SIGNAL(keysChanged(QStringList)), 
+                    registryInstance, SIGNAL(onKeysChanged(QStringList)));
+        }
+ 
+        mutex.unlock();
+    }
+ 
+    return registryInstance;
+}
+
 QList<QString> ContextRegistryInfo::listKeys() const
 {
     return InfoBackend::instance()->listKeys();
@@ -38,3 +59,11 @@ QList<QString> ContextRegistryInfo::listProviders() const
 {
     return InfoBackend::instance()->listProviders();
 }
+
+/* Slots */
+
+void ContextRegistryInfo::onKeysChanged(QStringList currentKeys)
+{
+    emit(keysChanged(currentKeys));
+}
+

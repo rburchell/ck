@@ -33,6 +33,12 @@
 InfoXmlBackend::InfoXmlBackend(QObject *parent)
     : InfoBackend(parent)
 {
+    /* Thinking about locking... the watcher notifications are delivered synced, 
+       so asuming the changes in the dir are atomic this is all we need. */
+
+    watcher.addPath(registryPath());
+    connect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
+
 	regenerateKeyDataList();
 }
 
@@ -103,6 +109,14 @@ QString InfoXmlBackend::providerForKey(QString key) const
         return "";
 
     return keyDataHash.value(key).provider;
+}
+
+/* Slots */
+
+void InfoXmlBackend::onDirectoryChanged(const QString &path)
+{
+    regenerateKeyDataList();
+    emit keysChanged(listKeys());
 }
 
 /* Private */

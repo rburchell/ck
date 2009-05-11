@@ -5,6 +5,8 @@
 
 int main(int argc, char **argv)
 {
+    QCoreApplication app(argc, argv);
+    
     ContextRegistryInfoUnitTest test1;
     QTest::qExec(&test1);
 

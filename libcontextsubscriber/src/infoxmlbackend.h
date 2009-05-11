@@ -29,6 +29,7 @@
 #include <QFileInfo>
 #include <QString>
 #include <QHash>
+#include <QFileSystemWatcher>
 #include "infobackend.h"
 #include "infokeydata.h"
 
@@ -47,7 +48,11 @@ public:
     virtual QString docForKey(QString key) const;
     virtual QString providerForKey(QString key) const;
 
+public slots:
+    void onDirectoryChanged(const QString &path);
+
 private:
+    QFileSystemWatcher watcher;
 	QHash <QString, InfoKeyData> keyDataHash;
 
     QString registryPath() const;

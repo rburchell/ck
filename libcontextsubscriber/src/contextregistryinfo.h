@@ -33,25 +33,14 @@ class ContextRegistryInfo : public QObject
 
 public:
 
-    static ContextRegistryInfo* instance()
-    {
-      static QMutex mutex;
-      if (!registryInstance)
-      {
-          mutex.lock();
- 
-          if (! registryInstance)
-              registryInstance = new ContextRegistryInfo;
- 
-          mutex.unlock();
-      }
- 
-      return registryInstance;
-    }
+    static ContextRegistryInfo* instance();
  
     QList<QString> listKeys() const;
     QList<QString> listKeys(QString providername) const;
     QList<QString> listProviders() const;
+
+public slots:
+    void onKeysChanged(QStringList currentKeys);
 
 private:
     ContextRegistryInfo() {};

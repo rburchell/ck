@@ -42,6 +42,9 @@ public:
     virtual QString docForKey(QString key) const = 0;
     virtual QString providerForKey(QString key) const = 0;
 
+signals:
+    void keysChanged(QStringList currentKeys);
+
 private:
     InfoBackend(QObject *parent = 0) : QObject(parent) {};
     InfoBackend(const InfoBackend&);
