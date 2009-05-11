@@ -6,20 +6,27 @@ class ContextRegistryInfoUnitTest : public QObject
 {
     Q_OBJECT
 
+private:
+    ContextRegistryInfo *context;
+
 private slots:
+    void initTestCase();
     void listKeys();
     void listKeysForProvider();
     void listProviders();
+
 };
+
+void ContextRegistryInfoUnitTest::initTestCase()
+{
+    setenv("CONTEXT_PROVIDERS", "./", 0);
+
+    context = ContextRegistryInfo::instance();
+    QVERIFY(context != NULL);
+}
 
 void ContextRegistryInfoUnitTest::listKeys()
 {
-    // FIXME Put in fixture setup
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-
-    ContextRegistryInfo *context = ContextRegistryInfo::instance();
-    QVERIFY(context != NULL);
-
     QList <QString> list = context->listKeys();
     QCOMPARE(list.size(), 3);
 
@@ -38,12 +45,6 @@ void ContextRegistryInfoUnitTest::listKeys()
 
 void ContextRegistryInfoUnitTest::listKeysForProvider()
 {
-    // FIXME Put in fixture setup
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-
-    ContextRegistryInfo *context = ContextRegistryInfo::instance();
-    QVERIFY(context != NULL);
-
     QList <QString> list = context->listKeys("org.freedesktop.ContextKit.contextd1");
     QCOMPARE(list.size(), 2);
 
@@ -62,12 +63,6 @@ void ContextRegistryInfoUnitTest::listKeysForProvider()
 
 void ContextRegistryInfoUnitTest::listProviders()
 {
-    // FIXME Put in fixture setup
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-
-    ContextRegistryInfo *context = ContextRegistryInfo::instance();
-    QVERIFY(context != NULL);
-
     QList <QString> list = context->listProviders();
     QCOMPARE(list.size(), 2);
 
