@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv)
 {
-    setenv("CONTEXT_PROVIDERS", "./", 0);
+    setenv("CONTEXT_PROVIDERS", "xml/", 0);
 
     QCoreApplication app(argc, argv);
     

@@ -5,22 +5,20 @@
 
 void ContextRegistryInfoUnitTest::initTestCase()
 {
-    // Ensure removed
-    QFile::remove("providers.xml");
-
-    // Create initial state
-    QFile::copy("providers1v1.xml.src", "providers.xml");
-
     context = ContextRegistryInfo::instance();
     QVERIFY(context != NULL);
 }
 
 void ContextRegistryInfoUnitTest::basicChange()
 {
+    // Setup state
+    QFile::remove("xml/providers.xml");
+    QFile::copy("xml/providers1v1.xml.src", "xml/providers.xml");
+
     QSignalSpy spy(context, SIGNAL(keysChanged(QStringList)));
 
-    QFile::remove("providers.xml");
-    QFile::copy("providers1v2.xml.src", "providers.xml");
+    QFile::remove("xml/providers.xml");
+    QFile::copy("xml/providers1v2.xml.src", "xml/providers.xml");
     QTest::qWait(500);
 
     QCOMPARE(spy.count(), 1);
@@ -34,7 +32,7 @@ void ContextRegistryInfoUnitTest::basicChange()
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove("providers.xml");
+    QFile::remove("xml/providers.xml");
 }
     
 #include "moc_contextregistryinfounittest_cpp.cpp"

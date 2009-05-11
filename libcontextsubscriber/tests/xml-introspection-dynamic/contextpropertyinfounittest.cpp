@@ -6,16 +6,16 @@
 void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 {
     // Create initial state
-    QFile::remove("providers.xml");
-    QFile::copy("providers2v1.xml.src", "providers.xml");
+    QFile::remove("xml/providers.xml");
+    QFile::copy("xml/providers2v1.xml.src", "xml/providers.xml");
 
     ContextPropertyInfo prop("Context.Battery.LowBattery");
     QCOMPARE(prop.type(), QString("TRUTH"));
     
     QSignalSpy spy(&prop, SIGNAL(typeChanged(QString)));
 
-    QFile::remove("providers.xml");
-    QFile::copy("providers2v2.xml.src", "providers.xml");
+    QFile::remove("xml/providers.xml");
+    QFile::copy("xml/providers2v2.xml.src", "xml/providers.xml");
     QTest::qWait(500);
 
     QCOMPARE(spy.count(), 1);
@@ -29,15 +29,15 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 void ContextPropertyInfoUnitTest::checkKeyRemoval()
 {
     // Create initial state
-    QFile::remove("providers.xml");
-    QFile::copy("providers3v1.xml.src", "providers.xml");
+    QFile::remove("xml/providers.xml");
+    QFile::copy("xml/providers3v1.xml.src", "xml/providers.xml");
 
     ContextPropertyInfo prop("Context.Battery.LowBattery");
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
     
-    QFile::remove("providers.xml");
-    QFile::copy("providers3v2.xml.src", "providers.xml");
+    QFile::remove("xml/providers.xml");
+    QFile::copy("xml/providers3v2.xml.src", "xml/providers.xml");
     QTest::qWait(500);
 
     QVERIFY(prop.type() == "");
@@ -46,7 +46,7 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
 
 void ContextPropertyInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove("providers.xml");
+    QFile::remove("xml/providers.xml");
 }
 
 #include "moc_contextpropertyinfounittest_cpp.cpp"
