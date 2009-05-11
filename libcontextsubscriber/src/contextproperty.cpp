@@ -22,6 +22,7 @@
 #include "contextproperty.h"
 #include "contextproperty_priv.h"
 #include "propertyhandle.h"
+#include "propertymanager.h"
 
 #include <strings.h>
 #include <QByteArray>
@@ -331,12 +332,8 @@ void ContextProperty::unsubscribe() const
     if (!priv->subscribed)
         return;
 
-    QObject::disconnect(priv->handle, SIGNAL(handleChanged()),
-                        this, SIGNAL(contentsChanged()));
-    QObject::disconnect(priv->handle, SIGNAL(handleChanged()),
+    QObject::disconnect(priv->handle, SIGNAL(valueChanged()),
                         this, SIGNAL(valueChanged()));
-    QObject::disconnect(priv->handle, SIGNAL(providerChanged()),
-                        this, SIGNAL(providerChanged()));
     priv->handle->unsubscribe();
     priv->subscribed = false;
 }
