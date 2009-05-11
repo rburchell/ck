@@ -5,8 +5,6 @@
 
 void ContextRegistryInfoUnitTest::initTestCase()
 {
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-
     context = ContextRegistryInfo::instance();
     QVERIFY(context != NULL);
 }

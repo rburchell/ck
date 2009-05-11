@@ -3,11 +3,6 @@
 #include "contextpropertyinfo.h"
 #include "contextpropertyinfounittest.h"
 
-void ContextPropertyInfoUnitTest::initTestCase()
-{
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-}
-
 void ContextPropertyInfoUnitTest::checkLowBAttery()
 {
     ContextPropertyInfo prop("Context.Battery.LowBattery");
