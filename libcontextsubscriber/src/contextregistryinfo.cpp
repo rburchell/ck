@@ -36,7 +36,7 @@ ContextRegistryInfo* ContextRegistryInfo::instance()
         if (! registryInstance) {
             registryInstance = new ContextRegistryInfo;
             connect(InfoBackend::instance(), SIGNAL(keysChanged(QStringList)), 
-                    registryInstance, SIGNAL(onKeysChanged(QStringList)));
+                    registryInstance, SLOT(onKeysChanged(QStringList)));
         }
  
         mutex.unlock();

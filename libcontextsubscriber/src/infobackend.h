@@ -44,6 +44,7 @@ public:
 
 signals:
     void keysChanged(QStringList currentKeys);
+    void keyDataChanged(QString key);
 
 private:
     InfoBackend(QObject *parent = 0) : QObject(parent) {};

@@ -42,6 +42,9 @@ public:
     QString providerDBusName() const;
     // DBusBusType providerDBusType() const;
 
+public slots:
+    void onKeyDataChanged(QString key);
+
 private:
     QString keyName;
 

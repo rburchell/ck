@@ -115,8 +115,14 @@ QString InfoXmlBackend::providerForKey(QString key) const
 
 void InfoXmlBackend::onDirectoryChanged(const QString &path)
 {
+    QStringList oldKeys = listKeys();
+
     regenerateKeyDataList();
     emit keysChanged(listKeys());
+
+    foreach(QString key, oldKeys) {
+        emit keyDataChanged(key);
+    }
 }
 
 /* Private */

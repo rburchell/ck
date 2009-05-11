@@ -26,6 +26,11 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
     : QObject(parent)
 {
     keyName = key;
+
+    if (key != "") {
+        connect(InfoBackend::instance(), SIGNAL(keyDataChanged(QString)), 
+                this, SLOT(onKeyDataChanged(QString)));
+    }
 }
 
 QString ContextPropertyInfo::key() const
@@ -54,3 +59,16 @@ DBusBusType ContextPropertyMeta::providerDBusType() const
     return DBUS_BUS_SESSION;
 }
 */
+
+/* Slots */
+
+void ContextPropertyInfo::onKeyDataChanged(QString key)
+{
+    if (key != keyName)
+        return;
+
+    // FIXME Cache the values and actually do SEE if it changed
+    emit typeChanged(type());
+    emit providerChanged(providerDBusName());
+}
+
