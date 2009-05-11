@@ -252,7 +252,7 @@ PropertyProvider* PropertyManager::getProvider(int provider_index)
     if (lookupProvider(provider_index, bus_kind, bus_name)){
         PropertyProvider *provider = providers[bus_kind][bus_name];
         if (!provider){
-            provider = new PropertyProvider((bus_kind ? QDBusConnection::SessionBus : QDBusConnection::SystemBus), bus_name);
+            provider = new PropertyProvider((bus_kind == 1 ? QDBusConnection::SystemBus : QDBusConnection::SessionBus), bus_name);
             providers[bus_kind][bus_name] = provider;
         }
         return provider;

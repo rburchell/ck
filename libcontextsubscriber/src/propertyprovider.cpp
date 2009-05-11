@@ -22,8 +22,9 @@
 #include "propertyprovider.h"
 
 #include "propertyhandle.h"
+#include "propertymanager.h"
+#include "sconnect.h"
 
-#include <QTimer>
 
 /*!
    \class PropertyProvider
@@ -34,25 +35,24 @@
 
 void PropertyProvider::getSubscriberFinished(QString objectPath)
 {
-/*
-         dBusSubscriber = new QDBusInterface(busName, path.path(), *connection, this);
+   
+    qDebug() << "******get subs finished";
+    
+ subscriber = new SubscriberInterface("com.nokia.ContextProviderExample", objectPath, QDBusConnection::sessionBus(), 0);
+    
 
-
-         // we can keep this connected all the time
-         connect(dBusSubscriber,
-                 SIGNAL(Changed(DBusVariantMap, const QStringList &)),
-                 this,
-                 SLOT(changeValues(const DBusVariantMap &, const QStringList &)));
-     }
-     
-     }*/
+    // we can keep this connected all the time
+    sconnect(subscriber,
+            SIGNAL(Changed(DBusVariantMap, const QStringList &)),
+            this,
+            SLOT(changeValues(const DBusVariantMap &, const QStringList &)));
 }
 
     
 /// Constructs a new instance. ContextProperty handles providers for
 /// you, no need to (and can't) call this constructor.
 PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
-    : managerInterface(busType, busName, this)
+    : managerInterface(busType, busName, this), subscriber(0)
 {
     qDBusRegisterMetaType<DBusVariantMap>();
 
@@ -62,8 +62,8 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
 
 
     // Call GetSubscriber asynchronously
-    
-
+    sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(getSubscriberFinished(QString)));
+    managerInterface.getSubscriber();
 }
 
 /// Returns the dbus name and bus type of the provider
@@ -75,7 +75,7 @@ QString PropertyProvider::getName() const
 /// Subscribes to contextd DBUS notifications for property \a prop.
 void PropertyProvider::subscribe(PropertyHandle* prop)
 {
-    /*QStringList unknowns;
+    QStringList unknowns;
     QStringList keys;
     keys.append(prop->key);
 
@@ -86,23 +86,22 @@ void PropertyProvider::subscribe(PropertyHandle* prop)
 
     QDBusReply<DBusVariantMap> reply = subscriber->Subscribe(keys, unknowns);
     if (!reply.isValid()) {
-        qCritical() << "subscribe: bad reply from provider " << dbusServiceString
-                    << ": " << reply.error();
+        qCritical() << "subscribe: bad reply from provider FIXME: " << reply.error();
         prop->value.clear(); // FIXME: Should this be changed?
         //emit prop->handleChanged();
     }
 
-    qDebug() << "subscribed to " << prop->key << " via provider " << dbusServiceString;
+    qDebug() << "subscribed to " << prop->key << " via provider FIXME";
 
     if (prop->value.type() != prop->type)
         prop->value = QVariant(prop->type);
-        changeValues(reply.value(), unknowns, true);*/
+        changeValues(reply.value(), unknowns, true);
 }
 
 /// Unsubscribes from contextd DBUS notifications for property \a prop.
 void PropertyProvider::unsubscribe(PropertyHandle* prop)
 {
-    /*QStringList keys;
+    QStringList keys;
     keys.append(prop->key);
 
     if (subscriber == NULL) {
@@ -114,14 +113,14 @@ void PropertyProvider::unsubscribe(PropertyHandle* prop)
 
     if (!reply.isValid())
         qWarning() << "Could not unsubscribe! This should not happen!" << reply.error() <<
-        " Provider: " << dbusServiceString;
+        " Provider: FIXME";
 
-        qDebug() << "unsubscribed from " << prop->key << " via provider: " << dbusServiceString;*/
+        qDebug() << "unsubscribed from " << prop->key << " via provider: FIXME";
 }
 
 
 /// Slot, handling changed values coming from contextd over DBUS.
-/*void PropertyProvider::changeValues(const DBusVariantMap& values,
+void PropertyProvider::changeValues(const DBusVariantMap& values,
                                     const QStringList& unknowns,
                                     const bool processingSubscription)
 {
@@ -183,7 +182,7 @@ void PropertyProvider::unsubscribe(PropertyHandle* prop)
             emit h->valueChanged();
         }
     }
-    }*/
+}
 
 PropertyProvider::~PropertyProvider()
 {

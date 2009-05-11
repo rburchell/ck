@@ -29,6 +29,8 @@
 #include <QSet>
 #include <QTimer>
 
+#include "dbusvariantmap.h" // FIXME: remove later
+
 class PropertyHandle;
 class SubscriberInterface;
 
@@ -57,8 +59,8 @@ private:
     QString busName;
 
 private slots:
-    /*void changeValues(const DBusVariantMap& values, const QStringList& unknowns,
-      const bool processingSubscription = false);*/
+    void changeValues(const DBusVariantMap& values, const QStringList& unknowns,
+      const bool processingSubscription = false);
     void getSubscriberFinished(QString objectPath);
 
     friend class PropertyManager; // FIXME: check if this can be removed
