@@ -7,8 +7,8 @@ class ContextPropertyInfoUnitTest : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase();
     void checkKeyTypeChanging();
+    void checkKeyRemoval();
     void cleanupTestCase();
 };
 
