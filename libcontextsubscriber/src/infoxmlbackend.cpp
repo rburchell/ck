@@ -59,7 +59,7 @@ QStringList InfoXmlBackend::listKeys() const
 	return list;
 }
 
-QList<QString> InfoXmlBackend::listKeys(QString providername) const
+QStringList InfoXmlBackend::listKeys(QString providername) const
 {
     // This is slow and not nice, but we're an xml backend and 
     // we can afford to not be the first in the run
@@ -73,10 +73,10 @@ QList<QString> InfoXmlBackend::listKeys(QString providername) const
     return list;
 }
 
-QList<QString> InfoXmlBackend::listProviders() const
+QStringList InfoXmlBackend::listProviders() const
 {
     // Again -- slow. 
-    QList <QString> list;
+    QStringList list;
 
     foreach (QString key, keyDataHash.keys()) {
         QString provider = keyDataHash.value(key).provider;

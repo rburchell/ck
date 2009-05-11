@@ -11,10 +11,10 @@ void ContextRegistryInfoUnitTest::initTestCase()
 
 void ContextRegistryInfoUnitTest::listKeys()
 {
-    QList <QString> list = context->listKeys();
+    QStringList list = context->listKeys();
     QCOMPARE(list.size(), 3);
 
-    QList <QString> expectedKeys;
+    QStringList expectedKeys;
     expectedKeys << "Context.Battery.ChargePercentage";
     expectedKeys << "Context.Battery.LowBattery";
     expectedKeys << "Context.Battery.Charging";
@@ -29,10 +29,10 @@ void ContextRegistryInfoUnitTest::listKeys()
 
 void ContextRegistryInfoUnitTest::listKeysForProvider()
 {
-    QList <QString> list = context->listKeys("org.freedesktop.ContextKit.contextd1");
+    QStringList list = context->listKeys("org.freedesktop.ContextKit.contextd1");
     QCOMPARE(list.size(), 2);
 
-    QList <QString> expectedKeys;
+    QStringList expectedKeys;
     expectedKeys << "Context.Battery.ChargePercentage";
     expectedKeys << "Context.Battery.LowBattery";
 
@@ -47,10 +47,10 @@ void ContextRegistryInfoUnitTest::listKeysForProvider()
 
 void ContextRegistryInfoUnitTest::listProviders()
 {
-    QList <QString> list = context->listProviders();
+    QStringList list = context->listProviders();
     QCOMPARE(list.size(), 2);
 
-    QList <QString> expectedProviders;
+    QStringList expectedProviders;
     expectedProviders << "org.freedesktop.ContextKit.contextd1";
     expectedProviders << "org.freedesktop.ContextKit.contextd2";
 

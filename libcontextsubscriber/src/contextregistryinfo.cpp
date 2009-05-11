@@ -45,17 +45,17 @@ ContextRegistryInfo* ContextRegistryInfo::instance()
     return registryInstance;
 }
 
-QList<QString> ContextRegistryInfo::listKeys() const
+QStringList ContextRegistryInfo::listKeys() const
 {
     return InfoBackend::instance()->listKeys();
 }
 
-QList<QString> ContextRegistryInfo::listKeys(QString providername) const
+QStringList ContextRegistryInfo::listKeys(QString providername) const
 {
     return InfoBackend::instance()->listKeys(providername);
 }
 
-QList<QString> ContextRegistryInfo::listProviders() const
+QStringList ContextRegistryInfo::listProviders() const
 {
     return InfoBackend::instance()->listProviders();
 }

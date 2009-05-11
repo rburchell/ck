@@ -36,8 +36,8 @@ public:
     static InfoBackend* instance();
     virtual QString name() const = 0;
 	virtual QStringList listKeys() const = 0;
-    virtual QList<QString> listKeys(QString providername) const = 0;
-    virtual QList<QString> listProviders() const = 0;
+    virtual QStringList listKeys(QString providername) const = 0;
+    virtual QStringList listProviders() const = 0;
     virtual QString typeForKey(QString key) const = 0;
     virtual QString docForKey(QString key) const = 0;
     virtual QString providerForKey(QString key) const = 0;

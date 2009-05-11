@@ -35,9 +35,9 @@ public:
 
     static ContextRegistryInfo* instance();
  
-    QList<QString> listKeys() const;
-    QList<QString> listKeys(QString providername) const;
-    QList<QString> listProviders() const;
+    QStringList listKeys() const;
+    QStringList listKeys(QString providername) const;
+    QStringList listProviders() const;
 
 private:
     ContextRegistryInfo() {};
