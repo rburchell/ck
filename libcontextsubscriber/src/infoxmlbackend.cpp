@@ -29,6 +29,7 @@
 #include <QXmlInputSource>
 #include <QFile>
 #include <stdlib.h>
+#include "sconnect.h"
 
 InfoXmlBackend::InfoXmlBackend(QObject *parent)
     : InfoBackend(parent)
@@ -37,7 +38,7 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
        so asuming the changes in the dir are atomic this is all we need. */
 
     watcher.addPath(registryPath());
-    connect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
+    sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
 
 	regenerateKeyDataList();
 }

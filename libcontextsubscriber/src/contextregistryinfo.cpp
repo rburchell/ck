@@ -21,6 +21,7 @@
 
 #include "contextregistryinfo.h"
 #include "infobackend.h"
+#include "sconnect.h"
 
 ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
 
@@ -35,8 +36,8 @@ ContextRegistryInfo* ContextRegistryInfo::instance()
  
         if (! registryInstance) {
             registryInstance = new ContextRegistryInfo;
-            connect(InfoBackend::instance(), SIGNAL(keysChanged(QStringList)), 
-                    registryInstance, SLOT(onKeysChanged(QStringList)));
+            sconnect(InfoBackend::instance(), SIGNAL(keysChanged(QStringList)), 
+                     registryInstance, SLOT(onKeysChanged(QStringList)));
         }
  
         mutex.unlock();

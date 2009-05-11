@@ -21,6 +21,7 @@
 
 #include "contextpropertyinfo.h"
 #include "infobackend.h"
+#include "sconnect.h"
 
 ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
     : QObject(parent)
@@ -28,8 +29,8 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
     keyName = key;
 
     if (key != "") {
-        connect(InfoBackend::instance(), SIGNAL(keyDataChanged(QString)), 
-                this, SLOT(onKeyDataChanged(QString)));
+        sconnect(InfoBackend::instance(), SIGNAL(keyDataChanged(QString)), 
+                 this, SLOT(onKeyDataChanged(QString)));
     }
 }
 
