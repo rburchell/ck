@@ -39,9 +39,6 @@ public:
     QList<QString> listKeys(QString providername) const;
     QList<QString> listProviders() const;
 
-public slots:
-    void onKeysChanged(QStringList currentKeys);
-
 private:
     ContextRegistryInfo() {};
     ContextRegistryInfo(const ContextRegistryInfo&);
@@ -49,6 +46,9 @@ private:
     ContextRegistryInfo& operator=(const ContextRegistryInfo&);
     
     static ContextRegistryInfo* registryInstance;
+
+private slots:
+    void onKeysChanged(QStringList currentKeys);
 
 signals:
     void keysChanged(QStringList currentKeys);
