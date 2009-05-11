@@ -1,7 +1,7 @@
-check_PROGRAMS = introspection-static
+check_PROGRAMS = xml-introspection-static
 
 # your test's sources
-introspection_static_SOURCES = contextregistryinfounittest.cpp contextpropertyinfounittest.cpp introspection-static.cpp
+xml_introspection_static_SOURCES = contextregistryinfounittest.cpp contextpropertyinfounittest.cpp xml-introspection-static.cpp
 
 # sources tested, all of the will be recompiled specificly for the tests
 SOURCE_CXX = contextregistryinfo.cpp contextpropertyinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp

@@ -72,7 +72,7 @@ AC_CONFIG_FILES([Makefile
 		 cli/Makefile
 		 tests/Makefile
 		 tests/testclass/Makefile
-         tests/introspection-static/Makefile])
+         tests/xml-introspection-static/Makefile])
 
 AC_OUTPUT
 
