@@ -11,10 +11,16 @@ mocmock_*.cpp
 
 Makefile
 
-/tests/testclass/testclassunittest
-/cli/context-cli
+# Auto-generated
 /src/infoxmlbackendconfig.h
 
 # Ignore resource forks
 ._*
-/tests/introspection-static/introspection-static
+
+# Tests
+/tests/xml-introspection-static/xml-introspection-static
+/tests/xml-introspection-dynamic/xml-introspection-dynamic
+/tests/testclass/testclassunittest
+
+# Other binaries
+/cli/context-cli
