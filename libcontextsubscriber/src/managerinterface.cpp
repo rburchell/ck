@@ -62,7 +62,7 @@ void ManagerInterface::getSubscriber()
                      this, SLOT(getSubscriberFinished(QDBusPendingCallWatcher *)));
 }
 
-void ManagerInterface::getSubscriberFinished(QDBusPendingCallWatcher* watcher)
+void ManagerInterface::onGetSubscriberFinished(QDBusPendingCallWatcher* watcher)
 {
      QDBusPendingReply<QDBusObjectPath> reply = *watcher;
      if (reply.isError()) {

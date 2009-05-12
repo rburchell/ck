@@ -38,14 +38,16 @@ void PropertyProvider::getSubscriberFinished(QString objectPath)
    
     qDebug() << "******get subs finished";
     
- subscriber = new SubscriberInterface("com.nokia.ContextProviderExample", objectPath, QDBusConnection::sessionBus(), 0);
+    subscriber = new SubscriberInterface(QDBusConnection::SessionBus,
+                                         "com.nokia.ContextProviderExample",
+                                         objectPath, this);
     
 
     // we can keep this connected all the time
-    sconnect(subscriber,
+    /*sconnect(subscriber,
             SIGNAL(Changed(DBusVariantMap, const QStringList &)),
             this,
-            SLOT(changeValues(const DBusVariantMap &, const QStringList &)));
+            SLOT(changeValues(const DBusVariantMap &, const QStringList &)));*/
 }
 
     
@@ -79,12 +81,14 @@ void PropertyProvider::subscribe(PropertyHandle* prop)
     QStringList keys;
     keys.append(prop->key);
 
-    if (subscriber == NULL) {
+    if (subscriber == 0) {
         qCritical() << "This provider does not really exist!";
         return;
     }
 
-    QDBusReply<DBusVariantMap> reply = subscriber->Subscribe(keys, unknowns);
+    subscriber->subscribe(keys);
+    
+/*QDBusReply<DBusVariantMap> reply = subscriber->subscribe(keys, unknowns);
     if (!reply.isValid()) {
         qCritical() << "subscribe: bad reply from provider FIXME: " << reply.error();
         prop->value.clear(); // FIXME: Should this be changed?
@@ -95,7 +99,7 @@ void PropertyProvider::subscribe(PropertyHandle* prop)
 
     if (prop->value.type() != prop->type)
         prop->value = QVariant(prop->type);
-        changeValues(reply.value(), unknowns, true);
+        changeValues(reply.value(), unknowns, true);*/
 }
 
 /// Unsubscribes from contextd DBUS notifications for property \a prop.
@@ -104,18 +108,22 @@ void PropertyProvider::unsubscribe(PropertyHandle* prop)
     QStringList keys;
     keys.append(prop->key);
 
-    if (subscriber == NULL) {
+    if (subscriber == 0) {
         qCritical() << "This provider does not really exist!";
         return;
     }
 
-    QDBusReply<void> reply = subscriber->Unsubscribe(keys);
+    subscriber->unsubscribe(keys);
+    
+/*
+    QDBusReply<void> reply = subscriber->unsubscribe(keys);
 
     if (!reply.isValid())
         qWarning() << "Could not unsubscribe! This should not happen!" << reply.error() <<
         " Provider: FIXME";
 
         qDebug() << "unsubscribed from " << prop->key << " via provider: FIXME";
+*/
 }
 
 

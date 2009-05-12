@@ -31,7 +31,7 @@
 #include <cdb.h>
 #include <QFileSystemWatcher>
 
-#include "subscriberiface_p.h"
+#include "subscriberinterface.h"
 
 /* Handling context properties and their providers.
 

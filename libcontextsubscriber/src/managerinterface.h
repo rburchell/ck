@@ -43,7 +43,7 @@ public:
     void getSubscriber();
 
 private slots:
-    void getSubscriberFinished(QDBusPendingCallWatcher* watcher);
+    void onGetSubscriberFinished(QDBusPendingCallWatcher* watcher);
 
 signals:
     void getSubscriberFinished(QString objectPath);
