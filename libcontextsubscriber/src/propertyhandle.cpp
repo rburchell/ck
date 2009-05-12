@@ -42,7 +42,7 @@
 /// Constructs a new instance. ContextProperty creates the handles, you
 /// don't have to (and can't) call this constructor ever.
 PropertyHandle::PropertyHandle(const QString& key)
-    : key(key), provider(NULL), type(QVariant::Invalid), subscribeCount(0)
+    : myKey(key), provider(NULL), type(QVariant::Invalid), subscribeCount(0)
 {
     update_provider();
 }
@@ -87,11 +87,11 @@ void PropertyHandle::update_provider()
     QVariant::Type new_type = QVariant::Invalid;
     PropertyProvider *new_provider = 0;
 
-    if (manager->lookupProperty(key, provider_index, new_type, typeName, description))
+    if (manager->lookupProperty(myKey, provider_index, new_type, typeName, description))
         new_provider = manager->getProvider (provider_index);
 
     if (new_provider != provider) {
-        qDebug() << "New provider:" << key;
+        qDebug() << "New provider:" << myKey;
         if (subscribeCount > 0) {
             if (provider)
                 provider->unsubscribe(this);
@@ -102,12 +102,12 @@ void PropertyHandle::update_provider()
         } else
             provider = new_provider;
     } else
-        qDebug() << "Same provider:" << key;
+        qDebug() << "Same provider:" << myKey;
 
     // XXX - what do we do when the type changes?
 
     if (new_type != type && type != QVariant::Invalid)
-        qWarning() << "Type of" << key << "changed!";
+        qWarning() << "Type of" << myKey << "changed!";
 
     type = new_type;
 }
@@ -119,4 +119,14 @@ QString PropertyHandle::providerName() const
         return provider->getName();
     }
     return "";
+}
+
+QString PropertyHandle::key() const
+{
+    return myKey;
+}
+
+QVariant PropertyHandle::value() const
+{
+    return myValue;
 }

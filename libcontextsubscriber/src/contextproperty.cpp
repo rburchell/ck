@@ -274,7 +274,7 @@ ContextProperty::~ContextProperty()
  */
 QString ContextProperty::key() const
 {
-    return priv->handle->key;
+    return priv->handle->key();
 }
 
 /*!
@@ -283,7 +283,7 @@ QString ContextProperty::key() const
  */
 QVariant ContextProperty::value() const
 {
-    return priv->handle->value;
+    return priv->handle->value();
 }
 
 /*!
@@ -294,7 +294,7 @@ QVariant ContextProperty::value() const
  */
 QVariant ContextProperty::value(const QVariant &def) const
 {
-    QVariant val = priv->handle->value;
+    QVariant val = priv->handle->value();
     if (val.isNull())
         return def;
     else

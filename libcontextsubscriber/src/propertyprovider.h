@@ -51,13 +51,13 @@ private:
     QTimer idleTimer; ///< For scheduling subscriptions / unsubscriptions as idle processing
     ManagerInterface managerInterface;
 
-    QSet<PropertyHandle*> toSubscribe;
-    QSet<PropertyHandle*> toUnsubscribe;
+    QSet<QString> toSubscribe;
+    QSet<QString> toUnsubscribe;
 
     QString busName;
 
 private slots:
-    void changeValues(const QMap<QString, QVariant>& values, const bool processingSubscription = false);
+    void onValuesChanged(QMap<QString, QVariant>& values, bool processingSubscription);
     void getSubscriberFinished(QString objectPath);
 
     friend class PropertyManager; // FIXME: check if this can be removed

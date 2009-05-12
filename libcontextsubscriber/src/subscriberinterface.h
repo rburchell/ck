@@ -45,13 +45,10 @@ public:
     void unsubscribe(QStringList keys);
 
 signals:
-    void subscribeFinished(QMap<QString, QVariant> values);
-    void unsubscribeFinished();
-    void valuesChanged(QMap<QString, QVariant> values);
+    void valuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
 
 private slots:
     void onSubscribeFinished(QDBusPendingCallWatcher* watcher);
-    void onUnsubscribeFinished(QDBusPendingCallWatcher* watcher);
     void onChanged(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);
 
 private:
@@ -60,7 +57,7 @@ private:
     SubscriberInterface(const SubscriberInterface& other);
     SubscriberInterface& operator=(const SubscriberInterface& other);
 
-    QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls);
+    static QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
 };
 
 class SubscriberSignallingInterface: public QDBusAbstractInterface

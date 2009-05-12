@@ -64,7 +64,6 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
     idleTimer.setSingleShot(true);
     idleTimer.setInterval(0);
 
-
     // Call GetSubscriber asynchronously
     sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(getSubscriberFinished(QString)));
     managerInterface.getSubscriber();
@@ -79,9 +78,15 @@ QString PropertyProvider::getName() const
 /// Subscribes to contextd DBUS notifications for property \a prop.
 void PropertyProvider::subscribe(PropertyHandle* prop)
 {
+    // include in the set
+    // remove from the unsubscribe set
+    // if subscriber != 0 -> reset the timer
+    toSubscribe.insert(prop->key());
+
+
     QStringList unknowns;
     QStringList keys;
-    keys.append(prop->key);
+    keys.append(prop->key());
 
     if (subscriber == 0) {
         qCritical() << "This provider does not really exist!";
@@ -108,7 +113,7 @@ void PropertyProvider::subscribe(PropertyHandle* prop)
 void PropertyProvider::unsubscribe(PropertyHandle* prop)
 {
     QStringList keys;
-    keys.append(prop->key);
+    keys.append(prop->key());
 
     if (subscriber == 0) {
         qCritical() << "This provider does not really exist!";
@@ -130,22 +135,20 @@ void PropertyProvider::unsubscribe(PropertyHandle* prop)
 
 
 /// Slot, handling changed values coming from contextd over DBUS.
-void PropertyProvider::changeValues(const QMap<QString, QVariant>& values, const bool processingSubscription)
+void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription)
 {
     const QHash<QString, PropertyHandle*> &properties =
         PropertyManager::instance()->properties;
 
-/* FIXME
-    for (QMap<QString, QDBusVariant>::const_iterator i = values.constBegin();
-         i != values.constEnd(); ++i) {
-        QString key = i.key();
-        PropertyHandle *h = properties.value(key, 0);
+    // FIXME: manager should be a simple container of handles...
+    for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
+        PropertyHandle *h = properties.value(i.key(), 0);
         if (h == 0) {
-            qWarning() << "Received property not in registry:" << key;
+            qWarning() << "Received property not in registry:" << i.key();
             continue;
         }
         if (h->provider != this) {
-            qWarning() << "Received property not handled by this provider:" << key;
+            qWarning() << "Received property not handled by this provider:" << i.key();
             continue;
         }
 

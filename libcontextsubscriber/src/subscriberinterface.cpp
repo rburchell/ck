@@ -67,16 +67,22 @@ void SubscriberInterface::subscribe(QStringList keys)
 
 void SubscriberInterface::unsubscribe(QStringList keys)
 {
+    if (iface == 0) {
+        return;
+    }
+    // Construct the asynchronous call
+    iface->asyncCall("Unsubscribe", keys);
+    // we are just not interested in the possible errors, because we can't do anything about them
 }
 
 void SubscriberInterface::onChanged(const QMap<QString, QVariant> &values, const QStringList& unknownKeys)
 {
     qDebug() << "SubscriberInterface::onChanged";
     QMap<QString, QVariant> copy = values;
-    qDebug() << mergeNullsWithMap(copy, unknownKeys);
+    emit valuesChanged(mergeNullsWithMap(copy, unknownKeys), false);
 }
 
-QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls)
+QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const
 {
     foreach (QString null, nulls) {
         if (map.contains(null))
@@ -102,12 +108,8 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
         QStringList unknowns = reply.argumentAt<1>();
 
         // FIXME: the protocol should be better, this is just a workaround
-        emit subscribeFinished(mergeNullsWithMap(subscribeTimeValues, unknowns));
+        emit valuesChanged(mergeNullsWithMap(subscribeTimeValues, unknowns), true);
      }
-}
-
-void SubscriberInterface::onUnsubscribeFinished(QDBusPendingCallWatcher* watcher)
-{
 }
 
 SubscriberSignallingInterface::SubscriberSignallingInterface(const QString &dbusName, const QString& objectPath, const QDBusConnection &connection, QObject *parent)

@@ -66,9 +66,8 @@ public:
     bool subscribed() const;
 
     QString providerName() const;
-
-    QString key;
-    QVariant value;
+    QString key() const;
+    QVariant value() const;
 
     // TODO: Remove these when introspection is ready
     QString typeName; ///< Type name of this property.
@@ -86,7 +85,9 @@ private:
 
     void update_provider();
 
-    friend class PropertyProvider;
+    QString myKey;
+    QVariant myValue;
+
     friend class PropertyManager;
 };
 
