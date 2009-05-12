@@ -57,7 +57,7 @@ SubscriberInterface::SubscriberInterface(
 /// Calls the Subscribe function over DBus asynchronously.
 void SubscriberInterface::subscribe(QStringList keys)
 {
-    if (iface == 0) {
+    if (iface == 0 || keys.size() == 0) {
         return;
     }
     // Construct the asynchronous call
@@ -71,7 +71,7 @@ void SubscriberInterface::subscribe(QStringList keys)
 /// Calls the Unsubscribe function over DBus asynchronously.
 void SubscriberInterface::unsubscribe(QStringList keys)
 {
-    if (iface == 0) {
+    if (iface == 0 || keys.size() == 0) {
         return;
     }
     // Construct the asynchronous call
@@ -82,7 +82,7 @@ void SubscriberInterface::unsubscribe(QStringList keys)
 /// Processes the results of the Changed signal which comes over DBus.
 void SubscriberInterface::onChanged(const QMap<QString, QVariant> &values, const QStringList& unknownKeys)
 {
-    qDebug() << "SubscriberInterface::onChanged";
+//    qDebug() << "SubscriberInterface::onChanged";
     QMap<QString, QVariant> copy = values;
     emit valuesChanged(mergeNullsWithMap(copy, unknownKeys), false);
 }

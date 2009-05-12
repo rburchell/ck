@@ -60,6 +60,7 @@ private:
 private slots:
     void onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
     void getSubscriberFinished(QString objectPath);
+    void idleHandler();
 
     friend class PropertyManager; // FIXME: check if this can be removed
 };

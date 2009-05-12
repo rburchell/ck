@@ -35,21 +35,15 @@
 
 void PropertyProvider::getSubscriberFinished(QString objectPath)
 {
-
-    qDebug() << "******get2 subs finished";
-
     subscriber = new SubscriberInterface(busType, busName, objectPath, this);
 
-    QStringList q;
-    q << "Context.Example.Count";
-    q << "Context.Example.EdgeUp";
-    subscriber->subscribe(q);
-
     // we can keep this connected all the time
-    /*sconnect(subscriber,
-            SIGNAL(Changed(DBusVariantMap, const QStringList &)),
-            this,
-            SLOT(changeValues(const DBusVariantMap &, const QStringList &)));*/
+    sconnect(subscriber,
+             SIGNAL(valuesChanged(QMap<QString, QVariant>, bool)),
+             this,
+             SLOT(onValuesChanged(QMap<QString, QVariant>, bool)));
+
+    idleTimer.start();
 }
 
 
@@ -64,6 +58,8 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
 
     // Call GetSubscriber asynchronously
     sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(getSubscriberFinished(QString)));
+    sconnect(&idleTimer, SIGNAL(timeout()),
+             this, SLOT(idleHandler()));
     managerInterface.getSubscriber();
 }
 
@@ -75,62 +71,34 @@ QString PropertyProvider::getName() const
 
 /// Schedules a property to be subscribed to when the main loop is
 /// entered the next time.
-void PropertyProvider::subscribe(PropertyHandle* prop)
+void PropertyProvider::subscribe(PropertyHandle* handle)
 {
-    // include in the set
-    // remove from the unsubscribe set
-    // if subscriber != 0 -> reset the timer
-    toSubscribe.insert(prop->key());
+    toSubscribe.insert(handle->key());
+    toUnsubscribe.remove(handle->key());
 
+    if (subscriber != 0)
+        idleTimer.start();
+}
 
-    QStringList unknowns;
-    QStringList keys;
-    keys.append(prop->key());
-
-    if (subscriber == 0) {
-        qCritical() << "This provider does not really exist!";
-        return;
+void PropertyProvider::idleHandler()
+{
+    if (subscriber != 0) {
+        subscriber->subscribe(toSubscribe.toList());
+        subscriber->unsubscribe(toUnsubscribe.toList());
+        toSubscribe.clear();
+        toUnsubscribe.clear();
     }
-
-    subscriber->subscribe(keys);
-
-/*QDBusReply<DBusVariantMap> reply = subscriber->subscribe(keys, unknowns);
-    if (!reply.isValid()) {
-        qCritical() << "subscribe: bad reply from provider FIXME: " << reply.error();
-        prop->value.clear(); // FIXME: Should this be changed?
-        //emit prop->handleChanged();
-    }
-
-    qDebug() << "subscribed to " << prop->key << " via provider FIXME";
-
-    if (prop->value.type() != prop->type)
-        prop->value = QVariant(prop->type);
-        changeValues(reply.value(), unknowns, true);*/
 }
 
 /// Schedules a property to be unsubscribed from when the main loop is
 /// entered the next time.
-void PropertyProvider::unsubscribe(PropertyHandle* prop)
+void PropertyProvider::unsubscribe(PropertyHandle* handle)
 {
-    QStringList keys;
-    keys.append(prop->key());
+    toUnsubscribe.insert(handle->key());
+    toSubscribe.remove(handle->key());
 
-    if (subscriber == 0) {
-        qCritical() << "This provider does not really exist!";
-        return;
-    }
-
-    subscriber->unsubscribe(keys);
-
-/*
-    QDBusReply<void> reply = subscriber->unsubscribe(keys);
-
-    if (!reply.isValid())
-        qWarning() << "Could not unsubscribe! This should not happen!" << reply.error() <<
-        " Provider: FIXME";
-
-        qDebug() << "unsubscribed from " << prop->key << " via provider: FIXME";
-*/
+    if (subscriber != 0)
+        idleTimer.start();
 }
 
 /// Slot, handling changed values coming from the provider over DBUS.
@@ -140,10 +108,9 @@ void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool proc
         PropertyManager::instance()->properties;
 
     // FIXME: manager should be a simple container of handles...
-    for (QMap<QString, QVariant>::const_iterator i = values.constBegin();
-         i != values.constEnd(); ++i) {
-
+    for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
         // Get the PropertyHandle corresponding to the property to update.
+        // FIXME: handlefactory->handle(i.key())
         PropertyHandle *h = properties.value(i.key(), 0);
         if (h == 0) {
             qWarning() << "Received property not in registry:" << i.key();
