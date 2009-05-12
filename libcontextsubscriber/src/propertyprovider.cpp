@@ -38,9 +38,7 @@ void PropertyProvider::getSubscriberFinished(QString objectPath)
 
     qDebug() << "******get2 subs finished";
 
-    subscriber = new SubscriberInterface(QDBusConnection::SessionBus,
-                                         "com.nokia.SensorD",
-                                         objectPath, this);
+    subscriber = new SubscriberInterface(busType, busName, objectPath, this);
 
     QStringList q;
     q << "Context.Example.Count";
@@ -58,7 +56,7 @@ void PropertyProvider::getSubscriberFinished(QString objectPath)
 /// Constructs a new instance. ContextProperty handles providers for
 /// you, no need to (and can't) call this constructor.
 PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
-    : managerInterface(busType, busName, this), subscriber(0)
+    : busType(busType), busName(busName), managerInterface(busType, busName, this), subscriber(0)
 {
     // Setup idle timer
     idleTimer.setSingleShot(true);
@@ -72,10 +70,11 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
 /// Returns the dbus name and bus type of the provider
 QString PropertyProvider::getName() const
 {
-    return "";
+    return ""; /// FIXME: Remove this function?
 }
 
-/// Subscribes to contextd DBUS notifications for property \a prop.
+/// Schedules a property to be subscribed to when the main loop is
+/// entered the next time.
 void PropertyProvider::subscribe(PropertyHandle* prop)
 {
     // include in the set
@@ -109,7 +108,8 @@ void PropertyProvider::subscribe(PropertyHandle* prop)
         changeValues(reply.value(), unknowns, true);*/
 }
 
-/// Unsubscribes from contextd DBUS notifications for property \a prop.
+/// Schedules a property to be unsubscribed from when the main loop is
+/// entered the next time.
 void PropertyProvider::unsubscribe(PropertyHandle* prop)
 {
     QStringList keys;
@@ -133,73 +133,53 @@ void PropertyProvider::unsubscribe(PropertyHandle* prop)
 */
 }
 
-
-/// Slot, handling changed values coming from contextd over DBUS.
+/// Slot, handling changed values coming from the provider over DBUS.
 void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription)
 {
     const QHash<QString, PropertyHandle*> &properties =
         PropertyManager::instance()->properties;
 
     // FIXME: manager should be a simple container of handles...
-    for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
+    for (QMap<QString, QVariant>::const_iterator i = values.constBegin();
+         i != values.constEnd(); ++i) {
+
+        // Get the PropertyHandle corresponding to the property to update.
         PropertyHandle *h = properties.value(i.key(), 0);
         if (h == 0) {
             qWarning() << "Received property not in registry:" << i.key();
             continue;
         }
-        if (h->provider != this) {
+        if (h->provider() != this) {
             qWarning() << "Received property not handled by this provider:" << i.key();
             continue;
         }
 
-        QVariant v = i.value().variant();
-        if (v.type() == h->type) {
-            // The type of the received value matches the known type of the property
+        // FIXME : Implement the type check here. Remember to check the types of non-nulls only.
 
-            if (h->value == v && h->value.isNull() == v.isNull()) {
-                // The DBus message contains the current value of the property
-                // Value shouldn't be changed
-                if (!processingSubscription) qWarning() << "PROVIDER ERROR: Received unnecessary DBUS signal for property" << key;
-            }
-            else {
-                h->value = v;
-                emit h->valueChanged();
+        // Note: the null we receive is always a non-typed null. We might need to convert it here.
+
+        QVariant newValue = i.value();
+        if (h->value() == newValue && h->value().isNull() == newValue.isNull()) {
+            // The property already has the value we received.
+            // If we're processing the return values of Subscribe, this is normal,
+            // since the return message contains values for the keys subscribed to.
+
+            // If we're not processing the return values of Subscribe, it is an error.
+            // Print out a message of provider error.
+            // In either case, don't emit valueChanged.
+            if (!processingSubscription) {
+                qWarning() << "PROVIDER ERROR: Received unnecessary DBUS signal for property" << i.key();
             }
         }
         else {
-            qWarning() << "Type mismatch for:" << key << v.type() << "!=" << h->type;
-            h->value.clear();
-            emit h->valueChanged();
+            // The value was new
+            h->setValue(newValue);
         }
     }
-
-    // clear the undeterminable ones
-    for (QStringList::const_iterator i = unknowns.begin(); i != unknowns.end(); ++i) {
-        QString key = *i;
-        PropertyHandle *h = properties.value(key, 0);
-        if (h == 0) {
-            qWarning() << "Received property not in registry: " << key;
-            continue;
-        }
-        if (h->provider != this) {
-            qWarning() << "Received property not handled by this provider: " << key;
-            continue;
-        }
-
-        if (h->value == QVariant(h->type) && h->value.isNull() == true) {
-            if (!processingSubscription) qWarning() << "PROVIDER ERROR: Received unnecessary DBUS signal for property" << key;
-        }
-        else {
-            h->value = QVariant(h->type); // Note: Null but typed QVariant
-            emit h->valueChanged();
-        }
-    }
-*/
 }
 
 PropertyProvider::~PropertyProvider()
 {
-    if (subscriber != 0)
-        delete subscriber;
-
+    // Note: The SubscriberInterface* subscriber was constructed with "this" as parent.
+    // It doesn't need to be deleted.
 }

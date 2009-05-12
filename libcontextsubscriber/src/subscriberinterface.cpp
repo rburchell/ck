@@ -27,6 +27,8 @@
 
 const QString SubscriberSignallingInterface::interfaceName = "org.freedesktop.ContextKit.Subscriber";
 
+/// Constructs the subscriber interface. Connects to the Subscriber object
+/// specified by the bus type (session or system bus), the bus name and object path.
 SubscriberInterface::SubscriberInterface(
     const QDBusConnection::BusType busType, const QString &busName, const QString& objectPath, QObject *parent)
     : iface(0)
@@ -52,6 +54,7 @@ SubscriberInterface::SubscriberInterface(
              this, SLOT(onChanged(const QMap<QString, QVariant>&, const QStringList &)));
 }
 
+/// Calls the Subscribe function over DBus asynchronously.
 void SubscriberInterface::subscribe(QStringList keys)
 {
     if (iface == 0) {
@@ -65,6 +68,7 @@ void SubscriberInterface::subscribe(QStringList keys)
              this, SLOT(onSubscribeFinished(QDBusPendingCallWatcher *)));
 }
 
+/// Calls the Unsubscribe function over DBus asynchronously.
 void SubscriberInterface::unsubscribe(QStringList keys)
 {
     if (iface == 0) {
@@ -75,6 +79,7 @@ void SubscriberInterface::unsubscribe(QStringList keys)
     // we are just not interested in the possible errors, because we can't do anything about them
 }
 
+/// Processes the results of the Changed signal which comes over DBus.
 void SubscriberInterface::onChanged(const QMap<QString, QVariant> &values, const QStringList& unknownKeys)
 {
     qDebug() << "SubscriberInterface::onChanged";
@@ -82,6 +87,7 @@ void SubscriberInterface::onChanged(const QMap<QString, QVariant> &values, const
     emit valuesChanged(mergeNullsWithMap(copy, unknownKeys), false);
 }
 
+/// A helper function. Sets the values of given keys to a null QVariant in a QMap.
 QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const
 {
     foreach (QString null, nulls) {
@@ -93,6 +99,7 @@ QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QV
     return map;
 }
 
+/// Is called when the asynchronous DBus call to Subscribe has finished.
 void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
 {
     qDebug() << "onSubscribeFinished";

@@ -46,18 +46,19 @@ private:
     PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
     ~PropertyProvider();
 
-    SubscriberInterface *subscriber; ///< The DBUS interface for the provider
+    SubscriberInterface *subscriber; ///< The DBus interface for the Subscriber object
 
     QTimer idleTimer; ///< For scheduling subscriptions / unsubscriptions as idle processing
-    ManagerInterface managerInterface;
+    ManagerInterface managerInterface; ///< The DBus interface for the Manager object
 
-    QSet<QString> toSubscribe;
-    QSet<QString> toUnsubscribe;
+    QSet<QString> toSubscribe; ///< Keys pending for subscription
+    QSet<QString> toUnsubscribe; ///< Keys pending for unsubscription
 
-    QString busName;
+    QDBusConnection::BusType busType; ///< The bus type of the DBus provider connected to
+    QString busName; ///< The bus name of the DBus provider connected to
 
 private slots:
-    void onValuesChanged(QMap<QString, QVariant>& values, bool processingSubscription);
+    void onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
     void getSubscriberFinished(QString objectPath);
 
     friend class PropertyManager; // FIXME: check if this can be removed

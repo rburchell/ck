@@ -27,10 +27,8 @@
 #include <QStringList>
 #include <QtDBus>
 
-/*
- * Proxy class for interface org.freedesktop.ContextKit.Subscriber.
- * Implements the operations Subscribe and Unsubscribe asynchronously.
- */
+/// Proxy class for interface org.freedesktop.ContextKit.Subscriber.
+/// Implements the operations Subscribe and Unsubscribe asynchronously.
 
 class SubscriberSignallingInterface;
 
@@ -57,9 +55,11 @@ private:
     SubscriberInterface(const SubscriberInterface& other);
     SubscriberInterface& operator=(const SubscriberInterface& other);
 
-    static QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
+    QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
 };
 
+/// The interface which is automatically connected to the the Changed signal
+/// coming from DBus.
 class SubscriberSignallingInterface: public QDBusAbstractInterface
 {
     Q_OBJECT
@@ -68,25 +68,6 @@ public:
     SubscriberSignallingInterface(const QString &dBusName, const QString &path, const QDBusConnection &connection, QObject *parent = 0);
 
     ~SubscriberSignallingInterface();
-
-/*public Q_SLOTS: // METHODS
-    inline QDBusReply<DBusVariantMap> Subscribe(const QStringList &keys, QStringList &undeterminable_keys)
-    {
-        QList<QVariant> argumentList;
-        argumentList << qVariantFromValue(keys);
-        QDBusMessage reply = callWithArgumentList(QDBus::Block, QLatin1String("Subscribe"), argumentList);
-        if (reply.type() == QDBusMessage::ReplyMessage && reply.arguments().count() == 2) {
-            undeterminable_keys = qdbus_cast<QStringList>(reply.arguments().at(1));
-        }
-        return reply;
-    }
-
-    inline QDBusReply<void> Unsubscribe(const QStringList &keys)
-    {
-        QList<QVariant> argumentList;
-        argumentList << qVariantFromValue(keys);
-        return callWithArgumentList(QDBus::Block, QLatin1String("Unsubscribe"), argumentList);
-        }*/
 
 Q_SIGNALS: // SIGNALS
     void Changed(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);

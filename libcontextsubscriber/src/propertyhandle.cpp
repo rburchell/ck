@@ -42,7 +42,7 @@
 /// Constructs a new instance. ContextProperty creates the handles, you
 /// don't have to (and can't) call this constructor ever.
 PropertyHandle::PropertyHandle(const QString& key)
-    : myKey(key), provider(NULL), type(QVariant::Invalid), subscribeCount(0)
+    : myKey(key), myProvider(0), type(QVariant::Invalid), subscribeCount(0)
 {
     update_provider();
 }
@@ -51,8 +51,8 @@ PropertyHandle::PropertyHandle(const QString& key)
 void PropertyHandle::subscribe()
 {
     ++subscribeCount;
-    if (subscribeCount == 1 && provider) {
-        provider->subscribe(this);
+    if (subscribeCount == 1 && myProvider) {
+        myProvider->subscribe(this);
     }
 }
 
@@ -60,8 +60,8 @@ void PropertyHandle::subscribe()
 void PropertyHandle::unsubscribe()
 {
     --subscribeCount;
-    if (subscribeCount == 0 && provider) {
-        provider->unsubscribe(this);
+    if (subscribeCount == 0 && myProvider) {
+        myProvider->unsubscribe(this);
     }
 }
 
@@ -90,17 +90,17 @@ void PropertyHandle::update_provider()
     if (manager->lookupProperty(myKey, provider_index, new_type, typeName, description))
         new_provider = manager->getProvider (provider_index);
 
-    if (new_provider != provider) {
+    if (new_provider != myProvider) {
         qDebug() << "New provider:" << myKey;
         if (subscribeCount > 0) {
-            if (provider)
-                provider->unsubscribe(this);
-            provider = new_provider;
-            if (provider)
-               provider->subscribe(this);
+            if (myProvider)
+                myProvider->unsubscribe(this);
+            myProvider = new_provider;
+            if (myProvider)
+               myProvider->subscribe(this);
             // emit providerChanged();
         } else
-            provider = new_provider;
+            myProvider = new_provider;
     } else
         qDebug() << "Same provider:" << myKey;
 
@@ -115,8 +115,8 @@ void PropertyHandle::update_provider()
 /// Return the DBus name and bus type of the provider providing this property.
 QString PropertyHandle::providerName() const
 {
-    if (provider) {
-        return provider->getName();
+    if (myProvider) {
+        return myProvider->getName();
     }
     return "";
 }
@@ -129,4 +129,16 @@ QString PropertyHandle::key() const
 QVariant PropertyHandle::value() const
 {
     return myValue;
+}
+
+PropertyProvider* PropertyHandle::provider() const
+{
+    return myProvider;
+}
+
+/// Changes the value of the property and emits the valueChanged signal.
+void PropertyHandle::setValue(QVariant newValue)
+{
+    myValue = newValue;
+    emit valueChanged();
 }

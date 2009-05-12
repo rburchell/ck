@@ -65,9 +65,12 @@ public:
     void unsubscribe();
     bool subscribed() const;
 
-    QString providerName() const;
+    QString providerName() const; // FIXME: remove?
     QString key() const;
     QVariant value() const;
+    PropertyProvider* provider() const;
+
+    void setValue(QVariant newValue);
 
     // TODO: Remove these when introspection is ready
     QString typeName; ///< Type name of this property.
@@ -79,7 +82,7 @@ signals:
 private:
     PropertyHandle(const QString& key);
 
-    PropertyProvider *provider; ///< Provider of this property
+    PropertyProvider *myProvider; ///< Provider of this property
     QVariant::Type type; ///< QVariant type of this property according to registry
     unsigned int subscribeCount; ///< Number of subscribed ContextProperty objects subscribed to this property
 
