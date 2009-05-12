@@ -48,7 +48,8 @@ SubscriberInterface::SubscriberInterface(
         return;
     }
     iface = new SubscriberSignallingInterface(busName, objectPath, connection, this);
-    sconnect(iface, SIGNAL(Changed(DBusVariantMap*, QStringList)), this, SLOT(onChanged(DBusVariantMap*, QStringList)));
+    sconnect(iface, SIGNAL(Changed(DBusVariantMap, const QStringList &)),
+             this, SLOT(onChanged(DBusVariantMap, const QStringList &)));
 }
 
 void SubscriberInterface::subscribe(QStringList keys)
@@ -56,16 +57,12 @@ void SubscriberInterface::subscribe(QStringList keys)
     if (iface == 0) {
         return;
     }
-    // Constcruct the parameters
-    QList<QVariant> argumentList;
-    argumentList << qVariantFromValue(keys);
-
     // Construct the asynchronous call
-    QDBusPendingCall subscribeCall = iface->asyncCall("Subscribe", argumentList);
+    QDBusPendingCall subscribeCall = iface->asyncCall("Subscribe", keys);
     SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(subscribeCall, this);
 
-    QObject::connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
-                     this, SLOT(onSubscribeFinished(QDBusPendingCallWatcher *)));
+    sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
+             this, SLOT(onSubscribeFinished(QDBusPendingCallWatcher *)));
 }
 
 void SubscriberInterface::unsubscribe(QStringList keys)
@@ -79,6 +76,7 @@ void SubscriberInterface::onChanged(DBusVariantMap values, const QStringList& un
 
 void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
 {
+    qDebug() << "onSubscribeFinished";
 }
 
 void SubscriberInterface::onUnsubscribeFinished(QDBusPendingCallWatcher* watcher)
