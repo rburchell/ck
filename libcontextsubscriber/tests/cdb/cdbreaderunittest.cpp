@@ -6,7 +6,7 @@ void CDBReaderUnitTest::basicCreation()
 {
     CDBReader reader("test.cdb");
 
-    //QCOMPARE(reader.valueForKey("KEY1"), QString("KEY1Value"));
+    QCOMPARE(reader.valueForKey("KEY1"), QString("KEY1Value"));
 
     QStringList list = reader.valuesForKey("KEYS");
     QCOMPARE(list.size(), 3);
@@ -17,5 +17,11 @@ void CDBReaderUnitTest::basicCreation()
 
     reader.close();
 }
+
+void CDBReaderUnitTest::cleanupTestCase()
+{
+    QFile::remove("test.cdb");
+}
+
 
 #include "moc_cdbreaderunittest_cpp.cpp"

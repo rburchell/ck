@@ -8,5 +8,6 @@ class CDBReaderUnitTest : public QObject
 
 private slots:
     void basicCreation();
+    void cleanupTestCase();
 };
 
