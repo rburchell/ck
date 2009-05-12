@@ -21,6 +21,7 @@ Makefile
 /tests/xml-introspection-static/xml-introspection-static
 /tests/xml-introspection-dynamic/xml-introspection-dynamic
 /tests/testclass/testclassunittest
+/tests/cdb/cdb
 
 # Other binaries
 /cli/context-cli
