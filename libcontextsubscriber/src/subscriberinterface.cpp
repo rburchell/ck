@@ -48,8 +48,8 @@ SubscriberInterface::SubscriberInterface(
         return;
     }
     iface = new SubscriberSignallingInterface(busName, objectPath, connection, this);
-    sconnect(iface, SIGNAL(Changed(DBusVariantMap, const QStringList &)),
-             this, SLOT(onChanged(DBusVariantMap, const QStringList &)));
+    sconnect(iface, SIGNAL(Changed(const QMap<QString, QVariant>&, const QStringList &)),
+             this, SLOT(onChanged(const QMap<QString, QVariant>&, const QStringList &)));
 }
 
 void SubscriberInterface::subscribe(QStringList keys)
@@ -69,14 +69,37 @@ void SubscriberInterface::unsubscribe(QStringList keys)
 {
 }
 
-void SubscriberInterface::onChanged(DBusVariantMap values, const QStringList& unknownKeys)
+void SubscriberInterface::onChanged(const QMap<QString, QVariant> &values, const QStringList& unknownKeys)
 {
     qDebug() << "SubscriberInterface::onChanged";
+    qDebug() << values;
+
 }
 
 void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
 {
     qDebug() << "onSubscribeFinished";
+    QDBusPendingReply<QMap<QString, QVariant>, QStringList> reply = *watcher;
+    if (reply.isError()) {
+        // Possible causes of the error:
+        // The provider is not running
+        // The provider didn't implement the needed interface + function
+        // The function resulted in an error
+        qWarning() << "Provider error while subscribing:" << reply.error().message();
+    } else {
+        QMap<QString, QVariant> subscribeTimeValues = reply.argumentAt<0>();
+        QStringList unknowns = reply.argumentAt<1>();
+
+        // FIXME: the protocol should be better, this is just a workaround
+        foreach (QString unknown, unknowns) {
+            if (subscribeTimeValues.contains(unknown))
+                qWarning() << "PROVIDER ERROR: returned unknown and a value for " << unknown;
+            else
+                subscribeTimeValues[unknown] = QVariant();
+        }
+
+        emit subscribeFinished(subscribeTimeValues);
+     }
 }
 
 void SubscriberInterface::onUnsubscribeFinished(QDBusPendingCallWatcher* watcher)

@@ -26,7 +26,6 @@
 #include <QString>
 #include <QStringList>
 #include <QtDBus>
-#include "dbusvariantmap.h"
 
 /*
  * Proxy class for interface org.freedesktop.ContextKit.Subscriber.
@@ -53,7 +52,7 @@ signals:
 private slots:
     void onSubscribeFinished(QDBusPendingCallWatcher* watcher);
     void onUnsubscribeFinished(QDBusPendingCallWatcher* watcher);
-    void onChanged(DBusVariantMap values, const QStringList &unknownKeys);
+    void onChanged(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);
 
 private:
     SubscriberSignallingInterface* iface;
@@ -92,7 +91,7 @@ public:
         }*/
 
 Q_SIGNALS: // SIGNALS
-    void Changed(DBusVariantMap values, const QStringList &unknownKeys);
+    void Changed(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);
 
 private:
     static const QString interfaceName;

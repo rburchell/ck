@@ -35,13 +35,17 @@
 
 void PropertyProvider::getSubscriberFinished(QString objectPath)
 {
-   
-    qDebug() << "******get subs finished";
-    
+
+    qDebug() << "******get2 subs finished";
+
     subscriber = new SubscriberInterface(QDBusConnection::SessionBus,
-                                         "com.nokia.ContextProviderExample",
+                                         "com.nokia.SensorD",
                                          objectPath, this);
-    
+
+    QStringList q;
+    q << "Context.Example.Count";
+    q << "Context.Example.EdgeUp";
+    subscriber->subscribe(q);
 
     // we can keep this connected all the time
     /*sconnect(subscriber,
@@ -50,14 +54,12 @@ void PropertyProvider::getSubscriberFinished(QString objectPath)
             SLOT(changeValues(const DBusVariantMap &, const QStringList &)));*/
 }
 
-    
+
 /// Constructs a new instance. ContextProperty handles providers for
 /// you, no need to (and can't) call this constructor.
 PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
     : managerInterface(busType, busName, this), subscriber(0)
 {
-    qDBusRegisterMetaType<DBusVariantMap>();
-
     // Setup idle timer
     idleTimer.setSingleShot(true);
     idleTimer.setInterval(0);
@@ -87,7 +89,7 @@ void PropertyProvider::subscribe(PropertyHandle* prop)
     }
 
     subscriber->subscribe(keys);
-    
+
 /*QDBusReply<DBusVariantMap> reply = subscriber->subscribe(keys, unknowns);
     if (!reply.isValid()) {
         qCritical() << "subscribe: bad reply from provider FIXME: " << reply.error();
@@ -114,7 +116,7 @@ void PropertyProvider::unsubscribe(PropertyHandle* prop)
     }
 
     subscriber->unsubscribe(keys);
-    
+
 /*
     QDBusReply<void> reply = subscriber->unsubscribe(keys);
 
@@ -128,13 +130,12 @@ void PropertyProvider::unsubscribe(PropertyHandle* prop)
 
 
 /// Slot, handling changed values coming from contextd over DBUS.
-void PropertyProvider::changeValues(const DBusVariantMap& values,
-                                    const QStringList& unknowns,
-                                    const bool processingSubscription)
+void PropertyProvider::changeValues(const QMap<QString, QVariant>& values, const bool processingSubscription)
 {
     const QHash<QString, PropertyHandle*> &properties =
         PropertyManager::instance()->properties;
 
+/* FIXME
     for (QMap<QString, QDBusVariant>::const_iterator i = values.constBegin();
          i != values.constEnd(); ++i) {
         QString key = i.key();
@@ -190,6 +191,7 @@ void PropertyProvider::changeValues(const DBusVariantMap& values,
             emit h->valueChanged();
         }
     }
+*/
 }
 
 PropertyProvider::~PropertyProvider()

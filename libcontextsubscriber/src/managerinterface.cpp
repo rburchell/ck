@@ -70,7 +70,7 @@ void ManagerInterface::onGetSubscriberFinished(QDBusPendingCallWatcher* watcher)
          // The provider is not running
          // The provider didn't implement the needed interface + function
          // The function resulted in an error
-         qWarning() << "Provider error:" << reply.error().message();
+         qWarning() << "Provider error while getting the subscriber object:" << reply.error().message();
      } else {
          QDBusObjectPath path = reply.argumentAt<0>();
          qDebug() << path.path();
