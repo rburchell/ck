@@ -22,6 +22,7 @@
 #include "cdbreader.h"
 #include <cdb.h>
 #include <fcntl.h>
+#include <QDebug>
 
 CDBReader::CDBReader(const QString &path, QObject *parent) 
     : QObject(parent)
@@ -60,15 +61,16 @@ QString CDBReader::valueForKey(const QString &key)
     if (! cdb)
         return "";
 
-    unsigned int klen = key.toUtf8().size() + 1;
+    unsigned int klen = key.toUtf8().size();
     if (cdb_find((struct cdb*) cdb, key.toUtf8().constData(), klen)) {
         unsigned int vpos = cdb_datapos((struct cdb*) cdb);
-        unsigned int vlen = cdb_datalen((struct cdb*) cdb) + 1;
-        char *val = (char *) malloc(vlen);
+        unsigned int vlen = cdb_datalen((struct cdb*) cdb);
+        char *val = (char *) malloc(vlen + 1);
         cdb_read((struct cdb*) cdb, val, vlen, vpos);
+        val[vlen] = 0;
         
         QString str(val);
-        //free(val);
+        free(val);
         return str;
     } else
         return "";
@@ -81,21 +83,24 @@ QStringList CDBReader::valuesForKey(const QString &key)
     if (! cdb)
        return list;
 
-    unsigned int klen = key.toUtf8().size() + 1; 
-    struct cdb_find cdbf;
-    cdb_findinit(&cdbf, (struct cdb*) cdb, key.toUtf8().constData(), klen);
+    unsigned int klen = key.toUtf8().size(); 
+    struct cdb_find *cdbf = (struct cdb_find *) calloc(sizeof(struct cdb_find), 1);
+    //i//memset(&cdbf, 0, sizeof(struct cdb_find));
+    cdb_findinit(cdbf, (struct cdb*) cdb, key.toUtf8().constData(), klen);
+    int f;
 
-    while(cdb_findnext(&cdbf) > 0) {
+    while((f = cdb_findnext(cdbf)) > 0) {
+        qDebug() << f;
         unsigned int vpos = cdb_datapos((struct cdb*) cdb);
-        unsigned int vlen = cdb_datalen((struct cdb*) cdb) + 1;
-        char *val = (char *) malloc(vlen);
+        unsigned int vlen = cdb_datalen((struct cdb*) cdb);
+        char *val = (char *) malloc(vlen + 1);
         cdb_read((struct cdb*) cdb, val, vlen, vpos);
+        val[vlen] = 0;
 
         QString str(val);
-        free(val);
+        //free(val);
         list << str;
     }
 
     return list;
 }
-

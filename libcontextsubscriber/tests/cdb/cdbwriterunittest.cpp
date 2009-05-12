@@ -1,21 +1,18 @@
 #include <QtTest/QtTest>
 #include <QtCore>
-#include "cdbwriter.h"
-
-class CDBWriterUnitTest : public QObject
-{
-    Q_OBJECT
-
-private slots:
-    void basicCreation();
-};
+#include "cdbwriterunittest.h"
 
 void CDBWriterUnitTest::basicCreation()
 {
+    /*
     CDBWriter writer("test.cdb");
-    writer.add("Key", "Value");
+    writer.add("KEYS", "KEYSValue1");
+    writer.add("KEYS", "KEYSValue2");
+    writer.add("KEYS", "KEYSValue3");
+
+    writer.add("KEY1", "KEY1Value");
     writer.close();
+    */
 }
 
-QTEST_MAIN(CDBWriterUnitTest);
 #include "moc_cdbwriterunittest_cpp.cpp"
