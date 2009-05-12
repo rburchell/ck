@@ -20,8 +20,8 @@
  */
 
 #include "managerinterface.h"
-
 #include "safedbuspendingcallwatcher.h"
+#include "sconnect.h"
 
 const QString ManagerInterface::interfaceName = "org.freedesktop.ContextKit.Manager";
 const QString ManagerInterface::objectPath = "/org/freedesktop/ContextKit/Manager";
@@ -58,8 +58,8 @@ void ManagerInterface::getSubscriber()
     QDBusPendingCall getSubscriberCall = iface->asyncCall("GetSubscriber");
     SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(getSubscriberCall, this);
 
-    QObject::connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
-                     this, SLOT(getSubscriberFinished(QDBusPendingCallWatcher *)));
+    sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
+             this, SLOT(onGetSubscriberFinished(QDBusPendingCallWatcher *)));
 }
 
 void ManagerInterface::onGetSubscriberFinished(QDBusPendingCallWatcher* watcher)

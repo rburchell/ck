@@ -23,6 +23,7 @@
 
 #include "propertyprovider.h"
 #include "propertyhandle.h"
+#include "sconnect.h"
 
 
 #include <fcntl.h>
@@ -43,10 +44,10 @@ PropertyManager::PropertyManager()
     // Start listening to Commander
     QDBusConnection sessionBusConnection = QDBusConnection::sessionBus();
 
-    connect(sessionBusConnection.interface(),
-            SIGNAL(serviceOwnerChanged(const QString &, const QString &, const QString &)),
-            this,
-            SLOT(on_nameOwnerChanged(const QString &, const QString &, const QString &)));
+    sconnect(sessionBusConnection.interface(),
+             SIGNAL(serviceOwnerChanged(const QString &, const QString &, const QString &)),
+             this,
+             SLOT(on_nameOwnerChanged(const QString &, const QString &, const QString &)));
 
     // Check if Commander is already present
     if (sessionBusConnection.interface()->isServiceRegistered("org.freedesktop.ContextKit.Commander")) {
@@ -120,8 +121,8 @@ void PropertyManager::update_registry ()
 
     fsWatcher = new QFileSystemWatcher(this);
     fsWatcher->addPath(registry_name);
-    connect(fsWatcher, SIGNAL(fileChanged(const QString &)),
-            this, SLOT(update_registry()));
+    sconnect(fsWatcher, SIGNAL(fileChanged(const QString &)),
+             this, SLOT(update_registry()));
 }
 
 /// Looks up a provider's bus kind (session (0) or system (1)) and bus

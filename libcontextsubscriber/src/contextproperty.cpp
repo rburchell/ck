@@ -23,6 +23,7 @@
 #include "contextproperty_priv.h"
 #include "propertyhandle.h"
 #include "propertymanager.h"
+#include "sconnect.h"
 
 #include <strings.h>
 #include <QByteArray>
@@ -312,8 +313,8 @@ void ContextProperty::subscribe() const
     if (priv->subscribed)
         return;
 
-    QObject::connect(priv->handle, SIGNAL(valueChanged()),
-                     this, SIGNAL(valueChanged()));
+    sconnect(priv->handle, SIGNAL(valueChanged()),
+             this, SIGNAL(valueChanged()));
     priv->handle->subscribe();
     priv->subscribed = true;
 }
