@@ -23,12 +23,16 @@
 #include <cdb.h>
 #include <fcntl.h>
 #include <QDebug>
+#include <QFile>
 
 CDBReader::CDBReader(const QString &path, QObject *parent) 
     : QObject(parent)
 {
     cdb = NULL;
     fd = 0;
+
+    if (! QFile::exists(path))
+        return;
 
     fd = open(path.toUtf8().constData(), O_RDONLY);
 
