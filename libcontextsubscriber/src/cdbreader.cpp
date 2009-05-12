@@ -32,7 +32,7 @@ CDBReader::CDBReader(const QString &path, QObject *parent)
     fd = open(path.toUtf8().constData(), O_RDONLY);
 
     if (fd != 0) {
-        cdb = malloc(sizeof(cdb));
+        cdb = calloc(sizeof(struct cdb), 1);
         cdb_init((struct cdb*) cdb, fd);
     }
 }
@@ -60,15 +60,15 @@ QString CDBReader::valueForKey(const QString &key)
     if (! cdb)
         return "";
 
-    unsigned int klen = key.toUtf8().size();
+    unsigned int klen = key.toUtf8().size() + 1;
     if (cdb_find((struct cdb*) cdb, key.toUtf8().constData(), klen)) {
         unsigned int vpos = cdb_datapos((struct cdb*) cdb);
-        unsigned int vlen = cdb_datalen((struct cdb*) cdb);
+        unsigned int vlen = cdb_datalen((struct cdb*) cdb) + 1;
         char *val = (char *) malloc(vlen);
         cdb_read((struct cdb*) cdb, val, vlen, vpos);
         
         QString str(val);
-        free(val);
+        //free(val);
         return str;
     } else
         return "";
@@ -81,13 +81,13 @@ QStringList CDBReader::valuesForKey(const QString &key)
     if (! cdb)
        return list;
 
-    unsigned int klen = key.toUtf8().size();
+    unsigned int klen = key.toUtf8().size() + 1; 
     struct cdb_find cdbf;
     cdb_findinit(&cdbf, (struct cdb*) cdb, key.toUtf8().constData(), klen);
 
     while(cdb_findnext(&cdbf) > 0) {
         unsigned int vpos = cdb_datapos((struct cdb*) cdb);
-        unsigned int vlen = cdb_datalen((struct cdb*) cdb);
+        unsigned int vlen = cdb_datalen((struct cdb*) cdb) + 1;
         char *val = (char *) malloc(vlen);
         cdb_read((struct cdb*) cdb, val, vlen, vpos);
 
