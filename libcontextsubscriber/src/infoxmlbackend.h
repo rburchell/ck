@@ -55,7 +55,8 @@ private:
     QFileSystemWatcher watcher;
 	QHash <QString, InfoKeyData> keyDataHash;
 
-    QString registryPath() const;
+    static QString registryPath();
+
     void regenerateKeyDataList();
     void readKeyDataFromXml(const QFileInfo &f);
 };

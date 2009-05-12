@@ -37,7 +37,7 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
     /* Thinking about locking... the watcher notifications are delivered synced, 
        so asuming the changes in the dir are atomic this is all we need. */
 
-    watcher.addPath(registryPath());
+    watcher.addPath(InfoXmlBackend::registryPath());
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
 
 	regenerateKeyDataList();
@@ -132,7 +132,7 @@ void InfoXmlBackend::regenerateKeyDataList()
 {
     keyDataHash.clear();
 
-    qDebug() << "Re-reading xml contents from" << registryPath();
+    qDebug() << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
 
     // For each xml file in the registry we parse it and 
     // add it to our hash
@@ -171,7 +171,7 @@ void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
     keyDataHash.unite(handler.keyDataHash);
 }
 
-QString InfoXmlBackend::registryPath() const
+QString InfoXmlBackend::registryPath()
 {
     const char *regpath = getenv("CONTEXT_PROVIDERS");
     if (! regpath)
