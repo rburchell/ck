@@ -59,7 +59,7 @@ int main(int argc, char **argv)
         ContextPropertyInfo keyInfo(key);
 
         // Write value to list key
-        writer.add("KEYLIST", key);
+        writer.add("KEYS", key);
 
         // Write type
         writer.replace(key + ":KEYTYPE", keyInfo.type());
@@ -69,6 +69,15 @@ int main(int argc, char **argv)
 
         // Write provider
         writer.replace(key + ":PROVIDER", keyInfo.providerDBusName());
+    }
+
+    foreach(QString provider, context->listProviders()) {
+        // Write provider itself
+        writer.add("PROVIDERS", provider);
+
+        foreach(QString key, context->listKeys(provider)) {
+            writer.add(provider + ":KEYS", key);
+        }
     }
 
     writer.close();

@@ -42,13 +42,13 @@ QString InfoCdbBackend::name() const
 
 QStringList InfoCdbBackend::listKeys() const
 {
-    return reader.valuesForKey("KEYLIST");
+    return reader.valuesForKey("KEYS");
 }
 
 QStringList InfoCdbBackend::listKeys(QString providername) const
 {
     // FIXME: Not present yet in cdb
-    return reader.valuesForKey(providername + ":KEYLIST");
+    return reader.valuesForKey(providername + ":KEYS");
 }
 
 QStringList InfoCdbBackend::listProviders() const
