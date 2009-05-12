@@ -72,8 +72,19 @@ void SubscriberInterface::unsubscribe(QStringList keys)
 void SubscriberInterface::onChanged(const QMap<QString, QVariant> &values, const QStringList& unknownKeys)
 {
     qDebug() << "SubscriberInterface::onChanged";
-    qDebug() << values;
+    QMap<QString, QVariant> copy = values;
+    qDebug() << mergeNullsWithMap(copy, unknownKeys);
+}
 
+QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls)
+{
+    foreach (QString null, nulls) {
+        if (map.contains(null))
+            qWarning() << "PROVIDER ERROR: provided unknown and a value for " << null;
+        else
+            map[null] = QVariant();
+    }
+    return map;
 }
 
 void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
@@ -91,14 +102,7 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
         QStringList unknowns = reply.argumentAt<1>();
 
         // FIXME: the protocol should be better, this is just a workaround
-        foreach (QString unknown, unknowns) {
-            if (subscribeTimeValues.contains(unknown))
-                qWarning() << "PROVIDER ERROR: returned unknown and a value for " << unknown;
-            else
-                subscribeTimeValues[unknown] = QVariant();
-        }
-
-        emit subscribeFinished(subscribeTimeValues);
+        emit subscribeFinished(mergeNullsWithMap(subscribeTimeValues, unknowns));
      }
 }
 

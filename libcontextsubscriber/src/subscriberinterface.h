@@ -60,6 +60,7 @@ private:
     SubscriberInterface(const SubscriberInterface& other);
     SubscriberInterface& operator=(const SubscriberInterface& other);
 
+    QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls);
 };
 
 class SubscriberSignallingInterface: public QDBusAbstractInterface
