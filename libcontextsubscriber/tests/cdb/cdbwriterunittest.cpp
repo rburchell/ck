@@ -14,7 +14,7 @@ void CDBWriterUnitTest::basicCreation()
 {
     CDBWriter writer("test.cdb");
     writer.add("Key", "Value");
-    writer.finish();
+    writer.close();
 }
 
 QTEST_MAIN(CDBWriterUnitTest);

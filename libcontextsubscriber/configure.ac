@@ -70,6 +70,7 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile
          src/infoxmlbackendconfig.h
 		 cli/Makefile
+         update-tool/Makefile
 		 tests/Makefile
 		 tests/testclass/Makefile
          tests/xml-introspection-static/Makefile
