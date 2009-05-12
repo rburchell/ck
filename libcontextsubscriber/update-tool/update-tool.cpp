@@ -12,7 +12,8 @@
    If not, bail out with proper error. */
 void checkDirectory(const QDir &dir)
 {
-    const char *path = dir.absolutePath().toUtf8().constData();
+    QByteArray utf8Data = dir.absolutePath().toUtf8();
+    const char *path = utf8Data.constData();
 
     if (! dir.exists()) {
         printf ("ERROR: Directory '%s' does not exist!\n", path);
@@ -81,6 +82,11 @@ int main(int argc, char **argv)
     }
 
     writer.close();
-    rename(tmpDbPath.toUtf8().constData(), finalDbPath.toUtf8().constData()); 
+
+    // Atomically rename
+    QByteArray tmpDbUtf8Data = tmpDbPath.toUtf8();
+    QByteArray finalDbUtf8Data = finalDbPath.toUtf8();
+
+    rename(tmpDbUtf8Data.constData(), finalDbUtf8Data.constData()); 
 }
 

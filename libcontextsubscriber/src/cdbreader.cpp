@@ -37,8 +37,11 @@ CDBReader::CDBReader(const QString &path, QObject *parent)
     fd = open(path.toUtf8().constData(), O_RDONLY);
 
     if (fd != 0) {
-        cdb = calloc(sizeof(struct cdb), 1);
-        cdb_init((struct cdb*) cdb, fd);
+        cdb = calloc(1, sizeof(struct cdb));
+        if (cdb_init((struct cdb*) cdb, fd) != 0) {
+            free(cdb);
+            cdb = NULL;
+        }
     }
 }
 
@@ -65,8 +68,11 @@ QString CDBReader::valueForKey(const QString &key) const
     if (! cdb)
         return "";
 
-    unsigned int klen = key.toUtf8().size();
-    if (cdb_find((struct cdb*) cdb, key.toUtf8().constData(), klen)) {
+    QByteArray utf8Data = key.toUtf8();
+    unsigned int klen = utf8Data.size();
+    const char *kval = utf8Data.constData();
+
+    if (cdb_find((struct cdb*) cdb, kval, klen)) {
         unsigned int vpos = cdb_datapos((struct cdb*) cdb);
         unsigned int vlen = cdb_datalen((struct cdb*) cdb);
         char *val = (char *) malloc(vlen + 1);
@@ -87,14 +93,14 @@ QStringList CDBReader::valuesForKey(const QString &key) const
     if (! cdb)
        return list;
 
-    unsigned int klen = key.toUtf8().size(); 
-    struct cdb_find *cdbf = (struct cdb_find *) calloc(sizeof(struct cdb_find), 1);
-    //i//memset(&cdbf, 0, sizeof(struct cdb_find));
-    cdb_findinit(cdbf, (struct cdb*) cdb, key.toUtf8().constData(), klen);
-    int f;
+    QByteArray utf8Data = key.toUtf8();
+    unsigned int klen = utf8Data.size();
+    const char *kval = utf8Data.constData();
 
-    while((f = cdb_findnext(cdbf)) > 0) {
-        qDebug() << f;
+    struct cdb_find cdbf;
+    cdb_findinit(&cdbf, (struct cdb*) cdb, kval, klen);
+    
+    while(cdb_findnext(&cdbf) > 0) {
         unsigned int vpos = cdb_datapos((struct cdb*) cdb);
         unsigned int vlen = cdb_datalen((struct cdb*) cdb);
         char *val = (char *) malloc(vlen + 1);
@@ -102,7 +108,7 @@ QStringList CDBReader::valuesForKey(const QString &key) const
         val[vlen] = 0;
 
         QString str(val);
-        //free(val);
+        free(val);
         list << str;
     }
 

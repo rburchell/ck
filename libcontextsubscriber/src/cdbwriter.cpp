@@ -32,7 +32,7 @@ CDBWriter::CDBWriter(const QString &path, QObject *parent)
     fd = open(path.toUtf8().constData(), O_RDWR | O_CREAT, 0644);
 
     if (fd != 0) {
-        cdbm = calloc(sizeof(struct cdb_make), 1);
+        cdbm = calloc(1, sizeof(struct cdb_make));
         cdb_make_start((struct cdb_make *) cdbm, fd);
     }
 }
@@ -78,11 +78,17 @@ void CDBWriter::put(const QString &key, const QString &val, int flag)
     if (! cdbm)
         return;
 
-    int klen = key.toUtf8().size();
-    int vlen = val.toUtf8().size();
+    QByteArray keyUtf8Data = key.toUtf8();
+    QByteArray valUtf8Data = val.toUtf8();
+
+    int klen = keyUtf8Data.size();
+    const char *kval = keyUtf8Data.constData();
+    int vlen = valUtf8Data.size();
+    const char *vval = valUtf8Data.constData();
+
     cdb_make_put((struct cdb_make *) cdbm, 
-                 key.toUtf8().constData(), klen, 
-                 val.toUtf8().constData(), vlen, 
+                 kval, klen, 
+                 vval, vlen, 
                  (cdb_put_mode) flag);
 }
 
