@@ -54,7 +54,9 @@ private:
     
     static InfoBackend* backendInstance;
     
+    // FIXME Friendship should be other way round
     friend class InfoXmlBackend;
+    friend class InfoCdbBackend;
 };
 
 #endif // INFOBACKEND_H

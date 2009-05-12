@@ -19,31 +19,39 @@
  *
  */
 
-#ifndef CDBREADER_H
-#define CDBREADER_H
+#ifndef INFOCDBBACKEND_H
+#define INFOCDBBACKEND_H
 
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include <stdlib.h>
+#include <QMutex>
+#include <QFileInfo>
+#include <QString>
+#include <QHash>
+#include <QFileSystemWatcher>
+#include "infobackend.h"
+#include "cdbreader.h"
 
-class CDBReader : public QObject
+class InfoCdbBackend : public InfoBackend
 {
-    Q_OBJECT
+    Q_OBJECT 
 
 public:
-    explicit CDBReader(const QString &path, QObject *parent = 0);
-    virtual ~CDBReader();
+    explicit InfoCdbBackend(QObject *parent = 0);
 
-    void close();
-    QString valueForKey(const QString &key) const;
-    QStringList valuesForKey(const QString &key) const;
+    virtual QString name() const;
+	virtual QStringList listKeys() const;
+    virtual QStringList listKeys(QString providername) const;
+    virtual QStringList listProviders() const;
+    virtual QString typeForKey(QString key) const;
+    virtual QString docForKey(QString key) const;
+    virtual QString providerForKey(QString key) const;
 
 private:
-    void *cdb;
-    int fd;
+    static QString databasePath();
+
+    CDBReader reader;
 };
 
-
-
-#endif
+#endif // INFOXMLBACKEND_H

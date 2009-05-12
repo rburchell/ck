@@ -11,7 +11,7 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  infobackend.cpp infoxmlbackend.h infoxmlbackend.cpp		\
 	  infoxmlbackendconfig.h infoxmlkeysfinder.h			\
 	  infoxmlkeysfinder.cpp infokeydata.h cdbwriter.h cdbwriter.cpp \
-          cdbreader.cpp cdbreader.h
+          cdbreader.cpp cdbreader.h infocdbbackend.cpp infocdbbackend.h
 
 AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
 

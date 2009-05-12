@@ -56,7 +56,7 @@ void CDBReader::close()
     }
 }
 
-QString CDBReader::valueForKey(const QString &key)
+QString CDBReader::valueForKey(const QString &key) const
 {
     if (! cdb)
         return "";
@@ -76,7 +76,7 @@ QString CDBReader::valueForKey(const QString &key)
         return "";
 }
 
-QStringList CDBReader::valuesForKey(const QString &key)
+QStringList CDBReader::valuesForKey(const QString &key) const
 {
     QStringList list;
 
