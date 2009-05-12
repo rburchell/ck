@@ -11,13 +11,15 @@ int main(int argc, char **argv)
 
     QCoreApplication app(argc, argv);
 
-    if (app.arguments().count() <= 1) {
+    QStringList args = app.arguments();
+    if (args.count() <= 1) {
         QTextStream out(stdout);
         out << "Usage: " << app.arguments().at(0) << " <properties...>" << endl;
         return 0;
     }
 
-    foreach (QString key, app.arguments()) {
+    args.pop_front();
+    foreach (QString key, args) {
         new PropertyListener(new ContextProperty(key, &app), &app);
     }
 
