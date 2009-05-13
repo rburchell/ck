@@ -37,7 +37,10 @@ int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
 
-    /* Initialize some randomness */
+    // Force the xml backend
+    ContextRegistryInfo *context = ContextRegistryInfo::instance("xml");
+
+    // Initialize some randomness
     QTime midnight(0, 0, 0);
     qsrand(midnight.secsTo(QTime::currentTime()));
 
@@ -55,7 +58,6 @@ int main(int argc, char **argv)
 
     CDBWriter writer(tmpDbPath);
 
-    ContextRegistryInfo *context = ContextRegistryInfo::instance();
     foreach(QString key, context->listKeys()) {
         ContextPropertyInfo keyInfo(key);
 
