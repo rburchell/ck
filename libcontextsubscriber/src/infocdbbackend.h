@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef INFOXMLBACKEND_H
-#define INFOXMLBACKEND_H
+#ifndef INFOCDBBACKEND_H
+#define INFOCDBBACKEND_H
 
 #include <QVariant>
 #include <QStringList>
@@ -31,14 +31,14 @@
 #include <QHash>
 #include <QFileSystemWatcher>
 #include "infobackend.h"
-#include "infokeydata.h"
+#include "cdbreader.h"
 
-class InfoXmlBackend : public InfoBackend
+class InfoCdbBackend : public InfoBackend
 {
     Q_OBJECT 
 
 public:
-    explicit InfoXmlBackend(QObject *parent = 0);
+    explicit InfoCdbBackend(QObject *parent = 0);
 
     virtual QString name() const;
 	virtual QStringList listKeys() const;
@@ -48,17 +48,10 @@ public:
     virtual QString docForKey(QString key) const;
     virtual QString providerForKey(QString key) const;
 
-public slots:
-    void onDirectoryChanged(const QString &path);
-
 private:
-    QFileSystemWatcher watcher;
-	QHash <QString, InfoKeyData> keyDataHash;
+    static QString databasePath();
 
-    static QString registryPath();
-
-    void regenerateKeyDataList();
-    void readKeyDataFromXml(const QFileInfo &f);
+    CDBReader reader;
 };
 
 #endif // INFOXMLBACKEND_H

@@ -1,4 +1,4 @@
-SUBDIRS = testclass xml-introspection-static xml-introspection-dynamic
+SUBDIRS = testclass xml-introspection-static xml-introspection-dynamic cdb
 
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \

@@ -70,10 +70,12 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile
          src/infoxmlbackendconfig.h
 		 cli/Makefile
+         update-tool/Makefile
 		 tests/Makefile
 		 tests/testclass/Makefile
          tests/xml-introspection-static/Makefile
-         tests/xml-introspection-dynamic/Makefile])
+         tests/xml-introspection-dynamic/Makefile
+         tests/cdb/Makefile])
 AC_OUTPUT
 
 # Checks for header files.
