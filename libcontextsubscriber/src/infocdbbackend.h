@@ -48,9 +48,10 @@ public:
     virtual QString docForKey(QString key) const;
     virtual QString providerForKey(QString key) const;
 
-private:
     static QString databasePath();
+    static bool databaseExists();
 
+private:
     CDBReader reader;
 };
 

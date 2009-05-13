@@ -31,8 +31,7 @@
 InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
 {
-    //reader = CDBReader(databasePath());
-    // FIXME: Check if database present!
+    qDebug() << "CDB backend with database" << InfoCdbBackend::databasePath();
 }
 
 QString InfoCdbBackend::name() const
@@ -47,7 +46,6 @@ QStringList InfoCdbBackend::listKeys() const
 
 QStringList InfoCdbBackend::listKeys(QString providername) const
 {
-    // FIXME: Not present yet in cdb
     return reader.valuesForKey(providername + ":KEYS");
 }
 
@@ -71,7 +69,11 @@ QString InfoCdbBackend::providerForKey(QString key) const
     return reader.valueForKey(key + ":PROVIDER");
 }
 
-/* Private */
+bool InfoCdbBackend::databaseExists()
+{
+    QDir dir(databasePath());
+    return dir.exists();
+}
 
 QString InfoCdbBackend::databasePath()
 {

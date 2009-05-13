@@ -47,6 +47,8 @@ public:
     virtual QString typeForKey(QString key) const;
     virtual QString docForKey(QString key) const;
     virtual QString providerForKey(QString key) const;
+    
+    static QString registryPath();
 
 private slots:
     void onDirectoryChanged(const QString &path);
@@ -54,8 +56,6 @@ private slots:
 private:
     QFileSystemWatcher watcher;
 	QHash <QString, InfoKeyData> keyDataHash;
-
-    static QString registryPath();
 
     void regenerateKeyDataList();
     void readKeyDataFromXml(const QFileInfo &f);

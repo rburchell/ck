@@ -37,6 +37,8 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
     /* Thinking about locking... the watcher notifications are delivered synced, 
        so asuming the changes in the dir are atomic this is all we need. */
 
+    qDebug() << "XML backend with path" << InfoXmlBackend::registryPath();
+
     watcher.addPath(InfoXmlBackend::registryPath());
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
 
@@ -112,6 +114,15 @@ QString InfoXmlBackend::providerForKey(QString key) const
     return keyDataHash.value(key).provider;
 }
 
+QString InfoXmlBackend::registryPath()
+{
+    const char *regpath = getenv("CONTEXT_PROVIDERS");
+    if (! regpath)
+        regpath = DEFAULT_REGISTRY_PATH;
+
+    return QString(regpath);
+}
+
 /* Slots */
 
 void InfoXmlBackend::onDirectoryChanged(const QString &path)
@@ -171,12 +182,4 @@ void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
     keyDataHash.unite(handler.keyDataHash);
 }
 
-QString InfoXmlBackend::registryPath()
-{
-    const char *regpath = getenv("CONTEXT_PROVIDERS");
-    if (! regpath)
-        regpath = DEFAULT_REGISTRY_PATH;
-
-    return QString(regpath);
-}
 

@@ -38,8 +38,10 @@ InfoBackend* InfoBackend::instance(const QString &backendName)
             else if (backendName == "cdb")
                 backendInstance = new InfoCdbBackend;
             else {
-                // FIXME Auto-detect if cdb file exists
-                backendInstance = new InfoXmlBackend;
+                if (InfoCdbBackend::databaseExists())
+                    backendInstance = new InfoCdbBackend;
+                else
+                    backendInstance = new InfoXmlBackend;
             }
         }
  
