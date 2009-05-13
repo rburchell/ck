@@ -20,7 +20,7 @@
  */
 
 #include "infoxmlbackend.h"
-#include "infoxmlbackendconfig.h"
+#include "infobackendconfig.h"
 #include "infoxmlkeysfinder.h"
 #include <QFileInfo>
 #include <QDir>

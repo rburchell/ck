@@ -20,7 +20,7 @@
  */
 
 #include "infocdbbackend.h"
-#include "infoxmlbackendconfig.h" // FIXME: Should be moved into a universal config
+#include "infobackendconfig.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>

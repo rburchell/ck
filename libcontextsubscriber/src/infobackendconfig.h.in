@@ -19,10 +19,10 @@
  *
  */
 
-#ifndef INFOXMLBACKENDCONFIG_H
-#define INFOXMLBACKENDCONFIG_H
+#ifndef INFOBACKENDCONFIG_H
+#define INFOBACKENDCONFIG_H
 
 // FIXME Use sharedir here!
 #define DEFAULT_REGISTRY_PATH "@prefix@/share/context-providers/"
 
-#endif // INFOXMLBACKENDCONFIG_H
+#endif // INFOBACKENDCONFIG_H

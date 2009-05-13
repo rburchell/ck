@@ -68,7 +68,7 @@ PKG_CHECK_MODULES([QtTest], [QtTest])
 
 AC_CONFIG_FILES([Makefile
 		 src/Makefile
-         src/infoxmlbackendconfig.h
+         src/infobackendconfig.h
 		 cli/Makefile
          update-tool/Makefile
 		 tests/Makefile

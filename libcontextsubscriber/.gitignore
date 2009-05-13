@@ -12,7 +12,7 @@ mocmock_*.cpp
 Makefile
 
 # Auto-generated
-/src/infoxmlbackendconfig.h
+/src/infobackendconfig.h
 
 # Ignore resource forks
 ._*
