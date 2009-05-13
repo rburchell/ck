@@ -27,7 +27,7 @@ void ContextRegistryInfoUnitTest::basicChange()
 
     // Now just make sure that the new key is availible
     QStringList newKeys = context->listKeys();
-    QVERIFY(newKeys.contains("Context.Battery.AboutToExplode"));
+    QVERIFY(newKeys.contains("Battery.AboutToExplode"));
 }
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()

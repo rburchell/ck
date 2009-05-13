@@ -9,7 +9,7 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
     QFile::remove("xml/providers.xml");
     QFile::copy("xml/providers2v1.xml.src", "xml/providers.xml");
 
-    ContextPropertyInfo prop("Context.Battery.LowBattery");
+    ContextPropertyInfo prop("Battery.LowBattery");
     QCOMPARE(prop.type(), QString("TRUTH"));
     
     QSignalSpy spy(&prop, SIGNAL(typeChanged(QString)));
@@ -32,7 +32,7 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
     QFile::remove("xml/providers.xml");
     QFile::copy("xml/providers3v1.xml.src", "xml/providers.xml");
 
-    ContextPropertyInfo prop("Context.Battery.LowBattery");
+    ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
     
