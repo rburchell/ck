@@ -1,0 +1,12 @@
+prefix=
+exec_prefix=
+libdir=${pcfiledir}/libcontextprovider
+includedir=${pcfiledir}/libcontextprovider
+pythondir=${pcfiledir}/python
+
+Name: contextprovider
+Description: ContextKit Context Provider library
+Version: uninstalled
+Requires: dbus-1 glib-2.0 gobject-2.0 gee-1.0
+Libs: -L${libdir} -lcontextprovider
+Cflags: -I${includedir}

@@ -24,7 +24,8 @@ while ($reader->read) {
     }
   } elsif ($reader->name eq "key") {      # print keys with type
     if ($reader->nodeType == XML_READER_TYPE_ELEMENT) {
-      print "*" . join('.', @name) . "." . $reader->getAttribute(name) . "*::\n";
+      print "*" . join('.', @name) . "." . $reader->getAttribute(name)
+	    . "* (_" . $reader->getAttribute(type) . "_)::\n";
     } elsif ($reader->nodeType == XML_READER_TYPE_END_ELEMENT) {
       print "\n";
     }

@@ -36,17 +36,15 @@ for the +Context.Example.Random+ property looks like this:
 ------------------
 <?xml version="1.0"?>
 <provider bus="session" service="com.example.RandomProvider">
-  <node name="Context">
-    <node name="Example">
+  <node name="Example">
+    <doc>
+      A exemplary context provider.
+    </doc>
+    <key name="Random" type="double">
       <doc>
-        A exemplary context provider.
+        A random number between 0 and 1 that changes every now and then.
       </doc>
-      <key name="Random" type="DOUBLE">
-        <doc>
- 	  A random number between 0 and 1 that changes every now and then.
-	</doc>
-      </key>
-    </node>
+    </key>
   </node>
 </provider>
 ------------------
@@ -109,89 +107,28 @@ Types
 just use a +type+ attribute in your +key+ elements with one of
 +"TRUTH"+, +"STRING"+, +"INT"+, or +"DOUBLE"+ as the value.
 
+ContextKit uses the experimental link:context-types.html[Desktop Type
+System].  A property declaration should have a +type+ element that
+conforms to the Desktop Type System.
 
-Each +key+ element in the property declaration tree should contain a
-child element that describes the possible values of the property.
-Allowed elements are:
-
-+bool+::
-True or false.
-
-+int+::
-A integer.  Attributes min, max.
-
-+float+::
-A floating point number.  Attributes min, max.
-
-+string+::
-A arbitrary string.
-
-+const+::
-A constant.  Constant are useful inside of a +choice+
-element. Attributes +bool+, +int+, +float+, +string+.
-
-+list+::
-A list.  The single child element of +list+ specifies the possible values
-for all the list elements.
-
-+struct+::
-A fixed length list.  Each child element of +struct+ specifies the
-possible values for the corresponding list element.  The +tag+
-attribute of the children can be used to give names to the list
-elements.
-
-+choice+::
-One of a given set of alternative.  Each child element describes one
-alternative.  The possible values for the alternatives must not
-overlap with each other.  This makes it possible to find the
-alternative that corresponds to a given value.  The +tag+ attribute of
-the children can be used to give names to the alternatives.
-
-For example,
+For example, a property that is a enumeration would be declared like
+this:
 
 [source,xml]
-----
-<struct>
-  <bool tag="landscape"/>
-  <bool tag="inverted"/>
-<struct>
-----
+------------------
+<key name="Economy">
+  <type>
+    <intenum>
+      <up   val="1" doc="Getting better"/>
+      <down val="2" doc="Getting worse"/>
+      <even val="3" doc="Getting boring"/>
+    </intenum>
+  <doc>
+    The current economic trend, as an enumerated value.
+  </doc>
+</key>
+------------------
 
-describes a pair of booleans.  When showing it, the first boolean is
-named "landscape" and the second is named "inverted".
-
-This example
-
-[source,xml]
-----
-<choice>
-  <const int="1" tag="First"/>
-  <const int="2" tag="Second"/>
-</choice>
-----
-
-describes a property that can have the values +1+ and +2+.  When
-letting the user edit the value, the given tags will be used in a drop
-down list instead of the raw numbers.
-
-The following example takes things to far.  It describes a tagged
-union that represents a location either by name or by geographical
-coordinates.
-
-[source,xml]
-----
-<choice>
-  <struct tag="named">
-    <const int="0"/>
-    <string/>
-  </struct>
-  <struct tag="coords">
-    <const int="1"/>
-    <float tag="latitude"/>
-    <float tag="longitude"/>
-  </struct>
-</choice>
-----
 
 Guidelines for property providers
 ---------------------------------

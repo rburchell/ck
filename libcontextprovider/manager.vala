@@ -33,7 +33,6 @@ namespace ContextProvider {
 
 		// NULL value means undetermined
 		HashTable<string, Value?> values;
-		static dynamic DBus.Object bus; // Needs to be stored so that we get the NameOwnerChanged
 
 		// Session / system bus option
 		DBus.BusType busType;
@@ -51,9 +50,6 @@ namespace ContextProvider {
 			
 			subscribers = new Gee.HashMap<string, Subscriber>(str_hash, str_equal);
 			values = new HashTable<string, Value?>(str_hash, str_equal);
-
-			// Start listening to the NameOwnerChanged signal (of the correct bus)
-			// to know when the clients exit.
 		}
 
 		public void get_internal (StringSet keyset, out HashTable<string, Value?> properties, out string[] undeterminable_keys) {

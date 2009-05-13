@@ -3,14 +3,14 @@ A high-level type system for the Free Desktops
 
 Desktop environments are not just for starting applications anymore.
 Data is flowing freely between well-integrated components, and the
-easier data flows, the better the integration of the components.
+easier the data flows, the better the integration of the components.
 
 Not all components are written in the same programming language, of
-course, and when letting data flow between, it needs to be represented
-in many different ways.  For example, GConf stores values differently
-than they travel over D-Bus, which is different again from how they
-are passed as GValues to signal handlers, which is different from how
-Perl wants to store it.
+course, and when letting data flow between them, it needs to be
+represented in many different ways.  For example, GConf stores values
+differently than they travel over D-Bus, which is different again from
+how they are passed as GValues to signal handlers, which is different
+from how Perl wants to store it.
 
 The desktop environment is heading towards a cooperative, dynamic
 environment, and it needs a rich and strong type system to tie its
@@ -25,7 +25,7 @@ The common type system defined here is rich enough to represent any
 reasonable value; it's roughly equivalent to what dynamic languages
 like Perl and Python have.
 
-But it goes one step further: it allows the definition of new
+But it goes one crucial step further: it allows the definition of new
 abstract, intentional types.  Intentional types give additional
 information about a value that is not available from the
 representation alone.
@@ -40,8 +40,8 @@ to formalize this so that documentation can be precise without much
 extra effort, up to a level where the machine itself is able to check
 whether everybody agrees on the intentional types.
 
-The age old conflict between static and dynamic types also matters
-here: how much type information should be associated with the values
+The age old battle between static and dynamic types also matters here:
+how much type information should be associated with the values
 themselves?  The boundary is exactly between intentional and
 representational types.  Intentional types are those that only the
 programmer or compiler know about, representational types are those
@@ -59,16 +59,17 @@ over there are intended to be a signed number or an unsigned one.
 In a dynamically typed language, values carry a lot of
 representational type information.  Code can easily be polymorphic and
 do different things depending on whether a value is an integer or a
-string.  It can also defer consistency checks to the run-time, which
-is more robust than doing it at compile time, but doesn't go as far
-since intentional types are not available.  Dynamic languages often
-don't have any means to declare intentional types for the benefit of
-the compiler; they only exist in the head of the programmer who
-expresses them by selecting the right operation manually.  (For
-example, if a string is intended to be a URL, you need to use
-'utils.net.web.url.get_scheme (url)' explicitly.  If the intentional
-type could have been declared in the language, it could have selected
-the right function automatically from just 'url.scheme'.)
+string.  It can also perform consistency checks at run-time, which is
+more robust than doing it at compile time, but doesn't go as far since
+intentional types are not available.
+
+Dynamic languages often don't have any means to declare intentional
+types for the benefit of the compiler; they only exist in the head of
+the programmer who expresses them by selecting the right operation
+manually.  For example, if a string is intended to be a URL, you need
+to use 'utils.net.web.url.get_scheme (url)' explicitly.  If the
+intentional type could have been declared in the language, it could
+have selected the right function automatically from just 'url.scheme()'.
 
 Thus, and coming back to the ground now, we define a concrete type
 system here with a rich representational part and a lightweight and
@@ -76,49 +77,797 @@ flexible intentional part.
 
 For the representational part, we define how it is implemented for a
 number of existing value systems.  For the intentional part, we define
-how it can be translated into a number of languages that support
-static type declarations.
+how it can be translated into a number of languages, both those with
+static type declaration and those where intent is mainly expressed by
+manually selecting the right operations.
 
-We also give a list of common intentional types.
+Intentional types are not optional; they are generally needed to make
+sense of values.  A programmer learns about them by reading
+documentation; if a debugging tool needs to find out a intentional
+type at run-time, there must be some way to find it.
+
+This means that declaration languages like D-Bus introspection
+facilities and GConf schemas need to be extended to support our
+intentional types.  Thus, purely declarative languages like these are
+also included in our list of supported languages.
+
+[source,C]
+----
+/* Witty example here. */
+----
+
+We also give a list of common intentional types, of course.
 
 This document then has three dimensions of extensibility:
 
 - A new value system can be added by defining how the representational
   part of the common type system maps to it.
 
-- A new static language can be added by defining how intentional types
-  are implemented in it, and by implementing all common intentional
-  types.
+- A new language can be added by defining how intentional types are
+  implemented in it, and by implementing all common intentional types.
 
 - A new common intentional type can be added by defining it and
-  implementing it in all supported static languages.
+  implementing it in all languages.
 
 The representational part of the common type system is not supposed to
-be change routinely.
+change frequently, but adding a new intentional type should be
+considered routine.
+
+The representation part of the common type system is restricted by the
+lowest common denominator of all the value system implementations that
+we want to include.  We don't want to distort the existing value
+systems too much, and force people to write code that feels unnatural
+for them.
+
+For example, not all value systems can directly represent complex
+numbers or multiple precision integers, but any grown up type system
+should include them.  We solve this conflict by relying on the
+intentional types: Instead of grafting complex numbers onto every
+value system, we only define a intentional type for them.
+
+Currently supported value systems: QVariant, D-Bus messages, GValue,
+GConfValue, GVariant, Python values, Perl values, JavaScript values,
+GKeyFile, JSON, YAML, Nepomuk ontologies, SQL, SparQL, Common Lisp
+values.
+
+Currently supported languages: Python, Perl, JavaScript, Java, C#, C++
+with QVariant, plain C++, C with D-Bus/GValue/GConfValue/GVariant,
+plain C, Vala, D-Bus introspection, D-Bus IDL (didl), GConf schema,
+our own XML schema.
 
 
 Representational types
 ----------------------
 
-For QVariant, D-Bus messages, GValue, GConfValue, GVariant, Python,
-Perl, JavaScript, Java, C#, GKeyFile, XML, JSON, YAML, C, C++, Vala,
-Nepomuk ontologies, SQL, SparQL.
+Whenever there is a choice of representation in the following table,
+it should be taken to mean: Represent the value with the first
+alternative in the list that is possible, even if that loses
+precision.
 
-Intentional types are used to disambiguate if needed.  I.e., different
-values can be mapped to a common representation, as long as the
-intentional types can disambiguate.  Hmm, does that mean intentional
-types are non-optional?
+For example, a 64 bit signed integer is represented in GConf as a
+"int" if it fits, and as a "double" if not.  It will always fit into a
+double, but it might mean chopping off some low bits.
+
+- null
++
+The null value.
++
+  QVariant:   QVariant::Null
+  D-Bus:      '()'
+  GValue:     G_TYPE_NONE
+  GConf:      empty GCONF_VALUE_LIST with type GCONF_VALUE_BOOL
+  GVariant:   '()'
+  Perl:       undef
+  Python 2:   None
+  CL:         nil
+
+- bool
++
+A boolean
++
+  QVariant:   QVariant::Bool
+  D-Bus:      'b'
+  GValue:     G_TYPE_BOOLEAN
+  GConf:      GCONF_VALUE_BOOL
+  GVariant:   'b'
+  Perl:       number, 0 or 1.
+  Python 2:   number, 0 or 1.
+  CL:         nil or t
+
+- int32
++
+Signed 32 bit integer
++
+  QVariant:   QVariant::Int
+  D-Bus:      'i'
+  GValue:     G_TYPE_INT
+  GConf:      GCONF_VALUE_INT
+  GVariant:   'i'
+  Perl:       number
+  Python 2:   int
+  CL:         number
+
+- int64
++
+Signed 64 bit integer
++
+  QVariant:   QVariant::LongLong
+  D-Bus:      'x'
+  GValue:     G_TYPE_INT64
+  GConf:      GCONF_VALUE_INT or GCONF_VALUE_DOUBLE
+  GVariant:   'x'
+  Perl:       number
+  Python 2:   int or long
+  CL:         number
+
+- uint32
++
+Unsigned 32 bit integer
++
+  QVariant:   QVariant::UInt
+  D-Bus:      'u'
+  GValue:     G_TYPE_UINT
+  GConf:      GCONF_VALUE_INT or GCONF_VALUE_DOUBLE
+  GVariant:   'u'
+  Perl:       number
+  Python 2:   int or long
+  CL:         number
+
+- uint64
++
+Unsigned 64 bit integer
++
+  QVariant:   QVariant::ULongLong
+  D-Bus:      't'
+  GValue:     G_TYPE_UINT64
+  GConf:      GCONF_VALUE_INT or GCONF_VALUE_DOUBLE
+  GVariant:   't'
+  Perl:       number
+  Python 2:   int or long
+  CL:         number
+
+- double
++
+Double precision floating point number
++
+  QVariant:   QVariant::Double
+  D-Bus:      'd'
+  GValue:     G_TYPE_DOUBLE 
+  GConf:      GCONF_VALUE_DOUBLE
+  GVariant:   'd'
+  Perl:       number
+  Python 2:   double
+  CL:         number
+
+- string
++
+String of Unicode code points
++
+  QVariant:   QVariant::QString
+  D-Bus:      's'
+  GValue:     G_TYPE_STRING
+  GConf:      GCONF_VALUE_STRING, UTF-8.
+  GVariant:   's'
+  Perl:       string
+  Python 2:   unicode
+  CL:         string
+
+- list
++
+List of values
++
+  QVariant:   QVariant::List
+  D-Bus:      'av'
+  GValue:     G_TYPE_POINTER pointing to a GSList of GValues.
+              (XXX - find something better, must be somewhere.)
+  GConf:      GCONF_VALUE_LIST or chained GCONF_VALUE_PAIRs
+  GVariant:   'av'
+  Perl:       array
+  Python 2:   list
+  CL:	      list
+
+- map
++
+Mapping from strings to values, with no duplicated keys.
++
+  QVariant:   QVariant::Map
+  D-Bus:      'a{sv}'
+  GValue:     G_TYPE_HASH_TABLE (?)
+  GConf:      Chain of GCONF_VALUE_PAIRs,
+              with the cars being a pair of GCONF_VALUE_STRING and an
+              arbitrary value.
+  GVariant:   'a{sv}'
+  Perl:       hash
+  Python:     dict
+  CL:	      alist
+
+A Mini-DOM
+----------
+
+The representational types can be used as a Mini-DOM for a small
+subset of XML.  This is useful when the small subset suffices but you
+still want to be enterprise ready.  Intentional type definitions use
+this subset, for example, and are thus easily handled at run-time.
+
+The limitiations of the subset as compared to full XML are: it can't
+represent lists, only maps, and attributes can't be distinguished from
+identically-named child elements.
+
+Thus, this piece of XML can't be represented in the Mini-DOM
+
+  <nums><num>1</num><num>2</num></nums>
+
+and these two pieces are equivalent
+
+  <foo bar="12"/>   ==   <foo><bar>12</bar></foo>
+
+The first limitation is quite severe, and we should maybe find ways to
+distinguish lists from maps, or just handle lists in the parser API.
+The second limitation is considered a feature.
+
+Converting a piece of XML produces two things: a 'tag' and a 'value'.
+The tag is a string or null, and the value is either a string or a
+map, according to the following rules:
+
+  TEXT                -> tag: null, value: TEXT
+  <foo>TEXT</foo>     -> tag: foo, value: TEXT
+  <foo>ELT...</foo>   -> no ELT must be TEXT
+                         tag: foo, value: map from the
+                         tags of the ELTs to their values.
+			 NOTE: order is not preserved and
+                         duplicates are not allowed.
+  <foo attr="TEXT">ELT...</foo>
+                      -> equivalent to <foo><attr>TEXT</attr>ELT...</foo>
+
+Examples, showing how XML maps to Python and to Common Lisp.
+
+  <foo>bar</foo>
+  => ('foo', 'bar')
+  => (foo bar)
+
+  <foo>
+    <bar>Hi</bar>
+  </foo>
+  => ('foo', {'bar': 'Hi'})
+  => (foo (bar "Hi"))
+
+  <foo bar="Hi"/>
+  => ('foo', {'bar': 'Hi'})   (Same thing)
+  => (foo (bar "Hi"))
+
+  <contact online="true">
+    <name>
+      <first>Foo</foo>
+      <last>Bar</last>
+    </name>
+  </contact>
+  => ('contact', {'online': 'true',
+     		  'name': {'first': 'Foo',
+                           'last': 'Bar'}})
+  => (contact (online "true")
+              (name (first "Foo")
+	            (last "Bar")))
+
+  <cat>
+    dog
+    <ernie>bert</ernie>
+  </cat>
+  => ERROR: dog has no tag.
+
 
 Intentional types
 -----------------
 
-The "intentional type" type is an intentional type itself, it is not
-representational.  (It's permissive values are all strings that are
-the name of an intentional type).
+The most important part by far of a intentional type definition is its
+documentation.  The documentation is the thing that explains the
+intent to programmers, so that they can 'reify' the abstract
+intentional type into concrete code.  For example, by reading the
+documentation, they know how to write a C++ class for the intentional
+type and add useful methods to it, or how to write a UI widget that
+allows displaying and maybe high-level editing of values of that type.
 
-Intentional types can not be deduced from values, they must come from
-somewhere else.
+Intentional types are _not_ a static type system.  They are only a
+tool for cross-referencing documentation.  Sometimes, intentional
+types are mapped into a static type system and the compiler will then
+perform some additonal checks at compile time, and the code using the
+types might look more natural, but that is not the main goal of the
+intentional types.
 
-A name, a description of the permissible representational values, and
-documentation, plus implementation in C, C++, Java, C#, Vala.  The
-description of permissible values gives guidance 
+In essence, intentional types use English as the 'formal' language to
+express their definitions.  Their documentation should basically be a
+description of the set of values that are permissible for this type
+(by referring to other already defined intentional types or the
+representational types from above), and what they mean.  For example,
+the "calendar-time" type could say that only "uint64" values are
+allowed, and that they are the number of nano-seconds since midnight
+January 1, UTC.
+
+Another example are enumerations: the documentation of
+"compass-direction" can say that the value is one of the four "int32"
+values 0, 90, 180, 270 where 0 means North, 90 means East, etc.
+
+As shown in the examples, intentional types usually have names, so
+that you can refer to them in the documentation of other types and in
+other places that refer to intentional types, such as in D-Bus
+introspection declarations.
+
+Names are optional however: if you use a type in only one place, you
+can write its definition right there, without having to give it a
+name.
+
+When other people refer to your type, they can provide a set of
+parameters to specialize it.  You should document which parameters are
+meaningful and what they do, of course.  You should also formally
+declare which paramaters are valid.  (See below for concrete
+examples).
+
+Type parameters allow us to define a small set of fundamental and
+general types, which can be instantiated to create a wide range of
+useful types.  For example, there is a generic "int-enum" type that
+can be turned into a specific enumeration via its parameters.  A
+single UI widget could be written for "int-enum" that is then
+(automatically) parameterized at run-time with the concrete set of
+choices.  The "int-enum" type is defined so that its parameters
+include the text to use for each enumeration choice, and the UI widget
+will get access to these parameters at run-time (as a map,
+incidentally).
+
+A intentional type definition can specify a "base" type for itself, by
+referring to another intentional type.  This base can be used to make
+the documentation a bit more formal, and of course to provide
+parameters for the base type.  For example, the documentation for the
+"compass-direction" type would not need to explicitly say that the
+numbers are "int32"s; it would just declare its base to be "int32".
+Even better, it sould say that it's actually a "int-enum" and specify
+the concrete values.
+
+
+In a context where a type is expected:
+
+  NAME                          - refers to type named NAME
+  <NAME>PARM...</NAME>          - refers to type named NAME, specialized
+                                  with PARM...
+  <name/><parms/><doc/><base/>  - anonymous type with inline definition
+
+Note that this means that types can't be named "name", "parms", "doc",
+or "base".  This might be a bit too clever.
+
+Attributes for type definitions:
+
+  name  - the name (string)
+  parms - valid paramaters (map from parm name to map of ...)
+  doc   - documentation (either string, or a map language code -> string)
+  base  - the base type (type)
+
+As an example, consider a hypothetical XML schema for describing
+key-value pairs.  Let's also assume that this schema follows our
+Mini-DOM rules.  It has a "key" element which needs name, doc and type
+attributes.  The "type" attribute should refer to an intentional type
+of course.  We can describe a key for the current temperature,
+expressed as one of "low", "medium", "high", in the following ways.
+
+First, we can refer to the predefined "three-level-enum" type, if
+there would be such a type.  Documentation of the possible values is
+left to the definition of "three-level-enum", which presumably would
+tell us that they are the strings "low", "medium", and "high".
+
+  <key>
+    <name>Temperature</name>
+    <doc>The current temperature.</doc>
+    <type>three-level-enum</type>
+  <key>
+
+Using the Mini-DOM rules, this can be shortened to:
+
+  <key name="Temperature"
+       doc="The current temperature"
+       type="three-level-enum"/>
+
+Instead of referring to the pre-defined "three-level-enum" type, we
+can instantiate a "string-enum" explicitly, which is one of the
+pre-defined generic types.
+
+  <key name="Temperature"
+       doc="The current temperature">
+    <type>
+      <string-enum>
+        <low doc="Brrrr"/>
+	<medium doc="Comfy."/>
+	<high doc="Siesta!"/>
+      </string-enum>
+    </type>
+  </key>
+
+If we want to, we can define a new type right in the key definition,
+but that should rarely be needed.  (XXX - Maybe we can disallow this
+altogether.)
+
+  <key name="Temperature"
+       doc="The current temperature">
+    <type>
+      <doc>
+        A temperature expressed as one of three levels: low, medium, or high.
+      </doc>
+      <base>
+        <string-enum>
+          <low doc="Brrrr"/>
+	  <medium doc="Comfy."/>
+	  <high doc="Siesta!"/>
+        </string-enum>
+      </base>
+    </type>
+  </key>
+
+The common intentional types are defined in XML, as a list of "type"
+elements that have "name", "parms", "doc", and "base" child elements,
+as expected.
+
+In the following, we give the type definitons verbatim, as XML, as an
+extended example (and because the real XML definition of the types
+does not exist yet).  In the future, this part of the document will be
+generated from the type definitions and will look nicer.
+
+Fundamental types
+~~~~~~~~~~~~~~~~~
+
+  <typedef name="int32">
+    <params>
+      <min doc="Minimum value"/>
+      <max doc="Maximum value"/>
+    <params>
+    <doc>
+      A int32 value within the given limits.
+    </doc>
+  </type>
+
+  <type name="int64">
+    <params>
+      <min doc="Minimum value"/>
+      <max doc="Maximum value"/>
+    <params>
+    <doc>
+      A int64 value within the given limits.
+    </doc>
+  </type>
+
+  <type name="uint32">
+    <params>
+      <min doc="Minimum value"/>
+      <max doc="Maximum value"/>
+    <params>
+    <doc>
+      A uint32 value within the given limits.
+    </doc>
+  </type>
+
+  <type name="uint64">
+    <params>
+      <min doc="Minimum value"/>
+      <max doc="Maximum value"/>
+    <params>
+    <doc>
+      A uint64 value within the given limits.
+    </doc>
+  </type>
+
+  <type name="double">
+    <params>
+      <min doc="Minimum value"/>
+      <max doc="Maximum value"/>
+    <params>
+    <doc>
+      A double value within the given limits.
+    </doc>
+  </type>
+
+  <type name="string">
+    <parms>
+      <must-match doc="Regular expression that must match"/>
+    </parms>
+    <doc>
+      A string value that matches the given regular expression.
+    </doc>
+  </type>
+
+  <type name="list">
+    <params>
+      <min doc="Minimum length"/>
+      <max doc="Maximum length"/>
+    <params>
+    <doc>
+      A list of arbitrary values, with the minimum and maximum 
+      length given by the "min" and "max" parameters, respectively.
+    </doc>
+  </type>
+
+  <type name="map">
+    <params>
+      <keys doc="Allowed keys"/>
+    </params>
+    <doc>
+      A map.  If given, the "keys" parameter determines which keys are
+      allowed.  The "keys" parameter should be a map itself, from key
+      names to a map with the attributes of the key.  Attributes of a
+      key are "doc" and "type".
+    </doc>
+  </type>
+
+Generic types
+~~~~~~~~~~~~~
+
+  <type name="value">
+    <doc>
+      Any representable value.
+    </doc>
+  </type>
+
+  <type name="number" base="value">
+    <doc>
+      A number, represented as either a "int32", "uint32", "int64", "uint64", or "double".
+    </doc>
+  </type>
+
+  <type name="integer" base="number">
+    <params>
+      <min doc="Lower bound"/>
+      <max doc="Upper bound"/>
+    </params>
+    <doc>
+      A integer, represented as any of the numeric types.  If the value 
+      is a "double", it is rounded to an integer, but not necessarily to
+      the nearest.  The "min" and "max" parameters, when given, constrain 
+      the range of the integer.
+    </doc>
+  </type>
+
+  <type name="uniform-list" base="list">
+    <params>
+      <min doc="Minimum length"/>
+      <max doc="Maximum length"/>
+      <type doc="Type of the elements"/>
+    </params>
+    <doc>
+      A list of values of the given type, with the 
+      minimum and maximum length given by the "min" and "max" parameters.
+      The type of all elements is given by the "type" parameter.
+    </doc>
+  </type>
+
+  <type name="string-enum" base="string">
+    <parms>
+      <rest doc="The possible values">
+    </parms>
+    <doc>
+      This is the base type for enumerations of fixed strings.  The
+      parameters describe the possible values.  Each parameter is one
+      of the choices: the name of the parameter is the string for the choice
+      itself and the value of the parameter is a map with further 
+      information of that choice, such as a "doc" entry.
+    </doc>
+  </type>
+
+  <type name="int-enum" base="int32">
+    <parms>
+      <rest doc="The possible values">
+    </parms>
+    <doc>
+      This is the base type for enumerations of fixed integers.  The
+      parameters describe the possible values.  Each parameter is one
+      of the choices: the name of the parameter is the symbolic name
+      for the choice itself and the value of the parameter is a map
+      with further information of that choice, such as a "val" entry
+      for the numerical value for that choice, and a "doc" entry.
+    </doc>
+  </type>
+
+Specific types
+~~~~~~~~~~~~~~
+
+  <type name="type">
+    <doc>
+      A type, represented as a map.  The map is the one you get as the Mini-DOM 
+      for the type definiton.  E.g., it will have "doc" mapped to a string,
+      and "base" mapped to either a string or another map, etc.
+    </doc>
+    <base>
+      <map>
+        <allowed-keys>
+	  <name/>
+	  <parms/>
+	  <doc/>
+          <base/>
+	</allowed-keys>
+      </map>
+    </base>
+  </type>
+    
+  <type name="geoloc">
+    <doc>
+      A list of two or three doubles giving a geographical location.
+      The first number is latitude, the second longitude, both in degrees.
+      If a third number is present, it is the altitude in meters.
+    </doc>
+    <base>
+      <uniform-list min="2" max="3" type="double"/>
+    </base>
+  </type>
+
+  <type name="temperature"
+        base="double"
+	doc="A temperature in Kelvin."/>
+
+  <type name="screen-edge">
+    <doc>
+      Indicates an edge of a rectangular screen, relative to
+      the natural orientation of the video hardware driving it.
+      It can be one of the four strings "top", "left", "right",
+      and "bottom".
+    </doc>
+    <base>
+      <string-enum>
+	<top/> <left/> <right/> <bottom/>
+      </string-enum>
+    </base>
+  </type>
+
+  <type name="screen-edge-ints">
+    <doc>
+      Indicates an edge of a rectangular screen, relative to
+      the natural orientation of the video hardware driving it.
+      It can be one of the four values "top", "left", "right",
+      and "bottom", encoded as an integer.
+    </doc>
+    <base>
+      <int-enum>
+	<top val="0"/> <left val="1"/> <right val="2"/> <bottom val="3"/>
+      </string-enum>
+    </base>
+  </type>
+
+  <type name="energy" base="double">
+    <doc>
+      An amount of energy, in Joule.
+    </doc>
+  </type>
+
+  <type name="power" base="double">
+    <doc>
+      A power, in Watt.
+    </doc>
+  </type>
+
+  <type name="time" base="int64">
+    <doc>
+      A point in time, represented as the number of nano-seconds since
+      00:00 January 1, 1970, UTC.
+    </doc>
+  </type>
+
+  <type name="duration" base="uint64">
+    <doc>
+      A time duration, in nano-seconds.
+    </doc>
+  </type>
+
+  <type name="percentage" base="int32">
+    <doc>
+      A percentage.
+    </doc>
+  </type>
+
+
+Intentional types and static languages
+--------------------------------------
+
+The normal use of intentional types is as follows: while programming
+in some language, you read some API documentation and find out that
+some argument to a function is of type "geoloc"; you then go to the
+documentation of "geoloc" and read how a "geoloc" works in your
+language.
+
+For C++ with QVariants, say, a geoloc could simply remain a list of
+two or three doubles, or it could be a QVariant::RectF with the height
+being abused as the altitude, a new QMetaType could be invented, or a
+completely new class could be defined that can be converted to and
+from a QVariant (together with an appropriate QMetaType).  In any
+case, there will be a QVariant involved in there somewhere.
+
+In other words, we need C++ language bindings for the intentional
+types.  These language bindings are maintained together with the
+intentional types.
+
+At the language boundaries, such as when marshalling and unmarshalling
+values for a D-Bus message, a geoloc value needs to be converted to
+and from a list of doubles.  This conversion code is also maintained
+together with the language bindings.  In any case, the types are well
+enough documented that the necessary code can be written manually if
+needed.
+
+
+C with GVariant
+~~~~~~~~~~~~~~~
+
+- geoloc
+
+  typedef struct {
+    double latitude;
+    double longitude;
+    double altitude; // NaN if unknown.
+  } DGeoLoc;
+
+Rest is done with inheritance:
+
+- duration
+
+  typedef int64_t DDuration;
+
+- screen-edge
+
+  typedef char *DScreenEdge;
+
+- screen-edge-ints
+
+  typedef int DScreenEdgeInts;
+  #define D_SCREEN_EDGE_TOP    0
+  #define D_SCREEN_EDGE_LEFT   1
+  #define D_SCREEN_EDGE_RIGHT  2
+  #define D_SCREEN_EDGE_BOTTOM 3
+
+- percentage
+
+  typedef int DPercentage;
+
+- type
+
+  typedef GVariant DGType;
+
+These definitions are in libdesktoptypes, built from the desktop-types
+source package, which includes everything else as well, such as this
+document, bindings for C++ with QVariant, etc.
+
+There is also g_variant_from_geoloc, etc.
+
+Then, libcontextprovider has context_provider_set_geoloc,
+context_provider_set_duration, etc, probably as macros using
+g_variant_from_geoloc.  Maybe we can have support for doing this
+automatically.
+
+C++ with QVariant
+~~~~~~~~~~~~~~~~~
+
+Types should be compatible with C and have the same names.
+
+- geoloc
++
+  struct DGeoLoc {
+    double latitude;
+    double longitude;
+    double altitude; // NaN if unknown.
+
+    DGeoLoc();
+    DGeoLoc(double, double);
+    DGeoLoc(double, double, double);
+
+    DGeoLoc (QVariant);
+    operator QVariant ();
+  };
++
+Registered as "DGeoLoc" with QMetaType.
+
+- rest identical with C, except "type", hmm...
+
+This is in libdesktoptypes-qt, built from the same desktop-types as
+the C bindings.
+
+
+Run-time introspection for intentional types
+--------------------------------------------
+
+libdesktoptypes contains an API for reading a type definition
+repository, in /usr/share/desktop-types/.  It can lookup DType values
+given a name.
+
+A DType contains name, doc, parms, and base, of course.
+
+Existing introspection APIs need to be extended to return DTypes, as
+well.
