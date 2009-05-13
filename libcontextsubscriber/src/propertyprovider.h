@@ -39,6 +39,7 @@ class PropertyProvider : public QObject
 public:
     void subscribe(PropertyHandle* handle);
     void unsubscribe(PropertyHandle* handle);
+    static PropertyProvider* instance(const QDBusConnection::BusType busType, const QString& busName);
 
     QString getName() const;
 
@@ -60,6 +61,8 @@ private:
 
     QDBusConnection::BusType busType; ///< The bus type of the DBus provider connected to
     QString busName; ///< The bus name of the DBus provider connected to
+
+    static QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> providerInstances;
 
 private slots:
     void onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription);

@@ -184,3 +184,16 @@ PropertyProvider::~PropertyProvider()
     // Note: The SubscriberInterface* subscriber was constructed with "this" as parent.
     // It doesn't need to be deleted.
 }
+
+PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busType, const QString& busName)
+{
+    QPair<QDBusConnection::BusType, QString> lookupValue(busType, busName);
+    if (!providerInstances.contains(lookupValue))
+            providerInstances.insert(lookupValue,
+                                     new PropertyProvider(busType, busName));
+
+    qDebug() << "Returning provider instance for" << busType << ":" << busName;
+
+    return providerInstances[lookupValue];
+}
+

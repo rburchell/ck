@@ -7,7 +7,7 @@
 
 int main(int argc, char **argv)
 {
-    setenv("CONTEXT_PROVIDERS", "./context-providers.cdb", 0);
+    setenv("CONTEXT_PROVIDERS", ".", 0);
 
     QCoreApplication app(argc, argv);
 

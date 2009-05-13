@@ -31,6 +31,10 @@
 #include <QDebug>
 #include <fcntl.h>
 #include <string>
+#include <QPair>
+#include <QMap>
+
+QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvider::providerInstances;
 
 /*!
    \class PropertyHandle
@@ -84,36 +88,26 @@ void PropertyHandle::onSubscribeFinished(QSet<QString> keys)
 /// set up subscription and the \c provider pointer accordingly.
 void PropertyHandle::update_provider()
 {
-    qDebug() << "PropertyHandle::update_provider";
-    PropertyManager *manager = PropertyManager::instance();
-    int provider_index;
+    // 1. query from the info classes
+    // 2. use the big singleton to look it up
 
-    QVariant::Type new_type = QVariant::Invalid;
-    PropertyProvider *new_provider = 0;
+    PropertyProvider *newProvider =
+        PropertyProvider::instance(myInfo.providerDBusType(),
+                                   myInfo.providerDBusName());
 
-    if (manager->lookupProperty(myKey, provider_index, new_type, typeName, description))
-        new_provider = manager->getProvider (provider_index);
+    qDebug() << "PropertyHandle::update_provider()";
 
-    if (new_provider != myProvider) {
-        qDebug() << "New provider:" << myKey;
+    if (newProvider != myProvider) {
         if (subscribeCount > 0) {
             if (myProvider)
                 myProvider->unsubscribe(this);
-            myProvider = new_provider;
+            myProvider = newProvider;
             if (myProvider)
                myProvider->subscribe(this);
             // emit providerChanged();
         } else
-            myProvider = new_provider;
-    } else
-        qDebug() << "Same provider:" << myKey;
-
-    // XXX - what do we do when the type changes?
-
-    if (new_type != type && type != QVariant::Invalid)
-        qWarning() << "Type of" << myKey << "changed!";
-
-    type = new_type;
+            myProvider = newProvider;
+    }
 }
 
 QString PropertyHandle::key() const
