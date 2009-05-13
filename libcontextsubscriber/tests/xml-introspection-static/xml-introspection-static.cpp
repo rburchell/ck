@@ -6,12 +6,12 @@
 
 int main(int argc, char **argv)
 {
+    QCoreApplication app(argc, argv);
+
     setenv("CONTEXT_PROVIDERS", "./", 0);
 
     // Force the xml backend before anything else happens...
     ContextRegistryInfo::instance("xml");
-
-    QCoreApplication app(argc, argv);
     
     ContextRegistryInfoUnitTest test1;
     QTest::qExec(&test1);
