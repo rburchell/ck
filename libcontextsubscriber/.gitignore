@@ -20,6 +20,7 @@ Makefile
 # Tests
 /tests/xml-introspection-static/xml-introspection-static
 /tests/xml-introspection-dynamic/xml-introspection-dynamic
+/tests/cdb-introspection-static/cdb-introspection-static
 /tests/testclass/testclassunittest
 /tests/cdb/cdb
 
