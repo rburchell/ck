@@ -50,6 +50,7 @@ private:
 	QString currentKeyName;
 	QString currentKeyType;
 	QString currentKeyDoc;
+    QString currentBus;
 	
 	QString getAttrValue(const QXmlAttributes &attrs, const QString &attrName);
 };

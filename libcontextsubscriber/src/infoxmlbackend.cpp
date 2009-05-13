@@ -114,6 +114,14 @@ QString InfoXmlBackend::providerForKey(QString key) const
     return keyDataHash.value(key).provider;
 }
 
+QString InfoXmlBackend::providerDBusTypeForKey(QString key) const
+{
+    if (! keyDataHash.contains(key))
+        return "";
+
+    return keyDataHash.value(key).bus;
+}
+
 QString InfoXmlBackend::registryPath()
 {
     const char *regpath = getenv("CONTEXT_PROVIDERS");

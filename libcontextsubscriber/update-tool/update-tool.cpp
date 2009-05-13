@@ -25,6 +25,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QTime>
+#include <QDBusConnection>
 #include "contextregistryinfo.h"
 #include "contextpropertyinfo.h"
 #include "cdbwriter.h"
@@ -92,7 +93,14 @@ int main(int argc, char **argv)
         writer.replace(key + ":KEYDOC", keyInfo.doc());
 
         // Write provider
-        writer.replace(key + ":PROVIDER", keyInfo.providerDBusName());
+        writer.replace(key + ":KEYPROVIDER", keyInfo.providerDBusName());
+
+        // Write bus
+        QDBusConnection::BusType t = keyInfo.providerDBusType(); 
+        if (t == QDBusConnection::SessionBus)
+            writer.replace(key + ":KEYBUS", "session");
+        else if (t == QDBusConnection::SystemBus)
+            writer.replace(key + ":KEYBUS", "system");
     }
 
     foreach(QString provider, context->listProviders()) {

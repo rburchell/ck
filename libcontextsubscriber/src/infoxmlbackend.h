@@ -47,6 +47,7 @@ public:
     virtual QString typeForKey(QString key) const;
     virtual QString docForKey(QString key) const;
     virtual QString providerForKey(QString key) const;
+    virtual QString providerDBusTypeForKey(QString key) const;
     
     static QString registryPath();
 

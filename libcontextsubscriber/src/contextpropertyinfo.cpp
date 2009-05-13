@@ -56,8 +56,14 @@ QString ContextPropertyInfo::providerDBusName() const
 
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
-    // FIXME Stub for now!
-    return QDBusConnection::SessionBus;
+    QString busTypeName = InfoBackend::instance()->providerDBusTypeForKey(keyName);
+    
+    if (busTypeName == "session")
+        return QDBusConnection::SessionBus;
+    else if (busTypeName == "system")
+        return QDBusConnection::SystemBus;
+    else
+        return QDBusConnection::SessionBus;
 }
 
 /* Slots */

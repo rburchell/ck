@@ -30,6 +30,7 @@ struct InfoKeyData
 	QString type;
 	QString doc;
 	QString provider;
+    QString bus;
 };
 
 #endif // INFOKEYDATA_H

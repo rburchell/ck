@@ -41,6 +41,7 @@ public:
     virtual QString typeForKey(QString key) const = 0;
     virtual QString docForKey(QString key) const = 0;
     virtual QString providerForKey(QString key) const = 0;
+    virtual QString providerDBusTypeForKey(QString key) const = 0;
 
 signals:
     void keysChanged(QStringList currentKeys);

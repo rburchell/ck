@@ -37,6 +37,7 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
     if (inProvider == false && name == "provider") {
 		inProvider = true;
         currentProvider = getAttrValue(attrs, "service");
+        currentBus = getAttrValue(attrs, "bus");
 		return true;
 	}
 
@@ -92,6 +93,7 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
             data.type = currentKeyType;
             data.doc = currentKeyDoc;
             data.provider = currentProvider;
+            data.bus = currentBus;
             keyDataHash.insert(currentKeyName, data);
         }
 

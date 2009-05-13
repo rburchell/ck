@@ -66,7 +66,12 @@ QString InfoCdbBackend::docForKey(QString key) const
 
 QString InfoCdbBackend::providerForKey(QString key) const
 {
-    return reader.valueForKey(key + ":PROVIDER");
+    return reader.valueForKey(key + ":KEYPROVIDER");
+}
+
+QString InfoCdbBackend::providerDBusTypeForKey(QString key) const
+{
+    return reader.valueForKey(key + ":KEYBUS");
 }
 
 bool InfoCdbBackend::databaseExists()
