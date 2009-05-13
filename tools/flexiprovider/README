@@ -1,0 +1,22 @@
+Flexiprovider is a Python module/tool for testing Context Framework
+clients.  It allows to define properties and provides means to change
+their values during runtime.
+
+There are two examples: `simple.py' and `complex.py', which you may use
+to get a clue how to write your own provider, and a third one,
+`provide.py', which allows you to start up a provider from the command
+line, without writing any Python code.
+
+The interactive mode supports the following commands on the standard
+input (note that this is Python syntax, and it gets eval()ed):
+    set(property, value):  sets the given property
+    get(property):         prints the value of the property
+    reset(property):       resets the property
+    add(propertydesc):     adds a new property
+    info():                prints properties and their values
+    quit():                stops the whole thing
+
+The provider will stop also if stdin is closed.
+
+You may use ./rl.py to enjoy readline interface:
+  ./rl.py ./provide.py my.fake.provider
