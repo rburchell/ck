@@ -54,12 +54,11 @@ QString ContextPropertyInfo::providerDBusName() const
     return InfoBackend::instance()->providerForKey(keyName);
 }
 
-/*
-DBusBusType ContextPropertyMeta::providerDBusType() const
+QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
-    return DBUS_BUS_SESSION;
+    // FIXME Stub for now!
+    return QDBusConnection::SessionBus;
 }
-*/
 
 /* Slots */
 

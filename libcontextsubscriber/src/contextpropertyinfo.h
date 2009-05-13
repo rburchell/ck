@@ -25,6 +25,7 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
+#include <QDBusConnection>
 
 class ContextPropertyInfo : public QObject
 {
@@ -40,7 +41,7 @@ public:
     QString type() const;
     
     QString providerDBusName() const;
-    // DBusBusType providerDBusType() const;
+    QDBusConnection::BusType providerDBusType() const;
 
 private:
     QString keyName;
