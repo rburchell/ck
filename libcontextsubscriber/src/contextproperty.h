@@ -109,8 +109,6 @@
 #ifndef CONTEXTPROPERTY_H
 #define CONTEXTPROPERTY_H
 
-
-
 #include <QObject>
 #include <QVariant>
 #include <QString>
@@ -205,7 +203,7 @@ public:
     QVariant value(const QVariant &def) const;
     QVariant value() const;
 
-    ContextPropertyInfo info() const;
+    const ContextPropertyInfo& info() const;
 
     void subscribe () const;
     void unsubscribe () const;

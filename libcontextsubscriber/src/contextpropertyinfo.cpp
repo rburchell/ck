@@ -34,17 +34,6 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
     }
 }
 
-ContextPropertyInfo::ContextPropertyInfo(const ContextPropertyInfo &other)
-{
-    keyName = other.keyName;
-
-    if (keyName != "") {
-        sconnect(InfoBackend::instance(), SIGNAL(keyDataChanged(QString)),
-                 this, SLOT(onKeyDataChanged(QString)));
-    }
-}
-
-
 QString ContextPropertyInfo::key() const
 {
     return keyName;

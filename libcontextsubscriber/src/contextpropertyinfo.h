@@ -33,7 +33,6 @@ class ContextPropertyInfo : public QObject
 
 public:
     explicit ContextPropertyInfo(const QString &key, QObject *parent = 0);
-    ContextPropertyInfo(const ContextPropertyInfo& other);
 
     virtual ~ContextPropertyInfo() {}
 

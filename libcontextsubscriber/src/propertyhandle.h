@@ -22,7 +22,10 @@
 #ifndef PROPERTYHANDLE_H
 #define PROPERTYHANDLE_H
 
+#include "contextpropertyinfo.h"
+
 #include <QObject>
+#include <QSet>
 #include <QString>
 #include <QStringList>
 #include <QVector>
@@ -30,8 +33,6 @@
 #include <QHash>
 #include <cdb.h>
 #include <QFileSystemWatcher>
-
-#include "subscriberinterface.h"
 
 /* Handling context properties and their providers.
 
@@ -69,7 +70,7 @@ public:
     QVariant value() const;
     bool isSubscribePending() const;
     PropertyProvider* provider() const;
-    ContextPropertyInfo info() const;
+    const ContextPropertyInfo& info() const;
 
     void setValue(QVariant newValue);
 
@@ -95,6 +96,7 @@ private:
 
     QString myKey;
     QVariant myValue;
+    ContextPropertyInfo myInfo;
 
     friend class PropertyManager;
 };

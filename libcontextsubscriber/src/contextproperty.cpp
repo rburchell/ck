@@ -174,7 +174,7 @@ void ContextProperty::ignoreCommander()
     PropertyManager::instance()->disableCommanding();
 }
 
-ContextPropertyInfo ContextProperty::info() const
+const ContextPropertyInfo& ContextProperty::info() const
 {
     return priv->handle->info();
 }

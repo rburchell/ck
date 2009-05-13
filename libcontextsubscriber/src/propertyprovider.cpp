@@ -24,7 +24,7 @@
 #include "propertyhandle.h"
 #include "propertymanager.h"
 #include "sconnect.h"
-
+#include "subscriberinterface.h"
 
 /*!
    \class PropertyProvider

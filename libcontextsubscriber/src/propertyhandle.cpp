@@ -44,7 +44,7 @@
 /// Constructs a new instance. ContextProperty creates the handles, you
 /// don't have to (and can't) call this constructor ever.
 PropertyHandle::PropertyHandle(const QString& key)
-    : myKey(key), myProvider(0), type(QVariant::Invalid), subscribeCount(0), subscribePending(false)
+    : myKey(key), myProvider(0), myInfo(key), type(QVariant::Invalid), subscribeCount(0), subscribePending(false)
 {
     update_provider();
 }
@@ -143,7 +143,7 @@ void PropertyHandle::setValue(QVariant newValue)
     emit valueChanged();
 }
 
-ContextPropertyInfo PropertyHandle::info() const
+const ContextPropertyInfo& PropertyHandle::info() const
 {
-    return ContextPropertyInfo(myKey);
+    return myInfo;
 }
