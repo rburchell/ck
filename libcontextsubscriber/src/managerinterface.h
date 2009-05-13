@@ -26,9 +26,16 @@
 #include <QString>
 #include <QtDBus>
 
-/*
- * Proxy class for interface org.freedesktop.ContextKit.Manager
- */
+/*!
+  \class ManagerInterface
+
+  \brief Proxy class for using the DBus interface
+  org.freedesktop.ContextKit.Manager asynchronously.
+
+  Implements methods for constructing the interface objects (given the DBus
+  type, session or system, and bus name) and calling the function GetSubscriber
+  asynchronously.
+*/
 
 class ManagerInterface : public QObject
 {
@@ -42,11 +49,11 @@ public:
 
     void getSubscriber();
 
-private slots:
-    void onGetSubscriberFinished(QDBusPendingCallWatcher* watcher);
-
 signals:
     void getSubscriberFinished(QString objectPath);
+
+private slots:
+    void onGetSubscriberFinished(QDBusPendingCallWatcher* watcher);
 
 private:
     QDBusInterface* iface;

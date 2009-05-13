@@ -27,8 +27,8 @@
 
 const QString SubscriberSignallingInterface::interfaceName = "org.freedesktop.ContextKit.Subscriber";
 
-/// Constructs the subscriber interface. Connects to the Subscriber object
-/// specified by the bus type (session or system bus), the bus name and object path.
+/// Constructs the SubscriberInterface. Connects to the DBus object specified
+/// by \a busType (session or system bus), \a busName and \a objectPath.
 SubscriberInterface::SubscriberInterface(
     const QDBusConnection::BusType busType, const QString &busName, const QString& objectPath, QObject *parent)
     : iface(0)
@@ -49,6 +49,8 @@ SubscriberInterface::SubscriberInterface(
         qCritical() << "Couldn't connect to DBUS: ";
         return;
     }
+
+    // Create the DBus interface
     iface = new SubscriberSignallingInterface(busName, objectPath, connection, this);
     sconnect(iface, SIGNAL(Changed(const QMap<QString, QVariant>&, const QStringList &)),
              this, SLOT(onChanged(const QMap<QString, QVariant>&, const QStringList &)));
@@ -57,9 +59,16 @@ SubscriberInterface::SubscriberInterface(
 /// Calls the Subscribe function over DBus asynchronously.
 void SubscriberInterface::subscribe(QStringList keys)
 {
-    if (iface == 0 || keys.size() == 0) {
+    if (iface == 0) {
+        // FIXME: signalling the error?
         return;
     }
+
+    if (keys.size() == 0) {
+        // FIXME: signalling that the request finished?
+        return;
+    }
+
     // Construct the asynchronous call
     QDBusPendingCall subscribeCall = iface->asyncCall("Subscribe", keys);
     SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(subscribeCall, this);
@@ -76,7 +85,7 @@ void SubscriberInterface::unsubscribe(QStringList keys)
     }
     // Construct the asynchronous call
     iface->asyncCall("Unsubscribe", keys);
-    // we are just not interested in the possible errors, because we can't do anything about them
+    // The possible errors are not tracked, because we can't do anything if Unsubscribe fails.
 }
 
 /// Processes the results of the Changed signal which comes over DBus.
@@ -99,7 +108,11 @@ QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QV
     return map;
 }
 
-/// Is called when the asynchronous DBus call to Subscribe has finished.
+/// Is called when the asynchronous DBus call to Subscribe has finished. Emits
+/// the signal valuesChanged with the return values of the subscribed keys.
+// FIXME: Probably we need another singal for subscribeFinished, and then yet
+// another for the error case.
+// FIXME: Would we like to check that the reply contains only the subscribed keys?
 void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
 {
     qDebug() << "onSubscribeFinished";
@@ -119,11 +132,15 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
      }
 }
 
-SubscriberSignallingInterface::SubscriberSignallingInterface(const QString &dbusName, const QString& objectPath, const QDBusConnection &connection, QObject *parent)
+/// Constructs the SubscriberSignallingInterface. The only operation needed is
+/// constructing the parent QDBusAbstractInterface.
+SubscriberSignallingInterface::SubscriberSignallingInterface(const QString &dbusName, const QString& objectPath,
+                                                             const QDBusConnection &connection, QObject *parent)
     : QDBusAbstractInterface(dbusName, objectPath, interfaceName.toStdString().c_str(), connection, parent)
 {
 }
 
+/// Destroys the SubscriberSignallingInterface
 SubscriberSignallingInterface::~SubscriberSignallingInterface()
 {
 }

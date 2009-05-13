@@ -26,7 +26,8 @@
 const QString ManagerInterface::interfaceName = "org.freedesktop.ContextKit.Manager";
 const QString ManagerInterface::objectPath = "/org/freedesktop/ContextKit/Manager";
 
-
+/// Constructs the ManagerInterface. Connects to the DBus object specified by
+/// \a busType (session or system bus) and \a busName.
 ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent)
     : iface(0)
 {
@@ -46,22 +47,28 @@ ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const
         qCritical() << "Couldn't connect to DBUS: ";
         return;
     }
+
+    // Create the DBus interface
     iface = new QDBusInterface(busName, objectPath, interfaceName, connection, this);
 }
 
+/// Calls the GetSubscriber function over DBus asynchronously.
 void ManagerInterface::getSubscriber()
 {
     if (iface == 0) {
-        return;
+        return; // FIXME: emitting some kind of error signal also here?
     }
 
+    // Construct the asynchronous call
     QDBusPendingCall getSubscriberCall = iface->asyncCall("GetSubscriber");
     SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(getSubscriberCall, this);
-
     sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
              this, SLOT(onGetSubscriberFinished(QDBusPendingCallWatcher *)));
 }
 
+/// Is called when the asynchronous call to GetSubscriber has finished. Emits
+/// the signal getSubscriberFinished if the call finished successfully.
+// FIXME: Probably the error also needs to be signalled.
 void ManagerInterface::onGetSubscriberFinished(QDBusPendingCallWatcher* watcher)
 {
      QDBusPendingReply<QDBusObjectPath> reply = *watcher;
