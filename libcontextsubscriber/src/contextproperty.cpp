@@ -163,8 +163,8 @@ void ContextProperty::waitForSubscription() const
     if (!priv->subscribed)
         return;
 
-    while (!priv->handle->subscribed())
-        QCoreApplication::processEvents();
+    while (priv->handle->isSubscribePending())
+        QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
 }
 
 /// Sets the Context Property immune to 'commanding' (overriding

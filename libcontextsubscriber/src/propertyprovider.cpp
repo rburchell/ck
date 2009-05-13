@@ -33,31 +33,54 @@
    handles subscriptions with the properties of that provider.
 */
 
-void PropertyProvider::getSubscriberFinished(QString objectPath)
+void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 {
-    subscriber = new SubscriberInterface(busType, busName, objectPath, this);
+    qDebug() << "PropertyProvider::onGetSubscriberFinished" << objectPath;
+    if (objectPath != "") {
+        // GetSubscriber was successful
+        getSubscriberFailed = false;
 
-    // we can keep this connected all the time
-    sconnect(subscriber,
-             SIGNAL(valuesChanged(QMap<QString, QVariant>, bool)),
-             this,
-             SLOT(onValuesChanged(QMap<QString, QVariant>, bool)));
+        subscriber = new SubscriberInterface(busType, busName, objectPath, this);
 
-    idleTimer.start();
+        sconnect(subscriber,
+                 SIGNAL(valuesChanged(QMap<QString, QVariant>, bool)),
+                 this,
+                 SLOT(onValuesChanged(QMap<QString, QVariant>, bool)));
+        sconnect(subscriber,
+                 SIGNAL(subscribeFinished(QSet<QString>)),
+                 this,
+                 SLOT(onSubscribeFinished(QSet<QString>)));
+
+        idleTimer.start();
+    }
+    else {
+        // GetSubscriber failed
+        getSubscriberFailed = true;
+        emit subscribeFinished(toSubscribe);
+        toSubscribe.clear();
+        toUnsubscribe.clear();
+    }
+}
+
+void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
+{
+    qDebug() << "PropertyProvider::onSubscribeFinished" << keys;
+    emit subscribeFinished(keys);
 }
 
 
 /// Constructs a new instance. ContextProperty handles providers for
 /// you, no need to (and can't) call this constructor.
 PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
-    : busType(busType), busName(busName), managerInterface(busType, busName, this), subscriber(0)
+    : busType(busType), busName(busName), managerInterface(busType, busName, this), subscriber(0),
+      getSubscriberFailed(false)
 {
     // Setup idle timer
     idleTimer.setSingleShot(true);
     idleTimer.setInterval(0);
 
     // Call GetSubscriber asynchronously
-    sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(getSubscriberFinished(QString)));
+    sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
     sconnect(&idleTimer, SIGNAL(timeout()),
              this, SLOT(idleHandler()));
     managerInterface.getSubscriber();
@@ -73,6 +96,17 @@ QString PropertyProvider::getName() const
 /// entered the next time.
 void PropertyProvider::subscribe(PropertyHandle* handle)
 {
+    qDebug() << "PropertyProvider::subscribe";
+
+    if (getSubscriberFailed) {
+        qDebug() << "GetSubscriber has failed previously";
+        // The subscription will never be successful
+        QSet<QString> toEmit;
+        toEmit.insert(handle->key());
+        emit subscribeFinished(toEmit);
+        return;
+    }
+
     toSubscribe.insert(handle->key());
     toUnsubscribe.remove(handle->key());
 
@@ -83,8 +117,8 @@ void PropertyProvider::subscribe(PropertyHandle* handle)
 void PropertyProvider::idleHandler()
 {
     if (subscriber != 0) {
-        subscriber->subscribe(toSubscribe.toList());
-        subscriber->unsubscribe(toUnsubscribe.toList());
+        subscriber->subscribe(toSubscribe);
+        subscriber->unsubscribe(toUnsubscribe);
         toSubscribe.clear();
         toUnsubscribe.clear();
     }

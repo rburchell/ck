@@ -48,11 +48,12 @@ public:
     SubscriberInterface(const QDBusConnection::BusType busType, const QString& busName,
                         const QString& objectPath, QObject* parent = 0);
 
-    void subscribe(QStringList keys);
-    void unsubscribe(QStringList keys);
+    void subscribe(QSet<QString> keys);
+    void unsubscribe(QSet<QString> keys);
 
 signals:
     void valuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
+    void subscribeFinished(QSet<QString> keys);
 
 private slots:
     void onSubscribeFinished(QDBusPendingCallWatcher* watcher);

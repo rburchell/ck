@@ -22,6 +22,7 @@
 #include "propertyhandle.h"
 #include "propertyprovider.h"
 #include "propertymanager.h"
+#include "sconnect.h"
 
 #include <QStringList>
 #include <QHash>
@@ -42,7 +43,7 @@
 /// Constructs a new instance. ContextProperty creates the handles, you
 /// don't have to (and can't) call this constructor ever.
 PropertyHandle::PropertyHandle(const QString& key)
-    : myKey(key), myProvider(0), type(QVariant::Invalid), subscribeCount(0)
+    : myKey(key), myProvider(0), type(QVariant::Invalid), subscribeCount(0), subscribePending(false)
 {
     update_provider();
 }
@@ -52,6 +53,9 @@ void PropertyHandle::subscribe()
 {
     ++subscribeCount;
     if (subscribeCount == 1 && myProvider) {
+        subscribePending = true;
+        sconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
+                 this, SLOT(onSubscribeFinished(QSet<QString>)));
         myProvider->subscribe(this);
     }
 }
@@ -61,19 +65,18 @@ void PropertyHandle::unsubscribe()
 {
     --subscribeCount;
     if (subscribeCount == 0 && myProvider) {
+        subscribePending = false;
         myProvider->unsubscribe(this);
+        disconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
+                   this, SLOT(onSubscribeFinished(QSet<QString>)));
     }
 }
 
-/// True if number of active subscriptions to this node is greater
-/// than zero and we have received the reply to the Subscribe call on
-/// D-Bus.
-bool PropertyHandle::subscribed() const
+void PropertyHandle::onSubscribeFinished(QSet<QString> keys)
 {
-    /* XXX - subscription is synchronous right now, so we don't need to
-       check for that.
-     */
-    return (subscribeCount > 0); // FIXME: Forward waiting to the provider
+    if (keys.contains(myKey)) {
+        subscribePending = false;
+    }
 }
 
 /// Check the registry for the provider providing this property (named \c key) and
@@ -134,6 +137,11 @@ QVariant PropertyHandle::value() const
 PropertyProvider* PropertyHandle::provider() const
 {
     return myProvider;
+}
+
+bool PropertyHandle::isSubscribePending() const
+{
+    return subscribePending;
 }
 
 /// Changes the value of the property and emits the valueChanged signal.

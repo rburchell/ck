@@ -71,18 +71,19 @@ void ManagerInterface::getSubscriber()
 // FIXME: Probably the error also needs to be signalled.
 void ManagerInterface::onGetSubscriberFinished(QDBusPendingCallWatcher* watcher)
 {
-     QDBusPendingReply<QDBusObjectPath> reply = *watcher;
-     if (reply.isError()) {
-         // Possible causes of the error:
-         // The provider is not running
-         // The provider didn't implement the needed interface + function
-         // The function resulted in an error
-         qWarning() << "Provider error while getting the subscriber object:" << reply.error().message();
-     } else {
-         QDBusObjectPath path = reply.argumentAt<0>();
-         qDebug() << path.path();
-
-         emit getSubscriberFinished(path.path());
-     }
+    QString pathString = "";
+    QDBusPendingReply<QDBusObjectPath> reply = *watcher;
+    if (reply.isError()) {
+        // Possible causes of the error:
+        // The provider is not running
+        // The provider didn't implement the needed interface + function
+        // The function resulted in an error
+        qWarning() << "Provider error while getting the subscriber object:" << reply.error().message();
+    } else {
+        QDBusObjectPath path = reply.argumentAt<0>();
+        pathString = path.path();
+        qDebug() << pathString;
+    }
+    emit getSubscriberFinished(pathString);
 }
 

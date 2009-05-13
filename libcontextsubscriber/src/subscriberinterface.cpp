@@ -57,34 +57,35 @@ SubscriberInterface::SubscriberInterface(
 }
 
 /// Calls the Subscribe function over DBus asynchronously.
-void SubscriberInterface::subscribe(QStringList keys)
+void SubscriberInterface::subscribe(QSet<QString> keys)
 {
-    if (iface == 0) {
-        // FIXME: signalling the error?
-        return;
-    }
-
-    if (keys.size() == 0) {
-        // FIXME: signalling that the request finished?
+    qDebug() << "SubscriberInterface::subscribe" << keys;
+    if (iface == 0 || keys.size() == 0) {
+        qDebug() << "Subscriber cannot subscribe -> emitting subscribeFinished()";
+        emit subscribeFinished(keys);
         return;
     }
 
     // Construct the asynchronous call
-    QDBusPendingCall subscribeCall = iface->asyncCall("Subscribe", keys);
+    QStringList keyList = keys.toList();
+    QDBusPendingCall subscribeCall = iface->asyncCall("Subscribe", keyList);
     SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(subscribeCall, this);
+    watcher->setProperty("keysToSubscribe", keyList);
 
     sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
              this, SLOT(onSubscribeFinished(QDBusPendingCallWatcher *)));
 }
 
 /// Calls the Unsubscribe function over DBus asynchronously.
-void SubscriberInterface::unsubscribe(QStringList keys)
+void SubscriberInterface::unsubscribe(QSet<QString> keys)
 {
     if (iface == 0 || keys.size() == 0) {
         return;
     }
     // Construct the asynchronous call
-    iface->asyncCall("Unsubscribe", keys);
+    QStringList keyList = keys.toList();
+
+    iface->asyncCall("Unsubscribe", keyList);
     // The possible errors are not tracked, because we can't do anything if Unsubscribe fails.
 }
 
@@ -110,9 +111,6 @@ QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QV
 
 /// Is called when the asynchronous DBus call to Subscribe has finished. Emits
 /// the signal valuesChanged with the return values of the subscribed keys.
-// FIXME: Probably we need another singal for subscribeFinished, and then yet
-// another for the error case.
-// FIXME: Would we like to check that the reply contains only the subscribed keys?
 void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
 {
     qDebug() << "onSubscribeFinished";
@@ -130,7 +128,9 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
         // FIXME: the protocol should be better, this is just a workaround
         emit valuesChanged(mergeNullsWithMap(subscribeTimeValues, unknowns), true);
     }
-    emit subscribeFinished(subscribeTimeValues.keys());
+    qDebug() << "***SubscriberInterface::onSubscribeFinished" << watcher->property("keysToSubscribe");
+    QStringList keys = watcher->property("keysToSubscribe").toStringList();
+    emit subscribeFinished(keys.toSet());
 }
 
 /// Constructs the SubscriberSignallingInterface. The only operation needed is

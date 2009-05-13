@@ -63,11 +63,11 @@ class PropertyHandle : public QObject
 public:
     void subscribe();
     void unsubscribe();
-    bool subscribed() const;
 
     QString providerName() const; // FIXME: remove?
     QString key() const;
     QVariant value() const;
+    bool isSubscribePending() const;
     PropertyProvider* provider() const;
 
     void setValue(QVariant newValue);
@@ -79,12 +79,16 @@ public:
 signals:
     void valueChanged();
 
+private slots:
+    void onSubscribeFinished(QSet<QString> keys);
+
 private:
     PropertyHandle(const QString& key);
 
     PropertyProvider *myProvider; ///< Provider of this property
     QVariant::Type type; ///< QVariant type of this property according to registry
     unsigned int subscribeCount; ///< Number of subscribed ContextProperty objects subscribed to this property
+    bool subscribePending;
 
     void update_provider();
 

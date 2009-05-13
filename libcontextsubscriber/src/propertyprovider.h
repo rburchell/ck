@@ -42,6 +42,9 @@ public:
 
     QString getName() const;
 
+signals:
+    void subscribeFinished(QSet<QString> keys);
+
 private:
     PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
     ~PropertyProvider();
@@ -50,6 +53,7 @@ private:
 
     QTimer idleTimer; ///< For scheduling subscriptions / unsubscriptions as idle processing
     ManagerInterface managerInterface; ///< The DBus interface for the Manager object
+    bool getSubscriberFailed;
 
     QSet<QString> toSubscribe; ///< Keys pending for subscription
     QSet<QString> toUnsubscribe; ///< Keys pending for unsubscription
@@ -59,7 +63,8 @@ private:
 
 private slots:
     void onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
-    void getSubscriberFinished(QString objectPath);
+    void onGetSubscriberFinished(QString objectPath);
+    void onSubscribeFinished(QSet<QString> keys);
     void idleHandler();
 
     friend class PropertyManager; // FIXME: check if this can be removed
