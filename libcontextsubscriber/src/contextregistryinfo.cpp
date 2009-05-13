@@ -27,7 +27,7 @@ ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
 
 /* Public */
 
-ContextRegistryInfo* ContextRegistryInfo::instance()
+ContextRegistryInfo* ContextRegistryInfo::instance(const QString &backendName)
 {
     static QMutex mutex;
     if (!registryInstance)
@@ -35,6 +35,7 @@ ContextRegistryInfo* ContextRegistryInfo::instance()
         mutex.lock();
  
         if (! registryInstance) {
+            InfoBackend::instance(backendName);
             registryInstance = new ContextRegistryInfo;
             sconnect(InfoBackend::instance(), SIGNAL(keysChanged(QStringList)), 
                      registryInstance, SLOT(onKeysChanged(QStringList)));

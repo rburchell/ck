@@ -21,18 +21,27 @@
 
 #include "infobackend.h"
 #include "infoxmlbackend.h"
+#include "infocdbbackend.h"
 
 InfoBackend* InfoBackend::backendInstance = NULL;
 
-InfoBackend* InfoBackend::instance()
+InfoBackend* InfoBackend::instance(const QString &backendName)
 {
     static QMutex mutex;
     if (!backendInstance)
     {
         mutex.lock();
 
-        if (! backendInstance)
-            backendInstance = new InfoXmlBackend; // For now hard-coded...
+        if (! backendInstance) {
+            if (backendName == "xml")
+                backendInstance = new InfoXmlBackend;
+            else if (backendName == "cdb")
+                backendInstance = new InfoCdbBackend;
+            else {
+                // FIXME Auto-detect if cdb file exists
+                backendInstance = new InfoXmlBackend;
+            }
+        }
  
         mutex.unlock();
     }

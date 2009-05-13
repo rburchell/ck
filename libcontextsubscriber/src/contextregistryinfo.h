@@ -33,7 +33,7 @@ class ContextRegistryInfo : public QObject
 
 public:
 
-    static ContextRegistryInfo* instance();
+    static ContextRegistryInfo* instance(const QString &backendName = "");
  
     QStringList listKeys() const;
     QStringList listKeys(QString providername) const;

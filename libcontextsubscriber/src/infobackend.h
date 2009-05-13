@@ -33,7 +33,7 @@ class InfoBackend : public QObject
 
 public:
 
-    static InfoBackend* instance();
+    static InfoBackend* instance(const QString &backendName = "");
     virtual QString name() const = 0;
 	virtual QStringList listKeys() const = 0;
     virtual QStringList listKeys(QString providername) const = 0;
