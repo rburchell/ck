@@ -1,8 +1,13 @@
-contextkit (0.1.5-2~unreleased) unstable; urgency=low
+contextkit (0.1.6-1) unstable; urgency=low
 
-  * 
+  New upstream release.
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 16 Apr 2009 17:17:18 +0300
+  * contextd provides hal-based battery properties.
+  * Couple of bug fixes related to properties handling.
+
+  * Implemented: SWP#CntFr-39.
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 13 May 2009 19:53:34 +0300
 
 contextkit (0.1.5-1) unstable; urgency=low
 
