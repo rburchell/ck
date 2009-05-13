@@ -129,7 +129,8 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
 
         // FIXME: the protocol should be better, this is just a workaround
         emit valuesChanged(mergeNullsWithMap(subscribeTimeValues, unknowns), true);
-     }
+    }
+    emit subscribeFinished(subscribeTimeValues.keys());
 }
 
 /// Constructs the SubscriberSignallingInterface. The only operation needed is
