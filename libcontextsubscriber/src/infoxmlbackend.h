@@ -48,7 +48,7 @@ public:
     virtual QString docForKey(QString key) const;
     virtual QString providerForKey(QString key) const;
 
-public slots:
+private slots:
     void onDirectoryChanged(const QString &path);
 
 private:
