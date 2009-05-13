@@ -46,10 +46,7 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
         currentKeyName = "";
         currentKeyType = "";
         currentKeyDoc = "";
-	    
-        QString keyName = getAttrValue(attrs, "name");
-		if (keyName != "")
-			currentKeyName = "Context." + keyName;
+        currentKeyName = getAttrValue(attrs, "name");
 
         inKey = true;
        		

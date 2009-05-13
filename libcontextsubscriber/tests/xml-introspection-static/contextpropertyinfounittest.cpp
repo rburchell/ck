@@ -5,9 +5,9 @@
 
 void ContextPropertyInfoUnitTest::checkLowBAttery()
 {
-    ContextPropertyInfo prop("Context.Battery.LowBattery");
+    ContextPropertyInfo prop("Battery.LowBattery");
 
-    QCOMPARE(prop.key(), QString("Context.Battery.LowBattery"));
+    QCOMPARE(prop.key(), QString("Battery.LowBattery"));
     QCOMPARE(prop.doc(), QString("This is true when battery is low"));
     QCOMPARE(prop.type(), QString("TRUTH"));
     QCOMPARE(prop.providerDBusName(), QString("org.freedesktop.ContextKit.contextd1"));

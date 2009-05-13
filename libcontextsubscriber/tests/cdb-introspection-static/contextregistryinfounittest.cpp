@@ -15,9 +15,9 @@ void ContextRegistryInfoUnitTest::listKeys()
     QCOMPARE(list.size(), 3);
 
     QStringList expectedKeys;
-    expectedKeys << "Context.Battery.ChargePercentage";
-    expectedKeys << "Context.Battery.LowBattery";
-    expectedKeys << "Context.Battery.Charging";
+    expectedKeys << "Battery.ChargePercentage";
+    expectedKeys << "Battery.LowBattery";
+    expectedKeys << "Battery.Charging";
 
     foreach (QString key, list) {
         if (expectedKeys.contains(key))
@@ -33,8 +33,8 @@ void ContextRegistryInfoUnitTest::listKeysForProvider()
     QCOMPARE(list.size(), 2);
 
     QStringList expectedKeys;
-    expectedKeys << "Context.Battery.ChargePercentage";
-    expectedKeys << "Context.Battery.LowBattery";
+    expectedKeys << "Battery.ChargePercentage";
+    expectedKeys << "Battery.LowBattery";
 
     foreach (QString key, list) {
         if (expectedKeys.contains(key))
