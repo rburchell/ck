@@ -116,7 +116,8 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
 
         // FIXME: the protocol should be better, this is just a workaround
         emit valuesChanged(mergeNullsWithMap(subscribeTimeValues, unknowns), true);
-     }
+    }
+    emit subscribeFinished(subscribeTimeValues.keys());
 }
 
 SubscriberSignallingInterface::SubscriberSignallingInterface(const QString &dbusName, const QString& objectPath, const QDBusConnection &connection, QObject *parent)
