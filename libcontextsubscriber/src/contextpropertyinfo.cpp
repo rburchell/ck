@@ -29,10 +29,21 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
     keyName = key;
 
     if (key != "") {
-        sconnect(InfoBackend::instance(), SIGNAL(keyDataChanged(QString)), 
+        sconnect(InfoBackend::instance(), SIGNAL(keyDataChanged(QString)),
                  this, SLOT(onKeyDataChanged(QString)));
     }
 }
+
+ContextPropertyInfo::ContextPropertyInfo(const ContextPropertyInfo &other)
+{
+    keyName = other.keyName;
+
+    if (keyName != "") {
+        sconnect(InfoBackend::instance(), SIGNAL(keyDataChanged(QString)),
+                 this, SLOT(onKeyDataChanged(QString)));
+    }
+}
+
 
 QString ContextPropertyInfo::key() const
 {

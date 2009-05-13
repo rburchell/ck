@@ -28,7 +28,6 @@ class ContextProperty;
 struct ContextPropertyPrivate
 {
     PropertyHandle *handle; ///< The common handle behind this context property
-    ContextProperty *pubInterface;
     bool subscribed; ///< True, if we are subscribed to the handle behind us
 };
 

@@ -24,6 +24,7 @@
 #include "propertyhandle.h"
 #include "propertymanager.h"
 #include "sconnect.h"
+#include "contextpropertyinfo.h"
 
 #include <strings.h>
 #include <QByteArray>
@@ -42,7 +43,6 @@ void ContextProperty::init(const QString &key)
 {
     priv = new ContextPropertyPrivate;
 
-    priv->pubInterface = this;
     priv->handle = PropertyManager::instance()->getHandle(key);
     priv->subscribed = false;
 
@@ -172,4 +172,9 @@ void ContextProperty::waitForSubscription() const
 void ContextProperty::ignoreCommander()
 {
     PropertyManager::instance()->disableCommanding();
+}
+
+ContextPropertyInfo ContextProperty::info() const
+{
+    return priv->handle->info();
 }

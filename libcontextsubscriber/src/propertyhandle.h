@@ -55,6 +55,7 @@
 class PropertyHandle;
 class PropertyProvider;
 class PropertyManager;
+class ContextPropertyInfo;
 
 class PropertyHandle : public QObject
 {
@@ -64,11 +65,11 @@ public:
     void subscribe();
     void unsubscribe();
 
-    QString providerName() const; // FIXME: remove?
     QString key() const;
     QVariant value() const;
     bool isSubscribePending() const;
     PropertyProvider* provider() const;
+    ContextPropertyInfo info() const;
 
     void setValue(QVariant newValue);
 

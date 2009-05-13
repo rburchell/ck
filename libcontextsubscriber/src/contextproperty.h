@@ -109,12 +109,14 @@
 #ifndef CONTEXTPROPERTY_H
 #define CONTEXTPROPERTY_H
 
+
+
 #include <QObject>
 #include <QVariant>
 #include <QString>
 
 class ContextPropertyPrivate;
-
+class ContextPropertyInfo;
 
 /*!
    \class ContextPropertyPrivate
@@ -203,7 +205,7 @@ public:
     QVariant value(const QVariant &def) const;
     QVariant value() const;
 
-    //ContextPropertyInfo info() const; //FIXME: enable when appropriate
+    ContextPropertyInfo info() const;
 
     void subscribe () const;
     void unsubscribe () const;

@@ -23,6 +23,7 @@
 #include "propertyprovider.h"
 #include "propertymanager.h"
 #include "sconnect.h"
+#include "contextpropertyinfo.h"
 
 #include <QStringList>
 #include <QHash>
@@ -115,15 +116,6 @@ void PropertyHandle::update_provider()
     type = new_type;
 }
 
-/// Return the DBus name and bus type of the provider providing this property.
-QString PropertyHandle::providerName() const
-{
-    if (myProvider) {
-        return myProvider->getName();
-    }
-    return "";
-}
-
 QString PropertyHandle::key() const
 {
     return myKey;
@@ -149,4 +141,9 @@ void PropertyHandle::setValue(QVariant newValue)
 {
     myValue = newValue;
     emit valueChanged();
+}
+
+ContextPropertyInfo PropertyHandle::info() const
+{
+    return ContextPropertyInfo(myKey);
 }
