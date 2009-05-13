@@ -1,6 +1,8 @@
 /* value_compare.vala
 *
-* Copyright (C) 2008  Rob Taylor
+* Copyright (C) 2008, 2009 Nokia Corporation.
+*
+* Contact: Marius Vollmer <marius.vollmer@nokia.com>
 *
 * This library is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as published by
