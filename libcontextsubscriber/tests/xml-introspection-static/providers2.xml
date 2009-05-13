@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<provider bus="session" service="org.freedesktop.ContextKit.contextd2">
+<provider bus="system" service="org.freedesktop.ContextKit.contextd2">
   <key name="Battery.Charging">
     <type>TRUTH</type>
     <doc>

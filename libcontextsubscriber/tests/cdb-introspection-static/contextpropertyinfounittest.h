@@ -29,5 +29,6 @@ class ContextPropertyInfoUnitTest : public QObject
 
 private slots:
     void checkLowBAttery();
+    void checkSystemBus();
 };
 

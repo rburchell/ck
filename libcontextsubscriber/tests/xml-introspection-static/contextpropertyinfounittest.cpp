@@ -32,6 +32,13 @@ void ContextPropertyInfoUnitTest::checkLowBAttery()
     QCOMPARE(prop.doc(), QString("This is true when battery is low"));
     QCOMPARE(prop.type(), QString("TRUTH"));
     QCOMPARE(prop.providerDBusName(), QString("org.freedesktop.ContextKit.contextd1"));
+    QCOMPARE(prop.providerDBusType(), QDBusConnection::SessionBus);
+}
+
+void ContextPropertyInfoUnitTest::checkSystemBus()
+{
+    ContextPropertyInfo prop("Battery.Charging");
+    QCOMPARE(prop.providerDBusType(), QDBusConnection::SystemBus);
 }
 
 #include "moc_contextpropertyinfounittest_cpp.cpp"
