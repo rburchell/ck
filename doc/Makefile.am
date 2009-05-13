@@ -12,7 +12,7 @@ html_DATA = $(html_EXTRA) \
 html-local: $(html_EXTRA) $(html_ASCIIDOCS:.txt=.html)
 
 %.html: %.txt
-	asciidoc -f myfilter.conf $^
+	asciidoc -a toc --unsafe -f myfilter.conf $^
 
 EXTRA_DIST = $(html_ASCIIDOCS) \
              $(html_DATA) \
