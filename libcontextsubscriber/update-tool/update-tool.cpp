@@ -19,16 +19,7 @@
  *
  */
 
-#include <QCoreApplication>
-#include <QString>
-#include <QStringList>
-#include <QDebug>
-#include <QDir>
-#include <QTime>
-#include <QDBusConnection>
-#include "contextregistryinfo.h"
-#include "contextpropertyinfo.h"
-#include "cdbwriter.h"
+#include "update-tool.h"
 
 /* Make sure the given directory exists, is readable etc. 
    If not, bail out with proper error. */
@@ -58,6 +49,21 @@ QString genTempName(const QDir &dir)
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
+    QStringList args = app.arguments();
+
+    // Check args etc
+    QString path;
+
+    // We first try to use first argument if present, then CONTEXT_PROVIDERS env, 
+    // lastly -- the compiled-in default path.
+    if (args.size() > 1)
+        path = args.at(1);
+    else if (getenv("CONTEXT_PROVIDERS"))
+        path = QString(getenv("CONTEXT_PROVIDERS"));
+    else
+        path = QString(DEFAULT_REGISTRY_PATH);
+
+    printf("Updating from: '%s'\n", path.toUtf8().constData());
 
     // Force the xml backend
     ContextRegistryInfo *context = ContextRegistryInfo::instance("xml");
@@ -66,17 +72,10 @@ int main(int argc, char **argv)
     QTime midnight(0, 0, 0);
     qsrand(midnight.secsTo(QTime::currentTime()));
 
-    const char *path = getenv("CONTEXT_PROVIDERS");
-    if (! path) {
-        printf ("ERROR: You need to specify CONTEXT_PROVIDERS env var!\n");
-        exit (128);
-    }
-
     QDir dir(path);
     checkDirectory(dir);
     QString tmpDbPath = genTempName(dir);
     QString finalDbPath = dir.absoluteFilePath("context-providers.cdb"); 
-    qDebug() << tmpDbPath;
 
     CDBWriter writer(tmpDbPath);
 
@@ -119,5 +118,6 @@ int main(int argc, char **argv)
     QByteArray finalDbUtf8Data = finalDbPath.toUtf8();
 
     rename(tmpDbUtf8Data.constData(), finalDbUtf8Data.constData()); 
+    printf("Generated: '%s'\n", finalDbUtf8Data.constData());
 }
 

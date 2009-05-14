@@ -71,6 +71,7 @@ AC_CONFIG_FILES([Makefile
          src/infobackendconfig.h
 		 cli/Makefile
          update-tool/Makefile
+         update-tool/update-tool.h
 		 tests/Makefile
          tests/xml-introspection-static/Makefile
          tests/cdb-introspection-static/Makefile
