@@ -32,14 +32,16 @@ class CDBReader : public QObject
     Q_OBJECT
 
 public:
-    explicit CDBReader(const QString &path, QObject *parent = 0);
+    explicit CDBReader(const QString &dbpath, QObject *parent = 0);
     virtual ~CDBReader();
 
     void close();
+    void reopen();
     QString valueForKey(const QString &key) const;
     QStringList valuesForKey(const QString &key) const;
 
 private:
+    QString path;
     void *cdb;
     int fd;
 };

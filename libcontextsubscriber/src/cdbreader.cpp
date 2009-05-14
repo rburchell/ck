@@ -25,24 +25,13 @@
 #include <QDebug>
 #include <QFile>
 
-CDBReader::CDBReader(const QString &path, QObject *parent) 
-    : QObject(parent)
+CDBReader::CDBReader(const QString &dbpath, QObject *parent) 
+    : QObject(parent), path(dbpath)
 {
     cdb = NULL;
     fd = 0;
 
-    if (! QFile::exists(path))
-        return;
-
-    fd = open(path.toUtf8().constData(), O_RDONLY);
-
-    if (fd != 0) {
-        cdb = calloc(1, sizeof(struct cdb));
-        if (cdb_init((struct cdb*) cdb, fd) != 0) {
-            free(cdb);
-            cdb = NULL;
-        }
-    }
+    reopen();
 }
 
 CDBReader::~CDBReader()
@@ -60,6 +49,24 @@ void CDBReader::close()
     if (fd != 0) {
         ::close(fd);
         fd = 0;
+    }
+}
+
+void CDBReader::reopen()
+{
+    close();
+
+    if (! QFile::exists(path))
+        return;
+
+    fd = open(path.toUtf8().constData(), O_RDONLY);
+
+    if (fd != 0) {
+        cdb = calloc(1, sizeof(struct cdb));
+        if (cdb_init((struct cdb*) cdb, fd) != 0) {
+            free(cdb);
+            cdb = NULL;
+        }
     }
 }
 
