@@ -186,7 +186,10 @@ void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
     reader.setContentHandler(&handler);
     reader.parse(source);
 
-    keyDataHash.unite(handler.keyDataHash);
+    // Use insert here instead of unite to overwrite keys
+    foreach (QString key, handler.keyDataHash.keys()) {
+        keyDataHash.insert(key, handler.keyDataHash.value(key));
+    }
 }
 
 
