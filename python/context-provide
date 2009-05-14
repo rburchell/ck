@@ -1,9 +1,7 @@
 #!/usr/bin/python
-"""provide.py -- start up a provider from the command line
+"""context-provide -- start up a provider from the command line
 
-SYNOPSIS
-
-./provide [BUSTYPE:]PROVIDERNAME [TYPE NAME INITVALUE ...]
+Usage: context-provide [BUSTYPE:]PROVIDERNAME [TYPE NAME INITVALUE ...]
 
 Starts up a Flexiprovider with the given PROVIDERNAME, serving
 properties specified in the arguments.  TYPE is one of 'int', 'string',
@@ -12,7 +10,7 @@ defaulting to the latter).
 """
 
 import sys
-from flexiprovider import *
+from ContextKit.flexiprovider import *
 
 types = dict(int=(INT, int),
              truth=(TRUTH, bool),
