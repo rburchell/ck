@@ -16,6 +16,7 @@ SUBDIRS = \
 	python \
 	fake-provider \
 	vapi \
+	python \
 	$(NULL)
 
 pkgconfigdir = $(libdir)/pkgconfig
