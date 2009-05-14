@@ -20,7 +20,8 @@ int main(int argc, char **argv)
 
     args.pop_front();
     foreach (QString key, args) {
-        new PropertyListener(new ContextProperty(key, &app), &app);
+        ContextProperty* prop = new ContextProperty(key);
+        prop->setParent(new PropertyListener(prop, &app));
     }
 
     return app.exec();
