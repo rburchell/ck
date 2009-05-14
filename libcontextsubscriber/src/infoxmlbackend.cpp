@@ -39,6 +39,12 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
 
     qDebug() << "XML backend with path" << InfoXmlBackend::registryPath();
 
+    QDir dir = QDir(InfoXmlBackend::registryPath());
+    if (! dir.exists() || ! dir.isReadable()) {
+        qDebug() << "Registry path is not a directory or is not readable!";
+        return;
+    }
+
     watcher.addPath(InfoXmlBackend::registryPath());
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
 
@@ -154,17 +160,10 @@ void InfoXmlBackend::regenerateKeyDataList()
     qDebug() << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
 
     // For each xml file in the registry we parse it and 
-    // add it to our hash
+    // add it to our hash. We did some sanity checks in the constructor
+    // so we skip them now.
 
-    // FIXME: More sanity checks here
     QDir dir = QDir(registryPath());
-    if (! dir.exists() || ! dir.isReadable()) {
-        qDebug() << "Registry path is not a directory or is not readable!";
-        return;
-    }
-
-    // FIXME: Locking will go somewhere here...
-
     dir.setFilter(QDir::Files);
     dir.setNameFilters(QStringList("*.xml"));
 
