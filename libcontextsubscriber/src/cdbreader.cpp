@@ -25,6 +25,8 @@
 #include <QDebug>
 #include <QFile>
 
+/// Constructs a new CDBReader reading from cdb database at \a dbpath
+/// \param dbpath Path to the database.
 CDBReader::CDBReader(const QString &dbpath, QObject *parent) 
     : QObject(parent), path(dbpath)
 {
@@ -34,11 +36,13 @@ CDBReader::CDBReader(const QString &dbpath, QObject *parent)
     reopen();
 }
 
+/// Destroys the object automatically closing the database and file.
 CDBReader::~CDBReader()
 {
     close();
 }
 
+/// Closes the reader and the underlying file on the filesystem.
 void CDBReader::close()
 {
     if (cdb) {
@@ -52,6 +56,8 @@ void CDBReader::close()
     }
 }
 
+/// Reopens the reader for reading. 
+/// It will first close the current reader if it's open.
 void CDBReader::reopen()
 {
     close();
@@ -70,6 +76,9 @@ void CDBReader::reopen()
     }
 }
 
+/// Returns a string value for the given \a key. 
+/// First value is returned if there are many values for one key.
+/// \param key The key name in the database.
 QString CDBReader::valueForKey(const QString &key) const
 {
     if (! cdb)
@@ -93,6 +102,8 @@ QString CDBReader::valueForKey(const QString &key) const
         return "";
 }
 
+/// Returns all values associated with the given key from the database.
+/// \param key The key name in the database.
 QStringList CDBReader::valuesForKey(const QString &key) const
 {
     QStringList list;
@@ -122,6 +133,8 @@ QStringList CDBReader::valuesForKey(const QString &key) const
     return list;
 }
 
+/// Returns the current state of the reader. Reader is not readable if
+/// it was created with a path that doesn't exist or if it was closed.
 bool CDBReader::isReadable()
 {
     return (fd > 0);

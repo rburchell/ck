@@ -27,6 +27,19 @@
 #include <QObject>
 #include <stdlib.h>
 
+/*!
+  \class CDBWriter
+
+  \brief A wrapper class to write data (create) tiny-cdb databases.
+
+  The writer operates only on strings. String values can be associated with string keys. 
+  Several operations are supported - ading, replacing and inserting. Those operations differ
+  in how they handle existing keys with same name. 
+
+  The writer automatically cloes the filesystem resource on destruction but
+  can be also closed manually. Writing to a closed writer has no effect.
+*/
+
 class CDBWriter : public QObject
 {
     Q_OBJECT
@@ -47,7 +60,5 @@ private:
 
     void put(const QString &key, const QString &val, int flag);
 };
-
-
 
 #endif

@@ -23,6 +23,8 @@
 #include <cdb.h>
 #include <fcntl.h>
 
+/// Constructs a new CDBWriter to write to a cdb database at \a dbpath
+/// \param dbpath Path to the database.
 CDBWriter::CDBWriter(const QString &path, QObject *parent) 
     : QObject(parent)
 {
@@ -37,26 +39,41 @@ CDBWriter::CDBWriter(const QString &path, QObject *parent)
     }
 }
 
+/// Destroys the object closing the file beforehand.
 CDBWriter::~CDBWriter()
 {
     close();
 }
 
+/// Add a new \a key with \a val to the database. If a value
+/// for this key already exists, another one is added.
+/// \param key Key name as string.
+/// \param val Value as string.
 void CDBWriter::add(const QString &key, const QString &val)
 {
     put(key, val, CDB_PUT_ADD);
 }
 
+/// Insert a new \a key with \a val to the database. If a value
+/// for this key already exists, nothing is done.
+/// \param key Key name as string.
+/// \param val Value as string.
 void CDBWriter::insert(const QString &key, const QString &val)
 {
     put(key, val, CDB_PUT_INSERT);
 }
 
+/// Insert a new \a key with \a val to the database. If a value
+/// for this key already exists, the old value is replaced with the
+/// new one.
+/// \param key Key name as string.
+/// \param val Value as string.
 void CDBWriter::replace(const QString &key, const QString &val)
 {
     put(key, val, CDB_PUT_REPLACE);
 }
 
+/// Closes the writer and the underlying filesystem resource for writing.
 void CDBWriter::close()
 {
     if (cdbm) {
@@ -71,6 +88,8 @@ void CDBWriter::close()
     }
 }
 
+/// Returns \a true if the writer is writable. The writer is not writable
+/// after it has been closed or the target path is not accessible.
 bool CDBWriter::isWritable()
 {
     return (fd > 0);
