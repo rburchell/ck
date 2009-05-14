@@ -29,11 +29,16 @@ if pkgconfig('--uninstalled', 'contextprovider-1.0').returncode == 0:
     sys.path.append(pkgconfig('--variable=pythondir', 'contextprovider-1.0').output)
 try:
     import ContextProvider as CP
+except ImportError:
+    raise
 except:
     # Failed, probably because LD_LIBRARY_PATH is not right.  Set it and
-    # re-exec ourselves.
+    # re-exec ourselves.  To avoid an infinite loop, we try this only
+    # when LD_LIBRARY_PATH doesn't yet contain what we want to add.
     libdir = pkgconfig('--variable=libdir', 'contextprovider-1.0').output
     ldpath = [d for d in os.environ.get('LD_LIBRARY_PATH', '').split(':') if d != '']
+    if libdir in ldpath:
+        raise
     ldpath += [libdir, libdir + '/.libs']
     env = dict(os.environ)
     env.update(LD_LIBRARY_PATH=':'.join(ldpath))

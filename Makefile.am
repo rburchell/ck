@@ -12,6 +12,7 @@ SUBDIRS = \
 	tests \
 	doc \
 	tools \
+	python \
 	$(NULL)
 
 pkgconfigdir = $(libdir)/pkgconfig

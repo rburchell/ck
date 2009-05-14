@@ -4,7 +4,7 @@ A very simple example of the Flexiprovider.  Exports three properties
 initially.
 """
 
-from flexiprovider import *
+from ContextKit.flexiprovider import *
 
 Flexiprovider([INT('location.altitude'),
                STRING('my.name', 'flexi'),

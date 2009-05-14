@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """A more complex provider with a horroristic theme."""
 
-from flexiprovider import *
+from ContextKit.flexiprovider import *
 import glib
 
 count = 0

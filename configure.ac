@@ -106,6 +106,7 @@ AC_SUBST(LOCATION_LIBS)
 AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
 
 AC_CONFIG_SUBDIRS([libcontextsubscriber])
+AM_PATH_PYTHON(,, [:])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libcontextprovider/Makefile])
@@ -120,6 +121,7 @@ AC_CONFIG_FILES([doc/Makefile])
 AC_CONFIG_FILES([doc/reference/Makefile])
 AC_CONFIG_FILES([doc/reference/libcontextprovider/Makefile])
 AC_CONFIG_FILES([tools/Makefile])
+AC_CONFIG_FILES([python/Makefile])
 AC_CONFIG_FILES([contextprovider-1.0.pc])
 AC_CONFIG_FILES([contextd/org.freedesktop.ContextKit.contextd.service])
 
