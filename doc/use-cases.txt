@@ -1,0 +1,355 @@
+ContextKit Use Cases
+====================
+
+Must Have
+---------
+
+3:: Visualizing the situation - Connected/Disconnected. The menu items
+will have different visuals when offline if they require a connection
+to function optimally e.g. Email and online browsing. This should be
+integrated with the appearance of the home screen and within
+applications. (Homecreen, Menu, Connectivity)
+
+5:: Automatic theme change e.g. time / location based themes
+(fun/entertainment). During working hours the theme indicates the user
+is at work, the time and location. The theme can change when work
+hours are typically finished or according to a calendar. When a
+workday is over or it is the weekend the theme could have a different
+feel.
+
+10:: Create reminder to show the note (e.g. shopping list) next time
+visiting local store, create reminder to buy or do X when entering
+store / shopping mall / specific location and time.
+
+11:: Device informs me of timezone differences that may affect my
+communications: e.g. calling a contact in LA when in Finland a query
+is shown "it's 3am in LA - are you sure you wish to make the call?"
+
+14:: If user is running and playlist ends then player will repeat the
+playlist rather than stop and require user action to reselect. There
+could be a visual to show the user the playlist is on repeat so they
+know what has happened when they stop.
+
+15:: View meeting location from Calendar meeting invitation, possibility
+to navigate to location from current position
+
+16:: Device offers a city guide or map if in a new location (after
+checking that the local guide/map does not exist). User can choose to
+purchase and use.
+
+18:: Text-to-speech preview of messages (make "listen" option visible),
+learn if user always wants to hear messages in the car or not
+
+19:: The device becomes aware of the fact, that it is in an office
+environment and assumes a special “profile”, with e.g. discreet
+alarms, homescreen, theme
+
+20:: Get location and orientation data when using the device camera. For
+example, this data can be used to created automatic metadata and tags
+to photos and videos when combined with reverse geocoding online
+service or utilized to show nearby POIs and tappable links to them to
+see more info from web/Maps application when watching through the
+camera viewfinder (GPS+accelerometer+magnetometer)
+
+21:: Automatically disable media online services and RSS feed updates
+when user is roaming or no free Wi-Fi connection available based on
+user preferences/settings
+
+22:: When user is moving enlarge some of the buttons, so that it is
+easier to press those in all media applications
+(GPS+accelerometer). Adjusting the maps interface and/or available
+tools based on user's current activity or mode of traveling (walking,
+driving, etc.)
+
+29:: Highlighted in the soup content and in contacts. Also related
+content can be highlighted in different applications (e.g. browsing
+photos, Jack comes near, all Jack’s pictures are highlighted)
+
+30:: Displays relevant content useful for the user - traffic report
+widget in car and during commute time - transit (bus/train schedule,
+stops) information before and during commute time.
+
+32:: Connecting to best available connection. If Wlan is available and
+reliable the the device will connect through this.  When it is not
+available the device will connect through the next best connect
+possibility. There may be settings for the device to behave
+differently on different connection types.
+
+41:: Screen brightness increases/decreases depending on the
+environment. For example; driving car at night time, screen is not
+100% bright to save your eyes and not blind you.
+
+Should Have
+-----------
+
+4:: Most used applications, links, data (device learns usage
+frequency) appear on the home screen. Or the user can be prompted when
+accessing most used apps whether apps should be added to home screen
+for easy access. Unused apps on the home screen can fade away if not
+used e.g. in a few months? (Except when S&S service priority?)
++
+Dynamic widgets on the Home screen based on context e.g. if user
+checks weather.com everyday via browser offer to add permanent weather
+widget to home screen.
+
+9:: Create reminder about telling a friend something e.g. when meeting
+him/her the next time (bluetooth/wlan proximity) or when calling next
+time. E.g. see a picture of daughter in Gallery => place reminder to
+book a dentist to her in the next "booking slot". This could also work
+with specific and related files being presented when in a meeting.
+
+12:: The device suggests volume increases in noisy environments. This
+may relate to ringing tone, music playback, movies etc. The volume
+increases in noisy environments and back to the original setting when
+the surrounding alters. The device learns the user patterns e.g. if
+the user regularly overrules suggested adjustments then after a while
+it is switched off.
+
+17:: Reduce WLAN energy consumption by optimizing
+activity. Automatically turn on / increase frequency of WLAN search
+when there is likely to be a hotspot nearby - turn scanning
+off/decrease frequency when it is unlikely (learning user's
+environments and schedule) - user does not have to manually
+activate/disable WLAN search.
+
+23:: Settings: The device learns what the most often used setting items
+are by the user, and always shows those most often used Setting items
+out of the category /or show them on the top of the list.
+
+26:: User is navigating from A to B, in search items "along the route"
+are emphasized (if not navigating, items "close to current location"
+are more important)
+
+27:: User has indicated that he has to be in certain location at certain
+time (e.g. calendar event, setting a "target location" in maps), alarm
+when it's time to leave (based on distance and optionally also traffic
+conditions, mode of traveling, etc.)
+
+28:: Some context-based recommendations, suggestions, etc. showed
+occasionally on the map (needs to be tested with the user if they like
+this..)
+
+34:: When device is on a desk or other hard surface the vibra is not
+used for alerting, just the nice ring tone I've selected
+
+35:: When the device is pulled from pocket/bag turn the background light
+on and show the now playing song/FM radio channel/Internet radio
+channel information on the screen automatically instead of tapping the
+screen or opening the screen lock (ambient light sensor)
+
+38:: When the device is in pocket, the sensitive level of touch screen
+could be lifted to allow small set of gestures even if the device is
+in the pocket (gestures through fabric)
+
+40:: When device is steadily on table and music is playing, the now
+playing view could start showing the song & artist names in large font
+sizes (easy to read even from long distance)
+
+42:: Unplugging headset pauses the music
+
+Nice to Have
+------------
+
+7:: Phone learns from the users behavior, e.g. a user calls home when
+leaving the office every weekday. The device adapts to this and
+provides easy and quick way to perform the task, the user may not be
+aware as the application will be launched in the background. This may
+be in the ‘soup’…the user can look into the future. They can see
+calendar events, and possibilities relating to their usage
+patterns…user can flick the item away if it is not right.
+
+8:: Meeting application: When in the meeting, business cards (with
+photos) are automatically exchanged and visualized in the UI so that
+they help the user to connect names with faces with sitting
+order. This also means contact details can be exchanged.
+
+24:: Application manager: Building In-device recommendation system: The
+devices learns the user’s preferences of applications (by
+analyzing/counting the usage of applications), the recommend the new
+applications to the user to download and install.
+
+25:: Personalization: The device learns the user’s personalization
+preferences (the device could learn this if the user transferring some
+personalization data from the old phone on the first time using the
+new device), and set automatically some personalization settings for
+the user (e.g. Ringing tone, background color, etc.)
+
+31:: The device is set to behave differently in certain modes. For
+example when you are driving you do not want to access your email and
+text messages so automatic messages are broadcasted to any contacts
+letting them know you are driving and will get back them when you are
+done...and possible provide more information.
+
+33:: Shouting “where are you” to the handbag, device turns the lights on
+(easier to find)
+
+36:: Shake device to play/show random media item
+
+37:: When jogging/walking detect the pace and UI could propose songs
+that would fit to the pace
+
+39:: Turn device to jump to next media item + turn to another direction
+to jump to previous media item (same with left/right swipes on touch
+screen)
+
+To be prioritized
+-----------------
+
+6:: Automatic connections and downloading content. The device
+automatically pulls relevant content, alerts, feed updates, people etc
+when it is connected (this may be set to a specific type of
+connection). The user can review this updated content when they have
+time. There could be a visual feature to show the user what content is
+new/updated. The user may need the ability to teach the device what
+they want to see and when. The device can also learn what the user
+looks at and their usage patterns. This may inform content management
+and filtering information.
+
+
+13:: If there are new albums available from my favorite artists my
+device has already gone and got if for me. I can do preview when
+convenient and then purchase the album if I want.  The device suggests
+what I will like based on my usage patterns and links with relevant
+networks and friends.  Content could be a playlist entitled "new music
+to try" or somehow be highlighted when appropriate e.g. when listening
+to music which connects in some way to what you're listening to at the
+time e.g. same artist. But as said before it bubbles to the surface,
+or catches you eye in some way, NOT with a pop-up looking for a yes/no
+response. Over time if you don’t play it, it would auto delete. Once
+it catches your eye it would then preview it, then if you want to keep
+it you do one click buy, no further download required, no waiting?
+(just download), just spontaneous enjoyment. Trick we learnt through a
+study is not to start 2nd guessing too soon as it takes time to learn
+and gain trust, on both sides of the relationship.
+
+43:: Weather and Location: Kate is now in Paris. She plans a bit about
+what she wants to do in Paris but she would like more suggestions. She
+checks her mobileand gets some suggestion about where she can go
+today. The mobile suggests that she’d better go to the Louvre museum
+rather than Eiffel tower today because it will be windy and cloudy.
+
+44:: Weather, location and speed: Michi is in Espoo and needs to go to
+Stockmann to meet his wife. He wants to buy some presents for his
+friends. He drives his car to the city center and worries about the
+heavy traffic jam. He put his mobile on the car dock to check a
+possible route. The mobile recommends to park his car at the nearest
+parking lot and take the subway directly to Stockmann.
+
+45:: Weather, location and time: Kate and friends are enjoying the open
+concert near Olympia stadium. The concert started at 7:00 PM and will
+end around 9:00 PM. The mobile suggests some places to get food after
+the concert. The recommended places are mostly in open areas as the
+weather is beautiful. There are free beer coupons on the screen with
+the recommendations. It is sunny outside so they pick on of the
+recommendations.
+
+46:: Weather, location and light: Roope is listening the music he owns
+on his mobile. It seems to be snowy outside and gets dark. His has his
+mobile set to offer him suggestions based on the weather and his
+listening patterns so his playlist suugests a playlist related to the
+snowing season and also has Christmas carols. This selection seems to
+be based on his listening pattern including favorite genre and
+artist. He’s satisfied with some of music on the list and starts play
+one of them.
+
+47:: When tagging there will be keyword suggestions from the context
+engine. E.g. Name of location, weather, office/home and so on. The
+user can browse contents by "cloudy" and photos shows cloudy pictures,
+as previously tagged by the user.
+
+48
+
+49:: User is enjoying media e.g. music player, (internet) radio, images,
+video or television and relevant adverts appear. Example: while
+viewing photos an advert for the local print shop is displayed
+
+50:: User creates or accepts an entry to calendar, maps or to-do-list,
+etc. and related adverts are shown. Example: user ads mom’s birthday
+into calendar and an advert for flowers appears or user plans a route
+in maps and special “Ibis” hotel offers appear along the route
+
+51:: User does a search for adverts based on a specific location or
+context (ad pull).
++
+Example: a vegetarian tourist arrives at a railway station in an
+unknown city at Sunday 5pm, an ad-search shows English ads for
+vegetarian restaurants in the area which are open now
+
+52:: Users installs an application or widget on her phone which merges
+adverts with other content like weather, news or timetables. Example:
+user installs the “Helsinki weather” widget to her home screen which
+also shows the most appropriate local activities for the current
+weather
+
+53:: If the user visits selected services with Direct UI then adverts
+are more relevant. Example: if the user uses Hotmail from Direct UI
+then advertisers are allowed to know that she belongs to a specific
+target group and that she is currently in Helsinki
+
+
+Notes
+-----
+
+Widget recommendation in widget library based on users
+interestes, needs and most used applications
+
+Updates management: the canvas probably will be very long,
+there is no sense to update the widget all the time if they
+are invisible in the canvas. So we need some smart management
+system.
+
+Widget functionality: as we all know, the widget is very
+compact and only be able to provide limited functions, so it
+would be great if the widget can provide the functionality
+based on the context.
+
+Widget configuration: if the configuration in the
+corresponding applications has been changed, the widget itself
+might need to be updated too.This can happen automatically.
+
+Prioritize the sharing options based on the context. For
+example, if I am chatting with you, and then I go to share
+with friend, maybe your name should show up on the top. Or if
+the contact bluetooth device is nearby, it would be good if we
+can show it as options for the user.
+
+Send email to nearby contacts. E.g. People in the same meeting
+room to hare some documents
+
+Recipient status. It can give some indication when you can
+expect a reply
+
+Email must react somehow to changes in
+connectivity. E.g. Offering chance for offline browsing, if
+there is no connectivity
+
+Reacting to events. E.g. Silencing notifications of new
+messages when user is in a meeting.
+
+Kath and Hanna have activated WayFinder application, which
+dynamically shows the direction and distance to the other
+person. During the day, Hanna has found an interesting
+Portuguese restaurant and defined a WayFinder anchor point
+there. She now activates the anchor point and her phone shows
+the distance and direction to the restaurant. Kath and Hanna
+start walking towards the restaurant and are ready for a great
+night in Portugal.
+
+Kath has found a nice youth hostel. She takes a photo and
+phone adds compass and GPS information to it. Kath sends the
+MMS to Hanna so that they can find the place
+easily. Additionally location data can also be used in picture
+browser at home.
+
+These areas still need to provide use cases. I am chasing up
+asap.
+
+Assobrowsing
+Tagging
+Sharing
+Advertising - ideas in the vision document. The server is currenly down so this will be done tomorrow.
+Search - suggestions in general should utilize heavily the context information
+Clock & Calendar
+People - contacts
+Places & browser
+	
