@@ -32,6 +32,12 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
 {
     qDebug() << "CDB backend with database" << InfoCdbBackend::databasePath();
+
+    if (reader.isReadable() == false) {
+        qDebug() << InfoCdbBackend::databasePath() << "is not readable! Bailing out.";
+        return;
+    }
+
     watcher.addPath(InfoCdbBackend::databasePath());
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
 }
@@ -97,7 +103,14 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
 {
     QStringList oldKeys = listKeys();
 
+    qDebug() << InfoCdbBackend::databasePath() << "changed, re-opening database.";
+
     reader.reopen();
+    if (reader.isReadable() == false) {
+        qDebug() << InfoCdbBackend::databasePath() << "is not readable! Bailing out.";
+        emit keysChanged(QStringList());
+        return;
+    }
 
     emit keysChanged(listKeys());
 
