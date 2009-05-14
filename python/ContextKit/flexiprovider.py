@@ -105,13 +105,18 @@ class Flexiprovider(object):
         # We assume that stdin is line-buffered (ie. readline() doesn't
         # block (too much)).  It's true if it's a tty.  If piping from
         # another program, do an entire line.
-        # TODO maybe we should rather fix ourselves
-        l = sys.stdin.readline().strip()
+        # TODO maybe we should rather fix ourselves and accept arbitrary
+        # amount of input (and accumulate lines ourselves).
+        l = sys.stdin.readline()
+        # If l is emtpy, we got EOF.
         if l == '':
             self.loop.quit()
             return False
+        # Nevertheless, ignore emtpy lines.
+        l = l.strip()
+        if l == '':
+            return True
         try:
-            # TODO something more sophisticated?
             code = compile(l, '<input from stdin>', 'single')
             eval(code, {}, dict(INT=INT,
                                 STRING=STRING,
