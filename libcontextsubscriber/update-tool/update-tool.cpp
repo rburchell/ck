@@ -78,6 +78,10 @@ int main(int argc, char **argv)
     QString finalDbPath = dir.absoluteFilePath("context-providers.cdb"); 
 
     CDBWriter writer(tmpDbPath);
+    if (writer.isWritable() == false) {
+        printf("ERROR: %s is not writable. No permissions?\n", tmpDbPath.toUtf8().constData());
+        exit(128);
+    }
 
     foreach(QString key, context->listKeys()) {
         ContextPropertyInfo keyInfo(key);
@@ -119,5 +123,6 @@ int main(int argc, char **argv)
 
     rename(tmpDbUtf8Data.constData(), finalDbUtf8Data.constData()); 
     printf("Generated: '%s'\n", finalDbUtf8Data.constData());
+    return 0;
 }
 
