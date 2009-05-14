@@ -24,6 +24,7 @@
 #include "propertyhandle.h"
 #include "sconnect.h"
 #include "subscriberinterface.h"
+#include "dbusnamelistener.h"
 
 QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvider::providerInstances;
 
@@ -37,8 +38,7 @@ QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvid
 /// Constructs a new instance. ContextProperty handles providers for
 /// you, no need to (and can't) call this constructor.
 PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
-    : busType(busType), busName(busName), managerInterface(busType, busName, this), subscriber(0),
-      getSubscriberFailed(false)
+    : busType(busType), busName(busName), managerInterface(busType, busName, this), subscriberInterface(0)
 {
     // Setup idle timer
     idleTimer.setSingleShot(true);
@@ -49,6 +49,34 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
     sconnect(&idleTimer, SIGNAL(timeout()),
              this, SLOT(idleHandler()));
     managerInterface.getSubscriber();
+
+    // Note if the provider on the dbus comes and go
+    dbusNameListener = new DBusNameListener(busType, busName);
+    sconnect(dbusNameListener,
+             SIGNAL(nameAppeared()),
+             this,
+             SLOT(onProviderAppears()));
+    sconnect(dbusNameListener,
+             SIGNAL(nameAppeared()),
+             this,
+             SLOT(onProviderDisappears()));
+}
+
+void PropertyProvider::onProviderAppears()
+{
+    if (subscriberInterface != 0) {
+        delete subscriberInterface;
+        subscriberInterface = 0;
+    }
+    managerInterface.getSubscriber();
+}
+
+void PropertyProvider::onProviderDisappears()
+{
+    if (subscriberInterface != 0) {
+        delete subscriberInterface;
+        subscriberInterface = 0;
+    }
 }
 
 void PropertyProvider::onGetSubscriberFinished(QString objectPath)
@@ -56,24 +84,25 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
     qDebug() << "PropertyProvider::onGetSubscriberFinished" << objectPath;
     if (objectPath != "") {
         // GetSubscriber was successful
-        getSubscriberFailed = false;
+        subscriberInterface = new SubscriberInterface(busType, busName, objectPath, this);
 
-        subscriber = new SubscriberInterface(busType, busName, objectPath, this);
-
-        sconnect(subscriber,
+        sconnect(subscriberInterface,
                  SIGNAL(valuesChanged(QMap<QString, QVariant>, bool)),
                  this,
                  SLOT(onValuesChanged(QMap<QString, QVariant>, bool)));
-        sconnect(subscriber,
+        sconnect(subscriberInterface,
                  SIGNAL(subscribeFinished(QSet<QString>)),
                  this,
                  SLOT(onSubscribeFinished(QSet<QString>)));
+
+        // TODO: foreach toSubscribe -> if handle.provider == me -> add to toSubscribe()
+        // TODO: toSubscribe.clear();
+        // TODO: toUnsubscribe.clear();
 
         idleTimer.start();
     }
     else {
         // GetSubscriber failed
-        getSubscriberFailed = true;
         emit subscribeFinished(toSubscribe);
         toSubscribe.clear();
         toUnsubscribe.clear();
@@ -98,7 +127,7 @@ void PropertyProvider::subscribe(const QString &key)
 {
     qDebug() << "PropertyProvider::subscribe";
 
-    if (getSubscriberFailed) {
+    if (managerInterface.isGetSubscriberFailed()) {
         qDebug() << "GetSubscriber has failed previously";
         // The subscription will never be successful
         QSet<QString> toEmit;
@@ -110,15 +139,15 @@ void PropertyProvider::subscribe(const QString &key)
     toSubscribe.insert(key);
     toUnsubscribe.remove(key);
 
-    if (subscriber != 0)
+    if (subscriberInterface != 0)
         idleTimer.start();
 }
 
 void PropertyProvider::idleHandler()
 {
-    if (subscriber != 0) {
-        subscriber->subscribe(toSubscribe);
-        subscriber->unsubscribe(toUnsubscribe);
+    if (subscriberInterface != 0) {
+        subscriberInterface->subscribe(toSubscribe);
+        subscriberInterface->unsubscribe(toUnsubscribe);
         toSubscribe.clear();
         toUnsubscribe.clear();
     }
@@ -131,7 +160,7 @@ void PropertyProvider::unsubscribe(const QString &key)
     toUnsubscribe.insert(key);
     toSubscribe.remove(key);
 
-    if (subscriber != 0)
+    if (subscriberInterface != 0)
         idleTimer.start();
 }
 

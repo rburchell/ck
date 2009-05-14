@@ -31,6 +31,7 @@
 
 class PropertyHandle;
 class SubscriberInterface;
+class DBusNameListener;
 
 class PropertyProvider : public QObject
 {
@@ -51,8 +52,8 @@ signals:
 private:
     PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
 
-    SubscriberInterface *subscriber; ///< The DBus interface for the Subscriber object
-
+    DBusNameListener *dbusNameListener;
+    SubscriberInterface *subscriberInterface; ///< The DBus interface for the Subscriber object
     QTimer idleTimer; ///< For scheduling subscriptions / unsubscriptions as idle processing
     ManagerInterface managerInterface; ///< The DBus interface for the Manager object
     bool getSubscriberFailed;
@@ -70,6 +71,8 @@ private slots:
     void onGetSubscriberFinished(QString objectPath);
     void onSubscribeFinished(QSet<QString> keys);
     void idleHandler();
+    void onProviderAppears();
+    void onProviderDisappears();
 };
 
 #endif

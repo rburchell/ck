@@ -48,6 +48,7 @@ public:
     ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
 
     void getSubscriber();
+    bool isGetSubscriberFailed() const;
 
 signals:
     void getSubscriberFinished(QString objectPath);
@@ -57,6 +58,7 @@ private slots:
 
 private:
     QDBusInterface* iface;
+    bool getSubscriberFailed;
 };
 
 

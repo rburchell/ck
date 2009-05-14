@@ -29,7 +29,7 @@ const QString ManagerInterface::objectPath = "/org/freedesktop/ContextKit/Manage
 /// Constructs the ManagerInterface. Connects to the DBus object specified by
 /// \a busType (session or system bus) and \a busName.
 ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent)
-    : iface(0)
+    : iface(0), getSubscriberFailed(false)
 {
     QDBusConnection connection("");
 
@@ -56,8 +56,11 @@ ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const
 void ManagerInterface::getSubscriber()
 {
     if (iface == 0) {
+        getSubscriberFailed = true;
         return; // FIXME: emitting some kind of error signal also here?
     }
+
+    getSubscriberFailed = false;
 
     // Construct the asynchronous call
     QDBusPendingCall getSubscriberCall = iface->asyncCall("GetSubscriber");
@@ -79,6 +82,7 @@ void ManagerInterface::onGetSubscriberFinished(QDBusPendingCallWatcher* watcher)
         // The provider didn't implement the needed interface + function
         // The function resulted in an error
         qWarning() << "Provider error while getting the subscriber object:" << reply.error().message();
+        getSubscriberFailed = true;
     } else {
         QDBusObjectPath path = reply.argumentAt<0>();
         pathString = path.path();
@@ -87,3 +91,7 @@ void ManagerInterface::onGetSubscriberFinished(QDBusPendingCallWatcher* watcher)
     emit getSubscriberFinished(pathString);
 }
 
+bool ManagerInterface::isGetSubscriberFailed() const
+{
+    return getSubscriberFailed;
+}
