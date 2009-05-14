@@ -20,7 +20,7 @@ if pid == 0:
     os.close(wfd)
     os.dup2(rfd, 0)
     sys.argv.pop(0)
-    os.execv(sys.argv[0], sys.argv)
+    os.execvp(sys.argv[0], sys.argv)
 else:
     def childied(n, f):
         p, ec = os.waitpid(pid, 0)
