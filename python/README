@@ -1,5 +1,9 @@
 These directories contain a simple Python binding for the
-libcontextprovider library and a test provider tool.
+libcontextprovider library and a test provider tool.  To use them, you
+need to ensure that pkg-config works wrt this library.  One way is to
+install everything into the appropriate locations, or alternatively, set
+PKG_CONFIG_PATH to contain the directories with the .pc files.  The
+latter is preferred during development.
 
 Flexiprovider is a Python module/tool for testing Context Framework
 clients.  It allows to define properties and provides means to change
@@ -26,4 +30,4 @@ The provider will stop also if stdin is closed.
 You may use `context-rlwrap' as illustrated below to enjoy a more
 friendlier readline interface:
 
-  context-rlwrap ./provide.py my.fake.provider
+  context-rlwrap ./context-provide.py my.fake.provider
