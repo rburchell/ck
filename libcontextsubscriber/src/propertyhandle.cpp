@@ -21,7 +21,6 @@
 
 #include "propertyhandle.h"
 #include "propertyprovider.h"
-#include "propertymanager.h"
 #include "sconnect.h"
 #include "contextpropertyinfo.h"
 
@@ -34,34 +33,78 @@
 #include <QPair>
 #include <QMap>
 
-QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvider::providerInstances;
+QMap<QString, PropertyHandle*> PropertyHandle::handleInstances;
 
 /*!
-   \class PropertyHandle
+  \class PropertyHandle
 
-   \brief A common handle for a context property.
+  \brief A common handle for a context property.
 
-   Only one handle exists at a time for a context property, no matter
-   how much ContextProperty objects are created for it.
+  Only one handle exists at a time for a context property, no matter
+  how much ContextProperty objects are created for it.
+
+  Handling context properties and their providers.
+
+  A PropertyHandle represents a context property.  There is at most
+  one PropertyHandle for each property, but more than one
+  ContextProperty can point to a PropertyHandle.  A PropertyHandle
+  points to a PropertyProvider object if there is a provider for it.
+
+  A PropertProvider represents a context provider and manages the
+  D-Bus connection to it.  A PropertyProvider can also represent the
+  "no known provider" case.
+
+  There is also a single PropertyManager object that ties everything
+  together.  It reads the registry, for example.
+  PropertyHandle and PropertyProvider objects as needed.
+
+  PropertyHandle and PropertyProvider instances are never deleted;
+  they stick around until the process is terminated.
 */
 
 /// Constructs a new instance. ContextProperty creates the handles, you
 /// don't have to (and can't) call this constructor ever.
 PropertyHandle::PropertyHandle(const QString& key)
-    : myKey(key), myProvider(0), myInfo(key), type(QVariant::Invalid), subscribeCount(0), subscribePending(false)
+    : myKey(key), myProvider(0), myInfo(0), subscribeCount(0), subscribePending(false)
 {
-    update_provider();
+    myInfo = new ContextPropertyInfo(myKey, this);
+
+    QString dbusName = myInfo->providerDBusName();
+    if (dbusName != "")
+        myProvider = PropertyProvider::instance(myInfo->providerDBusType(),
+                                                dbusName);
+/* FIXME: this code is needed, if a handle's provider can change (registry can change)
+    PropertyProvider *newProvider = 0;
+
+    if (dbusName != "")
+        newProvider = PropertyProvider::instance(myInfo->providerDBusType(),
+                                   dbusName);
+
+    if (newProvider != myProvider) {
+        if (subscribeCount > 0) {
+            if (myProvider)
+                myProvider->unsubscribe(myKey);
+            myProvider = newProvider;
+            if (myProvider)
+               myProvider->subscribe(myKey);
+            // emit providerChanged();
+        } else
+            myProvider = newProvider;
+    }
+*/
 }
 
 /// Increase the subscribeCount of this context property and subscribe to DBUS if neccessary.
 void PropertyHandle::subscribe()
 {
+    qDebug() << "PropertyHandle::subscribe";
+
     ++subscribeCount;
     if (subscribeCount == 1 && myProvider) {
         subscribePending = true;
         sconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
                  this, SLOT(onSubscribeFinished(QSet<QString>)));
-        myProvider->subscribe(this);
+        myProvider->subscribe(myKey);
     }
 }
 
@@ -69,9 +112,9 @@ void PropertyHandle::subscribe()
 void PropertyHandle::unsubscribe()
 {
     --subscribeCount;
-    if (subscribeCount == 0 && myProvider) {
+    if (subscribeCount == 0 && myProvider != 0) {
         subscribePending = false;
-        myProvider->unsubscribe(this);
+        myProvider->unsubscribe(myKey);
         disconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
                    this, SLOT(onSubscribeFinished(QSet<QString>)));
     }
@@ -81,32 +124,6 @@ void PropertyHandle::onSubscribeFinished(QSet<QString> keys)
 {
     if (keys.contains(myKey)) {
         subscribePending = false;
-    }
-}
-
-/// Check the registry for the provider providing this property (named \c key) and
-/// set up subscription and the \c provider pointer accordingly.
-void PropertyHandle::update_provider()
-{
-    // 1. query from the info classes
-    // 2. use the big singleton to look it up
-
-    PropertyProvider *newProvider =
-        PropertyProvider::instance(myInfo.providerDBusType(),
-                                   myInfo.providerDBusName());
-
-    qDebug() << "PropertyHandle::update_provider()";
-
-    if (newProvider != myProvider) {
-        if (subscribeCount > 0) {
-            if (myProvider)
-                myProvider->unsubscribe(this);
-            myProvider = newProvider;
-            if (myProvider)
-               myProvider->subscribe(this);
-            // emit providerChanged();
-        } else
-            myProvider = newProvider;
     }
 }
 
@@ -137,7 +154,18 @@ void PropertyHandle::setValue(QVariant newValue)
     emit valueChanged();
 }
 
-const ContextPropertyInfo& PropertyHandle::info() const
+const ContextPropertyInfo* PropertyHandle::info() const
 {
     return myInfo;
+}
+
+PropertyHandle* PropertyHandle::instance(const QString& key)
+{
+    if (!handleInstances.contains(key))
+        handleInstances.insert(key,
+                               new PropertyHandle(key));
+
+    Q_ASSERT(handleInstances[key] != 0);
+
+    return handleInstances[key];
 }

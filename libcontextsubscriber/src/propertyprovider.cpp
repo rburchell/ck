@@ -22,9 +22,10 @@
 #include "propertyprovider.h"
 
 #include "propertyhandle.h"
-#include "propertymanager.h"
 #include "sconnect.h"
 #include "subscriberinterface.h"
+
+QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvider::providerInstances;
 
 /*!
    \class PropertyProvider
@@ -32,6 +33,23 @@
    \brief Keeps the DBUS connection with a specific provider and
    handles subscriptions with the properties of that provider.
 */
+
+/// Constructs a new instance. ContextProperty handles providers for
+/// you, no need to (and can't) call this constructor.
+PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
+    : busType(busType), busName(busName), managerInterface(busType, busName, this), subscriber(0),
+      getSubscriberFailed(false)
+{
+    // Setup idle timer
+    idleTimer.setSingleShot(true);
+    idleTimer.setInterval(0);
+
+    // Call GetSubscriber asynchronously
+    sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
+    sconnect(&idleTimer, SIGNAL(timeout()),
+             this, SLOT(idleHandler()));
+    managerInterface.getSubscriber();
+}
 
 void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 {
@@ -68,24 +86,6 @@ void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
     emit subscribeFinished(keys);
 }
 
-
-/// Constructs a new instance. ContextProperty handles providers for
-/// you, no need to (and can't) call this constructor.
-PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
-    : busType(busType), busName(busName), managerInterface(busType, busName, this), subscriber(0),
-      getSubscriberFailed(false)
-{
-    // Setup idle timer
-    idleTimer.setSingleShot(true);
-    idleTimer.setInterval(0);
-
-    // Call GetSubscriber asynchronously
-    sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
-    sconnect(&idleTimer, SIGNAL(timeout()),
-             this, SLOT(idleHandler()));
-    managerInterface.getSubscriber();
-}
-
 /// Returns the dbus name and bus type of the provider
 QString PropertyProvider::getName() const
 {
@@ -94,7 +94,7 @@ QString PropertyProvider::getName() const
 
 /// Schedules a property to be subscribed to when the main loop is
 /// entered the next time.
-void PropertyProvider::subscribe(PropertyHandle* handle)
+void PropertyProvider::subscribe(const QString &key)
 {
     qDebug() << "PropertyProvider::subscribe";
 
@@ -102,13 +102,13 @@ void PropertyProvider::subscribe(PropertyHandle* handle)
         qDebug() << "GetSubscriber has failed previously";
         // The subscription will never be successful
         QSet<QString> toEmit;
-        toEmit.insert(handle->key());
+        toEmit.insert(key);
         emit subscribeFinished(toEmit);
         return;
     }
 
-    toSubscribe.insert(handle->key());
-    toUnsubscribe.remove(handle->key());
+    toSubscribe.insert(key);
+    toUnsubscribe.remove(key);
 
     if (subscriber != 0)
         idleTimer.start();
@@ -126,10 +126,10 @@ void PropertyProvider::idleHandler()
 
 /// Schedules a property to be unsubscribed from when the main loop is
 /// entered the next time.
-void PropertyProvider::unsubscribe(PropertyHandle* handle)
+void PropertyProvider::unsubscribe(const QString &key)
 {
-    toUnsubscribe.insert(handle->key());
-    toSubscribe.remove(handle->key());
+    toUnsubscribe.insert(key);
+    toSubscribe.remove(key);
 
     if (subscriber != 0)
         idleTimer.start();
@@ -138,27 +138,21 @@ void PropertyProvider::unsubscribe(PropertyHandle* handle)
 /// Slot, handling changed values coming from the provider over DBUS.
 void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription)
 {
-    const QHash<QString, PropertyHandle*> &properties =
-        PropertyManager::instance()->properties;
-
-    // FIXME: manager should be a simple container of handles...
     for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
         // Get the PropertyHandle corresponding to the property to update.
         // FIXME: handlefactory->handle(i.key())
-        PropertyHandle *h = properties.value(i.key(), 0);
-        if (h == 0) {
-            qWarning() << "Received property not in registry:" << i.key();
-            continue;
-        }
+        PropertyHandle *h = PropertyHandle::instance(i.key());
         if (h->provider() != this) {
-            qWarning() << "Received property not handled by this provider:" << i.key();
+            if (h->provider() == 0)
+                qWarning() << "Received property not in registry:" << i.key();
+            else
+                qWarning() << "Received property not handled by this provider:" << i.key();
             continue;
         }
 
         // FIXME : Implement the type check here. Remember to check the types of non-nulls only.
 
         // Note: the null we receive is always a non-typed null. We might need to convert it here.
-
         QVariant newValue = i.value();
         if (h->value() == newValue && h->value().isNull() == newValue.isNull()) {
             // The property already has the value we received.
@@ -171,8 +165,7 @@ void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool proc
             if (!processingSubscription) {
                 qWarning() << "PROVIDER ERROR: Received unnecessary DBUS signal for property" << i.key();
             }
-        }
-        else {
+        } else {
             // The value was new
             h->setValue(newValue);
         }

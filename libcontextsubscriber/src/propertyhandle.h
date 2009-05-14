@@ -22,41 +22,13 @@
 #ifndef PROPERTYHANDLE_H
 #define PROPERTYHANDLE_H
 
-#include "contextpropertyinfo.h"
-
 #include <QObject>
-#include <QSet>
-#include <QString>
-#include <QStringList>
-#include <QVector>
 #include <QVariant>
-#include <QHash>
-#include <cdb.h>
-#include <QFileSystemWatcher>
+#include <QString>
+#include <QSet>
 
-/* Handling context properties and their providers.
-
-   A PropertyHandle represents a context property.  There is at most
-   one PropertyHandle for each property, but more than one
-   ContextProperty can point to a PropertyHandle.  A PropertyHandle
-   points to a PropertyProvider object if there is a provider for it.
-
-   A PropertProvider represents a context provider and manages the
-   D-Bus connection to it.  A PropertyProvider can also represent the
-   "no known provider" case.
-
-   There is also a single PropertyManager object that ties everything
-   together.  It reads the registry, for example.
-   PropertyHandle and PropertyProvider objects as needed.
-
-   PropertyHandle and PropertyProvider instances are never deleted;
-   they stick around until the process is terminated.
- */
-
-class PropertyHandle;
-class PropertyProvider;
-class PropertyManager;
 class ContextPropertyInfo;
+class PropertyProvider;
 
 class PropertyHandle : public QObject
 {
@@ -70,13 +42,11 @@ public:
     QVariant value() const;
     bool isSubscribePending() const;
     PropertyProvider* provider() const;
-    const ContextPropertyInfo& info() const;
+    const ContextPropertyInfo* info() const;
+
+    static PropertyHandle* instance(const QString& key);
 
     void setValue(QVariant newValue);
-
-    // TODO: Remove these when introspection is ready
-    QString typeName; ///< Type name of this property.
-    QString description; ///< Documentation describing this property.
 
 signals:
     void valueChanged();
@@ -88,18 +58,12 @@ private:
     PropertyHandle(const QString& key);
 
     PropertyProvider *myProvider; ///< Provider of this property
-    QVariant::Type type; ///< QVariant type of this property according to registry
+    ContextPropertyInfo *myInfo; ///< Introspection instance
     unsigned int subscribeCount; ///< Number of subscribed ContextProperty objects subscribed to this property
-    bool subscribePending;
-
-    void update_provider();
-
-    QString myKey;
-    QVariant myValue;
-    ContextPropertyInfo myInfo;
-
-    friend class PropertyManager;
+    bool subscribePending; ///< True when the subscription has been started, but hasn't been finished yet
+                           ///  (used by the waitForSubscription() feature)
+    QString myKey; ///< Name of this context property
+    QVariant myValue; ///< Cached value of this context property
+    static QMap<QString, PropertyHandle*> handleInstances; ///< Container for singletons, see the \c instance(key) call
 };
-
-
 #endif

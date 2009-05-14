@@ -37,18 +37,19 @@ class PropertyProvider : public QObject
     Q_OBJECT
 
 public:
-    void subscribe(PropertyHandle* handle);
-    void unsubscribe(PropertyHandle* handle);
+    ~PropertyProvider();
+    void subscribe(const QString &key);
+    void unsubscribe(const QString &key);
     static PropertyProvider* instance(const QDBusConnection::BusType busType, const QString& busName);
 
     QString getName() const;
+
 
 signals:
     void subscribeFinished(QSet<QString> keys);
 
 private:
     PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
-    ~PropertyProvider();
 
     SubscriberInterface *subscriber; ///< The DBus interface for the Subscriber object
 

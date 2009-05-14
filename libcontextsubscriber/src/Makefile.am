@@ -1,17 +1,17 @@
 lib_LTLIBRARIES = libcontextsubscriber.la
 
 libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
-	  contextproperty.h contextproperty_priv.h propertyhandle.cpp	\
-	  propertyhandle.h propertyprovider.cpp propertyprovider.h	\
-	  propertymanager.cpp propertymanager.h managerinterface.h	\
+	  contextproperty.h propertyhandle.cpp propertyhandle.h		\
+	  propertyprovider.cpp propertyprovider.h managerinterface.h	\
 	  managerinterface.cpp safedbuspendingcallwatcher.h		\
 	  subscriberinterface.h subscriberinterface.cpp			\
 	  contextpropertyinfo.cpp contextpropertyinfo.h			\
 	  contextregistryinfo.cpp contextregistryinfo.h infobackend.h	\
 	  infobackend.cpp infoxmlbackend.h infoxmlbackend.cpp		\
 	  infobackendconfig.h infoxmlkeysfinder.h			\
-	  infoxmlkeysfinder.cpp infokeydata.h cdbwriter.h cdbwriter.cpp \
-          cdbreader.cpp cdbreader.h infocdbbackend.cpp infocdbbackend.h
+	  infoxmlkeysfinder.cpp infokeydata.h cdbwriter.h		\
+	  cdbwriter.cpp cdbreader.cpp cdbreader.h infocdbbackend.cpp	\
+	  infocdbbackend.h
 
 AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
 

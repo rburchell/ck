@@ -116,79 +116,6 @@
 class ContextPropertyPrivate;
 class ContextPropertyInfo;
 
-/*!
-   \class ContextPropertyPrivate
-
-   \brief The private parts of the ContextProperty class.
-*/
-
-/*!
-   \class ContextProperty
-
-   \brief The ContextProperty class allows access to keys and their
-   values.
-
-   The value is available with the value() member function and change
-   notifications are delivered via the valueChanged() signal.
-
-   You can explicity subscribe and unsubscribe using the subscribe()
-   and unsubscribe() member functions.  A ContextProperty is
-   initially subscribed.
-
-   When a ContextProperty is in the unsubscribed state, it usually
-   keeps its last value and the valueChanged() signal is not
-   emitted.  This is not guaranteed however: more than one
-   ContextProperty might exist in your process for the same key, and
-   as long as one of them is subscribed, all of them might receive new
-   values.
-
-   A ContextProperty is generally asynchronous and relies on a running
-   event loop.  Subscritions and unsubcriptions are only handled and
-   new values are only received when your program enters the event
-   loop.
-
-   When a ContextProperty is first created or goes from the
-   unsubcribed to the subscribed state later on, it is temporarily in
-   an intermediate 'subscribing' state.  This state lasts until the
-   negotiations with the provider of the key are over and the key's
-   current value is known to the ContextProperty.
-
-   Thus, there is a time after creating a ContextProperty (or
-   subscribing it again) where value() might be out of sync with the
-   provider of the key.  If you need to wait for this time to be over,
-   you can not rely on the valueChanged() signal being emitted.
-   This signal is only emitted when the value actually changes, which
-   might not happen when subscription is over.
-
-   Instead, you can use the waitForSubscription() member function.
-   This function runs a recursive event loop, if necessary, until the
-   ContextProperty is fully subscribed.
-
-   Thus, the recommended way is to first create all ContextProperty
-   instances that your program needs, then to call
-   waitForSubscription() on those values that are needed to create
-   the initial user interface, and then to connect handlers for the
-   relevant valueChanged() signals.
-   // FIXME: Why not first connect handlers and then waitForSubscription?
-
-   It is important to create all needed ContextProperty instances
-   before calling waitForSubscription() on any of them.  Subscriptions
-   are usually bundled together behind the scenes so that they can all
-   be done with a single round trip to the provider.  Interleaving
-   creation of ContextPropertys with calls to waitForSubscription()
-   would prevent this optimization.
-
-   \note
-   The ContextProperty class is not thread safe and may only be used from
-   an application's main thread.
- */
-
-/*!
-   \fn ContextProperty::valueChanged()
-
-   Emitted whenever the value of the property changes.
- */
-
 class ContextProperty : public QObject
 {
     Q_OBJECT
@@ -203,7 +130,7 @@ public:
     QVariant value(const QVariant &def) const;
     QVariant value() const;
 
-    const ContextPropertyInfo& info() const;
+    const ContextPropertyInfo* info() const;
 
     void subscribe () const;
     void unsubscribe () const;
