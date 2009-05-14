@@ -1,3 +1,9 @@
+contextkit (0.1.6-3~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 14 May 2009 14:25:08 +0300
+
 contextkit (0.1.6-2) unstable; urgency=low
 
   New upstream release.
