@@ -27,6 +27,18 @@
 #include <QObject>
 #include <QDBusConnection>
 
+/*!
+  \class ContextPropertyInfo
+
+  \brief A class to introspect a context property details.
+
+  This class is used to obtain information about a given key in the context registry. 
+  The information can be provided either from xml files or from a cdb database. 
+  It's possible to query the type, the provider and the documentation of the given 
+  key/property.
+
+*/
+
 class ContextPropertyInfo : public QObject
 {
     Q_OBJECT

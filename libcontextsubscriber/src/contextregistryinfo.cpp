@@ -27,6 +27,9 @@ ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
 
 /* Public */
 
+/// Returns the singleton instance of the ContextRegistryInfo. The object
+/// is constructed automaticall on first access. 
+/// \param backendName the optional name of the backend to use (force). 
 ContextRegistryInfo* ContextRegistryInfo::instance(const QString &backendName)
 {
     static QMutex mutex;
@@ -47,16 +50,20 @@ ContextRegistryInfo* ContextRegistryInfo::instance(const QString &backendName)
     return registryInstance;
 }
 
+/// Returns the list of all the keys currently availible in the registry.
 QStringList ContextRegistryInfo::listKeys() const
 {
     return InfoBackend::instance()->listKeys();
 }
 
+/// Returns the list of all the keys associated with the given provider.
 QStringList ContextRegistryInfo::listKeys(QString providername) const
 {
     return InfoBackend::instance()->listKeys(providername);
 }
 
+/// Returns the list of all unique providers in the registry. 
+/// The lists consists of strings with dbus names of the providers.
 QStringList ContextRegistryInfo::listProviders() const
 {
     return InfoBackend::instance()->listProviders();

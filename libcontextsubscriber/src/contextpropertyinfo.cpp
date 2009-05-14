@@ -23,6 +23,9 @@
 #include "infobackend.h"
 #include "sconnect.h"
 
+/// Constructs a new ContextPropertyInfo for \a key with the given \a parent.
+/// The object can be used to perform introspection on the given \a key.
+/// \param key The full name of the key.
 ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
     : QObject(parent)
 {
@@ -34,26 +37,32 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
     }
 }
 
+/// Returns the full name of the introspected key.
 QString ContextPropertyInfo::key() const
 {
     return keyName;
 }
 
+/// Returns the doc (documentation) for the introspected key.
 QString ContextPropertyInfo::doc() const
 {
     return InfoBackend::instance()->docForKey(keyName);
 }
 
+/// Returns the type name for the introspected key.
 QString ContextPropertyInfo::type() const
 {
     return InfoBackend::instance()->typeForKey(keyName);
 }
 
+/// Returns the dbus name of the provider supplying this property/key.
 QString ContextPropertyInfo::providerDBusName() const
 {
     return InfoBackend::instance()->providerForKey(keyName);
 }
 
+/// Returns the bus type of the provider supplying this property/key.
+/// Ie. if it's a session bus or a system bus. 
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
     QString busTypeName = InfoBackend::instance()->providerDBusTypeForKey(keyName);
