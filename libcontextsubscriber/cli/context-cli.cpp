@@ -8,6 +8,7 @@
 int main(int argc, char **argv)
 {
     setenv("CONTEXT_PROVIDERS", ".", 0);
+    ContextProperty::setTypeCheck(true);
 
     QCoreApplication app(argc, argv);
 

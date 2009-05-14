@@ -23,6 +23,7 @@
 #include "propertyprovider.h"
 #include "sconnect.h"
 #include "contextpropertyinfo.h"
+#include "contextproperty.h"
 
 #include <QStringList>
 #include <QHash>
@@ -148,10 +149,46 @@ bool PropertyHandle::isSubscribePending() const
 }
 
 /// Changes the value of the property and emits the valueChanged signal.
-void PropertyHandle::setValue(QVariant newValue)
+void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
 {
-    myValue = newValue;
-    emit valueChanged();
+    // FIXME : Implement the type check here. Remember to check the types of non-nulls only.
+    if (!newValue.isNull() && ContextProperty::isTypeCheck()) {
+        bool checked = false;
+        QString myType = myInfo->type();
+        if (myType == "STRING") {
+            checked = (QVariant::String == newValue.type());
+        } else if (myType == "TRUTH") {
+            checked = (QVariant::Bool == newValue.type());
+        } else if (myType == "DOUBLE") {
+            checked = (QVariant::Double == newValue.type());
+        } else if (myType == "INT") {
+            checked = (QVariant::Int == newValue.type());
+        }
+
+        if (!checked) {
+            qCritical() << "(PROVIDER) ERROR: bad type for" << myKey <<
+                "wanted:" << myType << "got:" << newValue.typeName();
+            return;
+        }
+    }
+
+    // Note: the null we receive is always a non-typed null. We might need to convert it here.
+    if (myValue == newValue && myValue.isNull() == newValue.isNull()) {
+        // The property already has the value we received.
+        // If we're processing the return values of Subscribe, this is normal,
+        // since the return message contains values for the keys subscribed to.
+
+        // If we're not processing the return values of Subscribe, it is an error.
+        // Print out a message of provider error.
+        // In either case, don't emit valueChanged.
+        if (!allowSameValue) {
+            qWarning() << "PROVIDER ERROR: Received unnecessary DBUS signal for property" << myKey;
+        }
+    } else {
+        // The value was new
+        myValue = newValue;
+        emit valueChanged();
+    }
 }
 
 const ContextPropertyInfo* PropertyHandle::info() const

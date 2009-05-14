@@ -145,17 +145,17 @@ public:
     static void ignoreCommander();
 
     static void setTypeCheck(bool typeCheck);
+    static bool isTypeCheck();
 
 signals:
     void valueChanged();
 
 private:
     ContextPropertyPrivate *priv;
+    static bool typeCheck;
 
     void init (const QString &key);
     void finalize ();
-
-    friend class ContextPropertyPrivate;
 };
 
 #endif // CONTEXTPROPERTY_H

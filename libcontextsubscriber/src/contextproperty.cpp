@@ -41,6 +41,7 @@
    \brief The private parts of the ContextProperty class.
 */
 
+bool ContextProperty::typeCheck = false;
 
 struct ContextPropertyPrivate
 {
@@ -255,4 +256,14 @@ void ContextProperty::ignoreCommander()
 const ContextPropertyInfo* ContextProperty::info() const
 {
     return priv->handle->info();
+}
+
+void ContextProperty::setTypeCheck(bool newTypeCheck)
+{
+    typeCheck = newTypeCheck;
+}
+
+bool ContextProperty::isTypeCheck()
+{
+    return typeCheck;
 }

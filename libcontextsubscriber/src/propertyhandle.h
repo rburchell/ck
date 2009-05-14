@@ -46,7 +46,7 @@ public:
 
     static PropertyHandle* instance(const QString& key);
 
-    void setValue(QVariant newValue);
+    void setValue(QVariant newValue, bool allowSameValue);
 
 signals:
     void valueChanged();

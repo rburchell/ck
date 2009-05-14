@@ -150,25 +150,7 @@ void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool proc
             continue;
         }
 
-        // FIXME : Implement the type check here. Remember to check the types of non-nulls only.
-
-        // Note: the null we receive is always a non-typed null. We might need to convert it here.
-        QVariant newValue = i.value();
-        if (h->value() == newValue && h->value().isNull() == newValue.isNull()) {
-            // The property already has the value we received.
-            // If we're processing the return values of Subscribe, this is normal,
-            // since the return message contains values for the keys subscribed to.
-
-            // If we're not processing the return values of Subscribe, it is an error.
-            // Print out a message of provider error.
-            // In either case, don't emit valueChanged.
-            if (!processingSubscription) {
-                qWarning() << "PROVIDER ERROR: Received unnecessary DBUS signal for property" << i.key();
-            }
-        } else {
-            // The value was new
-            h->setValue(newValue);
-        }
+        h->setValue(i.value(), processingSubscription);
     }
 }
 

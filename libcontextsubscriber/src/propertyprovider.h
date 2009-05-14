@@ -70,8 +70,6 @@ private slots:
     void onGetSubscriberFinished(QString objectPath);
     void onSubscribeFinished(QSet<QString> keys);
     void idleHandler();
-
-    friend class PropertyManager; // FIXME: check if this can be removed
 };
 
 #endif
