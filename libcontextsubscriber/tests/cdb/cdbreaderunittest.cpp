@@ -26,6 +26,7 @@
 void CDBReaderUnitTest::basicCreation()
 {
     CDBReader reader("test.cdb");
+    QCOMPARE(reader.isReadable(), true);
 
     QCOMPARE(reader.valueForKey("KEY1"), QString("KEY1Value"));
 

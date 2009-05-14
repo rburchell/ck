@@ -39,6 +39,7 @@ public:
     void reopen();
     QString valueForKey(const QString &key) const;
     QStringList valuesForKey(const QString &key) const;
+    bool isReadable();
 
 private:
     QString path;

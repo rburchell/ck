@@ -39,6 +39,7 @@ public:
     void insert(const QString &key, const QString &val);
     void replace(const QString &key, const QString &val);
     void close();
+    bool isWritable();
 
 private:
     void *cdbm;

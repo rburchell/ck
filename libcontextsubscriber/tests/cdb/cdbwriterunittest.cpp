@@ -26,6 +26,8 @@
 void CDBWriterUnitTest::basicCreation()
 {
     CDBWriter writer("test.cdb");
+    QCOMPARE(writer.isWritable(), true);
+
     writer.add("KEYS", "KEYSValue1");
     writer.add("KEYS", "KEYSValue2");
     writer.add("KEYS", "KEYSValue3");

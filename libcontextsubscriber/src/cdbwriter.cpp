@@ -31,7 +31,7 @@ CDBWriter::CDBWriter(const QString &path, QObject *parent)
 
     fd = open(path.toUtf8().constData(), O_RDWR | O_CREAT, 0644);
 
-    if (fd != 0) {
+    if (fd > 0) {
         cdbm = calloc(1, sizeof(struct cdb_make));
         cdb_make_start((struct cdb_make *) cdbm, fd);
     }
@@ -65,10 +65,15 @@ void CDBWriter::close()
         cdbm = NULL;
     }
 
-    if (fd != 0) {
+    if (fd > 0) {
         ::close(fd);
         fd = 0;
     }
+}
+
+bool CDBWriter::isWritable()
+{
+    return (fd > 0);
 }
 
 /* Private */

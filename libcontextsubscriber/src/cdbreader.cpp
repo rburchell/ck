@@ -46,7 +46,7 @@ void CDBReader::close()
         cdb = NULL;
     }
 
-    if (fd != 0) {
+    if (fd > 0) {
         ::close(fd);
         fd = 0;
     }
@@ -61,7 +61,7 @@ void CDBReader::reopen()
 
     fd = open(path.toUtf8().constData(), O_RDONLY);
 
-    if (fd != 0) {
+    if (fd > 0) {
         cdb = calloc(1, sizeof(struct cdb));
         if (cdb_init((struct cdb*) cdb, fd) != 0) {
             free(cdb);
@@ -120,4 +120,9 @@ QStringList CDBReader::valuesForKey(const QString &key) const
     }
 
     return list;
+}
+
+bool CDBReader::isReadable()
+{
+    return (fd > 0);
 }
