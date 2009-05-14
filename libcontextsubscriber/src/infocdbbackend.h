@@ -53,7 +53,12 @@ public:
     static bool databaseExists();
 
 private:
+    QFileSystemWatcher watcher;
     CDBReader reader;
+
+private slots:
+    void onDatabaseFileChanged(const QString &path);
+
 };
 
 #endif // INFOXMLBACKEND_H

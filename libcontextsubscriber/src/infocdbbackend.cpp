@@ -32,6 +32,8 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
 {
     qDebug() << "CDB backend with database" << InfoCdbBackend::databasePath();
+    watcher.addPath(InfoCdbBackend::databasePath());
+    sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
 }
 
 QString InfoCdbBackend::name() const
@@ -88,4 +90,20 @@ QString InfoCdbBackend::databasePath()
 
     return QString(regpath) + "context-providers.cdb";
 }
+
+/* Slots */
+
+void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
+{
+    QStringList oldKeys = listKeys();
+
+    reader.reopen();
+
+    emit keysChanged(listKeys());
+
+    foreach(QString key, oldKeys) {
+        emit keyDataChanged(key);
+    }
+}
+
 
