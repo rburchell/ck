@@ -29,6 +29,7 @@ class CDBReaderUnitTest : public QObject
 
 private slots:
     void basicCreation();
+    void doesNotExist();
     void cleanupTestCase();
 };
 

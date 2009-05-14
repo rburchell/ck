@@ -29,5 +29,6 @@ class CDBWriterUnitTest : public QObject
 
 private slots:
     void basicCreation();
+    void noPermissions();
 };
 

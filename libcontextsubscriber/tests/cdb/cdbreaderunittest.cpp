@@ -40,6 +40,13 @@ void CDBReaderUnitTest::basicCreation()
     reader.close();
 }
 
+void CDBReaderUnitTest::doesNotExist()
+{
+    CDBReader reader("/usr/test.cdb");
+    QCOMPARE(reader.isReadable(), false);
+    reader.close();
+}
+
 void CDBReaderUnitTest::cleanupTestCase()
 {
     QFile::remove("test.cdb");

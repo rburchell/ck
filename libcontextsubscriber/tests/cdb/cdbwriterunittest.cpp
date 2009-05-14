@@ -36,4 +36,11 @@ void CDBWriterUnitTest::basicCreation()
     writer.close();
 }
 
+void CDBWriterUnitTest::noPermissions()
+{
+    CDBWriter writer("/usr/test.cdb");
+    QCOMPARE(writer.isWritable(), false);
+    writer.close();
+}
+
 #include "moc_cdbwriterunittest_cpp.cpp"
