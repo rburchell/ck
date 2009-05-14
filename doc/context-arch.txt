@@ -138,27 +138,6 @@ start to use the Context Framework before all providers are
 available. Properties become dynamically available as providers become
 available, and removed when providers are no longer available.
 
-[dotty,fig2.svg]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-digraph G {
-
-  node [shape=record, style=filled];
-
-  xml
-    [label="Static\nProperty List", shape=note];
-  registry
-    [label="Registry", shape=box];
-  app       
-    [label="{Application | libcontextsubscriber}"];
-  provider  
-    [label="Provider",shape=box];
-
-  provider -> xml
-  xml -> registry [label="update-context-properties"];
-  app -> registry
-}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Communication between a +ContextProperty+ and the provider happens
 using a private D-Bus interface.  This interface allows for bulk
 retrieval of property values, bulk subscriptions, and bulk change
@@ -182,48 +161,13 @@ context providers as described above.  Additional context properties,
 such as those related to the Location Framework, are implemented by
 the _context daemon_ contained in the Context Framework.
 
-The following diagram shows the structural view in a typical scenario.
-
-[dotty,fig1.svg]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-digraph G {
-
-  node [shape=record, style=filled];
-
-  contextd  
-    [label="{libcontextprovider | Context Daemon }"];
-  libgeo
-    [label="libgeo", shape=box];
-  app       
-    [label="{Application | libcontextsubscriber}"];
-  status       
-    [label="{Battery Status Plugin | libcontextsubscriber}"];
-  sensfw
-    [label="{libcontextprovider | sensord}"];
-  confw
-    [label="{libcontextprovider | Connectivity Framework}"];
-  npe
-    [label="NPE", shape=box];
-  hal
-    [label="HAL", shape=box];
-
-  app -> contextd
-  contextd -> libgeo -> npe;
-  contextd -> sensfw [label=" org.freedesktop.ContextKit "];
-
-  app -> confw   [label=" org.freedesktop.ContextKit "];
-
-  app -> sensfw
-
-  status -> contextd -> hal
-}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 The +contextd+ Context Daemon will implement all context properties
 that don't have a native provider.  It will at least implement
 properties for the information contained in HAL and for location
 related information.  It is expected that +contextd+ runs the
-necessary reverse geocoding operations at a reasonable frequency.
+necessary reverse geocoding operations at a reasonable frequency.  It
+will also perform Content Framework queries to retrieve the values of
+certain properties.
 
 If necessary for security reasons, the +contextd+ might need to be
 split into multiple instances.
@@ -235,22 +179,84 @@ System context
 The context framework decouples context subscribers from context
 providers.
 
-[dotty,fig3.svg]
+[dotty,fig3.png]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 digraph G {
 
-  node [shape=box, style=filled];
+  graph [size="8,100"];
+  node [shape=box, style=filled, fontsize=11];
+  edge [fontsize=11];
+
 
   "Application 1" -> "Context Framework"
   "Application 2" -> "Context Framework"
   "Statusbar plugin" -> "Context Framework"
-
   "Central Policy" -> "Context Framework"
 
-  "Sensor Framework" -> "Context Framework"
-  "Connectivity" -> "Context Framework"
+  "Context Framework" -> "Connectivity" [dir="back"]
   "Context Framework" -> "Location Framework"
   "Context Framework" -> "HAL"
+  "Context Framework" -> "Sensor Framework" [dir="back"]
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Structural view
+~~~~~~~~~~~~~~~
+
+The following figure summarizes the components of the Context
+Framework.
+
+[dotty,fig4.png]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+digraph G {
+
+  graph [size="8,100"];
+  node [shape=box, style=filled, fontsize=11];
+  edge [fontsize=11];
+
+  { rank=source
+    app [label="<<process>>\n\napplication"];
+  }
+
+  subgraph cluster0 { 
+    label="Context Framework"
+
+    registry [label="<<XML documents>>\n\n/usr/share/context-providers/"];
+    cache [label="<<CDB file>>\n\ncache.cdb"];
+    libsub [label="<<library>>\n\nlibcontextsubscriber"];
+    update [label="<<utility>>\n\nupdate-context-providers"];
+    libprov [label="<<library>>\n\nlibcontextprovider"];
+    contextd [label="<<process>>\n\ncontextd"];
+
+    commander [label="<<utility>>\n\ncontext-commander"];
+    corepros [label="<<XML document>>\n\ncore properties", shape=note];
+
+    // update -> registry [label="<<read>>"]
+    // update -> cache [label="<<write>>"]
+    registry -> update [label="<<read>>", dir="back"]
+    cache -> update [label="<<write>>", dir="back"]
+
+    libsub -> libprov [label="<<D-Bus>>"]
+    libsub -> registry [label="<<read>>"]
+    libsub -> cache [label="<<read>>"]
+    libprov -> contextd [label="<<link>>", dir="back"]
+  }
+
+  {
+    rank=sink
+    props [label="<<XML document>>\n\nicd2-props.xml", shape=note];
+    icd2 [label="<<process>>\n\nicd2"];
+    libgeo [label="<<library>>\n\nlibgeo"];
+    libhal [label="<<library>>\n\nlibhal"];
+  }
+
+  app -> libsub [label="<<link>>"]
+
+  registry -> props [dir="back"]
+  contextd -> libgeo [label="<<link>>"]
+  contextd -> libhal [label="<<link>>"]
+  libprov -> icd2 [label="<<link>>", dir="back"]
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -263,10 +269,10 @@ context framework:
   +
   This applies to: HAL, Location subsystem, Kernel.
 
-- The principal producer of the information, such as a daemon in the
-  Connectivity subsystem, can use the libcontextprovider API and
-  export the information directly to applications without using the
-  context daemon as a middle man.
+- The principal producer of the information, such as the +icd2+ daemon
+  in the Connectivity subsystem, can use the libcontextprovider API
+  and export the information directly to applications without using
+  the context daemon as a middle man.
   +
   This applies to: Sensor Framework, possibly Connectivity subsystem
   (needs agreeement), possibly Telephony subsystem (needs agreement)
@@ -307,6 +313,12 @@ link:context-providers.html[Documentation]
 Development support
 ~~~~~~~~~~~~~~~~~~~
 
+No special features are needed in the Context Framework components to
+make them work in a Scratchbox environment.  Availability of
+individual properties depends on the ability of their providers to run
+in Scratchbox.  The +contextd+ Context Daemon runs but might not be
+able to provide all properties.
+
 The Context Framework provides a graphical tool called the Context
 Commander to watch all available context properties.  This can be used
 to test context providers during development.
@@ -323,8 +335,11 @@ itself.
 When started, the Context Commander takes control of all subscribers
 with their cooperation: when the
 "org.freedesktop.ContextKit.Commander" name appears on the session
-D-Bus, all ContextProperty instances redirect their subcription requests
-to it.
+D-Bus, all ContextProperty instances redirect their subcription
+requests to it.
+
+There are vague ideas about integrating the Context Commander into
+Eclipse.
 
 Licenses
 ~~~~~~~~
