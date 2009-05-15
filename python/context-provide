@@ -29,6 +29,7 @@ if busaddress[0] not in ('session', 'system'):
     sys.exit(2)
 while len(sys.argv) >= 3:
     datatype, name, initvalue = sys.argv[:3]
+    datatype = datatype.lower()
     del sys.argv[:3]
     if datatype not in types:
         continue
