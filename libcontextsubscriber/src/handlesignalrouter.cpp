@@ -37,9 +37,8 @@ HandleSignalRouter* HandleSignalRouter::instance()
     return myInstance;
 }
 
-void HandleSignalRouter::onValueChanged(QString key, QVariant value,
-                                        PropertyProvider* provider, bool processingSubscription)
+void HandleSignalRouter::onValueChanged(QString key, QVariant value, bool processingSubscription)
 {
     PropertyHandle* handle = PropertyHandle::instance(key);
-    handle->setValue(value, provider, processingSubscription);
+    handle->setValue(value, processingSubscription);
 }

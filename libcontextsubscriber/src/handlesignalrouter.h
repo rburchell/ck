@@ -26,8 +26,6 @@
 #include <QString>
 #include <QVariant>
 
-class PropertyProvider;
-
 class HandleSignalRouter : public QObject
 {
     Q_OBJECT
@@ -35,7 +33,7 @@ public:
     static HandleSignalRouter* instance();
 
 public slots:
-    void onValueChanged(QString key, QVariant value, PropertyProvider* provider, bool processingSubscription);
+    void onValueChanged(QString key, QVariant value, bool processingSubscription);
 
 private:
     HandleSignalRouter();

@@ -149,20 +149,8 @@ bool PropertyHandle::isSubscribePending() const
 }
 
 /// Changes the value of the property and emits the valueChanged signal.
-void PropertyHandle::setValue(QVariant newValue, PropertyProvider* provider, bool allowSameValue)
+void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
 {
-    // Discard the value if it is coming from a provider which should not provide it
-    if (provider != myProvider)
-    {
-        if (myProvider == 0) {
-            qWarning() << "Received property not in registry:" << myKey;
-        }
-        else {
-            qWarning() << "Received property not handled by this provider:" << myKey;
-        }
-        return;
-    }
-
     // FIXME : Implement the type check here. Remember to check the types of non-nulls only.
     if (!newValue.isNull() && ContextProperty::isTypeCheck()) {
         bool checked = false;

@@ -63,8 +63,8 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
 
     // Connect the signal of changing values to the class who handles it
     HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
-    sconnect(this, SIGNAL(valueChanged(QString, QVariant, PropertyProvider*, bool)),
-             handleSignalRouter, SLOT(onValueChanged(QString, QVariant, PropertyProvider*, bool)));
+    sconnect(this, SIGNAL(valueChanged(QString, QVariant, bool)),
+             handleSignalRouter, SLOT(onValueChanged(QString, QVariant, bool)));
 
 }
 
@@ -177,7 +177,12 @@ void PropertyProvider::unsubscribe(const QString &key)
 void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription)
 {
     for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
-        emit valueChanged(i.key(), i.value(), this, processingSubscription);
+        if (subscribedKeys.contains(i.key()) == false) {
+            qWarning() << "Received a property not subscribed to:" << i.key();
+            continue;
+        }
+
+        emit valueChanged(i.key(), i.value(), processingSubscription);
         // Note: HandleSignalRouter will catch this signal and set the value of the
         // corresponding PropertyHandle.
     }

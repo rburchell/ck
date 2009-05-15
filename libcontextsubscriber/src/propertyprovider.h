@@ -45,7 +45,7 @@ public:
 
 signals:
     void subscribeFinished(QSet<QString> keys);
-    void valueChanged(QString key, QVariant value, PropertyProvider* provider, bool processingSubscription);
+    void valueChanged(QString key, QVariant value, bool processingSubscription);
 
 private:
     PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
