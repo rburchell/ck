@@ -47,4 +47,3 @@ Gives a readline wrapped provider shell with a initial string property.
 
 NOTE: you must give default values for initial properties (the script
 reads them in 3 at a time).
-
