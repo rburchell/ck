@@ -21,7 +21,7 @@
 
 #include "propertyprovider.h"
 
-#include "propertyhandle.h"
+#include "handlesignalrouter.h"
 #include "sconnect.h"
 #include "subscriberinterface.h"
 #include "dbusnamelistener.h"
@@ -60,6 +60,12 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
              SIGNAL(nameAppeared()),
              this,
              SLOT(onProviderDisappears()));
+
+    // Connect the signal of changing values to the class who handles it
+    HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
+    sconnect(this, SIGNAL(valueChanged(QString, QVariant, PropertyProvider*, bool)),
+             handleSignalRouter, SLOT(onValueChanged(QString, QVariant, PropertyProvider*, bool)));
+
 }
 
 void PropertyProvider::onProviderAppears()
@@ -168,18 +174,9 @@ void PropertyProvider::unsubscribe(const QString &key)
 void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription)
 {
     for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
-        // Get the PropertyHandle corresponding to the property to update.
-        // FIXME: handlefactory->handle(i.key())
-        PropertyHandle *h = PropertyHandle::instance(i.key());
-        if (h->provider() != this) {
-            if (h->provider() == 0)
-                qWarning() << "Received property not in registry:" << i.key();
-            else
-                qWarning() << "Received property not handled by this provider:" << i.key();
-            continue;
-        }
-
-        h->setValue(i.value(), processingSubscription);
+        emit valueChanged(i.key(), i.value(), this, processingSubscription);
+        // Note: HandleSignalRouter will catch this signal and set the value of the
+        // corresponding PropertyHandle.
     }
 }
 
