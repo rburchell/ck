@@ -46,6 +46,7 @@ class ContextPropertyInfo : public QObject
 public:
     explicit ContextPropertyInfo(const QString &key, QObject *parent = 0);
 
+    /// Destroys the object.
     virtual ~ContextPropertyInfo() {}
 
     QString key() const;
