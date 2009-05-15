@@ -87,11 +87,22 @@ appliciable to the current location, they will be unavailable.
     <key name="CountryCode" type="string">
       <doc>The ISO 3166 two letter country code of the country which contains the location of the device.</doc>
     </key>
+    <key name="Timezone" type="string">
+      <doc>TBD</doc>
+    </key>
+    <key name="TimezoneOffset" type="duration">
+      <doc>TBD</doc>
+    </key>
     <key name="Continent" type="string">
       <doc>The localized name of the current continent, as a string.</doc>
     </key>
     <key name="Planet" type="string">
       <doc>The localized name of the current planet (or dwarf planet), as a string.</doc>
+    </key>
+    <key name="PointOfInterest" type="string">
+      <doc>
+The URI of the current point of interest, if any.  (The URI points to a Nepomuk object.)
+      </doc>
     </key>
   </node>
   <node name="Battery">
@@ -101,26 +112,26 @@ Battery
 
 Information about the batteries of the device.
     </doc>
-    <key name="ChargePercentage" type="INT">
+    <key name="ChargePercentage" type="percentage">
       <doc>
 The average charge level of the currently connected batteries. 
 Expressed as percentage of the maximum charge level.
       </doc>
     </key>
-    <key name="OnBattery" type="TRUTH">
+    <key name="OnBattery" type="bool">
       <doc>
 Whether or not the device is currently running on battery power,
 i.e., whether at least one of its batteries is currently discharging.
       </doc>
     </key>
-    <key name="LowBattery" type="TRUTH">
+    <key name="LowBattery" type="bool">
       <doc>
 Whether or not the device is currently running on low battery power.
 True if OnBattery is true and the charge levels of all 
 batteries are below 10%.
       </doc>
     </key>
-    <key name="IsCharging" type="TRUTH">
+    <key name="IsCharging" type="bool">
       <doc>
 Whether or not the device is currently charging at least one of its batteries.
       </doc>
@@ -144,9 +155,62 @@ Network connectivity
 
 Information about the network connectivity of the device.
     </doc>
+    <key name="HasInternet" type="bool">
+      <doc>
+Whether	or not the device is connected to the Internet.
+      </doc>
+    </key>
+    <key name="InternetIsFlatRate" type="bool">
+      <doc>
+Whether or not traffic to/from the Internet is billed per data volume
+(property is false) or per time (property is true).
+      </doc>
+    </key>
+    <key name="InternetNetworkType" type="string-enum">
+      <doc>
+The type of the current connection to the Internet, such as GPRS,
+WLAN, etc.  The possible value are TBD.
+      </doc>
+    </key>
+    <key name="InternetTrafficOut" type="percent">
+      <doc>
+A rough indication of the current traffic rate to the Internet, in
+percent of the maximum possible rate.
+      </doc>
+    </key>
+    <key name="InternetTrafficIn" type="percent">
+      <doc>
+A rough indication of the current traffic rate from the Internet, in
+percent of the maximum possible rate.
+      </doc>
+    </key>
+    <key name="BluetoothEnabled" type="bool">
+      <doc>
+A boolean indicating whether or not the Bluetooth radio is enabled.
+      </doc>
+    </key>
+    <key name="BluetoothTrafficOut" type="percent">
+      <doc>
+A rough indication of the current outgoing traffic rate over
+Bluetooth, in percent of the maximum possible rate.
+      </doc>
+    </key>
+    <key name="BluetoothTrafficIn" type="percent">
+      <doc>
+A rough indication of the current incoming traffic rate over
+Bluetooth, in percent of the maximum possible rate.
+      </doc>
+    </key>
+    <key name="BluetoothConnected" type="bool">
+      <doc>
+A boolean indicating whether or not there is a active BlueTooth
+connection.  (I don't know much about the BlueTooth connection model,
+please help.)
+      </doc>
+    </key>
     <key name="SignalStrength" type="percentage">
       <doc>
-	The strength of the radio connection.
+The strength of the radio connection.
       </doc>
     </key>
   </node>
@@ -274,6 +338,37 @@ compass terms: North, South-West, etc.
 - *WindDirectionD*
 +
 The wind direction in degrees.  North is 0, east is 90, etc.
+      </doc>
+    </key>
+    <key name="NearbyContacts" type="string-list">
+      <doc>
+A list of URIs for contacts that are physically nearby.  (The URIs
+point to Nepomuk objects.)
+      </doc>
+    </key>    
+    <key name="ConnectedContacts" type="string-list">
+      <doc>
+A list of URIs for contacts that the user is currently engaged in
+conversations with.  (The URIs point to Nepomuk objects.)
+      </doc>
+    </key>    
+  </node>
+  <node name="State">
+    <doc>
+State
+-----
+
+Information about the global state of the device.
+    </doc>
+    <key name="Situation" type="string">
+      <doc>
+The symbolic name of the current "Situation".  (Situations are a UI
+concept similar to Profiles that allows the user to have different
+customizations for his/her device and automatically/explcicitly switch
+between them.  Typical Situations are "AtHome", "AtWork", "InMeeting"
+etc.  Some of them are probably pre-defined, others can be defined by
+the user.  Situations might form a hierarchy: InMeeting includes
+AtWork.  Have to investigate this, obviously.)
       </doc>
     </key>
   </node>

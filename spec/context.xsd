@@ -152,6 +152,9 @@
       <enumeration value="percentage"/>
       <enumeration value="map"/>
       <enumeration value="string-enum"/>
+      <enumeration value="string-list"/>
+      <enumeration value="duration"/>
+      <enumeration value="percent"/>
     </restriction>
   </simpleType>
 </schema>

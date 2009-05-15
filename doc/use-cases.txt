@@ -10,6 +10,8 @@ to function optimally e.g. Email and online browsing. This should be
 integrated with the appearance of the home screen and within
 applications. (Homecreen, Menu, Connectivity)
 
+    Connectivity.HasInternet
+
 5:: Automatic theme change e.g. time / location based themes
 (fun/entertainment). During working hours the theme indicates the user
 is at work, the time and location. The theme can change when work
@@ -17,32 +19,48 @@ hours are typically finished or according to a calendar. When a
 workday is over or it is the weekend the theme could have a different
 feel.
 
+    State.Situation
+
 10:: Create reminder to show the note (e.g. shopping list) next time
 visiting local store, create reminder to buy or do X when entering
 store / shopping mall / specific location and time.
 
+    Location.PointOfInterest
+
 11:: Device informs me of timezone differences that may affect my
 communications: e.g. calling a contact in LA when in Finland a query
 is shown "it's 3am in LA - are you sure you wish to make the call?"
+
+    Location.TimezoneOffset
 
 14:: If user is running and playlist ends then player will repeat the
 playlist rather than stop and require user action to reselect. There
 could be a visual to show the user the playlist is on repeat so they
 know what has happened when they stop.
 
+    State.Situation == Running
+
 15:: View meeting location from Calendar meeting invitation, possibility
 to navigate to location from current position
+
+    (maps people)
 
 16:: Device offers a city guide or map if in a new location (after
 checking that the local guide/map does not exist). User can choose to
 purchase and use.
 
+    Location.City etc
+
 18:: Text-to-speech preview of messages (make "listen" option visible),
 learn if user always wants to hear messages in the car or not
+
+    State.Situation == InCar   (no learning)
 
 19:: The device becomes aware of the fact, that it is in an office
 environment and assumes a special “profile”, with e.g. discreet
 alarms, homescreen, theme
+
+    State.Situation == InOffice
 
 20:: Get location and orientation data when using the device camera. For
 example, this data can be used to created automatic metadata and tags
@@ -51,9 +69,14 @@ service or utilized to show nearby POIs and tappable links to them to
 see more info from web/Maps application when watching through the
 camera viewfinder (GPS+accelerometer+magnetometer)
 
+    Map context into content ontology.
+
 21:: Automatically disable media online services and RSS feed updates
 when user is roaming or no free Wi-Fi connection available based on
 user preferences/settings
+
+    Connectivity.HasInternet
+    Connectivity.InternetIsFlatRate
 
 22:: When user is moving enlarge some of the buttons, so that it is
 easier to press those in all media applications
@@ -61,13 +84,20 @@ easier to press those in all media applications
 tools based on user's current activity or mode of traveling (walking,
 driving, etc.)
 
+    State.Situation
+
 29:: Highlighted in the soup content and in contacts. Also related
 content can be highlighted in different applications (e.g. browsing
 photos, Jack comes near, all Jack’s pictures are highlighted)
 
+    Environment.NearbyContacts
+    Environment.ConnectedContacts
+
 30:: Displays relevant content useful for the user - traffic report
 widget in car and during commute time - transit (bus/train schedule,
 stops) information before and during commute time.
+
+    State.Situation == Commuting
 
 32:: Connecting to best available connection. If Wlan is available and
 reliable the the device will connect through this.  When it is not
@@ -75,9 +105,13 @@ available the device will connect through the next best connect
 possibility. There may be settings for the device to behave
 differently on different connection types.
 
+    State.Situation, but mostly connectivity people
+
 41:: Screen brightness increases/decreases depending on the
 environment. For example; driving car at night time, screen is not
 100% bright to save your eyes and not blind you.
+
+    Hmmm.
 
 Should Have
 -----------
