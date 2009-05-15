@@ -37,6 +37,7 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
 
         cachedType = InfoBackend::instance()->typeForKey(keyName);
         cachedProvider = InfoBackend::instance()->providerForKey(keyName);
+        cachedProviderDBusType = InfoBackend::instance()->providerDBusTypeForKey(keyName);
     }
 }
 
@@ -68,11 +69,9 @@ QString ContextPropertyInfo::providerDBusName() const
 /// Ie. if it's a session bus or a system bus. 
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
-    QString busTypeName = InfoBackend::instance()->providerDBusTypeForKey(keyName);
-    
-    if (busTypeName == "session")
+    if (cachedProviderDBusType == "session")
         return QDBusConnection::SessionBus;
-    else if (busTypeName == "system")
+    else if (cachedProviderDBusType == "system")
         return QDBusConnection::SystemBus;
     else
         return QDBusConnection::SessionBus;
@@ -88,13 +87,19 @@ void ContextPropertyInfo::onKeyDataChanged(QString key)
     QString newType = InfoBackend::instance()->typeForKey(keyName);
     if (cachedType != newType) {
         cachedType = newType;
-        emit typeChanged(newType);
+        emit typeChanged(cachedType);
     }
 
     QString newProvider = InfoBackend::instance()->providerForKey(keyName);
     if (cachedProvider != newProvider) {
         cachedProvider = newProvider;
-        emit providerChanged(providerDBusName());
+        emit providerChanged(cachedProvider);
+    }
+
+    QString newProviderDBusType = InfoBackend::instance()->providerDBusTypeForKey(keyName);
+    if (cachedProviderDBusType != newProviderDBusType) {
+        cachedProviderDBusType = newProviderDBusType;
+        emit providerDBusTypeChanged(providerDBusType());
     }
 }
 

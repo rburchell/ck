@@ -59,12 +59,14 @@ private:
     QString keyName;
     QString cachedType;
     QString cachedProvider; 
+    QString cachedProviderDBusType;
 
 private slots:
     void onKeyDataChanged(QString key);
 
 signals:
     void providerChanged(QString newProvider);
+    void providerDBusTypeChanged(QDBusConnection::BusType busType);
     void typeChanged(QString newType);
 };
 
