@@ -14,20 +14,36 @@ to get a clue how to write your own provider.  The `context-provide'
 script allows you to start up a provider from the command line, without
 writing any Python code.
 
-The interactive mode supports the following commands on the standard
-input (note that this is Python syntax, and it gets eval()ed):
+The interactive mode stops on closing stdin, and supports the following
+commands (note that this is Python syntax, and it gets eval()-ed):
 
     set(property, value):  sets the given property
     get(property):         prints the value of the property
     reset(property):       resets the property
     add(propertydesc):     adds a new property, see simple.py for
-                           examples of propertydesc  
+                           examples of propertydesc
     info():                prints properties and their values
     quit():                stops the whole thing
 
-The provider will stop also if stdin is closed.
+You may use `context-rlwrap' as illustrated below fora more friendly
+readline interface:
 
-You may use `context-rlwrap' as illustrated below to enjoy a more
-friendlier readline interface:
+  context-rlwrap ./context-provide my.fake.provider
 
-  context-rlwrap ./context-provide.py my.fake.provider
+Examples:
+
+Starts up a provider, initially having a single integer property named
+'an.example' with the default value of 32.
+
+  ./context-provide my.provider.name int an.example 32
+
+Starts up the provider on the system bus without any properties.
+
+  ./context-provide system:org.bottomdrawer.kit2000
+
+Gives a readline wrapped provider shell with a initial string property.
+
+  ./context-rlwrap context-provide your.cool.provider string my.name 'bond'
+
+NOTE: you must give default values for initial properties (the script
+reads them in 3 at a time).
