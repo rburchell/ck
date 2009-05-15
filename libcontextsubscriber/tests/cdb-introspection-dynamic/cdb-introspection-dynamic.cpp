@@ -30,6 +30,7 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
 
     setenv("CONTEXT_PROVIDERS", "./", 0);
+    QFile::copy("context-providers1v1.cdb", "context-providers.cdb");
 
     ContextRegistryInfoUnitTest test1;
     QTest::qExec(&test1);
@@ -37,5 +38,6 @@ int main(int argc, char **argv)
     ContextPropertyInfoUnitTest test2;
     QTest::qExec(&test2);
 
+    QFile::remove("context-providers.cdb");
     return 0;
 }

@@ -27,7 +27,6 @@
 
 void ContextRegistryInfoUnitTest::initTestCase()
 {
-    QFile::copy("context-providers1v1.cdb", "context-providers.cdb");
     context = ContextRegistryInfo::instance("cdb");
     QVERIFY(context != NULL);
 }
@@ -54,9 +53,4 @@ void ContextRegistryInfoUnitTest::basicChange()
     QVERIFY(newKeys.contains("Battery.AboutToExplode"));
 }
 
-void ContextRegistryInfoUnitTest::cleanupTestCase()
-{
-    QFile::remove("context-providers.cdb");
-}
-    
 #include "moc_contextregistryinfounittest_cpp.cpp"

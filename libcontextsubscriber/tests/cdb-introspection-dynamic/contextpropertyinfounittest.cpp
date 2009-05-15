@@ -68,9 +68,4 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
     QVERIFY(prop.doc() == "");
 }
 
-void ContextPropertyInfoUnitTest::cleanupTestCase()
-{
-    QFile::remove("context-providers.cdb");
-}
-
 #include "moc_contextpropertyinfounittest_cpp.cpp"
