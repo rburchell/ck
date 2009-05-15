@@ -94,6 +94,9 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
             data.doc = currentKeyDoc;
             data.provider = currentProvider;
             data.bus = currentBus;
+
+            if (keyDataHash.contains(currentKeyName)) 
+                qDebug() << "WARNING: key" << currentKeyName << "already defined in this xml file. Overwriting.";
             keyDataHash.insert(currentKeyName, data);
         }
 

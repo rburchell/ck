@@ -188,6 +188,9 @@ void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
 
     // Use insert here instead of unite to overwrite keys
     foreach (QString key, handler.keyDataHash.keys()) {
+        if (keyDataHash.contains(key)) 
+            qDebug() << "WARNING: key" << key << "already defined in previous xml file. Overwriting.";
+
         keyDataHash.insert(key, handler.keyDataHash.value(key));
     }
 }
