@@ -127,12 +127,36 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     if (! watcher.files().contains(InfoCdbBackend::databasePath()))
         watcher.addPath(InfoCdbBackend::databasePath());
 
+    QStringList currentKeys = listKeys();
+
+    // Build the list of new keys
+    // FIXME Put this into shared codebase of the backend
+    QStringList addedKeys;
+    foreach (QString key, currentKeys) {
+        if (! oldKeys.contains(key))
+            addedKeys << key;
+    }
+
+    // Build the list of the removed keys
+    // FIXME Put this into shared codebase of the backend
+    QStringList removedKeys;
+    foreach (QString key, oldKeys) {
+        if (! currentKeys.contains(key))
+            removedKeys << key;
+    }
+
+    // Emissions
     emit keysChanged(listKeys());
+
+    if (addedKeys.size() > 0)
+        emit keysAdded(addedKeys);
+
+    if (removedKeys.size() > 0)
+        emit keysRemoved(removedKeys);
 
     foreach(QString key, oldKeys) {
         emit keyDataChanged(key);
     }
-
 }
 
 

@@ -61,9 +61,13 @@ private:
 
 private slots:
     void onKeysChanged(QStringList currentKeys);
+    void onKeysAdded(QStringList newKeys);
+    void onKeysRemoved(QStringList removedKeys);
 
 signals:
     void keysChanged(QStringList currentKeys);
+    void keysAdded(QStringList newKeys);
+    void keysRemoved(QStringList removedKeys);
 };
 
 #endif

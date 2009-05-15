@@ -45,6 +45,8 @@ public:
 
 signals:
     void keysChanged(QStringList currentKeys);
+    void keysAdded(QStringList newKeys);
+    void keysRemoved(QStringList removedKeys);
     void keyDataChanged(QString key);
 
 private:

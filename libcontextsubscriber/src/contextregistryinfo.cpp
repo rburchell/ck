@@ -40,8 +40,15 @@ ContextRegistryInfo* ContextRegistryInfo::instance(const QString &backendName)
         if (! registryInstance) {
             InfoBackend::instance(backendName);
             registryInstance = new ContextRegistryInfo;
+            
             sconnect(InfoBackend::instance(), SIGNAL(keysChanged(QStringList)), 
                      registryInstance, SLOT(onKeysChanged(QStringList)));
+
+            sconnect(InfoBackend::instance(), SIGNAL(keysAdded(QStringList)), 
+                     registryInstance, SLOT(onKeysAdded(QStringList)));
+            
+            sconnect(InfoBackend::instance(), SIGNAL(keysRemoved(QStringList)), 
+                     registryInstance, SLOT(onKeysRemoved(QStringList)));
         }
  
         mutex.unlock();
@@ -74,5 +81,15 @@ QStringList ContextRegistryInfo::listProviders() const
 void ContextRegistryInfo::onKeysChanged(QStringList currentKeys)
 {
     emit(keysChanged(currentKeys));
+}
+
+void ContextRegistryInfo::onKeysAdded(QStringList newKeys)
+{
+    emit(keysAdded(newKeys));
+}
+
+void ContextRegistryInfo::onKeysRemoved(QStringList removedKeys)
+{
+    emit(keysRemoved(removedKeys));
 }
 
