@@ -65,8 +65,22 @@ private slots:
     void onKeyDataChanged(QString key);
 
 signals:
+    /// Emitted when the provider of the key changes. The \a newProvider 
+    /// contains the name of the new provider. This is a strict signal -
+    /// it's emitted only when there was an actual change in the value.
+    /// \param newProvider The DBus name of the new provider.
     void providerChanged(QString newProvider);
-    void providerDBusTypeChanged(QDBusConnection::BusType busType);
+
+    /// Emitted when the bus type of provider of the key changes. The 
+    /// \a newBusType is the type of new bus This is a strict signal -
+    /// it's emitted only when there was an actual change in the value.
+    /// \param newBusType The DBus bus type of the provider.
+    void providerDBusTypeChanged(QDBusConnection::BusType newBusType);
+
+    /// Emitted when the key type changes. The \a newType is the new type 
+    /// of the introspected key. This is a strict signal - it's emitted only 
+    /// when there was an actual change in the value.
+    /// \param newType The new type of the key.
     void typeChanged(QString newType);
 };
 
