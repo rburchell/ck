@@ -29,6 +29,7 @@
 
 class ContextPropertyInfo;
 class PropertyProvider;
+class DBusNameListener;
 
 class PropertyHandle : public QObject
 {
@@ -66,5 +67,6 @@ private:
     QString myKey; ///< Name of this context property
     QVariant myValue; ///< Cached value of this context property
     static QMap<QString, PropertyHandle*> handleInstances; ///< Container for singletons, see the \c instance(key) call
+    static DBusNameListener *commanderListener;
 };
 #endif

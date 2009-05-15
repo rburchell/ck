@@ -25,17 +25,20 @@
 #include "contextpropertyinfo.h"
 #include "contextregistryinfo.h"
 #include "contextproperty.h"
+#include "dbusnamelistener.h"
 
 #include <QStringList>
-#include <QHash>
 #include <QString>
 #include <QDebug>
-#include <fcntl.h>
-#include <string>
 #include <QPair>
 #include <QMap>
+#include <QDBusConnection>
 
 QMap<QString, PropertyHandle*> PropertyHandle::handleInstances;
+
+static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
+static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
+DBusNameListener* PropertyHandle::commanderListener = DBusNameListener::instance(commanderDBusType, commanderDBusName);
 
 /*!
   \class PropertyHandle
@@ -71,30 +74,41 @@ PropertyHandle::PropertyHandle(const QString& key)
 {
     myInfo = new ContextPropertyInfo(myKey, this);
 
-    QString dbusName = myInfo->providerDBusName();
-    if (dbusName != "")
-        myProvider = PropertyProvider::instance(myInfo->providerDBusType(),
-                                                dbusName);
+    onRegistryTouched();
 
     // Start listening to changes in property registry (e.g., new keys, keys removed)
     sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(QStringList)),
+             this, SLOT(onRegistryTouched()));
+
+    // Start listening for the beloved commander
+    sconnect(commanderListener, SIGNAL(nameAppeared()),
+             this, SLOT(onRegistryTouched()));
+    sconnect(commanderListener, SIGNAL(nameDisappeared()),
              this, SLOT(onRegistryTouched()));
 }
 
 void PropertyHandle::onRegistryTouched()
 {
-    // The myInfo object doesn't have to be re-created, because it routes the function calls
-    // to a registry backend.
+    PropertyProvider *newProvider;
 
-    QString dbusName = myInfo->providerDBusName();
-    PropertyProvider* newProvider = myProvider;
-    if (dbusName != "") {
-        newProvider = PropertyProvider::instance(myInfo->providerDBusType(),
-                                                 dbusName);
+    if (commanderListener->isServicePresent()) {
+        newProvider = PropertyProvider::instance(commanderDBusType,
+                                                 commanderDBusName);
+    } else {
+        // The myInfo object doesn't have to be re-created, because it routes the function calls
+        // to a registry backend.
+
+        newProvider = myProvider;
+        QString dbusName = myInfo->providerDBusName();
+
+        // If the property is no longer in the registry, we keep the pointer to the old provider.
+        // This way, we can still continue communicating with the provider even though the key
+        // is no longer in the registry.
+        if (dbusName != "") {
+            newProvider = PropertyProvider::instance(myInfo->providerDBusType(),
+                                                     dbusName);
+        }
     }
-    // If the property is no longer in the registry, we keep the pointer to the old provider.
-    // This way, we can still continue communicating with the provider even though the key
-    // is no longer in the registry.
 
     if (newProvider != myProvider && subscribeCount > 0) {
         // The provider has changed and ContextProperty classes are subscribed to this handle.

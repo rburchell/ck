@@ -51,7 +51,7 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
     managerInterface.getSubscriber();
 
     // Note if the provider on the dbus comes and go
-    dbusNameListener = new DBusNameListener(busType, busName);
+    dbusNameListener = DBusNameListener::instance(busType, busName);
     sconnect(dbusNameListener,
              SIGNAL(nameAppeared()),
              this,

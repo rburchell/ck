@@ -28,17 +28,25 @@
 #include <QDBusConnection>
 #include <QString>
 
+template<typename P1, typename P2> class QPair;
+template<typename K, typename V> class QMap;
+
 class DBusNameListener : public QObject
 {
     Q_OBJECT
 public:
-    DBusNameListener(const QDBusConnection::BusType busType, const QString &busName);
+    static DBusNameListener* instance(const QDBusConnection::BusType busType, const QString &busName);
+    bool isServicePresent() const;
 
 private slots:
     void onServiceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
 
 private:
+    bool servicePresent;
     QString busName;
+    static QMap<QPair<QDBusConnection::BusType, QString>, DBusNameListener*> listenerInstances;
+
+    DBusNameListener(const QDBusConnection::BusType busType, const QString &busName);
 
 signals:
     void nameAppeared();

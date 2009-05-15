@@ -23,10 +23,27 @@
 #include "sconnect.h"
 
 #include <QDBusConnectionInterface>
+#include <QPair>
+#include <QMap>
+#include <QString>
+
+QMap<QPair<QDBusConnection::BusType, QString>, DBusNameListener*> DBusNameListener::listenerInstances;
+
+DBusNameListener* DBusNameListener::instance(const QDBusConnection::BusType busType, const QString &busName)
+{
+    QPair<QDBusConnection::BusType, QString> lookupValue(busType, busName);
+    if (!listenerInstances.contains(lookupValue))
+            listenerInstances.insert(lookupValue,
+                                     new DBusNameListener(busType, busName));
+
+    return listenerInstances[lookupValue];
+}
 
 DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const QString &busName) :
-    busName(busName)
+    busName(busName), servicePresent(false)
 {
+    // FIXME: startup check of the name
+
     QDBusConnection connection("");
 
     // Create DBus connection
@@ -53,9 +70,17 @@ DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const
 void DBusNameListener::onServiceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
     if (name == busName) {
-        if (oldOwner == "")
+        if (oldOwner == "") {
+            servicePresent = true;
             emit nameAppeared();
-        else if (newOwner == "")
+        } else if (newOwner == "") {
+            servicePresent = false;
             emit nameDisappeared();
+        }
     }
+}
+
+bool DBusNameListener::isServicePresent() const
+{
+    return servicePresent;
 }
