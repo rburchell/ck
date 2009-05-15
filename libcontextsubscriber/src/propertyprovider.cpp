@@ -70,19 +70,15 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
 
 void PropertyProvider::onProviderAppears()
 {
-    if (subscriberInterface != 0) {
-        delete subscriberInterface;
-        subscriberInterface = 0;
-    }
+    delete subscriberInterface;
+    subscriberInterface = 0;
     managerInterface.getSubscriber();
 }
 
 void PropertyProvider::onProviderDisappears()
 {
-    if (subscriberInterface != 0) {
-        delete subscriberInterface;
-        subscriberInterface = 0;
-    }
+    delete subscriberInterface;
+    subscriberInterface = 0;
 }
 
 void PropertyProvider::onGetSubscriberFinished(QString objectPath)
@@ -90,6 +86,7 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
     qDebug() << "PropertyProvider::onGetSubscriberFinished" << objectPath;
     if (objectPath != "") {
         // GetSubscriber was successful
+        delete subscriberInterface;
         subscriberInterface = new SubscriberInterface(busType, busName, objectPath, this);
 
         sconnect(subscriberInterface,
@@ -101,9 +98,12 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
                  this,
                  SLOT(onSubscribeFinished(QSet<QString>)));
 
-        // TODO: foreach toSubscribe -> if handle.provider == me -> add to toSubscribe()
-        // TODO: toSubscribe.clear();
-        // TODO: toUnsubscribe.clear();
+        // Renew the subscriptions (if any).
+        // Renewing happens when a provider has disappeared and now it appeared again.
+
+        toUnsubscribe.clear();
+        toSubscribe.clear();
+        toSubscribe += subscribedKeys;
 
         idleTimer.start();
     }
@@ -118,13 +118,8 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 {
     qDebug() << "PropertyProvider::onSubscribeFinished" << keys;
-    emit subscribeFinished(keys);
-}
-
-/// Returns the dbus name and bus type of the provider
-QString PropertyProvider::getName() const
-{
-    return ""; /// FIXME: Remove this function?
+    // Drop keys which were not supposed to be subscribed to (by this provider)
+    emit subscribeFinished(keys.intersect(subscribedKeys));
 }
 
 /// Schedules a property to be subscribed to when the main loop is
@@ -132,6 +127,9 @@ QString PropertyProvider::getName() const
 void PropertyProvider::subscribe(const QString &key)
 {
     qDebug() << "PropertyProvider::subscribe";
+
+    // Note: the intention is saved in all cases; whether we can really subscribe or not.
+    subscribedKeys.insert(key);
 
     if (managerInterface.isGetSubscriberFailed()) {
         qDebug() << "GetSubscriber has failed previously";
@@ -142,6 +140,7 @@ void PropertyProvider::subscribe(const QString &key)
         return;
     }
 
+    // Schedule the key to be subscribed to
     toSubscribe.insert(key);
     toUnsubscribe.remove(key);
 
@@ -163,6 +162,10 @@ void PropertyProvider::idleHandler()
 /// entered the next time.
 void PropertyProvider::unsubscribe(const QString &key)
 {
+    // Save the intention of the higher level
+    subscribedKeys.remove(key);
+
+    // Schedule the key to be unsubscribed from
     toUnsubscribe.insert(key);
     toSubscribe.remove(key);
 

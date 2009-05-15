@@ -43,9 +43,6 @@ public:
     void unsubscribe(const QString &key);
     static PropertyProvider* instance(const QDBusConnection::BusType busType, const QString& busName);
 
-    QString getName() const;
-
-
 signals:
     void subscribeFinished(QSet<QString> keys);
     void valueChanged(QString key, QVariant value, PropertyProvider* provider, bool processingSubscription);
@@ -66,6 +63,7 @@ private:
     QString busName; ///< The bus name of the DBus provider connected to
 
     static QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> providerInstances;
+    QSet<QString> subscribedKeys; ///< The keys that should be currently subscribed to
 
 private slots:
     void onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription);

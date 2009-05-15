@@ -11,7 +11,8 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  infobackendconfig.h infoxmlkeysfinder.h			\
 	  infoxmlkeysfinder.cpp infokeydata.h cdbwriter.h		\
 	  cdbwriter.cpp cdbreader.cpp cdbreader.h infocdbbackend.cpp	\
-	  infocdbbackend.h dbusnamelistener.h dbusnamelistener.cpp
+	  infocdbbackend.h dbusnamelistener.h dbusnamelistener.cpp	\
+	  handlesignalrouter.cpp handlesignalrouter.h
 
 AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
 
