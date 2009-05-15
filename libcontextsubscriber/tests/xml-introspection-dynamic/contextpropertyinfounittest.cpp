@@ -29,6 +29,7 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
     // Create initial state
     QFile::remove("xml/providers.xml");
     QFile::copy("xml/providers2v1.xml.src", "xml/providers.xml");
+    QTest::qWait(200);
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QCOMPARE(prop.type(), QString("TRUTH"));

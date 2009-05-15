@@ -47,6 +47,7 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
 
     watcher.addPath(InfoXmlBackend::registryPath());
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
+    sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onFileChanged(QString)));
 
 	regenerateKeyDataList();
 }
@@ -139,8 +140,40 @@ QString InfoXmlBackend::registryPath()
 
 /* Slots */
 
+void InfoXmlBackend::onFileChanged(const QString &path)
+{
+    // If one of the watched xml files changed this it pretty much 
+    // an unconditional reload message for us.
+
+    qDebug() << path << "changed.";
+    
+    QStringList oldKeys = listKeys();
+
+    regenerateKeyDataList();
+ 
+    emit keysChanged(listKeys());
+
+    foreach(QString key, oldKeys) {
+        emit keyDataChanged(key);
+    }
+}
+
 void InfoXmlBackend::onDirectoryChanged(const QString &path)
 {
+    // It could be that some other file was added to the directory which 
+    // we don't care about anyways. 
+
+    QDir dir = QDir(registryPath());
+    dir.setFilter(QDir::Files);
+    dir.setNameFilters(QStringList("*.xml"));
+
+    // It's enough for us to compare sizes here, not actual content (filenames). The
+    // latter case is always handled by the fileChanged.
+
+    if (dir.entryInfoList().size() == countOfFilesInLastParse)
+        return;
+
+    qDebug() << registryPath() << "directory changed.";
     QStringList oldKeys = listKeys();
 
     regenerateKeyDataList();
@@ -156,6 +189,11 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
 void InfoXmlBackend::regenerateKeyDataList()
 {
     keyDataHash.clear();
+    countOfFilesInLastParse = 0;
+
+    // Stop watching all files. We do keep wathching the dir though. 
+    foreach (QString file, watcher.files())
+        watcher.removePath(file);
 
     qDebug() << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
 
@@ -171,6 +209,8 @@ void InfoXmlBackend::regenerateKeyDataList()
     for (int i = 0; i < list.size(); ++i) {
         QFileInfo f = list.at(i);
 		readKeyDataFromXml(f);
+        watcher.addPath(f.filePath());
+        countOfFilesInLastParse++;
     }
 }
 

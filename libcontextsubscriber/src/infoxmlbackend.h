@@ -53,10 +53,12 @@ public:
 
 private slots:
     void onDirectoryChanged(const QString &path);
+    void onFileChanged(const QString &path);
 
 private:
     QFileSystemWatcher watcher;
 	QHash <QString, InfoKeyData> keyDataHash;
+    int countOfFilesInLastParse;
 
     void regenerateKeyDataList();
     void readKeyDataFromXml(const QFileInfo &f);
