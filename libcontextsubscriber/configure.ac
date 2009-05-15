@@ -77,6 +77,7 @@ AC_CONFIG_FILES([Makefile
          tests/xml-introspection-static/Makefile
          tests/cdb-introspection-static/Makefile
          tests/xml-introspection-dynamic/Makefile
+         tests/cdb-introspection-dynamic/Makefile
          tests/cdb/Makefile])
 AC_OUTPUT
 
