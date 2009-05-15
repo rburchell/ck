@@ -126,7 +126,7 @@ void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 /// entered the next time.
 void PropertyProvider::subscribe(const QString &key)
 {
-    qDebug() << "PropertyProvider::subscribe";
+    qDebug() << "PropertyProvider::subscribe, provider" << busName << key;
 
     // Note: the intention is saved in all cases; whether we can really subscribe or not.
     subscribedKeys.insert(key);
@@ -151,8 +151,8 @@ void PropertyProvider::subscribe(const QString &key)
 void PropertyProvider::idleHandler()
 {
     if (subscriberInterface != 0) {
-        subscriberInterface->subscribe(toSubscribe);
-        subscriberInterface->unsubscribe(toUnsubscribe);
+        if (toSubscribe.size() > 0) subscriberInterface->subscribe(toSubscribe);
+        if (toUnsubscribe.size() > 0) subscriberInterface->unsubscribe(toUnsubscribe);
         toSubscribe.clear();
         toUnsubscribe.clear();
     }
@@ -162,6 +162,8 @@ void PropertyProvider::idleHandler()
 /// entered the next time.
 void PropertyProvider::unsubscribe(const QString &key)
 {
+    qDebug() << "PropertyProvider::unsubscribe, provider" << busName << key;
+
     // Save the intention of the higher level
     subscribedKeys.remove(key);
 

@@ -23,6 +23,7 @@
 #include "propertyprovider.h"
 #include "sconnect.h"
 #include "contextpropertyinfo.h"
+#include "contextregistryinfo.h"
 #include "contextproperty.h"
 
 #include <QStringList>
@@ -74,26 +75,37 @@ PropertyHandle::PropertyHandle(const QString& key)
     if (dbusName != "")
         myProvider = PropertyProvider::instance(myInfo->providerDBusType(),
                                                 dbusName);
-/* FIXME: this code is needed, if a handle's provider can change (registry can change)
-    PropertyProvider *newProvider = 0;
 
-    if (dbusName != "")
-        newProvider = PropertyProvider::instance(myInfo->providerDBusType(),
-                                   dbusName);
-
-    if (newProvider != myProvider) {
-        if (subscribeCount > 0) {
-            if (myProvider)
-                myProvider->unsubscribe(myKey);
-            myProvider = newProvider;
-            if (myProvider)
-               myProvider->subscribe(myKey);
-            // emit providerChanged();
-        } else
-            myProvider = newProvider;
-    }
-*/
+    // Start listening to changes in property registry (e.g., new keys, keys removed)
+    sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(QStringList)),
+             this, SLOT(onRegistryTouched()));
 }
+
+void PropertyHandle::onRegistryTouched()
+{
+    // The myInfo object doesn't have to be re-created, because it routes the function calls
+    // to a registry backend.
+
+    QString dbusName = myInfo->providerDBusName();
+    PropertyProvider* newProvider = myProvider;
+    if (dbusName != "") {
+        newProvider = PropertyProvider::instance(myInfo->providerDBusType(),
+                                                 dbusName);
+    }
+    // If the property is no longer in the registry, we keep the pointer to the old provider.
+    // This way, we can still continue communicating with the provider even though the key
+    // is no longer in the registry.
+
+    if (newProvider != myProvider && subscribeCount > 0) {
+        // The provider has changed and ContextProperty classes are subscribed to this handle.
+        // Unsubscribe from the old provider
+        if (myProvider) myProvider->unsubscribe(myKey);
+        // And subscribe to the new provider
+        if (newProvider) newProvider->subscribe(myKey);
+    }
+    myProvider = newProvider;
+}
+
 
 /// Increase the subscribeCount of this context property and subscribe to DBUS if neccessary.
 void PropertyHandle::subscribe()

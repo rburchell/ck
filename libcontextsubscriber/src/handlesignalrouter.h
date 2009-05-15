@@ -19,6 +19,8 @@
  *
  */
 
+// FIXME: Write documentation for this class
+
 #ifndef HANDLESIGNALROUTER_H
 #define HANDLESIGNALROUTER_H
 

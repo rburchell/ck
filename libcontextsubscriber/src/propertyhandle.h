@@ -53,6 +53,7 @@ signals:
 
 private slots:
     void onSubscribeFinished(QSet<QString> keys);
+    void onRegistryTouched();
 
 private:
     PropertyHandle(const QString& key);
