@@ -34,6 +34,9 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
     if (key != "") {
         sconnect(InfoBackend::instance(), SIGNAL(keyDataChanged(QString)),
                  this, SLOT(onKeyDataChanged(QString)));
+
+        cachedType = InfoBackend::instance()->typeForKey(keyName);
+        cachedProvider = InfoBackend::instance()->providerForKey(keyName);
     }
 }
 
@@ -52,13 +55,13 @@ QString ContextPropertyInfo::doc() const
 /// Returns the type name for the introspected key.
 QString ContextPropertyInfo::type() const
 {
-    return InfoBackend::instance()->typeForKey(keyName);
+    return cachedType;
 }
 
 /// Returns the dbus name of the provider supplying this property/key.
 QString ContextPropertyInfo::providerDBusName() const
 {
-    return InfoBackend::instance()->providerForKey(keyName);
+    return cachedProvider;
 }
 
 /// Returns the bus type of the provider supplying this property/key.
@@ -82,8 +85,16 @@ void ContextPropertyInfo::onKeyDataChanged(QString key)
     if (key != keyName)
         return;
 
-    // FIXME Cache the values and actually do SEE if it changed
-    emit typeChanged(type());
-    emit providerChanged(providerDBusName());
+    QString newType = InfoBackend::instance()->typeForKey(keyName);
+    if (cachedType != newType) {
+        cachedType = newType;
+        emit typeChanged(newType);
+    }
+
+    QString newProvider = InfoBackend::instance()->providerForKey(keyName);
+    if (cachedProvider != newProvider) {
+        cachedProvider = newProvider;
+        emit providerChanged(providerDBusName());
+    }
 }
 

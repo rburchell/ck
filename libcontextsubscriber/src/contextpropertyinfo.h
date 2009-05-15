@@ -57,6 +57,8 @@ public:
 
 private:
     QString keyName;
+    QString cachedType;
+    QString cachedProvider; 
 
 private slots:
     void onKeyDataChanged(QString key);
