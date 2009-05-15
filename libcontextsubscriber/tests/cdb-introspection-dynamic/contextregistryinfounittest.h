@@ -33,6 +33,5 @@ private:
 private slots:
     void initTestCase();
     void basicChange();
-    void cleanupTestCase();
 };
 

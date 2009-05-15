@@ -30,6 +30,5 @@ class ContextPropertyInfoUnitTest : public QObject
 private slots:
     void checkKeyTypeChanging();
     void checkKeyRemoval();
-    void cleanupTestCase();
 };
 
