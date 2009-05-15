@@ -39,6 +39,7 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     }
 
     watcher.addPath(InfoCdbBackend::databasePath());
+
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
 }
 
@@ -97,6 +98,15 @@ QString InfoCdbBackend::databasePath()
     return QString(regpath) + "context-providers.cdb";
 }
 
+QString InfoCdbBackend::databaseDirectory()
+{
+    const char *regpath = getenv("CONTEXT_PROVIDERS");
+    if (! regpath)
+        regpath = DEFAULT_REGISTRY_PATH;
+
+    return QString(regpath);
+}
+
 /* Slots */
 
 void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
@@ -111,12 +121,18 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
         emit keysChanged(QStringList());
         return;
     }
+  
+    // QFileSystemWatcher stops monitoring files and directories once 
+    // they have been removed from disk. Need to add again if we had a move ops.
+    if (! watcher.files().contains(InfoCdbBackend::databasePath()))
+        watcher.addPath(InfoCdbBackend::databasePath());
 
     emit keysChanged(listKeys());
 
     foreach(QString key, oldKeys) {
         emit keyDataChanged(key);
     }
+
 }
 
 
