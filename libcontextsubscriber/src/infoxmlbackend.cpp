@@ -148,9 +148,12 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     qDebug() << path << "changed.";
     
     QStringList oldKeys = listKeys();
-
     regenerateKeyDataList();
- 
+    QStringList currentKeys = listKeys();
+
+    // Emissions
+    checkAndEmitKeysAdded(currentKeys, oldKeys);
+    checkAndEmitKeysRemoved(currentKeys, oldKeys);
     emit keysChanged(listKeys());
 
     foreach(QString key, oldKeys) {
@@ -174,36 +177,15 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
         return;
 
     qDebug() << registryPath() << "directory changed.";
+    
     QStringList oldKeys = listKeys();
-
     regenerateKeyDataList();
-
     QStringList currentKeys = listKeys();
-
-    // Build the list of new keys
-    // FIXME Put this into shared codebase of the backend
-    QStringList addedKeys;
-    foreach (QString key, currentKeys) {
-        if (! oldKeys.contains(key))
-            addedKeys << key;
-    }
-
-    // Build the list of the removed keys
-    // FIXME Put this into shared codebase of the backend
-    QStringList removedKeys;
-    foreach (QString key, oldKeys) {
-        if (! currentKeys.contains(key))
-            removedKeys << key;
-    }
 
     // Emissions
     emit keysChanged(listKeys());
-
-    if (addedKeys.size() > 0)
-        emit keysAdded(addedKeys);
-
-    if (removedKeys.size() > 0)
-        emit keysRemoved(removedKeys);
+    checkAndEmitKeysAdded(currentKeys, oldKeys);
+    checkAndEmitKeysRemoved(currentKeys, oldKeys);
 
     foreach(QString key, oldKeys) {
         emit keyDataChanged(key);

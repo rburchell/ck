@@ -52,6 +52,8 @@ signals:
 private:
     InfoBackend(QObject *parent = 0) : QObject(parent) {};
     InfoBackend(const InfoBackend&);
+    void checkAndEmitKeysAdded(QStringList &currentKeys, QStringList &oldKeys);
+    void checkAndEmitKeysRemoved(QStringList &currentKeys, QStringList &oldKeys);
 
     InfoBackend& operator=(const InfoBackend&);
     
