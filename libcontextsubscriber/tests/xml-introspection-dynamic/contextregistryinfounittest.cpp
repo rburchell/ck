@@ -35,16 +35,22 @@ void ContextRegistryInfoUnitTest::basicChange()
     // Setup state
     QFile::remove("xml/providers.xml");
     QFile::copy("xml/providers1v1.xml.src", "xml/providers.xml");
+    QTest::qWait(100);
 
-    QSignalSpy spy(context, SIGNAL(keysChanged(QStringList)));
+    QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
+    QSignalSpy spy2(context, SIGNAL(keysAdded(QStringList)));
 
     QFile::remove("xml/providers.xml");
     QFile::copy("xml/providers1v2.xml.src", "xml/providers.xml");
     QTest::qWait(500);
 
-    QCOMPARE(spy.count(), 1);
-    QList<QVariant> args = spy.takeFirst();
-    QCOMPARE(args.at(0).toList().size(), 3);
+    QCOMPARE(spy1.count(), 1);
+    QList<QVariant> args1 = spy1.takeFirst();
+    QCOMPARE(args1.at(0).toList().size(), 3);
+
+    QCOMPARE(spy2.count(), 1);
+    QList<QVariant> args2 = spy2.takeFirst();
+    QCOMPARE(args2.at(0).toList().size(), 1);
 
     // Now just make sure that the new key is availible
     QStringList newKeys = context->listKeys();
