@@ -40,6 +40,18 @@ public:
 
 signals:
     void getSubscriberFinished(QString objectPath);
+
+public:
+    // Logging
+    static int getSubscriberCount;
+    static int creationCount;
+    static QList<QDBusConnection::BusType> creationBusTypes;
+    static QStringList creationBusNames;
+
+    static void resetLogs();
+
+    friend class PropertyProviderUnitTests;
+
 };
 
 #endif

@@ -26,6 +26,7 @@
 #include "dbusnamelistener.h"
 #include "handlesignalrouter.h"
 #include "subscriberinterface.h"
+#include "managerinterface.h"
 
 // Header file of the class to be tested
 #include "propertyprovider.h"
@@ -58,18 +59,42 @@ void myMessageOutput(QtMsgType type, const char *msg)
 }
 
 // Mock instances
+// These will be created by the test program
 DBusNameListener* mockDBusNameListener;
 HandleSignalRouter* mockHandleSignalRouter;
+// These will be created by the tested class and stored
+ManagerInterface* mockManagerInterface;
+SubscriberInterface* mockSubscriberInterface;
 
 // Mock implementation of the ManagerInterface
 
+int ManagerInterface::getSubscriberCount = 0;
+int ManagerInterface::creationCount = 0;
+QList<QDBusConnection::BusType> ManagerInterface::creationBusTypes;
+QStringList ManagerInterface::creationBusNames;
+
+int SubscriberInterface::creationCount = 0;
+QList<QDBusConnection::BusType> SubscriberInterface::creationBusTypes;
+QStringList SubscriberInterface::creationBusNames;
+QStringList SubscriberInterface::creationObjectPaths;
+
 ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent)
 {
+    // Store the mock implementation (created by the tested class)
+    mockManagerInterface = this;
+
+    qDebug() << "Creating mock ManagerInterface";
+    // Log the event: Manager interface created
+    ++ creationCount;
+    // Log the parameters
+    creationBusTypes << busType;
+    creationBusNames << busName;
 }
 
 
 void ManagerInterface::getSubscriber()
 {
+    ++ getSubscriberCount;
 }
 
 bool ManagerInterface::isGetSubscriberFailed() const
@@ -77,10 +102,28 @@ bool ManagerInterface::isGetSubscriberFailed() const
     return false;
 }
 
+void ManagerInterface::resetLogs()
+{
+    creationCount = 0;
+    creationBusTypes.clear();
+    creationBusNames.clear();
+    getSubscriberCount = 0;
+}
+
 // Mock implementation of the SubscriberInterface
+
 SubscriberInterface::SubscriberInterface(const QDBusConnection::BusType busType, const QString& busName,
                         const QString& objectPath, QObject* parent)
 {
+    // Store the mock implementation (created by the tested class)
+    mockSubscriberInterface = this;
+
+    // Log the event: interface created
+    ++ creationCount;
+    // Log the parameters
+    creationBusTypes << busType;
+    creationBusNames << busName;
+    creationObjectPaths << objectPath;
 }
 
 void SubscriberInterface::subscribe(QSet<QString> keys)
@@ -91,10 +134,20 @@ void SubscriberInterface::unsubscribe(QSet<QString> keys)
 {
 }
 
+void SubscriberInterface::resetLogs()
+{
+    creationCount = 0;
+    creationBusTypes.clear();
+    creationBusNames.clear();
+    creationObjectPaths.clear();
+}
+
+
 // Mock implementation of the DBusNameListener
 
 DBusNameListener* DBusNameListener::instance(const QDBusConnection::BusType busType, const QString &busName)
 {
+    // qDebug() << "Returning a mock dbus name listener";
     return mockDBusNameListener;
 }
 
@@ -109,6 +162,7 @@ bool DBusNameListener::isServicePresent() const
 }
 
 // Mock implementation of HandleSignalRouter
+
 HandleSignalRouter* HandleSignalRouter::instance()
 {
     return mockHandleSignalRouter;
@@ -139,8 +193,10 @@ void PropertyProviderUnitTests::init()
     mockDBusNameListener = new DBusNameListener();
     mockHandleSignalRouter = new HandleSignalRouter();
 
-    // Create the object to be tested
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, "Fake.Bus.Name");
+    // Reset logging of the mock objects
+    ManagerInterface::resetLogs();
+    SubscriberInterface::resetLogs();
+
 }
 
 // After each test
@@ -148,13 +204,72 @@ void PropertyProviderUnitTests::cleanup()
 {
     delete mockDBusNameListener;
     mockDBusNameListener = 0;
-    delete propertyProvider;
-    propertyProvider = 0;
+    delete mockHandleSignalRouter;
+    mockHandleSignalRouter = 0;
+
 }
 
-void PropertyProviderUnitTests::temp()
+void PropertyProviderUnitTests::initializing()
 {
-    QVERIFY(1 == 1);
+    // Test:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+
+    // The PropertyProvider is created (as part of initTestCase)
+    // Expected results:
+    // PropertyProvider constructed the ManagerInterface with correct parameters
+    QCOMPARE(ManagerInterface::creationCount, 1);
+    QCOMPARE(ManagerInterface::creationBusTypes.at(0), QDBusConnection::SessionBus);
+    QCOMPARE(ManagerInterface::creationBusNames.at(0), busName);
+    // PropertyProvider also called the GetSubscriber on the Manager interface
+    QCOMPARE(ManagerInterface::getSubscriberCount, 1);
 }
+
+void PropertyProviderUnitTests::getSubscriberSucceeds()
+{
+    // Test:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SystemBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with a non-empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
+
+    // Expected results: the SubscriberInterface object is created
+    QCOMPARE(SubscriberInterface::creationCount, 1);
+    QCOMPARE(SubscriberInterface::creationBusTypes.at(0), QDBusConnection::SystemBus);
+    QCOMPARE(SubscriberInterface::creationBusNames.at(0), busName);
+    QCOMPARE(SubscriberInterface::creationObjectPaths.at(0), QString("Fake.Subscriber.Path"));
+}
+
+void PropertyProviderUnitTests::getSubscriberFails()
+{
+    // Test:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+
+    // First subscribe to a key
+    propertyProvider->subscribe("Key.Which.Will.Fail");
+    // Start spying on the signal subscribeFinished
+    QSignalSpy spy(propertyProvider, SIGNAL(subscribeFinished(QSet<QString>)));
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with an empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("");
+
+    // Expected results:
+    // The provider signals that the subscription was finished for that key
+    QCOMPARE(spy.count(), 1);
+}
+
+
 
 QTEST_MAIN(PropertyProviderUnitTests);

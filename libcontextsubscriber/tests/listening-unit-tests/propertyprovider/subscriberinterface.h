@@ -43,6 +43,17 @@ signals:
     void valuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
     void subscribeFinished(QSet<QString> keys);
 
+public:
+    // Logging
+    static int creationCount;
+    static QList<QDBusConnection::BusType> creationBusTypes;
+    static QStringList creationBusNames;
+    static QStringList creationObjectPaths;
+
+    static void resetLogs();
+
+    friend class PropertyProviderUnitTests;
+
 };
 
 

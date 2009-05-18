@@ -39,5 +39,7 @@ private slots:
     void cleanup();
 
     // Test cases
-    void temp();
+    void initializing();
+    void getSubscriberSucceeds();
+    void getSubscriberFails();
 };
