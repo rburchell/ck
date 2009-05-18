@@ -52,9 +52,8 @@
    the key "Screen" is unrelated to "Screen.TopEdge".  In particular,
    change notifications do not travel up the tree.
 
-   You can get a list of all keys with the static
-   ContextProperty::listKeys() member function.
-   // FIXME: obsolete
+   The \ref Introspection section describes in detail how to get a list of
+   existing keys and examine their capabilities. 
 
    Programmers access the key/value pairs through instances of the
    ContextProperty class.  These instances allow applications to read
@@ -96,9 +95,10 @@
    The set of available context properties can change at any time.
    Keys might disappear when their providers terminate or are
    uninstalled; new keys might appear when providers start or are
-   installed; etc.
+   installed; etc. \ref Introspection has more information how to deal
+   with those situations.
 
-   Consequently, subscribing to a key that has no value associated
+   Subscribing to a key that has no value associated
    with it is not an error.  Instead, the ContextProperty will return
    a 'null' QVariant in that case.  If a provider for the key becomes
    available later, the property will start receiving values from the
