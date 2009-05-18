@@ -59,6 +59,16 @@ QString ContextPropertyInfo::type() const
     return cachedType;
 }
 
+/// Returns true if the key exists in the registry.
+bool ContextPropertyInfo::exists() const
+{
+	// A key is assumed to exist if it's type != "".
+	if (cachedType != "")
+		return true;
+	else
+		return false;
+}
+
 /// Returns the dbus name of the provider supplying this property/key.
 QString ContextPropertyInfo::providerDBusName() const
 {
@@ -86,6 +96,12 @@ void ContextPropertyInfo::onKeyDataChanged(QString key)
 
     QString newType = InfoBackend::instance()->typeForKey(keyName);
     if (cachedType != newType) {
+	
+		if (cachedType == "")
+			emit existsChanged(true);
+		if (newType == "")
+			emit existsChanged(false);
+			
         cachedType = newType;
         emit typeChanged(cachedType);
     }

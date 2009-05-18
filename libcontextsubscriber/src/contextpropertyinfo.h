@@ -72,7 +72,17 @@
     propInfo.doc();      //  ...returns empty string
     propInfo.provder();  //  ...returns empty string
     \endcode
-   
+
+	You can use this functionality to wait for keys to become availible in the registry. 
+	Just create a ContextPropertyInfo for a key that you're expecting to become present
+	and connect to the /c existsChanged signal.
+	
+	\code
+    ContextPropertyInfo propInfo("Something.That.Doesnt.Exist");
+    propInfo.exists(); // false
+	// Connect something to the existsChanged signal.
+    \endcode
+	
     \section xmlvscdb XML vs.CDB
    
     When the introspection API is first used, a backend choice is being made. \b CDB backend
@@ -116,6 +126,7 @@ public:
     QString key() const;
     QString doc() const;
     QString type() const;
+	bool exists() const;
     
     QString providerDBusName() const;
     QDBusConnection::BusType providerDBusType() const;
@@ -147,6 +158,13 @@ signals:
     /// when there was an actual change in the value.
     /// \param newType The new type of the key.
     void typeChanged(QString newType);
+
+	/// Emitted when the key existance in the registry changes. The \a exists
+	/// is the new state of the introspected key. This is a strict signal - it's 
+	/// emitted only when there was an actual change in the state. Using this
+	/// signal you can wait (watch) for various keys to become available.
+    /// \param exists The new state of the key.
+    void existsChanged(bool exists);
 };
 
 #endif // CONTEXTPROPERTYINFO_H
