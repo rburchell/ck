@@ -22,10 +22,8 @@
 #ifndef INFOXMLBACKEND_H
 #define INFOXMLBACKEND_H
 
-#include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include <QMutex>
 #include <QFileInfo>
 #include <QString>
 #include <QHash>

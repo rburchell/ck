@@ -19,14 +19,16 @@
  *
  */
 
-#include "infocdbbackend.h"
-#include "infobackendconfig.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
 #include <QFile>
 #include <stdlib.h>
+#include <QMutex>
+#include <QHash>
+#include "infobackendconfig.h"
 #include "sconnect.h"
+#include "infocdbbackend.h"
 
 InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())

@@ -25,7 +25,6 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include <QMutex>
 
 /*!
   \class ContextRegistryInfo

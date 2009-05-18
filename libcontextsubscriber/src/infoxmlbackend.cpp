@@ -19,17 +19,18 @@
  *
  */
 
-#include "infoxmlbackend.h"
-#include "infobackendconfig.h"
-#include "infoxmlkeysfinder.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
+#include <QMutex>
 #include <QXmlSimpleReader>
 #include <QXmlInputSource>
 #include <QFile>
 #include <stdlib.h>
 #include "sconnect.h"
+#include "infoxmlbackend.h"
+#include "infobackendconfig.h"
+#include "infoxmlkeysfinder.h"
 
 InfoXmlBackend::InfoXmlBackend(QObject *parent)
     : InfoBackend(parent)

@@ -22,8 +22,6 @@
 #ifndef INFOXMLKEYSFINDER_H
 #define INFOXMLKEYSFINDER_H
 
-#include <QVariant>
-#include <QStringList>
 #include <QObject>
 #include <QXmlDefaultHandler>
 #include <QHash>

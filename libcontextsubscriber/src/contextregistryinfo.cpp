@@ -22,6 +22,7 @@
 #include "contextregistryinfo.h"
 #include "infobackend.h"
 #include "sconnect.h"
+#include <QMutex>
 
 ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
 

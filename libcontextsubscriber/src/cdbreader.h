@@ -22,10 +22,8 @@
 #ifndef CDBREADER_H
 #define CDBREADER_H
 
-#include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include <stdlib.h>
 
 /*!
   \class CDBReader
