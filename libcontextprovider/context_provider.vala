@@ -109,6 +109,11 @@ namespace ContextProvider {
 	 */
 	public delegate void SubscriptionChangedCallback(bool subscribe);
 
+	private void log_null(string? log_domain, LogLevelFlags log_levels, string message) {
+		/* nop */
+	}
+
+
 	/**
 	 * context_provider_init:
 	 * @bus_type: which bus to advertise context on
@@ -122,7 +127,9 @@ namespace ContextProvider {
 	 * Returns: TRUE if successful, FALSE otherwise.
 	 */
 	public bool init (DBus.BusType bus_type, string? bus_name) {
-
+		// Don't emit debug() messages unless $CONTEXT_DEBUG is defined.
+		if (GLib.Environment.get_variable("CONTEXT_DEBUG") == null)
+			GLib.Log.set_handler("ContextKit", GLib.LogLevelFlags.LEVEL_DEBUG, log_null);
 		try {
 			var connection = DBus.Bus.get (bus_type);
 			bus = connection.get_object ( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus");
