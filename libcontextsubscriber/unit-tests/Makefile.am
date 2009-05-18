@@ -2,14 +2,7 @@ SUBDIRS = xml-introspection-static xml-introspection-dynamic cdb cdb-introspecti
 
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
-          if test "$$subdir" = "."; then \
-            dot_seen=yes; \
-            local_target="$$target-am"; \
-          else \
-            local_target="$$target"; \
-          fi; \
           (cd $$subdir && tput bold && echo $$subdir:\  && tput sgr0 && ( $(MAKE) $(AM_MAKEFLAGS) check | grep '^Total' | grep -v '^make' ) ) \
-          || eval $$failcom; \
         done
 
 covoptioncheck:
@@ -20,13 +13,7 @@ covoptioncheck:
 
 coverage: covoptioncheck
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
-          if test "$$subdir" = "."; then \
-            dot_seen=yes; \
-            local_target="$$target-am"; \
-          else \
-            local_target="$$target"; \
-          fi; \
-          (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) coverage) || eval $$failcom; \
+          (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) coverage) \
         done
 	mkdir -p coverage
 	lcov $(patsubst %, -a %/coverage/selected.cov, $(SUBDIRS)) -o coverage/selecteds.cov
@@ -34,7 +21,7 @@ coverage: covoptioncheck
 	@echo "build: $(abs_top_builddir)"
 	cat coverage/selecteds.cov | \
 		sed "s,`cd $(abs_top_builddir) && pwd`,`cd $(abs_top_srcdir) && pwd`," | \
-		sed 's,tests/.*mock_,src/,' >coverage/sedded.cov
+		sed 's,unit-tests/.*mock_,src/,' >coverage/sedded.cov
 	genhtml --prefix `cd $(abs_top_srcdir) && pwd` -o coverage/ coverage/sedded.cov
 
 clean-local:
