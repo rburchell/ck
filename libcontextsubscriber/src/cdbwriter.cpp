@@ -19,9 +19,10 @@
  *
  */
 
-#include "cdbwriter.h"
 #include <cdb.h>
 #include <fcntl.h>
+#include <stdlib.h>
+#include "cdbwriter.h"
 
 /// Constructs a new CDBWriter to write to a cdb database at \a dbpath
 /// \param dbpath Path to the database.

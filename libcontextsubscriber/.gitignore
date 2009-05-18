@@ -19,12 +19,13 @@ Makefile
 ._*
 
 # Tests
-/tests/xml-introspection-static/xml-introspection-static
-/tests/xml-introspection-dynamic/xml-introspection-dynamic
-/tests/cdb-introspection-static/cdb-introspection-static
-/tests/cdb-introspection-dynamic/cdb-introspection-dynamic
-/tests/testclass/testclassunittest
-/tests/cdb/cdb
+/unit_tests/xml-introspection-static/xml-introspection-static
+/unit_tests/xml-introspection-dynamic/xml-introspection-dynamic
+/unit_tests/cdb-introspection-static/cdb-introspection-static
+/unit_tests/cdb-introspection-dynamic/cdb-introspection-dynamic
+/unit_tests/testclass/testclassunittest
+/unit_tests/cdb/cdb
+/unit_tests/propertyprovider/propertyprovider-unit-test
 
 # Other binaries
 /cli/context-cli

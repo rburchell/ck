@@ -21,6 +21,3 @@ CLEANFILES =
 check_LIBRARIES =
 include $(top_srcdir)/am/tests.am
 include $(top_srcdir)/am/qt-check.am
-
-# Note: This might be unnecessary once the introspection api is separated
-#AM_CXXFLAGS += -DPREFIX="\"$(prefix)\""

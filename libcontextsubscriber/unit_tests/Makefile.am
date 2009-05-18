@@ -1,4 +1,4 @@
-SUBDIRS = xml-introspection-static xml-introspection-dynamic cdb cdb-introspection-static cdb-introspection-dynamic listening-unit-tests
+SUBDIRS = xml-introspection-static xml-introspection-dynamic cdb cdb-introspection-static cdb-introspection-dynamic propertyprovider
 
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
@@ -14,7 +14,7 @@ check-sum: all
 
 covoptioncheck:
 	@if test "$(GCOV)" = "" ; then \
-		echo "Didn't configured for coverage, please rerun configure with --with-coverage"; \
+		echo "Wasn't configured for coverage, please rerun configure with --with-coverage"; \
 		exit 1; \
 	fi
 

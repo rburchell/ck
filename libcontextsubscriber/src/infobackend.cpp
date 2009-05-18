@@ -22,6 +22,7 @@
 #include "infobackend.h"
 #include "infoxmlbackend.h"
 #include "infocdbbackend.h"
+#include <QMutex>
 
 InfoBackend* InfoBackend::backendInstance = NULL;
 

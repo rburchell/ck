@@ -245,12 +245,11 @@ void ContextProperty::waitForSubscription() const
         QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
 }
 
-/// Sets the Context Property immune to 'commanding' (overriding
+/// Sets all of the ContextProperty instaces immune to 'commanding' (overriding
 /// values done by Context Commander)
 void ContextProperty::ignoreCommander()
 {
-// FIXME
-//    PropertyManager::instance()->disableCommanding();
+    PropertyHandle::disableCommanding();
 }
 
 const ContextPropertyInfo* ContextProperty::info() const

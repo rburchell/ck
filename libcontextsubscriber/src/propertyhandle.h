@@ -48,6 +48,7 @@ public:
     static PropertyHandle* instance(const QString& key);
 
     void setValue(QVariant newValue, bool allowSameValue);
+    static void disableCommanding();
 
 signals:
     void valueChanged();
@@ -67,6 +68,7 @@ private:
     QString myKey; ///< Name of this context property
     QVariant myValue; ///< Cached value of this context property
     static QMap<QString, PropertyHandle*> handleInstances; ///< Container for singletons, see the \c instance(key) call
-    static DBusNameListener *commanderListener;
+    static DBusNameListener *commanderListener; ///< DBusListener for ContextCommander.
+    static bool commandingEnabled;
 };
 #endif

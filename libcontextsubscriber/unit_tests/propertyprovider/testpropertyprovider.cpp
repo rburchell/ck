@@ -31,11 +31,12 @@
 // Header file of the class to be tested
 #include "propertyprovider.h"
 
-#include "sconnect.h"
-
 #include <QtTest/QtTest>
 #include <QDebug>
 #include <QDBusConnection>
+
+Q_DECLARE_METATYPE(QVariant);
+Q_DECLARE_METATYPE(QSet<QString>);
 
 #define MYLOGLEVEL 2
 void myMessageOutput(QtMsgType type, const char *msg)
@@ -76,6 +77,7 @@ QList<QDBusConnection::BusType> ManagerInterface::creationBusTypes;
 QStringList ManagerInterface::creationBusNames;
 
 ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent)
+    : getSubscriberFailed(false)
 {
     // Store the mock implementation (created by the tested class)
     mockManagerInterface = this;
@@ -96,7 +98,7 @@ void ManagerInterface::getSubscriber()
 
 bool ManagerInterface::isGetSubscriberFailed() const
 {
-    return false;
+    return getSubscriberFailed;
 }
 
 void ManagerInterface::resetLogs()
@@ -188,20 +190,6 @@ void HandleSignalRouter::onValueChanged(QString key, QVariant value, bool proces
 {
 }
 
-// Implementation of the custom signal listener
-
-CustomSignalListener::CustomSignalListener()
-    : count(0)
-{
-}
-
-void CustomSignalListener::mySlot(QSet<QString> p)
-{
-    ++ count;
-    parameters << p;
-}
-
-
 //
 // Definition of testcases
 //
@@ -210,7 +198,8 @@ void CustomSignalListener::mySlot(QSet<QString> p)
 // Before all tests
 void PropertyProviderUnitTests::initTestCase()
 {
-
+    qRegisterMetaType<QVariant>("QVariant");
+    qRegisterMetaType<QSet<QString> >("QSet<QString>");
 }
 
 // After all tests
@@ -294,9 +283,7 @@ void PropertyProviderUnitTests::getSubscriberFails()
     // And subscribe to a key (so that we can test whether something interesting happened)
     propertyProvider->subscribe("Key.Which.Will.Fail");
     // Start spying on the signal subscribeFinished
-    CustomSignalListener listener;
-    sconnect(propertyProvider, SIGNAL(subscribeFinished(QSet<QString>)),
-             &listener, SLOT(mySlot(QSet<QString>)));
+    QSignalSpy spy(propertyProvider, SIGNAL(subscribeFinished(QSet<QString>)));
 
     // Test:
     // Command the mock manager to emit the getSubscriberFinished signal
@@ -305,10 +292,11 @@ void PropertyProviderUnitTests::getSubscriberFails()
 
     // Expected results:
     // The provider signals that the subscription was finished for that key
-    QCOMPARE(listener.count, 1);
-    QSet<QString> keysFinished = listener.parameters.at(0);
-    QCOMPARE(keysFinished.size(), 1);
-    QVERIFY(keysFinished.contains("Key.Which.Will.Fail"));
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> parameters = spy.takeFirst();
+    QSet<QString> keysReceived = parameters.at(0).value<QSet<QString> >();
+    QCOMPARE(keysReceived.size(), 1);
+    QVERIFY(keysReceived.contains("Key.Which.Will.Fail"));
 }
 
 void PropertyProviderUnitTests::subscription()
@@ -343,6 +331,44 @@ void PropertyProviderUnitTests::subscription()
     QSet<QString> keys = SubscriberInterface::subscribeKeys.at(0);
     QCOMPARE(keys.size(), 1);
     QVERIFY(keys.contains(QString("Fake.Key")));
+}
+
+void PropertyProviderUnitTests::subscriptionOfTwoProperties()
+{
+    // Setup:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with a non-empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
+
+    // Test:
+    // Subscribe to a property
+    propertyProvider->subscribe("Fake.Key.One");
+    // And another one
+    propertyProvider->subscribe("Fake.Key.Two");
+
+    // Expected results:
+    // Subscription is scheduled to happen only when we enter the main
+    // loop. So, no subscription happened yet.
+    QCOMPARE(SubscriberInterface::subscribeCount, 0);
+
+    // Test:
+    // Simulate being idle
+    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+
+    // Expected results:
+    // The subscription really happends, i.e.,
+    // the provider calls the SubscriberInterface::subscribe.
+    // Both keys are batched inside the same request.
+    QCOMPARE(SubscriberInterface::subscribeCount, 1);
+    QSet<QString> keys = SubscriberInterface::subscribeKeys.at(0);
+    QCOMPARE(keys.size(), 2);
+    QVERIFY(keys.contains(QString("Fake.Key.One")));
+    QVERIFY(keys.contains(QString("Fake.Key.Two")));
 }
 
 void PropertyProviderUnitTests::unsubscription()
@@ -381,6 +407,48 @@ void PropertyProviderUnitTests::unsubscription()
     QSet<QString> keys = SubscriberInterface::unsubscribeKeys.at(0);
     QCOMPARE(keys.size(), 1);
     QVERIFY(keys.contains(QString("Fake.Key")));
+}
+
+void PropertyProviderUnitTests::unsubscriptionOfTwoProperties()
+{
+    // Setup:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with a non-empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
+
+    // Subscribe to two properties
+    propertyProvider->subscribe("Fake.Key.One");
+    propertyProvider->subscribe("Fake.Key.Two");
+    // Simulate being idle, so that the subscription will really happen
+    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+
+    // Test:
+    // Unsubscribe to the two properties
+    propertyProvider->unsubscribe("Fake.Key.One");
+    propertyProvider->unsubscribe("Fake.Key.Two");
+
+    // Expected results:
+    // Unsubscription is scheduled to happen only when we enter the main
+    // loop. So, no unsubscription happened yet.
+    QCOMPARE(SubscriberInterface::unsubscribeCount, 0);
+
+    // Test:
+    // Simulate being idle
+    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+
+    // Expected results:
+    // the provider calls the SubscriberInterface::subscribe
+    // and both keys are batched inside the same request.
+    QCOMPARE(SubscriberInterface::unsubscribeCount, 1);
+    QSet<QString> keys = SubscriberInterface::unsubscribeKeys.at(0);
+    QCOMPARE(keys.size(), 2);
+    QVERIFY(keys.contains(QString("Fake.Key.One")));
+    QVERIFY(keys.contains(QString("Fake.Key.Two")));
 }
 
 void PropertyProviderUnitTests::immediateUnsubscription()
@@ -469,9 +537,7 @@ void PropertyProviderUnitTests::subscriptionFinished()
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
 
     // Spy the signal PropertyProvider::subscribeFinished
-    CustomSignalListener listener;
-    sconnect(propertyProvider, SIGNAL(subscribeFinished(QSet<QString>)),
-             &listener, SLOT(mySlot(QSet<QString>)));
+    QSignalSpy spy(propertyProvider, SIGNAL(subscribeFinished(QSet<QString>)));
 
     // Subscribe to a property
     propertyProvider->subscribe("Fake.Key");
@@ -486,11 +552,45 @@ void PropertyProviderUnitTests::subscriptionFinished()
 
     // Expected results:
     // The subscribeFinished is emitted
-    QCOMPARE(listener.count, 1);
-    QSet<QString> keysReceived = listener.parameters.at(0);
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> parameters = spy.takeFirst();
+    QSet<QString> keysReceived = parameters.at(0).value<QSet<QString> >();
     QCOMPARE(keysReceived.size(), 1);
     QVERIFY(keysReceived.contains("Fake.Key"));
 }
+
+void PropertyProviderUnitTests::subscriptionAfterGetSubscriberFailed()
+{
+    // Setup:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with an empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("");
+    // And make the manager return true when we ask did it fail
+    mockManagerInterface->getSubscriberFailed = true;
+
+    // Start spying on the signal subscribeFinished
+    QSignalSpy spy(propertyProvider, SIGNAL(subscribeFinished(QSet<QString>)));
+
+    // Test:
+    // Subscribe to a property
+    propertyProvider->subscribe("Fake.Key");
+
+    // Expected results:
+    // PropertyProvider doesn't actually subscribe to it.
+    // PropertyProvider signals that the subscription was finished for that key.
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> parameters = spy.takeFirst();
+    QSet<QString> keysReceived = parameters.at(0).value<QSet<QString> >();
+    QCOMPARE(keysReceived.size(), 1);
+    QVERIFY(keysReceived.contains("Fake.Key"));
+}
+
 
 void PropertyProviderUnitTests::valuesChanged()
 {
@@ -522,19 +622,112 @@ void PropertyProviderUnitTests::valuesChanged()
 
     // Expected results:
     // The valueChanged is emitted for both keys
-    // FIXME: This still fails, what's wrong with the signal spy?
-/*QCOMPARE(spy.count(), 2);
-    QList<QVariant> parameters1 = spy.takeAt(0);
+    QCOMPARE(spy.count(), 2);
+    QList<QVariant> parameters1 = spy.takeFirst();
     QCOMPARE(parameters1.at(0), QVariant("Fake.Key.One"));
-    qDebug() << parameters1.size();
-    qDebug() << parameters1.at(0) << parameters1.at(1) << parameters1.at(2);
-    QCOMPARE(parameters1.at(1), QVariant(312));
+    QCOMPARE(parameters1.size(), 3);
+    QCOMPARE(parameters1.at(1).value<QVariant>(), QVariant(312));
+    // Note: Getting the QVariant out from QSignalSpy causes this ugliness.
     QCOMPARE(parameters1.at(2), QVariant(false));
-    QList<QVariant> parameters2 = spy.takeAt(1);
+    QList<QVariant> parameters2 = spy.takeFirst();
+    QCOMPARE(parameters2.size(), 3);
     QCOMPARE(parameters2.at(0), QVariant("Fake.Key.Two"));
-    QCOMPARE(parameters2.at(1), QVariant("myValue"));
-    QCOMPARE(parameters2.at(2), QVariant(false));*/
+    QCOMPARE(parameters2.at(1).value<QVariant>(), QVariant("myValue"));
+    QCOMPARE(parameters2.at(2), QVariant(false));
 }
+
+void PropertyProviderUnitTests::valuesChangedWithUnnecessaryProperties()
+{
+    // Setup:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with a non-empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
+
+    // Start spying the valueChanged signal
+    QSignalSpy spy(propertyProvider, SIGNAL(valueChanged(QString, QVariant, bool)));
+
+    // Subscribe to two properties
+    propertyProvider->subscribe("Fake.Key.One");
+    propertyProvider->subscribe("Fake.Key.Two");
+    // Make the subscriptions really happen
+    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+
+    // Test:
+    // Command the subscriber to emit a valuesChanged signal
+    // for two keys which are not subscribed to.
+    QMap<QString, QVariant> values;
+    values.insert("Something.Totally.Different", QVariant(false));
+    values.insert("Not.Subscribed.To", QVariant(8.42));
+    emit mockSubscriberInterface->valuesChanged(values, false);
+
+    // Expected results:
+    // The valueChanged not is emitted at all
+    QCOMPARE(spy.count(), 0);
+}
+
+void PropertyProviderUnitTests::providerDisappearsAndAppears()
+{
+    // Setup:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with a non-empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
+
+    // Subscribe to a property
+    propertyProvider->subscribe("Fake.Key");
+    // Make the subscriptions really happen
+    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+
+    // The logs now contain calls that happen during initialization, reset them.
+    ManagerInterface::resetLogs();
+    SubscriberInterface::resetLogs();
+
+    // Test:
+    // Fake that the provider disappears
+    emit mockDBusNameListener->nameDisappeared();
+
+    // And appears again
+    emit mockDBusNameListener->nameAppeared();
+
+    // Expected results:
+    // PropertyProvider called again the GetSubscriber on the Manager interface
+    QCOMPARE(ManagerInterface::getSubscriberCount, 1);
+
+    // Test:
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with a non-empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
+
+    // Expected result:
+    // The PropertyProvider creates the Subscriber object
+    QCOMPARE(SubscriberInterface::creationCount, 1);
+    QCOMPARE(SubscriberInterface::creationBusTypes.at(0), QDBusConnection::SessionBus);
+    QCOMPARE(SubscriberInterface::creationBusNames.at(0), busName);
+    QCOMPARE(SubscriberInterface::creationObjectPaths.at(0), QString("Fake.Subscriber.Path"));
+
+    // Test:
+    // Simulate being idle
+    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+
+    // Expected results:
+    // The PropertyProvider renews the subscription to the key
+    QCOMPARE(SubscriberInterface::subscribeCount, 1);
+    QSet<QString> keys = SubscriberInterface::subscribeKeys.at(0);
+    QCOMPARE(keys.size(), 1);
+    QVERIFY(keys.contains(QString("Fake.Key")));
+}
+
 
 
 QTEST_MAIN(PropertyProviderUnitTests);

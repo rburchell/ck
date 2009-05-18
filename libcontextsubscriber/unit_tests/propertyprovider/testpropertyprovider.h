@@ -47,25 +47,20 @@ private slots:
     void getSubscriberFails();
 
     void subscription();
+    void subscriptionOfTwoProperties();
     void unsubscription();
+    void unsubscriptionOfTwoProperties();
 
     void immediateUnsubscription();
     void immediateResubscription();
 
     void subscriptionFinished();
 
+    void subscriptionAfterGetSubscriberFailed();
+
     void valuesChanged();
+    void valuesChangedWithUnnecessaryProperties();
 
-};
+    void providerDisappearsAndAppears();
 
-// Class for listening signals which have QSet<QString> as a parameter.
-class CustomSignalListener : public QObject
-{
-    Q_OBJECT
-public slots:
-    void mySlot(QSet<QString>);
-public:
-    CustomSignalListener();
-    int count;
-    QList<QSet<QString> > parameters;
 };

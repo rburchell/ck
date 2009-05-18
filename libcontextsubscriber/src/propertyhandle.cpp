@@ -38,7 +38,9 @@ QMap<QString, PropertyHandle*> PropertyHandle::handleInstances;
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
 static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
+
 DBusNameListener* PropertyHandle::commanderListener = DBusNameListener::instance(commanderDBusType, commanderDBusName);
+bool PropertyHandle::commandingEnabled = true;
 
 /*!
   \class PropertyHandle
@@ -87,11 +89,16 @@ PropertyHandle::PropertyHandle(const QString& key)
              this, SLOT(onRegistryTouched()));
 }
 
+void PropertyHandle::disableCommanding()
+{
+    commandingEnabled = false;
+}
+
 void PropertyHandle::onRegistryTouched()
 {
     PropertyProvider *newProvider;
 
-    if (commanderListener->isServicePresent()) {
+    if (commandingEnabled && commanderListener->isServicePresent()) {
         newProvider = PropertyProvider::instance(commanderDBusType,
                                                  commanderDBusName);
     } else {
