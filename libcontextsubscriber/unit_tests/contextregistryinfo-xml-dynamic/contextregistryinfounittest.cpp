@@ -22,6 +22,7 @@
 #include <QtTest/QtTest>
 #include <QtCore>
 #include "contextregistryinfo.h"
+#include "fcntl.h"
 
 class ContextRegistryInfoUnitTest : public QObject
 {
@@ -33,6 +34,7 @@ private:
 private slots:
     void initTestCase();
     void basicChange();
+    void changeWithRemove();
     void cleanupTestCase();
 };
 
@@ -41,7 +43,7 @@ void ContextRegistryInfoUnitTest::initTestCase()
     setenv("CONTEXT_PROVIDERS", "./", 0);
 
     // Setup state
-    QFile::remove("providers.xml");
+    // QFile::remove("providers.xml");
     QFile::copy("providers1v1.xml.src", "providers.xml");
     QTest::qWait(200);
        
@@ -53,8 +55,8 @@ void ContextRegistryInfoUnitTest::basicChange()
     QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
     QSignalSpy spy2(context, SIGNAL(keysAdded(QStringList)));
 
-    QFile::remove("providers.xml");
-    QFile::copy("providers1v2.xml.src", "providers.xml");
+    QFile::copy("providers1v2.xml.src", "tmp.file");
+    rename("tmp.file", "providers.xml");
     QTest::qWait(500);
 
     QCOMPARE(spy1.count(), 1);
@@ -68,6 +70,17 @@ void ContextRegistryInfoUnitTest::basicChange()
     // Now just make sure that the new key is availible
     QStringList newKeys = context->listKeys();
     QVERIFY(newKeys.contains("Battery.AboutToExplode"));
+}
+
+void ContextRegistryInfoUnitTest::changeWithRemove()
+{
+    QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
+
+    QFile::remove("providers.xml");
+    QFile::copy("providers1v1.xml.src", "providers.xml");
+    QTest::qWait(500);
+
+    QCOMPARE(spy1.count(), 2);
 }
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
