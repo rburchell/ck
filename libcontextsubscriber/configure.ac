@@ -80,8 +80,7 @@ AC_CONFIG_FILES([Makefile
          unit_tests/xml-introspection-dynamic/Makefile
          unit_tests/cdb-introspection-dynamic/Makefile
          unit_tests/cdb/Makefile
-	 unit_tests/listening-unit-tests/Makefile
-	 unit_tests/listening-unit-tests/propertyprovider/Makefile])
+	 unit_tests/propertyprovider/Makefile])
 AC_OUTPUT
 
 # Checks for header files.
