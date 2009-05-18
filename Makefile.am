@@ -12,6 +12,7 @@ SUBDIRS = \
 	tests \
 	doc \
 	tools \
+	fake-provider \
 	vapi \
 	$(NULL)
 

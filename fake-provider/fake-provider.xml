@@ -1,0 +1,343 @@
+<?xml version="1.0"?>
+<provider
+  xmlns="http://contextkit.freedesktop.org/Provider"
+  bus="session" service="com.nokia.FakeContextProvider">
+  <node name="Context">
+   <node name="Location">
+    <doc>
+Location
+--------
+
+Best effort location information. If any of the keys are not
+appliciable to the current location, they will be unavailable.
+    </doc>
+    <key name="Street" type="string">
+      <doc>The street nearest the location of the device, as a localized string.</doc>
+    </key>
+    <key name="PostalCode" type="string">
+      <doc>The postcode of the location of the device, as a localized string.</doc>
+    </key>
+    <key name="Area" type="string">
+      <doc>
+The name of the local area where the device is, for example a
+neighborhood or campus, as a localized string.
+      </doc>
+    </key>
+    <key name="Locality" type="string">
+      <doc>The name of the village, town or city where the device is, as a localized string.</doc>
+    </key>
+    <key name="Region" type="string">
+      <doc>The administrative region which contains the location of the device, as a localized string.</doc>
+    </key>
+    <key name="Country" type="string">
+      <doc>The country which contains the location of the device, as a localized string.</doc>
+    </key>
+    <key name="CountryCode" type="string">
+      <doc>The ISO 3166 two letter country code of the country which contains the location of the device.</doc>
+    </key>
+    <key name="Timezone" type="string">
+      <doc>TBD</doc>
+    </key>
+    <key name="TimezoneOffset" type="INT">
+      <doc>TBD</doc>
+    </key>
+    <key name="Continent" type="string">
+      <doc>The name of the current continent, as a localized string.</doc>
+    </key>
+    <key name="Planet" type="string">
+      <doc>The name of the current planet (or dwarf planet), as a localized string.</doc>
+    </key>
+    <key name="PointOfInterest" type="string">
+      <doc>
+The URI of the current point of interest, if any.  (The URI points to
+a Nepomuk object inside the Content Framework.)
+      </doc>
+    </key>
+    <key name="NearbyContacts" type="string">
+      <doc>
+A list of URIs for contacts that are physically nearby.  (The URIs
+point to Nepomuk objects.)
+      </doc>
+    </key>    
+  </node>
+  <node name="Internet">
+    <doc>
+Internet connectivity
+---------------------
+
+Information about the connection of the device to the Internet.
+    </doc>
+    <key name="NetworkType" type="string">
+      <doc>
+The type of the current connection to the Internet, such as GPRS,
+WLAN, etc.  The possible value are TBD.
+      </doc>
+    </key>
+
+    <key name="NetworkName" type="string">
+      <doc>
+The name of the current access point.
+      </doc>
+    </key>
+
+    <key name="NetworkState" type="string">
+      <doc>
+The state of the Internet connection, values TBD but will include
+things like "connected, "disconnected", "connecting".
+      </doc>
+    </key>
+
+    <key name="NetworkID" type="string">
+      <doc>
+The unique id of the network.
+      </doc>
+    </key>
+
+    <key name="ServiceName" type="string">
+      <doc>
+(Unclear)
+      </doc>
+    </key>
+
+    <key name="SignalStrength" type="INT">
+      <doc>
+The signal strength of the current connection to the Internet.  This
+will be 100% percent for wired connections, usually.
+      </doc>
+    </key>
+
+    <key name="IsCheap" type="bool">
+      <doc>
+Whether or not traffic to/from the Internet is billed per data volume
+(property is false) or per time (property is true).
+      </doc>
+    </key>
+
+    <key name="TrafficOut" type="INT">
+      <doc>
+A rough indication of the current traffic rate to the Internet, in
+percent of the maximum possible rate.
+      </doc>
+    </key>
+    <key name="TrafficIn" type="INT">
+      <doc>
+A rough indication of the current traffic rate from the Internet, in
+percent of the maximum possible rate.
+      </doc>
+    </key>
+  </node>
+  <node name="Bluetooth">
+    <doc>
+Bluetooth
+---------
+
+Information about Bluetooth related things.      
+    </doc>
+    <key name="Enabled" type="bool">
+      <doc>
+A boolean indicating whether or not the Bluetooth radio is enabled.
+      </doc>
+    </key>
+    <key name="Visible" type="bool">
+      <doc>
+A boolean indicating whether or not the device is visible to other
+Bluetooth devices when they search for others.
+      </doc>
+    </key>
+    <key name="TrafficOut" type="INT">
+      <doc>
+A rough indication of the current outgoing traffic rate over
+Bluetooth, in percent of the maximum possible rate.
+      </doc>
+    </key>
+    <key name="TrafficIn" type="INT">
+      <doc>
+A rough indication of the current incoming traffic rate over
+Bluetooth, in percent of the maximum possible rate.
+      </doc>
+    </key>
+    <key name="SignalStrength" type="INT">
+      <doc>
+The strength of the Bluetooth radio connection.
+      </doc>
+    </key>
+  </node>
+  <node name="Environment">
+    <doc>
+Environment
+-----------
+
+Information about the environment the device is in.
+    </doc>
+    <key name="SunRise" type="INT">
+      <doc>
+The time of sun rise.
+      </doc>
+    </key>
+    <key name="SunSet" type="INT">
+      <doc>
+The time of sun set.
+      </doc>
+    </key>
+    <key name="IsDark" type="bool">
+      <doc>Whether or not it is especially dark.</doc>
+    </key>
+    <key name="IsBright" type="bool">
+      <doc>Whether or not it is especially bright.</doc>
+    </key>
+    <key name="IsLoud" type="bool">
+      <doc>Whether or not it is especially loud.</doc>
+    </key>
+  </node>
+  <node name="Use">
+    <doc>
+Use
+---
+
+Information about the current usage context of the device.
+
+Situations are a UI concept similar to Profiles that allows the user
+to have different customizations for his/her device and
+automatically/explcicitly switch between them.  Typical Situations are
+"AtHome", "AtWork", "InMeeting" etc.  Some of them are probably
+pre-defined, others can be defined by the user.  Situations might form
+a hierarchy: InMeeting includes AtWork.
+
+Not much is known about all this right now.
+    </doc>
+    <key name="Situations" type="string">
+      <doc>
+The symbolic names of the currently active Situations.  Note that more
+than one situation might be active at the same time.
+      </doc>
+    </key>
+    <key name="Mode" type="string">
+      <!-- type>
+	<string-enum>
+	  <editing/>
+	  <recording/>
+	  <browsing/>
+	  <watching/>
+	  <listening/>
+	  <chatting/>
+	  <gaming/>
+	  <calling/>
+	  <active/>
+	  <idle/>
+	</string-enum>
+      </type -->
+      <doc>
+The current main usage mode of the device, as one of the following
+choices:
+
+editing:: The user is interacting closely with the device and is
+creating new content, such as when composing a email message or
+creating any other kind of document.
+
+recording:: The user is taking pictures, or recording video or audio.
+
+browsing:: The user is interacting closely with the device without
+creating new content, such as when browsing search results, or
+browsing through his/her music collection.
+
+watching:: The user is watching a video, without closely interacting
+with the device.
+
+listening:: The user is listening to audio, without closely
+interacting with the device.
+
+reading:: The user is reading a document, such as when reading a
+article on the web or a e-book.
+
+chatting:: The user is involved in a real-time, text-based dialog with
+external parties.
+
+gaming:: The user is interacting closely with the device, for
+entertainment.
+
+calling:: The user is involved in a real-time, audio- or video-based
+dialog with external parties.
+
+active:: The user interacting closely with the device, for an activity
+that doesn't fit into any of the above categories.
+
+idle:: The device is not being used.
+      </doc>
+    </key>
+    <key name="ConnectedContacts" type="string">
+      <doc>
+A list of URIs for contacts that the user is currently engaged in
+conversations with.  (The URIs point to Nepomuk objects.)
+      </doc>
+    </key>    
+    <key name="RecentDocuments" type="string">
+      <doc>
+A list of URIs for recently used documents, at most ten elements long.
+(The URIs point to Nepomuk objects.)
+      </doc>
+    </key>    
+    <key name="Keyboarding" type="bool">
+      <doc>
+Whether or not the user is ready to use the keyboard.  This property
+is true when a slideout keyboard has been slided out, for example, or
+when a transformer laptop with a tablet mode is in "laptop mode".
+      </doc>
+    </key>
+    <key name="Phoning" type="bool">
+      <doc>
+Whether or not the user is using the device as a telephone handset,
+holding it next to ear and mouth.
+      </doc>
+    </key>
+  </node>
+  <node name="Events">
+    <doc>
+Events
+------
+
+Information about current and upcoming calendar entries.
+    </doc>
+    <key name="Current" type="string">
+      <!-- type>
+        <uniform-list type="nepomuk-uri"/>
+      </type -->
+      <doc>
+The currently active events, as a list of Nepomuk URIs.  The list
+contains all events whose start time is earlier than or equal to the
+current time, and whose end time is later.
+      </doc>
+    </key>
+    <key name="CurrentStart" type="INT">
+      <doc>
+The earliest start time of the events in Events.Current.
+      </doc>
+    </key>
+    <key name="CurrentEnd" type="INT">
+      <doc>
+The latest end time of the events in Events.Current.
+      </doc>
+    </key>
+    <key name="Next" type="string">
+      <!-- type>
+        <uniform-list type="nepomuk-uri"/>
+      </type -->
+      <doc>
+The upcoming events, as a list of Nepomuk URIs.  The list contains
+those events whose start time is later than the current time and
+closest to now.  If there are multiple events in the list, they all
+start at exactly the same time.
+      </doc>
+    </key>
+    <key name="NextStart" type="INT">
+      <doc>
+The earliest start time of the events in Events.Next.
+      </doc>
+    </key>
+    <key name="NextEnd" type="INT">
+      <doc>
+The latest end time of the events in Events.Next.
+      </doc>
+    </key>
+  </node>
+ </node>
+</provider>

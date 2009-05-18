@@ -1,0 +1,6 @@
+This directory contains the "fake-provider".
+
+This provider declares a long list of properties, but doesn't
+implement them.  This is useful since these properties can be
+commanded with the context-commander, and applications can thus start
+using them already.
