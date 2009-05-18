@@ -41,11 +41,14 @@ class Subscription(unittest.TestCase):
                "truth","test.truth","true"],
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
         os.environ["CONTEXT_PROVIDERS"] = "."
+	print >>self.flexiprovider.stdin, "info()"
+        self.flexiprovider.stdout.readline()
         self.context_client = Popen(["../cli/context-cli","test.int","test.double","test.string","test.truth"],stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
         os.kill(self.flexiprovider.pid,9)
         os.kill(self.context_client.pid,9)
+	os.unlink('flexi-properties.xml')
 
     def testSimpleProperty(self):
         got = [self.context_client.stdout.readline().rstrip(),
