@@ -322,6 +322,7 @@ void PropertyProviderUnitTests::subscription()
     QVERIFY(keys.contains(QString("Fake.Key")));
 }
 
+
 void PropertyProviderUnitTests::unsubscription()
 {
     // Setup:
@@ -358,6 +359,80 @@ void PropertyProviderUnitTests::unsubscription()
     QSet<QString> keys = SubscriberInterface::unsubscribeKeys.at(0);
     QCOMPARE(keys.size(), 1);
     QVERIFY(keys.contains(QString("Fake.Key")));
+}
+
+
+void PropertyProviderUnitTests::immediateUnsubscription()
+{
+    // Setup:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with a non-empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
+
+    // Test:
+    // Subscribe to a property
+    propertyProvider->subscribe("Fake.Key");
+    // And unsubscribe to it immediately
+    propertyProvider->unsubscribe("Fake.Key");
+
+    // Expected results:
+    // No subscription / unsubscription happens
+    QCOMPARE(SubscriberInterface::subscribeCount, 0);
+    QCOMPARE(SubscriberInterface::unsubscribeCount, 0);
+
+    // Test:
+    // Simulate being idle
+    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+
+    // Expected results:
+    // Still no subscription / unsubscription happens
+    QCOMPARE(SubscriberInterface::subscribeCount, 0);
+    QCOMPARE(SubscriberInterface::unsubscribeCount, 0);
+}
+
+void PropertyProviderUnitTests::immediateResubscription()
+{
+    // Setup:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with a non-empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
+
+    // Subscribe to a property
+    propertyProvider->subscribe("Fake.Key");
+    // and make the subscription really happen
+    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // The logs now include this initial subscription -> clear them.
+    SubscriberInterface::resetLogs();
+
+    // Test:
+    // Unsubscribe from the prooperty
+    propertyProvider->unsubscribe("Fake.Key");
+    // And subscribe to it immediately
+    propertyProvider->subscribe("Fake.Key");
+
+    // Expected results:
+    // No subscription / unsubscription happens
+    QCOMPARE(SubscriberInterface::subscribeCount, 0);
+    QCOMPARE(SubscriberInterface::unsubscribeCount, 0);
+
+    // Test:
+    // Simulate being idle
+    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+
+    // Expected results:
+    // Still no subscription / unsubscription happens
+    QCOMPARE(SubscriberInterface::subscribeCount, 0);
+    QCOMPARE(SubscriberInterface::unsubscribeCount, 0);
 }
 
 

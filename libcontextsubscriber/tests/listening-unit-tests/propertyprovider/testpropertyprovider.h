@@ -40,9 +40,14 @@ private slots:
 
     // Test cases
     void initializing();
+
     void getSubscriberSucceeds();
     void getSubscriberFails();
+
     void subscription();
     void unsubscription();
+
+    void immediateUnsubscription();
+    void immediateResubscription();
 
 };

@@ -141,11 +141,18 @@ void PropertyProvider::subscribe(const QString &key)
     }
 
     // Schedule the key to be subscribed to
-    toSubscribe.insert(key);
-    toUnsubscribe.remove(key);
+    if (toUnsubscribe.contains(key)) {
+        // The key was scheduled to be unsubscribed
+        // Remove that scheduling, and nothing else needs to be done.
+        toUnsubscribe.remove(key);
+    }
+    else {
+        // Really schedule the key to be subscribed to
+        toSubscribe.insert(key);
 
-    if (subscriberInterface != 0)
-        idleTimer.start();
+        if (subscriberInterface != 0)
+            idleTimer.start();
+    }
 }
 
 void PropertyProvider::idleHandler()
@@ -168,11 +175,18 @@ void PropertyProvider::unsubscribe(const QString &key)
     subscribedKeys.remove(key);
 
     // Schedule the key to be unsubscribed from
-    toUnsubscribe.insert(key);
-    toSubscribe.remove(key);
+    if (toSubscribe.contains(key)) {
+        // The key was scheduled to be subscribed
+        // Remove that scheduling, and nothing else needs to be done.
+        toSubscribe.remove(key);
+    }
+    else {
+        // Really schedule the key to be unsubscribed from
+        toUnsubscribe.insert(key);
 
-    if (subscriberInterface != 0)
-        idleTimer.start();
+        if (subscriberInterface != 0)
+            idleTimer.start();
+    }
 }
 
 /// Slot, handling changed values coming from the provider over DBUS.
