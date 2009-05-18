@@ -47,7 +47,9 @@ private slots:
     void getSubscriberFails();
 
     void subscription();
+    void subscriptionOfTwoProperties();
     void unsubscription();
+    void unsubscriptionOfTwoProperties();
 
     void immediateUnsubscription();
     void immediateResubscription();
@@ -55,5 +57,8 @@ private slots:
     void subscriptionFinished();
 
     void valuesChanged();
+    void valuesChangedWithUnnecessaryProperties();
+
+    void providerDisappearsAndAppears();
 
 };
