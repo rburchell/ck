@@ -204,12 +204,6 @@ void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool proc
     }
 }
 
-PropertyProvider::~PropertyProvider()
-{
-    // Note: The SubscriberInterface* subscriber was constructed with "this" as parent.
-    // It doesn't need to be deleted.
-}
-
 PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busType, const QString& busName)
 {
     QPair<QDBusConnection::BusType, QString> lookupValue(busType, busName);

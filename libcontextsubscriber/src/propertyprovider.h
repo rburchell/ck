@@ -38,7 +38,6 @@ class PropertyProvider : public QObject
     Q_OBJECT
 
 public:
-    ~PropertyProvider();
     void subscribe(const QString &key);
     void unsubscribe(const QString &key);
     static PropertyProvider* instance(const QDBusConnection::BusType busType, const QString& busName);

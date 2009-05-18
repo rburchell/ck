@@ -39,13 +39,13 @@ covoptioncheck:
 		exit 2; \
 	fi
 
-SELECTED_FOR_COVERAGE = $(patsubst %.cpp, '*/tests/*/mock_%.cpp', $(COVERAGE_FILES))
+SELECTED_FOR_COVERAGE = $(patsubst %.cpp, '*/unit-tests/*/mock_%.cpp', $(COVERAGE_FILES))
 coverage: covoptioncheck check
 	@echo "building coverage"
 	mkdir -p coverage
 	lcov --directory . --capture --output-file coverage/all.cov
 	lcov --extract coverage/all.cov $(SELECTED_FOR_COVERAGE) --output-file coverage/selected.cov
-	lcov --extract coverage/all.cov '*/tests/*/mock_*.cpp' --output-file coverage/mock.cov
+	lcov --extract coverage/all.cov '*/unit-tests/*/mock_*.cpp' --output-file coverage/mock.cov
 	genhtml -o coverage/ coverage/mock.cov
 
 clean-local:

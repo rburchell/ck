@@ -72,15 +72,15 @@ AC_CONFIG_FILES([Makefile
 		 cli/Makefile
          update-tool/Makefile
          update-tool/update-tool.h
-		 unit_tests/Makefile
+		 unit-tests/Makefile
 		 doc/Makefile
          man/Makefile
-         unit_tests/xml-introspection-static/Makefile
-         unit_tests/cdb-introspection-static/Makefile
-         unit_tests/xml-introspection-dynamic/Makefile
-         unit_tests/cdb-introspection-dynamic/Makefile
-         unit_tests/cdb/Makefile
-	 unit_tests/propertyprovider/Makefile])
+         unit-tests/xml-introspection-static/Makefile
+         unit-tests/cdb-introspection-static/Makefile
+         unit-tests/xml-introspection-dynamic/Makefile
+         unit-tests/cdb-introspection-dynamic/Makefile
+         unit-tests/cdb/Makefile
+	 unit-tests/propertyprovider/Makefile])
 AC_OUTPUT
 
 # Checks for header files.
