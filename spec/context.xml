@@ -48,8 +48,8 @@ seen by the user.  This might mean that the device is laying face down
 on a table, or that its lid is closed if it has one.  _(stable)_
       </doc>
     </key>
-  </node>
-  <node name="Location">
+   </node>
+   <node name="Location">
     <doc>
 Location
 --------
@@ -57,32 +57,37 @@ Location
 Best effort location information. If any of the keys are not
 appliciable to the current location, they will be unavailable.
     </doc>
-    <key name="Latitude" type="double">
-      <doc>The latitude of the current position in degrees.</doc>
-    </key>
-    <key name="Longitude" type="double">
-      <doc>The longitude of the current position in degrees.</doc>
-    </key>
-    <key name="Altitude" type="double">
-      <doc>The altitude of the current position in meters.</doc>
+    <key name="Coordinates" type="uniform-list">
+      <!-- type
+        <uniform-list type="double"/>
+      /type -->
+      <doc>
+The coordinates of the current position as a list of two or three
+doubles.  The first two elemets are latitude and longitude,
+respectivly, in degrees.  The third element, when present, is the
+altitude in meter.
+      </doc>
     </key>
     <key name="Street" type="string">
-      <doc>The street nearest the location of the device.</doc>
+      <doc>The street nearest the location of the device, as a localized string.</doc>
     </key>
     <key name="PostalCode" type="string">
-      <doc>The postcode of the location of the device.</doc>
+      <doc>The postcode of the location of the device, as a localized string.</doc>
     </key>
     <key name="Area" type="string">
-      <doc>The name of the local area where the device is, for example a neighborhood or campus.</doc>
+      <doc>
+The name of the local area where the device is, for example a
+neighborhood or campus, as a localized string.
+      </doc>
     </key>
     <key name="Locality" type="string">
-      <doc>The name of the village, town or city where the device is.</doc>
+      <doc>The name of the village, town or city where the device is, as a localized string.</doc>
     </key>
     <key name="Region" type="string">
-      <doc>The administrative region which contains the location of the device.</doc>
+      <doc>The administrative region which contains the location of the device, as a localized string.</doc>
     </key>
     <key name="Country" type="string">
-      <doc>The country which contains the location of the device.</doc>
+      <doc>The country which contains the location of the device, as a localized string.</doc>
     </key>
     <key name="CountryCode" type="string">
       <doc>The ISO 3166 two letter country code of the country which contains the location of the device.</doc>
@@ -94,16 +99,26 @@ appliciable to the current location, they will be unavailable.
       <doc>TBD</doc>
     </key>
     <key name="Continent" type="string">
-      <doc>The localized name of the current continent, as a string.</doc>
+      <doc>The name of the current continent, as a localized string.</doc>
     </key>
     <key name="Planet" type="string">
-      <doc>The localized name of the current planet (or dwarf planet), as a string.</doc>
+      <doc>The name of the current planet (or dwarf planet), as a localized string.</doc>
     </key>
     <key name="PointOfInterest" type="string">
       <doc>
-The URI of the current point of interest, if any.  (The URI points to a Nepomuk object.)
+The URI of the current point of interest, if any.  (The URI points to
+a Nepomuk object inside the Content Framework.)
       </doc>
     </key>
+    <key name="NearbyContacts" type="string-list">
+      <!-- type>
+	<uniform-list type="nepomuk-uri"/>
+      </type -->
+      <doc>
+A list of URIs for contacts that are physically nearby.  (The URIs
+point to Nepomuk objects.)
+      </doc>
+    </key>    
   </node>
   <node name="Battery">
     <doc>
@@ -340,35 +355,163 @@ compass terms: North, South-West, etc.
 The wind direction in degrees.  North is 0, east is 90, etc.
       </doc>
     </key>
-    <key name="NearbyContacts" type="string-list">
+    <key name="IsDark" type="bool">
+      <doc>Whether or not it is especially dark.</doc>
+    </key>
+    <key name="IsBright" type="bool">
+      <doc>Whether or not it is especially bright.</doc>
+    </key>
+    <key name="IsLoud" type="bool">
+      <doc>Whether or not it is especially loud.</doc>
+    </key>
+  </node>
+  <node name="Use">
+    <doc>
+Use
+---
+
+Information about the current usage context of the device.
+
+Situations are a UI concept similar to Profiles that allows the user
+to have different customizations for his/her device and
+automatically/explcicitly switch between them.  Typical Situations are
+"AtHome", "AtWork", "InMeeting" etc.  Some of them are probably
+pre-defined, others can be defined by the user.  Situations might form
+a hierarchy: InMeeting includes AtWork.
+
+Not much is known about all this right now.
+    </doc>
+    <key name="Situations" type="string-list">
       <doc>
-A list of URIs for contacts that are physically nearby.  (The URIs
-point to Nepomuk objects.)
+The symbolic names of the currently active Situations.  Note that more
+than one situation might be active at the same time.
       </doc>
-    </key>    
+    </key>
+    <key name="Mode" type="string-enum">
+      <!-- type>
+	<string-enum>
+	  <editing/>
+	  <recording/>
+	  <browsing/>
+	  <watching/>
+	  <listening/>
+	  <chatting/>
+	  <gaming/>
+	  <calling/>
+	  <active/>
+	  <idle/>
+	</string-enum>
+      </type -->
+      <doc>
+The current main usage mode of the device, as one of the following
+choices:
+
+editing:: The user is interacting closely with the device and is
+creating new content, such as when composing a email message or
+creating any other kind of document.
+
+recording:: The user is taking pictures, or recording video or audio.
+
+browsing:: The user is interacting closely with the device without
+creating new content, such as when browsing search results, or
+browsing through his/her music collection.
+
+watching:: The user is watching a video, without closely interacting
+with the device.
+
+listening:: The user is listening to audio, without closely
+interacting with the device.
+
+reading:: The user is reading a document, such as when reading a
+article on the web or a e-book.
+
+chatting:: The user is involved in a real-time, text-based dialog with
+external parties.
+
+gaming:: The user is interacting closely with the device, for
+entertainment.
+
+calling:: The user is involved in a real-time, audio- or video-based
+dialog with external parties.
+
+active:: The user interacting closely with the device, for an activity
+that doesn't fit into any of the above categories.
+
+idle:: The device is not being used.
+      </doc>
+    </key>
     <key name="ConnectedContacts" type="string-list">
       <doc>
 A list of URIs for contacts that the user is currently engaged in
 conversations with.  (The URIs point to Nepomuk objects.)
       </doc>
     </key>    
-  </node>
-  <node name="State">
-    <doc>
-State
------
-
-Information about the global state of the device.
-    </doc>
-    <key name="Situation" type="string">
+    <key name="RecentDocuments" type="string-list">
       <doc>
-The symbolic name of the current "Situation".  (Situations are a UI
-concept similar to Profiles that allows the user to have different
-customizations for his/her device and automatically/explcicitly switch
-between them.  Typical Situations are "AtHome", "AtWork", "InMeeting"
-etc.  Some of them are probably pre-defined, others can be defined by
-the user.  Situations might form a hierarchy: InMeeting includes
-AtWork.  Have to investigate this, obviously.)
+A list of URIs for recently used documents, at most ten elements long.
+(The URIs point to Nepomuk objects.)
+      </doc>
+    </key>    
+    <key name="Keyboarding" type="bool">
+      <doc>
+Whether or not the user is ready to use the keyboard.  This property
+is true when a slideout keyboard has been slided out, for example, or
+when a transformer laptop with a tablet mode is in "laptop mode".
+      </doc>
+    </key>
+    <key name="Phoning" type="bool">
+      <doc>
+Whether or not the user is using the device as a telephone handset,
+holding it next to ear and mouth.
+      </doc>
+    </key>
+  </node>
+  <node name="Events">
+    <doc>
+Events
+------
+
+Information about current and upcoming calendar entries.
+    </doc>
+    <key name="Current" type="string-list">
+      <!-- type>
+        <uniform-list type="nepomuk-uri"/>
+      </type -->
+      <doc>
+The currently active events, as a list of Nepomuk URIs.  The list
+contains all events whose start time is earlier than or equal to the
+current time, and whose end time is later.
+      </doc>
+    </key>
+    <key name="CurrentStart" type="time">
+      <doc>
+The earliest start time of the events in Events.Current.
+      </doc>
+    </key>
+    <key name="CurrentEnd" type="time">
+      <doc>
+The latest end time of the events in Events.Current.
+      </doc>
+    </key>
+    <key name="Next" type="string-list">
+      <!-- type>
+        <uniform-list type="nepomuk-uri"/>
+      </type -->
+      <doc>
+The upcoming events, as a list of Nepomuk URIs.  The list contains
+those events whose start time is later than the current time and
+closest to now.  If there are multiple events in the list, they all
+start at exactly the same time.
+      </doc>
+    </key>
+    <key name="NextStart" type="time">
+      <doc>
+The earliest start time of the events in Events.Next.
+      </doc>
+    </key>
+    <key name="NextEnd" type="time">
+      <doc>
+The latest end time of the events in Events.Next.
       </doc>
     </key>
   </node>
