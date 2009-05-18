@@ -74,6 +74,7 @@ AC_CONFIG_FILES([Makefile
          update-tool/update-tool.h
 		 tests/Makefile
 		 doc/Makefile
+         man/Makefile
          tests/xml-introspection-static/Makefile
          tests/cdb-introspection-static/Makefile
          tests/xml-introspection-dynamic/Makefile
