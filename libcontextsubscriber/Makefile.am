@@ -1,10 +1,10 @@
-#SUBDIRS = src tests doc
+#SUBDIRS = src unit_tests doc
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = src tests cli update-tool doc man
+SUBDIRS = src unit_tests cli update-tool doc man
 
 check-sum:
-	make -C tests/ check-sum
+	make -C unit_tests/ check-sum
 
 covoptioncheck:
 	@if test "$(GCOV)" = "" ; then \
@@ -13,7 +13,7 @@ covoptioncheck:
 	fi
 
 coverage: covoptioncheck
-	make -C tests/ coverage
+	make -C unit_tests/ coverage
 
 #deb:
 #	rm -rf debian/
