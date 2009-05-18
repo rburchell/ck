@@ -19,11 +19,10 @@ def pkgconfig(*args):
 # uninstalled, we extend PYTHONPATH, then we try to import the module.
 # If that fails, extend LD_LIBRARY_PATH and re-exec ourselves.
 
-if pkgconfig('--exists', 'contextprovider-1.0').returncode != 0 or \
-   pkgconfig('--exists', 'duivaluespace-1.0').returncode != 0:
+if pkgconfig('--exists', 'contextprovider-1.0').returncode != 0:
     raise RuntimeError("You need to make pkg-config find "
-                       "contextprovider-1.0 and duivaluespace-1.0 "
-                       "somehow.\nTry setting $PKG_CONFIG_PATH.")
+                       "contextprovider-1.0 somehow. \n"
+                       "Try setting $PKG_CONFIG_PATH.")
 
 if pkgconfig('--uninstalled', 'contextprovider-1.0').returncode == 0:
     sys.path.append(pkgconfig('--variable=pythondir', 'contextprovider-1.0').output)
@@ -70,32 +69,19 @@ def xmlfor(busname='ctx.flexiprovider', bus='session', *props):
     xml = ['<?xml version="1.0"?>\n'
            '<provider bus="%s" service="%s">' % (bus, busname)]
     for p in props:
-        node, _, key = p.name.partition('.')
-        xml.append('  <node name="%s">\n'
-                   '    <key name="%s" type="%s">\n'
-                   '       <doc>A phony but very flexible property.</doc>\n'
-                   '    </key>\n'
-                   '  </node>' % (node, key, p.datatype))
+        xml.append('  <key name="%s">\n'
+                   '    <type>%s</type>\n'
+                   '    <doc>A phony but very flexible property.</doc>\n'
+                   '  </key>' % (p.name, p.datatype))
     xml.append('</provider>')
     return '\n'.join(xml)
 
-# Location of the update-context-providers script, initialized lazily
-# in the function below.
-U_C_P = None
 def update_context_providers(xml, dir='.'):
-    """Runs the update-context-provider script in $dir after writing
-    $xml to a temporary file."""
-    global U_C_P
-    if U_C_P is None:
-        U_C_P = ''
-        if pkgconfig('--uninstalled', 'duivaluespace-1.0').returncode == 0:
-            U_C_P = '%s/registry/' % pkgconfig('--variable=pcfiledir',
-                                              'duivaluespace-1.0').output
-        U_C_P += 'update-context-providers'
-    tmpf = tempfile.NamedTemporaryFile('w+b', -1, '.xml', 'flexi', dir)
-    print >>tmpf, xml
-    tmpf.flush()
-    subprocess.call([U_C_P, dir])
+    """Dumps the xml into $dir/flexi-properties.xml."""
+    tmpfd, tmpfn = tempfile.mkstemp('.xml', 'flexi', dir)
+    os.write(tmpfd, xml)
+    os.close(tmpfd)
+    os.rename(tmpfn, dir + '/flexi-properties.xml')
 
 class Flexiprovider(object):
     def stdin_ready(self, fd, cond):
