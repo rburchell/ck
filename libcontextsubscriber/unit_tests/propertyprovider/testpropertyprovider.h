@@ -56,6 +56,8 @@ private slots:
 
     void subscriptionFinished();
 
+    void subscriptionAfterGetSubscriberFailed();
+
     void valuesChanged();
     void valuesChangedWithUnnecessaryProperties();
 

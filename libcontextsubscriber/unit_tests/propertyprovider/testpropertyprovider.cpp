@@ -77,6 +77,7 @@ QList<QDBusConnection::BusType> ManagerInterface::creationBusTypes;
 QStringList ManagerInterface::creationBusNames;
 
 ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent)
+    : getSubscriberFailed(false)
 {
     // Store the mock implementation (created by the tested class)
     mockManagerInterface = this;
@@ -97,7 +98,7 @@ void ManagerInterface::getSubscriber()
 
 bool ManagerInterface::isGetSubscriberFailed() const
 {
-    return false;
+    return getSubscriberFailed;
 }
 
 void ManagerInterface::resetLogs()
@@ -557,6 +558,39 @@ void PropertyProviderUnitTests::subscriptionFinished()
     QCOMPARE(keysReceived.size(), 1);
     QVERIFY(keysReceived.contains("Fake.Key"));
 }
+
+void PropertyProviderUnitTests::subscriptionAfterGetSubscriberFailed()
+{
+    // Setup:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate property provider.
+    // Otherwise the tests are dependent on each other.
+
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with an empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("");
+    // And make the manager return true when we ask did it fail
+    mockManagerInterface->getSubscriberFailed = true;
+
+    // Start spying on the signal subscribeFinished
+    QSignalSpy spy(propertyProvider, SIGNAL(subscribeFinished(QSet<QString>)));
+
+    // Test:
+    // Subscribe to a property
+    propertyProvider->subscribe("Fake.Key");
+
+    // Expected results:
+    // PropertyProvider doesn't actually subscribe to it.
+    // PropertyProvider signals that the subscription was finished for that key.
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> parameters = spy.takeFirst();
+    QSet<QString> keysReceived = parameters.at(0).value<QSet<QString> >();
+    QCOMPARE(keysReceived.size(), 1);
+    QVERIFY(keysReceived.contains("Fake.Key"));
+}
+
 
 void PropertyProviderUnitTests::valuesChanged()
 {

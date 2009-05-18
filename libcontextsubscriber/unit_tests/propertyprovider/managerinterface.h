@@ -48,7 +48,9 @@ public:
     static QList<QDBusConnection::BusType> creationBusTypes;
     static QStringList creationBusNames;
 
+    // For tests
     static void resetLogs();
+    bool getSubscriberFailed;
 
     friend class PropertyProviderUnitTests;
 
