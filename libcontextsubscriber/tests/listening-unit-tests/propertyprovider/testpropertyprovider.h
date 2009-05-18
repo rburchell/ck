@@ -20,6 +20,8 @@
  */
 
 #include <QObject>
+#include <QSet>
+#include <QString>
 
 class PropertyProvider;
 
@@ -50,4 +52,20 @@ private slots:
     void immediateUnsubscription();
     void immediateResubscription();
 
+    void subscriptionFinished();
+
+    void valuesChanged();
+
+};
+
+// Class for listening signals which have QSet<QString> as a parameter.
+class CustomSignalListener : public QObject
+{
+    Q_OBJECT
+public slots:
+    void mySlot(QSet<QString>);
+public:
+    CustomSignalListener();
+    int count;
+    QList<QSet<QString> > parameters;
 };
