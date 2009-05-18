@@ -38,7 +38,7 @@
 Q_DECLARE_METATYPE(QVariant);
 Q_DECLARE_METATYPE(QSet<QString>);
 
-#define MYLOGLEVEL 2
+#define MYLOGLEVEL 0
 void myMessageOutput(QtMsgType type, const char *msg)
 {
     switch (type) {
