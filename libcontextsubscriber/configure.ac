@@ -80,13 +80,13 @@ AC_CONFIG_FILES([Makefile
          unit-tests/contextregistryinfo-xml-static/Makefile
          unit-tests/contextpropertyinfo-xml-static/Makefile
          unit-tests/contextregistryinfo-xml-dynamic/Makefile
-         unit_tests/contextpropertyinfo-xml-dynamic/Makefile
+         unit-tests/contextpropertyinfo-xml-dynamic/Makefile
          unit-tests/contextregistryinfo-cdb-static/Makefile
          unit-tests/contextpropertyinfo-cdb-static/Makefile
          unit-tests/contextregistryinfo-cdb-dynamic/Makefile
          unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
      	 unit-tests/propertyprovider/Makefile
-	 unit-tests/propertyhandle/Makefile])
+	     unit-tests/propertyhandle/Makefile])
 
 AC_OUTPUT
 
