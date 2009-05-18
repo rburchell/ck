@@ -14,7 +14,7 @@ check-sum: all
 
 covoptioncheck:
 	@if test "$(GCOV)" = "" ; then \
-		echo "Didn't configured for coverage, please rerun configure with --with-coverage"; \
+		echo "Wasn't configured for coverage, please rerun configure with --with-coverage"; \
 		exit 1; \
 	fi
 
