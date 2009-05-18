@@ -79,6 +79,7 @@ AC_CONFIG_FILES([Makefile
          unit-tests/cdb-introspection-static/Makefile
          unit-tests/xml-introspection-dynamic/Makefile
          unit-tests/cdb-introspection-dynamic/Makefile
+         unititests/contextregistryinfo-xml-static/Makefile
          unit-tests/cdb/Makefile
          unit-tests/cdbreader/Makefile
          unit-tests/cdbwriter/Makefile
