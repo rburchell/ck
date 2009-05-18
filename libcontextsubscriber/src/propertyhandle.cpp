@@ -177,8 +177,10 @@ bool PropertyHandle::isSubscribePending() const
 /// Changes the value of the property and emits the valueChanged signal.
 void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
 {
-    // FIXME : Implement the type check here. Remember to check the types of non-nulls only.
-    if (!newValue.isNull() && ContextProperty::isTypeCheck()) {
+    if (ContextProperty::isTypeCheck() // type checks enabled
+        && !newValue.isNull() // variable is non-null
+        && myInfo->type() != "") { // the type is found in the registry
+
         bool checked = false;
         QString myType = myInfo->type();
         if (myType == "STRING") {
