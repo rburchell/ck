@@ -22,10 +22,7 @@
 #ifndef CDBWRITER_H
 #define CDBWRITER_H
 
-#include <QVariant>
-#include <QStringList>
 #include <QObject>
-#include <stdlib.h>
 
 /*!
   \class CDBWriter

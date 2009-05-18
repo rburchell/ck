@@ -32,6 +32,47 @@
 
 #define DEFAULT_REGISTRY_PATH "@prefix@/share/context-providers/"
 
+/*!
+   \page "Update tool"
+
+   \brief The update tool (\c update-tool) is used to regenerate the registry cache database. 
+
+   \section Overview
+
+   Information about keys and providers is normally stored in a system directory in 
+   \b xml format. The xml (being xml) is slow to parse and not efficient as a storage format for
+   data that is mostly static.
+
+   It makes sense to store a cached version of the xml registry in a constant-database 
+   fast-access format and regenerate it when the xml data changes. 
+
+   Update tool does exactly that - it reads the xml registry and (re)generates a
+   constant \b tiny-cdb database containing the cached version of the data in the registry.
+
+   \section Usage
+
+   The \c update-tool binary, when lunched without parameters, will by default regenerate
+   the database in the default installation prefix. Most likely: \c "/usr/share/context-providers" .
+   Obviously, for this to be successful, it needs to be launched with proper privileges.
+
+   It's possible to override the registry directory with first parameter:
+
+   \code
+   $> update-tool /some/path/to/registry
+   \endcode
+
+   In this case the xml will be read from \c "/some/path/to/registry" and the resulting 
+   database will be written to \c "/some/path/to/registry/context-providers.cdb" .
+
+   Lastly, the \c "CONTEXT_PROVIDERS" environment variable can be used to specify 
+   a directory containing the registry.
+
+   \section Implementation 
+
+   To ensure the registry consistency the regeneration is happening atomically - the 
+   new database is first written to a temp-named file and then moved-over the old one.
+*/
+
 void checkDirectory(const QDir &dir);
 QString genTempName(const QDir &dir);
 int main(int argc, char **argv);

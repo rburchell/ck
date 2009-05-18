@@ -22,16 +22,12 @@
 #ifndef INFOCDBBACKEND_H
 #define INFOCDBBACKEND_H
 
-#include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include <QMutex>
-#include <QFileInfo>
 #include <QString>
-#include <QHash>
 #include <QFileSystemWatcher>
-#include "infobackend.h"
 #include "cdbreader.h"
+#include "infobackend.h"
 
 class InfoCdbBackend : public InfoBackend
 {
@@ -59,7 +55,6 @@ private:
 
 private slots:
     void onDatabaseFileChanged(const QString &path);
-
 };
 
-#endif // INFOXMLBACKEND_H
+#endif // INFOCDBBACKEND_H

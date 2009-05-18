@@ -19,11 +19,12 @@
  *
  */
 
-#include "cdbreader.h"
+#include <stdlib.h>
 #include <cdb.h>
 #include <fcntl.h>
 #include <QDebug>
 #include <QFile>
+#include "cdbreader.h"
 
 /// Constructs a new CDBReader reading from cdb database at \a dbpath
 /// \param dbpath Path to the database.

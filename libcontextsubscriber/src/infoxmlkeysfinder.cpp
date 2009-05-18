@@ -19,8 +19,8 @@
  *
  */
 
-#include "infoxmlkeysfinder.h"
 #include <QDebug>
+#include "infoxmlkeysfinder.h"
 
 bool InfoXmlKeysFinder::startDocument()
 {
