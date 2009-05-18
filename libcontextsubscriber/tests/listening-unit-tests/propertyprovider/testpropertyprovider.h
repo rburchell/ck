@@ -42,4 +42,7 @@ private slots:
     void initializing();
     void getSubscriberSucceeds();
     void getSubscriberFails();
+    void subscription();
+    void unsubscription();
+
 };

@@ -50,6 +50,11 @@ public:
     static QStringList creationBusNames;
     static QStringList creationObjectPaths;
 
+    static int subscribeCount;
+    static int unsubscribeCount;
+    static QList<QSet<QString> > subscribeKeys;
+    static QList<QSet<QString> > unsubscribeKeys;
+
     static void resetLogs();
 
     friend class PropertyProviderUnitTests;
