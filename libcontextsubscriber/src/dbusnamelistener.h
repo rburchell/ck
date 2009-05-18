@@ -31,6 +31,8 @@
 template<typename P1, typename P2> class QPair;
 template<typename K, typename V> class QMap;
 
+class QDBusPendingCallWatcher;
+
 class DBusNameListener : public QObject
 {
     Q_OBJECT
@@ -40,6 +42,7 @@ public:
 
 private slots:
     void onServiceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
+    void onNameHasOwnerFinished(QDBusPendingCallWatcher* watcher);
 
 private:
     bool servicePresent;
@@ -47,6 +50,8 @@ private:
     static QMap<QPair<QDBusConnection::BusType, QString>, DBusNameListener*> listenerInstances;
 
     DBusNameListener(const QDBusConnection::BusType busType, const QString &busName);
+    void setServicePresent();
+    void setServiceGone();
 
 signals:
     void nameAppeared();

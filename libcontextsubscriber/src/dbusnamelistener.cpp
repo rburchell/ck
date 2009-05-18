@@ -20,6 +20,7 @@
  */
 
 #include "dbusnamelistener.h"
+#include "safedbuspendingcallwatcher.h"
 #include "sconnect.h"
 
 #include <QDBusConnectionInterface>
@@ -42,8 +43,6 @@ DBusNameListener* DBusNameListener::instance(const QDBusConnection::BusType busT
 DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const QString &busName) :
     busName(busName), servicePresent(false)
 {
-    // FIXME: startup check of the name
-
     QDBusConnection connection("");
 
     // Create DBus connection
@@ -65,18 +64,47 @@ DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const
              SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
              this,
              SLOT(onServiceOwnerChanged(const QString&, const QString&, const QString&)));
+
+    // Check if the service is already there
+    QDBusPendingCall nameHasOwnerCall = connection.interface()->asyncCall("NameHasOwner", busName);
+    SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(nameHasOwnerCall, this);
+    sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
+             this, SLOT(onNameHasOwnerFinished(QDBusPendingCallWatcher *)));
 }
 
 void DBusNameListener::onServiceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
     if (name == busName) {
         if (oldOwner == "") {
-            servicePresent = true;
-            emit nameAppeared();
+            setServicePresent();
         } else if (newOwner == "") {
-            servicePresent = false;
-            emit nameDisappeared();
+            setServiceGone();
         }
+    }
+}
+
+void DBusNameListener::setServicePresent()
+{
+    if (servicePresent == false) {
+        servicePresent = true;
+        emit nameAppeared();
+    }
+}
+
+void DBusNameListener::setServiceGone()
+{
+    if (servicePresent == true) {
+        servicePresent = false;
+        emit nameDisappeared();
+    }
+}
+
+void DBusNameListener::onNameHasOwnerFinished(QDBusPendingCallWatcher* watcher)
+{
+    QDBusPendingReply<bool> reply = *watcher;
+    if (reply.isError() == false && reply.argumentAt<0>() == true) {
+        // The name has an owner
+        setServicePresent();
     }
 }
 
