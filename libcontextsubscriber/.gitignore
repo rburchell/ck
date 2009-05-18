@@ -24,6 +24,7 @@ Makefile
 /unit-tests/cdb-introspection-static/cdb-introspection-static
 /unit-tests/cdb-introspection-dynamic/cdb-introspection-dynamic
 /unit-tests/testclass/testclassunittest
+/unit_tests/cdbreader/cdbreaderunittest
 /unit-tests/cdb/cdb
 /unit-tests/propertyprovider/propertyprovider-unit-tests
 

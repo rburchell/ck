@@ -1,4 +1,4 @@
-SUBDIRS = xml-introspection-static xml-introspection-dynamic cdb cdb-introspection-static cdb-introspection-dynamic propertyprovider propertyhandle
+SUBDIRS = xml-introspection-static xml-introspection-dynamic cdb cdb-introspection-static cdb-introspection-dynamic propertyprovider propertyhandle cdbreader
 
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
