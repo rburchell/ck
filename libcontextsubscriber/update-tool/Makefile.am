@@ -2,7 +2,7 @@ bin_PROGRAMS = update-tool
 
 update_tool_SOURCES = update-tool.cpp
 
-AM_CXXFLAGS = -I../src
+AM_CPPFLAGS = -I../src
 
 # you have to add your ui designer designed forms here
 # QT_FORMS = commandview.ui
