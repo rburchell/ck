@@ -13,6 +13,7 @@ Makefile
 
 # Auto-generated
 /src/infobackendconfig.h
+/src/infoxmlbackendconfig.h
 /update-tool/update-tool.h
 
 # Ignore resource forks
@@ -30,7 +31,12 @@ Makefile
 /unit-tests/cdbreader/cdbreaderunittest
 /unit-tests/cdbreader/cdbwriterunittest
 /unit-tests/propertyprovider/propertyprovider-unit-tests
-
+/unit-tests/xml-introspection-static/xml-introspection-static
+/unit-tests/xml-introspection-dynamic/xml-introspection-dynamic
+/unit-tests/propertyhandle/propertyhandle-unit-tests
+/unit-tests/cdb/cdb
+/unit-tests/cdb-introspection-static/cdb-introspection-static
+/unit-tests/cdb-introspection-dynamic/cdb-introspection-dynamic
 coverage/
 
 # Other binaries
@@ -40,3 +46,4 @@ coverage/
 # Docs
 doc/html
 doc/doxygen.log
+
