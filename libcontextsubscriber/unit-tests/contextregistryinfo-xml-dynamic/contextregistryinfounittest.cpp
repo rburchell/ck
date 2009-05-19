@@ -35,6 +35,7 @@ private slots:
     void initTestCase();
     void basicChange();
     void changeWithRemove();
+    void keyRemoval();
     void cleanupTestCase();
 };
 
@@ -43,7 +44,7 @@ void ContextRegistryInfoUnitTest::initTestCase()
     setenv("CONTEXT_PROVIDERS", "./", 0);
 
     // Setup state
-    // QFile::remove("providers.xml");
+    QFile::remove("providers.xml");
     QFile::copy("providers1v1.xml.src", "providers.xml");
     QTest::qWait(200);
        
@@ -81,6 +82,32 @@ void ContextRegistryInfoUnitTest::changeWithRemove()
     QTest::qWait(500);
 
     QCOMPARE(spy1.count(), 2);
+}
+
+void ContextRegistryInfoUnitTest::keyRemoval()
+{
+    QFile::remove("providers.xml");
+    QFile::copy("providers1v2.xml.src", "providers.xml");
+    QTest::qWait(200);
+
+    QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
+    QSignalSpy spy2(context, SIGNAL(keysRemoved(QStringList)));
+
+    QFile::copy("providers1v1.xml.src", "tmp.file");
+    rename("tmp.file", "providers.xml");
+    QTest::qWait(500);
+
+    QCOMPARE(spy1.count(), 1);
+    QList<QVariant> args1 = spy1.takeFirst();
+    QCOMPARE(args1.at(0).toList().size(), 2);
+
+    QCOMPARE(spy2.count(), 1);
+    QList<QVariant> args2 = spy2.takeFirst();
+    QCOMPARE(args2.at(0).toList().size(), 1);
+
+    // Now just make sure that the new key is not there
+    QStringList newKeys = context->listKeys();
+    QVERIFY(! newKeys.contains("Battery.AboutToExplode"));
 }
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
