@@ -20,6 +20,7 @@
  */
 
 #include "update-tool.h"
+#include "fcntl.h"
 
 /* Make sure the given directory exists, is readable etc. 
    If not, bail out with proper error. */
@@ -109,10 +110,20 @@ int main(int argc, char **argv)
         }
     }
 
+    if (fsync(writer.fileDescriptor()) != 0) {
+        printf("ERROR: failed to fsync data on writer to %s.\n", templ.constData());
+        exit(64);
+    }
+
     writer.close();
 
     // Atomically rename
-    rename(templ.constData(), finalDbPath.toUtf8().constData()); 
+    if (rename(templ.constData(), finalDbPath.toUtf8().constData()) != 0) {
+        printf("ERROR: failed to rename %s to %s.\n", templ.constData(), finalDbPath.toUtf8().constData());
+        exit(64);
+    }
+
+    // All ok
     printf("Generated: '%s'\n", finalDbPath.toUtf8().constData());
     return 0;
 }
