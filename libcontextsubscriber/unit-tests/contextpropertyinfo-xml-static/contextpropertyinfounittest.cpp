@@ -30,8 +30,9 @@ class ContextPropertyInfoUnitTest : public QObject
 
 private slots:
     void initTestCase();
-    void checkLowBAttery();
+    void checkLowBattery();
     void checkSystemBus();
+    void checkNonExistant();
 };
 
 void ContextPropertyInfoUnitTest::initTestCase()
@@ -44,7 +45,7 @@ void ContextPropertyInfoUnitTest::initTestCase()
     ContextRegistryInfo::instance();
 }
 
-void ContextPropertyInfoUnitTest::checkLowBAttery()
+void ContextPropertyInfoUnitTest::checkLowBattery()
 {
     ContextPropertyInfo prop("Battery.LowBattery");
 
@@ -59,6 +60,13 @@ void ContextPropertyInfoUnitTest::checkSystemBus()
 {
     ContextPropertyInfo prop("Battery.Charging");
     QCOMPARE(prop.providerDBusType(), QDBusConnection::SystemBus);
+}
+
+void ContextPropertyInfoUnitTest::checkNonExistant()
+{
+    ContextPropertyInfo prop("This.doesnt.exist");
+    QCOMPARE(prop.doc(), QString(""));
+    QCOMPARE(prop.type(), QString(""));
 }
 
 #include "moc_contextpropertyinfounittest_cpp.cpp"
