@@ -31,7 +31,7 @@ Do this outside of Maemo, in Debian or Ubuntu.
 This will check for all the maintainer tools that are needed.  Install
 them until ./autogen.sh is happy.
 
-   $ ./configure --emable-gtk-doc
+   $ ./configure --enable-gtk-doc
    $ make
    $ make dist
 
