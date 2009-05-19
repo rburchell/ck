@@ -167,6 +167,9 @@ class Flexiprovider(object):
         self.update_providers()
 
     def update_providers(self):
+        # Don't update the registry if we are being run as a commander.
+        if self.busname == 'org.freedesktop.ContextKit.Commander':
+            return
         update_context_providers(xmlfor(self.busname, self.bus, *self.props.values()))
 
     def info(self):
