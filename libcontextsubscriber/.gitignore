@@ -34,6 +34,7 @@ contextsubscriber-1.0.pc
 /unit-tests/cdbwriter/cdbwriterunittest
 /unit-tests/propertyprovider/propertyprovider-unit-tests
 /unit-tests/propertyhandle/propertyhandle-unit-tests
+/unit-tests/handlesignalrouter/handlesignalrouter-unit-tests
 coverage/
 
 # Other binaries

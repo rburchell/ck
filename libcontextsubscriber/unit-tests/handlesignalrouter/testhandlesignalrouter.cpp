@@ -55,6 +55,9 @@ void myMessageOutput(QtMsgType type, const char *msg)
     }
 }
 
+// Help the QSignalSpy handle QVariant
+Q_DECLARE_METATYPE(QVariant);
+
 // Mock instances
 // These will be created by the test program
 PropertyHandle* mockHandleOne;
@@ -96,6 +99,8 @@ PropertyHandle* PropertyHandle::instance(const QString& key)
 void HandleSignalRouterUnitTests::initTestCase()
 {
     qInstallMsgHandler(myMessageOutput);
+    // Help the QSignalSpy handle QVariant
+    qRegisterMetaType<QVariant>("QVariant");
 }
 
 // After all tests
@@ -141,10 +146,29 @@ void HandleSignalRouterUnitTests::routingSignals()
     // Expected results:
     // The mockHandleOne.setValue was called
     QCOMPARE(spy1.count(), 1);
-    // FIXME: check parameters
+    QList<QVariant> parameters = spy1.takeFirst();
+    QCOMPARE(parameters.at(0), QVariant("Property.One"));
+    QCOMPARE(parameters.at(1).value<QVariant >(), QVariant(4.3));
+    QCOMPARE(parameters.at(2), QVariant(true));
     // The setValue of other mock handles were not called
     QCOMPARE(spy2.count(), 0);
     QCOMPARE(spy3.count(), 0);
+
+    // Test:
+    // Send a signal to the HandleSignalRouter
+    handleSignalRouter->onValueChanged("Property.Two", QVariant("value"), false);
+
+    // Expected results:
+    // The mockHandleTwo.setValue was called
+    QCOMPARE(spy2.count(), 1);
+    parameters = spy2.takeFirst();
+    QCOMPARE(parameters.at(0), QVariant("Property.Two"));
+    QCOMPARE(parameters.at(1).value<QVariant >(), QVariant("value"));
+    QCOMPARE(parameters.at(2), QVariant(false));
+    // The setValue of other mock handles were not called
+    QCOMPARE(spy1.count(), 0);
+    QCOMPARE(spy3.count(), 0);
+
 }
 
 QTEST_MAIN(HandleSignalRouterUnitTests);
