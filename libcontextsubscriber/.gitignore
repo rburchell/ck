@@ -13,6 +13,7 @@ Makefile
 
 # Auto-generated
 /src/infobackendconfig.h
+/src/infoxmlbackendconfig.h
 /update-tool/update-tool.h
 contextsubscriber-1.0.pc
 /update-context-providers/update-context-providers.h
@@ -37,6 +38,7 @@ coverage/
 
 # Other binaries
 /cli/context-cli
+/update-tool/update-tool
 /update-context-providers/update-context-providers
 
 # Docs
