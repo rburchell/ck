@@ -14,6 +14,7 @@ Makefile
 # Auto-generated
 /src/infobackendconfig.h
 /update-tool/update-tool.h
+contextsubscriber-1.0.pc
 
 # Ignore resource forks
 ._*
@@ -30,6 +31,7 @@ Makefile
 /unit-tests/cdbreader/cdbreaderunittest
 /unit-tests/cdbreader/cdbwriterunittest
 /unit-tests/propertyprovider/propertyprovider-unit-tests
+/unit-tests/propertyhandle/propertyhandle-unit-tests
 
 coverage/
 

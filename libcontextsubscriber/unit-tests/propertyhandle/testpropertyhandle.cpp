@@ -61,7 +61,11 @@ void myMessageOutput(QtMsgType type, const char *msg)
 // Mock instances
 // These will be created by the test program
 PropertyProvider* mockPropertyProvider;
-DBusNameListener* mockDBusNameListener;
+DBusNameListener mockDBusNameListener;
+// Note: The DBusNameListener is used as a static member of PropertyHandle,
+// so, the DBusNameListener::instance is called before we have a change to init()
+// the unit test class. Therefore, the DBusNameListener must be created here.
+
 ContextRegistryInfo* mockContextRegistryInfo;
 // These will be created by the tested class and stored here
 ContextPropertyInfo* mockContextPropertyInfo;
@@ -91,12 +95,12 @@ void PropertyProvider::unsubscribe(const QString& key)
 
 DBusNameListener* DBusNameListener::instance(const QDBusConnection::BusType busType, const QString &busName)
 {
-    // qDebug() << "Returning a mock dbus name listener";
-    return mockDBusNameListener;
+    qDebug() << "Returning a mock dbus name listener";
+    return &mockDBusNameListener;
 }
 
 DBusNameListener::DBusNameListener()
-    : servicePresent(true)
+: servicePresent(false)
 {
 }
 
