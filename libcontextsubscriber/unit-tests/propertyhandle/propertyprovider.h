@@ -61,6 +61,8 @@ public:
     PropertyProvider(QString name); // public only in tests
     static void resetLogs();
     QString myName;
+
+    friend class PropertyHandleUnitTests;
 };
 
 #endif

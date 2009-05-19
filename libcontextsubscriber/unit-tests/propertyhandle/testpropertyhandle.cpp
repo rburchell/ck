@@ -239,6 +239,34 @@ void PropertyHandleUnitTests::initializing()
     QCOMPARE(PropertyProvider::instanceDBusNames.at(0), QString("Fake.Provider"));
 }
 
+void PropertyHandleUnitTests::key()
+{
+    // Setup:
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Test and expected results:
+    // The key() function returns the correct key
+    QCOMPARE(propertyHandle->key(), key);
+}
+
+void PropertyHandleUnitTests::info()
+{
+    // Setup:
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Test and expected results:
+    // The info() function returns the correct ContextPropertyInfo
+    QCOMPARE(propertyHandle->info(), mockContextPropertyInfo);
+}
+
 void PropertyHandleUnitTests::subscribe()
 {
     // Setup:
@@ -303,6 +331,46 @@ void PropertyHandleUnitTests::subscribeTwice()
     QCOMPARE(PropertyProvider::subscribeCount, 1);
     QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
     QCOMPARE(PropertyProvider::unsubscribeCount, 0);
+}
+
+void PropertyHandleUnitTests::subscriptionPendingAndFinished()
+{
+    // Setup:
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Test:
+    // Command the PropertyHandle to subscribe
+    propertyHandle->subscribe();
+
+    // Expected results:
+    // The subscription is marked as pending
+    QVERIFY(propertyHandle->isSubscribePending());
+
+    // Test:
+    // Command the PropertyProvider to emit the subscriptionFinished signal
+    // without the relevant key
+    QSet<QString> toEmit1;
+    toEmit1.insert("Non.Relevant.Key");
+    emit mockPropertyProvider->subscribeFinished(toEmit1);
+
+    // Expected results:
+    // The subscription is still marked as pending
+    QVERIFY(propertyHandle->isSubscribePending());
+
+    // Test:
+    // Command the PropertyProvider to emit the subscriptionFinished signal
+    // with the relevant key
+    QSet<QString> toEmit2;
+    toEmit2.insert(key);
+    emit mockPropertyProvider->subscribeFinished(toEmit2);
+
+    // Expected results:
+    // The subscription is no longer marked as pending
+    QCOMPARE(propertyHandle->isSubscribePending(), false);
 }
 
 void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribe()
@@ -727,7 +795,7 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
 
-    // Subscribe to the handle
+    // Subscribe to the PropertyHandle
     propertyHandle->subscribe();
 
     // Clear the logs from the subscription
@@ -747,6 +815,8 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
     QCOMPARE(PropertyProvider::subscribeCount, 1);
     QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
     QCOMPARE(PropertyProvider::subscribeProviderNames.at(0), QString("Commander"));
+    // The provider is now the Commander
+    QCOMPARE(propertyHandle->provider(), mockCommanderProvider);
 
     // Setup:
     // Clear the logs from the subscription
@@ -758,7 +828,7 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
     emit mockDBusNameListener.nameDisappeared();
 
     // Expected results:
-    // The handle unsubscribes from the commander
+    // The PropertyHandle unsubscribes from the commander
     QCOMPARE(PropertyProvider::unsubscribeCount, 1);
     QCOMPARE(PropertyProvider::unsubscribeKeys.at(0), key);
     QCOMPARE(PropertyProvider::unsubscribeProviderNames.at(0), QString("Commander"));
@@ -766,6 +836,55 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
     QCOMPARE(PropertyProvider::subscribeCount, 1);
     QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
     QCOMPARE(PropertyProvider::subscribeProviderNames.at(0), QString("NormalProvider"));
+    // The provider is now the real provider
+    QCOMPARE(propertyHandle->provider(), mockPropertyProvider);
+}
+
+void PropertyHandleUnitTests::commandingDisabled()
+{
+    // Setup:
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Subscribe to the handle
+    propertyHandle->subscribe();
+
+    // Clear the logs from the subscription
+    PropertyProvider::resetLogs();
+
+    // Test:
+    // Disable commanding
+    propertyHandle->disableCommanding();
+
+    // Command the DBusNameListener to tell that the Commander has appeared
+    mockDBusNameListener.servicePresent = true;
+    emit mockDBusNameListener.nameAppeared();
+
+    // Expected results:
+    // The PropertyHandle ignores the Commander
+    QCOMPARE(PropertyProvider::unsubscribeCount, 0);
+    QCOMPARE(PropertyProvider::subscribeCount, 0);
+    // The provider is still the real provider
+    QCOMPARE(propertyHandle->provider(), mockPropertyProvider);
+
+    // Setup:
+    // Clear the logs from the subscription
+    PropertyProvider::resetLogs();
+
+    // Test:
+    // Command the DBusNameListener to tell that the Commander has disappeared
+    mockDBusNameListener.servicePresent = false;
+    emit mockDBusNameListener.nameDisappeared();
+
+    // Expected results:
+    // The PropertyHandle ignores the Commander
+    QCOMPARE(PropertyProvider::unsubscribeCount, 0);
+    QCOMPARE(PropertyProvider::subscribeCount, 0);
+    // The provider is still the real provider
+    QCOMPARE(propertyHandle->provider(), mockPropertyProvider);
 }
 
 

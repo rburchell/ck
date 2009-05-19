@@ -42,16 +42,22 @@ private slots:
 
     // Test cases
     void initializing();
+    void key();
+    void info();
+
     void subscribe();
     void subscribeAndUnsubscribe();
     void subscribeTwice();
     void subscribeTwiceAndUnsubscribe();
     void subscribeTwiceAndUnsubscribeTwice();
 
+    void subscriptionPendingAndFinished();
+
     void setValueWithoutTypeCheck();
     void setValueWithTypeCheckAndCorrectTypes();
     void setValueWithTypeCheckAndIncorrectTypes();
 
     void commanderAppearsAndDisappears();
+    void commandingDisabled();
 
 };
