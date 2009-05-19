@@ -140,3 +140,12 @@ bool CDBReader::isReadable()
 {
     return (fd > 0);
 }
+
+/// Returns the file descriptor used by the reader. Returns 0
+/// when the reader is closed.
+int CDBReader::fileDescriptor() const
+{
+    return fd;
+}
+
+

@@ -43,6 +43,7 @@ class CDBWriter : public QObject
 
 public:
     explicit CDBWriter(const QString &path, QObject *parent = 0);
+    explicit CDBWriter(int fd, QObject *parent = 0);
     virtual ~CDBWriter();
 
     void add(const QString &key, const QString &val);
@@ -50,6 +51,7 @@ public:
     void replace(const QString &key, const QString &val);
     void close();
     bool isWritable();
+    int fileDescriptor() const;
 
 private:
     void *cdbm;

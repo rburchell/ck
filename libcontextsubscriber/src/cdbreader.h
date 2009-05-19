@@ -50,6 +50,7 @@ public:
     QString valueForKey(const QString &key) const;
     QStringList valuesForKey(const QString &key) const;
     bool isReadable();
+    int fileDescriptor() const;
 
 private:
     QString path;

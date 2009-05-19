@@ -97,7 +97,7 @@
     \endcode
    
     This needs to be done early enough before the introspection API is first used. 
-    For more information about the \b xml and \cdb backends read the \ref "Update tool" page.
+    For more information about the \b xml and \cdb backends read the \ref "Updating context providers" page.
 
 */
 

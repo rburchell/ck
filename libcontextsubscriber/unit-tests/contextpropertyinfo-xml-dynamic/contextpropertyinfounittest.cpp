@@ -74,11 +74,13 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
-    
+    QVERIFY(prop.exists() == true);
+ 
     QFile::remove("providers.xml");
     QFile::copy("providers3v2.xml.src", "providers.xml");
     QTest::qWait(500);
 
+    QVERIFY(prop.exists() == false);
     QVERIFY(prop.type() == "");
     QVERIFY(prop.doc() == "");
 }

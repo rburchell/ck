@@ -1,8 +1,8 @@
-bin_PROGRAMS = update-tool
+bin_PROGRAMS = update-context-providers
 
-update_tool_SOURCES = update-tool.cpp
+update_context_providers_SOURCES = update-context-providers.cpp
 
-AM_CXXFLAGS = -I../src
+AM_CPPFLAGS = -I../src
 
 # you have to add your ui designer designed forms here
 # QT_FORMS = commandview.ui
@@ -23,8 +23,8 @@ QT_TOMOC_H = $(filter %.h, $(context_cli_SOURCES))
 # finally, do the moccing
 CLEANFILES =
 include $(top_srcdir)/am/qt.am
-update_tool_DEPENDENCIES = $(qt_mocobjects) ../src/libcontextsubscriber.la
-update_tool_LDADD = $(qt_mocobjects) ../src/libcontextsubscriber.la
+update_context_providers_DEPENDENCIES = $(qt_mocobjects) ../src/libcontextsubscriber.la
+update_context_providers_LDADD = $(qt_mocobjects) ../src/libcontextsubscriber.la
 
 # library dependency hack for seamless make in cli/
 ../src/libcontextsubscriber.la:
