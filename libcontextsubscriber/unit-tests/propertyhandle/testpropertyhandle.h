@@ -47,9 +47,11 @@ private slots:
     void subscribeTwice();
     void subscribeTwiceAndUnsubscribe();
     void subscribeTwiceAndUnsubscribeTwice();
-/*    void subscribeAndUnsubscribe();
-    void referenceCountedSubscribption();
 
+    void setValueWithoutTypeCheck();
+    void setValueWithTypeCheckAndCorrectTypes();
+
+/*
     void changingProvider();
 
     void commanderAppears();

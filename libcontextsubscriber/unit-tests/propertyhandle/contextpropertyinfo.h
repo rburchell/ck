@@ -46,6 +46,10 @@ signals:
     void providerDBusTypeChanged(QDBusConnection::BusType newBusType);
     void typeChanged(QString newType);
     void existsChanged(bool exists);
+
+public:
+    // For the test program
+    QString myType;
 };
 
 #endif // CONTEXTPROPERTYINFO_H
