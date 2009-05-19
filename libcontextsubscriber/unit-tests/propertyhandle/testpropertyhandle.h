@@ -50,6 +50,7 @@ private slots:
 
     void setValueWithoutTypeCheck();
     void setValueWithTypeCheckAndCorrectTypes();
+    void setValueWithTypeCheckAndIncorrectTypes();
 
 /*
     void changingProvider();

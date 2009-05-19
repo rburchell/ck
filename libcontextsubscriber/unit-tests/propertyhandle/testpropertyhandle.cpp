@@ -597,4 +597,101 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
 
 }
 
+void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
+{
+    // Setup:
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Enable the type checks
+    PropertyHandle::setTypeCheck(true);
+
+    // Start listening to the valueChanged signal
+    QSignalSpy spy(propertyHandle, SIGNAL(valueChanged()));
+
+    // Setup:
+    // Set the type to DOUBLE
+    mockContextPropertyInfo->myType = "DOUBLE";
+    // Set an initial value
+    propertyHandle->setValue(QVariant(4.2), true);
+    spy.clear();
+
+    // Test:
+    // Command the PropertyHandle to change its value multiple times but with
+    // incorrect types.
+    propertyHandle->setValue(QVariant(5), true);
+    propertyHandle->setValue(QVariant("string"), true);
+    propertyHandle->setValue(QVariant(false), true);
+
+    // Expected results:
+    // The valueChanged signal was not emitted
+    QCOMPARE(spy.count(), 0);
+    // The value is still the old value
+    QCOMPARE(propertyHandle->value(), QVariant(4.2));
+
+    // Setup:
+    // Set the type to INT
+    mockContextPropertyInfo->myType = "INT";
+    // Set an initial value
+    propertyHandle->setValue(QVariant(22), true);
+    spy.clear();
+
+    // Test:
+    // Command the PropertyHandle to change its value multiple times but with
+    // incorrect types.
+    propertyHandle->setValue(QVariant(5.6), true);
+    propertyHandle->setValue(QVariant("string"), true);
+    propertyHandle->setValue(QVariant(false), true);
+
+    // Expected results:
+    // The valueChanged signal was not emitted
+    QCOMPARE(spy.count(), 0);
+    // The value is still the old value
+    QCOMPARE(propertyHandle->value(), QVariant(22));
+
+    // Setup:
+    // Set the type to STRING
+    mockContextPropertyInfo->myType = "STRING";
+    // Set an initial value
+    propertyHandle->setValue(QVariant("myString"), true);
+    spy.clear();
+
+    // Test:
+    // Command the PropertyHandle to change its value multiple times but with
+    // incorrect types.
+    propertyHandle->setValue(QVariant(5.4), true);
+    propertyHandle->setValue(QVariant(-8), true);
+    propertyHandle->setValue(QVariant(false), true);
+
+    // Expected results:
+    // The valueChanged signal was not emitted
+    QCOMPARE(spy.count(), 0);
+    // The value is still the old value
+    QCOMPARE(propertyHandle->value(), QVariant("myString"));
+
+    // Setup:
+    // Set the type to TRUTH
+    mockContextPropertyInfo->myType = "TRUTH";
+    // Set an initial value
+    propertyHandle->setValue(QVariant(false), true);
+    spy.clear();
+
+    // Test:
+    // Command the PropertyHandle to change its value multiple times but with
+    // incorrect types.
+    propertyHandle->setValue(QVariant(5.4), true);
+    propertyHandle->setValue(QVariant(-8), true);
+    propertyHandle->setValue(QVariant("string"), true);
+
+    // Expected results:
+    // The valueChanged signal was not emitted
+    QCOMPARE(spy.count(), 0);
+    // The value is still the old value
+    QCOMPARE(propertyHandle->value(), QVariant(false));
+}
+
+
 QTEST_MAIN(PropertyHandleUnitTests);
