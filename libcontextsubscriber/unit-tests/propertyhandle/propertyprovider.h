@@ -37,11 +37,19 @@ public:
     void subscribe(const QString &key);
     void unsubscribe(const QString &key);
     static PropertyProvider* instance(const QDBusConnection::BusType busType, const QString& busName);
-    PropertyProvider(); // public only in tests
 
 signals:
     void subscribeFinished(QSet<QString> keys);
     void valueChanged(QString key, QVariant value, bool processingSubscription);
+public:
+    // Logging
+    static int instanceCount;
+    static QList<QDBusConnection::BusType> instanceDBusTypes;
+    static QStringList instanceDBusNames;
+
+    // For tests
+    PropertyProvider(); // public only in tests
+    static void resetLogs();
 };
 
 #endif

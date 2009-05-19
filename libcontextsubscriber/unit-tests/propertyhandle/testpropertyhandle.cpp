@@ -71,10 +71,15 @@ ContextRegistryInfo* mockContextRegistryInfo;
 ContextPropertyInfo* mockContextPropertyInfo;
 
 // Mock implementation of the PropertyProvider
+int PropertyProvider::instanceCount = 0;
+QList<QDBusConnection::BusType> PropertyProvider::instanceDBusTypes;
+QStringList PropertyProvider::instanceDBusNames;
 
 PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busType, const QString &busName)
 {
-    // qDebug() << "Returning a mock dbus name listener";
+    ++ instanceCount;
+    instanceDBusTypes << busType;
+    instanceDBusNames << busName;
     return mockPropertyProvider;
 }
 
@@ -90,12 +95,17 @@ void PropertyProvider::unsubscribe(const QString& key)
 {
 }
 
+void PropertyProvider::resetLogs()
+{
+    instanceCount = 0;
+    instanceDBusTypes.clear();
+    instanceDBusNames.clear();
+}
 
 // Mock implementation of the DBusNameListener
 
 DBusNameListener* DBusNameListener::instance(const QDBusConnection::BusType busType, const QString &busName)
 {
-    qDebug() << "Returning a mock dbus name listener";
     return &mockDBusNameListener;
 }
 
@@ -160,6 +170,8 @@ void PropertyHandleUnitTests::init()
     // Create the mock instances
     mockPropertyProvider = new PropertyProvider();
     mockContextRegistryInfo = new ContextRegistryInfo();
+    // Reset the logs
+    PropertyProvider::resetLogs();
 }
 
 // After each test
@@ -173,12 +185,17 @@ void PropertyHandleUnitTests::cleanup()
 
 void PropertyHandleUnitTests::initializing()
 {
+    // Test:
     // Create the object to be tested
     QString key = "Property." + QString(__FUNCTION__);
     propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
-
+    // Expected results:
+    // The PropertyProvider with the correct DBusName and DBusType was created.
+    QCOMPARE(PropertyProvider::instanceCount, 1);
+    QCOMPARE(PropertyProvider::instanceDBusTypes.at(0), QDBusConnection::SessionBus);
+    QCOMPARE(PropertyProvider::instanceDBusNames.at(0), QString("Fake.Provider"));
 }
 
 QTEST_MAIN(PropertyHandleUnitTests);
