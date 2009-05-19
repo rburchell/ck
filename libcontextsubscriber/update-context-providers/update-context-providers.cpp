@@ -50,9 +50,10 @@ int main(int argc, char **argv)
 
     // We first try to use first argument if present, then CONTEXT_PROVIDERS env, 
     // lastly -- the compiled-in default path.
-    if (args.size() > 1)
+    if (args.size() > 1) {
         path = args.at(1);
-    else if (getenv("CONTEXT_PROVIDERS"))
+        setenv("CONTEXT_PROVIDERS", path.toUtf8().constData(), 1);
+    } else if (getenv("CONTEXT_PROVIDERS"))
         path = QString(getenv("CONTEXT_PROVIDERS"));
     else
         path = QString(DEFAULT_REGISTRY_PATH);
