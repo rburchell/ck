@@ -20,7 +20,7 @@
 ## License along with this library; if not, write to the Free Software
 ## Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA
-## 
+##
 ##
 ## This test:
 ##   - starts up a client and a provider
@@ -52,7 +52,7 @@ class CommanderAppearing(unittest.TestCase):
         ret = Popen(["../../python/context-provide", busname] + args,
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
         # wait for it
-	print >>ret.stdin, "info()"
+        print >>ret.stdin, "info()"
         ret.stdout.readline().rstrip()
         return ret
     startProvider = Callable(startProvider)
@@ -75,7 +75,7 @@ class CommanderAppearing(unittest.TestCase):
         os.kill(self.flexiprovider.pid, 9)
         os.kill(self.context_commander.pid, 9)
         os.kill(self.context_client.pid, 9)
-	os.unlink('flexi-properties.xml')
+        os.unlink('flexi-properties.xml')
         pass
 
     def testCommanderFunctionality(self):
@@ -102,13 +102,13 @@ class CommanderAppearing(unittest.TestCase):
         got = self.context_client.stdout.readline().rstrip()
         self.assertEqual(got,
                          self.wanted("test.int", "int", "1235"),
-                         "Value after commander has changed it is bad")        
+                         "Value after commander has changed it is bad")
 
         os.kill(self.context_commander.pid, 9)
         got = self.context_client.stdout.readline().rstrip()
         self.assertEqual(got,
                          self.wanted("test.int", "int", "42"),
-                         "Value after killing the commander is bad")        
+                         "Value after killing the commander is bad")
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderAppearing)
