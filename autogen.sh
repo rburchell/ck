@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+cd $(dirname $0)
+mkdir -p libcontextsubscriber/m4
+
 . tools/autogen-helpers.sh
 
 version_check valac VALAC 'valac' 0.7.1 "http://vala-project.org"
