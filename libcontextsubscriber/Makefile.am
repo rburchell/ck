@@ -1,6 +1,9 @@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src unit-tests cli update-tool doc man
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = contextsubscriber-1.0.pc
+
 check-sum:
 	make -C unit-tests/ check-sum
 

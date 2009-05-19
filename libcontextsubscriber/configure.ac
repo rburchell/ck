@@ -75,6 +75,7 @@ AC_CONFIG_FILES([Makefile
 		 unit-tests/Makefile
 		 doc/Makefile
          man/Makefile
+         contextsubscriber-1.0.pc
          unit-tests/cdbreader/Makefile
          unit-tests/cdbwriter/Makefile
          unit-tests/contextregistryinfo-xml-static/Makefile

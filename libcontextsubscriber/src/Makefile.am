@@ -14,6 +14,10 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  infocdbbackend.h dbusnamelistener.h dbusnamelistener.cpp	\
 	  handlesignalrouter.cpp handlesignalrouter.h
 
+libcontextsubscriberdir=$(includedir)/contextsubscriber
+
+libcontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h
+
 AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
 
 # you have to add your ui designer designed forms here
