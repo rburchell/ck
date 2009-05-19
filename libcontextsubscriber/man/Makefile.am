@@ -1,1 +1,1 @@
-man_MANS = update-tool.1
+man_MANS = update-context-providers.1

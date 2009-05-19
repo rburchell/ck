@@ -19,7 +19,7 @@
  *
  */
 
-#include "update-tool.h"
+#include "update-context-providers.h"
 #include "fcntl.h"
 
 /* Make sure the given directory exists, is readable etc. 

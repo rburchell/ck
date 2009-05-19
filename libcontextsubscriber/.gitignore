@@ -13,9 +13,9 @@ Makefile
 
 # Auto-generated
 /src/infobackendconfig.h
-/src/infoxmlbackendconfig.h
 /update-tool/update-tool.h
 contextsubscriber-1.0.pc
+/update-context-providers/update-context-providers.h
 
 # Ignore resource forks
 ._*
@@ -25,19 +25,19 @@ contextsubscriber-1.0.pc
 /unit-tests/contextregistryinfo-cdb-static/contextregistryinfounittest
 /unit-tests/contextregistryinfo-xml-dynamic/contextregistryinfounittest
 /unit-tests/contextregistryinfo-cdb-dynamic/contextregistryinfounittest
-/unit-tests/contextpropertyinfo-xml-static/contextpropertyunittest
-/unit-tests/contextpropertyinfo-cdb-static/contextpropertyunittest
-/unit-tests/contextpropertyinfo-xml-dynamic/contextpropertyunittest
-/unit-tests/contextpropertyinfo-cdb-dynamic/contextpropertyunittest
+/unit-tests/contextpropertyinfo-xml-static/contextpropertyinfounittest
+/unit-tests/contextpropertyinfo-cdb-static/contextpropertyinfounittest
+/unit-tests/contextpropertyinfo-xml-dynamic/contextpropertyinfounittest
+/unit-tests/contextpropertyinfo-cdb-dynamic/contextpropertyinfounittest
 /unit-tests/cdbreader/cdbreaderunittest
-/unit-tests/cdbreader/cdbwriterunittest
+/unit-tests/cdbwriter/cdbwriterunittest
 /unit-tests/propertyprovider/propertyprovider-unit-tests
 /unit-tests/propertyhandle/propertyhandle-unit-tests
 coverage/
 
 # Other binaries
 /cli/context-cli
-/update-tool/update-tool
+/update-context-providers/update-context-providers
 
 # Docs
 doc/html
