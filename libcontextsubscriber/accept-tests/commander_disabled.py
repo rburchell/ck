@@ -63,7 +63,6 @@ class CommanderDisabled(unittest.TestCase):
     def setUp(self):
         self.flexiprovider = self.startProvider("com.nokia.test",
                                            ["int","test.int","42"])
-        sys
         self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
                                                     ["int", "test.int", "4242"])
         os.environ["CONTEXT_CLI_IGNORE_COMMANDER"] = ""
