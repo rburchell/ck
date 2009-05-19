@@ -40,6 +40,22 @@ CDBWriter::CDBWriter(const QString &path, QObject *parent)
     }
 }
 
+/// Constructs a new CDBWriter to write to a cdb database at a file
+/// descriptor \a fd. You should not manipulate the \a fd after calling
+/// this function.
+/// \param fd An open file descriptor. 
+CDBWriter::CDBWriter(int fdd, QObject *parent) 
+    : QObject(parent)
+{
+    cdbm = NULL;
+    fd = fdd;
+
+    if (fd > 0) {
+        cdbm = calloc(1, sizeof(struct cdb_make));
+        cdb_make_start((struct cdb_make *) cdbm, fd);
+    }
+}
+
 /// Destroys the object closing the file beforehand.
 CDBWriter::~CDBWriter()
 {
