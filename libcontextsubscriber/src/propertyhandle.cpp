@@ -24,7 +24,6 @@
 #include "sconnect.h"
 #include "contextpropertyinfo.h"
 #include "contextregistryinfo.h"
-#include "contextproperty.h"
 #include "dbusnamelistener.h"
 
 #include <QStringList>
@@ -41,6 +40,7 @@ static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
 
 DBusNameListener* PropertyHandle::commanderListener = DBusNameListener::instance(commanderDBusType, commanderDBusName);
 bool PropertyHandle::commandingEnabled = true;
+bool PropertyHandle::typeCheckEnabled = false;
 
 /*!
   \class PropertyHandle
@@ -60,10 +60,6 @@ bool PropertyHandle::commandingEnabled = true;
   A PropertProvider represents a context provider and manages the
   D-Bus connection to it.  A PropertyProvider can also represent the
   "no known provider" case.
-
-  There is also a single PropertyManager object that ties everything
-  together.  It reads the registry, for example.
-  PropertyHandle and PropertyProvider objects as needed.
 
   PropertyHandle and PropertyProvider instances are never deleted;
   they stick around until the process is terminated.
@@ -92,6 +88,11 @@ PropertyHandle::PropertyHandle(const QString& key)
 void PropertyHandle::disableCommanding()
 {
     commandingEnabled = false;
+}
+
+void PropertyHandle::setTypeCheck(bool typeCheck)
+{
+    typeCheckEnabled = typeCheck;
 }
 
 void PropertyHandle::onRegistryTouched()
@@ -184,7 +185,7 @@ bool PropertyHandle::isSubscribePending() const
 /// Changes the value of the property and emits the valueChanged signal.
 void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
 {
-    if (ContextProperty::isTypeCheck() // type checks enabled
+    if (typeCheckEnabled // type checks enabled
         && !newValue.isNull() // variable is non-null
         && myInfo->type() != "") { // the type is found in the registry
 

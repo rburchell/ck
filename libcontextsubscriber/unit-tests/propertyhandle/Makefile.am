@@ -9,7 +9,7 @@ COVERAGE_FILES = propertyhandle.cpp
 
 # MOC (and then compile) this headers from the source
 SOURCE_H = propertyhandle.h # process this headers with MOC and compile the results
-QT_TOMOC_H = testpropertyhandle.h propertyprovider.h
+QT_TOMOC_H = testpropertyhandle.h propertyprovider.h dbusnamelistener.h contextpropertyinfo.h contextregistryinfo.h
 
 # when MOCing from .cpp file, you also has to help the dependency tracker
 #QT_TOMOC_CPP = testlistening.cpp

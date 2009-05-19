@@ -145,7 +145,6 @@ public:
     static void ignoreCommander();
 
     static void setTypeCheck(bool typeCheck);
-    static bool isTypeCheck();
 
 signals:
     void valueChanged();

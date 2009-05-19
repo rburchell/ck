@@ -41,8 +41,6 @@
    \brief The private parts of the ContextProperty class.
 */
 
-bool ContextProperty::typeCheck = false;
-
 struct ContextPropertyPrivate
 {
     PropertyHandle *handle; ///< The common handle behind this context property
@@ -259,10 +257,6 @@ const ContextPropertyInfo* ContextProperty::info() const
 
 void ContextProperty::setTypeCheck(bool newTypeCheck)
 {
-    typeCheck = newTypeCheck;
+    PropertyHandle::setTypeCheck(newTypeCheck);
 }
 
-bool ContextProperty::isTypeCheck()
-{
-    return typeCheck;
-}

@@ -19,37 +19,33 @@
  *
  */
 
+// This is a mock implementation.
+
+#ifndef CONTEXTPROPERTYINFO_H
+#define CONTEXTPROPERTYINFO_H
+
+#include <QVariant>
+#include <QStringList>
 #include <QObject>
-#include <QSet>
-#include <QString>
+#include <QDBusConnection>
 
-class PropertyHandle;
-
-class PropertyHandleUnitTests : public QObject
+class ContextPropertyInfo : public QObject
 {
     Q_OBJECT
 
-private:
-    PropertyHandle *propertyHandle;
+public:
+    explicit ContextPropertyInfo(const QString &key, QObject *parent = 0);
 
-    // Tests
-private slots:
-    // Init and cleanup helper functions
-    void initTestCase();
-    void cleanupTestCase();
-    void init();
-    void cleanup();
+    QString type() const;
 
-    // Test cases
-    void initializing();
-    /*void subscription();
-    void unsubscription();
-    void referenceCountedSubscribption();
+    QString providerDBusName() const;
+    QDBusConnection::BusType providerDBusType() const;
 
-    void changingProvider();
-
-    void commanderAppears();
-    void commanderAppearsAndDisappears();
-*/
-
+signals:
+    void providerChanged(QString newProvider);
+    void providerDBusTypeChanged(QDBusConnection::BusType newBusType);
+    void typeChanged(QString newType);
+    void existsChanged(bool exists);
 };
+
+#endif // CONTEXTPROPERTYINFO_H

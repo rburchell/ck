@@ -19,37 +19,33 @@
  *
  */
 
+// This is a mock implementation.
+
+#ifndef DBUSNAMELISTENER_H
+#define DBUSNAMELISTENER_H
+
 #include <QObject>
-#include <QSet>
+#include <QDBusConnection>
 #include <QString>
 
-class PropertyHandle;
+template<typename P1, typename P2> class QPair;
+template<typename K, typename V> class QMap;
 
-class PropertyHandleUnitTests : public QObject
+class DBusNameListener : public QObject
 {
     Q_OBJECT
+public:
+    static DBusNameListener* instance(const QDBusConnection::BusType busType, const QString &busName);
+    bool isServicePresent() const;
 
-private:
-    PropertyHandle *propertyHandle;
+signals:
+    void nameAppeared();
+    void nameDisappeared();
 
-    // Tests
-private slots:
-    // Init and cleanup helper functions
-    void initTestCase();
-    void cleanupTestCase();
-    void init();
-    void cleanup();
-
-    // Test cases
-    void initializing();
-    /*void subscription();
-    void unsubscription();
-    void referenceCountedSubscribption();
-
-    void changingProvider();
-
-    void commanderAppears();
-    void commanderAppearsAndDisappears();
-*/
-
+public:
+    // For the test program
+    DBusNameListener();
+    bool servicePresent;
 };
+
+#endif

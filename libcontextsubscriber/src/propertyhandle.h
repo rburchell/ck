@@ -49,6 +49,7 @@ public:
 
     void setValue(QVariant newValue, bool allowSameValue);
     static void disableCommanding();
+    static void setTypeCheck(bool typeCheck);
 
 signals:
     void valueChanged();
@@ -69,6 +70,7 @@ private:
     QVariant myValue; ///< Cached value of this context property
     static QMap<QString, PropertyHandle*> handleInstances; ///< Container for singletons, see the \c instance(key) call
     static DBusNameListener *commanderListener; ///< DBusListener for ContextCommander.
-    static bool commandingEnabled;
+    static bool commandingEnabled; ///< Whether the properties can be directed to ContextCommander
+    static bool typeCheckEnabled; ///< Whether we check the type of the value provided by the provider.
 };
 #endif

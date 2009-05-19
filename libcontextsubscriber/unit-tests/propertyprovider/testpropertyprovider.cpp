@@ -65,7 +65,7 @@ void myMessageOutput(QtMsgType type, const char *msg)
 // These will be created by the test program
 DBusNameListener* mockDBusNameListener;
 HandleSignalRouter* mockHandleSignalRouter;
-// These will be created by the tested class and stored
+// These will be created by the tested class and stored here
 ManagerInterface* mockManagerInterface;
 SubscriberInterface* mockSubscriberInterface;
 

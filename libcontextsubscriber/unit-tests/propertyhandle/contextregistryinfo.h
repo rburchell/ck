@@ -19,37 +19,26 @@
  *
  */
 
-#include <QObject>
-#include <QSet>
+// This is a mock implementation
+
+#ifndef CONTEXTREGISTRYINFO_H
+#define CONTEXTREGISTRYINFO_H
+
+#include <QStringList>
 #include <QString>
+#include <QObject>
 
-class PropertyHandle;
-
-class PropertyHandleUnitTests : public QObject
+class ContextRegistryInfo : public QObject
 {
     Q_OBJECT
 
-private:
-    PropertyHandle *propertyHandle;
+public:
+    static ContextRegistryInfo* instance(const QString &backendName = "");
 
-    // Tests
-private slots:
-    // Init and cleanup helper functions
-    void initTestCase();
-    void cleanupTestCase();
-    void init();
-    void cleanup();
-
-    // Test cases
-    void initializing();
-    /*void subscription();
-    void unsubscription();
-    void referenceCountedSubscribption();
-
-    void changingProvider();
-
-    void commanderAppears();
-    void commanderAppearsAndDisappears();
-*/
-
+signals:
+    void keysChanged(QStringList currentKeys);
+    void keysAdded(QStringList newKeys);
+    void keysRemoved(QStringList removedKeys);
 };
+
+#endif

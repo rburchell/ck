@@ -24,6 +24,9 @@
 
 // Mock header files
 #include "propertyprovider.h"
+#include "dbusnamelistener.h"
+#include "contextpropertyinfo.h"
+#include "contextregistryinfo.h"
 
 // Header file of the class to be tested
 #include "propertyhandle.h"
@@ -32,7 +35,7 @@
 #include <QDebug>
 #include <QDBusConnection>
 
-#define MYLOGLEVEL 2
+#define MYLOGLEVEL 0
 void myMessageOutput(QtMsgType type, const char *msg)
 {
     switch (type) {
@@ -58,7 +61,10 @@ void myMessageOutput(QtMsgType type, const char *msg)
 // Mock instances
 // These will be created by the test program
 PropertyProvider* mockPropertyProvider;
-
+DBusNameListener* mockDBusNameListener;
+ContextRegistryInfo* mockContextRegistryInfo;
+// These will be created by the tested class and stored here
+ContextPropertyInfo* mockContextPropertyInfo;
 
 // Mock implementation of the PropertyProvider
 
@@ -72,6 +78,62 @@ PropertyProvider::PropertyProvider()
 {
 }
 
+void PropertyProvider::subscribe(const QString& key)
+{
+}
+
+void PropertyProvider::unsubscribe(const QString& key)
+{
+}
+
+
+// Mock implementation of the DBusNameListener
+
+DBusNameListener* DBusNameListener::instance(const QDBusConnection::BusType busType, const QString &busName)
+{
+    // qDebug() << "Returning a mock dbus name listener";
+    return mockDBusNameListener;
+}
+
+DBusNameListener::DBusNameListener()
+    : servicePresent(true)
+{
+}
+
+
+bool DBusNameListener::isServicePresent() const
+{
+    return servicePresent;
+}
+
+// Mock implementation of ContextPropertyInfo
+
+ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
+{
+}
+
+QString ContextPropertyInfo::type() const
+{
+    return "FakeType";
+}
+
+QString ContextPropertyInfo::providerDBusName() const
+{
+    return "Fake.Provider";
+}
+
+QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
+{
+    return QDBusConnection::SessionBus;
+}
+
+// Mock implementation of the ContextRegistryInfo
+
+ContextRegistryInfo* ContextRegistryInfo::instance(const QString& backendName)
+{
+    return mockContextRegistryInfo;
+}
+
 //
 // Definition of testcases
 //
@@ -80,7 +142,7 @@ PropertyProvider::PropertyProvider()
 // Before all tests
 void PropertyHandleUnitTests::initTestCase()
 {
-
+    qInstallMsgHandler(myMessageOutput);
 }
 
 // After all tests
@@ -92,19 +154,27 @@ void PropertyHandleUnitTests::cleanupTestCase()
 void PropertyHandleUnitTests::init()
 {
     // Create the mock instances
-    //mockPropertyProvider = new PropertyProvider();
+    mockPropertyProvider = new PropertyProvider();
+    mockContextRegistryInfo = new ContextRegistryInfo();
 }
 
 // After each test
 void PropertyHandleUnitTests::cleanup()
 {
-    //delete mockPropertyProvider;
-    //mockPropertyProvider = 0;
+    delete mockPropertyProvider;
+    mockPropertyProvider = 0;
+    delete mockContextRegistryInfo;
+    mockContextRegistryInfo = 0;
 }
 
 void PropertyHandleUnitTests::initializing()
 {
-    QCOMPARE(1, 1);
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
 }
 
 QTEST_MAIN(PropertyHandleUnitTests);
