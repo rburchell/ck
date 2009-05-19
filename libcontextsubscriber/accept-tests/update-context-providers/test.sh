@@ -22,33 +22,45 @@ function querydb {
     cdb -q "context-providers.cdb" "$1" > "$1.actual"
 }
 
+# Check the keys in the existing context-providers.cdb database
+function dotest {
+    querydb "KEYS"
+    compare "KEYS.expected" "KEYS.actual"
+
+    querydb "PROVIDERS"
+    compare "PROVIDERS.expected" "PROVIDERS.actual"
+
+    querydb "org.freedesktop.ContextKit.contextd1:KEYS"
+    compare "org.freedesktop.ContextKit.contextd1:KEYS.expected" "org.freedesktop.ContextKit.contextd1:KEYS.actual"
+
+    querydb "org.freedesktop.ContextKit.contextd2:KEYS"
+    compare "org.freedesktop.ContextKit.contextd2:KEYS.expected" "org.freedesktop.ContextKit.contextd2:KEYS.actual"
+
+    querydb "Battery.Charging:KEYTYPE"
+    compare "Battery.Charging:KEYTYPE.expected" "Battery.Charging:KEYTYPE.actual"
+
+    querydb "Battery.Charging:KEYDOC"
+    compare "Battery.Charging:KEYDOC.expected" "Battery.Charging:KEYDOC.actual"
+
+    querydb "Battery.Charging:KEYPROVIDER"
+    compare "Battery.Charging:KEYPROVIDER.expected" "Battery.Charging:KEYPROVIDER.actual"
+
+    querydb "Battery.Charging:KEYBUS"
+    compare "Battery.Charging:KEYBUS.expected" "Battery.Charging:KEYBUS.actual"
+}
+
 BASEDIR=`dirname $0`
+
+# Test using command line param
 ../../update-context-providers/update-context-providers "./"
+dotest
+clean
 
-querydb "KEYS"
-compare "KEYS.expected" "KEYS.actual"
-
-querydb "PROVIDERS"
-compare "PROVIDERS.expected" "PROVIDERS.actual"
-
-querydb "org.freedesktop.ContextKit.contextd1:KEYS"
-compare "org.freedesktop.ContextKit.contextd1:KEYS.expected" "org.freedesktop.ContextKit.contextd1:KEYS.actual"
-
-querydb "org.freedesktop.ContextKit.contextd2:KEYS"
-compare "org.freedesktop.ContextKit.contextd2:KEYS.expected" "org.freedesktop.ContextKit.contextd2:KEYS.actual"
-
-querydb "Battery.Charging:KEYTYPE"
-compare "Battery.Charging:KEYTYPE.expected" "Battery.Charging:KEYTYPE.actual"
-
-querydb "Battery.Charging:KEYDOC"
-compare "Battery.Charging:KEYDOC.expected" "Battery.Charging:KEYDOC.actual"
-
-querydb "Battery.Charging:KEYPROVIDER"
-compare "Battery.Charging:KEYPROVIDER.expected" "Battery.Charging:KEYPROVIDER.actual"
-
-querydb "Battery.Charging:KEYBUS"
-compare "Battery.Charging:KEYBUS.expected" "Battery.Charging:KEYBUS.actual"
+# Test using env var 
+export CONTEXT_PROVIDERS="./"
+../../update-context-providers/update-context-providers
+dotest
+clean
 
 echo "All ok!"
-clean
 exit 0
