@@ -8,10 +8,10 @@ be emulated by using the flexiprovider.
 
 terminal all: start from the directory of this README file
 
-terminal fast> cd ../python/
+terminal fast> cd ../../python/
 terminal fast> ./context-provide com.nokia.fast int test.fast 316
 
-terminal slow> cd ../python/
+terminal slow> cd ../../python/
 terminal slow> ./context-provide com.nokia.slow int test.slow 530
 terminal slow (inside python)> import time; time.sleep(10)
 
