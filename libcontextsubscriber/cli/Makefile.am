@@ -2,7 +2,7 @@ bin_PROGRAMS = context-cli
 
 context_cli_SOURCES = context-cli.cpp sconnect.h propertylistener.h propertylistener.cpp
 
-AM_CXXFLAGS = -I../src
+AM_CXXFLAGS = -I$(srcdir)/../src
 
 # you have to add your ui designer designed forms here
 # QT_FORMS = commandview.ui

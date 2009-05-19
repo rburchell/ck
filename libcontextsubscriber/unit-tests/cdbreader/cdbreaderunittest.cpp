@@ -21,6 +21,7 @@
 
 #include <QtTest/QtTest>
 #include <QtCore>
+#include <stdlib.h>
 #include "cdbreader.h"
 
 class CDBReaderUnitTest : public QObject
@@ -35,7 +36,7 @@ private slots:
 
 void CDBReaderUnitTest::basicCreation()
 {
-    CDBReader reader("test.cdb");
+    CDBReader reader(QString(getenv("srcdir")) + "/" + "test.cdb");
     QCOMPARE(reader.isReadable(), true);
 
     QCOMPARE(reader.valueForKey("KEY1"), QString("KEY1Value"));
@@ -59,7 +60,7 @@ void CDBReaderUnitTest::doesNotExist()
 
 void CDBReaderUnitTest::readingNotPresent()
 {
-    CDBReader reader("test.cdb");
+    CDBReader reader(QString(getenv("srcdir")) + "/" + "test.cdb");
     QCOMPARE(reader.isReadable(), true);
 
     QCOMPARE(reader.valueForKey("DOESNOTEXIST"), QString(""));

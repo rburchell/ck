@@ -11,6 +11,8 @@ COVERAGE_FILES = cdbreader.cpp
 SOURCE_H = cdbreader.h
 QT_TOMOC_H =
 
+EXTRA_DIST = test.cdb
+
 # when MOCing from .cpp file, you also has to help the dependency tracker
 QT_TOMOC_CPP = cdbreaderunittest.cpp
 cdbreaderunittest.o: moc_cdbreaderunittest_cpp.cpp 

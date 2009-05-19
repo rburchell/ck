@@ -39,9 +39,12 @@ private slots:
 void ContextPropertyInfoUnitTest::initTestCase()
 {
     setenv("CONTEXT_PROVIDERS", "./", 0);
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
 
     // Setup state
-    QFile::copy("context-providers2v1.cdb", "temp.cdb");
+    QFile::copy(xmlToCopy + "context-providers2v1.cdb", "temp.cdb");
     rename("temp.cdb", "context-providers.cdb");
     QTest::qWait(200);
     
@@ -55,7 +58,11 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
     
     QSignalSpy spy(&prop, SIGNAL(typeChanged(QString)));
 
-    QFile::copy("context-providers2v2.cdb", "temp.cdb");
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "context-providers2v2.cdb", "temp.cdb");
     rename("temp.cdb", "context-providers.cdb");
     QTest::qWait(500);
 
@@ -69,16 +76,24 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 
 void ContextPropertyInfoUnitTest::checkKeyRemoval()
 {
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
     // Create initial state
-    QFile::copy("context-providers3v1.cdb", "temp.cdb");
+    QFile::copy(xmlToCopy + "context-providers3v1.cdb", "temp.cdb");
     rename("temp.cdb", "context-providers.cdb");
     QTest::qWait(200);
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
-    
-    QFile::copy("context-providers3v2.cdb", "temp.cdb");
+
+    xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "context-providers3v2.cdb", "temp.cdb");
     rename("temp.cdb", "context-providers.cdb");
     QTest::qWait(500);
 

@@ -2,7 +2,7 @@ bin_PROGRAMS = update-context-providers
 
 update_context_providers_SOURCES = update-context-providers.cpp
 
-AM_CPPFLAGS = -I../src
+AM_CPPFLAGS = -I$(srcdir)/../src
 
 # you have to add your ui designer designed forms here
 # QT_FORMS = commandview.ui

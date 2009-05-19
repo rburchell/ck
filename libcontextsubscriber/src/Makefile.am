@@ -12,7 +12,7 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  infoxmlkeysfinder.cpp infokeydata.h cdbwriter.h		\
 	  cdbwriter.cpp cdbreader.cpp cdbreader.h infocdbbackend.cpp	\
 	  infocdbbackend.h dbusnamelistener.h dbusnamelistener.cpp	\
-	  handlesignalrouter.cpp handlesignalrouter.h
+	  handlesignalrouter.cpp handlesignalrouter.h sconnect.h
 
 libcontextsubscriberdir=$(includedir)/contextsubscriber
 

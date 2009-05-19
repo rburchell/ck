@@ -10,7 +10,7 @@ doxygen-maint:
 doxygen:
 	srcdir=$(srcdir) doxygen $(DOXYCFG)
 
-EXTRA_DIST = $(DOXYCFG) html
+EXTRA_DIST = $(DOXYCFG) # FIXME:  html
 
 maintainer-clean-local:
 	-rm -rf html doxygen.log

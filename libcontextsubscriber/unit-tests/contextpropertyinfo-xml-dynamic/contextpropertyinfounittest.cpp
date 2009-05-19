@@ -45,7 +45,11 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 {
     // Create initial state
     QFile::remove("providers.xml");
-    QFile::copy("providers2v1.xml.src", "providers.xml");
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "providers2v1.xml.src", "providers.xml");
     QTest::qWait(200);
 
     ContextPropertyInfo prop("Battery.LowBattery");
@@ -54,7 +58,11 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
     QSignalSpy spy(&prop, SIGNAL(typeChanged(QString)));
 
     QFile::remove("providers.xml");
-    QFile::copy("providers2v2.xml.src", "providers.xml");
+    xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "providers2v2.xml.src", "providers.xml");
     QTest::qWait(500);
 
     QCOMPARE(spy.count(), 1);
@@ -69,7 +77,11 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
 {
     // Create initial state
     QFile::remove("providers.xml");
-    QFile::copy("providers3v1.xml.src", "providers.xml");
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "providers3v1.xml.src", "providers.xml");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() != "");
@@ -77,7 +89,11 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
     QVERIFY(prop.exists() == true);
  
     QFile::remove("providers.xml");
-    QFile::copy("providers3v2.xml.src", "providers.xml");
+    xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "providers3v2.xml.src", "providers.xml");
     QTest::qWait(500);
 
     QVERIFY(prop.exists() == false);

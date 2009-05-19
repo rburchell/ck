@@ -40,9 +40,12 @@ private slots:
 void ContextRegistryInfoUnitTest::initTestCase()
 {
     setenv("CONTEXT_PROVIDERS", "./", 0);
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
 
     // Setup state
-    QFile::copy("context-providers1v1.cdb", "temp.cdb");
+    QFile::copy(xmlToCopy + "context-providers1v1.cdb", "temp.cdb");
     rename("temp.cdb", "context-providers.cdb");
     QTest::qWait(200);
     
@@ -53,7 +56,12 @@ void ContextRegistryInfoUnitTest::basicChange()
 {
     QSignalSpy spy(context, SIGNAL(keysChanged(QStringList)));
 
-    QFile::copy("context-providers1v2.cdb", "temp.cdb");
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    // Setup state
+    QFile::copy(xmlToCopy + "context-providers1v2.cdb", "temp.cdb");
     rename("temp.cdb", "context-providers.cdb");
     QTest::qWait(500);
 

@@ -36,7 +36,11 @@ private slots:
 
 void ContextPropertyInfoUnitTest::initTestCase()
 {
-    setenv("CONTEXT_PROVIDERS", "./", 0);
+    if (getenv("srcdir"))
+        setenv("CONTEXT_PROVIDERS", (QString(getenv("srcdir")) + "/").toUtf8().constData(), 0);
+    else
+        setenv("CONTEXT_PROVIDERS", "./", 0);
+
     ContextRegistryInfo::instance();
 }
 

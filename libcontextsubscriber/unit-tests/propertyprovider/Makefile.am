@@ -11,6 +11,8 @@ COVERAGE_FILES = propertyprovider.cpp
 SOURCE_H = propertyprovider.h # process this headers with MOC and compile the results
 QT_TOMOC_H = testpropertyprovider.h managerinterface.h dbusnamelistener.h subscriberinterface.h handlesignalrouter.h
 
+EXTRA_DIST = dbusnamelistener.h handlesignalrouter.h managerinterface.h subscriberinterface.h testpropertyprovider.h
+
 # when MOCing from .cpp file, you also has to help the dependency tracker
 #QT_TOMOC_CPP = testlistening.cpp
 #testlistening.o: moc_testlistening_cpp.cpp

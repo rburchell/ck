@@ -43,9 +43,13 @@ void ContextRegistryInfoUnitTest::initTestCase()
 {
     setenv("CONTEXT_PROVIDERS", "./", 0);
 
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
     // Setup state
     QFile::remove("providers.xml");
-    QFile::copy("providers1v1.xml.src", "providers.xml");
+    QFile::copy(xmlToCopy + "providers1v1.xml.src", "providers.xml");
     QTest::qWait(200);
        
     context = ContextRegistryInfo::instance("xml");
@@ -56,7 +60,11 @@ void ContextRegistryInfoUnitTest::basicChange()
     QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
     QSignalSpy spy2(context, SIGNAL(keysAdded(QStringList)));
 
-    QFile::copy("providers1v2.xml.src", "tmp.file");
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "providers1v2.xml.src", "tmp.file");
     rename("tmp.file", "providers.xml");
     QTest::qWait(500);
 
@@ -78,7 +86,11 @@ void ContextRegistryInfoUnitTest::changeWithRemove()
     QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
 
     QFile::remove("providers.xml");
-    QFile::copy("providers1v1.xml.src", "providers.xml");
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "providers1v1.xml.src", "providers.xml");
     QTest::qWait(500);
 
     // Sometimes it's 1, sometimes it's 2 -- depending on how agile the watcher is.
@@ -88,13 +100,21 @@ void ContextRegistryInfoUnitTest::changeWithRemove()
 void ContextRegistryInfoUnitTest::keyRemoval()
 {
     QFile::remove("providers.xml");
-    QFile::copy("providers1v2.xml.src", "providers.xml");
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "providers1v2.xml.src", "providers.xml");
     QTest::qWait(200);
 
     QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
     QSignalSpy spy2(context, SIGNAL(keysRemoved(QStringList)));
 
-    QFile::copy("providers1v1.xml.src", "tmp.file");
+    xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "providers1v1.xml.src", "tmp.file");
     rename("tmp.file", "providers.xml");
     QTest::qWait(500);
 
