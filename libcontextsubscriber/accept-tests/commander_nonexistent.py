@@ -23,14 +23,18 @@
 ##
 ##
 ## This test:
-##   - starts up a client with commanding disabled and a provider
-##   - starts a commander with a different value for that property
-##   - checks for the provider provided value on the client stdout
-##
+##   - starts up a client and a provider
+##   - starts a commander with a different value and type for a provider provided property
+##                    and with a new string non-provided property
+##   - checks that the client gets an error for the provider provided property
+##   - checks that the client gets the new string non-provided property
+##   - changes the non-provided property's type to int and checks it
+##     (so this proves that type checks are always off for commander added properties)
 
 import sys
 import os
 import signal
+import re
 
 import unittest
 from subprocess import Popen, PIPE
@@ -64,9 +68,9 @@ class CommanderDisabled(unittest.TestCase):
         self.flexiprovider = self.startProvider("com.nokia.test",
                                            ["int","test.int","42"])
         self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
-                                                    ["int", "test.int", "4242"])
-        os.environ["CONTEXT_CLI_IGNORE_COMMANDER"] = ""
-        self.context_client = Popen(["../cli/context-cli","test.int"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+                                                    ["string", "test.int", "foobar",
+                                                     "string", "test.string", "barfoo"])
+        self.context_client = Popen(["../cli/context-cli","test.int", "test.string"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def tearDown(self):
         os.kill(self.flexiprovider.pid, 9)
@@ -76,16 +80,32 @@ class CommanderDisabled(unittest.TestCase):
         pass
 
     def testCommanderFunctionality(self):
+        line = self.context_client.stderr.readline().rstrip()
+        while not line.startswith('(PROVIDER) ERROR: bad type for "test.int" wanted: "INT" got: QString'):
+            line = self.context_client.stderr.readline().rstrip()
+        # if we are here, then the type check worked
+
+        # check the non-existent property
+        self.context_commander.stdin.flush()
         got = self.context_client.stdout.readline().rstrip()
         self.assertEqual(got,
-                         self.wanted("test.int", "int", "42"),
-                         "Provider provided value is wrong")
+                         self.wanted("test.string", "QString", "barfoo"),
+                         "Non-existent property couldn't be commanded")
+
+        # change the type of the non-existent property
+        print >>self.context_commander.stdin, "add(INT('test.string', 42))"
+        self.context_commander.stdin.flush()
+        got = self.context_client.stdout.readline().rstrip()
+        self.assertEqual(got,
+                         self.wanted("test.string", "int", "42"),
+                         "Non-existent property's type couldn't be overwritten")
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderDisabled)
     unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
 
 if __name__ == "__main__":
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
     signal.signal(signal.SIGALRM, timeoutHandler)
     signal.alarm(10)
     runTests()

@@ -22,14 +22,14 @@ contextsubscriber-1.0.pc
 ._*
 
 # Tests
-/unit-tests/contextregistryinfo-xml-static/contextregistryinfounittest
-/unit-tests/contextregistryinfo-cdb-static/contextregistryinfounittest
-/unit-tests/contextregistryinfo-xml-dynamic/contextregistryinfounittest
-/unit-tests/contextregistryinfo-cdb-dynamic/contextregistryinfounittest
-/unit-tests/contextpropertyinfo-xml-static/contextpropertyinfounittest
-/unit-tests/contextpropertyinfo-cdb-static/contextpropertyinfounittest
-/unit-tests/contextpropertyinfo-xml-dynamic/contextpropertyinfounittest
-/unit-tests/contextpropertyinfo-cdb-dynamic/contextpropertyinfounittest
+/unit-tests/contextregistryinfo-xml-static/contextregistryinfounittest-xml-static
+/unit-tests/contextregistryinfo-cdb-static/contextregistryinfounittest-cdb-static
+/unit-tests/contextregistryinfo-xml-dynamic/contextregistryinfounittest-xml-dynamic
+/unit-tests/contextregistryinfo-cdb-dynamic/contextregistryinfounittest-cdb-dynamic
+/unit-tests/contextpropertyinfo-xml-static/contextpropertyinfounittest-xml-static
+/unit-tests/contextpropertyinfo-cdb-static/contextpropertyinfounittest-cdb-static
+/unit-tests/contextpropertyinfo-xml-dynamic/contextpropertyinfounittest-xml-dynamic
+/unit-tests/contextpropertyinfo-cdb-dynamic/contextpropertyinfounittest-cdb-dynamic
 /unit-tests/cdbreader/cdbreaderunittest
 /unit-tests/cdbwriter/cdbwriterunittest
 /unit-tests/propertyprovider/propertyprovider-unit-tests
