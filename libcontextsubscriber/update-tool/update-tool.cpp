@@ -39,13 +39,6 @@ void checkDirectory(const QDir &dir)
     }
 }
 
-/* Generates a temporary name for the database to be produced. */
-QString genTempName(const QDir &dir)
-{
-    QString dbName = "context-providers-" + QString::number(qrand() % 10000) + ".cdb";
-    return dir.absoluteFilePath(dbName);
-}
-
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
@@ -74,12 +67,13 @@ int main(int argc, char **argv)
 
     QDir dir(path);
     checkDirectory(dir);
-    QString tmpDbPath = genTempName(dir);
+    QString tmpDbPath = dir.absoluteFilePath("context-providers-XXXXXX");
     QString finalDbPath = dir.absoluteFilePath("context-providers.cdb"); 
+    QByteArray templ = tmpDbPath.toUtf8();
 
-    CDBWriter writer(tmpDbPath);
+    CDBWriter writer(mkstemp(templ.data()));
     if (writer.isWritable() == false) {
-        printf("ERROR: %s is not writable. No permissions?\n", tmpDbPath.toUtf8().constData());
+        printf("ERROR: %s is not writable. No permissions?\n", templ.constData());
         exit(128);
     }
 
@@ -118,11 +112,8 @@ int main(int argc, char **argv)
     writer.close();
 
     // Atomically rename
-    QByteArray tmpDbUtf8Data = tmpDbPath.toUtf8();
-    QByteArray finalDbUtf8Data = finalDbPath.toUtf8();
-
-    rename(tmpDbUtf8Data.constData(), finalDbUtf8Data.constData()); 
-    printf("Generated: '%s'\n", finalDbUtf8Data.constData());
+    rename(templ.constData(), finalDbPath.toUtf8().constData()); 
+    printf("Generated: '%s'\n", finalDbPath.toUtf8().constData());
     return 0;
 }
 
