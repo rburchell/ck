@@ -10,7 +10,13 @@
 int main(int argc, char **argv)
 {
     setenv("CONTEXT_PROVIDERS", ".", 0);
-    ContextProperty::setTypeCheck(true);
+    if (getenv("CONTEXT_CLI_NO_TYPE_CHECK"))
+        ContextProperty::setTypeCheck(false);
+    else
+        ContextProperty::setTypeCheck(true);
+
+    if (getenv("CONTEXT_CLI_IGNORE_COMMANDER"))
+        ContextProperty::ignoreCommander();
 
     QCoreApplication app(argc, argv);
 
@@ -35,4 +41,3 @@ int main(int argc, char **argv)
 
     return app.exec();
 }
-
