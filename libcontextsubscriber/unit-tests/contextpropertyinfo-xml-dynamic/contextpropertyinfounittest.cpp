@@ -32,6 +32,7 @@ private slots:
     void initTestCase();
     void checkKeyTypeChanging();
     void checkKeyRemoval();
+    void checkKeyAdding();
     void cleanupTestCase();
 };
 
@@ -99,6 +100,34 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
     QVERIFY(prop.exists() == false);
     QVERIFY(prop.type() == "");
     QVERIFY(prop.doc() == "");
+}
+
+void ContextPropertyInfoUnitTest::checkKeyAdding()
+{
+    // Create initial state
+    QFile::remove("providers.xml");
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "providers3v2.xml.src", "providers.xml");
+
+    ContextPropertyInfo prop("Battery.LowBattery");
+    QVERIFY(prop.type() == "");
+    QVERIFY(prop.doc() == "");
+    QVERIFY(prop.exists() == false);
+ 
+    QFile::remove("providers.xml");
+    xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "providers3v1.xml.src", "providers.xml");
+    QTest::qWait(500);
+
+    QVERIFY(prop.exists() == true);
+    QVERIFY(prop.type() != "");
+    QVERIFY(prop.doc() != "");
 }
 
 void ContextPropertyInfoUnitTest::cleanupTestCase()
