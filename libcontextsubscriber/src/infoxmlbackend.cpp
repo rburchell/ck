@@ -29,7 +29,6 @@
 #include <stdlib.h>
 #include "sconnect.h"
 #include "infoxmlbackend.h"
-#include "infobackendconfig.h"
 #include "infoxmlkeysfinder.h"
 
 InfoXmlBackend::InfoXmlBackend(QObject *parent)

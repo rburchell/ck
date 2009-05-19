@@ -8,7 +8,7 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  contextpropertyinfo.cpp contextpropertyinfo.h			\
 	  contextregistryinfo.cpp contextregistryinfo.h infobackend.h	\
 	  infobackend.cpp infoxmlbackend.h infoxmlbackend.cpp		\
-	  infobackendconfig.h infoxmlkeysfinder.h			\
+	  infoxmlkeysfinder.h			                        \
 	  infoxmlkeysfinder.cpp infokeydata.h cdbwriter.h		\
 	  cdbwriter.cpp cdbreader.cpp cdbreader.h infocdbbackend.cpp	\
 	  infocdbbackend.h dbusnamelistener.h dbusnamelistener.cpp	\
@@ -18,7 +18,7 @@ libcontextsubscriberdir=$(includedir)/contextsubscriber
 
 libcontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h
 
-AM_CXXFLAGS = -DPREFIX="\"$(prefix)\""
+AM_CXXFLAGS = '-DDEFAULT_REGISTRY_PATH="$(datadir)/context-providers/"'
 
 # you have to add your ui designer designed forms here
 # QT_FORMS = commandview.ui

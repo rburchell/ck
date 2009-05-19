@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <QMutex>
 #include <QHash>
-#include "infobackendconfig.h"
 #include "sconnect.h"
 #include "infocdbbackend.h"
 
