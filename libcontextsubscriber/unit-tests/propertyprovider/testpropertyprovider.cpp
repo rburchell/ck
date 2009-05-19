@@ -38,7 +38,7 @@
 Q_DECLARE_METATYPE(QVariant);
 Q_DECLARE_METATYPE(QSet<QString>);
 
-#define MYLOGLEVEL 0
+#define MYLOGLEVEL 2
 void myMessageOutput(QtMsgType type, const char *msg)
 {
     switch (type) {
@@ -200,6 +200,8 @@ void PropertyProviderUnitTests::initTestCase()
 {
     qRegisterMetaType<QVariant>("QVariant");
     qRegisterMetaType<QSet<QString> >("QSet<QString>");
+
+    qInstallMsgHandler(myMessageOutput);
 }
 
 // After all tests
