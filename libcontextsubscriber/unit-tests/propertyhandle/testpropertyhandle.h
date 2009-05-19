@@ -52,11 +52,6 @@ private slots:
     void setValueWithTypeCheckAndCorrectTypes();
     void setValueWithTypeCheckAndIncorrectTypes();
 
-/*
-    void changingProvider();
-
-    void commanderAppears();
     void commanderAppearsAndDisappears();
-*/
 
 };

@@ -46,6 +46,9 @@ public:
     // For the test program
     DBusNameListener();
     bool servicePresent;
+
+    friend class PropertyHandleUnitTests;
+
 };
 
 #endif

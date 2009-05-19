@@ -46,14 +46,21 @@ public:
     static int instanceCount;
     static QList<QDBusConnection::BusType> instanceDBusTypes;
     static QStringList instanceDBusNames;
-    static int subscribeCount;
-    static QStringList subscribeKeys;
+    // Log the subscribe calls
+    static int subscribeCount; // count
+    static QStringList subscribeKeys; // parameters
+    static QStringList subscribeProviderNames; // provider name of the object
+    // on which it was called
+    // Log the unsubscribe calls
     static int unsubscribeCount;
     static QStringList unsubscribeKeys;
+    static QStringList unsubscribeProviderNames; // provider name of the object
+    // on which it was called
 
     // For tests
-    PropertyProvider(); // public only in tests
+    PropertyProvider(QString name); // public only in tests
     static void resetLogs();
+    QString myName;
 };
 
 #endif
