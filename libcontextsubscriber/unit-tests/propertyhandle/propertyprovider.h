@@ -46,6 +46,10 @@ public:
     static int instanceCount;
     static QList<QDBusConnection::BusType> instanceDBusTypes;
     static QStringList instanceDBusNames;
+    static int subscribeCount;
+    static QStringList subscribeKeys;
+    static int unsubscribeCount;
+    static QStringList unsubscribeKeys;
 
     // For tests
     PropertyProvider(); // public only in tests

@@ -42,8 +42,12 @@ private slots:
 
     // Test cases
     void initializing();
-    /*void subscription();
-    void unsubscription();
+    void subscribe();
+    void subscribeAndUnsubscribe();
+    void subscribeTwice();
+    void subscribeTwiceAndUnsubscribe();
+    void subscribeTwiceAndUnsubscribeTwice();
+/*    void subscribeAndUnsubscribe();
     void referenceCountedSubscribption();
 
     void changingProvider();

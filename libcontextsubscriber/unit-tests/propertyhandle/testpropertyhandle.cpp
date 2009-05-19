@@ -74,6 +74,10 @@ ContextPropertyInfo* mockContextPropertyInfo;
 int PropertyProvider::instanceCount = 0;
 QList<QDBusConnection::BusType> PropertyProvider::instanceDBusTypes;
 QStringList PropertyProvider::instanceDBusNames;
+int PropertyProvider::subscribeCount = 0;
+QStringList PropertyProvider::subscribeKeys;
+int PropertyProvider::unsubscribeCount = 0;
+QStringList PropertyProvider::unsubscribeKeys;
 
 PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busType, const QString &busName)
 {
@@ -89,10 +93,14 @@ PropertyProvider::PropertyProvider()
 
 void PropertyProvider::subscribe(const QString& key)
 {
+    ++subscribeCount;
+    subscribeKeys << key;
 }
 
 void PropertyProvider::unsubscribe(const QString& key)
 {
+    ++unsubscribeCount;
+    unsubscribeKeys << key;
 }
 
 void PropertyProvider::resetLogs()
@@ -100,6 +108,10 @@ void PropertyProvider::resetLogs()
     instanceCount = 0;
     instanceDBusTypes.clear();
     instanceDBusNames.clear();
+    subscribeCount = 0;
+    subscribeKeys.clear();
+    unsubscribeCount = 0;
+    unsubscribeKeys.clear();
 }
 
 // Mock implementation of the DBusNameListener
@@ -191,11 +203,132 @@ void PropertyHandleUnitTests::initializing()
     propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+
     // Expected results:
     // The PropertyProvider with the correct DBusName and DBusType was created.
     QCOMPARE(PropertyProvider::instanceCount, 1);
     QCOMPARE(PropertyProvider::instanceDBusTypes.at(0), QDBusConnection::SessionBus);
     QCOMPARE(PropertyProvider::instanceDBusNames.at(0), QString("Fake.Provider"));
+}
+
+void PropertyHandleUnitTests::subscribe()
+{
+    // Setup:
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Test:
+    // Command the PropertyHandle to subscribe
+    propertyHandle->subscribe();
+
+    // Expected results:
+    // The PropertyHandle calls the PropertyProvider::subscribe
+    QCOMPARE(PropertyProvider::subscribeCount, 1);
+    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
+    QCOMPARE(PropertyProvider::unsubscribeCount, 0);
+}
+
+void PropertyHandleUnitTests::subscribeAndUnsubscribe()
+{
+    // Setup:
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Test:
+    // Command the PropertyHandle to subscribe
+    propertyHandle->subscribe();
+    // Command the PropertyHandle to unsubscribe
+    propertyHandle->unsubscribe();
+
+    // Expected results:
+    // The PropertyHandle calls the PropertyProvider::unsubscribe
+    QCOMPARE(PropertyProvider::subscribeCount, 1);
+    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
+    QCOMPARE(PropertyProvider::unsubscribeCount, 1);
+    QCOMPARE(PropertyProvider::unsubscribeKeys.at(0), key);
+}
+
+void PropertyHandleUnitTests::subscribeTwice()
+{
+    // Setup:
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Test:
+    // Command the PropertyHandle to subscribe
+    propertyHandle->subscribe();
+    // and subscribe again
+    propertyHandle->subscribe();
+
+    // Expected results:
+    // The PropertyHandle calls the PropertyProvider::subscribe
+    // but only once.
+    QCOMPARE(PropertyProvider::subscribeCount, 1);
+    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
+    QCOMPARE(PropertyProvider::unsubscribeCount, 0);
+}
+
+void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribe()
+{
+    // Setup:
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Test:
+    // Command the PropertyHandle to subscribe
+    propertyHandle->subscribe();
+    // and subscribe again
+    propertyHandle->subscribe();
+    // and then unsubscribe.
+    propertyHandle->unsubscribe();
+
+    // Expected results:
+    // The PropertyHandle calls the PropertyProvider::subscribe
+    // but only once. The unsubscribe is not called, since one of the
+    // subscriptions is still valid.
+    QCOMPARE(PropertyProvider::subscribeCount, 1);
+    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
+    QCOMPARE(PropertyProvider::unsubscribeCount, 0);
+}
+
+void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribeTwice()
+{
+    // Setup:
+    // Create the object to be tested
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Test:
+    // Command the PropertyHandle to subscribe
+    propertyHandle->subscribe();
+    // and subscribe again
+    propertyHandle->subscribe();
+    // and then unsubscribe
+    propertyHandle->unsubscribe();
+    // and unsubscribe again
+    propertyHandle->unsubscribe();
+
+    // Expected results:
+    // The PropertyHandle calls the PropertyProvider::subscribe
+    // but only once. Also the unsubscription is called once.
+    QCOMPARE(PropertyProvider::subscribeCount, 1);
+    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
+    QCOMPARE(PropertyProvider::unsubscribeCount, 1);
+    QCOMPARE(PropertyProvider::unsubscribeKeys.at(0), key);
 }
 
 QTEST_MAIN(PropertyHandleUnitTests);
