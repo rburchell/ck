@@ -85,7 +85,7 @@ def update_context_providers(xml, dir='.'):
 
 class Flexiprovider(object):
     def stdin_ready(self, fd, cond):
-        if cond & (glib.IO_ERR | glib.IO_HUP):
+        if cond & glib.IO_ERR:
             self.loop.quit()
             return False
         # We assume that stdin is line-buffered (ie. readline() doesn't
@@ -189,6 +189,8 @@ class Flexiprovider(object):
 
         The provider will stop also if stdin is closed.
         """
+        # Reopen stdout to be line-buffered.
+        sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
         glib.io_add_watch(sys.stdin.fileno(),
                           glib.IO_IN | glib.IO_HUP | glib.IO_ERR,
                           self.stdin_ready)
