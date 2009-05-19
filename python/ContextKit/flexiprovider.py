@@ -73,7 +73,7 @@ def xmlfor(busname='ctx.flexiprovider', bus='session', *props):
                    '    <type>%s</type>\n'
                    '    <doc>A phony but very flexible property.</doc>\n'
                    '  </key>' % (p.name, p.datatype))
-    xml.append('</provider>')
+    xml.append('</provider>\n')
     return '\n'.join(xml)
 
 def update_context_providers(xml, dir='.'):
