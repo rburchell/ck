@@ -1,5 +1,7 @@
 #include "contextproperty.h"
 #include "propertylistener.h"
+#include "sconnect.h"
+#include <QSocketNotifier>
 #include <QCoreApplication>
 #include <QString>
 #include <QStringList>
@@ -24,6 +26,12 @@ int main(int argc, char **argv)
         ContextProperty* prop = new ContextProperty(key);
         prop->setParent(new PropertyListener(prop, &app));
     }
+
+    QSocketNotifier stdinWatcher(0, QSocketNotifier::Read, &app);
+    sconnect(&stdinWatcher,
+             SIGNAL(activated(int)),
+             &app,
+             SLOT(quit()));
 
     return app.exec();
 }
