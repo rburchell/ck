@@ -1,4 +1,4 @@
-SUBDIRS = propertyprovider propertyhandle cdbreader cdbwriter contextregistryinfo-xml-static contextpropertyinfo-xml-static contextregistryinfo-cdb-static contextpropertyinfo-cdb-static contextregistryinfo-cdb-dynamic contextpropertyinfo-cdb-dynamic contextregistryinfo-xml-dynamic contextpropertyinfo-xml-dynamic
+SUBDIRS = propertyprovider propertyhandle handlesignalrouter cdbreader cdbwriter contextregistryinfo-xml-static contextpropertyinfo-xml-static contextregistryinfo-cdb-static contextpropertyinfo-cdb-static contextregistryinfo-cdb-dynamic contextpropertyinfo-cdb-dynamic contextregistryinfo-xml-dynamic contextpropertyinfo-xml-dynamic
 
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \

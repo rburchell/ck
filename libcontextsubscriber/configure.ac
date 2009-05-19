@@ -87,7 +87,8 @@ AC_CONFIG_FILES([Makefile
          unit-tests/contextregistryinfo-cdb-dynamic/Makefile
          unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
      	 unit-tests/propertyprovider/Makefile
-	     unit-tests/propertyhandle/Makefile])
+         unit-tests/propertyhandle/Makefile
+         unit-tests/handlesignalrouter/Makefile])
 
 AC_OUTPUT
 
