@@ -32,7 +32,7 @@
 #include <QDebug>
 #include <QDBusConnection>
 
-#define MYLOGLEVEL 0
+#define MYLOGLEVEL 2
 void myMessageOutput(QtMsgType type, const char *msg)
 {
     switch (type) {
