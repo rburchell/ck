@@ -19,12 +19,16 @@ Makefile
 ._*
 
 # Tests
-/unit-tests/xml-introspection-static/xml-introspection-static
-/unit-tests/xml-introspection-dynamic/xml-introspection-dynamic
-/unit-tests/cdb-introspection-static/cdb-introspection-static
-/unit-tests/cdb-introspection-dynamic/cdb-introspection-dynamic
-/unit-tests/testclass/testclassunittest
-/unit-tests/cdb/cdb
+/unit-tests/contextregistryinfo-xml-static/contextregistryinfounittest
+/unit-tests/contextregistryinfo-cdb-static/contextregistryinfounittest
+/unit-tests/contextregistryinfo-xml-dynamic/contextregistryinfounittest
+/unit-tests/contextregistryinfo-cdb-dynamic/contextregistryinfounittest
+/unit-tests/contextpropertyinfo-xml-static/contextpropertyunittest
+/unit-tests/contextpropertyinfo-cdb-static/contextpropertyunittest
+/unit-tests/contextpropertyinfo-xml-dynamic/contextpropertyunittest
+/unit-tests/contextpropertyinfo-cdb-dynamic/contextpropertyunittest
+/unit-tests/cdbreader/cdbreaderunittest
+/unit-tests/cdbreader/cdbwriterunittest
 /unit-tests/propertyprovider/propertyprovider-unit-tests
 
 coverage/

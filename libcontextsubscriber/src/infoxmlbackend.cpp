@@ -201,8 +201,9 @@ void InfoXmlBackend::regenerateKeyDataList()
     countOfFilesInLastParse = 0;
 
     // Stop watching all files. We do keep wathching the dir though. 
-    foreach (QString file, watcher.files())
-        watcher.removePath(file);
+    QStringList watchedFiles = watcher.files();
+    if (watchedFiles.size() > 0)
+        watcher.removePaths(watchedFiles);
 
     qDebug() << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
 
@@ -218,7 +219,10 @@ void InfoXmlBackend::regenerateKeyDataList()
     for (int i = 0; i < list.size(); ++i) {
         QFileInfo f = list.at(i);
 		readKeyDataFromXml(f);
-        watcher.addPath(f.filePath());
+
+        if (! watcher.files().contains(f.filePath()))
+            watcher.addPath(f.filePath());
+
         countOfFilesInLastParse++;
     }
 }

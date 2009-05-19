@@ -87,8 +87,8 @@ QString InfoCdbBackend::providerDBusTypeForKey(QString key) const
 
 bool InfoCdbBackend::databaseExists()
 {
-    QDir dir(databasePath());
-    return dir.exists();
+    QFile file(databasePath());
+    return file.exists();
 }
 
 QString InfoCdbBackend::databasePath()
