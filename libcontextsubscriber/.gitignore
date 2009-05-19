@@ -13,6 +13,7 @@ Makefile
 
 # Auto-generated
 /src/infobackendconfig.h
+/src/infoxmlbackendconfig.h
 /update-tool/update-tool.h
 contextsubscriber-1.0.pc
 
@@ -32,7 +33,6 @@ contextsubscriber-1.0.pc
 /unit-tests/cdbreader/cdbwriterunittest
 /unit-tests/propertyprovider/propertyprovider-unit-tests
 /unit-tests/propertyhandle/propertyhandle-unit-tests
-
 coverage/
 
 # Other binaries
