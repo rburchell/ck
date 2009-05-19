@@ -25,3 +25,5 @@ CLEANFILES =
 check_LIBRARIES = 
 include $(top_srcdir)/am/tests.am
 include $(top_srcdir)/am/qt-check.am
+
+AM_CXXFLAGS += '-DDEFAULT_REGISTRY_PATH="@DEFAULT_REGISTRY_PATH@"'

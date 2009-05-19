@@ -12,7 +12,7 @@ AM_CPPFLAGS = -I$(srcdir)/../src
 # you can moc every header if you want to be fool proof
 QT_TOMOC_H = $(filter %.h, $(context_cli_SOURCES))
 
-AM_CXXFLAGS = '-DDEFAULT_REGISTRY_PATH="$(datadir)/context-providers/"'
+AM_CXXFLAGS = '-DDEFAULT_REGISTRY_PATH="@DEFAULT_REGISTRY_PATH@"'
 
 # or you can explicitly specify the list of headers which should be MOC'd
 # QT_TOMOC_H = ...
