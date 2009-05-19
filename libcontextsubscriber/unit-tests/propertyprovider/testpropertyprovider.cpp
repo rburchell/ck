@@ -238,7 +238,7 @@ void PropertyProviderUnitTests::initializing()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
 
     // The PropertyProvider is created (as part of initTestCase)
@@ -257,7 +257,7 @@ void PropertyProviderUnitTests::getSubscriberSucceeds()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SystemBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
 
     // Test:
@@ -279,7 +279,7 @@ void PropertyProviderUnitTests::getSubscriberFails()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
 
     // And subscribe to a key (so that we can test whether something interesting happened)
@@ -307,7 +307,7 @@ void PropertyProviderUnitTests::subscription()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -341,7 +341,7 @@ void PropertyProviderUnitTests::subscriptionOfTwoProperties()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -379,7 +379,7 @@ void PropertyProviderUnitTests::unsubscription()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -417,7 +417,7 @@ void PropertyProviderUnitTests::unsubscriptionOfTwoProperties()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -459,7 +459,7 @@ void PropertyProviderUnitTests::immediateUnsubscription()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -492,7 +492,7 @@ void PropertyProviderUnitTests::immediateResubscription()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -532,7 +532,7 @@ void PropertyProviderUnitTests::subscriptionFinished()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -567,7 +567,7 @@ void PropertyProviderUnitTests::subscriptionAfterGetSubscriberFailed()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
 
     // Command the mock manager to emit the getSubscriberFinished signal
@@ -600,7 +600,7 @@ void PropertyProviderUnitTests::valuesChanged()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -644,7 +644,7 @@ void PropertyProviderUnitTests::valuesChangedWithUnnecessaryProperties()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
 
     // Command the mock manager to emit the getSubscriberFinished signal
@@ -679,7 +679,7 @@ void PropertyProviderUnitTests::providerDisappearsAndAppears()
     // Create the object to be tested
     QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
-    // Note: For each test, we need to create a separate property provider.
+    // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
 
     // Command the mock manager to emit the getSubscriberFinished signal
