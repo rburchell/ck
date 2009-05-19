@@ -128,3 +128,4 @@ tests/contextd_tests/plugin.c
 tests/contextd_tests/hal_plugin.c
 .project
 /python/flexi-properties.xml
+/INSTALL

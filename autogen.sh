@@ -12,11 +12,10 @@ existence_check source-highlight
 gtkdocize
 
 # Autoreconf will overwrite INSTALL, but we have our own version of
-# it.  So we move it out of the way.
+# it.
 
-mv INSTALL INSTALL.backup
 autoreconf -i -f
-mv INSTALL.backup INSTALL
+cp INSTALL.real INSTALL
 
 run_configure=true
 for arg in $*; do
