@@ -105,6 +105,13 @@ void CDBWriter::close()
     }
 }
 
+/// Returns the file descriptor used by the writer. Returns 0
+/// when the writer is closed.
+int CDBWriter::fileDescriptor() const
+{
+    return fd;
+}
+
 /// Returns \a true if the writer is writable. The writer is not writable
 /// after it has been closed or the target path is not accessible.
 bool CDBWriter::isWritable()

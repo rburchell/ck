@@ -51,6 +51,7 @@ public:
     void replace(const QString &key, const QString &val);
     void close();
     bool isWritable();
+    int fileDescriptor() const;
 
 private:
     void *cdbm;
