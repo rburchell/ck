@@ -75,3 +75,16 @@ void InfoBackend::checkAndEmitKeysRemoved(QStringList &currentKeys, QStringList 
     if (removedKeys.size() > 0)
         emit keysRemoved(removedKeys);
 }
+
+void InfoBackend::checkAndEmitKeysChanged(QStringList &currentKeys, QStringList &oldKeys)
+{
+    foreach(QString key, oldKeys) {
+        emit keyDataChanged(key);
+    }
+
+    foreach(QString key, currentKeys) {
+        if (! oldKeys.contains(key))
+            emit keyDataChanged(key);
+    }
+}
+

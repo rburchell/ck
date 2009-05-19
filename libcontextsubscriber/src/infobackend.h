@@ -53,6 +53,7 @@ private:
     InfoBackend(const InfoBackend&);
     void checkAndEmitKeysAdded(QStringList &currentKeys, QStringList &oldKeys);
     void checkAndEmitKeysRemoved(QStringList &currentKeys, QStringList &oldKeys);
+    void checkAndEmitKeysChanged(QStringList &currentKeys, QStringList &oldKeys);
 
     InfoBackend& operator=(const InfoBackend&);
     

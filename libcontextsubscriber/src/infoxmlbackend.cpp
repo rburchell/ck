@@ -155,16 +155,7 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     checkAndEmitKeysAdded(currentKeys, oldKeys);
     checkAndEmitKeysRemoved(currentKeys, oldKeys);
     emit keysChanged(listKeys());
-
-    // FIXME Put in common functionality
-    foreach(QString key, oldKeys) {
-        emit keyDataChanged(key);
-    }
-
-    foreach(QString key, currentKeys) {
-        if (! oldKeys.contains(key))
-            emit keyDataChanged(key);
-    }
+    checkAndEmitKeysChanged(currentKeys, oldKeys);
 }
 
 void InfoXmlBackend::onDirectoryChanged(const QString &path)
@@ -189,19 +180,10 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
     QStringList currentKeys = listKeys();
 
     // Emissions
-    emit keysChanged(listKeys());
     checkAndEmitKeysAdded(currentKeys, oldKeys);
     checkAndEmitKeysRemoved(currentKeys, oldKeys);
-
-    // FIXME Put in common functionality
-    foreach(QString key, oldKeys) {
-        emit keyDataChanged(key);
-    }
-
-    foreach(QString key, currentKeys) {
-        if (! oldKeys.contains(key))
-            emit keyDataChanged(key);
-    }
+    emit keysChanged(listKeys());
+    checkAndEmitKeysChanged(currentKeys, oldKeys);
 }
 
 /* Private */
