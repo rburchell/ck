@@ -73,16 +73,16 @@
     propInfo.provder();  //  ...returns empty string
     \endcode
 
-	You can use this functionality to wait for keys to become availible in the registry. 
-	Just create a ContextPropertyInfo for a key that you're expecting to become present
-	and connect to the /c existsChanged signal.
-	
-	\code
+    You can use this functionality to wait for keys to become availible in the registry. 
+    Just create a ContextPropertyInfo for a key that you're expecting to become present
+    and connect to the /c existsChanged signal.
+    
+    \code
     ContextPropertyInfo propInfo("Something.That.Doesnt.Exist");
     propInfo.exists(); // false
-	// Connect something to the existsChanged signal.
+    // Connect something to the existsChanged signal.
     \endcode
-	
+    
     \section xmlvscdb XML vs.CDB
    
     When the introspection API is first used, a backend choice is being made. \b CDB backend
@@ -104,13 +104,12 @@
 /*!
     \class ContextPropertyInfo
 
-  \brief A class to introspect a context property details.
+    \brief A class to introspect a context property details.
 
-  This class is used to obtain information about a given key in the context registry. 
-  The information can be provided either from xml files or from a cdb database. 
-  It's possible to query the type, the provider and the documentation of the given 
-  key/property.
-
+    This class is used to obtain information about a given key in the context registry. 
+    The information can be provided either from xml files or from a cdb database. 
+    It's possible to query the type, the provider and the documentation of the given 
+    key/property.
 */
 
 class ContextPropertyInfo : public QObject
@@ -126,7 +125,7 @@ public:
     QString key() const;
     QString doc() const;
     QString type() const;
-	bool exists() const;
+    bool exists() const;
     
     QString providerDBusName() const;
     QDBusConnection::BusType providerDBusType() const;
@@ -159,10 +158,10 @@ signals:
     /// \param newType The new type of the key.
     void typeChanged(QString newType);
 
-	/// Emitted when the key existance in the registry changes. The \a exists
-	/// is the new state of the introspected key. This is a strict signal - it's 
-	/// emitted only when there was an actual change in the state. Using this
-	/// signal you can wait (watch) for various keys to become available.
+    /// Emitted when the key existance in the registry changes. The \a exists
+    /// is the new state of the introspected key. This is a strict signal - it's 
+    /// emitted only when there was an actual change in the state. Using this
+    /// signal you can wait (watch) for various keys to become available.
     /// \param exists The new state of the key.
     void existsChanged(bool exists);
 };

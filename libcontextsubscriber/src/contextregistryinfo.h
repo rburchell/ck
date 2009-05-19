@@ -27,15 +27,14 @@
 #include <QObject>
 
 /*!
-  \class ContextRegistryInfo
+    \class ContextRegistryInfo
 
-  \brief A class to introspect the registry contents.
+    \brief A class to introspect the registry contents.
 
-  This is a singelton class used to obtain information about the keys (properties)
-  in the registry database. The information can be provided either from xml files 
-  or from a cdb database. It's possible to list all the keys in the registry and 
-  also list all keys belonging to a one particular provider. 
-
+    This is a singelton class used to obtain information about the keys (properties)
+    in the registry database. The information can be provided either from xml files 
+    or from a cdb database. It's possible to list all the keys in the registry and 
+    also list all keys belonging to a one particular provider. 
 */
 
 class ContextRegistryInfo : public QObject

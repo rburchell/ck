@@ -25,8 +25,8 @@
 bool InfoXmlKeysFinder::startDocument()
 {
     keyDataHash.clear();
-	inProvider = false;
-	inKey = false;
+    inProvider = false;
+    inKey = false;
     inKeyType = false;
     inKeyDoc = false;
 }
@@ -35,37 +35,37 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
 {
     // <provider> ...
     if (inProvider == false && name == "provider") {
-		inProvider = true;
+        inProvider = true;
         currentProvider = getAttrValue(attrs, "service");
         currentBus = getAttrValue(attrs, "bus");
-		return true;
-	}
+        return true;
+    }
 
     // <key> ...
     if (inKey == false && inProvider == true && name == "key") {
-	    // Reset all potential key data
+        // Reset all potential key data
         currentKeyName = "";
         currentKeyType = "";
         currentKeyDoc = "";
         currentKeyName = getAttrValue(attrs, "name");
 
         inKey = true;
-       		
-		return true;
+            
+        return true;
     }
 
     // <type> ...
     if (inKeyType == false && inKey == true && name == "type") {
         inKeyType = true;
         currentKeyType = ""; // Reset type data
-		return true;
+        return true;
     }
 
     // <doc> ...
     if (inKeyDoc == false && inKey == true && name == "doc") {
         inKeyDoc = true;
         currentKeyDoc = ""; // Reset doc data
-		return true;
+        return true;
     }
 
     return true;
@@ -142,10 +142,10 @@ bool InfoXmlKeysFinder::characters(const QString &chars)
 
 QString InfoXmlKeysFinder::getAttrValue(const QXmlAttributes &attrs, const QString &attrName)
 {
-	for (int i = 0; i< attrs.count(); i++) {
-     	if (attrs.localName(i) == attrName) 
-			return attrs.value(i);
-	}
-	
-	return "";
+    for (int i = 0; i< attrs.count(); i++) {
+        if (attrs.localName(i) == attrName) 
+            return attrs.value(i);
+    }
+    
+    return "";
 }

@@ -39,7 +39,7 @@ public:
     explicit InfoXmlBackend(QObject *parent = 0);
 
     virtual QString name() const;
-	virtual QStringList listKeys() const;
+    virtual QStringList listKeys() const;
     virtual QStringList listKeys(QString providername) const;
     virtual QStringList listProviders() const;
     virtual QString typeForKey(QString key) const;
@@ -55,7 +55,7 @@ private slots:
 
 private:
     QFileSystemWatcher watcher;
-	QHash <QString, InfoKeyData> keyDataHash;
+    QHash <QString, InfoKeyData> keyDataHash;
     int countOfFilesInLastParse;
 
     void regenerateKeyDataList();

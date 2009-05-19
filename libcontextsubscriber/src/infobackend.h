@@ -34,7 +34,7 @@ public:
 
     static InfoBackend* instance(const QString &backendName = "");
     virtual QString name() const = 0;
-	virtual QStringList listKeys() const = 0;
+    virtual QStringList listKeys() const = 0;
     virtual QStringList listKeys(QString providername) const = 0;
     virtual QStringList listProviders() const = 0;
     virtual QString typeForKey(QString key) const = 0;
@@ -58,7 +58,6 @@ private:
     
     static InfoBackend* backendInstance;
     
-    // FIXME Friendship should be other way round
     friend class InfoXmlBackend;
     friend class InfoCdbBackend;
 };

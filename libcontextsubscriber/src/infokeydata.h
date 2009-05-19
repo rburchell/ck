@@ -26,10 +26,10 @@
 
 struct InfoKeyData
 {
-	QString name;
-	QString type;
-	QString doc;
-	QString provider;
+    QString name;
+    QString type;
+    QString doc;
+    QString provider;
     QString bus;
 };
 

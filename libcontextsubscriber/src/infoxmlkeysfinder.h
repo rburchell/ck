@@ -39,18 +39,18 @@ public:
     QHash <QString, InfoKeyData> keyDataHash;
 
 private:
-	bool inProvider;
-	bool inKey;
+    bool inProvider;
+    bool inKey;
     bool inKeyType;
     bool inKeyDoc;
 
-	QString currentProvider;
-	QString currentKeyName;
-	QString currentKeyType;
-	QString currentKeyDoc;
+    QString currentProvider;
+    QString currentKeyName;
+    QString currentKeyType;
+    QString currentKeyDoc;
     QString currentBus;
-	
-	QString getAttrValue(const QXmlAttributes &attrs, const QString &attrName);
+    
+    QString getAttrValue(const QXmlAttributes &attrs, const QString &attrName);
 };
 
 #endif // INFOXMLKEYSFINDER_H

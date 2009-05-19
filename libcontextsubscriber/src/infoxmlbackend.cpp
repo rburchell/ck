@@ -49,7 +49,7 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onFileChanged(QString)));
 
-	regenerateKeyDataList();
+    regenerateKeyDataList();
 }
 
 QString InfoXmlBackend::name() const
@@ -59,21 +59,21 @@ QString InfoXmlBackend::name() const
 
 QStringList InfoXmlBackend::listKeys() const
 {
-	QStringList list;
+    QStringList list;
 
     // FIXME Hmm, we could return just the keyDataHash.keys itself here...
     foreach (QString key, keyDataHash.keys()) {
         list << keyDataHash.value(key).name;
     }
-		
-	return list;
+        
+    return list;
 }
 
 QStringList InfoXmlBackend::listKeys(QString providername) const
 {
     // This is slow and not nice, but we're an xml backend and 
     // we can afford to not be the first in the run
-   	QStringList list;
+    QStringList list;
 
     foreach (QString key, keyDataHash.keys()) {
         if (keyDataHash.value(key).provider == providername)
@@ -217,7 +217,7 @@ void InfoXmlBackend::regenerateKeyDataList()
     QFileInfoList list = dir.entryInfoList();
     for (int i = 0; i < list.size(); ++i) {
         QFileInfo f = list.at(i);
-		readKeyDataFromXml(f);
+        readKeyDataFromXml(f);
 
         if (! watcher.files().contains(f.filePath()))
             watcher.addPath(f.filePath());

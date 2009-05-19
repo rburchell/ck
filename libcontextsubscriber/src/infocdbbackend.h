@@ -37,7 +37,7 @@ public:
     explicit InfoCdbBackend(QObject *parent = 0);
 
     virtual QString name() const;
-	virtual QStringList listKeys() const;
+    virtual QStringList listKeys() const;
     virtual QStringList listKeys(QString providername) const;
     virtual QStringList listProviders() const;
     virtual QString typeForKey(QString key) const;
