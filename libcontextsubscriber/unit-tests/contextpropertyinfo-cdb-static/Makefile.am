@@ -1,7 +1,7 @@
-check_PROGRAMS = contextpropertyinfounittest
+check_PROGRAMS = contextpropertyinfounittest-cdb-static
 
 # your test's sources
-contextpropertyinfounittest_SOURCES = contextpropertyinfounittest.cpp
+contextpropertyinfounittest_cdb_static_SOURCES = contextpropertyinfounittest.cpp
 
 # sources tested, all of the will be recompiled specificly for the tests
 SOURCE_CXX = contextregistryinfo.cpp contextpropertyinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp cdbreader.cpp

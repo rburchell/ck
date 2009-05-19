@@ -1,7 +1,7 @@
-check_PROGRAMS = contextregistryinfounittest
+check_PROGRAMS = contextregistryinfounittest-xml-dynamic
 
 # your test's sources
-contextregistryinfounittest_SOURCES = contextregistryinfounittest.cpp
+contextregistryinfounittest_xml_dynamic_SOURCES = contextregistryinfounittest.cpp
 
 # sources tested, all of the will be recompiled specificly for the tests
 SOURCE_CXX = contextregistryinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp cdbreader.cpp
