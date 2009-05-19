@@ -40,7 +40,6 @@ private slots:
 void ContextRegistryInfoUnitTest::initTestCase()
 {
     if (getenv("srcdir")) {
-	qCritical() << "OK";
         setenv("CONTEXT_PROVIDERS", (QString(getenv("srcdir")) + QString("/")).toUtf8().constData(), 0);
     } else
         setenv("CONTEXT_PROVIDERS", "./", 0);
