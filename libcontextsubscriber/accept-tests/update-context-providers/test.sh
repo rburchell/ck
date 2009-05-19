@@ -1,10 +1,12 @@
 #!/bin/bash
 
+# Remove all temp files
 function clean {
     `rm -f *.actual`
     `rm -f *.cdb`
 }
 
+# Compare file $1 to $2 and display diff if different
 function compare {
     f=`diff -u "$1" "$2"`
     if [ $? != 0 ] ; then
@@ -15,31 +17,36 @@ function compare {
     fi
 }
 
+# Query the database $1 using the cdb tool and echo results to $1.actual
+function querydb {
+    cdb -q "context-providers.cdb" "$1" > "$1.actual"
+}
+
 BASEDIR=`dirname $0`
 ../../update-context-providers/update-context-providers "./"
 
-cdb -q "context-providers.cdb" "KEYS" > "KEYS.actual"
+querydb "KEYS"
 compare "KEYS.expected" "KEYS.actual"
 
-cdb -q "context-providers.cdb" "PROVIDERS" > "PROVIDERS.actual"
+querydb "PROVIDERS"
 compare "PROVIDERS.expected" "PROVIDERS.actual"
 
-cdb -q "context-providers.cdb" "org.freedesktop.ContextKit.contextd1:KEYS" > "org.freedesktop.ContextKit.contextd1:KEYS.actual"
+querydb "org.freedesktop.ContextKit.contextd1:KEYS"
 compare "org.freedesktop.ContextKit.contextd1:KEYS.expected" "org.freedesktop.ContextKit.contextd1:KEYS.actual"
 
-cdb -q "context-providers.cdb" "org.freedesktop.ContextKit.contextd2:KEYS" > "org.freedesktop.ContextKit.contextd2:KEYS.actual"
+querydb "org.freedesktop.ContextKit.contextd2:KEYS"
 compare "org.freedesktop.ContextKit.contextd2:KEYS.expected" "org.freedesktop.ContextKit.contextd2:KEYS.actual"
 
-cdb -q "context-providers.cdb" "Battery.Charging:KEYTYPE" > "Battery.Charging:KEYTYPE.actual"
+querydb "Battery.Charging:KEYTYPE"
 compare "Battery.Charging:KEYTYPE.expected" "Battery.Charging:KEYTYPE.actual"
 
-cdb -q "context-providers.cdb" "Battery.Charging:KEYDOC" > "Battery.Charging:KEYDOC.actual"
+querydb "Battery.Charging:KEYDOC"
 compare "Battery.Charging:KEYDOC.expected" "Battery.Charging:KEYDOC.actual"
 
-cdb -q "context-providers.cdb" "Battery.Charging:KEYPROVIDER" > "Battery.Charging:KEYPROVIDER.actual"
+querydb "Battery.Charging:KEYPROVIDER"
 compare "Battery.Charging:KEYPROVIDER.expected" "Battery.Charging:KEYPROVIDER.actual"
 
-cdb -q "context-providers.cdb" "Battery.Charging:KEYBUS" > "Battery.Charging:KEYBUS.actual"
+querydb "Battery.Charging:KEYBUS"
 compare "Battery.Charging:KEYBUS.expected" "Battery.Charging:KEYBUS.actual"
 
 echo "All ok!"
