@@ -33,6 +33,7 @@ private slots:
     void initTestCase();
     void checkKeyTypeChanging();
     void checkKeyRemoval();
+    void checkKeyAdding();
     void cleanupTestCase();
 };
 
@@ -88,6 +89,7 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
+    QVERIFY(prop.exists() == true);
 
     xmlToCopy = "./";
     if (getenv("srcdir"))
@@ -99,6 +101,36 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
 
     QVERIFY(prop.type() == "");
     QVERIFY(prop.doc() == "");
+    QVERIFY(prop.exists() == false);
+}
+
+void ContextPropertyInfoUnitTest::checkKeyAdding()
+{
+    QString xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    // Create initial state
+    QFile::copy(xmlToCopy + "context-providers3v2.cdb", "temp.cdb");
+    rename("temp.cdb", "context-providers.cdb");
+    QTest::qWait(200);
+
+    ContextPropertyInfo prop("Battery.LowBattery");
+    QVERIFY(prop.type() == "");
+    QVERIFY(prop.doc() == "");
+    QVERIFY(prop.exists() == false);
+
+    xmlToCopy = "./";
+    if (getenv("srcdir"))
+        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+
+    QFile::copy(xmlToCopy + "context-providers3v1.cdb", "temp.cdb");
+    rename("temp.cdb", "context-providers.cdb");
+    QTest::qWait(500);
+
+    QVERIFY(prop.exists() == true);
+    QVERIFY(prop.type() != "");
+    QVERIFY(prop.doc() != "");
 }
 
 void ContextPropertyInfoUnitTest::cleanupTestCase()
