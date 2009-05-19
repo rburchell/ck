@@ -22,7 +22,6 @@
 #include <QApplication>
 #include <QDir>
 #include <stdlib.h>
-#include <QTime>
 #include "contextregistryinfo.h"
 #include "contextpropertyinfo.h"
 #include "cdbwriter.h"
@@ -109,10 +108,6 @@ int main(int argc, char **argv)
 
     // Force the xml backend
     ContextRegistryInfo *context = ContextRegistryInfo::instance("xml");
-
-    // Initialize some randomness
-    QTime midnight(0, 0, 0);
-    qsrand(midnight.secsTo(QTime::currentTime()));
 
     QDir dir(path);
     checkDirectory(dir);
