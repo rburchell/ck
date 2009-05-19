@@ -1,6 +1,5 @@
 #!/usr/bin/env python2.5
 ##
-## @file contextOrientationTCs.py
 ## This file is part of ContextKit.
 ##
 ## Copyright (C) 2008, 2009 Nokia. All rights reserved.
@@ -46,7 +45,7 @@ class Callable:
     def __init__(self, anycallable):
         self.__call__ = anycallable
 
-class CommanderDisabled(unittest.TestCase):
+class CommanderNonExistent(unittest.TestCase):
     def startProvider(busname, args):
         ret = Popen(["../../python/context-provide", busname] + args,
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
@@ -77,7 +76,6 @@ class CommanderDisabled(unittest.TestCase):
         if (self.context_commander != 0): os.kill(self.context_commander.pid, 9)
         os.kill(self.context_client.pid, 9)
         os.unlink('flexi-properties.xml')
-        pass
 
     def testCommanderFunctionality(self):
         line = self.context_client.stderr.readline().rstrip()
@@ -86,7 +84,6 @@ class CommanderDisabled(unittest.TestCase):
         # if we are here, then the type check worked
 
         # check the non-existent property
-        self.context_commander.stdin.flush()
         got = self.context_client.stdout.readline().rstrip()
         self.assertEqual(got,
                          self.wanted("test.string", "QString", "barfoo"),
@@ -94,14 +91,13 @@ class CommanderDisabled(unittest.TestCase):
 
         # change the type of the non-existent property
         print >>self.context_commander.stdin, "add(INT('test.string', 42))"
-        self.context_commander.stdin.flush()
         got = self.context_client.stdout.readline().rstrip()
         self.assertEqual(got,
                          self.wanted("test.string", "int", "42"),
                          "Non-existent property's type couldn't be overwritten")
 
 def runTests():
-    suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderDisabled)
+    suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderNonExistent)
     unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 #!/usr/bin/env python2.5
 ##
-## @file contextOrientationTCs.py
 ## This file is part of ContextKit.
 ##
 ## Copyright (C) 2008, 2009 Nokia. All rights reserved.

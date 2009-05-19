@@ -81,7 +81,10 @@ def update_context_providers(xml, dir='.'):
     tmpfd, tmpfn = tempfile.mkstemp('.xml', 'flexi', dir)
     os.write(tmpfd, xml)
     os.close(tmpfd)
-    os.rename(tmpfn, dir + '/flexi-properties.xml')
+    if "CONTEXT_FLEXI_XML" in os.environ:
+        os.rename(tmpfn, os.environ["CONTEXT_FLEXI_XML"])
+    else:
+        os.rename(tmpfn, dir + '/flexi-properties.xml')
 
 class Flexiprovider(object):
     def stdin_ready(self, fd, cond):
