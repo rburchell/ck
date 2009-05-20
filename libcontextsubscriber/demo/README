@@ -2,7 +2,7 @@ libcontextsubscriber is using only asynchronous DBUS calls to
 communicate with the providers/commander.  Here is the process to
 demonstrate it.
 
-You will need 3 terminals, one for the context-cli, one for a "slow
+You will need 3 terminals, one for the context-listener, one for a "slow
 provider" and one for a "fast provider".  Both of the providers will
 be emulated by using the flexiprovider.
 
@@ -15,7 +15,7 @@ terminal slow> cd ../../python/
 terminal slow> ./context-provide com.nokia.slow int test.slow 530
 terminal slow (inside python)> import time; time.sleep(10)
 
-terminal cli> ../cli/context-cli test.fast test.slow
+terminal cli> ../cli/context-listener test.fast test.slow
 
 terminal fast (inside python)> set('test.fast', 613)
 

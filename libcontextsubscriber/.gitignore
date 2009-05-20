@@ -38,7 +38,7 @@ contextsubscriber-1.0.pc
 coverage/
 
 # Other binaries
-/cli/context-cli
+/cli/context-listener
 /update-tool/update-tool
 /update-context-providers/update-context-providers
 

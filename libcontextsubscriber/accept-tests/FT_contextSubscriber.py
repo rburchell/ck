@@ -43,7 +43,7 @@ class Subscription(unittest.TestCase):
         os.environ["CONTEXT_PROVIDERS"] = "."
 	print >>self.flexiprovider.stdin, "info()"
         self.flexiprovider.stdout.readline()
-        self.context_client = Popen(["../cli/context-cli","test.int","test.double","test.string","test.truth"],stdout=PIPE,stderr=PIPE)
+        self.context_client = Popen(["../cli/context-listener","test.int","test.double","test.string","test.truth"],stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
         os.kill(self.flexiprovider.pid,9)
@@ -128,12 +128,12 @@ class MultipleSubscribers(unittest.TestCase):
 	print >>self.flexiprovider.stdin, "info()"
         self.flexiprovider.stdout.readline()
 
-        self.context_client1 = Popen(["../cli/context-cli","test.int","test.double","test.string","test.truth"],stdout=PIPE,stderr=PIPE)
-        self.context_client2 = Popen(["../cli/context-cli","test.int","test.double"],stdout=PIPE,stderr=PIPE)
+        self.context_client1 = Popen(["../cli/context-listener","test.int","test.double","test.string","test.truth"],stdout=PIPE,stderr=PIPE)
+        self.context_client2 = Popen(["../cli/context-listener","test.int","test.double"],stdout=PIPE,stderr=PIPE)
 
-        self.context_client3 = Popen(["../cli/context-cli","test.int","test.string","test.truth"],stdout=PIPE,stderr=PIPE)
+        self.context_client3 = Popen(["../cli/context-listener","test.int","test.string","test.truth"],stdout=PIPE,stderr=PIPE)
 
-        self.context_client4 = Popen(["../cli/context-cli","test.int","test.double","test.string"],stdout=PIPE,stderr=PIPE)
+        self.context_client4 = Popen(["../cli/context-listener","test.int","test.double","test.string"],stdout=PIPE,stderr=PIPE)
 
 
     def tearDown(self):
@@ -236,7 +236,7 @@ class MultipleProviders(unittest.TestCase):
 	print >> self.flexiprovider1.stdin, "info()"
         self.flexiprovider1.stdout.readline()
 
-        self.context_client = Popen(["../cli/context-cli","test.int","test.double","test.string","test.truth"],stdout=PIPE,stderr=PIPE)
+        self.context_client = Popen(["../cli/context-listener","test.int","test.double","test.string","test.truth"],stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
         os.kill(self.flexiprovider1.pid,9)
