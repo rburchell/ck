@@ -79,3 +79,13 @@ Description: Helper library for providers of context properties
  org.freedesktop.ContextKit D-Bus interface.
  .
  This package contains the documentation.
+
+Package: fake-context-provider
+Section: devel
+Architecture: all
+Description: Provider for all unimplemented core context properties
+ This package installs the declarations for all core context
+ properties that are not yet implemented by anyone.
+ .
+ You can use the context-commander to change the value of these
+ properties.

@@ -1,3 +1,3 @@
-usr/bin/*
-usr/share/context-providers/*.xml
-usr/share/dbus-1/services/*.service
+usr/bin/contextd
+usr/share/context-providers/contextd.xml
+usr/share/dbus-1/services/org.freedesktop.ContextKit.contextd.service
