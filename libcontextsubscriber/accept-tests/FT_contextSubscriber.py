@@ -256,6 +256,8 @@ class MultipleProviders(unittest.TestCase):
                                     stdin=PIPE,stderr=PIPE,stdout=PIPE)
         print >>self.flexiprovider2.stdin, "info()"
         self.flexiprovider2.stdout.readline()
+        self.flexiprovider2.stdout.readline()
+        self.flexiprovider2.stdout.readline()
 
 
 def runTests():
