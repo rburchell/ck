@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # Remove all temp files
 function clean {
