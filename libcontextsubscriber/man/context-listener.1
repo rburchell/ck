@@ -3,32 +3,51 @@
 context-listener
 - a simple test client to listen to changes in context properties from different providers.
 .SH SYNOPSIS
-.B context-listener [PROPERTIES]
+.B context-listener\fR [\fIPROPERTY\fR]...
 .SH DESCRIPTION
-context-listener will listen for changes in the PROPERTIES and notify the user about them. At leas one property has to be given. In order to find the approppriate provider for each of the PROPERTIES context-listener reads all the XML files in the present directory. Check libcontextprovider documentation for the format of these XML files.
-Hit ENTER to terminate the running application.
+context-listener will listen for changes in the PROPERTIES and notify
+the user about them. At least one property has to be given. In order
+to find the appropriate provider for each of the PROPERTIES
+context-listener reads the ./context-providers.cdb or if it doesn't
+exist then all the XML files in the present directory.  Check
+libcontextprovider documentation for the format of these XML files and
+how to convert them to a cdb cache.  Hit ENTER to terminate the
+running context-listener.
 .SH ENVIRONMENT VARIABLES
 .TP 8
 CONTEXT_CLI_DISABLE_TYPE_CHECK
-when defined context-listener will not croak about type mismatch between the expected and actual type.
+when defined context-listener will not croak about type mismatch
+between the expected and actual type.
 .TP 8
 CONTEXT_CLI_IGNORE_COMMANDER
-when defined context-listener will become immune to the commander, i.e. it will not be affected by context-commander at all.
+when defined context-listener will become immune to the commander,
+i.e. it will not be affected by context-commander at all.
 .TP 8
 CONTEXT_PROVIDERS
-may define a directory containing the provider descriptor XML files. In this case context-listener will read XMLs from CONTEXT_PROVIDERS directory and not the present one.
+may define a directory containing the provider descriptor cdb or XML
+files. In this case context-listener will read from the directory
+specified by CONTEXT_PROVIDERS and not the present one.
 .SH ARGUMENTS
 .TP 8
-The argumets are the PROPERTIES, a space delimited list of the properties to subscribe to. Properties are dot separated names, like context.location.latitude. Obviously a property have to be provided by some provider to be any useful.
+The argumets are the PROPERTIES, a space delimited list of the
+properties to subscribe to. Properties are dot separated names, like
+Context.Location.Latitude. Obviously a property have to be provided by
+some provider to be any useful.
 .SH EXAMPLES
 .TP 8
 context-provide my.test.provider int mun.testi.property 42
 Creates a test provider with a single int property. Keep this running.
 .TP 8
 context-listener mun.testi.property
-starts context-listener listening for changes in the property 'mun.testi.property' from the provider 'my.test.provider'. This should be running in the same directory (from an other terminal) or CONTEXT_PROVIDERS should be set accordingly.
+starts context-listener listening for changes in the
+property 'mun.testi.property' from the
+provider 'my.test.provider'. This should be running in the same
+directory (from an other terminal) or CONTEXT_PROVIDERS should be set
+accordingly.
 .TP 8
-set(mun.testi.property', 59)
-The above command typed in the first terminal running context-provider will change the property and the change will be visible in the second terminal running context-listener.
+set('mun.testi.property', 59)
+The above command typed in the first terminal running context-provider
+will change the property and the change will be visible in the second
+terminal running context-listener.
 .SH SEE ALSO
 context-provide(1)
