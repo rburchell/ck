@@ -163,69 +163,105 @@ Estimates the needed charging time of the device. In seconds.
       </doc>
     </key>
   </node>
-  <node name="Connectivity">
+  <node name="Internet">
     <doc>
-Network connectivity
---------------------
+Internet connectivity
+---------------------
 
-Information about the network connectivity of the device.
+Information about the connection of the devide to the Internet.
     </doc>
-    <key name="HasInternet" type="bool">
-      <doc>
-Whether	or not the device is connected to the Internet.
-      </doc>
-    </key>
-    <key name="InternetIsFlatRate" type="bool">
-      <doc>
-Whether or not traffic to/from the Internet is billed per data volume
-(property is false) or per time (property is true).
-      </doc>
-    </key>
-    <key name="InternetNetworkType" type="string-enum">
+    <key name="NetworkType" type="string-enum">
       <doc>
 The type of the current connection to the Internet, such as GPRS,
 WLAN, etc.  The possible value are TBD.
       </doc>
     </key>
-    <key name="InternetTrafficOut" type="percent">
+
+    <key name="NetworkName" type="string">
+      <doc>
+The name of the current access point.
+      </doc>
+    </key>
+
+    <key name="NetworkState" type="string-enum">
+      <doc>
+The state of the Internet connection, values TBD but will include
+things like "connected, "disconnected", "connecting".
+      </doc>
+    </key>
+
+    <key name="NetworkID" type="string">
+      <doc>
+The unique id of the network.
+      </doc>
+    </key>
+
+    <key name="ServiceName" type="string">
+      <doc>
+(Unclear)
+      </doc>
+    </key>
+
+    <key name="SignalStrength" type="percent">
+      <doc>
+The signal strength of the current connection to the Internet.  This
+will be 100% percent for wired connections, usually.
+      </doc>
+    </key>
+
+    <key name="IsCheap" type="bool">
+      <doc>
+Whether or not traffic to/from the Internet is billed per data volume
+(property is false) or per time (property is true).
+      </doc>
+    </key>
+
+    <key name="TrafficOut" type="percent">
       <doc>
 A rough indication of the current traffic rate to the Internet, in
 percent of the maximum possible rate.
       </doc>
     </key>
-    <key name="InternetTrafficIn" type="percent">
+    <key name="TrafficIn" type="percent">
       <doc>
 A rough indication of the current traffic rate from the Internet, in
 percent of the maximum possible rate.
       </doc>
     </key>
-    <key name="BluetoothEnabled" type="bool">
+  </node>
+  <node name="Bluetooth">
+    <doc>
+Bluetooth
+---------
+
+Information about Bluetooth related things.      
+    </doc>
+    <key name="Enabled" type="bool">
       <doc>
 A boolean indicating whether or not the Bluetooth radio is enabled.
       </doc>
     </key>
-    <key name="BluetoothTrafficOut" type="percent">
+    <key name="Visible" type="bool">
+      <doc>
+A boolean indicating whether or not the device is visible to other
+Bluetooth devices when they search for others.
+      </doc>
+    </key>
+    <key name="TrafficOut" type="percent">
       <doc>
 A rough indication of the current outgoing traffic rate over
 Bluetooth, in percent of the maximum possible rate.
       </doc>
     </key>
-    <key name="BluetoothTrafficIn" type="percent">
+    <key name="TrafficIn" type="percent">
       <doc>
 A rough indication of the current incoming traffic rate over
 Bluetooth, in percent of the maximum possible rate.
       </doc>
     </key>
-    <key name="BluetoothConnected" type="bool">
-      <doc>
-A boolean indicating whether or not there is a active BlueTooth
-connection.  (I don't know much about the BlueTooth connection model,
-please help.)
-      </doc>
-    </key>
     <key name="SignalStrength" type="percentage">
       <doc>
-The strength of the radio connection.
+The strength of the Bluetooth radio connection.
       </doc>
     </key>
   </node>
