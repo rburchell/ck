@@ -95,22 +95,3 @@ AC_CONFIG_FILES([Makefile
          unit-tests/handlesignalrouter/Makefile])
 
 AC_OUTPUT
-
-# Checks for header files.
-# Checks for typedefs, structures, and compiler characteristics.
-# Checks for library functions.
-# Output files.
-#AC_CONFIG_HEADERS([config.h])             # optional
-
-# Full from ContextCommander -- coming soon
-#AC_CONFIG_FILES([Makefile src/Makefile doc/Makefile tests/Makefile
-#			  tests/signallingmap/Makefile
-#			  tests/applicationlist/Makefile
-#			  tests/subscriber/Makefile
-#			  tests/boolvariant/Makefile
-#			  tests/commandmodel/Makefile
-#			  tests/manager/Makefile
-#			  tests/inspectmodel/Makefile
-#			  debian-devel/control debian-devel/rules])
-
-
