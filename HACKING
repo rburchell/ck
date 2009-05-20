@@ -125,9 +125,11 @@ Coding style
 
 We follow the DUI coding style for C++ code.  In brief:
 
+ - No tab characters (0x09)
  - Linux style, but
  - Indentation offset is 4 and
  - Maximum line length is 120.
+ - No editor specific settings in the files.
 
 For Python:
 

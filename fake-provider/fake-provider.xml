@@ -1,54 +1,8 @@
 <?xml version="1.0"?>
-<properties xmlns="http://contextkit.freedesktop.org/Provider">
-  <doc>
-Core Context Properties
-=======================
-
-This is the list of the core contextual properties of the Maemo
-platform.
-
-This document is maintained as part of the +contextkit+ package.
-Please report change requests as bugs against the +contextkit+
-package.
- 
-*NOTE:* Most of these properties are unstable and their definition will
-change for some time still.  Only the ones explicitly marked as stable
-should be used for now.
-
-  </doc>
+<provider
+  xmlns="http://contextkit.freedesktop.org/Provider"
+  bus="session" service="com.nokia.FakeContextProvider">
   <node name="Context">
-   <node name="Screen">
-    <doc>
-Display screens
----------------
-
-These properties talk about the display screens of the device.
-    </doc>
-    <key name="TopEdge" type="string-enum">
-      <!-- type
-	<string-enum>
-	  <top/>
-	  <bottom/>
-	  <left/>
-	  <right/>
-	</string-enum>
-      /type -->
-      <doc>
-The edge of the main display screen where the user expects
-the top-most UI elements to be.  Possible values are the
-strings "top", "bottom", "left", and "right", which refer to
-the edges of the screen in its normal orientation as defined
-by the graphics hardware.  _(stable)_
-      </doc>
-    </key>
-    <key name="IsCovered" type="bool">
-      <doc>
-Whether or not the main display screen is covered and can thus not be
-seen by the user.  This might mean that the device is laying face down
-on a table, or that its lid is closed if it has one.  _(stable)_
-      </doc>
-    </key>
-   </node>
    <node name="Location">
     <doc>
 Location
@@ -57,17 +11,6 @@ Location
 Best effort location information. If any of the keys are not
 appliciable to the current location, they will be unavailable.
     </doc>
-    <key name="Coordinates" type="uniform-list">
-      <!-- type
-        <uniform-list type="double"/>
-      /type -->
-      <doc>
-The coordinates of the current position as a list of two or three
-doubles.  The first two elemets are latitude and longitude,
-respectivly, in degrees.  The third element, when present, is the
-altitude in meter.
-      </doc>
-    </key>
     <key name="Street" type="string">
       <doc>The street nearest the location of the device, as a localized string.</doc>
     </key>
@@ -95,7 +38,7 @@ neighborhood or campus, as a localized string.
     <key name="Timezone" type="string">
       <doc>TBD</doc>
     </key>
-    <key name="TimezoneOffset" type="duration">
+    <key name="TimezoneOffset" type="INT">
       <doc>TBD</doc>
     </key>
     <key name="Continent" type="string">
@@ -110,67 +53,21 @@ The URI of the current point of interest, if any.  (The URI points to
 a Nepomuk object inside the Content Framework.)
       </doc>
     </key>
-    <key name="NearbyContacts" type="string-list">
-      <!-- type>
-	<uniform-list type="nepomuk-uri"/>
-      </type -->
+    <key name="NearbyContacts" type="string">
       <doc>
 A list of URIs for contacts that are physically nearby.  (The URIs
 point to Nepomuk objects.)
       </doc>
     </key>    
   </node>
-  <node name="Battery">
-    <doc>
-Battery
--------
-
-Information about the batteries of the device.
-    </doc>
-    <key name="ChargePercentage" type="percentage">
-      <doc>
-The average charge level of the currently connected batteries. 
-Expressed as percentage of the maximum charge level.
-      </doc>
-    </key>
-    <key name="OnBattery" type="bool">
-      <doc>
-Whether or not the device is currently running on battery power,
-i.e., whether at least one of its batteries is currently discharging.
-      </doc>
-    </key>
-    <key name="LowBattery" type="bool">
-      <doc>
-Whether or not the device is currently running on low battery power.
-True if OnBattery is true and the charge levels of all 
-batteries are below 10%.
-      </doc>
-    </key>
-    <key name="IsCharging" type="bool">
-      <doc>
-Whether or not the device is currently charging at least one of its batteries.
-      </doc>
-    </key>
-    <key name="TimeUntilLow" type="INT">
-      <doc>
-Estimates the time that the device can run on battery before the property 
-OnLowBattery becomes true. In seconds.
-      </doc>
-    </key>
-    <key name="TimeUntilFull" type="INT">
-      <doc>
-Estimates the needed charging time of the device. In seconds.
-      </doc>
-    </key>
-  </node>
   <node name="Internet">
     <doc>
 Internet connectivity
 ---------------------
 
-Information about the connection of the devide to the Internet.
+Information about the connection of the device to the Internet.
     </doc>
-    <key name="NetworkType" type="string-enum">
+    <key name="NetworkType" type="string">
       <doc>
 The type of the current connection to the Internet, such as GPRS,
 WLAN, etc.  The possible value are TBD.
@@ -183,7 +80,7 @@ The name of the current access point.
       </doc>
     </key>
 
-    <key name="NetworkState" type="string-enum">
+    <key name="NetworkState" type="string">
       <doc>
 The state of the Internet connection, values TBD but will include
 things like "connected, "disconnected", "connecting".
@@ -202,7 +99,7 @@ The unique id of the network.
       </doc>
     </key>
 
-    <key name="SignalStrength" type="percent">
+    <key name="SignalStrength" type="INT">
       <doc>
 The signal strength of the current connection to the Internet.  This
 will be 100% percent for wired connections, usually.
@@ -216,13 +113,13 @@ Whether or not traffic to/from the Internet is billed per data volume
       </doc>
     </key>
 
-    <key name="TrafficOut" type="percent">
+    <key name="TrafficOut" type="INT">
       <doc>
 A rough indication of the current traffic rate to the Internet, in
 percent of the maximum possible rate.
       </doc>
     </key>
-    <key name="TrafficIn" type="percent">
+    <key name="TrafficIn" type="INT">
       <doc>
 A rough indication of the current traffic rate from the Internet, in
 percent of the maximum possible rate.
@@ -247,19 +144,19 @@ A boolean indicating whether or not the device is visible to other
 Bluetooth devices when they search for others.
       </doc>
     </key>
-    <key name="TrafficOut" type="percent">
+    <key name="TrafficOut" type="INT">
       <doc>
 A rough indication of the current outgoing traffic rate over
 Bluetooth, in percent of the maximum possible rate.
       </doc>
     </key>
-    <key name="TrafficIn" type="percent">
+    <key name="TrafficIn" type="INT">
       <doc>
 A rough indication of the current incoming traffic rate over
 Bluetooth, in percent of the maximum possible rate.
       </doc>
     </key>
-    <key name="SignalStrength" type="percentage">
+    <key name="SignalStrength" type="INT">
       <doc>
 The strength of the Bluetooth radio connection.
       </doc>
@@ -272,123 +169,14 @@ Environment
 
 Information about the environment the device is in.
     </doc>
-    <key name="IsDark" type="bool">
-      <doc>
-Whether or not it is dark.
-      </doc>
-    </key>
-    <key name="SunRise" type="time">
+    <key name="SunRise" type="INT">
       <doc>
 The time of sun rise.
       </doc>
     </key>
-    <key name="SunSet" type="time">
+    <key name="SunSet" type="INT">
       <doc>
 The time of sun set.
-      </doc>
-    </key>
-    <key name="Weather" type="map">
-      <!-- type
-	<map>
-	  <allowed-keys>
-	    <Condition type="string">
-	      <doc>
-The current weather condition, as a localized, human readable string.
-Examples are "Cloudy", "Raining", etc.
-	      </doc>
-	    </Condition>
-	    <ConditionCode>
-	      <type>
-		<string-enum>
-		  <cloudy/>
-		  ...
-		</string-enum>
-	      </type>
-	      <doc>
-The current weather condition, as a symbolic string.  The set of
-symbols is to be defined, but it will be fixed and quite small so that
-you can provide an icon for each of them, etc.
-	      </doc>
-	    </ConditionCode>
-	    ...
-	  </allowed-keys>
-	</map>
-      /type -->
-      <doc>
-The current weather.  See http://www.ominous-valve.com/wx_codes.txt for
-more information about codifying weather conditions.  We should lift
-something from there, if just for extra geek points.
-+
-The value of the weather property is a dictionary with the following
-keys.  All keys are optional and additional keys might be present.
-+
-- *Condition*
-+
-The current weather condition, as a localized, human readable string.
-Examples are "Cloudy", "Raining", etc.
-+
-- *ConditionCode*
-+
-The current weather condition, as a symbolic string.  The set of
-symbols is to be defined, but it will be fixed and quite small so that
-you can provide an icon for each of them, etc.
-+
-- *Humidity*
-+
-The relative humidity in percent.
-+
-- *Temperature*
-+
-The temperature as a localized string.  This string represents the
-temperature in the way preferred by the user.  Most often this means
-either degrees Celsius or degrees Fahrenheit, but it could be some
-other unit entirely.
-+
-- *TemperatureK*
-+
-The temperature in Kelvin.
-+
-- *ApparentTemperature*
-+
-The felt temperature as a localized string, analogous to Temperature.
-+
-- *ApparentTemperatureK*
-+
-The felt temperature in Kelvin.
-+
-- *DewPoint*
-+
-The dew point as a localized string, analogous to Temperature.
-+
-- *DewPointK*
-+
-The dew point in Kelvin.
-+
-- *Pressure*
-+
-The atmospheric pressure in milli bar.
-+
-- *Precipitation*
-+
-The rain or snow fall in millimeter per square meter per hour (or some
-other more common unit).
-+
-- *Visibility*
-+
-The visibility in meter.
-+
-- *WindSpeed*
-+
-The wind speed in meters per second.
-+
-- *WindDirection*
-+
-The wind direction as a localized string.  The direction is given in
-compass terms: North, South-West, etc.
-+
-- *WindDirectionD*
-+
-The wind direction in degrees.  North is 0, east is 90, etc.
       </doc>
     </key>
     <key name="IsDark" type="bool">
@@ -417,13 +205,13 @@ a hierarchy: InMeeting includes AtWork.
 
 Not much is known about all this right now.
     </doc>
-    <key name="Situations" type="string-list">
+    <key name="Situations" type="string">
       <doc>
 The symbolic names of the currently active Situations.  Note that more
 than one situation might be active at the same time.
       </doc>
     </key>
-    <key name="Mode" type="string-enum">
+    <key name="Mode" type="string">
       <!-- type>
 	<string-enum>
 	  <editing/>
@@ -476,13 +264,13 @@ that doesn't fit into any of the above categories.
 idle:: The device is not being used.
       </doc>
     </key>
-    <key name="ConnectedContacts" type="string-list">
+    <key name="ConnectedContacts" type="string">
       <doc>
 A list of URIs for contacts that the user is currently engaged in
 conversations with.  (The URIs point to Nepomuk objects.)
       </doc>
     </key>    
-    <key name="RecentDocuments" type="string-list">
+    <key name="RecentDocuments" type="string">
       <doc>
 A list of URIs for recently used documents, at most ten elements long.
 (The URIs point to Nepomuk objects.)
@@ -509,7 +297,7 @@ Events
 
 Information about current and upcoming calendar entries.
     </doc>
-    <key name="Current" type="string-list">
+    <key name="Current" type="string">
       <!-- type>
         <uniform-list type="nepomuk-uri"/>
       </type -->
@@ -519,17 +307,17 @@ contains all events whose start time is earlier than or equal to the
 current time, and whose end time is later.
       </doc>
     </key>
-    <key name="CurrentStart" type="time">
+    <key name="CurrentStart" type="INT">
       <doc>
 The earliest start time of the events in Events.Current.
       </doc>
     </key>
-    <key name="CurrentEnd" type="time">
+    <key name="CurrentEnd" type="INT">
       <doc>
 The latest end time of the events in Events.Current.
       </doc>
     </key>
-    <key name="Next" type="string-list">
+    <key name="Next" type="string">
       <!-- type>
         <uniform-list type="nepomuk-uri"/>
       </type -->
@@ -540,16 +328,16 @@ closest to now.  If there are multiple events in the list, they all
 start at exactly the same time.
       </doc>
     </key>
-    <key name="NextStart" type="time">
+    <key name="NextStart" type="INT">
       <doc>
 The earliest start time of the events in Events.Next.
       </doc>
     </key>
-    <key name="NextEnd" type="time">
+    <key name="NextEnd" type="INT">
       <doc>
 The latest end time of the events in Events.Next.
       </doc>
     </key>
   </node>
  </node>
-</properties>
+</provider>
