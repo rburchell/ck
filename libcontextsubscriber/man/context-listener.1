@@ -5,13 +5,13 @@ context-listener
 .SH SYNOPSIS
 .B context-listener\fR [\fIPROPERTY\fR]...
 .SH DESCRIPTION
-context-listener will listen for changes in the PROPERTIES and notify
+context-listener will listen for changes in the properties and notify
 the user about them. At least one property has to be given. In order
-to find the appropriate provider for each of the PROPERTIES
+to find the appropriate provider for each of the properties
 context-listener reads the ./context-providers.cdb or if it doesn't
 exist then all the XML files in the present directory.  Check
 libcontextprovider documentation for the format of these XML files and
-how to convert them to a cdb cache.  Hit ENTER to terminate the
+how to convert them to a cdb cache. Hit ENTER to terminate the
 running context-listener.
 .SH ENVIRONMENT VARIABLES
 .TP 8
@@ -28,11 +28,9 @@ may define a directory containing the provider descriptor cdb or XML
 files. In this case context-listener will read from the directory
 specified by CONTEXT_PROVIDERS and not the present one.
 .SH ARGUMENTS
-.TP 8
-The argumets are the PROPERTIES, a space delimited list of the
-properties to subscribe to. Properties are dot separated names, like
-Context.Location.Latitude. Obviously a property have to be provided by
-some provider to be any useful.
+context-listener takes a list of properties as arguments.
+Properties are dot separated names, like Context.Location.Latitude.
+Obviously a property have to be provided by some provider to be any useful.
 .SH EXAMPLES
 .TP 8
 context-provide my.test.provider int mun.testi.property 42
