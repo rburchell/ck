@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "contextpropertyinfo.h"
 #include "contextregistryinfo.h"
+#include "fileutils.h"
 
 class ContextPropertyInfoUnitTest : public QObject
 {
@@ -36,11 +37,7 @@ private slots:
 
 void ContextPropertyInfoUnitTest::initTestCase()
 {
-    if (getenv("srcdir"))
-        setenv("CONTEXT_PROVIDERS", (QString(getenv("srcdir")) + "/").toUtf8().constData(), 0);
-    else
-        setenv("CONTEXT_PROVIDERS", "./", 0);
-
+    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
     ContextRegistryInfo::instance();
 }
 

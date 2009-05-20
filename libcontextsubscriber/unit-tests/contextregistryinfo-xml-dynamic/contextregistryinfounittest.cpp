@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "contextregistryinfo.h"
 #include "fcntl.h"
+#include "fileutils.h"
 
 class ContextRegistryInfoUnitTest : public QObject
 {
@@ -41,17 +42,11 @@ private slots:
 
 void ContextRegistryInfoUnitTest::initTestCase()
 {
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
 
     // Setup state
-    QFile::remove("providers.xml");
-    QFile::copy(xmlToCopy + "providers1v1.xml.src", "providers.xml");
-    QTest::qWait(200);
-       
+    utilCopyLocalWithRemove("providers1v1.xml.src", "providers.xml");
+           
     context = ContextRegistryInfo::instance("xml");
 }
 
@@ -60,13 +55,7 @@ void ContextRegistryInfoUnitTest::basicChange()
     QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
     QSignalSpy spy2(context, SIGNAL(keysAdded(QStringList)));
 
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "providers1v2.xml.src", "tmp.file");
-    rename("tmp.file", "providers.xml");
-    QTest::qWait(500);
+    utilCopyLocalAtomically("providers1v2.xml.src", "providers.xml");
 
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> args1 = spy1.takeFirst();
@@ -84,14 +73,8 @@ void ContextRegistryInfoUnitTest::basicChange()
 void ContextRegistryInfoUnitTest::changeWithRemove()
 {
     QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
-
-    QFile::remove("providers.xml");
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "providers1v1.xml.src", "providers.xml");
-    QTest::qWait(500);
+    
+    utilCopyLocalWithRemove("providers1v1.xml.src", "providers.xml");
 
     // Sometimes it's 1, sometimes it's 2 -- depending on how agile the watcher is.
     QVERIFY(spy1.count() > 0);
@@ -99,24 +82,12 @@ void ContextRegistryInfoUnitTest::changeWithRemove()
 
 void ContextRegistryInfoUnitTest::keyRemoval()
 {
-    QFile::remove("providers.xml");
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "providers1v2.xml.src", "providers.xml");
-    QTest::qWait(200);
-
+    utilCopyLocalWithRemove("providers1v2.xml.src", "providers.xml");
+    
     QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
     QSignalSpy spy2(context, SIGNAL(keysRemoved(QStringList)));
-
-    xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "providers1v1.xml.src", "tmp.file");
-    rename("tmp.file", "providers.xml");
-    QTest::qWait(500);
+    
+    utilCopyLocalAtomically("providers1v1.xml.src", "providers.xml");
 
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> args1 = spy1.takeFirst();
@@ -133,7 +104,7 @@ void ContextRegistryInfoUnitTest::keyRemoval()
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove("providers.xml");
+    QFile::remove(LOCAL_FILE("providers.xml"));
 }
     
 #include "moc_contextregistryinfounittest_cpp.cpp"

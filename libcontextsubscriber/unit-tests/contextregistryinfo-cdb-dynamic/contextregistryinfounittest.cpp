@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "contextregistryinfo.h"
 #include <fcntl.h>
+#include "fileutils.h"
 
 class ContextRegistryInfoUnitTest : public QObject
 {
@@ -39,31 +40,17 @@ private slots:
 
 void ContextRegistryInfoUnitTest::initTestCase()
 {
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
 
-    // Setup state
-    QFile::copy(xmlToCopy + "context-providers1v1.cdb", "temp.cdb");
-    rename("temp.cdb", "context-providers.cdb");
-    QTest::qWait(200);
-    
+    // Setup initial state
+    utilCopyLocalAtomically("context-providers1v1.cdb", "context-providers.cdb");    
     context = ContextRegistryInfo::instance("cdb");
 }
 
 void ContextRegistryInfoUnitTest::basicChange()
 {
     QSignalSpy spy(context, SIGNAL(keysChanged(QStringList)));
-
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    // Setup state
-    QFile::copy(xmlToCopy + "context-providers1v2.cdb", "temp.cdb");
-    rename("temp.cdb", "context-providers.cdb");
-    QTest::qWait(500);
+    utilCopyLocalAtomically("context-providers1v2.cdb", "context-providers.cdb");    
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
@@ -76,7 +63,7 @@ void ContextRegistryInfoUnitTest::basicChange()
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove("context-providers.cdb");
+    QFile::remove(LOCAL_FILE("context-providers.cdb"));
 }
 
 #include "moc_contextregistryinfounittest_cpp.cpp"

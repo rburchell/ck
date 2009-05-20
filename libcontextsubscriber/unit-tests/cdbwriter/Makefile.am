@@ -23,3 +23,5 @@ CLEANFILES =
 check_LIBRARIES = 
 include $(top_srcdir)/am/tests.am
 include $(top_srcdir)/am/qt-check.am
+
+AM_CPPFLAGS += '-I../util/'

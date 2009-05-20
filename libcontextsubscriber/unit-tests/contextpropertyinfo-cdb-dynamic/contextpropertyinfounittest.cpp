@@ -24,6 +24,7 @@
 #include "contextpropertyinfo.h"
 #include "contextregistryinfo.h"
 #include <fcntl.h>
+#include "fileutils.h"
 
 class ContextPropertyInfoUnitTest : public QObject
 {
@@ -39,16 +40,9 @@ private slots:
 
 void ContextPropertyInfoUnitTest::initTestCase()
 {
-    setenv("CONTEXT_PROVIDERS", "./", 0);
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
+    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
+    utilCopyLocalAtomically("context-providers2v1.cdb", "context-providers.cdb");
 
-    // Setup state
-    QFile::copy(xmlToCopy + "context-providers2v1.cdb", "temp.cdb");
-    rename("temp.cdb", "context-providers.cdb");
-    QTest::qWait(200);
-    
     ContextRegistryInfo::instance("cdb");
 }
 
@@ -59,13 +53,7 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
     
     QSignalSpy spy(&prop, SIGNAL(typeChanged(QString)));
 
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "context-providers2v2.cdb", "temp.cdb");
-    rename("temp.cdb", "context-providers.cdb");
-    QTest::qWait(500);
+    utilCopyLocalAtomically("context-providers2v2.cdb", "context-providers.cdb");
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
@@ -77,27 +65,15 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 
 void ContextPropertyInfoUnitTest::checkKeyRemoval()
 {
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
     // Create initial state
-    QFile::copy(xmlToCopy + "context-providers3v1.cdb", "temp.cdb");
-    rename("temp.cdb", "context-providers.cdb");
-    QTest::qWait(200);
+    utilCopyLocalAtomically("context-providers3v1.cdb", "context-providers.cdb");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
     QVERIFY(prop.exists() == true);
 
-    xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "context-providers3v2.cdb", "temp.cdb");
-    rename("temp.cdb", "context-providers.cdb");
-    QTest::qWait(500);
+    utilCopyLocalAtomically("context-providers3v2.cdb", "context-providers.cdb");
 
     QVERIFY(prop.type() == "");
     QVERIFY(prop.doc() == "");
@@ -106,27 +82,15 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
 
 void ContextPropertyInfoUnitTest::checkKeyAdding()
 {
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
     // Create initial state
-    QFile::copy(xmlToCopy + "context-providers3v2.cdb", "temp.cdb");
-    rename("temp.cdb", "context-providers.cdb");
-    QTest::qWait(200);
+    utilCopyLocalAtomically("context-providers3v2.cdb", "context-providers.cdb");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() == "");
     QVERIFY(prop.doc() == "");
     QVERIFY(prop.exists() == false);
 
-    xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "context-providers3v1.cdb", "temp.cdb");
-    rename("temp.cdb", "context-providers.cdb");
-    QTest::qWait(500);
+    utilCopyLocalAtomically("context-providers3v1.cdb", "context-providers.cdb");
 
     QVERIFY(prop.exists() == true);
     QVERIFY(prop.type() != "");
@@ -135,7 +99,7 @@ void ContextPropertyInfoUnitTest::checkKeyAdding()
 
 void ContextPropertyInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove("context-providers.cdb");
+    QFile::remove(LOCAL_FILE("context-providers.cdb"));
 }
 
 #include "moc_contextpropertyinfounittest_cpp.cpp"

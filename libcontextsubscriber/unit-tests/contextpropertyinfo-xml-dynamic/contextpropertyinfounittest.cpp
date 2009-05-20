@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "contextpropertyinfo.h"
 #include "contextregistryinfo.h"
+#include "fileutils.h"
 
 class ContextPropertyInfoUnitTest : public QObject
 {
@@ -38,33 +39,21 @@ private slots:
 
 void ContextPropertyInfoUnitTest::initTestCase()
 {
-    setenv("CONTEXT_PROVIDERS", "./", 0);
+    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
     ContextRegistryInfo::instance("xml");
 }
 
 void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 {
     // Create initial state
-    QFile::remove("providers.xml");
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "providers2v1.xml.src", "providers.xml");
-    QTest::qWait(200);
+    utilCopyLocalWithRemove("providers2v1.xml.src", "providers.xml");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QCOMPARE(prop.type(), QString("TRUTH"));
     
     QSignalSpy spy(&prop, SIGNAL(typeChanged(QString)));
 
-    QFile::remove("providers.xml");
-    xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "providers2v2.xml.src", "providers.xml");
-    QTest::qWait(500);
+    utilCopyLocalWithRemove("providers2v2.xml.src", "providers.xml");
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
@@ -77,25 +66,14 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 void ContextPropertyInfoUnitTest::checkKeyRemoval()
 {
     // Create initial state
-    QFile::remove("providers.xml");
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "providers3v1.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers3v1.xml.src", "providers.xml");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
     QVERIFY(prop.exists() == true);
  
-    QFile::remove("providers.xml");
-    xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "providers3v2.xml.src", "providers.xml");
-    QTest::qWait(500);
+    utilCopyLocalWithRemove("providers3v2.xml.src", "providers.xml");
 
     QVERIFY(prop.exists() == false);
     QVERIFY(prop.type() == "");
@@ -105,26 +83,15 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
 void ContextPropertyInfoUnitTest::checkKeyAdding()
 {
     // Create initial state
-    QFile::remove("providers.xml");
-    QString xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "providers3v2.xml.src", "providers.xml");
-
+    utilCopyLocalWithRemove("providers3v2.xml.src", "providers.xml");
+    
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() == "");
     QVERIFY(prop.doc() == "");
     QVERIFY(prop.exists() == false);
  
-    QFile::remove("providers.xml");
-    xmlToCopy = "./";
-    if (getenv("srcdir"))
-        xmlToCopy = (QString(getenv("srcdir")) + "/").toUtf8().constData();
-
-    QFile::copy(xmlToCopy + "providers3v1.xml.src", "providers.xml");
-    QTest::qWait(500);
-
+    utilCopyLocalWithRemove("providers3v1.xml.src", "providers.xml");
+    
     QVERIFY(prop.exists() == true);
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
@@ -132,7 +99,7 @@ void ContextPropertyInfoUnitTest::checkKeyAdding()
 
 void ContextPropertyInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove("providers.xml");
+    QFile::remove(LOCAL_FILE("providers.xml"));
 }
 
 #include "moc_contextpropertyinfounittest_cpp.cpp"

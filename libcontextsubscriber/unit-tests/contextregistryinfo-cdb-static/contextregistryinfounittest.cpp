@@ -22,6 +22,7 @@
 #include <QtTest/QtTest>
 #include <QtCore>
 #include "contextregistryinfo.h"
+#include "fileutils.h"
 
 class ContextRegistryInfoUnitTest : public QObject
 {
@@ -39,11 +40,7 @@ private slots:
 
 void ContextRegistryInfoUnitTest::initTestCase()
 {
-    if (getenv("srcdir")) {
-        setenv("CONTEXT_PROVIDERS", (QString(getenv("srcdir")) + QString("/")).toUtf8().constData(), 0);
-    } else
-        setenv("CONTEXT_PROVIDERS", "./", 0);
-
+    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
     context = ContextRegistryInfo::instance();
     QVERIFY(context != NULL);
 }

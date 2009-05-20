@@ -22,6 +22,7 @@
 #include <QtTest/QtTest>
 #include <QtCore>
 #include "cdbwriter.h"
+#include "fileutils.h"
 
 class CDBWriterUnitTest : public QObject
 {
@@ -35,7 +36,7 @@ private slots:
 
 void CDBWriterUnitTest::basicCreation()
 {
-    CDBWriter writer("test.cdb");
+    CDBWriter writer(LOCAL_FILE("test.cdb"));
     QCOMPARE(writer.isWritable(), true);
 
     writer.add("KEYS", "KEYSValue1");
@@ -55,7 +56,7 @@ void CDBWriterUnitTest::noPermissions()
 
 void CDBWriterUnitTest::cleanupTestCase()
 {
-    QFile::remove("test.cdb");
+    QFile::remove(LOCAL_FILE("test.cdb"));
 }
 
 #include "moc_cdbwriterunittest_cpp.cpp"
