@@ -10,6 +10,7 @@ contextd_VALASOURCES = \
 	main.vala \
 	plugin.vala \
 	hal_plugin.vala \
+	lowmem_plugin.vala \
 	$(NULL)
 
 contextd_GENERATEDSOURCES = \

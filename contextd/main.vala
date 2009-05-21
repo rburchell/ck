@@ -46,6 +46,7 @@ namespace ContextD {
 			// Define the set of plugins
 			plugins = new Gee.ArrayList<Plugin> ();
 			plugins.add(new Plugins.HalPlugin ());
+			plugins.add(new Plugins.LowmemPlugin ());
 
 			// TODO: define the used plugins based on which
 			// resources are detected during configure phase.
