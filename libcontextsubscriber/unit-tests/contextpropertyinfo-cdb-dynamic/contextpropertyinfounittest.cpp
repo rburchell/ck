@@ -33,6 +33,7 @@ class ContextPropertyInfoUnitTest : public QObject
 private slots:
     void initTestCase();
     void checkKeyTypeChanging();
+    void checkKeyProviderChanging();
     void checkKeyRemoval();
     void checkKeyAdding();
     void cleanupTestCase();
@@ -59,8 +60,27 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
     QList<QVariant> args = spy.takeFirst();
     QCOMPARE(args.at(0).toString(), QString("INT"));
 
-    // Now just make sure that the new val is ok too
+    // Now just make sure that the new values are ok
     QCOMPARE(prop.type(), QString("INT"));
+    QCOMPARE(prop.providerDBusType(), QDBusConnection::SessionBus);
+    QCOMPARE(prop.providerDBusName(), QString("org.freedesktop.ContextKit.contextd1"));
+}
+
+void ContextPropertyInfoUnitTest::checkKeyProviderChanging()
+{
+    // Create initial state
+    utilCopyLocalAtomically("context-providers4v1.cdb", "context-providers.cdb");
+
+    ContextPropertyInfo prop("Battery.LowBattery");
+    QCOMPARE(prop.providerDBusName(), QString("org.freedesktop.ContextKit.contextd1"));
+    QSignalSpy spy(&prop, SIGNAL(providerChanged(QString)));
+
+    utilCopyLocalAtomically("context-providers4v2.cdb", "context-providers.cdb");
+
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> args = spy.takeFirst();
+    QCOMPARE(args.at(0).toString(), QString("org.freedesktop.ContextKit.contextd2"));
+    QCOMPARE(prop.providerDBusName(), QString("org.freedesktop.ContextKit.contextd2"));
 }
 
 void ContextPropertyInfoUnitTest::checkKeyRemoval()

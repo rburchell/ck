@@ -85,17 +85,8 @@ void ContextRegistryInfoUnitTest::listProviders()
 {
     QStringList list = context->listProviders();
     QCOMPARE(list.size(), 2);
-
-    QStringList expectedProviders;
-    expectedProviders << "org.freedesktop.ContextKit.contextd1";
-    expectedProviders << "org.freedesktop.ContextKit.contextd2";
-
-    foreach (QString key, list) {
-        if (expectedProviders.contains(key))
-            expectedProviders.removeAll(key);
-    }
-
-    QCOMPARE(expectedProviders.size(), 0);
+    QVERIFY(list.contains("org.freedesktop.ContextKit.contextd1"));
+    QVERIFY(list.contains("org.freedesktop.ContextKit.contextd2"));
 }
 
 #include "moc_contextregistryinfounittest_cpp.cpp"
