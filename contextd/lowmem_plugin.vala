@@ -52,10 +52,15 @@ namespace Plugins {
 		BoolSysfsPoller(string filename, string key) {
 			this.key = key;
 			this.state = Tristate.UNKNOWN;
-			this.ioc = new IOChannel.file(filename, "r");
-			this.ioc.set_encoding(null);
-			this.ioc.set_buffered(false);
-			this.ioc.add_watch(IOCondition.PRI | IOCondition.ERR, ioc_ready);
+
+			try {
+				this.ioc = new IOChannel.file(filename, "r");
+				this.ioc.set_encoding(null);
+				this.ioc.set_buffered(false);
+				this.ioc.add_watch(IOCondition.PRI | IOCondition.ERR, ioc_ready);
+			} catch { 
+				stderr.printf("Lowmem: failed to open %s\n", filename);
+			}
 		}
 	}
 
