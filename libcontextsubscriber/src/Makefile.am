@@ -16,7 +16,7 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 
 libcontextsubscriberdir=$(includedir)/contextsubscriber
 
-libcontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h
+libcontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h
 
 AM_CXXFLAGS = '-DDEFAULT_REGISTRY_PATH="@DEFAULT_REGISTRY_PATH@"'
 
