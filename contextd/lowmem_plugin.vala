@@ -15,9 +15,9 @@ namespace Plugins {
 	// -- you have to lseek(2) to the beginning after reading it
 	private class BoolSysfsPoller: Object {
 
-		public signal void value_changed();
+		public signal void state_changed();
 
-		public Tristate value;
+		public Tristate state;
 		public string key;
 
 		private IOChannel ioc;
@@ -42,16 +42,16 @@ namespace Plugins {
 			} catch {
 				new_state = Tristate.UNKNOWN;
 			}
-			if (new_state != value) {
-				value = new_state;
-				value_changed();
+			if (new_state != state) {
+				state = new_state;
+				state_changed();
 			}
 			return true;
 		}
 
 		BoolSysfsPoller(string filename, string key) {
 			this.key = key;
-			this.value = Tristate.UNKNOWN;
+			this.state = Tristate.UNKNOWN;
 			this.ioc = new IOChannel.file(filename, "r");
 			this.ioc.set_encoding(null);
 			this.ioc.set_buffered(false);
@@ -82,10 +82,10 @@ namespace Plugins {
 		};
 
 		private void attr_changed(BoolSysfsPoller sp) {
-			if (sp.value == Tristate.UNKNOWN)
+			if (sp.state == Tristate.UNKNOWN)
 				ContextProvider.set_null(sp.key);
 			else
-				ContextProvider.set_boolean(sp.key, sp.value == Tristate.TRUE);
+				ContextProvider.set_boolean(sp.key, sp.state == Tristate.TRUE);
 		}
 
 		bool install() {
@@ -97,7 +97,7 @@ namespace Plugins {
 		internal LowmemPlugin() {
 			foreach (var p in properties) {
 				p.poller = new BoolSysfsPoller(p.sysfs_attr, p.key);
-				p.poller.value_changed.connect(attr_changed);
+				p.poller.state_changed.connect(attr_changed);
 			}
 		}
 
