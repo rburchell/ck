@@ -150,6 +150,10 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     QStringList oldKeys = listKeys();
     regenerateKeyDataList();
     QStringList currentKeys = listKeys();
+    
+    // In the cdb (fast) backend we do check if anybody is watching 
+    // before doing this list processing. But in xml backend the perf
+    // is not an issue.
 
     // Emissions
     checkAndEmitKeysAdded(currentKeys, oldKeys);
@@ -178,6 +182,10 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
     QStringList oldKeys = listKeys();
     regenerateKeyDataList();
     QStringList currentKeys = listKeys();
+    
+    // In the cdb (fast) backend we do check if anybody is watching 
+    // before doing this list processing. But in xml backend the perf
+    // is not an issue.
 
     // Emissions
     checkAndEmitKeysAdded(currentKeys, oldKeys);

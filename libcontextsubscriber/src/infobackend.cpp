@@ -23,8 +23,14 @@
 #include "infoxmlbackend.h"
 #include "infocdbbackend.h"
 #include <QMutex>
+#include <QDebug>
 
 InfoBackend* InfoBackend::backendInstance = NULL;
+
+InfoBackend::InfoBackend(QObject *parent) : QObject(parent) 
+{
+    connectCount = 0; 
+}
 
 InfoBackend* InfoBackend::instance(const QString &backendName)
 {
@@ -87,4 +93,19 @@ void InfoBackend::checkAndEmitKeysChanged(QStringList &currentKeys, QStringList 
             emit keyDataChanged(key);
     }
 }
+
+/* Protected */
+
+void InfoBackend::connectNotify(const char *signal)
+{
+    QObject::connectNotify(signal);
+    connectCount++;   
+}
+
+void InfoBackend::disconnectNotify(const char *signal)
+{
+    QObject::disconnectNotify(signal);
+    connectCount--;
+}
+
 

@@ -127,6 +127,13 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     // they have been removed from disk. Need to add again if we had a move ops.
     if (! watcher.files().contains(InfoCdbBackend::databasePath()))
         watcher.addPath(InfoCdbBackend::databasePath());
+        
+    // If nobody is watching us anyways, drop out now and skip
+    // the further processing. This could be made more granular 
+    // (ie. in many cases nobody will be watching on added/removed)
+    // but will be watching on changed.
+    if (connectCount == 0)
+        return;
 
     QStringList currentKeys = listKeys();
 
