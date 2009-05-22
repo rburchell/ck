@@ -64,8 +64,8 @@ CXXFLAGS="$CXXFLAGS $Qt_CFLAGS"
 LIBS="$LIBS $Qt_LIBS"
 PKG_CHECK_MODULES([QtTest], [QtTest])
 
-AC_CHECK_HEADERS(cdb.h, [], 
-    [AC_MSG_ERROR([Can't find tiny-cdb headers])])
+AC_CHECK_LIB([cdb], [cdb_make_start], [],
+    [AC_MSG_ERROR([Can't find cdb library])])
 
 DEFAULT_REGISTRY_PATH="$datadir/context-providers/"
 AC_SUBST(DEFAULT_REGISTRY_PATH)
