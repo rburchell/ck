@@ -36,6 +36,7 @@ private slots:
     void listKeys();
     void listKeysForProvider();
     void listProviders();
+    void checkPrefix();
 };
 
 void ContextRegistryInfoUnitTest::initTestCase()
@@ -87,6 +88,14 @@ void ContextRegistryInfoUnitTest::listProviders()
     QCOMPARE(list.size(), 2);
     QVERIFY(list.contains("org.freedesktop.ContextKit.contextd1"));
     QVERIFY(list.contains("org.freedesktop.ContextKit.contextd2"));
+}
+
+void ContextRegistryInfoUnitTest::checkPrefix()
+{
+    QStringList list = context->listKeys();
+    foreach (QString key, list) {
+        QVERIFY(key.startsWith("Context", Qt::CaseInsensitive) == false);
+    }
 }
 
 #include "moc_contextregistryinfounittest_cpp.cpp"
