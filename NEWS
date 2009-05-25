@@ -1,3 +1,12 @@
+Changes in ContextKit 0.1.7
+
+- Added the "fake provider", which just declares a lot of core
+  properties but doesn't implement any of them, relying on the Context
+  Commander to give them values.
+
+  This provider is useful to give a pre-view to properties that are
+  planned, and hopefully to gather early feedback about them.
+
 Changes in ContextKit 0.1.6
 
 - contextd provides hal-based battery properties.
