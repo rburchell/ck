@@ -54,7 +54,7 @@ Description: Helper library for providers of context properties
 Package: libcontextprovider0-dbg
 Priority: extra
 Architecture: any
-Depends: libcontextprovider0 (= ${binary:Version}), contextkit-dbg (= ${binary:Version})
+Depends: libcontextprovider0 (= ${binary:Version})
 Description: Helper library for providers of context properties
  The libcontextprovider library implements the provider side of the
  org.freedesktop.ContextKit D-Bus interface.

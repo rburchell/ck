@@ -58,7 +58,8 @@ binary-arch: build install
 	dh_installexamples -a
 	dh_installmenu -a
 	dh_installman -a
-	dh_strip -a --dbg-package="contextkit-dbg"
+	dh_strip -p contextkit --dbg-package="contextkit-dbg"
+	dh_strip -p libcontextprovider0 --dbg-package="libcontextprovider0-dbg"
 	dh_link -a
 	dh_compress -a
 	dh_fixperms -a
