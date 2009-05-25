@@ -128,6 +128,9 @@ line utility provided by the context framework.  This will then
 trigger all libcontextsubscriber clients to reload the registry
 information, and existing +ContextProperty+ instances to be updated.
 
+(Note that the cache only caches property declarations, it does not
+ever contain the values of context properties.)
+
 When providers are installed from packages, recompilation of the cache
 happens automatically.  _Triggers_ in the Context Framework packages
 are used to run the command line utility at the right times.
@@ -146,7 +149,31 @@ notification.
 The values of properties are represented to clients as a +QVariant+
 value.  Properties can have a special _null_ value when they are not
 available, either because they are not provided by any provider, or
-because the provider is not able to deliver a value.
+because the provider is not able to deliver a value.  In other words,
+the types of all context properties are "maybe types": subscribers
+might get a value or not.  In general, the _null_ value means that the
+real value of the property is unknown.
+
+The _null_ value is different from the empty string or the empty list.
+For example, the "Location.City" property, which denotes the name of
+the current city as a string, will be _null_ when the name of the city
+is unknown (either because the current location of the device is
+unknown or because the database that maps from locations to city names
+is not reachable), but it will be the empty string when the current
+location is known to be outside of any city.
+
+The absence of a value can have many reasons: no provider is available
+for this property, the provider has not yet delivered a value, or the
+provider is deliberately not delivering a value, which it can in turn
+have many reasons.  For example, necessary hardware might not be
+present or its use might be disallowed by the current power management
+policy, or a needed online database might not reachable.
+
+The Context Framework makes no attempt to distinguish these different
+reasons.  Subscribers should make good use of a value when they get
+it, but they must not fail catastrophically when no value is
+available, or when it takes longer than expected for it to become
+available.
 
 It is expected that eventually the statusbar plugins, such as the
 battery charge monitor and the connectivity indicators, exclusively
@@ -188,15 +215,14 @@ digraph G {
   edge [fontsize=11];
 
 
-  "Application 1" -> "Context Framework"
-  "Application 2" -> "Context Framework"
-  "Statusbar plugin" -> "Context Framework"
-  "Central Policy" -> "Context Framework"
+  "Direct UI Framework" -> "Context Framework"
+  "Policy Engine" -> "Context Framework"
+  "Sensor" -> "Context Framework"
+  "Content Framework" -> "Context Framework" [dir="both"]
 
-  "Context Framework" -> "Connectivity" [dir="back"]
+  "Context Framework" -> "Internet Connectivity" [dir="back"]
   "Context Framework" -> "Location Framework"
-  "Context Framework" -> "HAL"
-  "Context Framework" -> "Sensor Framework" [dir="back"]
+  "Context Framework" -> "Freedesktop Essentials"
 
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -230,7 +256,7 @@ digraph G {
     contextd [label="<<process>>\n\ncontextd"];
 
     commander [label="<<utility>>\n\ncontext-commander"];
-    corepros [label="<<XML document>>\n\ncore properties", shape=note];
+    corepros [label="<<XML document>>\n\ncore context\nproperty declarations", shape=note];
 
     // update -> registry [label="<<read>>"]
     // update -> cache [label="<<write>>"]
@@ -450,8 +476,8 @@ Memory
 |========================================================================================
 | OneNAND  | All files are stored on the OneNAND, in their FHS mandated places | 200 KiB
 | eMMC     | Not used | 0
-| RAM/Idle | A couple of bytes per subscription plus a couple more per provided property | 10 KiB
-| RAM/Peak | The biggest property values might reach a KiB  | 100 KiB
+| RAM/Idle | A couple of bytes per subscription plus a couple more per provided property | 200 KiB
+| RAM/Peak | The biggest property values might reach a KiB  | 500 KiB
 |========================================================================================
 
 Runtime
@@ -461,6 +487,11 @@ The Context Framework allows subscribers and providers to directly
 connect to each other (incurring only the usual D-Bus daemon
 overhead).  Context properties are expected to change only
 infrequently and providers are urged to throttle the rate of change.
+
+The contextd daemon is started on the first subscription to one of its
+properties.  This is expected to happen on every boot since it
+provides properties that are used by other daemons, such as the
+context engine.
 
 Power consumption
 ~~~~~~~~~~~~~~~~~
@@ -472,6 +503,21 @@ operations for producing values that are not needed.
 The documentation for subscribers urges them to take the cost of
 producing property values into consideration.  The subscriber API
 offers an easy way to temporarily suspend a subscription.
+
+Sometimes, increased granularity of control over a property is needed:
+instead of just switching it on and off, the subscriber might want to
+request different levels of quality.  For example, some subscribers
+might need a higher update frequency than others and are willing to
+pay the associated price in power consumption.
+
+The recommended way to implement this increased control is to offer
+multiple properties that deliver the same value but with different
+qualities-of-service.  For example, there could be both
+"Location.HighResCoordinates" and "Location.LowResCoordinates"
+properties that both deliver the current geographical coordinates.
+Subscribing to "Location.HighResCoordinates", however, would cause the
+location to be updated more frequently and maybe even activate a GPS
+device, if available.
 
 Security Impact
 ---------------
@@ -488,6 +534,16 @@ or disallow connections to the provider as a whole.
 
 The Context Daemon needs to follow the same rules, of course.
 
+The libcontextsubscriber library listens for a special D-Bus bus name
+to appear and then allows the service behind that name to override all
+values of context properties.  The library protects this special name
+with a security token so that only specially certified software can
+own this name.  The context commander might or might not be certified
+in this way; instead of certifying it, it might be preferrable to
+require developers to explicitly disable the name protection (via a
+developer certificate or a general device unlocking ceremony) before
+they can use the context commander.
+
 Open Items
 -----------
 
@@ -501,6 +557,10 @@ Open Items
   periodically to provide contextual information (such as the ten most
   recently accessed documents).
 
+- The current plan for localization of context properties requires
+  context providers to do it.  They thusly need access to the current
+  device language and rumour has it that everything about l10n is
+  different in Harmattan.
 
 Appendices
 ----------
@@ -560,15 +620,14 @@ low.
 Relation to Policy Engine
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The central policy engine is the component in the Maemo platform that
-decides system global behavior and controls the various distributed
-enforcement points accordingly.  This job will likely be done by
-OHMng.
+The policy engine has the role in the Maemo platform to decide system
+global behavior and controls the various distributed enforcement
+points accordingly.  This job will likely be done by OHMng.
 
-The central policy engine can be both a subscriber to and provider of
-context properties.  The policy engine will base its decisions
-(partly) on the current values of context properties and will publish
-(part of) its decisions as context properties.
+The policy engine can be both a subscriber to and provider of context
+properties.  The policy engine will base its decisions (partly) on the
+current values of context properties and will publish (part of) its
+decisions as context properties.
 
 Most facts that need to be gathered as input for the policy engine can
 be communicted to it via the context framework.  If necessary,
