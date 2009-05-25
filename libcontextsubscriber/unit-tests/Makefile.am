@@ -1,7 +1,5 @@
 SUBDIRS = propertyprovider propertyhandle handlesignalrouter cdbreader cdbwriter contextregistryinfo-xml-static contextpropertyinfo-xml-static contextregistryinfo-cdb-static contextpropertyinfo-cdb-static contextregistryinfo-cdb-dynamic contextpropertyinfo-cdb-dynamic contextregistryinfo-xml-dynamic contextpropertyinfo-xml-dynamic
 
-AM_CXXFLAGS = '-DDEFAULT_REGISTRY_PATH="$(datadir)/context-providers/"'
-
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
           (cd $$subdir && tput bold && echo $$subdir:\  && tput sgr0 && ( $(MAKE) $(AM_MAKEFLAGS) check | grep '^Total' | grep -v '^make' ) ) \

@@ -102,7 +102,7 @@ int main(int argc, char **argv)
     } else if (getenv("CONTEXT_PROVIDERS"))
         path = QString(getenv("CONTEXT_PROVIDERS"));
     else
-        path = QString(DEFAULT_REGISTRY_PATH);
+        path = QString(DEFAULT_CONTEXT_PROVIDERS);
 
     printf("Updating from: '%s'\n", path.toUtf8().constData());
 

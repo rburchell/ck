@@ -133,7 +133,7 @@ QString InfoXmlBackend::registryPath()
 {
     const char *regpath = getenv("CONTEXT_PROVIDERS");
     if (! regpath)
-        regpath = DEFAULT_REGISTRY_PATH;
+        regpath = DEFAULT_CONTEXT_PROVIDERS;
 
     return QString(regpath);
 }

@@ -94,7 +94,7 @@ QString InfoCdbBackend::databasePath()
 {
     const char *regpath = getenv("CONTEXT_PROVIDERS");
     if (! regpath)
-        regpath = DEFAULT_REGISTRY_PATH;
+        regpath = DEFAULT_CONTEXT_PROVIDERS;
 
     return QString(regpath) + "context-providers.cdb";
 }
@@ -103,7 +103,7 @@ QString InfoCdbBackend::databaseDirectory()
 {
     const char *regpath = getenv("CONTEXT_PROVIDERS");
     if (! regpath)
-        regpath = DEFAULT_REGISTRY_PATH;
+        regpath = DEFAULT_CONTEXT_PROVIDERS;
 
     return QString(regpath);
 }

@@ -18,7 +18,7 @@ libcontextsubscriberdir=$(includedir)/contextsubscriber
 
 libcontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h
 
-AM_CXXFLAGS = '-DDEFAULT_REGISTRY_PATH="@DEFAULT_REGISTRY_PATH@"'
+AM_CXXFLAGS = '-DDEFAULT_CONTEXT_PROVIDERS="@DEFAULT_CONTEXT_PROVIDERS@"'
 
 # you have to add your ui designer designed forms here
 # QT_FORMS = commandview.ui

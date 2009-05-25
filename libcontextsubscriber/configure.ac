@@ -67,8 +67,8 @@ PKG_CHECK_MODULES([QtTest], [QtTest])
 AC_CHECK_LIB([cdb], [cdb_make_start], [],
     [AC_MSG_ERROR([Can't find cdb library])])
 
-DEFAULT_REGISTRY_PATH="$datadir/context-providers/"
-AC_SUBST(DEFAULT_REGISTRY_PATH)
+DEFAULT_CONTEXT_PROVIDERS="$datadir/context-providers/"
+AC_SUBST(DEFAULT_CONTEXT_PROVIDERS)
 
 #AC_CONFIG_HEADER([config.h])
 
