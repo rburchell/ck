@@ -52,9 +52,10 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
     regenerateKeyDataList();
 }
 
+/// Returns 'xml'.
 QString InfoXmlBackend::name() const
 {
-    return QString("xml backend");
+    return QString("xml");
 }
 
 QStringList InfoXmlBackend::listKeys() const
@@ -129,6 +130,8 @@ QString InfoXmlBackend::providerDBusTypeForKey(QString key) const
     return keyDataHash.value(key).bus;
 }
 
+/// Returns the full path to the registry directory. Takes the
+/// \c CONTEXT_PROVIDERS env variable into account.
 QString InfoXmlBackend::registryPath()
 {
     const char *regpath = getenv("CONTEXT_PROVIDERS");
@@ -140,6 +143,8 @@ QString InfoXmlBackend::registryPath()
 
 /* Slots */
 
+/// Called when one of the parsed XML files changed. This 
+/// triggers a whole registry rebuild + signal emissions.
 void InfoXmlBackend::onFileChanged(const QString &path)
 {
     // If one of the watched xml files changed this it pretty much 
@@ -162,6 +167,9 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     checkAndEmitKeysChanged(currentKeys, oldKeys);
 }
 
+/// Called when the registry directory changed (ie. file removed or added).
+/// Triggers a whole registry rebuild + signal emissions. It detects a situation
+/// when a added/removed file was not a parsed(xml) file.
 void InfoXmlBackend::onDirectoryChanged(const QString &path)
 {
     // It could be that some other file was added to the directory which 
@@ -196,6 +204,8 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
 
 /* Private */
 
+/// Clears all the stored data about the registry and parses it 
+/// all over again.
 void InfoXmlBackend::regenerateKeyDataList()
 {
     keyDataHash.clear();
@@ -228,6 +238,8 @@ void InfoXmlBackend::regenerateKeyDataList()
     }
 }
 
+/// Parses a given \a finfo file and adds it's contents to the hash.
+/// Also adds the file to the watcher (starts observing it).
 void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
 {
     qDebug() << "Reading keys from" << finfo.filePath();

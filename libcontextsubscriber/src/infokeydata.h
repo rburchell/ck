@@ -24,12 +24,30 @@
 
 #include <QString>
 
+/*!
+    \struct InfoKeyData
+
+    \brief Simple storage class that groups info about a given key.
+
+    This struct is not a part of the public API. It's used by the InfoXmlBackend that
+    keeps in memory a hash of InfoKeyData instances for each key. 
+*/
+
 struct InfoKeyData
 {
+    /// Name of the we're storing data for.
     QString name;
+
+    /// Type of the key.
     QString type;
+
+    /// Doc for the key.
     QString doc;
+
+    /// Provider for the key.
     QString provider;
+
+    /// Bus (ie. 'session' or 'system') for the key.
     QString bus;
 };
 

@@ -31,6 +31,18 @@
 #include "infobackend.h"
 #include "infokeydata.h"
 
+/*!
+    \class InfoXmlBackend
+
+    \brief Implements the InfoBackend for reading data from a directory
+    with xml files.
+
+    This class is not exported in the public API. It keeps all the data cached 
+    in the memory. It's assumed that this backend is not going to be used live in
+    production systems and does not need to be ultra-fast (instead, implementation
+    simplicity and corectness are preffered). For fast backend see the InfoCdbBackend.
+*/
+
 class InfoXmlBackend : public InfoBackend
 {
     Q_OBJECT 
@@ -54,8 +66,14 @@ private slots:
     void onFileChanged(const QString &path);
 
 private:
+    /// A watched object obsering the database file. 
+    /// Delivers syned notifications.
     QFileSystemWatcher watcher;
+
+    /// This hash contains the full state of registry in memory.
     QHash <QString, InfoKeyData> keyDataHash;
+
+    /// The number of xml files we parsed in last registry update.
     int countOfFilesInLastParse;
 
     void regenerateKeyDataList();

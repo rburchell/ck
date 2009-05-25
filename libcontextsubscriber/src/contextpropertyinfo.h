@@ -131,9 +131,16 @@ public:
     QDBusConnection::BusType providerDBusType() const;
 
 private:
+    /// The name of the key his ContextPropertyInfo represents.
     QString keyName;
+
+    /// Cached (stored) type of the key.
     QString cachedType;
+
+    /// Cached (stored) provider of the key.
     QString cachedProvider; 
+
+    /// Cached (stored) provider dbus type of the key.
     QString cachedProviderDBusType;
 
 private slots:

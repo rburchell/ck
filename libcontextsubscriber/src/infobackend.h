@@ -26,6 +26,18 @@
 #include <QStringList>
 #include <QObject>
 
+/*!
+    \class InfoBackend
+
+    \brief An abstract (pure virtual) singleton class that represents the actual 
+    registry backend.
+
+    This class is not exported in the public API. It provides a list methods that need 
+    to be implemented by a concrete registry backend implementation. The InfoBackend instance
+    is a singleton that is created on first access. This class (the instance of it) is 
+    used by ContextRegistryInfo and ContextPropertyInfo classes. 
+*/
+
 class InfoBackend : public QObject
 {
     Q_OBJECT 
@@ -33,19 +45,42 @@ class InfoBackend : public QObject
 public:
 
     static InfoBackend* instance(const QString &backendName = "");
+
+    /// Returns the name of the backend, ie: 'xml'. 
     virtual QString name() const = 0;
+    
+    /// Returns the list of all the keys in the registry.
     virtual QStringList listKeys() const = 0;
+
+    /// Returns the list of all the keys in the registry with given \a providername.
     virtual QStringList listKeys(QString providername) const = 0;
+
+    /// Returns a list of all the unique providers in the database.
     virtual QStringList listProviders() const = 0;
+
+    /// Returns a type for the given \a key.
     virtual QString typeForKey(QString key) const = 0;
+
+    /// Returns the documentation for the given \a key name.
     virtual QString docForKey(QString key) const = 0;
+
+    /// Returns the provider name for the given \a key name.
     virtual QString providerForKey(QString key) const = 0;
+
+    /// Returns the dbus type for the given \a key name.
     virtual QString providerDBusTypeForKey(QString key) const = 0;
 
 signals:
+    /// Emitted when key list changes. ContextRegistryInfo listens on that.
     void keysChanged(const QStringList& currentKeys);
+    
+    /// Emitted when new keys are added. ContextRegistryInfo listens on that.
     void keysAdded(const QStringList& newKeys);
+
+    /// Emitted when keys are removed. ContextRegistryInfo listens on that.
     void keysRemoved(const QStringList& removedKeys);
+    
+    /// Emitted when key data changes. ContextPropertyInfo instances listen on that.
     void keyDataChanged(const QString& key);
     
 protected:
@@ -53,16 +88,22 @@ protected:
     virtual void disconnectNotify(const char *signal);
 
 private:
+    /// Number of connections to signals. Used to optimized signal emission when 0.
     int connectCount;
-    
+   
     InfoBackend(QObject *parent = 0);
+    
+    /// Private constructor. Do not use.
     InfoBackend(const InfoBackend&);
+
     void checkAndEmitKeysAdded(const QStringList &currentKeys, const QStringList &oldKeys);
     void checkAndEmitKeysRemoved(const QStringList &currentKeys, const QStringList &oldKeys);
     void checkAndEmitKeysChanged(const QStringList &currentKeys, const QStringList &oldKeys);
 
+    /// Private operator. Do not use.
     InfoBackend& operator=(const InfoBackend&);
-    
+  
+    /// Holds a pointer to the instance of the singelton.
     static InfoBackend* backendInstance;
     
     friend class InfoXmlBackend;

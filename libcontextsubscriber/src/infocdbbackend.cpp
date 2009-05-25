@@ -44,9 +44,10 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
 }
 
+/// Returns 'cdb'.
 QString InfoCdbBackend::name() const
 {
-    return QString("cdb backend");
+    return QString("cdb");
 }
 
 QStringList InfoCdbBackend::listKeys() const
@@ -84,12 +85,15 @@ QString InfoCdbBackend::providerDBusTypeForKey(QString key) const
     return reader.valueForKey(key + ":KEYBUS");
 }
 
+/// Returns true if the database file is present.
 bool InfoCdbBackend::databaseExists()
 {
     QFile file(databasePath());
     return file.exists();
 }
 
+/// Returns the full path to the database.
+/// Takes the \c CONTEXT_PROVIDERS env variable into account.
 QString InfoCdbBackend::databasePath()
 {
     const char *regpath = getenv("CONTEXT_PROVIDERS");
@@ -99,6 +103,8 @@ QString InfoCdbBackend::databasePath()
     return QString(regpath) + "context-providers.cdb";
 }
 
+/// Returns full path to the directory containing the database.
+/// Takes the \c CONTEXT_PROVIDERS env varialbe into account.
 QString InfoCdbBackend::databaseDirectory()
 {
     const char *regpath = getenv("CONTEXT_PROVIDERS");
@@ -110,6 +116,8 @@ QString InfoCdbBackend::databaseDirectory()
 
 /* Slots */
 
+/// Called when the database changes. Reopens the database and emits 
+/// the change signals. If database does not exist it bails out but keeps observing.
 void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
 {
     QStringList oldKeys = listKeys();

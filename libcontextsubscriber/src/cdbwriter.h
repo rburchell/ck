@@ -29,6 +29,7 @@
 
     \brief A wrapper class to write data (create) tiny-cdb databases.
 
+    This class is not a part of the public API.
     The writer operates only on strings. String values can be associated with string keys. 
     Several operations are supported - ading, replacing and inserting. Those operations differ
     in how they handle existing keys with same name. 
@@ -54,7 +55,10 @@ public:
     int fileDescriptor() const;
 
 private:
+    /// A cdb library structure used to read data.
     void *cdbm;
+
+    /// A file descriptor pointing to the database.
     int fd;
 
     void put(const QString &key, const QString &val, int flag);

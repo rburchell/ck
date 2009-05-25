@@ -121,6 +121,9 @@ bool CDBWriter::isWritable()
 
 /* Private */
 
+/// Puts a new \a key with value \a val into the database. Depending
+/// on the \a flag the key is added, inserted or replaced. The public
+/// methods of this class are wrapperes of this method with proper flags.
 void CDBWriter::put(const QString &key, const QString &val, int flag)
 {
     if (! cdbm)
