@@ -1,3 +1,12 @@
+Changes in ContextKit 0.1.6
+
+- contextd provides hal-based battery properties.
+  Couple of bug fixes related to handling properties.
+
+As visible in Scrumworks, the following backlog items are done:
+
+CntFr-39
+
 Changes in ContextKit 0.1.5
 
 - The libcontextprovider API has been cleaned up 
