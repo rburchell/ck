@@ -79,17 +79,17 @@ QStringList ContextRegistryInfo::listProviders() const
 
 /* Slots */
 
-void ContextRegistryInfo::onKeysChanged(QStringList currentKeys)
+void ContextRegistryInfo::onKeysChanged(const QStringList& currentKeys)
 {
     emit(keysChanged(currentKeys));
 }
 
-void ContextRegistryInfo::onKeysAdded(QStringList newKeys)
+void ContextRegistryInfo::onKeysAdded(const QStringList& newKeys)
 {
     emit(keysAdded(newKeys));
 }
 
-void ContextRegistryInfo::onKeysRemoved(QStringList removedKeys)
+void ContextRegistryInfo::onKeysRemoved(const QStringList& removedKeys)
 {
     emit(keysRemoved(removedKeys));
 }
