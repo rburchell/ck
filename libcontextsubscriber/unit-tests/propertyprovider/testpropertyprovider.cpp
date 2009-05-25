@@ -730,6 +730,32 @@ void PropertyProviderUnitTests::providerDisappearsAndAppears()
     QVERIFY(keys.contains(QString("Fake.Key")));
 }
 
+void PropertyProviderUnitTests::providerPresentAtStartup()
+{
+    // Setup:
+    // Create the object to be tested
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+    // Note: For each test, we need to create a separate instance.
+    // Otherwise the tests are dependent on each other.
+
+    // Command the mock manager to emit the getSubscriberFinished signal
+    // with a non-empty subscriber object path
+    emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
+
+    // Test: make the DBusNameListener notify the PropertyProvider
+    // that the real provider is present
+    emit mockDBusNameListener->nameAppeared();
+
+    // Expected result:
+    // GetSubscriber is called only once
+    QCOMPARE(ManagerInterface::getSubscriberCount, 1);
+
+
+    // Note: This test was added because of a bug. GetSubscriber was
+    // called two times when the provider was already present at startup.
+}
+
 
 
 QTEST_MAIN(PropertyProviderUnitTests);
