@@ -210,7 +210,7 @@ providers.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 digraph G {
 
-  graph [size="8,100"];
+  graph [size="7,100"];
   node [shape=box, style=filled, fontsize=11];
   edge [fontsize=11];
 
@@ -237,7 +237,7 @@ Framework.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 digraph G {
 
-  graph [size="8,100"];
+  graph [size="7,100"];
   node [shape=box, style=filled, fontsize=11];
   edge [fontsize=11];
 
