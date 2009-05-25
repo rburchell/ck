@@ -1,6 +1,6 @@
-bin_PROGRAMS = update-context-providers
+bin_PROGRAMS = update-contextkit-providers
 
-update_context_providers_SOURCES = update-context-providers.cpp
+update_contextkit_providers_SOURCES = update-contextkit-providers.cpp
 
 AM_CPPFLAGS = -I$(srcdir)/../src
 
@@ -25,8 +25,8 @@ AM_CXXFLAGS = '-DDEFAULT_CONTEXT_PROVIDERS="@DEFAULT_CONTEXT_PROVIDERS@"'
 # finally, do the moccing
 CLEANFILES =
 include $(top_srcdir)/am/qt.am
-update_context_providers_DEPENDENCIES = $(qt_mocobjects) ../src/libcontextsubscriber.la
-update_context_providers_LDADD = $(qt_mocobjects) ../src/libcontextsubscriber.la
+update_contextkit_providers_DEPENDENCIES = $(qt_mocobjects) ../src/libcontextsubscriber.la
+update_contextkit_providers_LDADD = $(qt_mocobjects) ../src/libcontextsubscriber.la
 
 # library dependency hack for seamless make in cli/
 ../src/libcontextsubscriber.la:

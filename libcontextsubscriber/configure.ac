@@ -75,7 +75,7 @@ AC_SUBST(DEFAULT_CONTEXT_PROVIDERS)
 AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 cli/Makefile
-         update-context-providers/Makefile
+         update-contextkit-providers/Makefile
 		 unit-tests/Makefile
 		 doc/Makefile
          man/Makefile
