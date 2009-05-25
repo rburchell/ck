@@ -43,10 +43,10 @@ public:
     virtual QString providerDBusTypeForKey(QString key) const = 0;
 
 signals:
-    void keysChanged(QStringList currentKeys);
-    void keysAdded(QStringList newKeys);
-    void keysRemoved(QStringList removedKeys);
-    void keyDataChanged(QString key);
+    void keysChanged(const QStringList& currentKeys);
+    void keysAdded(const QStringList& newKeys);
+    void keysRemoved(const QStringList& removedKeys);
+    void keyDataChanged(const QString& key);
     
 protected:
     virtual void connectNotify(const char *signal);
@@ -57,9 +57,9 @@ private:
     
     InfoBackend(QObject *parent = 0);
     InfoBackend(const InfoBackend&);
-    void checkAndEmitKeysAdded(QStringList &currentKeys, QStringList &oldKeys);
-    void checkAndEmitKeysRemoved(QStringList &currentKeys, QStringList &oldKeys);
-    void checkAndEmitKeysChanged(QStringList &currentKeys, QStringList &oldKeys);
+    void checkAndEmitKeysAdded(const QStringList &currentKeys, const QStringList &oldKeys);
+    void checkAndEmitKeysRemoved(const QStringList &currentKeys, const QStringList &oldKeys);
+    void checkAndEmitKeysChanged(const QStringList &currentKeys, const QStringList &oldKeys);
 
     InfoBackend& operator=(const InfoBackend&);
     

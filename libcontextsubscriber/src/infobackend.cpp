@@ -58,7 +58,8 @@ InfoBackend* InfoBackend::instance(const QString &backendName)
     return backendInstance;
 }
 
-void InfoBackend::checkAndEmitKeysAdded(QStringList &currentKeys, QStringList &oldKeys)
+void InfoBackend::checkAndEmitKeysAdded(const QStringList &currentKeys, 
+                                        const QStringList &oldKeys)
 {
     QStringList addedKeys;
     foreach (QString key, currentKeys) {
@@ -66,11 +67,12 @@ void InfoBackend::checkAndEmitKeysAdded(QStringList &currentKeys, QStringList &o
             addedKeys << key;
     }
 
-    if (addedKeys.size() > 0)
+    if (addedKeys.size() > 0) 
         emit keysAdded(addedKeys);
 }
 
-void InfoBackend::checkAndEmitKeysRemoved(QStringList &currentKeys, QStringList &oldKeys)
+void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys, 
+                                          const QStringList &oldKeys)
 {
     QStringList removedKeys;
     foreach (QString key, oldKeys) {
@@ -82,7 +84,8 @@ void InfoBackend::checkAndEmitKeysRemoved(QStringList &currentKeys, QStringList 
         emit keysRemoved(removedKeys);
 }
 
-void InfoBackend::checkAndEmitKeysChanged(QStringList &currentKeys, QStringList &oldKeys)
+void InfoBackend::checkAndEmitKeysChanged(const QStringList &currentKeys, 
+                                          const QStringList &oldKeys)
 {
     foreach(QString key, oldKeys) {
         emit keyDataChanged(key);
@@ -107,5 +110,4 @@ void InfoBackend::disconnectNotify(const char *signal)
     QObject::disconnectNotify(signal);
     connectCount--;
 }
-
 

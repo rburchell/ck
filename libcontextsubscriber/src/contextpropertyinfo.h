@@ -137,14 +137,14 @@ private:
     QString cachedProviderDBusType;
 
 private slots:
-    void onKeyDataChanged(QString key);
+    void onKeyDataChanged(const QString& key);
 
 signals:
     /// Emitted when the provider of the key changes. The \a newProvider 
     /// contains the name of the new provider. This is a strict signal -
     /// it's emitted only when there was an actual change in the value.
     /// \param newProvider The DBus name of the new provider.
-    void providerChanged(QString newProvider);
+    void providerChanged(const QString& newProvider);
 
     /// Emitted when the bus type of provider of the key changes. The 
     /// \a newBusType is the type of new bus This is a strict signal -
@@ -156,7 +156,7 @@ signals:
     /// of the introspected key. This is a strict signal - it's emitted only 
     /// when there was an actual change in the value.
     /// \param newType The new type of the key.
-    void typeChanged(QString newType);
+    void typeChanged(const QString& newType);
 
     /// Emitted when the key existance in the registry changes. The \a exists
     /// is the new state of the introspected key. This is a strict signal - it's 

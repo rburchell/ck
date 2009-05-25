@@ -89,7 +89,7 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 
 /* Slots */
 
-void ContextPropertyInfo::onKeyDataChanged(QString key)
+void ContextPropertyInfo::onKeyDataChanged(const QString& key)
 {
     if (key != keyName)
         return;
