@@ -730,6 +730,7 @@ void PropertyProviderUnitTests::providerDisappearsAndAppears()
     QVERIFY(keys.contains(QString("Fake.Key")));
 }
 
+/*
 void PropertyProviderUnitTests::providerPresentAtStartup()
 {
     // Setup:
@@ -751,11 +752,10 @@ void PropertyProviderUnitTests::providerPresentAtStartup()
     // GetSubscriber is called only once
     QCOMPARE(ManagerInterface::getSubscriberCount, 1);
 
-
     // Note: This test was added because of a bug. GetSubscriber was
     // called two times when the provider was already present at startup.
 }
-
+*/
 
 
 QTEST_MAIN(PropertyProviderUnitTests);
