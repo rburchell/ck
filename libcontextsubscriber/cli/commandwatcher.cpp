@@ -7,6 +7,7 @@
 #include <QSocketNotifier>
 #include <QStringList>
 #include <QCoreApplication>
+#include "contextpropertyinfo.h"
 #include <QDebug>
 #include <unistd.h>
 #include <fcntl.h>
@@ -54,6 +55,10 @@ void CommandWatcher::help()
         qDebug() << "  waitforsubscription KEY...      - subscribe to keys";
         qDebug() << "  unsubscribe KEY...              - unsubscribe from keys";
         qDebug() << "  value KEY [DEF]                 - get value for a key";
+        qDebug() << "  key KEY                         - get the key for a key (rather useless)";
+        qDebug() << "  ikey KEY                        - get the info()->key for a key (rather useless)";
+        qDebug() << "  man KEY                         - get the info()->doc for a key";
+        qDebug() << "  type KEY                        - get the info()->type for a key";
         qDebug() << "Any prefix of a command can be used as an abbreviation";
 }
 
@@ -119,6 +124,30 @@ void CommandWatcher::interpret(const QString& command) const
                 else
                     out << "value: " << value.typeName() << ":" << value.toString() << endl;
             } else
+                qDebug() << "no such key:" << key;
+        } else if (QString("key").startsWith(commandName)) {
+            QString key = args[0];
+            if (properties->contains(key))
+                out << "key: " << properties->value(key)->key() << endl;
+            else
+                qDebug() << "no such key:" << key;
+        } else if (QString("ikey").startsWith(commandName)) {
+            QString key = args[0];
+            if (properties->contains(key))
+                out << "ikey: " << properties->value(key)->info()->key() << endl;
+            else
+                qDebug() << "no such key:" << key;
+        } else if (QString("man").startsWith(commandName)) {
+            QString key = args[0];
+            if (properties->contains(key))
+                out << "man: " << properties->value(key)->info()->doc() << endl;
+            else
+                qDebug() << "no such key:" << key;
+        } else if (QString("type").startsWith(commandName)) {
+            QString key = args[0];
+            if (properties->contains(key))
+                out << "type: " << properties->value(key)->info()->type() << endl;
+            else
                 qDebug() << "no such key:" << key;
         } else
             help();
