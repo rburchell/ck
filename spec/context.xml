@@ -15,394 +15,419 @@ package.
 change for some time still.  Only the ones explicitly marked as stable
 should be used for now.
 
-  </doc>
-  <node name="Context">
-   <node name="Screen">
-    <doc>
 Display screens
 ---------------
 
 These properties talk about the display screens of the device.
-    </doc>
-    <key name="TopEdge" type="string-enum">
-      <!-- type
-	<string-enum>
-	  <top/>
-	  <bottom/>
-	  <left/>
-	  <right/>
-	</string-enum>
-      /type -->
-      <doc>
+  </doc>
+  <key name="Screen.TopEdge">
+    <type>
+      <string-enum>
+        <top/>
+        <bottom/>
+        <left/>
+        <right/>
+      </string-enum>
+    </type>
+    <doc>
 The edge of the main display screen where the user expects
 the top-most UI elements to be.  Possible values are the
 strings "top", "bottom", "left", and "right", which refer to
 the edges of the screen in its normal orientation as defined
 by the graphics hardware.  _(stable)_
-      </doc>
-    </key>
-    <key name="IsCovered" type="bool">
-      <doc>
+    </doc>
+  </key>
+  <key name="Screen.IsCovered">
+    <type>bool</type>
+    <doc>
 Whether or not the main display screen is covered and can thus not be
 seen by the user.  This might mean that the device is laying face down
 on a table, or that its lid is closed if it has one.  _(stable)_
-      </doc>
-    </key>
-   </node>
-   <node name="Location">
-    <doc>
+    </doc>
+  </key>
+  <doc>
 Location
 --------
 
 Best effort location information. If any of the keys are not
 appliciable to the current location, they will be unavailable.
-    </doc>
-    <key name="Coordinates" type="uniform-list">
-      <!-- type
-        <uniform-list type="double"/>
-      /type -->
-      <doc>
+  </doc>
+  <key name="Location.Coordinates">
+    <type>
+      <uniform-list type="double"/>
+    </type>
+    <doc>
 The coordinates of the current position as a list of two or three
 doubles.  The first two elemets are latitude and longitude,
 respectivly, in degrees.  The third element, when present, is the
 altitude in meter.
-      </doc>
-    </key>
-    <key name="Street" type="string">
-      <doc>The street nearest the location of the device, as a localized string.</doc>
-    </key>
-    <key name="PostalCode" type="string">
-      <doc>The postcode of the location of the device, as a localized string.</doc>
-    </key>
-    <key name="Area" type="string">
-      <doc>
+    </doc>
+  </key>
+  <key name="Location.Street">
+    <type>string</type>
+    <doc>The street nearest the location of the device, as a localized string.</doc>
+  </key>
+  <key name="Location.PostalCode">
+    <type>string</type>
+    <doc>The postcode of the location of the device, as a localized string.</doc>
+  </key>
+  <key name="Location.Area">
+    <type>string</type>
+    <doc>
 The name of the local area where the device is, for example a
 neighborhood or campus, as a localized string.
-      </doc>
-    </key>
-    <key name="Locality" type="string">
-      <doc>The name of the village, town or city where the device is, as a localized string.</doc>
-    </key>
-    <key name="Region" type="string">
-      <doc>The administrative region which contains the location of the device, as a localized string.</doc>
-    </key>
-    <key name="Country" type="string">
-      <doc>The country which contains the location of the device, as a localized string.</doc>
-    </key>
-    <key name="CountryCode" type="string">
-      <doc>The ISO 3166 two letter country code of the country which contains the location of the device.</doc>
-    </key>
-    <key name="Timezone" type="string">
-      <doc>TBD</doc>
-    </key>
-    <key name="TimezoneOffset" type="duration">
-      <doc>TBD</doc>
-    </key>
-    <key name="Continent" type="string">
-      <doc>The name of the current continent, as a localized string.</doc>
-    </key>
-    <key name="Planet" type="string">
-      <doc>The name of the current planet (or dwarf planet), as a localized string.</doc>
-    </key>
-    <key name="PointOfInterest" type="string">
-      <doc>
+    </doc>
+  </key>
+  <key name="Location.Locality">
+    <type>string</type>
+    <doc>The name of the village, town or city where the device is, as a localized string.</doc>
+  </key>
+  <key name="Location.Region">
+    <type>string</type>
+    <doc>The administrative region which contains the location of the device, as a localized string.</doc>
+  </key>
+  <key name="Location.Country">
+    <type>string</type>
+    <doc>The country which contains the location of the device, as a localized string.</doc>
+  </key>
+  <key name="Location.CountryCode">
+    <type>string</type>
+    <doc>The ISO 3166 two letter country code of the country which contains the location of the device.</doc>
+  </key>
+  <key name="Location.Timezone">
+    <type>string</type>
+    <doc>TBD</doc>
+  </key>
+  <key name="Location.TimezoneOffset">
+    <type>duration</type>
+    <doc>TBD</doc>
+  </key>
+  <key name="Location.Continent">
+    <type>string</type>
+    <doc>The name of the current continent, as a localized string.</doc>
+  </key>
+  <key name="Location.Planet">
+    <type>string</type>
+    <doc>The name of the current planet (or dwarf planet), as a localized string.</doc>
+  </key>
+  <key name="Location.PointOfInterest">
+    <type>string</type>
+    <doc>
 The URI of the current point of interest, if any.  (The URI points to
 a Nepomuk object inside the Content Framework.)
-      </doc>
-    </key>
-    <key name="NearbyContacts" type="string-list">
-      <!-- type>
-	<uniform-list type="nepomuk-uri"/>
-      </type -->
-      <doc>
-A list of URIs for contacts that are physically nearby.  (The URIs
-point to Nepomuk objects.)
-      </doc>
-    </key>    
-  </node>
-  <node name="Battery">
+    </doc>
+  </key>
+  <key name="Location.NearbyContacts">
+    <type>
+      <uniform-list type="nepomuk-uri"/>
+    </type>
     <doc>
+A list of URIs for contacts that are physically nearby.
+    </doc>
+  </key>    
+  <doc>
 Battery
 -------
 
 Information about the batteries of the device.
-    </doc>
-    <key name="ChargePercentage" type="percentage">
-      <doc>
+  </doc>
+  <key name="Battery.ChargePercentage">
+    <type>percentage</type>
+    <doc>
 The average charge level of the currently connected batteries. 
 Expressed as percentage of the maximum charge level.
-      </doc>
-    </key>
-    <key name="OnBattery" type="bool">
-      <doc>
+    </doc>
+  </key>
+  <key name="Battery.OnBattery">
+    <type>bool</type>
+    <doc>
 Whether or not the device is currently running on battery power,
 i.e., whether at least one of its batteries is currently discharging.
-      </doc>
-    </key>
-    <key name="LowBattery" type="bool">
-      <doc>
+    </doc>
+  </key>
+  <key name="Battery.LowBattery">
+    <type>bool</type>
+    <doc>
 Whether or not the device is currently running on low battery power.
 True if OnBattery is true and the charge levels of all 
 batteries are below 10%.
-      </doc>
-    </key>
-    <key name="IsCharging" type="bool">
-      <doc>
+    </doc>
+  </key>
+  <key name="Battery.IsCharging">
+    <type>bool</type>
+    <doc>
 Whether or not the device is currently charging at least one of its batteries.
-      </doc>
-    </key>
-    <key name="TimeUntilLow" type="INT">
-      <doc>
+    </doc>
+  </key>
+  <key name="Battery.TimeUntilLow">
+    <type>duration</type>
+    <doc>
 Estimates the time that the device can run on battery before the property 
 OnLowBattery becomes true. In seconds.
-      </doc>
-    </key>
-    <key name="TimeUntilFull" type="INT">
-      <doc>
-Estimates the needed charging time of the device. In seconds.
-      </doc>
-    </key>
-  </node>
-  <node name="Internet">
+    </doc>
+  </key>
+  <key name="Battery.TimeUntilFull">
+    <type>duration</type>
     <doc>
+Estimates the needed charging time of the device. In seconds.
+    </doc>
+  </key>
+  <doc>
 Internet connectivity
 ---------------------
 
 Information about the connection of the devide to the Internet.
-    </doc>
-    <key name="NetworkType" type="string-enum">
-      <doc>
+  </doc>
+  <key name="Internet.NetworkType">
+    <type>
+      <string-enum>
+        <GPRS/>
+        <WLAN/>
+      </string-enum>
+    </type>
+    <doc>
 The type of the current connection to the Internet, such as GPRS,
 WLAN, etc.  The possible value are TBD.
-      </doc>
-    </key>
+    </doc>
+  </key>
+  <key name="Internet.NetworkName">
+    <type>string</type>
+    <doc>
+      The name of the current access point.
+    </doc>
+  </key>
 
-    <key name="NetworkName" type="string">
-      <doc>
-The name of the current access point.
-      </doc>
-    </key>
-
-    <key name="NetworkState" type="string-enum">
-      <doc>
-The state of the Internet connection, values TBD but will include
-things like "connected, "disconnected", "connecting".
-      </doc>
-    </key>
-
-    <key name="NetworkID" type="string">
-      <doc>
+  <key name="Internet.NetworkState">
+    <type>
+      <string-enum>
+        <disconnected/>
+        <connecting/>
+        <connected/>
+      </string-enum>
+    </type>
+    <doc>
+      The state of the Internet connection, values TBD but will include
+      things like "connected, "disconnected", "connecting".
+    </doc>
+  </key>
+  
+  <key name="Internet.NetworkID">
+    <type>string</type>
+    <doc>
 The unique id of the network.
-      </doc>
-    </key>
+    </doc>
+  </key>
 
-    <key name="ServiceName" type="string">
-      <doc>
+  <key name="Internet.ServiceName">
+    <type>string</type>
+    <doc>
 (Unclear)
-      </doc>
-    </key>
+    </doc>
+  </key>
 
-    <key name="SignalStrength" type="percent">
-      <doc>
+  <key name="Internet.SignalStrength">
+    <type>percentage</type>
+    <doc>
 The signal strength of the current connection to the Internet.  This
 will be 100% percent for wired connections, usually.
-      </doc>
-    </key>
+    </doc>
+  </key>
 
-    <key name="IsCheap" type="bool">
-      <doc>
+  <key name="Internet.IsCheap">
+    <type>bool</type>
+    <doc>
 Whether or not traffic to/from the Internet is billed per data volume
 (property is false) or per time (property is true).
-      </doc>
-    </key>
+    </doc>
+  </key>
 
-    <key name="TrafficOut" type="percent">
-      <doc>
+  <key name="Internet.TrafficOut">
+    <type>percentage</type>
+    <doc>
 A rough indication of the current traffic rate to the Internet, in
 percent of the maximum possible rate.
-      </doc>
-    </key>
-    <key name="TrafficIn" type="percent">
-      <doc>
+    </doc>
+  </key>
+  <key name="Internet.TrafficIn">
+    <type>percentage</type>
+    <doc>
 A rough indication of the current traffic rate from the Internet, in
 percent of the maximum possible rate.
-      </doc>
-    </key>
-  </node>
-  <node name="Bluetooth">
-    <doc>
+    </doc>
+  </key>
+  <doc>
 Bluetooth
 ---------
 
 Information about Bluetooth related things.      
-    </doc>
-    <key name="Enabled" type="bool">
-      <doc>
+  </doc>
+  <key name="Bluetooth.Enabled">
+    <type>bool</type>
+    <doc>
 A boolean indicating whether or not the Bluetooth radio is enabled.
-      </doc>
-    </key>
-    <key name="Visible" type="bool">
-      <doc>
+    </doc>
+  </key>
+  <key name="Bluetooth.Visible">
+    <type>bool</type>
+    <doc>
 A boolean indicating whether or not the device is visible to other
 Bluetooth devices when they search for others.
-      </doc>
-    </key>
-    <key name="TrafficOut" type="percent">
-      <doc>
+    </doc>
+  </key>
+  <key name="Bluetooth.TrafficOut">
+    <type>percentage</type>
+    <doc>
 A rough indication of the current outgoing traffic rate over
 Bluetooth, in percent of the maximum possible rate.
-      </doc>
-    </key>
-    <key name="TrafficIn" type="percent">
-      <doc>
+    </doc>
+  </key>
+  <key name="Bluetooth.TrafficIn">
+    <type>percentage</type>
+    <doc>
 A rough indication of the current incoming traffic rate over
 Bluetooth, in percent of the maximum possible rate.
-      </doc>
-    </key>
-    <key name="SignalStrength" type="percentage">
-      <doc>
-The strength of the Bluetooth radio connection.
-      </doc>
-    </key>
-  </node>
-  <node name="Environment">
+    </doc>
+  </key>
+  <key name="Bluetooth.SignalStrength">
+    <type>percentage</type>
     <doc>
+The strength of the Bluetooth radio connection.
+    </doc>
+  </key>
+  <doc>
 Environment
 -----------
 
 Information about the environment the device is in.
-    </doc>
-    <key name="IsDark" type="bool">
-      <doc>
-Whether or not it is dark.
-      </doc>
-    </key>
-    <key name="SunRise" type="time">
-      <doc>
+  </doc>
+  <key name="Environment.SunRise">
+    <type>time</type>
+    <doc>
 The time of sun rise.
-      </doc>
-    </key>
-    <key name="SunSet" type="time">
-      <doc>
+    </doc>
+  </key>
+  <key name="Environment.SunSet">
+    <type>time</type>
+    <doc>
 The time of sun set.
-      </doc>
-    </key>
-    <key name="Weather" type="map">
-      <!-- type
-	<map>
-	  <allowed-keys>
-	    <Condition type="string">
-	      <doc>
+    </doc>
+  </key>
+  <key name="Environment.Weather">
+    <type>
+       <map>
+	 <allowed-keys>
+	   <Condition>
+             <type>string</type>
+	     <doc>
 The current weather condition, as a localized, human readable string.
 Examples are "Cloudy", "Raining", etc.
-	      </doc>
-	    </Condition>
-	    <ConditionCode>
-	      <type>
-		<string-enum>
-		  <cloudy/>
-		  ...
-		</string-enum>
-	      </type>
-	      <doc>
+	     </doc>
+	   </Condition>
+	   <ConditionCode>
+	     <type>
+	       <string-enum>
+		 <cloudy/>
+		 <sunny/>
+	       </string-enum>
+	     </type>
+	     <doc>
 The current weather condition, as a symbolic string.  The set of
 symbols is to be defined, but it will be fixed and quite small so that
 you can provide an icon for each of them, etc.
-	      </doc>
-	    </ConditionCode>
-	    ...
-	  </allowed-keys>
-	</map>
-      /type -->
-      <doc>
-The current weather.  See http://www.ominous-valve.com/wx_codes.txt for
-more information about codifying weather conditions.  We should lift
-something from there, if just for extra geek points.
-+
-The value of the weather property is a dictionary with the following
-keys.  All keys are optional and additional keys might be present.
-+
-- *Condition*
-+
-The current weather condition, as a localized, human readable string.
-Examples are "Cloudy", "Raining", etc.
-+
-- *ConditionCode*
-+
-The current weather condition, as a symbolic string.  The set of
-symbols is to be defined, but it will be fixed and quite small so that
-you can provide an icon for each of them, etc.
-+
-- *Humidity*
-+
+	     </doc>
+	   </ConditionCode>
+           <Humidity>
+             <doc>
 The relative humidity in percent.
-+
-- *Temperature*
-+
+             </doc>
+           </Humidity>
+           <Temperature>
+             <doc>
 The temperature as a localized string.  This string represents the
 temperature in the way preferred by the user.  Most often this means
 either degrees Celsius or degrees Fahrenheit, but it could be some
 other unit entirely.
-+
-- *TemperatureK*
-+
+             </doc>
+           </Temperature>
+           <TemperatureK>
+             <doc>
 The temperature in Kelvin.
-+
-- *ApparentTemperature*
-+
+             </doc>
+           </TemperatureK>
+           <ApparentTemperature>
+             <doc>
 The felt temperature as a localized string, analogous to Temperature.
-+
-- *ApparentTemperatureK*
-+
+             </doc>
+           </ApparentTemperature>
+           <ApparentTemperatureK>
+             <doc>
 The felt temperature in Kelvin.
-+
-- *DewPoint*
-+
+             </doc>
+           </ApparentTemperatureK>
+           <DewPoint>
+             <doc>
 The dew point as a localized string, analogous to Temperature.
-+
-- *DewPointK*
-+
+             </doc>
+           </DewPoint>
+           <DewPointK>
+             <doc>
 The dew point in Kelvin.
-+
-- *Pressure*
-+
+             </doc>
+           </DewPointK>
+           <Pressure>
+             <doc>
 The atmospheric pressure in milli bar.
-+
-- *Precipitation*
-+
+             </doc>
+           </Pressure>
+           <Precipitation>
+             <doc>
 The rain or snow fall in millimeter per square meter per hour (or some
 other more common unit).
-+
-- *Visibility*
-+
+             </doc>
+           </Precipitation>
+           <Visibility>
+             <doc>
 The visibility in meter.
-+
-- *WindSpeed*
-+
+             </doc>
+           </Visibility>
+           <WindSpeed>
+             <doc>
 The wind speed in meters per second.
-+
-- *WindDirection*
-+
+             </doc>
+           </WindSpeed>
+           <WindDirection>
+             <doc>
 The wind direction as a localized string.  The direction is given in
 compass terms: North, South-West, etc.
-+
-- *WindDirectionD*
-+
+             </doc>
+           </WindDirection>
+           <WindDirectionD>
+             <doc>
 The wind direction in degrees.  North is 0, east is 90, etc.
-      </doc>
-    </key>
-    <key name="IsDark" type="bool">
-      <doc>Whether or not it is especially dark.</doc>
-    </key>
-    <key name="IsBright" type="bool">
-      <doc>Whether or not it is especially bright.</doc>
-    </key>
-    <key name="IsLoud" type="bool">
-      <doc>Whether or not it is especially loud.</doc>
-    </key>
-  </node>
-  <node name="Use">
+             </doc>
+           </WindDirectionD>
+	 </allowed-keys>
+       </map>
+    </type>
     <doc>
+The current weather.  See http://www.ominous-valve.com/wx_codes.txt for
+more information about codifying weather conditions.  We should lift
+something from there, if just for extra geek points.
+    </doc>
+  </key>
+  <key name="Environment.IsDark">
+    <type>bool</type>
+    <doc>Whether or not it is especially dark.</doc>
+  </key>
+  <key name="Environment.IsBright">
+    <type>bool</type>
+    <doc>Whether or not it is especially bright.</doc>
+  </key>
+  <key name="Environment.IsLoud">
+    <type>bool</type>
+    <doc>Whether or not it is especially loud.</doc>
+  </key>
+  <doc>
 Use
 ---
 
@@ -416,140 +441,170 @@ pre-defined, others can be defined by the user.  Situations might form
 a hierarchy: InMeeting includes AtWork.
 
 Not much is known about all this right now.
-    </doc>
-    <key name="Situations" type="string-list">
-      <doc>
+  </doc>
+  <key name="Use.Situations">
+    <type>string-list</type>
+    <doc>
 The symbolic names of the currently active Situations.  Note that more
 than one situation might be active at the same time.
-      </doc>
+    </doc>
     </key>
-    <key name="Mode" type="string-enum">
-      <!-- type>
-	<string-enum>
-	  <editing/>
-	  <recording/>
-	  <browsing/>
-	  <watching/>
-	  <listening/>
-	  <chatting/>
-	  <gaming/>
-	  <calling/>
-	  <active/>
-	  <idle/>
-	</string-enum>
-      </type -->
-      <doc>
-The current main usage mode of the device, as one of the following
-choices:
-
-editing:: The user is interacting closely with the device and is
-creating new content, such as when composing a email message or
-creating any other kind of document.
-
-recording:: The user is taking pictures, or recording video or audio.
-
-browsing:: The user is interacting closely with the device without
+  <key name="Mode">
+    <doc>
+The current main usage mode of the device.
+    </doc>
+    <type>
+      <string-enum>
+	<editing>
+          <doc>
+The user is interacting closely with the device and is creating new
+content, such as when composing a email message or creating any other
+kind of document.
+          </doc>
+	</editing>
+	<recording>
+          <doc>
+The user is taking pictures, or recording video or audio.
+          </doc>
+	</recording>
+	<browsing>
+          <doc>
+The user is interacting closely with the device without
 creating new content, such as when browsing search results, or
 browsing through his/her music collection.
-
-watching:: The user is watching a video, without closely interacting
-with the device.
-
-listening:: The user is listening to audio, without closely
-interacting with the device.
-
-reading:: The user is reading a document, such as when reading a
-article on the web or a e-book.
-
-chatting:: The user is involved in a real-time, text-based dialog with
+          </doc>
+	</browsing>
+	<watching>
+          <doc>
+The user is watching a video, without closely interacting with the
+device.
+          </doc>
+	</watching>
+	<listening>
+          <doc>
+The user is listening to audio, without closely interacting with the
+device.
+          </doc>
+	</listening>
+        <reading>
+          <doc>
+The user is reading a document, such as when reading a article on the
+web or a e-book.
+          </doc>
+        </reading>
+	<chatting>
+          <doc>
+The user is involved in a real-time, text-based dialog with external
+parties.
+          </doc>
+	</chatting>
+	<gaming>
+          <doc>
+The user is interacting closely with the device, for entertainment.
+          </doc>
+	</gaming>
+	<calling>
+          <doc>
+The user is involved in a real-time, audio- or video-based dialog with
 external parties.
-
-gaming:: The user is interacting closely with the device, for
-entertainment.
-
-calling:: The user is involved in a real-time, audio- or video-based
-dialog with external parties.
-
-active:: The user interacting closely with the device, for an activity
-that doesn't fit into any of the above categories.
-
-idle:: The device is not being used.
-      </doc>
-    </key>
-    <key name="ConnectedContacts" type="string-list">
-      <doc>
+          </doc>
+	</calling>
+	<active>
+          <doc>
+The user interacting closely with the device, for an activity that
+doesn't fit into any of the above categories.
+          </doc>
+	</active>
+	<idle>
+          <doc>
+The device is not being used.
+          </doc>
+	</idle>
+      </string-enum>
+    </type>
+  </key>
+  <key name="Use.ConnectedContacts" type="string-list">
+    <type>
+      <uniform-list type="nepomuk-uri"/>
+    </type>
+    <doc>
 A list of URIs for contacts that the user is currently engaged in
 conversations with.  (The URIs point to Nepomuk objects.)
-      </doc>
-    </key>    
-    <key name="RecentDocuments" type="string-list">
-      <doc>
+    </doc>
+  </key>    
+  <key name="Use.RecentDocuments">
+    <type>
+      <uniform-list type="nepomuk-uri"/>
+    </type>
+    <doc>
 A list of URIs for recently used documents, at most ten elements long.
 (The URIs point to Nepomuk objects.)
-      </doc>
-    </key>    
-    <key name="Keyboarding" type="bool">
-      <doc>
+    </doc>
+  </key>    
+  <key name="Use.Keyboarding">
+    <type>bool</type>
+    <doc>
 Whether or not the user is ready to use the keyboard.  This property
 is true when a slideout keyboard has been slided out, for example, or
 when a transformer laptop with a tablet mode is in "laptop mode".
-      </doc>
-    </key>
-    <key name="Phoning" type="bool">
-      <doc>
+    </doc>
+  </key>
+  <key name="Use.Phoning">
+    <type>bool</type>
+    <doc>
 Whether or not the user is using the device as a telephone handset,
 holding it next to ear and mouth.
-      </doc>
-    </key>
-  </node>
-  <node name="Events">
-    <doc>
+    </doc>
+  </key>
+  <doc>
 Events
 ------
 
 Information about current and upcoming calendar entries.
-    </doc>
-    <key name="Current" type="string-list">
-      <!-- type>
-        <uniform-list type="nepomuk-uri"/>
-      </type -->
-      <doc>
+  </doc>
+  <key name="Event.Current">
+    <type>
+      <uniform-list type="nepomuk-uri"/>
+    </type>
+    <doc>
 The currently active events, as a list of Nepomuk URIs.  The list
 contains all events whose start time is earlier than or equal to the
 current time, and whose end time is later.
-      </doc>
-    </key>
-    <key name="CurrentStart" type="time">
-      <doc>
+    </doc>
+  </key>
+  <key name="Event.CurrentStart">
+    <type>time</type>
+    <doc>
 The earliest start time of the events in Events.Current.
-      </doc>
-    </key>
-    <key name="CurrentEnd" type="time">
-      <doc>
+    </doc>
+  </key>
+  <key name="Event.CurrentEnd">
+    <type>time</type>
+    <doc>
 The latest end time of the events in Events.Current.
-      </doc>
-    </key>
-    <key name="Next" type="string-list">
-      <!-- type>
-        <uniform-list type="nepomuk-uri"/>
-      </type -->
-      <doc>
+    </doc>
+  </key>
+  <key name="Event.Next">
+    <type>
+      <uniform-list type="nepomuk-uri"/>
+    </type>
+    <doc>
 The upcoming events, as a list of Nepomuk URIs.  The list contains
 those events whose start time is later than the current time and
 closest to now.  If there are multiple events in the list, they all
 start at exactly the same time.
-      </doc>
-    </key>
-    <key name="NextStart" type="time">
-      <doc>
+    </doc>
+  </key>
+  <key name="Event.NextStart">
+    <type>time</type>
+    <doc>
 The earliest start time of the events in Events.Next.
-      </doc>
-    </key>
-    <key name="NextEnd" type="time">
-      <doc>
+    </doc>
+  </key>
+  <key name="Event.NextEnd">
+    <type>time</type>
+    <doc>
 The latest end time of the events in Events.Next.
-      </doc>
-    </key>
-  </node>
- </node>
+    </doc>
+  </key>
 </properties>
