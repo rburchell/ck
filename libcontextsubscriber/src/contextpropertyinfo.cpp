@@ -98,6 +98,85 @@
 */
 
 /*!
+    \page "Migrating from DuiValueSpace"
+
+    \brief libcontextsubscriber is a replacement library for DuiValueSpace which is deprecated.
+
+    DuiValueSpace, the old subscription library providing the keys, is deprecated. This library
+    is a replacement for it, providing better API and better implementation while maintaining the 
+    same core ideas and structure. 
+
+    \section Quicklook
+
+    A quick introduction to major changes:
+
+    \code
+    DuiValueSpaceItem topEdge("Context.Screen.TopEdge");
+    QObject::connect(&topEdge, SIGNAL(valueChanged()),
+                     this, SLOT(topEdgeChanged()));
+    \endcode
+
+    becomes:
+
+    \code
+    ContextProperty topEdge("Screen.TopEdge");
+    QObject::connect(&topEdge, SIGNAL(valueChanged()),
+                     this, SLOT(topEdgeChanged()));
+    \endcode
+
+    to list keys:
+
+    \code
+    DuiValueSpaceItem::listKeys();
+    \endcode
+    
+    becomes:
+
+    \code
+    ContextRegistryInfo::instance()->listKeys();
+    \endcode
+
+    \section prefix Context. prefix
+
+    In \b DuiValueSpace and accompanying packages, the properties used to 
+    have a "Contex." prefix. In example:
+    
+    \code
+    Context.Screen.TopEdge
+    Context.Screen.IsCovered
+    \endcode
+
+    This 'Context.' has been dropped now from \b libcontextsubscriber and 
+    all the provider packages. Providers now explicitely provide properties 
+    with keys like:
+
+    \code
+    Screen.TopEdge
+    Screen.IsCovered
+    \endcode
+
+    For compatibility reasons the 'Context.' prefix is still supported in 
+    newer releases of \b DuiValueSpace. The \b DuiValueSpace library transparently
+    adds the 'Contex.' prefix to all access functions. 
+
+    A call to:
+
+    \code
+    DuiValueSpaceItem topEdge("Context.Screen.TopEdge");
+    \endcode
+
+    ...is internally in \b DuiValueSpace converted to actual \c Screen.TopEdge 
+    wire access. This mechanism has been introduced to make the 
+    \b DuiValueSpace and \b libcontextsubscriber libraries parallel-installable.
+
+    It's expected that all \b DuiValueSpace clients migrate to \b libcontextsubscriber
+    eventually and \b DuiValueSpace library will be removed. 
+
+    \warning When migrating to \b libcontextsubscriber make sure to remove the 'Context.'
+    from you key access paths.
+*/
+
+/*!
     \class ContextPropertyInfo
 
     \brief A class to introspect a context property details.
