@@ -28,6 +28,15 @@
 #include <QString>
 #include "infokeydata.h"
 
+/*!
+    \class InfoXmlKeysFinder
+
+    \brief Implements a SAX parser to parse xml files with provider/key data.
+
+    This class is not exported in the public API. Traditional old-school context-based
+    parsing logic here.
+*/
+
 class InfoXmlKeysFinder : public QXmlDefaultHandler
 {
 public:
@@ -36,18 +45,35 @@ public:
     virtual bool endElement(const QString&, const QString&, const QString &name);
     virtual bool characters(const QString &ch);
 
+    /// A hash containing keyname -> InfoKeyData mapping.
     QHash <QString, InfoKeyData> keyDataHash;
 
 private:
+    /// Are we in the <provider>...
     bool inProvider;
+
+    /// Are we in the <key>...
     bool inKey;
+
+    /// Are we in the <key><type>...
     bool inKeyType;
+
+    /// Are we in the <key><doc>...
     bool inKeyDoc;
 
+    /// For our current parse position, the <provider service=?>.
     QString currentProvider;
+
+    /// For our current parse position, the <key>? name.
     QString currentKeyName;
+
+    /// For our current parse position, the <key><type>? type.
     QString currentKeyType;
+    
+    /// For our current parse position, the <key><doc>? documentation.
     QString currentKeyDoc;
+
+    /// For our current parse position, the <provider bus=?>.
     QString currentBus;
     
     QString getAttrValue(const QXmlAttributes &attrs, const QString &attrName);

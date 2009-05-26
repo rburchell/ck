@@ -27,11 +27,15 @@
 
 InfoBackend* InfoBackend::backendInstance = NULL;
 
+/// Constructs the object. The \a connectCount is 0 on start.
 InfoBackend::InfoBackend(QObject *parent) : QObject(parent) 
 {
     connectCount = 0; 
 }
 
+/// Returns the actual singleton instance, creates it on first access. Mutex-protected.
+/// ContextRegistryInfo and ContextPropertyInfo use this method to access the backend.
+/// The optional \a backendName specifies the backend to force, ie: 'xml' or 'cdb'. 
 InfoBackend* InfoBackend::instance(const QString &backendName)
 {
     static QMutex mutex;
@@ -58,6 +62,9 @@ InfoBackend* InfoBackend::instance(const QString &backendName)
     return backendInstance;
 }
 
+/// Given the \a currentKeys list of keys and the \a oldKeys list of keys, 
+/// emit a signal containing the new keys (keys that are in \a currentKeys 
+/// but are no in \a oldKeys).
 void InfoBackend::checkAndEmitKeysAdded(const QStringList &currentKeys, 
                                         const QStringList &oldKeys)
 {
@@ -71,6 +78,9 @@ void InfoBackend::checkAndEmitKeysAdded(const QStringList &currentKeys,
         emit keysAdded(addedKeys);
 }
 
+/// Given the \a currentKeys list of keys and the \a oldKeys list of keys, 
+/// emit a signal containing the removed keys (keys that are in \a oldKeys 
+/// but are no in \a currentKeys).
 void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys, 
                                           const QStringList &oldKeys)
 {
@@ -84,6 +94,8 @@ void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys,
         emit keysRemoved(removedKeys);
 }
 
+/// Given the \a currentKeys list of keys and the \a oldKeys list of keys, 
+/// emit a signal containing the union of those two lists. 
 void InfoBackend::checkAndEmitKeysChanged(const QStringList &currentKeys, 
                                           const QStringList &oldKeys)
 {
@@ -99,12 +111,14 @@ void InfoBackend::checkAndEmitKeysChanged(const QStringList &currentKeys,
 
 /* Protected */
 
+/// Called each time we have a signal connection. Increases the connect count.
 void InfoBackend::connectNotify(const char *signal)
 {
     QObject::connectNotify(signal);
     connectCount++;   
 }
 
+/// Called each time we have a signal disconnection. Decreases the connect count.
 void InfoBackend::disconnectNotify(const char *signal)
 {
     QObject::disconnectNotify(signal);

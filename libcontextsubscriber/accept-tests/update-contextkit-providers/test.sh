@@ -52,13 +52,13 @@ function dotest {
 BASEDIR=`dirname $0`
 
 # Test using command line param
-../../update-context-providers/update-context-providers "./"
+../../update-contextkit-providers/update-contextkit-providers "./"
 dotest
 clean
 
 # Test using env var 
 export CONTEXT_PROVIDERS="./"
-../../update-context-providers/update-context-providers
+../../update-contextkit-providers/update-contextkit-providers
 dotest
 clean
 

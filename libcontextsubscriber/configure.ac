@@ -67,15 +67,15 @@ PKG_CHECK_MODULES([QtTest], [QtTest])
 AC_CHECK_LIB([cdb], [cdb_make_start], [],
     [AC_MSG_ERROR([Can't find cdb library])])
 
-DEFAULT_REGISTRY_PATH="$datadir/context-providers/"
-AC_SUBST(DEFAULT_REGISTRY_PATH)
+DEFAULT_CONTEXT_PROVIDERS="$datadir/contextkit/providers/"
+AC_SUBST(DEFAULT_CONTEXT_PROVIDERS)
 
 #AC_CONFIG_HEADER([config.h])
 
 AC_CONFIG_FILES([Makefile
 		 src/Makefile
 		 cli/Makefile
-         update-context-providers/Makefile
+         update-contextkit-providers/Makefile
 		 unit-tests/Makefile
 		 doc/Makefile
          man/Makefile

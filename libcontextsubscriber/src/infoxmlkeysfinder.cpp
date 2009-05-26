@@ -22,6 +22,7 @@
 #include <QDebug>
 #include "infoxmlkeysfinder.h"
 
+/// Called when parsing starts.
 bool InfoXmlKeysFinder::startDocument()
 {
     keyDataHash.clear();
@@ -31,6 +32,7 @@ bool InfoXmlKeysFinder::startDocument()
     inKeyDoc = false;
 }
 
+/// Called for each <element> when we start parsing it.
 bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QString &name, const QXmlAttributes &attrs)
 {
     // <provider> ...
@@ -71,6 +73,7 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
     return true;
 }
 
+/// Called for each </element> when we stop parsing it.
 bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString &name)
 {
     // ... </provider>
@@ -121,6 +124,7 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
     return true;
 }
 
+/// Called for each bit of textual data. We trim spaces here.
 bool InfoXmlKeysFinder::characters(const QString &chars)
 {
     // <type> CHARS ...
@@ -140,6 +144,8 @@ bool InfoXmlKeysFinder::characters(const QString &chars)
 
 /* Private */
 
+/// In the given \a attrs atribute list, find the one with \a attrName and return it's value.
+/// Returns empty string if attribute not found.
 QString InfoXmlKeysFinder::getAttrValue(const QXmlAttributes &attrs, const QString &attrName)
 {
     for (int i = 0; i< attrs.count(); i++) {

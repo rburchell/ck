@@ -89,6 +89,10 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 
 /* Slots */
 
+/// This slot is connected to the \a keyDataChanged signal of the
+/// actual infobackend instance. It's executed on every change to any
+/// of the keys. We first check if the data concerns us. Next we 
+/// update the cached values and fire the actual signals.
 void ContextPropertyInfo::onKeyDataChanged(const QString& key)
 {
     if (key != keyName)

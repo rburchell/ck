@@ -30,7 +30,7 @@
 /*!
    \page "Updating context providers"
 
-   \brief The update tool (\c update-context-providers) is used to regenerate the registry cache database. 
+   \brief The update tool (\c update-contextkit-providers) is used to regenerate the registry cache database. 
 
    \section Overview
 
@@ -46,14 +46,14 @@
 
    \section Usage
 
-   The \c update-context-providers binary, when lunched without parameters, will by default regenerate
-   the database in the default installation prefix. Most likely: \c "/usr/share/context-providers" .
+   The \c update-contextkit-providers binary, when lunched without parameters, will by default regenerate
+   the database in the default installation prefix. Most likely: \c "/usr/share/contextkit/providers" .
    Obviously, for this to be successful, it needs to be launched with proper privileges.
 
    It's possible to override the registry directory with first parameter:
 
    \code
-   $> update-context-providers /some/path/to/registry
+   $> update-contextkit-providers /some/path/to/registry
    \endcode
 
    In this case the xml will be read from \c "/some/path/to/registry" and the resulting 
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
     } else if (getenv("CONTEXT_PROVIDERS"))
         path = QString(getenv("CONTEXT_PROVIDERS"));
     else
-        path = QString(DEFAULT_REGISTRY_PATH);
+        path = QString(DEFAULT_CONTEXT_PROVIDERS);
 
     printf("Updating from: '%s'\n", path.toUtf8().constData());
 

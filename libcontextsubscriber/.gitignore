@@ -36,7 +36,7 @@ coverage/
 # Other binaries
 /cli/context-listener
 /update-tool/update-tool
-/update-context-providers/update-context-providers
+/update-contextkit-providers/update-contextkit-providers
 
 # Docs
 doc/html

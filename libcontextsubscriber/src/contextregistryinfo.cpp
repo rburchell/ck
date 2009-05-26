@@ -79,16 +79,19 @@ QStringList ContextRegistryInfo::listProviders() const
 
 /* Slots */
 
+/// This is connected to the \a onKeysChanged of the actual info backend instance.
 void ContextRegistryInfo::onKeysChanged(const QStringList& currentKeys)
 {
     emit(keysChanged(currentKeys));
 }
 
+/// This is connected to the \a onKeysAdded of the actual info backend instance.
 void ContextRegistryInfo::onKeysAdded(const QStringList& newKeys)
 {
     emit(keysAdded(newKeys));
 }
 
+/// This is connected to the \a onKeysRemoved of the actual info backend instance.
 void ContextRegistryInfo::onKeysRemoved(const QStringList& removedKeys)
 {
     emit(keysRemoved(removedKeys));
