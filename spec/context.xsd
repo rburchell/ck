@@ -45,10 +45,16 @@
     </restriction>
   </simpleType>
 
+  <group name="propertyElement">
+    <choice>
+      <element ref="provider:doc"/>
+      <element ref="provider:key"/>
+    </choice>
+  </group>
+
   <complexType name="propertyList">
     <sequence>
-      <element minOccurs="0" ref="provider:doc"/>
-      <element maxOccurs="unbounded" ref="provider:node"/>
+      <group minOccurs="0" maxOccurs="unbounded" ref="provider:propertyElement"/>
     </sequence>
   </complexType>
 
@@ -88,74 +94,41 @@
     </annotation>
   </element>
 
-
-  <element name="node">
-    <complexType>
-      <annotation><documentation>
-	  A node in the tree of provided context.
-	  A node can have children that are keys or nodes.
-      </documentation></annotation>
-
-      <sequence>
-	<element minOccurs="0" ref="provider:doc"/>
-	<choice>
-	  <element minOccurs="0" maxOccurs="unbounded" ref="provider:node"/>
-	  <element minOccurs="0" maxOccurs="unbounded" ref="provider:key"/>
-	</choice>
-      </sequence>
-      <attribute name="name" use="required" type="NCName">
-	<annotation><documentation>
-	    The name of the node.
-	</documentation></annotation>
-      </attribute>
-    </complexType>
-  </element>
-
-  <element name="doc" type="string">
+  <element name="doc" type="normalizedString">
     <annotation><documentation>
 	Documentation about a key or node.
     </documentation></annotation>
   </element>
 
   <element name="key">
-    <complexType >
-      <sequence>
+    <complexType>
+      <all>
 	<element minOccurs="0" ref="provider:doc"/>
-      </sequence>
-      <attribute name="name" use="required" type="NCName">
+	<element minOccurs="0" ref="provider:type"/>
+      </all>
+      <attribute name="name" use="required" type="token">
 	<annotation><documentation>
 	  The name of this key.
 	</documentation></annotation>
       </attribute>
-      <attribute name="type" use="required" type="provider:contextType">
+      <attribute name="type" use="optional" type="token">
 	<annotation><documentation>
-	  The type of this key.
+	  The type of this key, if it is a simple string.
 	</documentation></annotation>
       </attribute>
     </complexType>
   </element>
 
-  <simpleType name="contextType">
+  <element name="type">
     <annotation><documentation>
-	The type of a simple context key.
+      The type of this key.
     </documentation></annotation>
-    <restriction base="string">
-      <enumeration value="INT"/>
-      <enumeration value="DOUBLE"/>
-      <enumeration value="STRING"/>
-      <enumeration value="TRUTH"/>
-      <enumeration value="int32"/>
-      <enumeration value="double"/>
-      <enumeration value="string"/>
-      <enumeration value="bool"/>
-      <enumeration value="time"/>
-      <enumeration value="percentage"/>
-      <enumeration value="map"/>
-      <enumeration value="string-enum"/>
-      <enumeration value="string-list"/>
-      <enumeration value="uniform-list"/>
-      <enumeration value="duration"/>
-      <enumeration value="percent"/>
-    </restriction>
-  </simpleType>
+    <!-- XXX - not very strict -->
+    <complexType mixed="true">
+      <sequence>
+        <any minOccurs="0" processContents="lax"/>
+      </sequence>
+    </complexType>
+  </element>
+
 </schema>
