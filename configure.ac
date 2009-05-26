@@ -1,5 +1,5 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.1.7~unreleased], [marius.vollmer@nokia.com], ContextKit)
+AC_INIT([ContextKit], [0.1.8~unreleased], [marius.vollmer@nokia.com], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
@@ -124,6 +124,8 @@ AC_CONFIG_FILES([tools/Makefile])
 AC_CONFIG_FILES([python/Makefile])
 AC_CONFIG_FILES([contextprovider-1.0.pc])
 AC_CONFIG_FILES([contextd/org.freedesktop.ContextKit.contextd.service])
+AC_CONFIG_FILES([fake-provider/Makefile])
+AC_CONFIG_FILES([vapi/Makefile])
 
 AC_OUTPUT
 

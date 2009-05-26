@@ -17,30 +17,15 @@ tools like moc.  See the ContextCommander for an elaborate example.
 Upstream and Packaging
 ----------------------
 
-We separate 'upstream' code development on the one side and packaging
-for Maemo on the other.  Both happen on branches: a branch for
-upstream development is called "upstream branch" and doesn't have a
-debian/ directory in it; a branch with a debian/ directory is called a
-"packaging branch".
+We do not separate 'upstream' code development and packaging for
+Maemo.  Both happen in the same branch.
 
-A upstream branch is merged into a packaging branch at controlled
-points in time.  (See below "Making a release" for more details.)
-Never merge a packagin branch into upstream branch.  If you want to
-move changes from a packaging branch to a upstream branch, cherry-pick
-them.
+In the Maemo context, we don't get any benefit from separating the
+two, so we don't.
 
-Feel free to make smallish changes to to the actual source or
-Makefiles in a packaging branch, but always with the intention of
-moving them to upstream in the immediate future.  Thus, you should
-isolate these changes into their own commits: never make a commit that
-includes changes to both files inside and outside of debian/.
-
-As explained below, only merge release tags into a packaging branch.
-If you need a fix from the upstream branch that is not in any release
-yet, cherry pick it to the packaging branch.
-
-The "master" branch is our main upstream branch, and "pkg-master" is
-the packaging branch that follows "master".
+Thus, all our packages are "native": we do not use Debian revision
+dashes such as "0.1-3" in our version numbers, we always use plain
+upstream versions such as "0.1".
 
 Documentation
 -------------
@@ -125,9 +110,11 @@ Coding style
 
 We follow the DUI coding style for C++ code.  In brief:
 
+ - No tab characters (0x09)
  - Linux style, but
  - Indentation offset is 4 and
  - Maximum line length is 120.
+ - No editor specific settings in the files.
 
 For Python:
 
@@ -156,7 +143,7 @@ detailed log of the changes.  Likewise, debian/changelog does not
 record detailed changes, just the stuff that would go into an
 announcement.
 
-Upstream branches have a NEWS file that records user-visible changes.
+We use debian/changelog instead of ./NEWS.
 
 Marking fixed bugs
 ------------------
@@ -216,11 +203,16 @@ the contents of the created directory.
 Making releases
 ---------------
 
-Version numbers are bumped post-release and have a "~unreleased"
-suffix.  Thus, configure.ac always contains the version that is going
-to be released next (with a "~unreleased" suffix) and debian/changelog
-contains a prepared entry for the next release (with a "~unreleased"
-suffix).
+Version numbers are bumped post-release: the version numbers in master
+and other branches always reflect the version that is going to be
+released next.  Once a release has been made, the version numbers in
+the branch are immediately incremented.  In addition, version numbers
+in branches have a "~unreleased" suffix to make this clear.
+
+Thus, configure.ac always contains the version that is going to be
+released next with a "~unreleased" suffix and debian/changelog
+contains a prepared entry for the next release with a "~unreleased"
+suffix.
 
 That suffix is there to make it clear that we are using the
 "post-release bump" schema.  It also reduces confusion when you create
@@ -233,95 +225,48 @@ If you do want to label multiple intermediate non-releases, use
 suffixes of the form "~unreleasedN".  Do this by changing the existing
 debian/changelog entry in place.  Do not create a new entry.
 
-As a rule, configure.ac in a upstream branch should always have a
-version number with a "~unreleased" suffix.  The distribution tags made
-from a branch should never have a version number with a "~unreleased"
-suffix.
+Thus, as a rule, configure.ac and debian/changelog in a branch should
+always have a version number with a "~unreleased" suffix, and the
+distribution tags made from a branch should never have a version
+number with a "~unreleased" suffix.  Also, no other entry in
+debian/changelog than the top-most one in a branch should have the
+"~unreleased" suffix.
 
-Likewise, the topmost entry of the debian/changelog in a branch should
-always have a "~unreleased" suffix, and no other entry should have
-such a suffix.  A debian/changelog file in a distribution tag should not
-have a ~unreleased suffix.
+The procedure for making a release is as follows:
 
-Also, the configure.ac file in a packaging branch should _not_ have a
-"~unreleased" suffix.  In other words, only merge the
-"release_VERSION" tags into a packaging branch.  Never merge the
-upstream branch itself between releases.
+- Make sure that you are in a releasable state.  This includes running
+  "make distcheck", running dpkg-buildpackage and checking the
+  generated packages for obvious problems, maybe installing those
+  packages and doing some smoke tests.
 
-If you want to merge the upstream branch with the packaging branch for
-experimenting, make a new branch for this purpose.  The continous
-integration machinery creates such a throw-away branch whenever
-"master" changes, with the name "pkg-next".
+- Remove the "~unreleased" suffix in configure.ac.  You can also
+  increase the version more generally at this time, such as from
+  0.1.5~unreleased to 0.2.0.
 
-** Upstream releases
+- Do the same in debian/changelog, and also make sure that the
+  'release notes' in it are up-to-date.
 
-When making the release in a upstream branch (a branch without the
-packaging bits), remove the "~unreleased" suffix in configure.ac.  You
-can also increase the version more generally at this time, such as
-from 0.1.5~unreleased to 0.2.0.
+- Update the date line in the top-most entry so that it has your name
+  and the current date and time.
 
-Then do all the steps listed in "Making a distribution tag" *except*
-running git-make-dist.  Once the final "make distcheck" succeeds,
-commit the removal of the "~unreleased" suffix with the commit message
-"Released VERSION."  (VERSION is of course the version in configure.ac
-without the ~unreleased suffix.)
+- Commit this with a message of "Released VERSION".
 
-Then make a annotated tag with the name "release_VERSION" and the
-message "Released VERSION."
+- Make a annotated tag with the name "release_VERSION" and the message
+  "Released VERSION."
 
-Then run all the steps in "Making a distribution tag" again, this time
-*including* git-make-dist.  Use the plain VERSION as the tag name.
+- Run all the steps in "Making a distribution tag".  Use the plain
+  VERSION as the tag name.
 
-Then bump the version in configure.ac by increasing the least
-significant component and add the "~unreleased" suffix again.  Commit
-this with the message "Prepare VERSION" where VERSION is the new
-version without the "~unreleased" suffix.
+- Bump the version in configure.ac by increasing the least significant
+  component and add the "~unreleased" suffix again.
 
-Push everything.  Don't forget to push the tags as well.  If you can't
-push at this time because you need to pull first, do that but be
-careful to merge the remote changes.  Do not use "git pull --rebase"
-at this time.
+- Add a new empty entry to debian/changelog with the same version that
+  is now in configure.ac.
 
-** Merging a upstream release into a packaging branch.
+- Commit this with the message "Prepare VERSION" where VERSION is the
+  new version without the "~unreleased" suffix.
 
-Merge the most recent "release_VERSION" tag into the packaging branch.
-Update the topmost debian/changelog entry (which has the ~unreleased
-suffix) to have version VERSION-1~unreleased, adding the text "New
-upstream release.".  Add a summary of the changes compared to the last
-upstream release based on the NEWS file in the upstream release.
-
-Look for tags of the form "fixes_NNNNN" and copy their messages into
-debian/changelog.  [ This should be automated. ]
-
-** Package releases
-
-Making a release on a packaging branch is very similar to releasing a
-upstream branch.
-
-The only differences are:
-
- - You leave configure.ac alone, which shouldn't have any ~unreleased
-   suffix if you have followed the rule about only merging
-   release_VERSION tags into a packaging branch.  Instead, you remove
-   the ~unreleased suffix in debian/changelog.
-
-   VERY IMPORTANT: Update the date in the topmost debian/changelog
-   entry whenever you change it.
-
- - Instead of using "release_VERSION" for the tag, you use
-   "pkg_VERSION-REVISION".
-
- - You use "VERSION-REVISION" for the distribution tag name.
-   Git-make-dist will automatically include the debian/ directory in
-   the distribution tag.
-
- - When bumping the version post-release, you create a new, empty
-   entry in debian/changelog.  Make sure it has a valid signature line
-   so that packages can be build with it.
-
-Snapshots versus releases
--------------------------
-
-We make a 'real' release as explained above whenever we need to
-integrate something.  Such a release gets a real version number, and
-not a timestamp suffix or similar.
+- Push everything.  Don't forget to push the tags as well.  If you
+  can't push at this time because you need to pull first, do that but
+  be careful to merge the remote changes.  Do not use "git pull
+  --rebase" at this time.

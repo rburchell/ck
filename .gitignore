@@ -128,6 +128,9 @@ tests/contextd_tests/plugin.c
 tests/contextd_tests/hal_plugin.c
 .project
 /python/flexi-properties.xml
-/INSTALL
 /py-compile
 /contextd/org.freedesktop.ContextKit.contextd.service
+/doc/use-cases.html
+/doc/context-arch.html
+/doc/context-types.html
+/INSTALL

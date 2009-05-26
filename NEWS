@@ -1,3 +1,21 @@
+Changes in ContextKit 0.1.7
+
+- Added the "fake provider", which just declares a lot of core
+  properties but doesn't implement any of them, relying on the Context
+  Commander to give them values.
+
+  This provider is useful to give a pre-view to properties that are
+  planned, and hopefully to gather early feedback about them.
+
+Changes in ContextKit 0.1.6
+
+- contextd provides hal-based battery properties.
+  Couple of bug fixes related to handling properties.
+
+As visible in Scrumworks, the following backlog items are done:
+
+CntFr-39
+
 Changes in ContextKit 0.1.5
 
 - The libcontextprovider API has been cleaned up 

@@ -1,7 +1,7 @@
 SUBDIRS=reference
 
 htmldir = $(datadir)/doc/contextkit/html/
-html_ASCIIDOCS = context-intro.txt context-providers.txt context-types.txt
+html_ASCIIDOCS = context-intro.txt context-providers.txt context-types.txt context-arch.txt use-cases.txt
 
 # Support for html_ASCIIDOCS and html_EXTRA
 
@@ -12,6 +12,9 @@ html_DATA = $(html_EXTRA) \
 html-local: $(html_EXTRA) $(html_ASCIIDOCS:.txt=.html)
 
 %.html: %.txt
+	asciidoc -a toc --unsafe -f myfilter.conf $^
+
+context-arch.html: %.html: %.txt
 	asciidoc -a toc --unsafe -f myfilter.conf $^
 
 EXTRA_DIST = $(html_ASCIIDOCS) \

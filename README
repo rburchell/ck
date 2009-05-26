@@ -9,9 +9,9 @@ The ContextKit consists of:
 
 - user documentation including a list of standard context properties
 
-In the future, the following components will be added:
-
 - contextd, daemon for combining and refining contextual information
+
+In the future, the following components will be added:
 
 - libcontextsubscriber, a library implementing 
   the simple API for accessing the contextual information.
