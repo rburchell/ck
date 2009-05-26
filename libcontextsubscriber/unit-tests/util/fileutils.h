@@ -42,7 +42,7 @@ QString utilPathForLocalDir()
     const char *srcdir = getenv("srcdir");
     if (srcdir) {
         QDir dir = QDir(srcdir);
-        return dir.absolutePath();
+        return dir.absolutePath() + "/";
     } else {
         return QString("./");
     }
