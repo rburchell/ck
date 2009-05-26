@@ -38,7 +38,7 @@ namespace ContextProvider {
 
 		Value v = Value (typeof(int));
 		v.set_int (value);
-		manager.property_value_change (key, v);
+		manager.property_value_change (remove_context_prefix(key), v);
 	}
 
 	/**
@@ -53,7 +53,7 @@ namespace ContextProvider {
 
 		Value v = Value (typeof(double));
 		v.set_double (value);
-		manager.property_value_change (key, v);
+		manager.property_value_change (remove_context_prefix(key), v);
 	}
 
 	/**
@@ -68,7 +68,7 @@ namespace ContextProvider {
 
 		Value v = Value (typeof(bool));
 		v.set_boolean (value);
-		manager.property_value_change (key, v);
+		manager.property_value_change (remove_context_prefix(key), v);
 	}
 
 	/**
@@ -83,7 +83,7 @@ namespace ContextProvider {
 
 		Value v = Value (typeof(string));
 		v.set_string (value);
-		manager.property_value_change (key, v);
+		manager.property_value_change (remove_context_prefix(key), v);
 	}
 
 	/**
@@ -95,7 +95,7 @@ namespace ContextProvider {
 	public void set_null (string key) {
 		assert (manager != null);
 
-		manager.property_value_change (key, null);
+		manager.property_value_change (remove_context_prefix(key), null);
 	}
 
 	/**
@@ -186,7 +186,7 @@ namespace ContextProvider {
 	 */
 	public void install_group ([CCode (array_length = false, array_null_terminated = true)] string[] key_group, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
 		assert (manager != null);
-		Group g = new Group(key_group, clear_values_on_subscribe, subscription_changed_cb);
+		Group g = new Group(remove_context_prefix_from_array(key_group), clear_values_on_subscribe, subscription_changed_cb);
 		manager.group_list.add(g);
 	}
 
@@ -201,10 +201,29 @@ namespace ContextProvider {
 	 */
 	public void install_key(string key, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
 		assert (manager != null);
-		string[] key_group = {key};
+		string[] key_group = {remove_context_prefix(key)};
 		Group g = new Group(key_group, clear_values_on_subscribe, subscription_changed_cb);
 		manager.group_list.add(g);
 	}
 
+	private string remove_context_prefix(string key) {
+		if (key.has_prefix("Context.")) {
+			return key.substring(8);
+		}
+		return key;
+	}
+
+	private string[] remove_context_prefix_from_array(string[] key_array) {
+		string[] to_return = {};
+		foreach (var key in key_array) {
+			if (key.has_prefix("Context.")) {
+				to_return += key.substring(8);
+			}
+			else {
+				to_return += key;
+			}
+		}
+		return to_return;
+	}
 
 }

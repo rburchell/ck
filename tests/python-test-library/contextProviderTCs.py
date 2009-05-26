@@ -32,6 +32,7 @@ from subprocess import Popen
 from time import sleep
 from contexttest import exec_tests, get_manager, get_subscriber
 from servicetest import ProxyWrapper
+import os
 
 busname = "org.freedesktop.ContextKit.Testing.Provider"
 
@@ -41,7 +42,10 @@ def setUp():
     global provider_iface
     bus = dbus.SessionBus()
     initOk = True
-        
+
+    # Make the provider stub to find the libcontextprovider.so
+    # (if it is not installed)
+    os.environ['LD_LIBRARY_PATH'] = '../../libcontextprovider/.libs'
     # Start a provider stub
     provider_stub_p = Popen("stubs/provider_stub.py", shell=True)
     sleep(0.5)
@@ -171,9 +175,41 @@ def testInstallKey(q,bus):
     q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber',
               args = [{u'test.single.int': 1}, []])
 
+def testContextPrefixDropping(q,bus):
+    print "testContextPrefixDropping"
+    provider_iface.DoInstallWithContextPrefix()
+    manager = get_manager(bus, busname)
+    subscriber_path = manager.GetSubscriber()
+    assert (subscriber_path != "")
+    subscriber = get_subscriber(bus, busname, subscriber_path)
+    vals,unavail = subscriber.Subscribe(['test2.int','test2.double','test2.string','test2.bool', 'test2.unknown'])
+
+    # Command the provider to change these properties (with the prefix)
+    propertiesToSend = {"Context.test2.int" : 109, "Context.test2.double" : 5.89, "Context.test2.string" : "somethingnew", "Context.test2.bool" : True, "Context.test2.unknown": 321}
+    undeterminedToSend = []
+    provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
+
+    # Expected result: we get the Changed signal (even though we're subscribed to
+    # keys without the prefix)
+    q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber',
+             args = [{u'test2.int': 109, u'test2.double': 5.89 ,u'test2.string': "somethingnew", u'test2.bool': True, u'test2.unknown': 321}, []])
+
+    # Commande the provider to change one property to unknown
+    propertiesToSend = {}
+    undeterminedToSend = ["Context.test2.unknown"]
+    provider_iface.SendChangeSet(propertiesToSend,undeterminedToSend)
+
+    # Expected result: we get the Changed signal again, with the unknown key
+    q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber',
+             args = [{}, ['test2.unknown']])
+
+
+    subscriber.Unsubscribe(['test2.int','test2.double','test2.string','test2.bool', 'test2.unknown'])
+
+
  
 if __name__ == '__main__':
     setUp()
     exec_tests([testInstallGroup,testUndeterminable,testInexistentProperty,testUnsubscribe, 
-                testTypes,testCallback,testInstallKey])
+                testTypes,testCallback,testInstallKey, testContextPrefixDropping])
     provider_iface.Exit()
