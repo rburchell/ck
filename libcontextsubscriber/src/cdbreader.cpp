@@ -26,6 +26,19 @@
 #include <QFile>
 #include "cdbreader.h"
 
+/*!
+    \class CDBReader
+
+    \brief A wrapper class to read data from a tiny-cdb database.
+
+    This class is not a part of the public API. 
+    The reader operates only on strings and can read a string value for a string key
+    or a list of string values for a string key. The reader automatically closes the 
+    underlying filesystem resource on destruction but can be also closed manually. 
+
+    Reading from a closed reader with return empty strings. 
+*/
+
 /// Constructs a new CDBReader reading from cdb database at \a dbpath
 /// \param dbpath Path to the database.
 CDBReader::CDBReader(const QString &dbpath, QObject *parent) 

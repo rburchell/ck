@@ -26,18 +26,6 @@
 #include <QStringList>
 #include <QObject>
 
-/*!
-    \class InfoBackend
-
-    \brief An abstract (pure virtual) singleton class that represents the actual 
-    registry backend.
-
-    This class is not exported in the public API. It provides a list methods that need 
-    to be implemented by a concrete registry backend implementation. The InfoBackend instance
-    is a singleton that is created on first access. This class (the instance of it) is 
-    used by ContextRegistryInfo and ContextPropertyInfo classes. 
-*/
-
 class InfoBackend : public QObject
 {
     Q_OBJECT 
@@ -88,8 +76,7 @@ protected:
     virtual void disconnectNotify(const char *signal);
 
 private:
-    /// Number of connections to signals. Used to optimized signal emission when 0.
-    int connectCount;
+    int connectCount; //< Number of connections to signals. Used to optimized signal emission when 0.
    
     InfoBackend(QObject *parent = 0);
     
@@ -103,8 +90,7 @@ private:
     /// Private operator. Do not use.
     InfoBackend& operator=(const InfoBackend&);
   
-    /// Holds a pointer to the instance of the singelton.
-    static InfoBackend* backendInstance;
+    static InfoBackend* backendInstance; //< Holds a pointer to the instance of the singelton.
     
     friend class InfoXmlBackend;
     friend class InfoCdbBackend;

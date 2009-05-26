@@ -25,6 +25,18 @@
 #include <QMutex>
 #include <QDebug>
 
+/*!
+    \class InfoBackend
+
+    \brief An abstract (pure virtual) singleton class that represents the actual 
+    registry backend.
+
+    This class is not exported in the public API. It provides a list methods that need 
+    to be implemented by a concrete registry backend implementation. The InfoBackend instance
+    is a singleton that is created on first access. This class (the instance of it) is 
+    used by ContextRegistryInfo and ContextPropertyInfo classes. 
+*/
+
 InfoBackend* InfoBackend::backendInstance = NULL;
 
 /// Constructs the object. The \a connectCount is 0 on start.

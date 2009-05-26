@@ -29,18 +29,6 @@
 #include "cdbreader.h"
 #include "infobackend.h"
 
-/*!
-    \class InfoCdbBackend
-
-    \brief Implements the InfoBackend for reading data from a cdb database.
-
-    This class is not exported in the public API. It does not cache any data
-    to optimize the memory consumption. It's assumed that most data is anyways
-    cached (as needed) in the ContextPropertyInfo and the cdb key-based access
-    (no enumetation) is fast anyways. It observers the \c context-providers.cdb
-    with a file system watcher.
-*/
-
 class InfoCdbBackend : public InfoBackend
 {
     Q_OBJECT 
@@ -62,12 +50,8 @@ public:
     static bool databaseExists();
 
 private:
-    /// A watched object obsering the database file. 
-    /// Delivers syned notifications.
-    QFileSystemWatcher watcher;
-
-    /// The cdb reader object used to access the cdb database.
-    CDBReader reader;
+    QFileSystemWatcher watcher; //< A watched object obsering the database file. Delivers synced notifications.
+    CDBReader reader; //< The cdb reader object used to access the cdb database.
 
 private slots:
     void onDatabaseFileChanged(const QString &path);
