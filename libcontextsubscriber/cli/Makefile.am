@@ -1,6 +1,6 @@
 bin_PROGRAMS = context-listener
 
-context_listener_SOURCES = context-listener.cpp sconnect.h propertylistener.h propertylistener.cpp
+context_listener_SOURCES = context-listener.cpp sconnect.h propertylistener.h propertylistener.cpp commandwatcher.h commandwatcher.cpp
 
 AM_CXXFLAGS = -I$(srcdir)/../src
 

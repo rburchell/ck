@@ -11,7 +11,7 @@ to find the appropriate provider for each of the properties
 context-listener reads the ./context-providers.cdb or if it doesn't
 exist then all the XML files in the present directory.  Check
 libcontextprovider documentation for the format of these XML files and
-how to convert them to a cdb cache. Hit ENTER to terminate the
+how to convert them to a cdb cache. Send EOF on stdin to terminate the
 running context-listener.
 .SH ENVIRONMENT VARIABLES
 .TP 8
@@ -31,6 +31,10 @@ specified by CONTEXT_PROVIDERS and not the present one.
 context-listener takes a list of properties as arguments.
 Properties are dot separated names, like Context.Location.Latitude.
 Obviously a property have to be provided by some provider to be any useful.
+.SH COMMAND LINE INTERFACE
+context-listener can be commanded on its standard input, the available
+commands can be seen at startup on stderr.  All debugging/error messages
+are directed to stderr.
 .SH EXAMPLES
 .TP 8
 context-provide my.test.provider int mun.testi.property 42
