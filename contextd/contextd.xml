@@ -9,5 +9,8 @@
       <key name="TimeUntilLow" type="INT"></key>
       <key name="TimeUntilFull" type="INT"></key>
     </node>
+    <node name="System">
+      <key name="MemoryPressure" type="INT"></key>
+    </node>
   </node>
 </provider>
