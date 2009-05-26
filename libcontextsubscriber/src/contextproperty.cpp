@@ -114,7 +114,10 @@ struct ContextPropertyPrivate
    Emitted whenever the value of the property changes.
  */
 
-void ContextProperty::init(const QString &key)
+/// Constructs a new ContextProperty for \a key with the given \a parent.
+/// \param key The full name of the key.
+ContextProperty::ContextProperty(const QString &key, QObject* parent)
+    : QObject(parent), priv(0)
 {
     priv = new ContextPropertyPrivate;
 
@@ -124,54 +127,12 @@ void ContextProperty::init(const QString &key)
     subscribe();
 }
 
-void ContextProperty::finalize()
-{
-    unsubscribe();
-    delete priv;
-}
-
-/// Constructs a new ContextProperty for \a key with the given \a parent.
-/// \param key The full name of the key.
-ContextProperty::ContextProperty(const QString &key, QObject* parent)
-    : QObject(parent), priv(0)
-{
-    init (key);
-}
-
-/// Constructs a new ContextProperty with the given \a parent that
-/// refers to the same key as \a other.
-ContextProperty::ContextProperty(const ContextProperty &other, QObject* parent)
-    : QObject(parent), priv(0)
-{
-    init (other.key());
-}
-
-/// Constructs a new ContextProperty with the given \a parent that
-/// refers to the key "" (emtpy string).
-// FIXME: Is this function needed?
-ContextProperty::ContextProperty(QObject* parent)
-    : QObject(parent), priv(0)
-{
-    init ("");
-}
-
-/// Assigns the ContextProperty \a other to this.
-ContextProperty &ContextProperty::operator=(const ContextProperty& other)
-{
-    if (this == &other)
-        return *this;
-
-    finalize();
-    init (other.key());
-
-    return *this;
-}
-
 /// Destroys the ContextProperty.
 ContextProperty::~ContextProperty()
 {
     qDebug() << "ContextProperty::~ContextProperty";
-    finalize();
+    unsubscribe();
+    delete priv;
 }
 
 /// Returns the key of the ContextProperty.

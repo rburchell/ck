@@ -29,6 +29,18 @@
 #include "sconnect.h"
 #include "infocdbbackend.h"
 
+/*!
+    \class InfoCdbBackend
+
+    \brief Implements the InfoBackend for reading data from a cdb database.
+
+    This class is not exported in the public API. It does not cache any data
+    to optimize the memory consumption. It's assumed that most data is anyways
+    cached (as needed) in the ContextPropertyInfo and the cdb key-based access
+    (no enumetation) is fast anyways. It observers the \c context-providers.cdb
+    with a file system watcher.
+*/
+
 InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
 {

@@ -26,17 +26,6 @@
 #include <QStringList>
 #include <QObject>
 
-/*!
-    \class ContextRegistryInfo
-
-    \brief A class to introspect the registry contents.
-
-    This is a singelton class used to obtain information about the keys (properties)
-    in the registry database. The information can be provided either from xml files 
-    or from a cdb database. It's possible to list all the keys in the registry and 
-    also list all keys belonging to a one particular provider. 
-*/
-
 class ContextRegistryInfo : public QObject
 {
     Q_OBJECT 
@@ -50,14 +39,9 @@ public:
     QStringList listProviders() const;
 
 private:
-    /// Private constructor. Do not use. 
-    ContextRegistryInfo() {};
-
-    /// Private constructor. Do not use. 
-    ContextRegistryInfo(const ContextRegistryInfo&);
-
-    /// Private operator. Do not use. 
-    ContextRegistryInfo& operator=(const ContextRegistryInfo&);
+    ContextRegistryInfo() {}; //< Private constructor. Do not use. 
+    ContextRegistryInfo(const ContextRegistryInfo&); //< Private constructor. Do not use. 
+    ContextRegistryInfo& operator=(const ContextRegistryInfo&); //< Private operator. Do not use. 
    
     /// Holds the actual pointer to the singelton instance. 
     /// Mutex protected during creation.

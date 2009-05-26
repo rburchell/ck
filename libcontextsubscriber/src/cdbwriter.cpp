@@ -24,6 +24,20 @@
 #include <stdlib.h>
 #include "cdbwriter.h"
 
+/*!
+    \class CDBWriter
+
+    \brief A wrapper class to write data (create) tiny-cdb databases.
+
+    This class is not a part of the public API.
+    The writer operates only on strings. String values can be associated with string keys. 
+    Several operations are supported - ading, replacing and inserting. Those operations differ
+    in how they handle existing keys with same name. 
+
+    The writer automatically cloes the filesystem resource on destruction but
+    can be also closed manually. Writing to a closed writer has no effect.
+*/
+
 /// Constructs a new CDBWriter to write to a cdb database at \a dbpath
 /// \param dbpath Path to the database.
 CDBWriter::CDBWriter(const QString &path, QObject *parent) 

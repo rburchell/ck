@@ -3,13 +3,11 @@
 #include "sconnect.h"
 #include <QDebug>
 
-PropertyListener::PropertyListener(ContextProperty *prop, QObject *parent) :
-    QObject(parent), prop(prop)
+PropertyListener::PropertyListener(ContextProperty *prop) :
+    QObject(prop), prop(prop)
 {
-    // TODO: when the library is asynchronous, this will have to be changed
     sconnect(prop, SIGNAL(valueChanged()), this, SLOT(onValueChanged()));
-    QTextStream out(stdout);
-    qDebug() << prop->key() << "has been subscribed";
+    qDebug() << prop->key() << " subscribtion started";
 }
 
 void PropertyListener::onValueChanged()

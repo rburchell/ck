@@ -1,11 +1,12 @@
 #include "contextproperty.h"
 #include "propertylistener.h"
-#include "sconnect.h"
-#include <QSocketNotifier>
+#include "commandwatcher.h"
 #include <QCoreApplication>
 #include <QString>
 #include <QStringList>
+#include <QMap>
 #include <QDebug>
+#include <stdlib.h>
 
 int main(int argc, char **argv)
 {
@@ -21,23 +22,20 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
 
     QStringList args = app.arguments();
-    if (args.count() <= 1) {
-        QTextStream out(stdout);
-        out << "Usage: " << app.arguments().at(0) << " <properties...>" << endl;
-        return 0;
-    }
+    if (args.count() <= 1)
+        qWarning() << "Started without properties, if you want properties at startup, pass them as arguments";
+
+    QMap<QString, ContextProperty*> properties;
 
     args.pop_front();
     foreach (QString key, args) {
-        ContextProperty* prop = new ContextProperty(key);
-        prop->setParent(new PropertyListener(prop, &app));
+        if (properties[key] == 0) {
+            properties[key] = new ContextProperty(key, QCoreApplication::instance());
+            new PropertyListener(properties[key]);
+        }
     }
 
-    QSocketNotifier stdinWatcher(0, QSocketNotifier::Read, &app);
-    sconnect(&stdinWatcher,
-             SIGNAL(activated(int)),
-             &app,
-             SLOT(quit()));
+    new CommandWatcher(STDIN_FILENO, &properties, QCoreApplication::instance());
 
     return app.exec();
 }

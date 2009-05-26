@@ -9,7 +9,7 @@ class PropertyListener : public QObject
 {
     Q_OBJECT
 public:
-    PropertyListener(ContextProperty *prop, QObject *parent = 0);
+    PropertyListener(ContextProperty *prop);
 private slots:
     void onValueChanged();
 private:

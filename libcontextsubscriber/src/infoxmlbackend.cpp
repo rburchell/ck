@@ -31,6 +31,18 @@
 #include "infoxmlbackend.h"
 #include "infoxmlkeysfinder.h"
 
+/*!
+    \class InfoXmlBackend
+
+    \brief Implements the InfoBackend for reading data from a directory
+    with xml files.
+
+    This class is not exported in the public API. It keeps all the data cached 
+    in the memory. It's assumed that this backend is not going to be used live in
+    production systems and does not need to be ultra-fast (instead, implementation
+    simplicity and corectness are preffered). For fast backend see the InfoCdbBackend.
+*/
+
 InfoXmlBackend::InfoXmlBackend(QObject *parent)
     : InfoBackend(parent)
 {

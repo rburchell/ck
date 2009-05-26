@@ -22,6 +22,15 @@
 #include <QDebug>
 #include "infoxmlkeysfinder.h"
 
+/*!
+    \class InfoXmlKeysFinder
+
+    \brief Implements a SAX parser to parse xml files with provider/key data.
+
+    This class is not exported in the public API. Traditional old-school context-based
+    parsing logic here.
+*/
+
 /// Called when parsing starts.
 bool InfoXmlKeysFinder::startDocument()
 {

@@ -53,7 +53,7 @@
     change notifications do not travel up the tree.
 
     The \ref Introspection section describes in detail how to get a list of
-    existing keys and examine their capabilities. 
+    existing keys and examine their capabilities.
 
     Programmers access the key/value pairs through instances of the
     ContextProperty class.  These instances allow applications to read
@@ -103,7 +103,7 @@
     a 'null' QVariant in that case.  If a provider for the key becomes
     available later, the property will start receiving values from the
     provider transparently.
- 
+
 */
 
 #ifndef CONTEXTPROPERTY_H
@@ -137,9 +137,6 @@ public:
 
     void waitForSubscription () const;
 
-    ContextProperty(const ContextProperty &other, QObject *parent = 0);
-    ContextProperty &operator=(const ContextProperty&);
-
     // This function should only be called by the Commander.
     // It sets all the ContextProperty instances immune to commanding.
     static void ignoreCommander();
@@ -152,9 +149,6 @@ signals:
 private:
     ContextPropertyPrivate *priv;
     static bool typeCheck;
-
-    void init (const QString &key);
-    void finalize ();
 };
 
 #endif // CONTEXTPROPERTY_H
