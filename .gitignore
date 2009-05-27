@@ -6,6 +6,7 @@ Makefile.in
 aclocal.m4
 autom4te.cache
 compile
+/py-compile
 config.guess
 config.h
 config.h.in
@@ -29,7 +30,8 @@ introspect/generic-types.xml
 libtool
 ltmain.sh
 missing
-spec/context.valid.stamp
+/spec/context.valid.stamp
+/spec/introspect/
 .dirstamp
 .deps
 *.o
@@ -82,6 +84,8 @@ doc/context-providers.html
 libcontextprovider/libcontextprovider.vala.stamp
 libcontextprovider/value_compare.[ch]
 spec/context-provider-schema.html
+spec/context-properties.html
+spec/contextkit.html
 doc/context-intro.html
 doc/context-properties.html
 doc/fig1.svg
@@ -131,3 +135,14 @@ tests/contextd_tests/hal_plugin.c
 /doc/context-arch.html
 /doc/context-types.html
 /INSTALL
+/contextd/org.freedesktop.ContextKit.contextd.service
+/doc/fig3.png
+/doc/fig4.png
+/libcontextprovider/context_provider-internal.h
+/libcontextprovider/contextprovider-internal.vapi
+/libcontextprovider/intset_binding.c
+/tests/python-test-library/config.py
+/tests/python-test-library/testfw/com.nokia.ContextProviderExample.service
+/tests/python-test-library/testfw/exec-with-log.sh
+/tests/python-test-library/testfw/tmp-session-bus.conf
+/tests/python-test-library/testfw/tmp-system-bus.conf
