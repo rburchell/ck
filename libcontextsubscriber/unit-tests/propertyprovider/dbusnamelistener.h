@@ -40,6 +40,9 @@ signals:
     void nameAppeared();
     void nameDisappeared();
 
+public: // for tests
+    bool initialCheck;
+
     friend class PropertyProviderUnitTests;
 };
 

@@ -165,6 +165,7 @@ void SubscriberInterface::resetLogs()
 
 DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const QString &busName,
                                    bool initialCheck, QObject* parent)
+    : initialCheck(initialCheck)
 {
     // qDebug() << "Returning a mock dbus name listener";
     // Store the mock implementation (created by the tested class)
@@ -724,7 +725,7 @@ void PropertyProviderUnitTests::providerDisappearsAndAppears()
     QVERIFY(keys.contains(QString("Fake.Key")));
 }
 
-/*
+
 void PropertyProviderUnitTests::providerPresentAtStartup()
 {
     // Setup:
@@ -740,7 +741,9 @@ void PropertyProviderUnitTests::providerPresentAtStartup()
 
     // Test: make the DBusNameListener notify the PropertyProvider
     // that the real provider is present
-    emit mockDBusNameListener->nameAppeared();
+    if (mockDBusNameListener->initialCheck) {
+        emit mockDBusNameListener->nameAppeared();
+    }
 
     // Expected result:
     // GetSubscriber is called only once
@@ -749,7 +752,7 @@ void PropertyProviderUnitTests::providerPresentAtStartup()
     // Note: This test was added because of a bug. GetSubscriber was
     // called two times when the provider was already present at startup.
 }
-*/
+
 
 
 QTEST_MAIN(PropertyProviderUnitTests);
