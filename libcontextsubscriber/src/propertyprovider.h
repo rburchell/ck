@@ -27,11 +27,11 @@
 #include <QObject>
 #include <QDBusConnection>
 #include <QSet>
-#include <QTimer>
 
 class PropertyHandle;
 class SubscriberInterface;
 class DBusNameListener;
+class QTimer;
 
 class PropertyProvider : public QObject
 {
@@ -46,31 +46,32 @@ signals:
     void subscribeFinished(QSet<QString> keys);
     void valueChanged(QString key, QVariant value, bool processingSubscription);
 
-private:
-    PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
-
-    DBusNameListener *dbusNameListener;
-    SubscriberInterface *subscriberInterface; ///< The DBus interface for the Subscriber object
-    QTimer idleTimer; ///< For scheduling subscriptions / unsubscriptions as idle processing
-    ManagerInterface managerInterface; ///< The DBus interface for the Manager object
-    bool getSubscriberFailed;
-
-    QSet<QString> toSubscribe; ///< Keys pending for subscription
-    QSet<QString> toUnsubscribe; ///< Keys pending for unsubscription
-
-    QDBusConnection::BusType busType; ///< The bus type of the DBus provider connected to
-    QString busName; ///< The bus name of the DBus provider connected to
-
-    static QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> providerInstances;
-    QSet<QString> subscribedKeys; ///< The keys that should be currently subscribed to
-
 private slots:
     void onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
     void onGetSubscriberFinished(QString objectPath);
     void onSubscribeFinished(QSet<QString> keys);
     void idleHandler();
-    void onProviderAppears();
-    void onProviderDisappears();
+    void onProviderAppeared();
+    void onProviderDisappeared();
+
+private:
+    PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
+
+    DBusNameListener *providerListener; //< Listens to provider's (dis)appearance over DBus
+    SubscriberInterface *subscriberInterface; //< The DBus interface for the Subscriber object
+    QTimer *idleTimer; //< For scheduling subscriptions / unsubscriptions as idle processing
+    ManagerInterface managerInterface; //< The DBus interface for the Manager object
+    bool getSubscriberFailed; //< Whether the GetSubscriber dbus call failed on the manager interface
+
+    QSet<QString> toSubscribe; //< Keys pending for subscription
+    QSet<QString> toUnsubscribe; //< Keys pending for unsubscription
+
+    QDBusConnection::BusType busType; //< The bus type of the DBus provider connected to
+    QString busName; //< The bus name of the DBus provider connected to
+
+    /// Singleton instance container
+    static QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> providerInstances;
+    QSet<QString> subscribedKeys; //< The keys that should be currently subscribed to
 };
 
 #endif

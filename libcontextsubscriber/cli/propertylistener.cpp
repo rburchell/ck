@@ -2,6 +2,7 @@
 #include "contextproperty.h"
 #include "sconnect.h"
 #include <QDebug>
+#include <QVariant>
 
 PropertyListener::PropertyListener(ContextProperty *prop) :
     QObject(prop), prop(prop)

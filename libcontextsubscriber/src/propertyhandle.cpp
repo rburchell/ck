@@ -26,19 +26,12 @@
 #include "contextregistryinfo.h"
 #include "dbusnamelistener.h"
 
-#include <QStringList>
-#include <QString>
-#include <QDebug>
-#include <QPair>
-#include <QMap>
-#include <QDBusConnection>
-
 QMap<QString, PropertyHandle*> PropertyHandle::handleInstances;
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
 static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
 
-DBusNameListener* PropertyHandle::commanderListener = DBusNameListener::instance(commanderDBusType, commanderDBusName);
+DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusType, commanderDBusName);
 bool PropertyHandle::commandingEnabled = true;
 bool PropertyHandle::typeCheckEnabled = false;
 
@@ -50,42 +43,36 @@ bool PropertyHandle::typeCheckEnabled = false;
   Only one handle exists at a time for a context property, no matter
   how much ContextProperty objects are created for it.
 
-  Handling context properties and their providers.
-
-  A PropertyHandle represents a context property.  There is at most
-  one PropertyHandle for each property, but more than one
-  ContextProperty can point to a PropertyHandle.  A PropertyHandle
-  points to a PropertyProvider object if there is a provider for it.
-
-  A PropertProvider represents a context provider and manages the
-  D-Bus connection to it.  A PropertyProvider can also represent the
-  "no known provider" case.
+  Communication with the provider is done through the \c myProvider \c
+  PropertyProvider instance, which is updated when needed because of
+  registry changes.  Handling of disappearance from the DBus and then
+  reappearance on the DBus of the same provider is handled privately
+  by \c PropertyProvider.  If we don't know the current provider for
+  this handle, then the \c myProvider pointer is 0.
 
   PropertyHandle and PropertyProvider instances are never deleted;
   they stick around until the process is terminated.
 */
 
-/// Constructs a new instance. ContextProperty creates the handles, you
-/// don't have to (and can't) call this constructor ever.
 PropertyHandle::PropertyHandle(const QString& key)
     : myKey(key), myProvider(0), myInfo(0), subscribeCount(0), subscribePending(false)
 {
     myInfo = new ContextPropertyInfo(myKey, this);
 
-    onRegistryTouched();
+    updateProvider();
 
     // Start listening to changes in property registry (e.g., new keys, keys removed)
-    sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(QStringList)),
-             this, SLOT(onRegistryTouched()));
+    sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(const QStringList&)),
+             this, SLOT(updateProvider()));
 
     // Start listening for the beloved commander
     sconnect(commanderListener, SIGNAL(nameAppeared()),
-             this, SLOT(onRegistryTouched()));
+             this, SLOT(updateProvider()));
     sconnect(commanderListener, SIGNAL(nameDisappeared()),
-             this, SLOT(onRegistryTouched()));
+             this, SLOT(updateProvider()));
 }
 
-void PropertyHandle::disableCommanding()
+void PropertyHandle::ignoreCommander()
 {
     commandingEnabled = false;
 }
@@ -95,26 +82,34 @@ void PropertyHandle::setTypeCheck(bool typeCheck)
     typeCheckEnabled = typeCheck;
 }
 
-void PropertyHandle::onRegistryTouched()
+/// Decides who is the current provider of this property and sets up
+/// \c myProvider accordingly.  If the provider has changed then
+/// renews the subscriptions.
+void PropertyHandle::updateProvider()
 {
     PropertyProvider *newProvider;
 
     if (commandingEnabled && commanderListener->isServicePresent()) {
+        // If commander is present it should be able to override the
+        // property, so connect to it.
         newProvider = PropertyProvider::instance(commanderDBusType,
                                                  commanderDBusName);
     } else {
-        // The myInfo object doesn't have to be re-created, because it routes the function calls
-        // to a registry backend.
-
-        newProvider = myProvider;
+        // The myInfo object doesn't have to be re-created, because it
+        // just routes the function calls to a registry backend.
         QString dbusName = myInfo->providerDBusName();
 
-        // If the property is no longer in the registry, we keep the pointer to the old provider.
-        // This way, we can still continue communicating with the provider even though the key
-        // is no longer in the registry.
         if (dbusName != "") {
+            // If myInfo knows the current provider which should be
+            // connected to, connect to it.
             newProvider = PropertyProvider::instance(myInfo->providerDBusType(),
                                                      dbusName);
+        } else {
+            // Otherwise we keep the pointer to the old provider.
+            // This way, we can still continue communicating with the
+            // provider even though the key is no longer in the
+            // registry.
+            newProvider = myProvider;
         }
     }
 
@@ -125,11 +120,12 @@ void PropertyHandle::onRegistryTouched()
         // And subscribe to the new provider
         if (newProvider) newProvider->subscribe(myKey);
     }
+
     myProvider = newProvider;
 }
 
-
-/// Increase the subscribeCount of this context property and subscribe to DBUS if neccessary.
+/// Increase the \c subscribeCount of this context property and
+/// subscribe to it through the \c myProvider instance if neccessary.
 void PropertyHandle::subscribe()
 {
     qDebug() << "PropertyHandle::subscribe";
@@ -143,7 +139,9 @@ void PropertyHandle::subscribe()
     }
 }
 
-/// Decrease the subscribeCount of this context property and unsubscribe from DBUS if neccessary.
+/// Decrease the \c subscribeCount of this context property and
+/// unsubscribe from it through the \c myProvider instance if
+/// neccessary.
 void PropertyHandle::unsubscribe()
 {
     --subscribeCount;
@@ -155,6 +153,8 @@ void PropertyHandle::unsubscribe()
     }
 }
 
+/// Sets \c subscribePending to false if this property is contained in
+/// the \c keys set.
 void PropertyHandle::onSubscribeFinished(QSet<QString> keys)
 {
     if (keys.contains(myKey)) {
@@ -172,17 +172,17 @@ QVariant PropertyHandle::value() const
     return myValue;
 }
 
-PropertyProvider* PropertyHandle::provider() const
-{
-    return myProvider;
-}
-
 bool PropertyHandle::isSubscribePending() const
 {
     return subscribePending;
 }
 
-/// Changes the value of the property and emits the valueChanged signal.
+/// Used by the \c HandleSignalRouter to change the value of the
+/// property.  Before changing the value it checks the type if type
+/// checks are enabled.  It also verifies that the new value is
+/// different from the old one if \c allowSameValue is false.  These
+/// verification errors are signalled on the stderr.  After the checks
+/// it updates the value and emits the valueChanged() signal.
 void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
 {
     if (typeCheckEnabled // type checks enabled
@@ -208,7 +208,6 @@ void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
         }
     }
 
-    // Note: the null we receive is always a non-typed null. We might need to convert it here.
     if (myValue == newValue && myValue.isNull() == newValue.isNull()) {
         // The property already has the value we received.
         // If we're processing the return values of Subscribe, this is normal,
@@ -237,8 +236,6 @@ PropertyHandle* PropertyHandle::instance(const QString& key)
     if (!handleInstances.contains(key))
         handleInstances.insert(key,
                                new PropertyHandle(key));
-
-    Q_ASSERT(handleInstances[key] != 0);
 
     return handleInstances[key];
 }

@@ -19,9 +19,24 @@
  *
  */
 
+/*!
+  \class ManagerInterface
+
+  \brief Proxy class for using the DBus interface
+  org.freedesktop.ContextKit.Manager asynchronously.
+
+  Implements methods for constructing the interface objects (given the DBus
+  type (session or system), and bus name) and calling the function GetSubscriber
+  asynchronously.
+*/
+
 #include "managerinterface.h"
 #include "safedbuspendingcallwatcher.h"
 #include "sconnect.h"
+
+#include <QDBusInterface>
+#include <QDBusPendingReply>
+#include <QDBusObjectPath>
 
 const QString ManagerInterface::interfaceName = "org.freedesktop.ContextKit.Manager";
 const QString ManagerInterface::objectPath = "/org/freedesktop/ContextKit/Manager";
@@ -57,24 +72,23 @@ void ManagerInterface::getSubscriber()
 {
     if (iface == 0) {
         getSubscriberFailed = true;
-        return; // FIXME: emitting some kind of error signal also here?
+        emit getSubscriberFinished("");
+    } else {
+        getSubscriberFailed = false;
+
+        // Construct the asynchronous call
+        // FIXME: this four lines are repeated everywhere, should have a util function for it
+        QDBusPendingCall getSubscriberCall = iface->asyncCall("GetSubscriber");
+        SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(getSubscriberCall, this);
+        sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
+                 this, SLOT(onGetSubscriberFinished(QDBusPendingCallWatcher *)));
     }
-
-    getSubscriberFailed = false;
-
-    // Construct the asynchronous call
-    QDBusPendingCall getSubscriberCall = iface->asyncCall("GetSubscriber");
-    SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(getSubscriberCall, this);
-    sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
-             this, SLOT(onGetSubscriberFinished(QDBusPendingCallWatcher *)));
 }
 
 /// Is called when the asynchronous call to GetSubscriber has finished. Emits
 /// the signal getSubscriberFinished if the call finished successfully.
-// FIXME: Probably the error also needs to be signalled.
 void ManagerInterface::onGetSubscriberFinished(QDBusPendingCallWatcher* watcher)
 {
-    QString pathString = "";
     QDBusPendingReply<QDBusObjectPath> reply = *watcher;
     if (reply.isError()) {
         // Possible causes of the error:
@@ -83,12 +97,11 @@ void ManagerInterface::onGetSubscriberFinished(QDBusPendingCallWatcher* watcher)
         // The function resulted in an error
         qWarning() << "Provider error while getting the subscriber object:" << reply.error().message();
         getSubscriberFailed = true;
+        emit getSubscriberFinished("");
     } else {
         QDBusObjectPath path = reply.argumentAt<0>();
-        pathString = path.path();
-        qDebug() << pathString;
+        emit getSubscriberFinished(path.path());
     }
-    emit getSubscriberFinished(pathString);
 }
 
 bool ManagerInterface::isGetSubscriberFailed() const

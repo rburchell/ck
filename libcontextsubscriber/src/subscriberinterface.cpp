@@ -19,6 +19,30 @@
  *
  */
 
+/*!
+  \class SubscriberSignallingInterface
+
+  \brief Proxy class for the DBus interface
+  org.freedesktop.ContextKit.Subscriber which connects automatically
+  to the Changed signal over DBus.
+
+  It has to be a separate class because it needs the connection at
+  initialization time, and we want to pass only the bus type which
+  will be used to create the connection _after_ initialization time.
+*/
+
+/*!
+  \class SubscriberInterface
+
+  \brief Proxy class for using the DBus interface
+  org.freedesktop.ContextKit.Subscriber asynchronously.
+
+  Implements methods for constructing the interface objects (given the
+  DBus type, session or system, and bus name), calling the functions
+  Subscribe and Unsubscribe asynchronously, and listening to the
+  Changed signal.
+*/
+
 #include "subscriberinterface.h"
 #include "safedbuspendingcallwatcher.h"
 #include "sconnect.h"
@@ -29,8 +53,10 @@ const QString SubscriberSignallingInterface::interfaceName = "org.freedesktop.Co
 
 /// Constructs the SubscriberInterface. Connects to the DBus object specified
 /// by \a busType (session or system bus), \a busName and \a objectPath.
-SubscriberInterface::SubscriberInterface(
-    const QDBusConnection::BusType busType, const QString &busName, const QString& objectPath, QObject *parent)
+SubscriberInterface::SubscriberInterface(const QDBusConnection::BusType busType,
+                                         const QString &busName,
+                                         const QString& objectPath,
+                                         QObject *parent)
     : iface(0)
 {
     QDBusConnection connection("");
@@ -68,31 +94,32 @@ void SubscriberInterface::subscribe(QSet<QString> keys)
 
     // Construct the asynchronous call
     QStringList keyList = keys.toList();
+
     QDBusPendingCall subscribeCall = iface->asyncCall("Subscribe", keyList);
     SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(subscribeCall, this);
-    watcher->setProperty("keysToSubscribe", keyList);
-
     sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
              this, SLOT(onSubscribeFinished(QDBusPendingCallWatcher *)));
+
+    // When the pending call returns, we need to know the keys we
+    // tried to subscribe to.
+    watcher->setProperty("keysToSubscribe", keyList);
 }
 
 /// Calls the Unsubscribe function over DBus asynchronously.
 void SubscriberInterface::unsubscribe(QSet<QString> keys)
 {
-    if (iface == 0 || keys.size() == 0) {
-        return;
-    }
-    // Construct the asynchronous call
-    QStringList keyList = keys.toList();
+    if (iface != 0 && keys.size() != 0) {
+        // Construct the asynchronous call
+        QStringList keyList = keys.toList();
 
-    iface->asyncCall("Unsubscribe", keyList);
-    // The possible errors are not tracked, because we can't do anything if Unsubscribe fails.
+        iface->asyncCall("Unsubscribe", keyList);
+        // The possible errors are not tracked, because we can't do anything if Unsubscribe fails.
+    }
 }
 
 /// Processes the results of the Changed signal which comes over DBus.
 void SubscriberInterface::onChanged(const QMap<QString, QVariant> &values, const QStringList& unknownKeys)
 {
-//    qDebug() << "SubscriberInterface::onChanged";
     QMap<QString, QVariant> copy = values;
     emit valuesChanged(mergeNullsWithMap(copy, unknownKeys), false);
 }
@@ -113,7 +140,6 @@ QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QV
 /// the signal valuesChanged with the return values of the subscribed keys.
 void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
 {
-    qDebug() << "onSubscribeFinished";
     QDBusPendingReply<QMap<QString, QVariant>, QStringList> reply = *watcher;
     if (reply.isError()) {
         // Possible causes of the error:
@@ -125,10 +151,9 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
         QMap<QString, QVariant> subscribeTimeValues = reply.argumentAt<0>();
         QStringList unknowns = reply.argumentAt<1>();
 
-        // FIXME: the protocol should be better, this is just a workaround
+        // TODO: the protocol should be better, this is just a workaround
         emit valuesChanged(mergeNullsWithMap(subscribeTimeValues, unknowns), true);
     }
-    qDebug() << "***SubscriberInterface::onSubscribeFinished" << watcher->property("keysToSubscribe");
     QStringList keys = watcher->property("keysToSubscribe").toStringList();
     emit subscribeFinished(keys.toSet());
 }
@@ -138,11 +163,6 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
 SubscriberSignallingInterface::SubscriberSignallingInterface(const QString &dbusName, const QString& objectPath,
                                                              const QDBusConnection &connection, QObject *parent)
     : QDBusAbstractInterface(dbusName, objectPath, interfaceName.toStdString().c_str(), connection, parent)
-{
-}
-
-/// Destroys the SubscriberSignallingInterface
-SubscriberSignallingInterface::~SubscriberSignallingInterface()
 {
 }
 

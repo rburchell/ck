@@ -24,18 +24,10 @@
 
 #include <QObject>
 #include <QString>
-#include <QtDBus>
+#include <QDBusConnection>
 
-/*!
-  \class ManagerInterface
-
-  \brief Proxy class for using the DBus interface
-  org.freedesktop.ContextKit.Manager asynchronously.
-
-  Implements methods for constructing the interface objects (given the DBus
-  type, session or system, and bus name) and calling the function GetSubscriber
-  asynchronously.
-*/
+class QDBusPendingCallWatcher;
+class QDBusInterface;
 
 class ManagerInterface : public QObject
 {
@@ -57,9 +49,7 @@ private slots:
     void onGetSubscriberFinished(QDBusPendingCallWatcher* watcher);
 
 private:
-    QDBusInterface* iface;
-    bool getSubscriberFailed;
+    QDBusInterface* iface; //< DBus interface for the manager
+    bool getSubscriberFailed; //< Previous async GetSubscriber call failed
 };
-
-
 #endif

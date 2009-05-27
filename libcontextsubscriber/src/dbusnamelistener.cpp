@@ -28,20 +28,27 @@
 #include <QMap>
 #include <QString>
 
-QMap<QPair<QDBusConnection::BusType, QString>, DBusNameListener*> DBusNameListener::listenerInstances;
+/*! \class DBusNameListener
 
-DBusNameListener* DBusNameListener::instance(const QDBusConnection::BusType busType, const QString &busName)
-{
-    QPair<QDBusConnection::BusType, QString> lookupValue(busType, busName);
-    if (!listenerInstances.contains(lookupValue))
-            listenerInstances.insert(lookupValue,
-                                     new DBusNameListener(busType, busName));
+  \brief Listens for changes in a specific service name on a DBus bus,
+  optionally gets the initial state of the service name.
 
-    return listenerInstances[lookupValue];
-}
+  When you create an instance of this class, it will open a connection
+  to DBus bus \c busType, and will start to listen to name changes of
+  service name \c busName.  If a service appears, it will emit the \c
+  nameAppeared() signal, if disappears, then the nameDisappeared()
+  signal.  An initial query and signal emission will be done if \c
+  initialCheck is true, which is the default.
 
-DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const QString &busName) :
-    busName(busName), servicePresent(false)
+  Anytime you can check with <tt>isServicePresent()</tt> if according
+  to our current knowledge (last signal emission) the service is
+  present or not.  This means that if \c initialCheck is false,
+  <tt>isServicePresent()</tt> can return false, even though the service
+  is present.
+*/
+DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const QString &busName,
+                                   bool initialCheck, QObject *parent) :
+    QObject(parent), busName(busName), servicePresent(false)
 {
     QDBusConnection connection("");
 
@@ -66,12 +73,18 @@ DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const
              SLOT(onServiceOwnerChanged(const QString&, const QString&, const QString&)));
 
     // Check if the service is already there
-    QDBusPendingCall nameHasOwnerCall = connection.interface()->asyncCall("NameHasOwner", busName);
-    SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(nameHasOwnerCall, this);
-    sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
-             this, SLOT(onNameHasOwnerFinished(QDBusPendingCallWatcher *)));
+    if (initialCheck) {
+        QDBusPendingCall nameHasOwnerCall = connection.interface()->asyncCall("NameHasOwner", busName);
+        SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(nameHasOwnerCall, this);
+        sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
+                 this, SLOT(onNameHasOwnerFinished(QDBusPendingCallWatcher *)));
+    }
 }
 
+/// This slot is called when DBusNameOwnerChanged signal arrives and
+/// it just filters the name and if we are interested in the name it
+/// emits the <tt>nameAppeared()</tt> or <tt>nameDisappeared()</tt>
+/// signal.
 void DBusNameListener::onServiceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
     if (name == busName) {
@@ -99,6 +112,7 @@ void DBusNameListener::setServiceGone()
     }
 }
 
+/// Handling of the asynchronous reply of the initial query.
 void DBusNameListener::onNameHasOwnerFinished(QDBusPendingCallWatcher* watcher)
 {
     QDBusPendingReply<bool> reply = *watcher;

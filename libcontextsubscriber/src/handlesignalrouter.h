@@ -19,8 +19,6 @@
  *
  */
 
-// FIXME: Write documentation for this class
-
 #ifndef HANDLESIGNALROUTER_H
 #define HANDLESIGNALROUTER_H
 
@@ -39,8 +37,7 @@ public slots:
 
 private:
     HandleSignalRouter();
-    static HandleSignalRouter* myInstance;
-
+    static HandleSignalRouter* myInstance; //< Singleton instance
 };
 
 
