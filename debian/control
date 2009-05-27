@@ -1,0 +1,109 @@
+Source: contextkit
+Section: misc
+Priority: optional
+Maintainer: Marius Vollmer <marius.vollmer@nokia.com>
+Build-Depends: debhelper (>= 5),
+               automake1.9,
+               gnome-common,
+               libglib2.0-dev (>= 2.12.0),
+               libsqlite3-dev,
+               libdbus-glib-1-dev,
+               libgee-dev (>= 0.1.3),
+               python,
+               python-central,
+               xsltproc,
+               libhal-dev,
+               gtk-doc-tools
+XS-Python-Version: all
+Standards-Version: 3.8.0
+
+Package: contextkit
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: A framework for collecting contextual information
+ ContextKit is a system for providing real-time context awareness to
+ applications.
+ .
+ This package provides the session-activated D-Bus daemon.
+
+Package: contextkit-dbg
+Priority: extra
+Architecture: any
+Depends: contextkit (= ${binary:Version})
+Description: A framework for collecting contextual information
+ ContextKit is a system for providing real-time context awareness to
+ applications.
+ .
+ This package contains the debug symbols for the daemon.
+
+Package: contextkit-doc
+Section: doc
+Architecture: all
+Provides: org-freedesktop-contextkit-doc
+Description: A framework for collecting contextual information
+ ContextKit is a system for providing real-time context awareness to
+ applications.
+ .
+ This package contains the documentation.
+
+Package: libcontextprovider0
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Helper library for providers of context properties
+ The libcontextprovider library implements the provider side of the
+ org.freedesktop.ContextKit D-Bus interface.
+
+Package: libcontextprovider0-dbg
+Priority: extra
+Architecture: any
+Depends: libcontextprovider0 (= ${binary:Version})
+Description: Helper library for providers of context properties
+ The libcontextprovider library implements the provider side of the
+ org.freedesktop.ContextKit D-Bus interface.
+ .
+ This package contains the debug symbols.
+
+Package: libcontextprovider-dev
+Section: libdevel
+Architecture: any
+Depends: libcontextprovider0 (= ${binary:Version}), libdbus-1-dev, libdbus-glib-1-dev, libglib2.0-dev, libgee-dev
+Description: Helper library for providers of context properties
+ The libcontextprovider library implements the provider side of the
+ org.freedesktop.ContextKit D-Bus interface.
+ .
+ This package contains the development files.
+
+Package: libcontextprovider-doc
+Section: doc
+Architecture: all
+Description: Helper library for providers of context properties
+ The libcontextprovider library implements the provider side of the
+ org.freedesktop.ContextKit D-Bus interface.
+ .
+ This package contains the documentation.
+
+Package: fake-context-provider
+Section: devel
+Architecture: all
+Description: Provider for all unimplemented core context properties
+ This package installs the declarations for all core context
+ properties that are not yet implemented by anyone.
+ .
+ You can use the context-commander to change the value of these
+ properties.
+
+Package: python-contextkit
+Section: python
+Architecture: any
+Provides: ${python:Provides}
+Depends: ${python:Depends}, python-gobject
+XB-Python-Version: ${python:Versions}
+Description: Python bindings for ContextKit APIs
+ This package contains python bindings for the libcontextprovider
+ C interface, which helps you writing providers in python.
+ .
+ In the future it will contain the python bindings for
+ libcontextsubscriber too, but it is not ready yet.
+ .
+ If you are interested in some quick test tools for the ContextKit,
+ please look into the package named contextkit-utils.

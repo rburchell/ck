@@ -1,0 +1,49 @@
+These directories contain a simple Python binding for the
+libcontextprovider library and a test provider tool.  To use them, you
+need to ensure that pkg-config works wrt this library.  One way is to
+install everything into the appropriate locations, or alternatively, set
+PKG_CONFIG_PATH to contain the directories with the .pc files.  The
+latter is preferred during development.
+
+Flexiprovider is a Python module/tool for testing Context Framework
+clients.  It allows to define properties and provides means to change
+their values during runtime.
+
+There are two examples: `simple.py' and `complex.py', which you may use
+to get a clue how to write your own provider.  The `context-provide'
+script allows you to start up a provider from the command line, without
+writing any Python code.
+
+The interactive mode stops on closing stdin, and supports the following
+commands (note that this is Python syntax, and it gets eval()-ed):
+
+    set(property, value):  sets the given property
+    get(property):         prints the value of the property
+    reset(property):       resets the property
+    add(propertydesc):     adds a new property, see simple.py for
+                           examples of propertydesc
+    info():                prints properties and their values
+    quit():                stops the whole thing
+
+You may use `context-rlwrap' as illustrated below fora more friendly
+readline interface:
+
+  context-rlwrap ./context-provide my.fake.provider
+
+Examples:
+
+Starts up a provider, initially having a single integer property named
+'an.example' with the default value of 32.
+
+  ./context-provide my.provider.name int an.example 32
+
+Starts up the provider on the system bus without any properties.
+
+  ./context-provide system:org.bottomdrawer.kit2000
+
+Gives a readline wrapped provider shell with a initial string property.
+
+  ./context-rlwrap context-provide your.cool.provider string my.name 'bond'
+
+NOTE: you must give default values for initial properties (the script
+reads them in 3 at a time).
