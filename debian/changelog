@@ -1,8 +1,9 @@
 contextkit (0.1.8~unreleased) unstable; urgency=low
 
-  * 
+  * Added python-contextkit, which is a python binding for
+    libcontextprovider and (in the future) libcontextsubscriber.
 
- -- Marius Vollmer <marius.vollmer@nokia.com>  Mon, 25 May 2009 19:12:19 +0300
+ -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Wed, 27 May 2009 08:38:17 +0300
 
 contextkit (0.1.7) unstable; urgency=low
 
