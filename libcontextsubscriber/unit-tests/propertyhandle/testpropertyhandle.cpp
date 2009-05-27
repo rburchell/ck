@@ -62,14 +62,11 @@ void myMessageOutput(QtMsgType type, const char *msg)
 // These will be created by the test program
 PropertyProvider* mockPropertyProvider;
 PropertyProvider* mockCommanderProvider;
-DBusNameListener mockDBusNameListener;
-// Note: The DBusNameListener is used as a static member of PropertyHandle,
-// so, the DBusNameListener::instance is called before we have a change to init()
-// the unit test class. Therefore, the DBusNameListener must be created here.
 
 ContextRegistryInfo* mockContextRegistryInfo;
 // These will be created by the tested class and stored here
 ContextPropertyInfo* mockContextPropertyInfo;
+DBusNameListener* mockDBusNameListener;
 
 // Mock implementation of the PropertyProvider
 int PropertyProvider::instanceCount = 0;
@@ -130,16 +127,13 @@ void PropertyProvider::resetLogs()
 
 // Mock implementation of the DBusNameListener
 
-DBusNameListener* DBusNameListener::instance(const QDBusConnection::BusType busType, const QString &busName)
+DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType,
+                                   const QString &busName, bool initialCheck, QObject* parent)
+ : servicePresent(false)
 {
-    return &mockDBusNameListener;
+    // Store the object created by the class to be tested
+    mockDBusNameListener = this;
 }
-
-DBusNameListener::DBusNameListener()
-: servicePresent(false)
-{
-}
-
 
 bool DBusNameListener::isServicePresent() const
 {
@@ -203,7 +197,7 @@ void PropertyHandleUnitTests::init()
     // Reset the logs
     PropertyProvider::resetLogs();
     // Reset the DBusNameListener (it is created only once, by the class to be tested)
-    mockDBusNameListener.servicePresent = false;
+    mockDBusNameListener->servicePresent = false;
 }
 
 // After each test
@@ -219,8 +213,8 @@ void PropertyHandleUnitTests::cleanup()
     // Disconnect all signals from the DBusNameListener.
     // Even if all the PropertyHandle objects (created in the tests) will live,
     // they won't receive any signals.
-    QObject::disconnect(&mockDBusNameListener, SIGNAL(nameAppeared()), 0, 0);
-    QObject::disconnect(&mockDBusNameListener, SIGNAL(nameDisappeared()), 0, 0);
+    QObject::disconnect(mockDBusNameListener, SIGNAL(nameAppeared()), 0, 0);
+    QObject::disconnect(mockDBusNameListener, SIGNAL(nameDisappeared()), 0, 0);
 }
 
 void PropertyHandleUnitTests::initializing()
@@ -803,8 +797,8 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
 
     // Test:
     // Command the DBusNameListener to tell that the Commander has appeared
-    mockDBusNameListener.servicePresent = true;
-    emit mockDBusNameListener.nameAppeared();
+    mockDBusNameListener->servicePresent = true;
+    emit mockDBusNameListener->nameAppeared();
 
     // Expected results:
     // The handle unsubscribes from the real provider
@@ -815,8 +809,6 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
     QCOMPARE(PropertyProvider::subscribeCount, 1);
     QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
     QCOMPARE(PropertyProvider::subscribeProviderNames.at(0), QString("Commander"));
-    // The provider is now the Commander
-    QCOMPARE(propertyHandle->provider(), mockCommanderProvider);
 
     // Setup:
     // Clear the logs from the subscription
@@ -824,8 +816,8 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
 
     // Test:
     // Command the DBusNameListener to tell that the Commander has disappeared
-    mockDBusNameListener.servicePresent = false;
-    emit mockDBusNameListener.nameDisappeared();
+    mockDBusNameListener->servicePresent = false;
+    emit mockDBusNameListener->nameDisappeared();
 
     // Expected results:
     // The PropertyHandle unsubscribes from the commander
@@ -836,8 +828,6 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
     QCOMPARE(PropertyProvider::subscribeCount, 1);
     QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
     QCOMPARE(PropertyProvider::subscribeProviderNames.at(0), QString("NormalProvider"));
-    // The provider is now the real provider
-    QCOMPARE(propertyHandle->provider(), mockPropertyProvider);
 }
 
 void PropertyHandleUnitTests::commandingDisabled()
@@ -857,18 +847,16 @@ void PropertyHandleUnitTests::commandingDisabled()
 
     // Test:
     // Disable commanding
-    propertyHandle->disableCommanding();
+    propertyHandle->ignoreCommander();
 
     // Command the DBusNameListener to tell that the Commander has appeared
-    mockDBusNameListener.servicePresent = true;
-    emit mockDBusNameListener.nameAppeared();
+    mockDBusNameListener->servicePresent = true;
+    emit mockDBusNameListener->nameAppeared();
 
     // Expected results:
     // The PropertyHandle ignores the Commander
     QCOMPARE(PropertyProvider::unsubscribeCount, 0);
     QCOMPARE(PropertyProvider::subscribeCount, 0);
-    // The provider is still the real provider
-    QCOMPARE(propertyHandle->provider(), mockPropertyProvider);
 
     // Setup:
     // Clear the logs from the subscription
@@ -876,15 +864,13 @@ void PropertyHandleUnitTests::commandingDisabled()
 
     // Test:
     // Command the DBusNameListener to tell that the Commander has disappeared
-    mockDBusNameListener.servicePresent = false;
-    emit mockDBusNameListener.nameDisappeared();
+    mockDBusNameListener->servicePresent = false;
+    emit mockDBusNameListener->nameDisappeared();
 
     // Expected results:
     // The PropertyHandle ignores the Commander
     QCOMPARE(PropertyProvider::unsubscribeCount, 0);
     QCOMPARE(PropertyProvider::subscribeCount, 0);
-    // The provider is still the real provider
-    QCOMPARE(propertyHandle->provider(), mockPropertyProvider);
 }
 
 
