@@ -3,7 +3,7 @@ import os
 import sys
 import tempfile
 import subprocess
-import glib, gobject
+import gobject
 import dbus, dbus.service, dbus.mainloop.glib
 
 def pkgconfig(*args):
@@ -88,7 +88,7 @@ def update_context_providers(xml, dir='.'):
 
 class Flexiprovider(object):
     def stdin_ready(self, fd, cond):
-        if cond & glib.IO_ERR:
+        if cond & gobject.IO_ERR:
             self.loop.quit()
             return False
         # We assume that stdin is line-buffered (ie. readline() doesn't
@@ -197,9 +197,9 @@ class Flexiprovider(object):
         """
         # Reopen stdout to be line-buffered.
         sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
-        glib.io_add_watch(sys.stdin.fileno(),
-                          glib.IO_IN | glib.IO_HUP | glib.IO_ERR,
-                          self.stdin_ready)
+        gobject.io_add_watch(sys.stdin.fileno(),
+                             gobject.IO_IN | gobject.IO_HUP | gobject.IO_ERR,
+                             self.stdin_ready)
         self.loop.run()
 
     def run(self):
