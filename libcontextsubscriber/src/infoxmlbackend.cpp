@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include "sconnect.h"
 #include "infoxmlbackend.h"
-#include "infoxmlkeysfinder.h"
+#include "infokeysfinder.h"
 
 /*!
     \class InfoXmlBackend
@@ -189,7 +189,7 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
 
     QDir dir = QDir(registryPath());
     dir.setFilter(QDir::Files);
-    dir.setNameFilters(QStringList("*.xml"));
+    dir.setNameFilters(QStringList("*.context"));
 
     // It's enough for us to compare sizes here, not actual content (filenames). The
     // latter case is always handled by the fileChanged.
