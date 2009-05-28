@@ -91,6 +91,7 @@ private:
     InfoBackend& operator=(const InfoBackend&);
   
     static InfoBackend* backendInstance; //< Holds a pointer to the instance of the singelton.
+    static void destroyInstance();
     
     friend class InfoXmlBackend;
     friend class InfoCdbBackend;
