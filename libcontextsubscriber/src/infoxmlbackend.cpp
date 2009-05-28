@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include "sconnect.h"
 #include "infoxmlbackend.h"
-#include "infokeysfinder.h"
+#include "infoxmlkeysfinder.h"
 
 /*!
     \class InfoXmlBackend
