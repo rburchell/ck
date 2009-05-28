@@ -98,5 +98,15 @@ void ContextRegistryInfoUnitTest::checkPrefix()
     }
 }
 
+int main(int argc, char **argv)
+{
+    // Leak the application. Intentionally for now, until
+    // the QFileSystemWatcher issues are resolved.
+    QCoreApplication *app = new QCoreApplication(argc, argv);
+    
+    ContextRegistryInfoUnitTest test;
+    QTest::qExec(&test);
+}
+
 #include "moc_contextregistryinfounittest_cpp.cpp"
-QTEST_MAIN(ContextRegistryInfoUnitTest);
+//QTEST_MAIN(ContextRegistryInfoUnitTest);
