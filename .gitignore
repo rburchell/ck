@@ -167,3 +167,4 @@ tests/contextd_tests/hal_plugin.c
 /debian/*.prerm.debhelper
 /debian/*.preinst.debhelper
 /debian/*.substvars
+/debian/contextkit-utils/

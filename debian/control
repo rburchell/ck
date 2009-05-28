@@ -107,3 +107,13 @@ Description: Python bindings for ContextKit APIs
  .
  If you are interested in some quick test tools for the ContextKit,
  please look into the package named contextkit-utils.
+
+Package: contextkit-utils
+Section: utils
+Architecture: all
+Depends: python-contextkit
+Description: Command line utilities for ContextKit
+ This package contains the context-provide and context-listen
+ tools. You can use context-provide to quickly provide context
+ properties from the command line, while with context-listen you can
+ watch properties for changes.
