@@ -19,7 +19,7 @@ function compare {
 
 # Query the database $1 using the cdb tool and echo results to $1.actual
 function querydb {
-    cdb -q "context-providers.cdb" "$1" > "$1.actual"
+    cdb -q "cache.cdb" "$1" > "$1.actual"
 }
 
 # Check the keys in the existing context-providers.cdb database
