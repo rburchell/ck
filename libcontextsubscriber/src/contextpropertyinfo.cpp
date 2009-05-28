@@ -82,7 +82,7 @@
     \section xmlvscdb XML vs.CDB
    
     When the introspection API is first used, a backend choice is being made. \b CDB backend
-    (reading data from \c 'context-providers.cdb' ) is used if the tiny database cache file exists
+    (reading data from \c 'cache.cdb' ) is used if the tiny database cache file exists
     in the registry. The standard (slower) \b XML backend is used in other cases. 
    
     It's possible to force a usage of a particular backend. 

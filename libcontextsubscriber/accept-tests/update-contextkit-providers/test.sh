@@ -22,7 +22,7 @@ function querydb {
     cdb -q "cache.cdb" "$1" > "$1.actual"
 }
 
-# Check the keys in the existing context-providers.cdb database
+# Check the keys in the existing cache.cdb database
 function dotest {
     querydb "KEYS"
     compare "KEYS.expected" "KEYS.actual"
