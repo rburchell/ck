@@ -11,7 +11,7 @@ COVERAGE_FILES = contextregistryinfo.cpp infobackend.cpp infoxmlbackend.cpp info
 SOURCE_H = contextregistryinfo.h infobackend.h infoxmlbackend.h infocdbbackend.h infoxmlkeysfinder.h cdbreader.h # process this headers with MOC and compile the results
 QT_TOMOC_H = 
 
-EXTRA_DIST = providers1.xml providers2.xml
+EXTRA_DIST = providers1.context providers2.context
 
 # when MOCing from .cpp file, you also has to help the dependency tracker
 QT_TOMOC_CPP = contextregistryinfounittest.cpp
