@@ -20,11 +20,11 @@
  */
 
 #include "propertyprovider.h"
-
 #include "handlesignalrouter.h"
 #include "sconnect.h"
 #include "subscriberinterface.h"
 #include "dbusnamelistener.h"
+#include <QTimer>
 
 QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvider::providerInstances;
 
@@ -32,55 +32,55 @@ QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvid
    \class PropertyProvider
 
    \brief Keeps the DBUS connection with a specific provider and
-   handles subscriptions with the properties of that provider.
+   handles subscriptions and value changes with the properties of that
+   provider.
 */
 
-/// Constructs a new instance. ContextProperty handles providers for
-/// you, no need to (and can't) call this constructor.
 PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
     : busType(busType), busName(busName), managerInterface(busType, busName, this), subscriberInterface(0)
 {
-    // Setup idle timer
-    idleTimer.setSingleShot(true);
-    idleTimer.setInterval(0);
+    // Setup idle timer, 0: always run it when we are entering the
+    // mainloop and the timer is enabled.
+    idleTimer = new QTimer(this);
+    idleTimer->setSingleShot(true);
+    idleTimer->setInterval(0);
 
     // Call GetSubscriber asynchronously
     sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
-    sconnect(&idleTimer, SIGNAL(timeout()),
-             this, SLOT(idleHandler()));
+    sconnect(idleTimer, SIGNAL(timeout()), this, SLOT(idleHandler()));
     managerInterface.getSubscriber();
 
     // Note if the provider on the dbus comes and go
-    dbusNameListener = DBusNameListener::instance(busType, busName);
-    sconnect(dbusNameListener,
-             SIGNAL(nameAppeared()),
-             this,
-             SLOT(onProviderAppears()));
-    sconnect(dbusNameListener,
-             SIGNAL(nameAppeared()),
-             this,
-             SLOT(onProviderDisappears()));
+    providerListener = new DBusNameListener(busType, busName, false, this);
+    sconnect(providerListener, SIGNAL(nameAppeared()),
+             this, SLOT(onProviderAppeared()));
+    sconnect(providerListener, SIGNAL(nameDisappeared()),
+             this, SLOT(onProviderDisappeared()));
 
     // Connect the signal of changing values to the class who handles it
     HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
     sconnect(this, SIGNAL(valueChanged(QString, QVariant, bool)),
              handleSignalRouter, SLOT(onValueChanged(QString, QVariant, bool)));
-
 }
 
-void PropertyProvider::onProviderAppears()
+/// Provider reappeared on the DBus, so get a new subscriber interface from it
+void PropertyProvider::onProviderAppeared()
 {
     delete subscriberInterface;
     subscriberInterface = 0;
     managerInterface.getSubscriber();
 }
 
-void PropertyProvider::onProviderDisappears()
+/// Delete our subscriber interface when the provider went away
+void PropertyProvider::onProviderDisappeared()
 {
     delete subscriberInterface;
     subscriberInterface = 0;
 }
 
+/// Called when the manager interface is ready with the asynchronous
+/// GetSubscriber call.  We use the new subscriber interface to
+/// subscribe to the currently subscribed keys.
 void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 {
     qDebug() << "PropertyProvider::onGetSubscriberFinished" << objectPath;
@@ -105,7 +105,7 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
         toSubscribe.clear();
         toSubscribe += subscribedKeys;
 
-        idleTimer.start();
+        idleTimer->start();
     }
     else {
         // GetSubscriber failed
@@ -115,6 +115,11 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
     }
 }
 
+/// Called when the subscriber interface is ready with the
+/// asynchronous Subscribe call. Emit the \c subscribeFinished signal
+/// which will be caught by the \c PropertyHandle objects to set the
+/// \c subscribePending boolean which is used by the not so busy
+/// busyloop in <tt>waitForSubscription()</tt>.
 void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 {
     qDebug() << "PropertyProvider::onSubscribeFinished" << keys;
@@ -133,7 +138,8 @@ void PropertyProvider::subscribe(const QString &key)
 
     if (managerInterface.isGetSubscriberFailed()) {
         qDebug() << "GetSubscriber has failed previously";
-        // The subscription will never be successful
+        // The subscription will not be successful, emit the subscribeFinished
+        // signal so that the handles will stop waiting.
         QSet<QString> toEmit;
         toEmit.insert(key);
         emit subscribeFinished(toEmit);
@@ -151,17 +157,7 @@ void PropertyProvider::subscribe(const QString &key)
         toSubscribe.insert(key);
 
         if (subscriberInterface != 0)
-            idleTimer.start();
-    }
-}
-
-void PropertyProvider::idleHandler()
-{
-    if (subscriberInterface != 0) {
-        if (toSubscribe.size() > 0) subscriberInterface->subscribe(toSubscribe);
-        if (toUnsubscribe.size() > 0) subscriberInterface->unsubscribe(toUnsubscribe);
-        toSubscribe.clear();
-        toUnsubscribe.clear();
+            idleTimer->start();
     }
 }
 
@@ -185,7 +181,19 @@ void PropertyProvider::unsubscribe(const QString &key)
         toUnsubscribe.insert(key);
 
         if (subscriberInterface != 0)
-            idleTimer.start();
+            idleTimer->start();
+    }
+}
+
+/// Is executed when the main loop is entered and we have previously
+/// scheduled subscriptions / unsubscriptions.
+void PropertyProvider::idleHandler()
+{
+    if (subscriberInterface != 0) {
+        if (toSubscribe.size() > 0) subscriberInterface->subscribe(toSubscribe);
+        if (toUnsubscribe.size() > 0) subscriberInterface->unsubscribe(toUnsubscribe);
+        toSubscribe.clear();
+        toUnsubscribe.clear();
     }
 }
 
@@ -195,12 +203,11 @@ void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool proc
     for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
         if (subscribedKeys.contains(i.key()) == false) {
             qWarning() << "Received a property not subscribed to:" << i.key();
-            continue;
+        } else {
+            // Note: HandleSignalRouter will catch this signal and set the value of the
+            // corresponding PropertyHandle.
+            emit valueChanged(i.key(), i.value(), processingSubscription);
         }
-
-        emit valueChanged(i.key(), i.value(), processingSubscription);
-        // Note: HandleSignalRouter will catch this signal and set the value of the
-        // corresponding PropertyHandle.
     }
 }
 

@@ -64,7 +64,6 @@ private slots:
     void providerDisappearsAndAppears();
 
     // Tests for bug fixes
-    // Note: test is disabled (bug will be fixed later)
-    // void providerPresentAtStartup();
+    void providerPresentAtStartup();
 
 };

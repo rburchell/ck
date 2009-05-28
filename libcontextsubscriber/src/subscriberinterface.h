@@ -27,17 +27,6 @@
 #include <QStringList>
 #include <QtDBus>
 
-/*!
-  \class SubscriberInterface
-
-  \brief Proxy class for using the DBus interface
-  org.freedesktop.ContextKit.Subscriber asynchronously.
-
-  Implements methods for constructing the interface objects (given the DBus
-  type, session or system, and bus name), calling the functions Subscribe and
-  Unsubscribe asynchronously, and listening to the Changed signal.
-*/
-
 class SubscriberSignallingInterface;
 
 class SubscriberInterface : public QObject
@@ -60,22 +49,12 @@ private slots:
     void onChanged(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);
 
 private:
-    SubscriberSignallingInterface* iface;
-
     SubscriberInterface(const SubscriberInterface& other);
     SubscriberInterface& operator=(const SubscriberInterface& other);
-
     QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
+
+    SubscriberSignallingInterface* iface; //< DBus interface to the subscriber
 };
-
-/*!
-  \class SubscriberSignallingInterface
-
-  \brief Proxy class for the DBus interface
-  org.freedesktop.ContextKit.Subscriber which connects automatically to the
-  Changed signal over DBus.
-
-*/
 
 class SubscriberSignallingInterface: public QDBusAbstractInterface
 {
@@ -84,13 +63,11 @@ class SubscriberSignallingInterface: public QDBusAbstractInterface
 public:
     SubscriberSignallingInterface(const QString &dBusName, const QString &path, const QDBusConnection &connection, QObject *parent = 0);
 
-    ~SubscriberSignallingInterface();
-
-Q_SIGNALS: // SIGNALS
+signals:
     void Changed(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);
 
 private:
-    static const QString interfaceName;
+    static const QString interfaceName; //< ContextKit protocol's subscriber dbus interface name
 };
 
 #endif

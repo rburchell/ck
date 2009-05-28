@@ -19,8 +19,17 @@
  *
  */
 
-#include "handlesignalrouter.h"
+/*! \class HandleSignalRouter
 
+  \brief Routes the <tt>valueChanged()</tt> signal to the correct \c
+  PropertyHandle object.
+
+  This is an optimization, so we don't have to connect all of the
+  value changes from the same provider to all of the
+  <tt>PropertyHandle</tt>s of that provider.
+*/
+
+#include "handlesignalrouter.h"
 #include "propertyhandle.h"
 
 HandleSignalRouter* HandleSignalRouter::myInstance = 0;

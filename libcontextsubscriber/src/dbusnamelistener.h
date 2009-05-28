@@ -19,8 +19,6 @@
  *
  */
 
-// FIXME: Documentation for this class
-
 #ifndef DBUSNAMELISTENER_H
 #define DBUSNAMELISTENER_H
 
@@ -28,16 +26,14 @@
 #include <QDBusConnection>
 #include <QString>
 
-template<typename P1, typename P2> class QPair;
-template<typename K, typename V> class QMap;
-
 class QDBusPendingCallWatcher;
 
 class DBusNameListener : public QObject
 {
     Q_OBJECT
 public:
-    static DBusNameListener* instance(const QDBusConnection::BusType busType, const QString &busName);
+    DBusNameListener(const QDBusConnection::BusType busType, const QString &busName,
+                     bool initialCheck = true, QObject *parent = 0);
     bool isServicePresent() const;
 
 private slots:
@@ -45,11 +41,9 @@ private slots:
     void onNameHasOwnerFinished(QDBusPendingCallWatcher* watcher);
 
 private:
-    bool servicePresent;
-    QString busName;
-    static QMap<QPair<QDBusConnection::BusType, QString>, DBusNameListener*> listenerInstances;
+    bool servicePresent; //< Our current understanding about the service name's state
+    QString busName; //< The service name we are interested in
 
-    DBusNameListener(const QDBusConnection::BusType busType, const QString &busName);
     void setServicePresent();
     void setServiceGone();
 

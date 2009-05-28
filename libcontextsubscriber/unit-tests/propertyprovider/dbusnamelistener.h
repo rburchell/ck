@@ -32,14 +32,16 @@ class DBusNameListener : public QObject
 {
     Q_OBJECT
 public:
-    static DBusNameListener* instance(const QDBusConnection::BusType busType, const QString &busName);
+    DBusNameListener(const QDBusConnection::BusType busType, const QString &busName,
+                     bool initialCheck = true, QObject* parent = 0);
     bool isServicePresent() const;
-
-    DBusNameListener(); // Note: public only in tests
 
 signals:
     void nameAppeared();
     void nameDisappeared();
+
+public: // for tests
+    bool initialCheck;
 
     friend class PropertyProviderUnitTests;
 };

@@ -24,6 +24,7 @@
 #include "infocdbbackend.h"
 #include <QMutex>
 #include <QDebug>
+#include <QCoreApplication>
 
 /*!
     \class InfoBackend
@@ -66,6 +67,8 @@ InfoBackend* InfoBackend::instance(const QString &backendName)
                 else
                     backendInstance = new InfoXmlBackend;
             }
+            
+            qAddPostRoutine(destroyInstance);
         }
  
         mutex.unlock();
@@ -135,5 +138,18 @@ void InfoBackend::disconnectNotify(const char *signal)
 {
     QObject::disconnectNotify(signal);
     connectCount--;
+}
+
+/* Private */
+
+/// Called before the application is destroyed. Deletes the backend instance. 
+/// This is to ensure that the QFileSystemWatcher in backends gets deleted
+/// before the application terminates (otherwise weird issues follow).
+void InfoBackend::destroyInstance()
+{
+    if (backendInstance) {
+        delete backendInstance;
+        backendInstance = NULL;
+    }
 }
 

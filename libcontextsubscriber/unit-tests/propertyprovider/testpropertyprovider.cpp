@@ -63,9 +63,9 @@ void myMessageOutput(QtMsgType type, const char *msg)
 
 // Mock instances
 // These will be created by the test program
-DBusNameListener* mockDBusNameListener;
 HandleSignalRouter* mockHandleSignalRouter;
 // These will be created by the tested class and stored here
+DBusNameListener* mockDBusNameListener;
 ManagerInterface* mockManagerInterface;
 SubscriberInterface* mockSubscriberInterface;
 
@@ -163,16 +163,14 @@ void SubscriberInterface::resetLogs()
 
 // Mock implementation of the DBusNameListener
 
-DBusNameListener* DBusNameListener::instance(const QDBusConnection::BusType busType, const QString &busName)
+DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const QString &busName,
+                                   bool initialCheck, QObject* parent)
+    : initialCheck(initialCheck)
 {
     // qDebug() << "Returning a mock dbus name listener";
-    return mockDBusNameListener;
+    // Store the mock implementation (created by the tested class)
+    mockDBusNameListener = this;
 }
-
-DBusNameListener::DBusNameListener()
-{
-}
-
 
 bool DBusNameListener::isServicePresent() const
 {
@@ -213,7 +211,6 @@ void PropertyProviderUnitTests::cleanupTestCase()
 void PropertyProviderUnitTests::init()
 {
     // Create the mock instances
-    mockDBusNameListener = new DBusNameListener();
     mockHandleSignalRouter = new HandleSignalRouter();
 
     // Reset logging of the mock objects
@@ -225,8 +222,6 @@ void PropertyProviderUnitTests::init()
 // After each test
 void PropertyProviderUnitTests::cleanup()
 {
-    delete mockDBusNameListener;
-    mockDBusNameListener = 0;
     delete mockHandleSignalRouter;
     mockHandleSignalRouter = 0;
 
@@ -730,7 +725,7 @@ void PropertyProviderUnitTests::providerDisappearsAndAppears()
     QVERIFY(keys.contains(QString("Fake.Key")));
 }
 
-/*
+
 void PropertyProviderUnitTests::providerPresentAtStartup()
 {
     // Setup:
@@ -746,7 +741,9 @@ void PropertyProviderUnitTests::providerPresentAtStartup()
 
     // Test: make the DBusNameListener notify the PropertyProvider
     // that the real provider is present
-    emit mockDBusNameListener->nameAppeared();
+    if (mockDBusNameListener->initialCheck) {
+        emit mockDBusNameListener->nameAppeared();
+    }
 
     // Expected result:
     // GetSubscriber is called only once
@@ -755,7 +752,7 @@ void PropertyProviderUnitTests::providerPresentAtStartup()
     // Note: This test was added because of a bug. GetSubscriber was
     // called two times when the provider was already present at startup.
 }
-*/
+
 
 
 QTEST_MAIN(PropertyProviderUnitTests);

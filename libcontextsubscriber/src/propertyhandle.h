@@ -23,8 +23,8 @@
 #define PROPERTYHANDLE_H
 
 #include <QObject>
-#include <QVariant>
 #include <QString>
+#include <QVariant>
 #include <QSet>
 
 class ContextPropertyInfo;
@@ -42,13 +42,12 @@ public:
     QString key() const;
     QVariant value() const;
     bool isSubscribePending() const;
-    PropertyProvider* provider() const;
     const ContextPropertyInfo* info() const;
 
     static PropertyHandle* instance(const QString& key);
 
     void setValue(QVariant newValue, bool allowSameValue);
-    static void disableCommanding();
+    static void ignoreCommander();
     static void setTypeCheck(bool typeCheck);
 
 signals:
@@ -56,21 +55,22 @@ signals:
 
 private slots:
     void onSubscribeFinished(QSet<QString> keys);
-    void onRegistryTouched();
+    void updateProvider();
 
 private:
     PropertyHandle(const QString& key);
 
-    PropertyProvider *myProvider; ///< Provider of this property
-    ContextPropertyInfo *myInfo; ///< Introspection instance
-    unsigned int subscribeCount; ///< Number of subscribed ContextProperty objects subscribed to this property
-    bool subscribePending; ///< True when the subscription has been started, but hasn't been finished yet
+    PropertyProvider *myProvider; //< Provider of this property
+    ContextPropertyInfo *myInfo; //< Metadata for this property
+    unsigned int subscribeCount; //< Number of subscribed ContextProperty objects subscribed to this property
+    bool subscribePending; //< True when the subscription has been started, but hasn't been finished yet
                            ///  (used by the waitForSubscription() feature)
-    QString myKey; ///< Name of this context property
-    QVariant myValue; ///< Cached value of this context property
-    static QMap<QString, PropertyHandle*> handleInstances; ///< Container for singletons, see the \c instance(key) call
-    static DBusNameListener *commanderListener; ///< DBusListener for ContextCommander.
-    static bool commandingEnabled; ///< Whether the properties can be directed to ContextCommander
-    static bool typeCheckEnabled; ///< Whether we check the type of the value provided by the provider.
+    QString myKey; //< Key of this property
+    QVariant myValue; //< Current value of this property
+    /// Container for singletons, see PropertyHandle::instance()
+    static QMap<QString, PropertyHandle*> handleInstances;
+    static DBusNameListener *commanderListener; //< Listener for ContextCommander's (dis)appearance
+    static bool commandingEnabled; //< Whether the properties can be directed to ContextCommander
+    static bool typeCheckEnabled; //< Whether we check the type of the value received from the provider
 };
 #endif

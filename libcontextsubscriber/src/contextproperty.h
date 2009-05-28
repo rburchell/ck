@@ -19,102 +19,15 @@
  *
  */
 
-///////////////////////////////////////////////////////////////////////////////
-// define ContextProperty
-///////////////////////////////////////////////////////////////////////////////
-
-/*!
-    \mainpage Context Properties
-
-    \brief The Context Framework allows you to access system- and
-    session-wide named values. Examples are context properties like the
-    current geographical location. You can receive notifications about
-    changes to these values, and you can also easily subscribe and
-    unsubscribe from change notifications to help with managing power
-    consumption.
-
-    \section Overview
-
-    The Context Properties are key/value pairs. The keys are
-    strings and the values are QVariants.
-
-    Key are arranged in a hierarchical name space like in this example
-    of two contextual properties
-
-    \code
-    Screen.TopEdge = "left"
-    Screen.IsCovered = false
-    \endcode
-
-    Although the key names can be considered to form a tree (with
-    "Screen" at the root in the preceeding example, etc.) there is no
-    semantic relationship between parent and child nodes in that tree:
-    the key "Screen" is unrelated to "Screen.TopEdge".  In particular,
-    change notifications do not travel up the tree.
-
-    The \ref Introspection section describes in detail how to get a list of
-    existing keys and examine their capabilities.
-
-    Programmers access the key/value pairs through instances of the
-    ContextProperty class.  These instances allow applications to read
-    item values and receive change notifications.
-
-    Example:
-    \code
-    ContextProperty topEdge("Screen.TopEdge");
-    QObject::connect(&topEdge, SIGNAL(valueChanged()),
-                     this, SLOT(topEdgeChanged()));
-    \endcode
-
-    In your edgeUpChanged method you are able to get the data:
-    \code
-    qWarning() << "The edge " << topEdge.value() << " is up";
-    \endcode
-
-    Creating a ContextProperty instance for a key causes the program to
-    'subscribe' to this key.  The values for some keys might be
-    expensive to determine, so you should only subscribe to those keys
-    that you are currently interested in.  You can temporarily
-    unsubscribe from a key without destroying the ContextProperty
-    instance for it by using the unsubscribe() member function. Later,
-    you can resume the subscription by calling the and subscribe()
-    member function.
-
-    \code
-    void onScreenBlank ()
-    {
-        topEdge.unsubscribe();
-    }
-
-    void onScreenUnblank ()
-    {
-        topEdge.subscribe();
-    }
-    \endcode
-
-    The set of available context properties can change at any time.
-    Keys might disappear when their providers terminate or are
-    uninstalled; new keys might appear when providers start or are
-    installed; etc. \ref Introspection has more information how to deal
-    with those situations.
-
-    Subscribing to a key that has no value associated
-    with it is not an error.  Instead, the ContextProperty will return
-    a 'null' QVariant in that case.  If a provider for the key becomes
-    available later, the property will start receiving values from the
-    provider transparently.
-
-*/
-
 #ifndef CONTEXTPROPERTY_H
 #define CONTEXTPROPERTY_H
 
 #include <QObject>
-#include <QVariant>
-#include <QString>
 
 class ContextPropertyPrivate;
 class ContextPropertyInfo;
+class QVariant;
+class QString;
 
 class ContextProperty : public QObject
 {
@@ -137,18 +50,15 @@ public:
 
     void waitForSubscription () const;
 
-    // This function should only be called by the Commander.
-    // It sets all the ContextProperty instances immune to commanding.
     static void ignoreCommander();
-
     static void setTypeCheck(bool typeCheck);
 
 signals:
-    void valueChanged();
+    void valueChanged(); //< Emitted whenever the value of the property changes and the property is subscribed.
 
 private:
     ContextPropertyPrivate *priv;
     static bool typeCheck;
 };
 
-#endif // CONTEXTPROPERTY_H
+#endif

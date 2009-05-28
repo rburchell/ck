@@ -2,9 +2,10 @@
 #define SAFEDBUSPENDINGCALLWATCHER_H
 
 #include "sconnect.h"
-#include <QDebug>
 #include <QDBusPendingCallWatcher>
 
+//! Deletes itself after the <tt>finished()</tt> signal is emitted
+//! (and the mainloop entered).
 class SafeDBusPendingCallWatcher : public QDBusPendingCallWatcher
 {
     Q_OBJECT;
@@ -17,5 +18,4 @@ public:
                      this, SLOT(deleteLater()));
         }
 };
-
 #endif
