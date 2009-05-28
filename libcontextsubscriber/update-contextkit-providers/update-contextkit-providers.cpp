@@ -57,7 +57,7 @@
    \endcode
 
    In this case the xml will be read from \c "/some/path/to/registry" and the resulting 
-   database will be written to \c "/some/path/to/registry/context-providers.cdb" .
+   database will be written to \c "/some/path/to/registry/cache.cdb" .
 
    Lastly, the \c "CONTEXT_PROVIDERS" environment variable can be used to specify 
    a directory containing the registry.
@@ -111,8 +111,8 @@ int main(int argc, char **argv)
 
     QDir dir(path);
     checkDirectory(dir);
-    QString tmpDbPath = dir.absoluteFilePath("context-providers-XXXXXX");
-    QString finalDbPath = dir.absoluteFilePath("context-providers.cdb"); 
+    QString tmpDbPath = dir.absoluteFilePath("cache-XXXXXX");
+    QString finalDbPath = dir.absoluteFilePath("cache.cdb"); 
     QByteArray templ = tmpDbPath.toUtf8();
 
     CDBWriter writer(mkstemp(templ.data()));

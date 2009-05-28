@@ -37,7 +37,7 @@
     This class is not exported in the public API. It does not cache any data
     to optimize the memory consumption. It's assumed that most data is anyways
     cached (as needed) in the ContextPropertyInfo and the cdb key-based access
-    (no enumetation) is fast anyways. It observers the \c context-providers.cdb
+    (no enumetation) is fast anyways. It observers the \c cache.cdb
     with a file system watcher.
 */
 
@@ -112,7 +112,7 @@ QString InfoCdbBackend::databasePath()
     if (! regpath)
         regpath = DEFAULT_CONTEXT_PROVIDERS;
 
-    return QString(regpath) + "context-providers.cdb";
+    return QString(regpath) + "cache.cdb";
 }
 
 /// Returns full path to the directory containing the database.
