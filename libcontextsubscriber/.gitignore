@@ -17,6 +17,9 @@ contextsubscriber-1.0.pc
 # Ignore resource forks
 ._*
 
+# Ignore TextMate projects
+*.tmproj
+
 # Tests
 /unit-tests/contextregistryinfo-xml-static/contextregistryinfounittest-xml-static
 /unit-tests/contextregistryinfo-cdb-static/contextregistryinfounittest-cdb-static
