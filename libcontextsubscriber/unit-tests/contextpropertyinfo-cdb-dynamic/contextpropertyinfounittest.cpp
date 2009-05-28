@@ -42,7 +42,7 @@ private slots:
 void ContextPropertyInfoUnitTest::initTestCase()
 {
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
-    utilCopyLocalAtomically("context-providers2v1.cdb", "context-providers.cdb");
+    utilCopyLocalAtomically("context-providers2v1.cdb", "cache.cdb");
 
     ContextRegistryInfo::instance("cdb");
 }
@@ -54,7 +54,7 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
     
     QSignalSpy spy(&prop, SIGNAL(typeChanged(QString)));
 
-    utilCopyLocalAtomically("context-providers2v2.cdb", "context-providers.cdb");
+    utilCopyLocalAtomically("context-providers2v2.cdb", "cache.cdb");
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
@@ -69,13 +69,13 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 void ContextPropertyInfoUnitTest::checkKeyProviderChanging()
 {
     // Create initial state
-    utilCopyLocalAtomically("context-providers4v1.cdb", "context-providers.cdb");
+    utilCopyLocalAtomically("context-providers4v1.cdb", "cache.cdb");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QCOMPARE(prop.providerDBusName(), QString("org.freedesktop.ContextKit.contextd1"));
     QSignalSpy spy(&prop, SIGNAL(providerChanged(QString)));
 
-    utilCopyLocalAtomically("context-providers4v2.cdb", "context-providers.cdb");
+    utilCopyLocalAtomically("context-providers4v2.cdb", "cache.cdb");
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
@@ -86,14 +86,14 @@ void ContextPropertyInfoUnitTest::checkKeyProviderChanging()
 void ContextPropertyInfoUnitTest::checkKeyRemoval()
 {
     // Create initial state
-    utilCopyLocalAtomically("context-providers3v1.cdb", "context-providers.cdb");
+    utilCopyLocalAtomically("context-providers3v1.cdb", "cache.cdb");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
     QVERIFY(prop.exists() == true);
 
-    utilCopyLocalAtomically("context-providers3v2.cdb", "context-providers.cdb");
+    utilCopyLocalAtomically("context-providers3v2.cdb", "cache.cdb");
 
     QVERIFY(prop.type() == "");
     QVERIFY(prop.doc() == "");
@@ -103,14 +103,14 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
 void ContextPropertyInfoUnitTest::checkKeyAdding()
 {
     // Create initial state
-    utilCopyLocalAtomically("context-providers3v2.cdb", "context-providers.cdb");
+    utilCopyLocalAtomically("context-providers3v2.cdb", "cache.cdb");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() == "");
     QVERIFY(prop.doc() == "");
     QVERIFY(prop.exists() == false);
 
-    utilCopyLocalAtomically("context-providers3v1.cdb", "context-providers.cdb");
+    utilCopyLocalAtomically("context-providers3v1.cdb", "cache.cdb");
 
     QVERIFY(prop.exists() == true);
     QVERIFY(prop.type() != "");
@@ -119,7 +119,7 @@ void ContextPropertyInfoUnitTest::checkKeyAdding()
 
 void ContextPropertyInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove(LOCAL_FILE("context-providers.cdb"));
+    QFile::remove(LOCAL_FILE("cache.cdb"));
 }
 
 #include "moc_contextpropertyinfounittest_cpp.cpp"

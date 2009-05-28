@@ -43,14 +43,14 @@ void ContextRegistryInfoUnitTest::initTestCase()
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
 
     // Setup initial state
-    utilCopyLocalAtomically("context-providers1v1.cdb", "context-providers.cdb");    
+    utilCopyLocalAtomically("context-providers1v1.cdb", "cache.cdb");    
     context = ContextRegistryInfo::instance("cdb");
 }
 
 void ContextRegistryInfoUnitTest::basicChange()
 {
     QSignalSpy spy(context, SIGNAL(keysChanged(QStringList)));
-    utilCopyLocalAtomically("context-providers1v2.cdb", "context-providers.cdb");    
+    utilCopyLocalAtomically("context-providers1v2.cdb", "cache.cdb");    
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
@@ -63,7 +63,7 @@ void ContextRegistryInfoUnitTest::basicChange()
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove(LOCAL_FILE("context-providers.cdb"));
+    QFile::remove(LOCAL_FILE("cache.cdb"));
 }
 
 #include "moc_contextregistryinfounittest_cpp.cpp"
