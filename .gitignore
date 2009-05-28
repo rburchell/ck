@@ -168,3 +168,5 @@ tests/contextd_tests/hal_plugin.c
 /debian/*.preinst.debhelper
 /debian/*.substvars
 /debian/contextkit-utils/
+# flexiprovider default output
+flexi-properties.xml

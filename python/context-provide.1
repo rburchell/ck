@@ -1,0 +1,66 @@
+.TH context-provide 1 May-28-2009
+.SH NAME
+context-provide
+- a simple provider to provide context properties for testing/debugging
+.SH SYNOPSIS
+.B context-provide\fR [\fIBUSTYPE\fR:]\fIPROVIDERNAME\fR [\fITYPE\fR \fINAME\fR \fIINITVALUE\fR]...
+.SH DESCRIPTION
+context-provide is a tool for testing/debugging Context Framework
+clients.  It allows you to define properties and change their values
+during runtime.
+
+.SH PARAMETERS
+.TP 8
+BUSTYPE
+can be session (the default) or system, depending on which bus you
+want to run the provider on.
+.TP 8
+PROVIDERNAME
+service name of the provider on DBus.
+.TP 8
+TYPE NAME INITVALUE
+with these triplets you can define initial properties.  Type can be one of int, string,
+double, truth.
+.SH ENVIRONMENT VARIABLES
+.TP 8
+CONTEXT_FLEXI_XML
+points to a directory, which will be used to output the
+flexi-properties.xml, which contains the definition of the added
+properties (either via commands or arguments).  If not defined, the
+xml will go to the current directory.
+.SH COMMAND LINE INTERFACE
+The interactive mode stops on closing stdin, and supports the following
+commands (note that this is Python syntax, and it gets eval()-ed):
+
+    set(property, value):  sets the given property, if value
+                           is None, it will be sent as Unknown
+    get(property):         prints the value of the property
+    reset(property):       resets the property
+    add(TYPE(property[, initvalue])):
+            adds a new property, where TYPE has to be capitalized
+    info():                prints properties and their values
+    quit():                stops the whole thing
+
+Please note that this is Python shell, so you have to quote strings,
+use parantheses after function names, etc.
+
+If you want readline support, please have a look at the package rlwrap.
+
+.SH EXAMPLES
+Starts up a provider, initially having a single integer property named
+an.example with the default value of 42.
+
+  ./context-provide my.provider.name int an.example 42
+
+Starts up the provider on the system bus without any properties, then
+add some through the command line interface:
+
+  ./context-provide system:org.bottomdrawer.kit2000
+    add(INT('example.int', 33))
+    add(STRING('example.string'))
+    set('example.string', 'value1')
+    set('example.string', 'value2')
+    set('example.int', None)
+
+.SH SEE ALSO
+context-listen(1)
