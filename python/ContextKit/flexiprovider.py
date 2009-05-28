@@ -5,43 +5,7 @@ import tempfile
 import subprocess
 import gobject
 import dbus, dbus.service, dbus.mainloop.glib
-
-def pkgconfig(*args):
-    """Runs `pkg-config $args` and returns the Popen object, augmented
-    with an `output' attribute containing stdout."""
-    cmd = ['pkg-config'] + list(args)
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    process.output = process.communicate()[0].strip()
-    return process
-
-# The following kludge is needed if we want this to be usable without
-# installing libcontextprovider.  If pkg-config reports it as
-# uninstalled, we extend PYTHONPATH, then we try to import the module.
-# If that fails, extend LD_LIBRARY_PATH and re-exec ourselves.
-
-if pkgconfig('--exists', 'contextprovider-1.0').returncode != 0:
-    raise RuntimeError("You need to make pkg-config find "
-                       "contextprovider-1.0 somehow. \n"
-                       "Try setting $PKG_CONFIG_PATH.")
-
-if pkgconfig('--uninstalled', 'contextprovider-1.0').returncode == 0:
-    sys.path.append(pkgconfig('--variable=pythondir', 'contextprovider-1.0').output)
-try:
-    import ContextProvider as CP
-except ImportError:
-    raise
-except:
-    # Failed, probably because LD_LIBRARY_PATH is not right.  Set it and
-    # re-exec ourselves.  To avoid an infinite loop, we try this only
-    # when LD_LIBRARY_PATH doesn't yet contain what we want to add.
-    libdir = pkgconfig('--variable=libdir', 'contextprovider-1.0').output
-    ldpath = [d for d in os.environ.get('LD_LIBRARY_PATH', '').split(':') if d != '']
-    if libdir in ldpath:
-        raise
-    ldpath += [libdir, libdir + '/.libs']
-    env = dict(os.environ)
-    env.update(LD_LIBRARY_PATH=':'.join(ldpath))
-    os.execve(sys.argv[0], sys.argv, env)
+import ContextProvider as CP
 
 class _property(object):
     """Kind-of a template for property types."""

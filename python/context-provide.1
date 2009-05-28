@@ -62,5 +62,12 @@ add some through the command line interface:
     set('example.string', 'value2')
     set('example.int', None)
 
+.SH RUNNING IN SCRATCHBOX
+Inside scratchbox the default python version currently is 2.3, but
+context-provide needs 2.5, so you have to run it like this:
+  python2.5 /usr/bin/context-provide
+
+You can check the current python version with python -V
+
 .SH SEE ALSO
 context-listen(1)
