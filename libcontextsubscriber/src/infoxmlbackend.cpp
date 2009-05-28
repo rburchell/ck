@@ -236,7 +236,7 @@ void InfoXmlBackend::regenerateKeyDataList()
 
     QDir dir = QDir(registryPath());
     dir.setFilter(QDir::Files);
-    dir.setNameFilters(QStringList("*.xml"));
+    dir.setNameFilters(QStringList("*.context"));
 
     QFileInfoList list = dir.entryInfoList();
     for (int i = 0; i < list.size(); ++i) {
