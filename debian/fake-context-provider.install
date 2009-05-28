@@ -1,2 +1,2 @@
 usr/share/context-providers/fake-provider.xml
-usr/share/contextkit/providers/com.nokia.FakeContextProvider.xml
+usr/share/contextkit/providers/com.nokia.FakeContextProvider.context
