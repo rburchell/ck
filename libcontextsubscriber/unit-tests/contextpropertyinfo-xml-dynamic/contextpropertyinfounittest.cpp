@@ -47,14 +47,14 @@ void ContextPropertyInfoUnitTest::initTestCase()
 void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 {
     // Create initial state
-    utilCopyLocalWithRemove("providers2v1.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers2v1.xml.src", "providers.context");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QCOMPARE(prop.type(), QString("TRUTH"));
     
     QSignalSpy spy(&prop, SIGNAL(typeChanged(QString)));
 
-    utilCopyLocalWithRemove("providers2v2.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers2v2.xml.src", "providers.context");
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
@@ -69,13 +69,13 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 void ContextPropertyInfoUnitTest::checkKeyProviderChanging()
 {
     // Create initial state
-    utilCopyLocalWithRemove("providers4v1.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers4v1.xml.src", "providers.context");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QCOMPARE(prop.providerDBusName(), QString("org.freedesktop.ContextKit.contextd1"));
     QSignalSpy spy(&prop, SIGNAL(providerChanged(QString)));
 
-    utilCopyLocalWithRemove("providers4v2.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers4v2.xml.src", "providers.context");
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
@@ -86,14 +86,14 @@ void ContextPropertyInfoUnitTest::checkKeyProviderChanging()
 void ContextPropertyInfoUnitTest::checkKeyRemoval()
 {
     // Create initial state
-    utilCopyLocalWithRemove("providers3v1.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers3v1.xml.src", "providers.context");
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
     QVERIFY(prop.exists() == true);
  
-    utilCopyLocalWithRemove("providers3v2.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers3v2.xml.src", "providers.context");
 
     QVERIFY(prop.exists() == false);
     QVERIFY(prop.type() == "");
@@ -103,14 +103,14 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
 void ContextPropertyInfoUnitTest::checkKeyAdding()
 {
     // Create initial state
-    utilCopyLocalWithRemove("providers3v2.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers3v2.xml.src", "providers.context");
     
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() == "");
     QVERIFY(prop.doc() == "");
     QVERIFY(prop.exists() == false);
  
-    utilCopyLocalWithRemove("providers3v1.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers3v1.xml.src", "providers.context");
     
     QVERIFY(prop.exists() == true);
     QVERIFY(prop.type() != "");
@@ -119,7 +119,7 @@ void ContextPropertyInfoUnitTest::checkKeyAdding()
 
 void ContextPropertyInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove(LOCAL_FILE("providers.xml"));
+    QFile::remove(LOCAL_FILE("providers.context"));
 }
 
 #include "moc_contextpropertyinfounittest_cpp.cpp"

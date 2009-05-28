@@ -45,7 +45,7 @@ void ContextRegistryInfoUnitTest::initTestCase()
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
 
     // Setup state
-    utilCopyLocalWithRemove("providers1v1.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers1v1.xml.src", "providers.context");
            
     context = ContextRegistryInfo::instance("xml");
 }
@@ -55,7 +55,7 @@ void ContextRegistryInfoUnitTest::basicChange()
     QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
     QSignalSpy spy2(context, SIGNAL(keysAdded(QStringList)));
 
-    utilCopyLocalAtomically("providers1v2.xml.src", "providers.xml");
+    utilCopyLocalAtomically("providers1v2.xml.src", "providers.context");
 
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> args1 = spy1.takeFirst();
@@ -74,7 +74,7 @@ void ContextRegistryInfoUnitTest::changeWithRemove()
 {
     QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
     
-    utilCopyLocalWithRemove("providers1v1.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers1v1.xml.src", "providers.context");
 
     // Sometimes it's 1, sometimes it's 2 -- depending on how agile the watcher is.
     QVERIFY(spy1.count() > 0);
@@ -82,12 +82,12 @@ void ContextRegistryInfoUnitTest::changeWithRemove()
 
 void ContextRegistryInfoUnitTest::keyRemoval()
 {
-    utilCopyLocalWithRemove("providers1v2.xml.src", "providers.xml");
+    utilCopyLocalWithRemove("providers1v2.xml.src", "providers.context");
     
     QSignalSpy spy1(context, SIGNAL(keysChanged(QStringList)));
     QSignalSpy spy2(context, SIGNAL(keysRemoved(QStringList)));
     
-    utilCopyLocalAtomically("providers1v1.xml.src", "providers.xml");
+    utilCopyLocalAtomically("providers1v1.xml.src", "providers.context");
 
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> args1 = spy1.takeFirst();
@@ -104,7 +104,7 @@ void ContextRegistryInfoUnitTest::keyRemoval()
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove(LOCAL_FILE("providers.xml"));
+    QFile::remove(LOCAL_FILE("providers.context"));
 }
     
 #include "moc_contextregistryinfounittest_cpp.cpp"
