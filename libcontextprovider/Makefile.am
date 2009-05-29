@@ -43,11 +43,11 @@ libcontextprovider.vala.stamp contextprovider.vapi: $(libcontextprovider_VALASOU
 
 libcontextprovider_la_CFLAGS =	\
 				-DG_LOG_DOMAIN=\"ContextKit\" \
-				$(CONTEXTD_CFLAGS) \
+				$(CONTEXTPROVIDER_CFLAGS) \
 				$(NULL)
 
 libcontextprovider_la_LIBADD = \
-			  $(CONTEXTD_LIBS) \
+			  $(CONTEXTPROVIDER_LIBS) \
 			  $(NULL)
 
 EXTRA_DIST = \
