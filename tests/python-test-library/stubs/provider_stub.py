@@ -24,7 +24,6 @@ else:
 
 import ContextKit.ContextProvider as cp
 
-sys.path.append("./testcases/")
 import conf as cfg
 
 import dbus

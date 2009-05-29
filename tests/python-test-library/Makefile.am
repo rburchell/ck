@@ -13,7 +13,7 @@ check-dbus:
 		$(MAKE) -C testfw
 		rm -f testfw/core
 		rm -f testfw/testing.log
-		TMPSYSFS=`mktemp -d`; \
+		TMPSYSFS=`mktemp -d` \
 		$(srcdir)/testfw/with-session-bus.sh \
 				--sleep=$(CHECK_DBUS_SLEEP) \
 				--config-file=testfw/tmp-session-bus.conf \

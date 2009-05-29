@@ -162,7 +162,7 @@ def testCallback(q,bus):
     subscriber.Unsubscribe(['test.string'])
     q.expect('dbus-signal', signal='Changed', interface='org.freedesktop.ContextKit.Subscriber', 
              args = [{u'test.log': "Unsubscribed"}, []])
-    
+    subscriber.Unsubscribe(['test.log'])
 
 def testInstallKey(q,bus):
     provider_iface.DoInstallKey()
