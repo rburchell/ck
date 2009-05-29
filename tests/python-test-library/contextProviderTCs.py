@@ -47,7 +47,12 @@ def setUp():
     # (if it is not installed)
     os.environ['LD_LIBRARY_PATH'] = '../../libcontextprovider/.libs'
     # Start a provider stub
-    provider_stub_p = Popen("stubs/provider_stub.py", shell=True)
+    if "srcdir" in os.environ:
+        provider_stub_path = os.environ["srcdir"] + "/stubs/provider_stub.py"
+    else:
+        provider_stub_path = "stubs/provider_stub.py"
+
+    provider_stub_p = Popen(provider_stub_path, shell=True)
     sleep(0.5)
 
     try:

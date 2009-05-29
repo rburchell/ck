@@ -13,8 +13,16 @@
 ##
 
 import sys
-sys.path.append("../../python/") # libcontextprovider python bindings
-import ContextProvider as cp
+import os
+
+# libcontextprovider python bindings
+if "srcdir" in os.environ:
+    # For vpath builds
+    sys.path.append(os.environ["srcdir"] + "/../../python/")
+else:
+    sys.path.append("../../python/")
+
+import ContextKit.ContextProvider as cp
 
 sys.path.append("./testcases/")
 import conf as cfg
