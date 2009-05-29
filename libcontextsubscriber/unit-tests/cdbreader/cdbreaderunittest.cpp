@@ -33,12 +33,14 @@ private slots:
     void basicCreation();
     void doesNotExist();
     void readingNotPresent();
+    void readingFromBad();
 };
 
 void CDBReaderUnitTest::basicCreation()
 {
     CDBReader reader(LOCAL_FILE("test.cdb"));
     QCOMPARE(reader.isReadable(), true);
+    QVERIFY(reader.fileDescriptor() > 0);
 
     QCOMPARE(reader.valueForKey("KEY1"), QString("KEY1Value"));
 
@@ -57,6 +59,16 @@ void CDBReaderUnitTest::doesNotExist()
     CDBReader reader("/usr/test.cdb");
     QCOMPARE(reader.isReadable(), false);
     reader.close();
+}
+
+void CDBReaderUnitTest::readingFromBad()
+{
+    CDBReader reader("/usr/test.cdb");
+    QCOMPARE(reader.isReadable(), false);
+    QVERIFY(reader.fileDescriptor() <= 0);
+    
+    QString v = reader.valueForKey("SOMETHING");
+    QCOMPARE(v, QString());
 }
 
 void CDBReaderUnitTest::readingNotPresent()
