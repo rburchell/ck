@@ -67,7 +67,7 @@ class CommanderAppearing(unittest.TestCase):
     def setUp(self):
         self.flexiprovider = self.startProvider("com.nokia.test",
                                            ["int","test.int","42"])
-        self.context_client = Popen(["../cli/context-listener","test.int"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self.context_client = Popen(["../cli/context-listen","test.int"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         self.context_commander = 0
 
     def tearDown(self):

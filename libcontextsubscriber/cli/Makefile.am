@@ -1,6 +1,6 @@
-bin_PROGRAMS = context-listener
+bin_PROGRAMS = context-listen
 
-context_listener_SOURCES = context-listener.cpp sconnect.h propertylistener.h propertylistener.cpp commandwatcher.h commandwatcher.cpp
+context_listen_SOURCES = context-listen.cpp sconnect.h propertylistener.h propertylistener.cpp commandwatcher.h commandwatcher.cpp
 
 AM_CXXFLAGS = -I$(srcdir)/../src
 
@@ -10,7 +10,7 @@ AM_CXXFLAGS = -I$(srcdir)/../src
 # commandview.$(OBJEXT): ui_commandview.h
 
 # you can moc every header if you want to be fool proof
-QT_TOMOC_H = $(filter %.h, $(context_listener_SOURCES))
+QT_TOMOC_H = $(filter %.h, $(context_listen_SOURCES))
 
 # or you can explicitly specify the list of headers which should be MOC'd
 # QT_TOMOC_H = ...
@@ -23,8 +23,8 @@ QT_TOMOC_H = $(filter %.h, $(context_listener_SOURCES))
 # finally, do the moccing
 CLEANFILES =
 include $(top_srcdir)/am/qt.am
-context_listener_DEPENDENCIES = $(qt_mocobjects) ../src/libcontextsubscriber.la
-context_listener_LDADD = $(qt_mocobjects) ../src/libcontextsubscriber.la
+context_listen_DEPENDENCIES = $(qt_mocobjects) ../src/libcontextsubscriber.la
+context_listen_LDADD = $(qt_mocobjects) ../src/libcontextsubscriber.la
 
 # library dependency hack for seamless make in cli/
 ../src/libcontextsubscriber.la:

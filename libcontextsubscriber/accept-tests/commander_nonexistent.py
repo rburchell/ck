@@ -69,7 +69,7 @@ class CommanderNonExistent(unittest.TestCase):
         self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
                                                     ["string", "test.int", "foobar",
                                                      "string", "test.string", "barfoo"])
-        self.context_client = Popen(["../cli/context-listener","test.int", "test.string"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self.context_client = Popen(["../cli/context-listen","test.int", "test.string"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def tearDown(self):
         os.kill(self.flexiprovider.pid, 9)
