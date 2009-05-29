@@ -62,6 +62,7 @@ binary-arch: build install
 	dh_installmenu -a
 	dh_installman -a
 	dh_strip -p contextkit --dbg-package="contextkit-dbg"
+	dh_strip -p contextkit-utils
 	dh_strip -p libcontextprovider0 --dbg-package="libcontextprovider0-dbg"
 	dh_strip -p libcontextsubscriber0 --dbg-package="libcontextsubscriber0-dbg"
 	dh_pycentral -ppython-contextkit

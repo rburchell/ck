@@ -110,8 +110,8 @@ Description: Python bindings for ContextKit APIs
 
 Package: contextkit-utils
 Section: utils
-Architecture: all
-Depends: python-contextkit, python-dbus, python
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-contextkit, python-dbus, python
 Description: Command line utilities for ContextKit
  This package contains the context-provide and context-listen
  tools. You can use context-provide to quickly provide context
