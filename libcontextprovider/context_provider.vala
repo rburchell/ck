@@ -34,7 +34,10 @@ namespace ContextProvider {
 	 * Set a key to have an integer value of #value
 	 */
 	public void set_integer (string key, int value) {
-		assert (manager != null);
+		if (manager == null) {
+			critical("Setting a value without a successful init");
+			return;
+		}
 
 		Value v = Value (typeof(int));
 		v.set_int (value);
@@ -49,7 +52,10 @@ namespace ContextProvider {
 	 * Set a key to have an floating point value of #value
 	 */
 	public void set_double (string key, double value) {
-		assert (manager != null);
+		if (manager == null) {
+			critical("Setting a value without a successful init");
+			return;
+		}
 
 		Value v = Value (typeof(double));
 		v.set_double (value);
@@ -64,7 +70,10 @@ namespace ContextProvider {
 	 * Set a key to have an boolean value of #val
 	 */
 	public void set_boolean (string key, bool value) {
-		assert (manager != null);
+		if (manager == null) {
+			critical("Setting a value without a successful init");
+			return;
+		}
 
 		Value v = Value (typeof(bool));
 		v.set_boolean (value);
@@ -79,7 +88,10 @@ namespace ContextProvider {
 	 * Set a key to have an boolean value of #val
 	 */
 	public void set_string (string key, string value) {
-		assert (manager != null);
+		if (manager == null) {
+			critical("Setting a value without a successful init");
+			return;
+		}
 
 		Value v = Value (typeof(string));
 		v.set_string (value);
@@ -93,7 +105,10 @@ namespace ContextProvider {
 	 * Marks #key as not having a determinable value.
 	 */
 	public void set_null (string key) {
-		assert (manager != null);
+		if (manager == null) {
+			critical("Setting a value without a successful init");
+			return;
+		}
 
 		manager.property_value_change (remove_context_prefix(key), null);
 	}
@@ -152,7 +167,7 @@ namespace ContextProvider {
 			debug ("Registering new Manager D-Bus service");
 			connection.register_object ("/org/freedesktop/ContextKit/Manager", manager);
 		} catch (DBus.Error e) {
-			debug ("Registration failed: %s", e.message);
+			warning ("Unable to register DBus service: %s", e.message);
 			manager = null;
 			return false;
 		}
@@ -185,7 +200,10 @@ namespace ContextProvider {
 	 * 
 	 */
 	public void install_group ([CCode (array_length = false, array_null_terminated = true)] string[] key_group, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
-		assert (manager != null);
+		if (manager == null) {
+			critical("Installing keys without a successful init");
+			return;
+		}
 		Group g = new Group(remove_context_prefix_from_array(key_group), clear_values_on_subscribe, subscription_changed_cb);
 		manager.group_list.add(g);
 	}
@@ -200,7 +218,10 @@ namespace ContextProvider {
 	 *
 	 */
 	public void install_key(string key, bool clear_values_on_subscribe, SubscriptionChangedCallback? subscription_changed_cb) {
-		assert (manager != null);
+		if (manager == null) {
+			critical("Installing keys without a successful init");
+			return;
+		}
 		string[] key_group = {remove_context_prefix(key)};
 		Group g = new Group(key_group, clear_values_on_subscribe, subscription_changed_cb);
 		manager.group_list.add(g);
