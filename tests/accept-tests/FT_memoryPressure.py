@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 ##
-## @file contextOrientationTCs.py
+## @file FT_memoryPressure.py
 ## This file is part of ContextKit.
 ##
 ## Copyright (C) 2008, 2009 Nokia. All rights reserved.
