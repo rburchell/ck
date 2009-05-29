@@ -49,14 +49,14 @@ class Subscription(unittest.TestCase):
                "truth","test.truth","true"],
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
         os.environ["CONTEXT_PROVIDERS"] = "."
-	print >>self.flexiprovider.stdin, "info()"
+        print >>self.flexiprovider.stdin, "info()"
         self.flexiprovider.stdout.readline()
         self.context_client = Popen(["../cli/context-listener","test.int","test.double","test.string","test.truth"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
         os.kill(self.flexiprovider.pid,9)
         os.kill(self.context_client.pid,9)
-	os.unlink('context-provide.context')
+        os.unlink('context-provide.context')
 
     def testValue(self):
         """
@@ -247,7 +247,7 @@ class MultipleSubscribers(unittest.TestCase):
                "truth","test.truth","true"],
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
         os.environ["CONTEXT_PROVIDERS"] = "."
-	print >>self.flexiprovider.stdin, "info()"
+        print >>self.flexiprovider.stdin, "info()"
         self.flexiprovider.stdout.readline()
 
         self.context_client1 = Popen(["../cli/context-listener","test.int","test.double","test.string","test.truth"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
@@ -264,7 +264,7 @@ class MultipleSubscribers(unittest.TestCase):
         os.kill(self.context_client2.pid,9)
         os.kill(self.context_client3.pid,9)
         os.kill(self.context_client4.pid,9)
-	os.unlink('context-provide.context')
+        os.unlink('context-provide.context')
 
     def testInitialSubscription(self):
         """
@@ -390,7 +390,7 @@ class MultipleProviders(unittest.TestCase):
 
         os.environ["CONTEXT_PROVIDERS"] = "."
 
-	print >> self.flexiprovider1.stdin, "info()"
+        print >> self.flexiprovider1.stdin, "info()"
         self.flexiprovider1.stdout.readline()
 
         self.context_client = Popen(["../cli/context-listener","test.int","test.double","test.string","test.truth"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
@@ -399,8 +399,8 @@ class MultipleProviders(unittest.TestCase):
         os.kill(self.flexiprovider1.pid,9)
         os.kill(self.flexiprovider2.pid,9)
         os.kill(self.context_client.pid,9)
-	os.unlink('flexi-provider1.xml')
-	os.unlink('flexi-provider2.xml')
+        os.unlink('flexi-provider1.xml')
+        os.unlink('flexi-provider2.xml')
 
     def testIdenticalProvider(self):
         os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./flexi-provider2.xml"
@@ -424,7 +424,7 @@ class SubscriptionPause (unittest.TestCase):
 
         os.environ["CONTEXT_PROVIDERS"] = "."
 
-	print >> self.flexiprovider.stdin, "info()"
+        print >> self.flexiprovider.stdin, "info()"
         self.flexiprovider.stdout.readline()
 
         self.context_client = Popen(["../cli/context-listener","test.int"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
@@ -432,7 +432,7 @@ class SubscriptionPause (unittest.TestCase):
     def tearDown(self):
         os.kill(self.flexiprovider.pid,9)
         os.kill(self.context_client.pid,9)
-	os.unlink('context-provide.context')
+        os.unlink('context-provide.context')
 
     def testPause(self):
         """
