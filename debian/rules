@@ -33,6 +33,9 @@ install: build
 	mkdir -p `pwd`/debian/tmp/usr/share/gtk-doc/html
 	rm -rf `pwd`/debian/tmp/usr/share/gtk-doc/html/libcontextprovider
 	cp -a doc/reference/libcontextprovider/html `pwd`/debian/tmp/usr/share/gtk-doc/html/libcontextprovider
+	mkdir -p `pwd`/debian/tmp/usr/share/doc/libcontextsubscriber-doc
+	rm -rf `pwd`/debian/tmp/usr/share/doc/libcontextsubscriber-doc/html
+	cp -a libcontextsubscriber/doc/html `pwd`/debian/tmp/usr/share/doc/libcontextsubscriber-doc
 	dh_install --sourcedir=`pwd`/debian/tmp/
 
 binary-indep: build install
@@ -60,6 +63,7 @@ binary-arch: build install
 	dh_installman -a
 	dh_strip -p contextkit --dbg-package="contextkit-dbg"
 	dh_strip -p libcontextprovider0 --dbg-package="libcontextprovider0-dbg"
+	dh_strip -p libcontextsubscriber0 --dbg-package="libcontextsubscriber0-dbg"
 	dh_pycentral -ppython-contextkit
 	dh_link -a
 	dh_compress -a
