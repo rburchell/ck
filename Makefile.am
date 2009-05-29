@@ -16,7 +16,6 @@ SUBDIRS = \
 	python \
 	fake-provider \
 	vapi \
-	python \
 	$(NULL)
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -32,7 +31,7 @@ DISTCLEANFILES = \
 version:
 	@echo @VERSION@
 
-.PHONEY: version
+.PHONY: version
 
 if HAVE_COVERAGE
 include tools/lcov.am
