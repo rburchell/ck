@@ -99,11 +99,21 @@ Provides: ${python:Provides}
 Depends: ${python:Depends}, python-gobject
 XB-Python-Version: ${python:Versions}
 Description: Python bindings for ContextKit APIs
- This package contains python bindings for the libcontextprovider
- C interface, which helps you writing providers in python.
+ This package contains Python bindings for the libcontextprovider
+ C interface, which helps you writing providers in Python.
  .
- In the future it will contain the python bindings for
+ In the future it will contain the Python bindings for
  libcontextsubscriber too, but it is not ready yet.
  .
  If you are interested in some quick test tools for the ContextKit,
  please look into the package named contextkit-utils.
+
+Package: contextkit-utils
+Section: utils
+Architecture: all
+Depends: python-contextkit, python-dbus, python
+Description: Command line utilities for ContextKit
+ This package contains the context-provide and context-listen
+ tools. You can use context-provide to quickly provide context
+ properties from the command line, while with context-listen you can
+ watch properties for changes.
