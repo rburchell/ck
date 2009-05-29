@@ -23,11 +23,11 @@ with these triplets you can define initial properties.  Type can be one of int, 
 double, truth.
 .SH ENVIRONMENT VARIABLES
 .TP 8
-CONTEXT_FLEXI_XML
-points to a directory, which will be used to output the
-flexi-properties.xml, which contains the definition of the added
-properties (either via commands or arguments).  If not defined, the
-xml will go to the current directory.
+CONTEXT_PROVIDE_REGISTRY_FILE
+path to output the definitions of the added properties (either via
+commands or arguments).  If not defined, the definitions will go
+to ./context-provide.xml.
+
 .SH COMMAND LINE INTERFACE
 The interactive mode stops on closing stdin, and supports the following
 commands (note that this is Python syntax, and it gets eval()-ed):

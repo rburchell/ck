@@ -41,14 +41,16 @@ def xmlfor(busname='ctx.flexiprovider', bus='session', *props):
     return '\n'.join(xml)
 
 def update_context_providers(xml, dir='.'):
-    """Dumps the xml into $dir/flexi-properties.xml."""
-    tmpfd, tmpfn = tempfile.mkstemp('.xml', 'flexi', dir)
+    """Dumps the xml into $dir/context-provide.context."""
+    if "CONTEXT_PROVIDE_REGISTRY_FILE" in os.environ:
+        outfilename = os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"]
+    else:
+        outfilename = dir + '/context-provide.context'
+    tmpdir = outfilename[:outfilename.rindex('/')]
+    tmpfd, tmpfn = tempfile.mkstemp('.context', 'context-provide-', tmpdir)
     os.write(tmpfd, xml)
     os.close(tmpfd)
-    if "CONTEXT_FLEXI_XML" in os.environ:
-        os.rename(tmpfn, os.environ["CONTEXT_FLEXI_XML"])
-    else:
-        os.rename(tmpfn, dir + '/flexi-properties.xml')
+    os.rename(tmpfn, outfilename)
 
 class Flexiprovider(object):
     def stdin_ready(self, fd, cond):
