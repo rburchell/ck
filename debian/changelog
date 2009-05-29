@@ -2,7 +2,12 @@ contextkit (0.1.9~unreleased) unstable; urgency=low
 
   * context-provide's registry output file is now specified by
     CONTEXT_PROVIDE_REGISTRY_FILE and not CONTEXT_FLEXI_XML
-  *
+  * added libcontextsubscriber{0{,-dbg},-dev,-doc}, the implementation of
+    the new subscription helper library for creating context aware
+    applications
+  * 
+
+    Implemented: SWP#CntFr-204
 
  -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Thu, 28 May 2009 14:24:14 +0300
 
@@ -56,10 +61,10 @@ contextkit (0.1.6-1) unstable; urgency=low
 contextkit (0.1.5-1) unstable; urgency=low
 
   New upstream release.
-  
+
   * Complete new libcontextprovider.
   * Documentation reorganized.
-	
+
   * Implemented: SWP#CntFr-70, SWP#CntFr-68, SWP#CntFr-38,
     SWP#CntFr-8, SWP#CntFr-11, SWP#CntFr-36, SWP#CntFr-72,
     SWP#CntFr-96, SWP#CntFr-71, SWP#CntFr-80, SWP#CntFr-9,
@@ -94,7 +99,7 @@ contextkit (0.1.3-2) unstable; urgency=low
 contextkit (0.1.3-1) unstable; urgency=low
 
   New upstream release
-  
+
   * More docs, mostly.
 
  -- Marius Vollmer <marius.vollmer@nokia.com>  Tue, 24 Mar 2009 18:13:25 +0200
@@ -109,7 +114,7 @@ contextkit (0.1.2-2) unstable; urgency=low
 contextkit (0.1.2-1) unstable; urgency=low
 
   New upstream release.
-  
+
   * Add string support to libcontextprovider.
 
  -- Marius Vollmer <marius.vollmer@nokia.com>  Thu, 12 Mar 2009 21:34:03 +0200

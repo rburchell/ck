@@ -70,7 +70,7 @@ class Asynchronous(unittest.TestCase):
         self.flexiprovider_fast = self.startProvider("com.nokia.fast",
                                                      ["int","test.fast","42"])
         print >>self.flexiprovider_slow.stdin, "import time ; time.sleep(3)"
-        self.context_client = Popen(["../cli/context-listener","test.fast", "test.slow"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self.context_client = Popen(["../cli/context-listen","test.fast", "test.slow"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
         # check the fast property
         got = self.context_client.stdout.readline().rstrip()

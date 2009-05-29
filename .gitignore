@@ -173,3 +173,7 @@ tests/contextd_tests/hal_plugin.c
 /debian/contextkit-utils/
 # flexiprovider default output
 flexi-properties.xml
+/debian/libcontextsubscriber-dev/
+/debian/libcontextsubscriber0-dbg/
+/debian/libcontextsubscriber-doc/
+/debian/libcontextsubscriber0/

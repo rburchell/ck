@@ -65,7 +65,7 @@ class CommanderDisabled(unittest.TestCase):
         self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
                                                     ["int", "test.int", "4242"])
         os.environ["CONTEXT_CLI_IGNORE_COMMANDER"] = ""
-        self.context_client = Popen(["../cli/context-listener","test.int"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self.context_client = Popen(["../cli/context-listen","test.int"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def tearDown(self):
         os.kill(self.flexiprovider.pid, 9)

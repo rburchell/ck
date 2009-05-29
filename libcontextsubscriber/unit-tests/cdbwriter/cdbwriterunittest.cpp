@@ -32,12 +32,14 @@ private slots:
     void basicCreation();
     void noPermissions();
     void cleanupTestCase();
+    void writingToBad();
 };
 
 void CDBWriterUnitTest::basicCreation()
 {
     CDBWriter writer(LOCAL_FILE("test.cdb"));
     QCOMPARE(writer.isWritable(), true);
+    QVERIFY(writer.fileDescriptor() > 0);
 
     writer.add("KEYS", "KEYSValue1");
     writer.add("KEYS", "KEYSValue2");
@@ -51,6 +53,16 @@ void CDBWriterUnitTest::noPermissions()
 {
     CDBWriter writer("/usr/test.cdb");
     QCOMPARE(writer.isWritable(), false);
+    writer.close();
+}
+
+void CDBWriterUnitTest::writingToBad()
+{
+    CDBWriter writer("/usr/test.cdb");
+    QCOMPARE(writer.isWritable(), false);
+    QVERIFY(writer.fileDescriptor() <= 0);
+    
+    writer.add("KEYS", "VAL");
     writer.close();
 }
 

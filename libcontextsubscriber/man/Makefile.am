@@ -1,1 +1,1 @@
-dist_man_MANS = update-contextkit-providers.1 context-listener.1
+dist_man_MANS = update-contextkit-providers.1 context-listen.1

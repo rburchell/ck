@@ -1,38 +1,38 @@
-.TH context-listener 1 May-19-2009
+.TH context-listen 1 May-29-2009
 .SH NAME
-context-listener
+context-listen
 - a simple test client to listen to changes in context properties from different providers.
 .SH SYNOPSIS
-.B context-listener\fR [\fIPROPERTY\fR]...
+.B context-listen\fR [\fIPROPERTY\fR]...
 .SH DESCRIPTION
-context-listener will listen for changes in the properties and notify
+context-listen will listen for changes in the properties and notify
 the user about them. At least one property has to be given. In order
 to find the appropriate provider for each of the properties
-context-listener reads the ./cache.cdb or if it doesn't
+context-listen reads the ./cache.cdb or if it doesn't
 exist then all the XML files in the present directory.  Check
 libcontextprovider documentation for the format of these XML files and
 how to convert them to a cdb cache. Send EOF on stdin to terminate the
-running context-listener.
+running context-listen.
 .SH ENVIRONMENT VARIABLES
 .TP 8
 CONTEXT_CLI_DISABLE_TYPE_CHECK
-when defined context-listener will not croak about type mismatch
+when defined context-listen will not croak about type mismatch
 between the expected and actual type.
 .TP 8
 CONTEXT_CLI_IGNORE_COMMANDER
-when defined context-listener will become immune to the commander,
+when defined context-listen will become immune to the commander,
 i.e. it will not be affected by context-commander at all.
 .TP 8
 CONTEXT_PROVIDERS
 may define a directory containing the provider descriptor cdb or XML
-files. In this case context-listener will read from the directory
+files. In this case context-listen will read from the directory
 specified by CONTEXT_PROVIDERS and not the present one.
 .SH ARGUMENTS
-context-listener takes a list of properties as arguments.
+context-listen takes a list of properties as arguments.
 Properties are dot separated names, like Context.Location.Latitude.
 Obviously a property have to be provided by some provider to be any useful.
 .SH COMMAND LINE INTERFACE
-context-listener can be commanded on its standard input, the available
+context-listen can be commanded on its standard input, the available
 commands can be seen at startup on stderr.  All debugging/error messages
 are directed to stderr.
 .SH EXAMPLES
@@ -40,8 +40,8 @@ are directed to stderr.
 context-provide my.test.provider int mun.testi.property 42
 Creates a test provider with a single int property. Keep this running.
 .TP 8
-context-listener mun.testi.property
-starts context-listener listening for changes in the
+context-listen mun.testi.property
+starts context-listen listening for changes in the
 property 'mun.testi.property' from the
 provider 'my.test.provider'. This should be running in the same
 directory (from an other terminal) or CONTEXT_PROVIDERS should be set
@@ -50,6 +50,6 @@ accordingly.
 set('mun.testi.property', 59)
 The above command typed in the first terminal running context-provider
 will change the property and the change will be visible in the second
-terminal running context-listener.
+terminal running context-listen.
 .SH SEE ALSO
 context-provide(1)

@@ -1,6 +1,6 @@
 NULL =
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
+DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --with-doxygen
 
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
@@ -16,7 +16,6 @@ SUBDIRS = \
 	python \
 	fake-provider \
 	vapi \
-	python \
 	$(NULL)
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -32,7 +31,7 @@ DISTCLEANFILES = \
 version:
 	@echo @VERSION@
 
-.PHONEY: version
+.PHONY: version
 
 if HAVE_COVERAGE
 include tools/lcov.am
