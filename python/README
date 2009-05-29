@@ -1,0 +1,18 @@
+These directories contain a simple Python binding for the
+libcontextprovider library and a test provider tool.  To use them, you
+need to ensure that pkg-config works wrt this library.  One way is to
+install everything into the appropriate locations, or alternatively, set
+PKG_CONFIG_PATH to contain the directories with the .pc files.  The
+latter is preferred during development.
+
+Flexiprovider is a Python module/tool for testing Context Framework
+clients.  It allows to define properties and provides means to change
+their values during runtime.
+
+There are two examples: `simple.py' and `complex.py', which you may use
+to get a clue how to write your own provider.  The `context-provide'
+script allows you to start up a provider from the command line, without
+writing any Python code.
+
+Command line usage of the 'context-provide' tool is documented in
+the manpage context-provide.1

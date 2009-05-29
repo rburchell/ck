@@ -4,15 +4,17 @@ Priority: optional
 Maintainer: Marius Vollmer <marius.vollmer@nokia.com>
 Build-Depends: debhelper (>= 5),
                automake1.9,
-	       	   gnome-common,
+               gnome-common,
                libglib2.0-dev (>= 2.12.0),
                libsqlite3-dev,
                libdbus-glib-1-dev,
                libgee-dev (>= 0.1.3),
-			   python,
-	       	   xsltproc,
-			   libhal-dev,
-	       	   gtk-doc-tools
+               python,
+               python-central,
+               xsltproc,
+               libhal-dev,
+               gtk-doc-tools
+XS-Python-Version: all
 Standards-Version: 3.8.0
 
 Package: contextkit
@@ -89,3 +91,29 @@ Description: Provider for all unimplemented core context properties
  .
  You can use the context-commander to change the value of these
  properties.
+
+Package: python-contextkit
+Section: python
+Architecture: any
+Provides: ${python:Provides}
+Depends: ${python:Depends}, python-gobject
+XB-Python-Version: ${python:Versions}
+Description: Python bindings for ContextKit APIs
+ This package contains Python bindings for the libcontextprovider
+ C interface, which helps you writing providers in Python.
+ .
+ In the future it will contain the Python bindings for
+ libcontextsubscriber too, but it is not ready yet.
+ .
+ If you are interested in some quick test tools for the ContextKit,
+ please look into the package named contextkit-utils.
+
+Package: contextkit-utils
+Section: utils
+Architecture: all
+Depends: python-contextkit, python-dbus, python
+Description: Command line utilities for ContextKit
+ This package contains the context-provide and context-listen
+ tools. You can use context-provide to quickly provide context
+ properties from the command line, while with context-listen you can
+ watch properties for changes.
