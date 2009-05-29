@@ -25,18 +25,17 @@
 ## Requires python2.5-gobject and python2.5-dbus
 ##
 import sys
-sys.path.append("../../python")
 import unittest
 import os
 import string
 from subprocess import Popen, PIPE
-import time
+from time import sleep
 
 class MemoryPressure(unittest.TestCase):
 
     def setUp(self):
         self.contextd = Popen("contextd",stdin=PIPE,stderr=PIPE,stdout=PIPE)
-        self.context_client = Popen(["../../libcontextsubscriber/cli/context-listener","System.MemoryPressure"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
+        self.context_client = Popen(["context-listener","System.MemoryPressure"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
         cmd = 'echo 15000 > /proc/sys/vm/lowmem_notify_high_pages'
         os.system(cmd)
 
@@ -57,26 +56,27 @@ class MemoryPressure(unittest.TestCase):
         References
 
         """
-        actual = [self.context_client.stdout.readline().rstrip()]
-        actual.sort()
-        expected = ["value: int:0"]
+        actual = self.context_client.stdout.readline().rstrip()
+        expected = "System.MemoryPressure: int:0"
         self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
 
         cmd = 'memload 100MB'
-        os.system(cmd)
+        self.memload = Popen(cmd,stdin=PIPE,stdout=PIPE,stderr=PIPE)
+        sleep(2)
 
-        actual = [self.context_client.stdout.readline().rstrip()]
-        actual.sort()
-        expected = ["value: int:1"]
+        actual = self.context_client.stdout.readline().rstrip()
+        expected = "System.MemoryPressure: int:1"
         self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
 
         cmd = 'memload 150MB'
-        os.system(cmd)
+        self.memload2 = Popen(cmd,stdin=PIPE,stdout=PIPE,stderr=PIPE)
+        sleep(2)
 
-        actual = [self.context_client.stdout.readline().rstrip()]
-        actual.sort()
-        expected = ["value: int:2"]
+        actual = self.context_client.stdout.readline().rstrip()
+        expected = "System.MemoryPressure: int:2"
         self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+        os.kill(self.memload.pid,9)
+        os.kill(self.memload2.pid,9)
 
 def runTests():
     suiteLowMemoryPlugin = unittest.TestLoader().loadTestsFromTestCase(MemoryPressure)
