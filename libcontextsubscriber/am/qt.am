@@ -13,6 +13,7 @@ QT_CXXMOCS = $(QT_TOMOC_CPP:%.cpp=moc_%_cpp.cpp)
 QT_HMOCS = $(QT_TOMOC_H:%.h=moc_%_h.cpp)
 
 qt_mocobjects = $(QT_HMOCS:%.cpp=%.o)
+qt_moclobjects = $(QT_HMOCS:%.cpp=%.lo)
 
 # cleanup
 CLEANFILES += $(QT_FORMS:%.ui=ui_%.h) $(QT_HMOCS) $(QT_CXXMOCS)

@@ -43,5 +43,5 @@ QT_TOMOC_H = $(filter %.h, $(libcontextsubscriber_la_SOURCES))
 # finally, do the moccing
 CLEANFILES =
 include $(top_srcdir)/am/qt.am
-libcontextsubscriber_la_DEPENDENCIES = $(qt_mocobjects)
-libcontextsubscriber_la_LIBADD = $(qt_mocobjects)
+libcontextsubscriber_la_DEPENDENCIES = $(qt_moclobjects)
+libcontextsubscriber_la_LIBADD = $(qt_moclobjects)
