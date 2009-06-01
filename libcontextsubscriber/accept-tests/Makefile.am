@@ -4,3 +4,5 @@ check-accept:
 	./runTests.sh
 
 CLEANFILES = *.pyc
+
+SUBDIRS = update-contextkit-providers
