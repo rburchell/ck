@@ -1,5 +1,5 @@
 AC_INIT([libcontextsubscriber], [0.1], [marius.vollmer@nokia.com])
-AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2])
+AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2 tar-ustar])
 AM_MAINTAINER_MODE
 
 AC_SUBST([USE_MAINTAINER_MODE])
