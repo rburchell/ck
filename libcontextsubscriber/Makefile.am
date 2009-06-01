@@ -16,8 +16,6 @@ covoptioncheck:
 coverage: covoptioncheck
 	make -C unit-tests/ coverage
 
-EXTRA_DIST = accept-tests
-
 #deb:
 #	rm -rf debian/
 #	mkdir debian/
