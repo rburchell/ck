@@ -67,7 +67,7 @@ void ContextRegistryInfoUnitTest::initTestCase()
 {
     qInstallMsgHandler(myMessageOutput);
 
-    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
+    utilSetEnv("CONTEXT_PROVIDERS", "./");
 
     // Setup state
     utilCopyLocalWithRemove("providers1v1.xml.src", "providers.context");
@@ -129,7 +129,7 @@ void ContextRegistryInfoUnitTest::keyRemoval()
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove(LOCAL_FILE("providers.context"));
+    QFile::remove("providers.context");
 }
     
 #include "moc_contextregistryinfounittest_cpp.cpp"

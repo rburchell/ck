@@ -1,6 +1,6 @@
 NULL =
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --with-doxygen
+DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4

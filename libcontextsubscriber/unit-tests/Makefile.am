@@ -1,7 +1,14 @@
-SUBDIRS = propertyprovider propertyhandle handlesignalrouter cdbreader cdbwriter contextregistryinfo-xml-static contextpropertyinfo-xml-static contextregistryinfo-cdb-static contextpropertyinfo-cdb-static contextregistryinfo-cdb-dynamic contextpropertyinfo-cdb-dynamic contextregistryinfo-xml-dynamic contextpropertyinfo-xml-dynamic
+SUBDIRSTESTS = propertyprovider propertyhandle handlesignalrouter	\
+	cdbreader cdbwriter contextregistryinfo-xml-static		\
+	contextpropertyinfo-xml-static contextregistryinfo-cdb-static	\
+	contextpropertyinfo-cdb-static contextregistryinfo-cdb-dynamic	\
+	contextpropertyinfo-cdb-dynamic					\
+	contextregistryinfo-xml-dynamic					\
+	contextpropertyinfo-xml-dynamic
+SUBDIRS = $(SUBDIRSTESTS) util
 
 check-sum: all
-	@list='$(SUBDIRS)'; for subdir in $$list; do \
+	@list='$(SUBDIRSTESTS)'; for subdir in $$list; do \
           (cd $$subdir && tput bold && echo $$subdir:\  && tput sgr0 && ( $(MAKE) $(AM_MAKEFLAGS) check | grep '^Total' | grep -v '^make' ) ) \
         done
 
@@ -12,11 +19,11 @@ covoptioncheck:
 	fi
 
 coverage: covoptioncheck
-	@list='$(SUBDIRS)'; for subdir in $$list; do \
+	@list='$(SUBDIRSTESTS)'; for subdir in $$list; do \
           (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) coverage) \
         done
 	mkdir -p coverage
-	lcov $(patsubst %, -a %/coverage/selected.cov, $(SUBDIRS)) -o coverage/selecteds.cov
+	lcov $(patsubst %, -a %/coverage/selected.cov, $(SUBDIRSTESTS)) -o coverage/selecteds.cov
 	@echo "real sources: `cd $(abs_top_srcdir) && pwd`"
 	@echo "build: $(abs_top_builddir)"
 	cat coverage/selecteds.cov | \

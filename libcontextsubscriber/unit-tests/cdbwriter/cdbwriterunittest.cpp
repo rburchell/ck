@@ -40,7 +40,7 @@ private slots:
 
 void CDBWriterUnitTest::basicCreation()
 {
-    CDBWriter writer(LOCAL_FILE("test.cdb"));
+    CDBWriter writer("test.cdb");
     QCOMPARE(writer.isWritable(), true);
     QVERIFY(writer.fileDescriptor() > 0);
 
@@ -64,7 +64,7 @@ void CDBWriterUnitTest::writingToBad()
     CDBWriter writer("/usr/test.cdb");
     QCOMPARE(writer.isWritable(), false);
     QVERIFY(writer.fileDescriptor() <= 0);
-    
+
     writer.add("KEYS", "VAL");
     writer.close();
 }
@@ -87,8 +87,8 @@ void CDBWriterUnitTest::createWithBadFileDescriptor()
 
 void CDBWriterUnitTest::cleanupTestCase()
 {
-    QFile::remove(LOCAL_FILE("test.cdb"));
-    QFile::remove(LOCAL_FILE("test-fdo.cdb"));
+    QFile::remove("test.cdb");
+    QFile::remove("test-fdo.cdb");
 }
 
 

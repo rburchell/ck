@@ -73,26 +73,27 @@ AC_SUBST(DEFAULT_CONTEXT_PROVIDERS)
 #AC_CONFIG_HEADER([config.h])
 
 AC_CONFIG_FILES([Makefile
-		 src/Makefile
-		 cli/Makefile
-         update-contextkit-providers/Makefile
-		 unit-tests/Makefile
-		 doc/Makefile
-         man/Makefile
-         contextsubscriber-1.0.pc
-         unit-tests/cdbreader/Makefile
-         unit-tests/cdbwriter/Makefile
-         unit-tests/contextregistryinfo-xml-static/Makefile
-         unit-tests/contextpropertyinfo-xml-static/Makefile
-         unit-tests/contextregistryinfo-xml-dynamic/Makefile
-         unit-tests/contextpropertyinfo-xml-dynamic/Makefile
-         unit-tests/contextregistryinfo-cdb-static/Makefile
-         unit-tests/contextpropertyinfo-cdb-static/Makefile
-         unit-tests/contextregistryinfo-cdb-dynamic/Makefile
-         unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
-     	 unit-tests/propertyprovider/Makefile
-         unit-tests/propertyhandle/Makefile
-         unit-tests/handlesignalrouter/Makefile
+                 src/Makefile
+                 cli/Makefile
+                 update-contextkit-providers/Makefile
+                 unit-tests/Makefile
+                 doc/Makefile
+                 man/Makefile
+                 contextsubscriber-1.0.pc
+                 unit-tests/util/Makefile
+                 unit-tests/cdbreader/Makefile
+                 unit-tests/cdbwriter/Makefile
+                 unit-tests/contextregistryinfo-xml-static/Makefile
+                 unit-tests/contextpropertyinfo-xml-static/Makefile
+                 unit-tests/contextregistryinfo-xml-dynamic/Makefile
+                 unit-tests/contextpropertyinfo-xml-dynamic/Makefile
+                 unit-tests/contextregistryinfo-cdb-static/Makefile
+                 unit-tests/contextpropertyinfo-cdb-static/Makefile
+                 unit-tests/contextregistryinfo-cdb-dynamic/Makefile
+                 unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
+                 unit-tests/propertyprovider/Makefile
+                 unit-tests/propertyhandle/Makefile
+                 unit-tests/handlesignalrouter/Makefile
 		 accept-tests/Makefile])
 
 AC_OUTPUT
