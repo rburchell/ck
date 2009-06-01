@@ -2,6 +2,9 @@ NULL =
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
+# We exclude the caches from the uninstall check.
+distuninstallcheck_listfiles = find . -type f -a ! -name '*.cdb' -print
+
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
 

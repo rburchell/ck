@@ -3,7 +3,7 @@ AC_INIT([ContextKit], [0.1.9~unreleased], [marius.vollmer@nokia.com], ContextKit
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
-AM_INIT_AUTOMAKE([-Wall -Wno-portability -Werror dist-bzip2 tar-ustar 1.9])
+AM_INIT_AUTOMAKE([-Wall -Wno-portability -Wno-override -Werror dist-bzip2 tar-ustar 1.9])
 
 # Honor aclocal flags
 ACLOCAL="$ACLOCAL $ACLOCAL_FLAGS"
