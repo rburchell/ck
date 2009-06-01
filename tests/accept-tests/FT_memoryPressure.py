@@ -35,7 +35,7 @@ class MemoryPressure(unittest.TestCase):
 
     def setUp(self):
         self.contextd = Popen("contextd",stdin=PIPE,stderr=PIPE,stdout=PIPE)
-        self.context_client = Popen(["context-listener","System.MemoryPressure"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
+        self.context_client = Popen(["context-listen","System.MemoryPressure"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
         cmd = 'echo 15000 > /proc/sys/vm/lowmem_notify_high_pages'
         os.system(cmd)
 
