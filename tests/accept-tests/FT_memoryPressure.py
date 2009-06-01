@@ -57,7 +57,7 @@ class MemoryPressure(unittest.TestCase):
 
         """
         actual = self.context_client.stdout.readline().rstrip()
-        expected = "System.MemoryPressure: int:0"
+        expected = "System.MemoryPressure: int:0" # Normal
         self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
 
         cmd = 'memload 100MB'
@@ -65,7 +65,7 @@ class MemoryPressure(unittest.TestCase):
         sleep(2)
 
         actual = self.context_client.stdout.readline().rstrip()
-        expected = "System.MemoryPressure: int:1"
+        expected = "System.MemoryPressure: int:1" # High
         self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
 
         cmd = 'memload 150MB'
@@ -73,7 +73,7 @@ class MemoryPressure(unittest.TestCase):
         sleep(2)
 
         actual = self.context_client.stdout.readline().rstrip()
-        expected = "System.MemoryPressure: int:2"
+        expected = "System.MemoryPressure: int:2" # Critical
         self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
         os.kill(self.memload.pid,9)
         os.kill(self.memload2.pid,9)
