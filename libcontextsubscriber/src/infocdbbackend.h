@@ -46,7 +46,6 @@ public:
     virtual QString providerDBusTypeForKey(QString key) const;
 
     static QString databasePath();
-    static QString databaseDirectory();
     static bool databaseExists();
 
 private:

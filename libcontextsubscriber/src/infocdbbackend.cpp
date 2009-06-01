@@ -115,17 +115,6 @@ QString InfoCdbBackend::databasePath()
     return QString(regpath) + "cache.cdb";
 }
 
-/// Returns full path to the directory containing the database.
-/// Takes the \c CONTEXT_PROVIDERS env varialbe into account.
-QString InfoCdbBackend::databaseDirectory()
-{
-    const char *regpath = getenv("CONTEXT_PROVIDERS");
-    if (! regpath)
-        regpath = DEFAULT_CONTEXT_PROVIDERS;
-
-    return QString(regpath);
-}
-
 /* Slots */
 
 /// Called when the database changes. Reopens the database and emits 
