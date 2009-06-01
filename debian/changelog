@@ -1,10 +1,15 @@
-contextkit (0.1.9~unreleased) unstable; urgency=low
+contextkit (0.1.9) unstable; urgency=low
 
   * context-provide's registry output file is now specified by
     CONTEXT_PROVIDE_REGISTRY_FILE and not CONTEXT_FLEXI_XML
-  *
 
- -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Thu, 28 May 2009 14:24:14 +0300
+  * Added new-style property declaration file to contextd, for use by the
+    upcoming libcontextsubscriber.
+
+  * Fixes: NB#119635 - ContextProvider library API checks it's input with
+    assertions.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Mon, 01 Jun 2009 15:17:29 +0300
 
 contextkit (0.1.8) unstable; urgency=low
 
