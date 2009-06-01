@@ -19,7 +19,7 @@
  *
  */
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDir>
 #include <stdlib.h>
 #include "contextregistryinfo.h"

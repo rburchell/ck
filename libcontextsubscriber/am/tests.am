@@ -2,8 +2,8 @@
 TESTS = $(check_PROGRAMS)
 
 # include header files from source as a last resource and use QTest
-AM_CPPFLAGS = -I$(top_srcdir)/src $(QtTest_CFLAGS)
-AM_LDFLAGS = $(QtTest_LIBS)
+AM_CPPFLAGS = -I$(top_srcdir)/src $(QtTest_CFLAGS) $(QtDBus_CFLAGS)
+AM_LDFLAGS = $(QtTest_LIBS) $(QtDBus_LIBS)
 
 # recompile every file %.cpp in SOURCE_CXX as mock_%.o in the current
 # test directory (so the mock objects don't have to be ABI compatible)

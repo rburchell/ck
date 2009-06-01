@@ -2,7 +2,8 @@ bin_PROGRAMS = update-contextkit-providers
 
 update_contextkit_providers_SOURCES = update-contextkit-providers.cpp
 
-AM_CPPFLAGS = -I$(srcdir)/../src
+AM_CPPFLAGS = -I$(srcdir)/../src $(QtXml_CFLAGS) $(QtCore_CFLAGS) $(QtDBus_CFLAGS)
+AM_LDFLAGS = $(QtXml_LIBS) $(QtCore_LIBS)
 
 # you have to add your ui designer designed forms here
 # QT_FORMS = commandview.ui

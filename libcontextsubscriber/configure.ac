@@ -46,7 +46,9 @@ AS_IF([test "$with_doxygen" = yes -o \( "$with_doxygen" = "" -a "$withm_doxygen"
 	    [AC_MSG_NOTICE([Doxygen not enabled, enable it with --with-doxygen])])
 
 # Checks for libraries.
-PKG_CHECK_MODULES([Qt], [QtCore QtGui QtDBus QtXml])
+PKG_CHECK_MODULES([QtCore], [QtCore])
+PKG_CHECK_MODULES([QtDBus], [QtDBus])
+PKG_CHECK_MODULES([QtXml], [QtXml])
 MOC=`pkg-config QtCore --variable=moc_location`
 AC_CHECK_FILE([$MOC], [],
    AC_MSG_ERROR([Can't find moc compiler: $MOC]))
@@ -59,9 +61,14 @@ RCC=`pkg-config QtCore --variable=exec_prefix`/bin/rcc
 AC_CHECK_FILE([$RCC], [],
    AC_MSG_ERROR([Can't find rcc compiler: $RCC]))
 AC_SUBST([RCC])
+AC_SUBST([QtCore_CFLAGS])
+AC_SUBST([QtCore_LIBS])
+AC_SUBST([QtXml_CFLAGS])
+AC_SUBST([QtXml_LIBS])
+AC_SUBST([QtDBus_CFLAGS])
+AC_SUBST([QtDBus_LIBS])
 
-CXXFLAGS="$CXXFLAGS $Qt_CFLAGS"
-LIBS="$LIBS $Qt_LIBS"
+
 PKG_CHECK_MODULES([QtTest], [QtTest])
 
 AC_CHECK_LIB([cdb], [cdb_make_start], [],

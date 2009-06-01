@@ -3,8 +3,11 @@ context_listen_SOURCES = context-listen.cpp sconnect.h			\
 	propertylistener.h propertylistener.cpp commandwatcher.h	\
 	commandwatcher.cpp
 
+AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)
+LIBS += $(QtCore_LIBS)
+
 # library dependency hack for seamless make in cli/
-AM_CXXFLAGS = -I$(srcdir)/../src
+AM_CXXFLAGS += -I$(srcdir)/../src
 context_listen_LDADD = ../src/libcontextsubscriber.la
 ../src/libcontextsubscriber.la:
 	$(MAKE) -C ../src libcontextsubscriber.la
