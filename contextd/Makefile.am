@@ -62,5 +62,5 @@ BUILT_SOURCES = \
 	$(NULL)
 
 install-data-hook:
-	-update-context-providers $(contextdir)
-	-update-contextkit-providers $(providersdir)
+	-update-context-providers $(DESTDIR)$(contextdir)
+	-update-contextkit-providers $(DESTDIR)$(providersdir)
