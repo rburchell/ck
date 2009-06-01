@@ -21,6 +21,7 @@
 
 #include <QtTest/QtTest>
 #include <QtCore>
+#include <fcntl.h>
 #include "cdbwriter.h"
 #include "fileutils.h"
 
@@ -33,6 +34,8 @@ private slots:
     void noPermissions();
     void cleanupTestCase();
     void writingToBad();
+    void createWithFileDescriptor();
+    void createWithBadFileDescriptor();
 };
 
 void CDBWriterUnitTest::basicCreation()
@@ -66,10 +69,28 @@ void CDBWriterUnitTest::writingToBad()
     writer.close();
 }
 
+void CDBWriterUnitTest::createWithFileDescriptor()
+{
+    int fd = open("test-fdo.cdb", O_RDWR | O_CREAT, 0644);
+    CDBWriter writer(fd);
+    
+    QCOMPARE(writer.isWritable(), true);
+}
+
+void CDBWriterUnitTest::createWithBadFileDescriptor()
+{
+    int fd = open("/usr/test/something/database.cdb", O_RDWR | O_CREAT, 0644);
+    CDBWriter writer(fd);
+    
+    QCOMPARE(writer.isWritable(), false);
+}
+
 void CDBWriterUnitTest::cleanupTestCase()
 {
     QFile::remove(LOCAL_FILE("test.cdb"));
+    QFile::remove(LOCAL_FILE("test-fdo.cdb"));
 }
+
 
 #include "moc_cdbwriterunittest_cpp.cpp"
 QTEST_MAIN(CDBWriterUnitTest);
