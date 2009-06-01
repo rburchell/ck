@@ -13,10 +13,17 @@
 ##
 
 import sys
-sys.path.append("../../python/") # libcontextprovider python bindings
-import ContextProvider as cp
+import os
 
-sys.path.append("./testcases/")
+# libcontextprovider python bindings
+if "srcdir" in os.environ:
+    # For vpath builds
+    sys.path.append(os.environ["srcdir"] + "/../../python/")
+else:
+    sys.path.append("../../python/")
+
+import ContextKit.ContextProvider as cp
+
 import conf as cfg
 
 import dbus
@@ -69,6 +76,13 @@ class FakeProvider (dbus.service.Object):
         p = cp.ContextProvider.install_group(["test.double", "test.int", "test.bool",
                                  "test.string"], 1, self.subscription_changed_cb, None)
         p_other = cp.ContextProvider.install_group(["test.log"], 1, self.dummy_cb, None)
+    @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
+                       in_signature='', out_signature='')
+    def DoInstallWithContextPrefix(self):
+        self.dummy_cb = cp.ContextProvider.SUBSCRIPTION_CHANGED_CALLBACK(self.py_dummy_cb)
+
+        p = cp.ContextProvider.install_group(["Context.test2.double", "Context.test2.int", "Context.test2.bool", "Context.test2.unknown"], 1, self.dummy_cb, None)
+        p_other = cp.ContextProvider.install_key("Context.test2.string", 1, self.dummy_cb, None)
     
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')

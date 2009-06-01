@@ -49,6 +49,7 @@ Description: A framework for collecting contextual information
 Package: libcontextprovider0
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libduivaluespace0 (<< 0.9)
 Description: Helper library for providers of context properties
  The libcontextprovider library implements the provider side of the
  org.freedesktop.ContextKit D-Bus interface.

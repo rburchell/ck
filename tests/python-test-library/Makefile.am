@@ -1,9 +1,9 @@
-DBUS_TESTS = contextProviderTCs.py
+DBUS_TESTS = $(srcdir)/contextProviderTCs.py
 
 TESTS =
 
 TESTS_ENVIRONMENT = \
-		PYTHONPATH=@abs_top_srcdir@/tests/dbus:@abs_top_builddir@/tests/python-test-library
+		PYTHONPATH=@abs_top_srcdir@/tests/dbus:@abs_top_builddir@/tests/python-test-library:@abs_top_srcdir@/tests/python-test-library
 
 check-local: check-dbus
 
@@ -13,18 +13,15 @@ check-dbus:
 		$(MAKE) -C testfw
 		rm -f testfw/core
 		rm -f testfw/testing.log
-		TMPSYSFS=`mktemp -d`; \
-		CONTEXT_EXAMPLE_SYSFS_LOCATION=$$TMPSYSFS; \
-		export CONTEXT_EXAMPLE_SYSFS_LOCATION; \
-		sleep=$(CHECK_DBUS_SLEEP); \
-		echo "CONTEXT_EXAMPLE_SYSFS_LOCATION: $$CONTEXT_EXAMPLE_SYSFS_LOCATION"; \
-		sh testfw/with-session-bus.sh \
-				--sleep=$$sleep \
+		TMPSYSFS=`mktemp -d` \
+		$(srcdir)/testfw/with-session-bus.sh \
+				--sleep=$(CHECK_DBUS_SLEEP) \
 				--config-file=testfw/tmp-session-bus.conf \
 				-- $(MAKE) check-TESTS \
 				TESTS="$(DBUS_TESTS)" \
-				TESTS_ENVIRONMENT="CONTEXT_EXAMPLE_SYSFS_LOCATION=$$TMPSYSFS $(TESTS_ENVIRONMENT) $(TEST_PYTHON)"; \
-		rm -rf $$TMPSYSFS;
+				TESTS_ENVIRONMENT="CONTEXT_EXAMPLE_SYSFS_LOCATION=$$TMPSYSFS $(TESTS_ENVIRONMENT) $(TEST_PYTHON)"; e=$$?; \
+		rm -rf $$TMPSYSFS; \
+		exit $$e
 		@if test -e testfw/core; then\
 			echo "Core dump exists: testfw/core";\
 			exit 1;\
@@ -42,7 +39,10 @@ EXTRA_DIST = \
 		inotify.py \
 		sysfsemulator.py \
 		eventprotocol.py \
-		testhelpers.py
+		testhelpers.py \
+		contextProviderTCs.py \
+		stubs/provider_stub.py \
+		conf.py
 
 CLEANFILES = *.pyc */*.pyc config.py
 

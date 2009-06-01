@@ -3,6 +3,9 @@ bin_PROGRAMS = contextd
 contextddir = $(datadir)/context-providers
 contextd_DATA = contextd.xml
 
+providersdir = $(datadir)/contextkit/providers
+dist_providers_DATA = org.freedesktop.ContextKit.contextd.context
+
 servicedir = $(datadir)/dbus-1/services
 service_DATA = org.freedesktop.ContextKit.contextd.service
 
@@ -58,3 +61,6 @@ BUILT_SOURCES = \
 	contextd.vala.stamp \
 	$(NULL)
 
+install-data-hook:
+	-update-context-providers $(contextdir)
+	-update-contextkit-providers $(providersdir)
