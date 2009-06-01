@@ -23,8 +23,8 @@ QT_TOMOC_H = $(filter %.h, $(context_listen_SOURCES))
 # finally, do the moccing
 CLEANFILES =
 include $(top_srcdir)/am/qt.am
-context_listen_DEPENDENCIES = $(qt_mocobjects) ../src/libcontextsubscriber.la
-context_listen_LDADD = $(qt_mocobjects) ../src/libcontextsubscriber.la
+context_listen_DEPENDENCIES = $(qt_moclobjects) ../src/libcontextsubscriber.la
+context_listen_LDADD = $(qt_moclobjects) ../src/libcontextsubscriber.la
 
 # library dependency hack for seamless make in cli/
 ../src/libcontextsubscriber.la:

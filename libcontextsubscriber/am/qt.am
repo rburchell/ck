@@ -1,9 +1,9 @@
 # if you include this file, you have to declare CLEANFILES in your
 # Makefile.am before inclusion
 # and after inclusion:
-#	your_target_DEPENDENCIES = $(qt_mocobjects)
-#	your_target_LIBADD = $(qt_mocobjects)         (if your target is a library)
-#	your_target_LDADD = $(qt_mocobjects)          (if your target is a program)
+#	your_target_DEPENDENCIES = $(qt_moclobjects)
+#	your_target_LIBADD = $(qt_moclobjects)         (if your target is a library)
+#	your_target_LDADD = $(qt_moclobjects)          (if your target is a program)
 
 # handling of QT_TOMOC_CPP and QT_TOMOC_H files
 #   %.h mocced will be moc_%_h.cpp
@@ -12,7 +12,6 @@
 QT_CXXMOCS = $(QT_TOMOC_CPP:%.cpp=moc_%_cpp.cpp)
 QT_HMOCS = $(QT_TOMOC_H:%.h=moc_%_h.cpp)
 
-qt_mocobjects = $(QT_HMOCS:%.cpp=%.o)
 qt_moclobjects = $(QT_HMOCS:%.cpp=%.lo)
 
 # cleanup
