@@ -25,6 +25,29 @@
 #include "fcntl.h"
 #include "fileutils.h"
 
+#define MYLOGLEVEL 2
+void myMessageOutput(QtMsgType type, const char *msg)
+{
+    switch (type) {
+    case QtDebugMsg:
+        if (MYLOGLEVEL <= 0)
+            fprintf(stderr, "Debug: %s\n", msg);
+        break;
+    case QtWarningMsg:
+        if (MYLOGLEVEL <= 1)
+            fprintf(stderr, "Warning: %s\n", msg);
+        break;
+    case QtCriticalMsg:
+        if (MYLOGLEVEL <= 2)
+            fprintf(stderr, "Critical: %s\n", msg);
+        break;
+    case QtFatalMsg:
+        if (MYLOGLEVEL <= 3)
+            fprintf(stderr, "Fatal: %s\n", msg);
+        abort();
+    }
+}
+
 class ContextRegistryInfoUnitTest : public QObject
 {
     Q_OBJECT
@@ -42,11 +65,13 @@ private slots:
 
 void ContextRegistryInfoUnitTest::initTestCase()
 {
+    qInstallMsgHandler(myMessageOutput);
+
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
 
     // Setup state
     utilCopyLocalWithRemove("providers1v1.xml.src", "providers.context");
-           
+
     context = ContextRegistryInfo::instance("xml");
 }
 

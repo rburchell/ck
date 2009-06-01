@@ -25,6 +25,29 @@
 #include "contextregistryinfo.h"
 #include "fileutils.h"
 
+#define MYLOGLEVEL 2
+void myMessageOutput(QtMsgType type, const char *msg)
+{
+    switch (type) {
+    case QtDebugMsg:
+        if (MYLOGLEVEL <= 0)
+            fprintf(stderr, "Debug: %s\n", msg);
+        break;
+    case QtWarningMsg:
+        if (MYLOGLEVEL <= 1)
+            fprintf(stderr, "Warning: %s\n", msg);
+        break;
+    case QtCriticalMsg:
+        if (MYLOGLEVEL <= 2)
+            fprintf(stderr, "Critical: %s\n", msg);
+        break;
+    case QtFatalMsg:
+        if (MYLOGLEVEL <= 3)
+            fprintf(stderr, "Fatal: %s\n", msg);
+        abort();
+    }
+}
+
 class ContextPropertyInfoUnitTest : public QObject
 {
     Q_OBJECT
@@ -40,6 +63,8 @@ private slots:
 
 void ContextPropertyInfoUnitTest::initTestCase()
 {
+    qInstallMsgHandler(myMessageOutput);
+
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
     ContextRegistryInfo::instance("xml");
 }
@@ -51,7 +76,7 @@ void ContextPropertyInfoUnitTest::checkKeyTypeChanging()
 
     ContextPropertyInfo prop("Battery.LowBattery");
     QCOMPARE(prop.type(), QString("TRUTH"));
-    
+
     QSignalSpy spy(&prop, SIGNAL(typeChanged(QString)));
 
     utilCopyLocalWithRemove("providers2v2.xml.src", "providers.context");
@@ -92,7 +117,7 @@ void ContextPropertyInfoUnitTest::checkKeyRemoval()
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
     QVERIFY(prop.exists() == true);
- 
+
     utilCopyLocalWithRemove("providers3v2.xml.src", "providers.context");
 
     QVERIFY(prop.exists() == false);
@@ -104,14 +129,14 @@ void ContextPropertyInfoUnitTest::checkKeyAdding()
 {
     // Create initial state
     utilCopyLocalWithRemove("providers3v2.xml.src", "providers.context");
-    
+
     ContextPropertyInfo prop("Battery.LowBattery");
     QVERIFY(prop.type() == "");
     QVERIFY(prop.doc() == "");
     QVERIFY(prop.exists() == false);
- 
+
     utilCopyLocalWithRemove("providers3v1.xml.src", "providers.context");
-    
+
     QVERIFY(prop.exists() == true);
     QVERIFY(prop.type() != "");
     QVERIFY(prop.doc() != "");
