@@ -61,17 +61,20 @@ class Asynchronous(unittest.TestCase):
         return "%s is Unknown" % (name)
     wantedUnknown = Callable(wantedUnknown)
 
-    def testCommanderFunctionality(self):
-        ### SETUP
-        os.environ["CONTEXT_FLEXI_XML"] = "./flexi-properties-slow.xml"
+    #SetUp
+    def setUp(self):
+
+        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./flexi-properties-slow.xml"
         self.flexiprovider_slow = self.startProvider("com.nokia.slow",
                                                      ["int","test.slow","42"])
-        os.environ["CONTEXT_FLEXI_XML"] = "./flexi-properties-fast.xml"
+        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./flexi-properties-fast.xml"
         self.flexiprovider_fast = self.startProvider("com.nokia.fast",
                                                      ["int","test.fast","42"])
         print >>self.flexiprovider_slow.stdin, "import time ; time.sleep(3)"
         self.context_client = Popen(["../cli/context-listen","test.fast", "test.slow"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
+
+    def testCommanderFunctionality(self):
         # check the fast property
         got = self.context_client.stdout.readline().rstrip()
         self.assertEqual(got,
@@ -89,7 +92,8 @@ class Asynchronous(unittest.TestCase):
         self.assert_(slow_time - fast_time > 2.0,
                      "The arrival time of the fast and slow property is not far enough from each other")
 
-        ### TEARDOWN
+    #TearDown
+    def tearDown(self):
         os.kill(self.flexiprovider_fast.pid, 9)
         os.kill(self.flexiprovider_slow.pid, 9)
         os.unlink('flexi-properties-slow.xml')

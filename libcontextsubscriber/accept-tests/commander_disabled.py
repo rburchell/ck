@@ -71,7 +71,7 @@ class CommanderDisabled(unittest.TestCase):
         os.kill(self.flexiprovider.pid, 9)
         if (self.context_commander != 0): os.kill(self.context_commander.pid, 9)
         os.kill(self.context_client.pid, 9)
-        os.unlink('flexi-properties.xml')
+        os.unlink('context-provide.context')
         pass
 
     def testCommanderFunctionality(self):

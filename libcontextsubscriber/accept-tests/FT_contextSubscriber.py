@@ -380,7 +380,7 @@ class MultipleSubscribers(unittest.TestCase):
 
 class MultipleProviders(unittest.TestCase):
     def setUp(self):
-        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./flexi-provider1.xml"
+        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide1.context"
         self.flexiprovider1 = Popen(["../../python/context-provide","session:com.nokia.test",
                "int","test.int","1",
                "string","test.string","foobar",
@@ -399,11 +399,11 @@ class MultipleProviders(unittest.TestCase):
         os.kill(self.flexiprovider1.pid,9)
         os.kill(self.flexiprovider2.pid,9)
         os.kill(self.context_client.pid,9)
-        os.unlink('flexi-provider1.xml')
-        os.unlink('flexi-provider2.xml')
+        os.unlink('context-provide1.context')
+        os.unlink('context-provide2.context')
 
     def testIdenticalProvider(self):
-        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./flexi-provider2.xml"
+        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide2.context"
         self.flexiprovider2 = Popen(["../../python/context-provide","session:com.nokia.test2",
                                      "int","test.int","1",
                                      "string","test.string","foobar",

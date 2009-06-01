@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src unit-tests cli update-contextkit-providers doc man
+SUBDIRS = src unit-tests accept-tests cli update-contextkit-providers doc man
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextsubscriber-1.0.pc
@@ -15,7 +15,7 @@ covoptioncheck:
 
 coverage: covoptioncheck
 	make -C unit-tests/ coverage
-	
+
 EXTRA_DIST = accept-tests
 
 #deb:
