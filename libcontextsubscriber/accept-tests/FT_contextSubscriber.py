@@ -365,6 +365,15 @@ class MultipleSubscribers(unittest.TestCase):
         self.assertEqual(self.client2_actual,client2_expected,"Actual key values pairs do not match expected")
         self.assertEqual(self.client4_actual,client4_expected,"Actual key values pairs do not match expected")
 
+        print >> self.context_client3.stdin, "type test.truth"
+
+        client3_expected = "type: TRUTH"
+
+        self.client3_actual = self.context_client3.stdout.readline().rstrip()
+        self.assertEqual(self.client3_actual,client3_expected,
+                         "Actual key values pairs do not match expected %s %s " % (self.client3_actual,client3_expected))
+
+
         print >> self.flexiprovider.stdin, "set('test.truth',None)"
 
         self.client1_actual = [self.context_client1.stdout.readline().rstrip()]
@@ -382,13 +391,16 @@ class MultipleSubscribers(unittest.TestCase):
                          "Actual key values pairs do not match expected %s %s " % (self.client3_actual,client3_expected))
 
 class MultipleProviders(unittest.TestCase):
+
     def setUp(self):
         os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide1.context"
         self.flexiprovider1 = Popen(["context-provide","session:com.nokia.test",
-               "int","test.int","1",
-               "string","test.string","foobar",
-               "double","test.double","2.5",
                "truth","test.truth","true"],
+              stdin=PIPE,stderr=PIPE,stdout=PIPE)
+
+        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide2.context"
+        self.flexiprovider2 = Popen(["context-provide","session:com.nokia.test2",
+               "int","test.int","24"],
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
 
         os.environ["CONTEXT_PROVIDERS"] = "."
@@ -396,7 +408,8 @@ class MultipleProviders(unittest.TestCase):
         print >> self.flexiprovider1.stdin, "info()"
         self.flexiprovider1.stdout.readline()
 
-        self.context_client = Popen(["context-listen","test.int","test.double","test.string","test.truth"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
+        self.context_client = Popen(["context-listen","test.int","test.truth"]
+                                    ,stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
         os.kill(self.flexiprovider1.pid,9)
@@ -405,16 +418,20 @@ class MultipleProviders(unittest.TestCase):
         os.unlink('context-provide1.context')
         os.unlink('context-provide2.context')
 
-    def testIdenticalProvider(self):
-        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide2.context"
-        self.flexiprovider2 = Popen(["context-provide","session:com.nokia.test2",
-                                     "int","test.int","1",
-                                     "string","test.string","foobar",
-                                     "double","test.double","2.5",
-                                     "truth","test.truth","true"],
-                                    stdin=PIPE,stderr=PIPE,stdout=PIPE)
-        print >>self.flexiprovider2.stdin, "info()"
-        stdoutRead(self.flexiprovider2,3)
+    def testTwoProviders(self):
+        stdoutRead(self.context_client,2)
+        print >>self.flexiprovider2.stdin, "set('test.int',-68)"
+
+        actual = self.context_client.stdout.readline().rstrip()
+        expected = "test.int = int:-68"
+        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+
+        print >>self.flexiprovider1.stdin, "set('test.truth',False)"
+
+        actual = self.context_client.stdout.readline().rstrip()
+        expected = "test.truth = bool:false"
+        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+
 
 class SubscriptionPause (unittest.TestCase):
 
