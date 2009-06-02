@@ -15,4 +15,4 @@ update_contextkit_providers_LDADD = ../src/libcontextsubscriber.la
 # Note: enable these 2 lines when there is something to mock
 #nodist_update_contextkit_providers_SOURCES = mocs.cpp
 #QT_TOMOC = $(filter %.h, $(update_contextkit_providers_SOURCES))
-#include $(top_srcdir)/am/qt-new.am
+#include $(top_srcdir)/am/qt.am

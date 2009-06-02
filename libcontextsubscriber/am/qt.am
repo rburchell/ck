@@ -4,7 +4,7 @@
 # nodist_yourtarget_SOURCES = mocs.cpp
 # QT_TOMOC = $(filter %.h, $(yourtarget_SOURCES))
 #            ^^^^ or you can use explicit header file listing here
-# include $(top_srcdir)/am/qt-new.am
+# include $(top_srcdir)/am/qt.am
 
 ## If you have a .cpp file, which you want to moc, you have to use an
 ## explicit dependency like this:
