@@ -37,7 +37,7 @@ QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvid
 */
 
 PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
-    : busType(busType), busName(busName), managerInterface(busType, busName, this), subscriberInterface(0)
+    : subscriberInterface(0), managerInterface(busType, busName, this), busType(busType), busName(busName)
 {
     // Setup idle timer, 0: always run it when we are entering the
     // mainloop and the timer is enabled.

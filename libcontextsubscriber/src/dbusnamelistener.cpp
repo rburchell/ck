@@ -48,7 +48,7 @@
 */
 DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const QString &busName,
                                    bool initialCheck, QObject *parent) :
-    QObject(parent), busName(busName), servicePresent(false)
+    QObject(parent), servicePresent(false), busName(busName)
 {
     QDBusConnection connection("");
 
