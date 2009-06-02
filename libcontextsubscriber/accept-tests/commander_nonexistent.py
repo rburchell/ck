@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.5
+#!/usr/bin/env python
 ##
 ## This file is part of ContextKit.
 ##
@@ -47,7 +47,7 @@ class Callable:
 
 class CommanderNonExistent(unittest.TestCase):
     def startProvider(busname, args):
-        ret = Popen(["../../python/context-provide", busname] + args,
+        ret = Popen(["context-provide", busname] + args,
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
         # wait for it
         print >>ret.stdin, "info()"
@@ -69,7 +69,7 @@ class CommanderNonExistent(unittest.TestCase):
         self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
                                                     ["string", "test.int", "foobar",
                                                      "string", "test.string", "barfoo"])
-        self.context_client = Popen(["../cli/context-listen","test.int", "test.string"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self.context_client = Popen(["context-listen","test.int", "test.string"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
     def tearDown(self):
         os.kill(self.flexiprovider.pid, 9)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.5
+#!/usr/bin/env python
 ##
 ## This file is part of ContextKit.
 ##
@@ -48,7 +48,7 @@ class Callable:
 
 class CommanderAppearing(unittest.TestCase):
     def startProvider(busname, args):
-        ret = Popen(["../../python/context-provide", busname] + args,
+        ret = Popen(["context-provide", busname] + args,
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
         # wait for it
         print >>ret.stdin, "info()"
@@ -67,7 +67,7 @@ class CommanderAppearing(unittest.TestCase):
     def setUp(self):
         self.flexiprovider = self.startProvider("com.nokia.test",
                                            ["int","test.int","42"])
-        self.context_client = Popen(["../cli/context-listen","test.int"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self.context_client = Popen(["context-listen","test.int"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         self.context_commander = 0
 
     def tearDown(self):

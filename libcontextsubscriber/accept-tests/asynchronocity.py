@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.5
+#!/usr/bin/env python
 ##
 ## Copyright (C) 2008, 2009 Nokia. All rights reserved.
 ##
@@ -45,8 +45,8 @@ class Callable:
 
 class Asynchronous(unittest.TestCase):
     def startProvider(busname, args):
-        ret = Popen(["../../python/context-provide", busname] + args,
-              stdin=PIPE,stderr=PIPE,stdout=PIPE)
+        ret = Popen(["context-provide", busname] + args,
+              stdin=PIPE,stdout=PIPE)
         # wait for it
         print >>ret.stdin, "info()"
         ret.stdout.readline().rstrip()
@@ -64,18 +64,42 @@ class Asynchronous(unittest.TestCase):
     #SetUp
     def setUp(self):
 
-        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./flexi-properties-slow.xml"
+        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide-slow.context"
         self.flexiprovider_slow = self.startProvider("com.nokia.slow",
                                                      ["int","test.slow","42"])
-        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./flexi-properties-fast.xml"
+        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide-fast.context"
         self.flexiprovider_fast = self.startProvider("com.nokia.fast",
                                                      ["int","test.fast","42"])
         print >>self.flexiprovider_slow.stdin, "import time ; time.sleep(3)"
-        self.context_client = Popen(["../cli/context-listen","test.fast", "test.slow"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
 
     def testCommanderFunctionality(self):
+        """
+        Description
+            This test verifies that the asynchronicity of the subscriber
+            library
+
+        Pre-conditions
+            2 Providers started with context-provide tool.
+            Each provider offers one property.
+            1 provider is delayed (3s).
+
+        Steps
+            Subscribe to both properties
+            Verify that return values are correct
+            Measure the time elapsed between the reception of the 2 values.
+
+        Post-conditions
+            Kill providers
+
+        References
+            None
+        """
+
         # check the fast property
+        self.context_client = Popen(["context-listen", "test.fast", "test.slow"],
+                                    stdin=PIPE, stdout=PIPE, stderr=PIPE)
+
         got = self.context_client.stdout.readline().rstrip()
         self.assertEqual(got,
                          self.wanted("test.fast", "int", "42"),
@@ -96,8 +120,8 @@ class Asynchronous(unittest.TestCase):
     def tearDown(self):
         os.kill(self.flexiprovider_fast.pid, 9)
         os.kill(self.flexiprovider_slow.pid, 9)
-        os.unlink('flexi-properties-slow.xml')
-        os.unlink('flexi-properties-fast.xml')
+        os.unlink('context-provide-fast.context')
+        os.unlink('context-provide-slow.context')
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(Asynchronous)
