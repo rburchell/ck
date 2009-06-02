@@ -133,5 +133,5 @@ void ContextPropertyInfoUnitTest::checkNewTypeMulti()
     QCOMPARE(prop.type(), QString("SECOND"));
 }
 
-#include "moc_contextpropertyinfounittest_cpp.cpp"
+#include "contextpropertyinfounittest.moc"
 QTEST_MAIN(ContextPropertyInfoUnitTest);

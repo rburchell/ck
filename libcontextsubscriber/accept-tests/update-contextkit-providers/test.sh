@@ -19,34 +19,34 @@ function compare {
 
 # Query the database $1 using the cdb tool and echo results to $1.actual
 function querydb {
-    cdb -q "cache.cdb" "$1" > "$1.actual"
+    cdb -q "cache.cdb" "$1" > "$2.actual"
 }
 
 # Check the keys in the existing cache.cdb database
 function dotest {
-    querydb "KEYS"
+    querydb "KEYS" "KEYS"
     compare "KEYS.expected" "KEYS.actual"
 
-    querydb "PROVIDERS"
+    querydb "PROVIDERS" "PROVIDERS"
     compare "PROVIDERS.expected" "PROVIDERS.actual"
 
-    querydb "org.freedesktop.ContextKit.contextd1:KEYS"
-    compare "org.freedesktop.ContextKit.contextd1:KEYS.expected" "org.freedesktop.ContextKit.contextd1:KEYS.actual"
+    querydb "org.freedesktop.ContextKit.contextd1:KEYS" "org.freedesktop.ContextKit.contextd1_KEYS"
+    compare "org.freedesktop.ContextKit.contextd1_KEYS.expected" "org.freedesktop.ContextKit.contextd1_KEYS.actual"
 
-    querydb "org.freedesktop.ContextKit.contextd2:KEYS"
-    compare "org.freedesktop.ContextKit.contextd2:KEYS.expected" "org.freedesktop.ContextKit.contextd2:KEYS.actual"
+    querydb "org.freedesktop.ContextKit.contextd2:KEYS" "org.freedesktop.ContextKit.contextd2_KEYS"
+    compare "org.freedesktop.ContextKit.contextd2_KEYS.expected" "org.freedesktop.ContextKit.contextd2_KEYS.actual"
 
-    querydb "Battery.Charging:KEYTYPE"
-    compare "Battery.Charging:KEYTYPE.expected" "Battery.Charging:KEYTYPE.actual"
+    querydb "Battery.Charging:KEYTYPE" "Battery.Charging_KEYTYPE"
+    compare "Battery.Charging_KEYTYPE.expected" "Battery.Charging_KEYTYPE.actual"
 
-    querydb "Battery.Charging:KEYDOC"
-    compare "Battery.Charging:KEYDOC.expected" "Battery.Charging:KEYDOC.actual"
+    querydb "Battery.Charging:KEYDOC" "Battery.Charging_KEYDOC"
+    compare "Battery.Charging_KEYDOC.expected" "Battery.Charging_KEYDOC.actual"
 
-    querydb "Battery.Charging:KEYPROVIDER"
-    compare "Battery.Charging:KEYPROVIDER.expected" "Battery.Charging:KEYPROVIDER.actual"
+    querydb "Battery.Charging:KEYPROVIDER" "Battery.Charging_KEYPROVIDER"
+    compare "Battery.Charging_KEYPROVIDER.expected" "Battery.Charging_KEYPROVIDER.actual"
 
-    querydb "Battery.Charging:KEYBUS"
-    compare "Battery.Charging:KEYBUS.expected" "Battery.Charging:KEYBUS.actual"
+    querydb "Battery.Charging:KEYBUS" "Battery.Charging_KEYBUS"
+    compare "Battery.Charging_KEYBUS.expected" "Battery.Charging_KEYBUS.actual"
 }
 
 BASEDIR=`dirname $0`

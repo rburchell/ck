@@ -1,8 +1,12 @@
 from ctypes import *
 from CTypesHelpers import *
+import sys
 
-
-_dll = CDLL("libcontextprovider.so.0")
+try:
+    _dll = CDLL("libcontextprovider.so.0")
+except:
+    raise IOError("Could not load libcontextprovider library")
+    sys.exit(1)
 
 class ContextProvider:
     SUBSCRIPTION_CHANGED_CALLBACK = CFUNCTYPE(None, c_int, c_void_p)

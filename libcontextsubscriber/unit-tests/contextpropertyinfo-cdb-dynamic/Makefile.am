@@ -3,28 +3,28 @@ check_PROGRAMS = contextpropertyinfounittest-cdb-dynamic
 # your test's sources
 contextpropertyinfounittest_cdb_dynamic_SOURCES = contextpropertyinfounittest.cpp
 
-# sources tested, all of the will be recompiled specificly for the tests
-SOURCE_CXX = contextregistryinfo.cpp contextpropertyinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp cdbreader.cpp
-COVERAGE_FILES = contextregistryinfo.cpp contextpropertyinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp cdbreader.cpp
+COVERAGE_FILES = contextregistryinfo.cpp contextpropertyinfo.cpp	\
+	infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp	\
+	infocdbbackend.cpp cdbreader.cpp
+EXTRA_DIST = context-providers2v1.cdb context-providers2v2.cdb	\
+	context-providers3v1.cdb context-providers3v2.cdb	\
+	context-providers4v1.cdb context-providers4v2.cdb
 
-# MOC (and then compile) this headers from the source
-SOURCE_H = contextregistryinfo.h contextpropertyinfo.h infobackend.h infoxmlbackend.h infocdbbackend.h infoxmlkeysfinder.h cdbreader.h # process this headers with MOC and compile the results
-QT_TOMOC_H = 
-
-EXTRA_DIST = context-providers2v1.cdb context-providers2v2.cdb context-providers3v1.cdb context-providers3v2.cdb context-providers4v1.cdb context-providers4v2.cdb
-
-# when MOCing from .cpp file, you also has to help the dependency tracker
-QT_TOMOC_CPP = contextpropertyinfounittest.cpp
-contextpropertyinfounittest.o: moc_contextpropertyinfounittest_cpp.cpp 
-
-LIBS += -lcdb
-
-# automake can only use +=, if = was used before, so this is a must for includes
-LDADD = 
-CLEANFILES =
-check_LIBRARIES = 
+# do the testing, coverage, etc. stuff
+# tests.am is using +=, so we have to set a value here for these four always
+AM_CXXFLAGS = $(QtDBus_CFLAGS) -DDEFAULT_CONTEXT_PROVIDERS="\"@DEFAULT_CONTEXT_PROVIDERS@\"" -I$(srcdir)/../util/
+AM_LDFLAGS = -lcdb $(QtXml_LIBS)
+FROM_SOURCE = src_contextregistryinfo.cpp src_contextpropertyinfo.cpp	\
+	src_infobackend.cpp src_infoxmlbackend.cpp			\
+	src_infoxmlkeysfinder.cpp src_infocdbbackend.cpp		\
+	src_cdbreader.cpp src_contextregistryinfo.h			\
+	src_contextpropertyinfo.h src_infobackend.h src_infoxmlbackend.h	\
+	src_infocdbbackend.h src_infoxmlkeysfinder.h src_cdbreader.h
+LDADD =
 include $(top_srcdir)/am/tests.am
-include $(top_srcdir)/am/qt-check.am
 
-AM_CPPFLAGS += '-DDEFAULT_CONTEXT_PROVIDERS="@DEFAULT_CONTEXT_PROVIDERS@"'
-AM_CPPFLAGS += '-I$(srcdir)/../util/'
+nodist_contextpropertyinfounittest_cdb_dynamic_SOURCES = mocs.cpp
+QT_TOMOC = $(filter %.h, $(contextpropertyinfounittest_cdb_dynamic_SOURCES) $(FROM_SOURCE))
+include $(top_srcdir)/am/qt.am
+
+contextpropertyinfounittest.o: contextpropertyinfounittest.moc

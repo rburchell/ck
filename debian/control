@@ -121,6 +121,7 @@ Description: Command line utilities for ContextKit
 
 Package: libcontextsubscriber0
 Architecture: any
+Conflicts: libcontextprovider0 (<< 0.1.9)
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Helper library for subscribers of context properties
  The libcontextsubscriber library implements the subscriber side of the

@@ -36,5 +36,10 @@ while len(sys.argv) >= 3:
     cookiecutter, conversion = types[datatype]
     properties.append(cookiecutter(name, conversion(initvalue)))
 
-provider = Flexiprovider(properties, busaddress[1], busaddress[0])
+try:
+    provider = Flexiprovider(properties, busaddress[1], busaddress[0])
+except ImportError:
+    raise IOError("Could not instantiate Flexiprovider")
+    sys.exit(1)
 provider.interactive()
+

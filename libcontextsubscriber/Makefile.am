@@ -7,6 +7,9 @@ pkgconfig_DATA = contextsubscriber-1.0.pc
 check-sum:
 	make -C unit-tests/ check-sum
 
+check-accept:
+	$(MAKE) -C accept-tests check-accept
+
 covoptioncheck:
 	@if test "$(GCOV)" = "" ; then \
 		echo "Didn't configured for coverage, please rerun configure with --with-coverage"; \

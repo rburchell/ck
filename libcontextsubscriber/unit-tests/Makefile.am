@@ -28,7 +28,8 @@ coverage: covoptioncheck
 	@echo "build: $(abs_top_builddir)"
 	cat coverage/selecteds.cov | \
 		sed "s,`cd $(abs_top_builddir) && pwd`,`cd $(abs_top_srcdir) && pwd`," | \
-		sed 's,unit-tests/.*mock_,src/,' >coverage/sedded.cov
+		sed 's,unit-tests/.*mock_,src/,' | \
+		sed 's,unit-tests/.*src_,src/,' >coverage/sedded.cov
 	genhtml --prefix `cd $(abs_top_srcdir) && pwd` -o coverage/ coverage/sedded.cov
 
 clean-local:

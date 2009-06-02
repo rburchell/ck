@@ -45,15 +45,11 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
 {
     qDebug() << "CDB backend with database" << InfoCdbBackend::databasePath();
-
-    if (reader.isReadable() == false) {
-        qDebug() << InfoCdbBackend::databasePath() << "is not readable! Bailing out.";
-        return;
-    }
-
-    watcher.addPath(InfoCdbBackend::databasePath());
-
+    
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
+    sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
+
+    watchPathOrDirectory();
 }
 
 /// Returns 'cdb'.
@@ -115,6 +111,45 @@ QString InfoCdbBackend::databasePath()
     return QString(regpath) + "cache.cdb";
 }
 
+/// Returns the full path to the database directory.
+/// Takes the \c CONTEXT_PROVIDERS env variable into account.
+QString InfoCdbBackend::databaseDirectory()
+{
+    const char *regpath = getenv("CONTEXT_PROVIDERS");
+    if (! regpath)
+        regpath = DEFAULT_CONTEXT_PROVIDERS;
+
+    return QString(regpath);
+}
+
+/* Private */
+
+/// Start watching the database direcory for changes.
+void InfoCdbBackend::watchDirectory()
+{
+    if (! watcher.directories().contains(InfoCdbBackend::databaseDirectory()))
+        watcher.addPath(InfoCdbBackend::databaseDirectory()); 
+}
+
+/// Start watching the database file for changes.
+void InfoCdbBackend::watchPath()
+{
+    if (! watcher.files().contains(InfoCdbBackend::databasePath()))
+        watcher.addPath(InfoCdbBackend::databasePath());
+}
+
+/// Depending on our readability status, watch either path or the 
+/// directory.
+void InfoCdbBackend::watchPathOrDirectory()
+{
+    if (reader.isReadable() == false) {
+        qDebug() << InfoCdbBackend::databasePath() << "is not readable. Watching dir.";
+        watchDirectory();
+    } else {
+        watchPath();
+    }
+}
+
 /* Slots */
 
 /// Called when the database changes. Reopens the database and emits 
@@ -126,17 +161,8 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     qDebug() << InfoCdbBackend::databasePath() << "changed, re-opening database.";
 
     reader.reopen();
-    if (reader.isReadable() == false) {
-        qDebug() << InfoCdbBackend::databasePath() << "is not readable! Bailing out.";
-        emit keysChanged(QStringList());
-        return;
-    }
-  
-    // QFileSystemWatcher stops monitoring files and directories once 
-    // they have been removed from disk. Need to add again if we had a move ops.
-    if (! watcher.files().contains(InfoCdbBackend::databasePath()))
-        watcher.addPath(InfoCdbBackend::databasePath());
-        
+    watchPathOrDirectory();
+ 
     // If nobody is watching us anyways, drop out now and skip
     // the further processing. This could be made more granular 
     // (ie. in many cases nobody will be watching on added/removed)
@@ -153,4 +179,12 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     checkAndEmitKeysChanged(currentKeys, oldKeys);
 }
 
+/// Called when the directory with cache.db chanes. We start to observe this
+/// directory only when we don't have the cache.db in the first place.
+void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
+{
+    if (reader.isReadable())
+        return;
 
+    onDatabaseFileChanged(path);    
+}
