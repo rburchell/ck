@@ -39,6 +39,7 @@ bool InfoXmlKeysFinder::startDocument()
     inKey = false;
     inKeyType = false;
     inKeyDoc = false;
+    return true;
 }
 
 /// Called for each <element> when we start parsing it.
