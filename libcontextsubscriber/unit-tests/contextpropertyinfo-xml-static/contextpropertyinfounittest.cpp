@@ -57,6 +57,12 @@ private slots:
     void checkLowBattery();
     void checkSystemBus();
     void checkNonExistant();
+    void checkAttribute();
+    void checkNewTypeBool();
+    void checkNewTypeInt32();
+    void checkNewTypeString();
+    void checkNewTypeDouble();
+    void checkNewTypeMulti();
 };
 
 void ContextPropertyInfoUnitTest::initTestCase()
@@ -89,6 +95,42 @@ void ContextPropertyInfoUnitTest::checkNonExistant()
     ContextPropertyInfo prop("This.doesnt.exist");
     QCOMPARE(prop.doc(), QString(""));
     QCOMPARE(prop.type(), QString(""));
+}
+
+void ContextPropertyInfoUnitTest::checkAttribute()
+{
+    ContextPropertyInfo prop("Key.With.Attribute");
+    QCOMPARE(prop.type(), QString("TRUTH"));
+}
+
+void ContextPropertyInfoUnitTest::checkNewTypeBool()
+{
+    ContextPropertyInfo prop("Key.With.bool");
+    QCOMPARE(prop.type(), QString("TRUTH"));
+}
+
+void ContextPropertyInfoUnitTest::checkNewTypeInt32()
+{
+    ContextPropertyInfo prop("Key.With.int32");
+    QCOMPARE(prop.type(), QString("INT"));
+}
+
+void ContextPropertyInfoUnitTest::checkNewTypeString()
+{
+    ContextPropertyInfo prop("Key.With.string");
+    QCOMPARE(prop.type(), QString("STRING"));
+}
+
+void ContextPropertyInfoUnitTest::checkNewTypeDouble()
+{
+    ContextPropertyInfo prop("Key.With.double");
+    QCOMPARE(prop.type(), QString("DOUBLE"));
+}
+
+void ContextPropertyInfoUnitTest::checkNewTypeMulti()
+{
+    ContextPropertyInfo prop("Key.With.Multi");
+    QCOMPARE(prop.type(), QString("SECOND"));
 }
 
 #include "moc_contextpropertyinfounittest_cpp.cpp"
