@@ -77,6 +77,8 @@ AC_CHECK_LIB([cdb], [cdb_make_start], [],
 DEFAULT_CONTEXT_PROVIDERS="$datadir/contextkit/providers/"
 AC_SUBST(DEFAULT_CONTEXT_PROVIDERS)
 
+CXXFLAGS="-Wall -Werror"
+
 #AC_CONFIG_HEADER([config.h])
 
 AC_CONFIG_FILES([Makefile
