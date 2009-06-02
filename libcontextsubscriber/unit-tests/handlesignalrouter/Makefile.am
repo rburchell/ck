@@ -1,25 +1,20 @@
 check_PROGRAMS = handlesignalrouter-unit-tests
 
 # your test's sources
-handlesignalrouter_unit_tests_SOURCES = testhandlesignalrouter.cpp
+handlesignalrouter_unit_tests_SOURCES = testhandlesignalrouter.cpp	\
+	propertyhandle.h testhandlesignalrouter.h
 
-# sources tested, all of the will be recompiled specificly for the tests
-SOURCE_CXX = handlesignalrouter.cpp
+# only include these files in the coverage
 COVERAGE_FILES = handlesignalrouter.cpp
 
-# MOC (and then compile) this headers from the source
-SOURCE_H = handlesignalrouter.h # process this headers with MOC and compile the results
-QT_TOMOC_H = testhandlesignalrouter.h propertyhandle.h
+# do the testing, coverage, etc. stuff
+# tests-new.am is using +=, so we have to set a value here for these four always
+AM_CXXFLAGS = $(QtDBus_CFLAGS) -DDEFAULT_CONTEXT_PROVIDERS=\"@DEFAULT_CONTEXT_PROVIDERS@\"
+AM_LDFLAGS = 
+FROM_SOURCE = src_handlesignalrouter.cpp src_handlesignalrouter.h # copy these files from the real source
+LDADD = 
+include $(top_srcdir)/am/tests-new.am
 
-EXTRA_DIST = propertyhandle.h testhandlesignalrouter.h
-
-# when MOCing from .cpp file, you also has to help the dependency tracker
-#QT_TOMOC_CPP = testlistening.cpp
-#testlistening.o: moc_testlistening_cpp.cpp
-
-# automake can only use +=, if = was used before, so this is a must for includes
-LDADD =
-CLEANFILES =
-check_LIBRARIES =
-include $(top_srcdir)/am/tests.am
-include $(top_srcdir)/am/qt-check.am
+nodist_handlesignalrouter_unit_tests_SOURCES = mocs.cpp
+QT_TOMOC = $(filter %.h, $(handlesignalrouter_unit_tests_SOURCES) $(FROM_SOURCE))
+include $(top_srcdir)/am/qt-new.am
