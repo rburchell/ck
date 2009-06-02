@@ -10,7 +10,8 @@
 ## explicit dependency like this:
 # main.o: main.moc
 ## and of course you have to put #include "main.moc" at the end of
-## main.cpp
+## main.cpp.
+## Declaring the cpp file in QT_TOMOC is not needed.
 
 QT_MOCS = $(QT_TOMOC:%.h=moc_%_h.cpp)
 
