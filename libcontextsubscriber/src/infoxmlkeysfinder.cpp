@@ -56,7 +56,7 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
     if (inKey == false && inProvider == true && name == "key") {
         // Reset all potential key data
         currentKeyName = "";
-        currentKeyType = getAttrValue(attrs, "type");
+        currentKeyType = canonicalizeType (getAttrValue(attrs, "type"));
         currentKeyDoc = "";
         currentKeyName = getAttrValue(attrs, "name");
 
@@ -138,7 +138,9 @@ bool InfoXmlKeysFinder::characters(const QString &chars)
 {
     // <type> CHARS ...
     if (inKeyType == true) {
-        currentKeyType += chars.trimmed();
+        if (currentKeyType != "")
+            qDebug() << "WARNING: key" << currentKeyName << "already has a type. Overwriting.";
+        currentKeyType = canonicalizeType (chars.trimmed());
         return true;
     }
 
@@ -163,4 +165,22 @@ QString InfoXmlKeysFinder::getAttrValue(const QXmlAttributes &attrs, const QStri
     }
     
     return "";
+}
+
+// Convert a subset of new-style type names to the currently used
+// old-style type names.  This way we can slowely fade in new-style
+// types.
+
+QString InfoXmlKeysFinder::canonicalizeType (const QString &type)
+{
+    if (type == "bool")
+        return "TRUTH";
+    else if (type == "int32")
+        return "INT";
+    else if (type == "string")
+        return "STRING";
+    else if (type == "double")
+        return "DOUBLE";
+    else
+        return type;
 }

@@ -50,6 +50,8 @@ private:
     QString currentBus; //< For our current parse position, the <provider bus=?>.
     
     QString getAttrValue(const QXmlAttributes &attrs, const QString &attrName);
+
+    QString canonicalizeType(const QString &type);
 };
 
 #endif // INFOXMLKEYSFINDER_H
