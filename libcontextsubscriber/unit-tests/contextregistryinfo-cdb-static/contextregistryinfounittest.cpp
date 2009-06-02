@@ -129,5 +129,5 @@ void ContextRegistryInfoUnitTest::checkPrefix()
     }
 }
 
-#include "moc_contextregistryinfounittest_cpp.cpp"
+#include "contextregistryinfounittest.moc"
 QTEST_MAIN(ContextRegistryInfoUnitTest);
