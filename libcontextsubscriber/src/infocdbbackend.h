@@ -45,15 +45,20 @@ public:
     virtual QString providerForKey(QString key) const;
     virtual QString providerDBusTypeForKey(QString key) const;
 
+    static QString databaseDirectory();
     static QString databasePath();
     static bool databaseExists();
 
 private:
     QFileSystemWatcher watcher; //< A watched object obsering the database file. Delivers synced notifications.
     CDBReader reader; //< The cdb reader object used to access the cdb database.
+    void watchPathOrDirectory();
+    void watchDirectory();
+    void watchPath();
 
 private slots:
     void onDatabaseFileChanged(const QString &path);
+    void onDatabaseDirectoryChanged(const QString &path);
 };
 
 #endif // INFOCDBBACKEND_H

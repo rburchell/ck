@@ -1,29 +1,35 @@
-# if you include this file, you have to declare CLEANFILES in your
-# Makefile.am before inclusion
-# and after inclusion:
-#	your_target_DEPENDENCIES = $(qt_moclobjects)
-#	your_target_LIBADD = $(qt_moclobjects)         (if your target is a library)
-#	your_target_LDADD = $(qt_moclobjects)          (if your target is a program)
+## Basic idea from here: http://blog.hartwork.org/?p=133
+## If you want to do the qt moccing for your header files and link them
+## to your executable:
+# nodist_yourtarget_SOURCES = mocs.cpp
+# QT_TOMOC = $(filter %.h, $(yourtarget_SOURCES))
+#            ^^^^ or you can use explicit header file listing here
+# include $(top_srcdir)/am/qt.am
 
-# handling of QT_TOMOC_CPP and QT_TOMOC_H files
-#   %.h mocced will be moc_%_h.cpp
-# %.cpp mocced will be moc_%_cpp.cpp
+## If you have a .cpp file, which you want to moc, you have to use an
+## explicit dependency like this:
+# main.o: main.moc
+## and of course you have to put #include "main.moc" at the end of
+## main.cpp.
+## Declaring the cpp file in QT_TOMOC is not needed.
 
-QT_CXXMOCS = $(QT_TOMOC_CPP:%.cpp=moc_%_cpp.cpp)
-QT_HMOCS = $(QT_TOMOC_H:%.h=moc_%_h.cpp)
+QT_MOCS = $(QT_TOMOC:%.h=moc_%_h.cpp)
 
-qt_moclobjects = $(QT_HMOCS:%.cpp=%.lo)
+mocs.cpp: $(QT_MOCS)
+	rm -f mocs.cpp
+	for i in $(QT_MOCS); do \
+		echo "#include \"$$i\"" >>mocs.cpp; \
+	done
 
-# cleanup
-CLEANFILES += $(QT_FORMS:%.ui=ui_%.h) $(QT_HMOCS) $(QT_CXXMOCS)
+moc_%_h.cpp: %.h
+	$(MOC) -o "$@" "$<"
 
-# it is important, to write $(srcdir) before original source files,
-# and never write that prefix before generated source files!
-ui_%.h: $(srcdir)/%.ui
-	$(UIC) $< -o $@
+%.moc: %.cpp
+	$(MOC) -o "$@" "$<"
 
-moc_%_h.cpp: $(srcdir)/%.h
-	$(MOC) $< -o $@
+clean-moc-extra:
+	rm -f moc_*.cpp mocs.cpp *.moc mocs.lo
 
-moc_%_cpp.cpp: $(srcdir)/%.cpp
-	$(MOC) $< -o $@
+clean-local: clean-moc-extra
+
+.PHONY: clean-moc-extra

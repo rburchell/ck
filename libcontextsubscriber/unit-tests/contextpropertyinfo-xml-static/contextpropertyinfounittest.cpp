@@ -91,5 +91,5 @@ void ContextPropertyInfoUnitTest::checkNonExistant()
     QCOMPARE(prop.type(), QString(""));
 }
 
-#include "moc_contextpropertyinfounittest_cpp.cpp"
+#include "contextpropertyinfounittest.moc"
 QTEST_MAIN(ContextPropertyInfoUnitTest);

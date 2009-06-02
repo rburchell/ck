@@ -82,5 +82,5 @@ void CDBReaderUnitTest::readingNotPresent()
     QCOMPARE(list.size(), 0);
 }
 
-#include "moc_cdbreaderunittest_cpp.cpp"
+#include "cdbreaderunittest.moc"
 QTEST_MAIN(CDBReaderUnitTest);

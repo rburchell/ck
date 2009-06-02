@@ -147,5 +147,5 @@ void ContextPropertyInfoUnitTest::cleanupTestCase()
     QFile::remove("providers.context");
 }
 
-#include "moc_contextpropertyinfounittest_cpp.cpp"
+#include "contextpropertyinfounittest.moc"
 QTEST_MAIN(ContextPropertyInfoUnitTest);

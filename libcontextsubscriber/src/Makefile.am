@@ -22,4 +22,4 @@ LIBS += -lcdb $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
 # moccing
 nodist_libcontextsubscriber_la_SOURCES = mocs.cpp
 QT_TOMOC = $(filter %.h, $(libcontextsubscriber_la_SOURCES))
-include $(top_srcdir)/am/qt-new.am
+include $(top_srcdir)/am/qt.am

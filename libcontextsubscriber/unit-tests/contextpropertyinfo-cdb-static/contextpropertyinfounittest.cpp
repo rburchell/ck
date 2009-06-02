@@ -58,5 +58,5 @@ void ContextPropertyInfoUnitTest::checkSystemBus()
     QCOMPARE(prop.providerDBusType(), QDBusConnection::SystemBus);
 }
 
-#include "moc_contextpropertyinfounittest_cpp.cpp"
+#include "contextpropertyinfounittest.moc"
 QTEST_MAIN(ContextPropertyInfoUnitTest);
