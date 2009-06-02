@@ -1,4 +1,4 @@
-contextkit (0.1.9~unreleased) unstable; urgency=low
+contextkit (0.2.0~unreleased) unstable; urgency=low
 
   * context-provide's registry output file is now specified by
     CONTEXT_PROVIDE_REGISTRY_FILE and not CONTEXT_FLEXI_XML
