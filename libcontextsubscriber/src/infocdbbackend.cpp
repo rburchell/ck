@@ -49,12 +49,7 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
 
-    if (reader.isReadable() == false) {
-        qDebug() << InfoCdbBackend::databasePath() << "is not readable! Watching dir.";
-        watchDirectory();
-    } else {
-        watchPath();
-    }
+    watchPathOrDirectory();
 }
 
 /// Returns 'cdb'.
@@ -129,16 +124,30 @@ QString InfoCdbBackend::databaseDirectory()
 
 /* Private */
 
+/// Start watching the database direcory for changes.
 void InfoCdbBackend::watchDirectory()
 {
     if (! watcher.directories().contains(InfoCdbBackend::databaseDirectory()))
         watcher.addPath(InfoCdbBackend::databaseDirectory()); 
 }
 
+/// Start watching the database file for changes.
 void InfoCdbBackend::watchPath()
 {
     if (! watcher.files().contains(InfoCdbBackend::databasePath()))
         watcher.addPath(InfoCdbBackend::databasePath());
+}
+
+/// Depending on our readability status, watch either path or the 
+/// directory.
+void InfoCdbBackend::watchPathOrDirectory()
+{
+    if (reader.isReadable() == false) {
+        qDebug() << InfoCdbBackend::databasePath() << "is not readable. Watching dir.";
+        watchDirectory();
+    } else {
+        watchPath();
+    }
 }
 
 /* Slots */
@@ -152,15 +161,8 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     qDebug() << InfoCdbBackend::databasePath() << "changed, re-opening database.";
 
     reader.reopen();
-    if (reader.isReadable() == false) {
-        qDebug() << InfoCdbBackend::databasePath() << "is not readable. Watching dir.";
-        watchDirectory();
-    } else {
-        // QFileSystemWatcher stops monitoring files and directories once 
-        // they have been removed from disk. Need to add again if we had a move ops.
-        watchPath();
-    }
-  
+    watchPathOrDirectory();
+ 
     // If nobody is watching us anyways, drop out now and skip
     // the further processing. This could be made more granular 
     // (ie. in many cases nobody will be watching on added/removed)
@@ -181,5 +183,8 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
 /// directory only when we don't have the cache.db in the first place.
 void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
 {
+    if (reader.isReadable())
+        return;
+
     onDatabaseFileChanged(path);    
 }
