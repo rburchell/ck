@@ -1,25 +1,21 @@
 check_PROGRAMS = propertyprovider-unit-tests
 
 # your test's sources
-propertyprovider_unit_tests_SOURCES = testpropertyprovider.cpp
+propertyprovider_unit_tests_SOURCES = testpropertyprovider.cpp		\
+	testpropertyprovider.h managerinterface.h dbusnamelistener.h	\
+	subscriberinterface.h handlesignalrouter.h
 
-# sources tested, all of the will be recompiled specificly for the tests
-SOURCE_CXX = propertyprovider.cpp
+# only include these files in the coverage
 COVERAGE_FILES = propertyprovider.cpp
 
-# MOC (and then compile) this headers from the source
-SOURCE_H = propertyprovider.h # process this headers with MOC and compile the results
-QT_TOMOC_H = testpropertyprovider.h managerinterface.h dbusnamelistener.h subscriberinterface.h handlesignalrouter.h
-
-EXTRA_DIST = dbusnamelistener.h handlesignalrouter.h managerinterface.h subscriberinterface.h testpropertyprovider.h
-
-# when MOCing from .cpp file, you also has to help the dependency tracker
-#QT_TOMOC_CPP = testlistening.cpp
-#testlistening.o: moc_testlistening_cpp.cpp
-
-# automake can only use +=, if = was used before, so this is a must for includes
+# do the testing, coverage, etc. stuff
+# tests-new.am is using +=, so we have to set a value here for these four always
+AM_CXXFLAGS = $(QtDBus_CFLAGS)
+AM_LDFLAGS = 
+FROM_SOURCE = src_propertyprovider.cpp src_propertyprovider.h # copy these files from the real source
 LDADD =
-CLEANFILES =
-check_LIBRARIES =
-include $(top_srcdir)/am/tests.am
-include $(top_srcdir)/am/qt-check.am
+include $(top_srcdir)/am/tests-new.am
+
+nodist_propertyprovider_unit_tests_SOURCES = mocs.cpp
+QT_TOMOC = $(filter %.h, $(propertyprovider_unit_tests_SOURCES) $(FROM_SOURCE))
+include $(top_srcdir)/am/qt-new.am
