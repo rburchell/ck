@@ -92,5 +92,5 @@ void CDBWriterUnitTest::cleanupTestCase()
 }
 
 
-#include "moc_cdbwriterunittest_cpp.cpp"
+#include "cdbwriterunittest.moc"
 QTEST_MAIN(CDBWriterUnitTest);

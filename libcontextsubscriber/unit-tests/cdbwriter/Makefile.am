@@ -1,27 +1,21 @@
 check_PROGRAMS = cdbwriterunittest
 
-# your test's sources
+# test's sources
 cdbwriterunittest_SOURCES = cdbwriterunittest.cpp
 
-# sources tested, all of the will be recompiled specificly for the tests
-SOURCE_CXX = cdbwriter.cpp
 COVERAGE_FILES = cdbwriter.cpp 
 
-# MOC (and then compile) this headers from the source
-SOURCE_H = cdbwriter.h
-QT_TOMOC_H =
+# do the testing, coverage, etc. stuff
+# tests-new.am is using +=, so we have to set a value here for these four always
+AM_CXXFLAGS = '-I$(srcdir)/../util/'
+AM_LDFLAGS = -lcdb
+FROM_SOURCE = src_cdbwriter.cpp src_cdbwriter.h # copy these files from the real source
+LDADD = 
+include $(top_srcdir)/am/tests-new.am
+
+nodist_cdbwriterunittest_SOURCES = mocs.cpp
+QT_TOMOC = $(filter %.h, $(cdbwriterunittest_SOURCES) $(FROM_SOURCE))
+include $(top_srcdir)/am/qt-new.am
 
 # when MOCing from .cpp file, you also has to help the dependency tracker
-QT_TOMOC_CPP = cdbwriterunittest.cpp
-cdbwriterunittest.o: moc_cdbwriterunittest_cpp.cpp 
-
-LIBS += -lcdb
-
-# automake can only use +=, if = was used before, so this is a must for includes
-LDADD = 
-CLEANFILES =
-check_LIBRARIES = 
-include $(top_srcdir)/am/tests.am
-include $(top_srcdir)/am/qt-check.am
-
-AM_CPPFLAGS += '-I$(srcdir)/../util/'
+cdbwriterunittest.o: cdbwriterunittest.moc
