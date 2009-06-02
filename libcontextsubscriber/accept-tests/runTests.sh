@@ -1,15 +1,13 @@
 #!/bin/bash
 
-output=`dpkg-query -W -f='${Status}\n' libcontextprovider0`
-
-if [ "$output" != "deinstall ok config-files" -o ! -d ../../libcontextprovider/.libs ]
+if pkg-config contextprovider-1.0 || [ -e ../../libcontextprovider/.libs/libcontextprovider.so ]
 then
-	echo "libcontextprovider is not installed nor built"
-	exit 1
-else
 	export LD_LIBRARY_PATH=../src/.libs:../../libcontextprovider/.libs;
 	export PATH=$PATH:../../python:../cli;
 	for file in *.py ; do
-		./$file
+		./$file || exit 1
 	done
+else
+	echo "libcontextprovider is not installed nor built"
+	exit 1
 fi
