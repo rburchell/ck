@@ -56,7 +56,7 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
     if (inKey == false && inProvider == true && name == "key") {
         // Reset all potential key data
         currentKeyName = "";
-        currentKeyType = "";
+        currentKeyType = getAttrValue(attrs, "type");
         currentKeyDoc = "";
         currentKeyName = getAttrValue(attrs, "name");
 
