@@ -8,6 +8,7 @@ libmock.a
 moc_*.cpp
 mock_*.cpp
 mocmock_*.cpp
+mocs.cpp
 
 Makefile
 
@@ -34,6 +35,7 @@ contextsubscriber-1.0.pc
 /unit-tests/propertyprovider/propertyprovider-unit-tests
 /unit-tests/propertyhandle/propertyhandle-unit-tests
 /unit-tests/handlesignalrouter/handlesignalrouter-unit-tests
+/unit-tests/contextregistryinfo-xml-dynamic/providers.context
 coverage/
 
 # Other binaries
@@ -44,3 +46,4 @@ coverage/
 # Docs
 doc/html
 doc/doxygen.log
+

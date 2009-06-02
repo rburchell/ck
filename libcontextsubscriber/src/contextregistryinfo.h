@@ -37,6 +37,7 @@ public:
     QStringList listKeys() const;
     QStringList listKeys(QString providername) const;
     QStringList listProviders() const;
+    QString backendName() const;
 
 private:
     ContextRegistryInfo() {}; //< Private constructor. Do not use. 

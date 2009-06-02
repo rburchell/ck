@@ -93,12 +93,12 @@
     \endcode
    
     This needs to be done early enough before the introspection API is first used. 
-    For more information about the \b xml and \cdb backends read the \ref "Updating context providers" page.
+    For more information about the \b xml and \cdb backends read the \ref UpdatingContextProviders page.
 
 */
 
 /*!
-    \page "Migrating from DuiValueSpace"
+    \page MigratingFromDuiValueSpace
 
     \brief libcontextsubscriber is a replacement library for DuiValueSpace which is deprecated.
 

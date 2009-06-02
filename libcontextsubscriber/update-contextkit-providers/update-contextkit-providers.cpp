@@ -19,7 +19,7 @@
  *
  */
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDir>
 #include <stdlib.h>
 #include "contextregistryinfo.h"
@@ -28,7 +28,7 @@
 #include "fcntl.h"
 
 /*!
-   \page "Updating context providers"
+   \page UpdatingContextProviders
 
    \brief The update tool (\c update-contextkit-providers) is used to regenerate the registry cache database. 
 

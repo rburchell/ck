@@ -1,5 +1,5 @@
 AC_INIT([libcontextsubscriber], [0.1], [marius.vollmer@nokia.com])
-AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2])
+AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2 tar-ustar])
 AM_MAINTAINER_MODE
 
 AC_SUBST([USE_MAINTAINER_MODE])
@@ -46,7 +46,9 @@ AS_IF([test "$with_doxygen" = yes -o \( "$with_doxygen" = "" -a "$withm_doxygen"
 	    [AC_MSG_NOTICE([Doxygen not enabled, enable it with --with-doxygen])])
 
 # Checks for libraries.
-PKG_CHECK_MODULES([Qt], [QtCore QtGui QtDBus QtXml])
+PKG_CHECK_MODULES([QtCore], [QtCore])
+PKG_CHECK_MODULES([QtDBus], [QtDBus])
+PKG_CHECK_MODULES([QtXml], [QtXml])
 MOC=`pkg-config QtCore --variable=moc_location`
 AC_CHECK_FILE([$MOC], [],
    AC_MSG_ERROR([Can't find moc compiler: $MOC]))
@@ -59,9 +61,14 @@ RCC=`pkg-config QtCore --variable=exec_prefix`/bin/rcc
 AC_CHECK_FILE([$RCC], [],
    AC_MSG_ERROR([Can't find rcc compiler: $RCC]))
 AC_SUBST([RCC])
+AC_SUBST([QtCore_CFLAGS])
+AC_SUBST([QtCore_LIBS])
+AC_SUBST([QtXml_CFLAGS])
+AC_SUBST([QtXml_LIBS])
+AC_SUBST([QtDBus_CFLAGS])
+AC_SUBST([QtDBus_LIBS])
 
-CXXFLAGS="$CXXFLAGS $Qt_CFLAGS"
-LIBS="$LIBS $Qt_LIBS"
+
 PKG_CHECK_MODULES([QtTest], [QtTest])
 
 AC_CHECK_LIB([cdb], [cdb_make_start], [],
@@ -73,27 +80,28 @@ AC_SUBST(DEFAULT_CONTEXT_PROVIDERS)
 #AC_CONFIG_HEADER([config.h])
 
 AC_CONFIG_FILES([Makefile
-		 src/Makefile
-		 cli/Makefile
-         update-contextkit-providers/Makefile
-		 unit-tests/Makefile
-		 doc/Makefile
-         man/Makefile
-         contextsubscriber-1.0.pc
-         unit-tests/cdbreader/Makefile
-         unit-tests/cdbwriter/Makefile
-         unit-tests/contextregistryinfo-xml-static/Makefile
-         unit-tests/contextpropertyinfo-xml-static/Makefile
-         unit-tests/contextregistryinfo-xml-dynamic/Makefile
-         unit-tests/contextpropertyinfo-xml-dynamic/Makefile
-         unit-tests/contextregistryinfo-cdb-static/Makefile
-         unit-tests/contextpropertyinfo-cdb-static/Makefile
-         unit-tests/contextregistryinfo-cdb-dynamic/Makefile
-         unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
-     	 unit-tests/propertyprovider/Makefile
-         unit-tests/propertyhandle/Makefile
-         unit-tests/handlesignalrouter/Makefile
-		 accept-tests/Makefile
-		 accept-tests/update-contextkit-providers/Makefile])
+                 src/Makefile
+                 cli/Makefile
+                 update-contextkit-providers/Makefile
+                 unit-tests/Makefile
+                 doc/Makefile
+                 man/Makefile
+                 contextsubscriber-1.0.pc
+                 unit-tests/util/Makefile
+                 unit-tests/cdbreader/Makefile
+                 unit-tests/cdbwriter/Makefile
+                 unit-tests/contextregistryinfo-xml-static/Makefile
+                 unit-tests/contextpropertyinfo-xml-static/Makefile
+                 unit-tests/contextregistryinfo-xml-dynamic/Makefile
+                 unit-tests/contextpropertyinfo-xml-dynamic/Makefile
+                 unit-tests/contextregistryinfo-cdb-static/Makefile
+                 unit-tests/contextpropertyinfo-cdb-static/Makefile
+                 unit-tests/contextregistryinfo-cdb-dynamic/Makefile
+                 unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
+                 unit-tests/propertyprovider/Makefile
+                 unit-tests/propertyhandle/Makefile
+                 unit-tests/handlesignalrouter/Makefile
+		 		 accept-tests/Makefile
+				 accept-tests/update-contextkit-providers/Makefile])
 
 AC_OUTPUT

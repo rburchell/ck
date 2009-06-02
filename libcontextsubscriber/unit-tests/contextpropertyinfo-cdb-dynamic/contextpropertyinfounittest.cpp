@@ -66,7 +66,7 @@ void ContextPropertyInfoUnitTest::initTestCase()
 {
     qInstallMsgHandler(myMessageOutput);
 
-    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
+    utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilCopyLocalAtomically("context-providers2v1.cdb", "cache.cdb");
 
     ContextRegistryInfo::instance("cdb");
@@ -144,7 +144,7 @@ void ContextPropertyInfoUnitTest::checkKeyAdding()
 
 void ContextPropertyInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove(LOCAL_FILE("cache.cdb"));
+    QFile::remove("cache.cdb");
 }
 
 #include "moc_contextpropertyinfounittest_cpp.cpp"

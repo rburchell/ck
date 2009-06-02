@@ -56,6 +56,7 @@ private:
 
 private slots:
     void initTestCase();
+    void checkProperBackend();
     void listKeys();
     void listKeysForProvider();
     void listProviders();
@@ -69,6 +70,11 @@ void ContextRegistryInfoUnitTest::initTestCase()
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
     context = ContextRegistryInfo::instance();
     QVERIFY(context != NULL);
+}
+
+void ContextRegistryInfoUnitTest::checkProperBackend()
+{
+    QCOMPARE(context->backendName(), QString("cdb"));
 }
 
 void ContextRegistryInfoUnitTest::listKeys()

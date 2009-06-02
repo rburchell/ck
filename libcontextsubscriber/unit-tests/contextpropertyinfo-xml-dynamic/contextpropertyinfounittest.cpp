@@ -65,7 +65,7 @@ void ContextPropertyInfoUnitTest::initTestCase()
 {
     qInstallMsgHandler(myMessageOutput);
 
-    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
+    utilSetEnv("CONTEXT_PROVIDERS", "./");
     ContextRegistryInfo::instance("xml");
 }
 
@@ -144,7 +144,7 @@ void ContextPropertyInfoUnitTest::checkKeyAdding()
 
 void ContextPropertyInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove(LOCAL_FILE("providers.context"));
+    QFile::remove("providers.context");
 }
 
 #include "moc_contextpropertyinfounittest_cpp.cpp"

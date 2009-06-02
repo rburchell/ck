@@ -65,7 +65,7 @@ void ContextRegistryInfoUnitTest::initTestCase()
 {
     qInstallMsgHandler(myMessageOutput);
 
-    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
+    utilSetEnv("CONTEXT_PROVIDERS", "./");
 
     // Setup initial state
     utilCopyLocalAtomically("context-providers1v1.cdb", "cache.cdb");
@@ -88,7 +88,7 @@ void ContextRegistryInfoUnitTest::basicChange()
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
 {
-    QFile::remove(LOCAL_FILE("cache.cdb"));
+    QFile::remove("cache.cdb");
 }
 
 #include "moc_contextregistryinfounittest_cpp.cpp"

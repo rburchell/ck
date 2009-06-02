@@ -88,6 +88,12 @@ QStringList ContextRegistryInfo::listProviders() const
     return InfoBackend::instance()->listProviders();
 }
 
+/// Returns the name of the currently used registry backend. Ie. "cdb" or "xml".
+QString ContextRegistryInfo::backendName() const
+{
+    return InfoBackend::instance()->name();
+}
+
 /* Slots */
 
 /// This is connected to the \a onKeysChanged of the actual info backend instance.

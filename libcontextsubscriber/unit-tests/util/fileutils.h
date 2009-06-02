@@ -30,8 +30,7 @@ QString utilPathForLocalFile(QString fname)
 {
     const char *srcdir = getenv("srcdir");
     if (srcdir) {
-        QDir dir = QDir(srcdir);
-        return dir.absoluteFilePath(fname);
+        return QString(srcdir) + QDir::separator() + fname;
     } else {
         return QString("./") + QString(fname);
     }
@@ -56,11 +55,10 @@ void utilSetEnv(QString env, QString val)
 void utilCopyLocalWithRemove(QString src, QString dest, int waitPeriod = DEFAULT_WAIT_PERIOD)
 {
     src = LOCAL_FILE(src);
-    dest = LOCAL_FILE(dest);
 
     QFile::remove(dest);
     QFile::copy(src, dest);
-    
+
     if (waitPeriod > 0)
         QTest::qWait(waitPeriod);
 }
@@ -68,12 +66,11 @@ void utilCopyLocalWithRemove(QString src, QString dest, int waitPeriod = DEFAULT
 void utilCopyLocalAtomically(QString src, QString dest, int waitPeriod = DEFAULT_WAIT_PERIOD)
 {
     src = LOCAL_FILE(src);
-    dest = LOCAL_FILE(dest);
-    QString temp = LOCAL_FILE("temp.file");
-    
+    QString temp = "temp.file";
+
     QFile::copy(src, temp);
     rename(temp.toUtf8().constData(), dest.toUtf8().constData());
-    
+
     if (waitPeriod > 0)
         QTest::qWait(waitPeriod);
 }
