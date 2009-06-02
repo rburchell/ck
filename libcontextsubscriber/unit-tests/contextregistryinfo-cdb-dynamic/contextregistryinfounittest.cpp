@@ -58,6 +58,7 @@ private:
 private slots:
     void initTestCase();
     void basicChange();
+    void worksAfterDatabaseFail();
     void cleanupTestCase();
 };
 
@@ -84,6 +85,17 @@ void ContextRegistryInfoUnitTest::basicChange()
     // Now just make sure that the new key is availible
     QStringList newKeys = context->listKeys();
     QVERIFY(newKeys.contains("Battery.AboutToExplode"));
+}
+
+void ContextRegistryInfoUnitTest::worksAfterDatabaseFail()
+{
+    QFile::remove("cache.cdb");
+    QTest::qWait(100);
+
+    QCOMPARE(context->listKeys().size(), 0);
+    
+    utilCopyLocalAtomically("context-providers1v2.cdb", "cache.cdb");
+    QCOMPARE(context->listKeys().size(), 3);
 }
 
 void ContextRegistryInfoUnitTest::cleanupTestCase()
