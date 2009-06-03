@@ -554,5 +554,5 @@ def runTests():
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
     signal.signal(signal.SIGALRM, timeoutHandler)
-    signal.alarm(10)
+    signal.alarm(30)
     runTests()
