@@ -7,7 +7,8 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AS_IF([test "$USE_MAINTAINER_MODE" = yes],
 	[withm_coverage=yes
-	 withm_doxygen=yes])
+	 withm_doxygen=yes
+	 withm_debug=yes])
 
 AC_ARG_WITH([coverage],
 	[AS_HELP_STRING([--with-coverage],
@@ -18,6 +19,11 @@ AC_ARG_WITH([doxygen],
 	[AS_HELP_STRING([--with-doxygen],
 		[regenerate doxygen documentation by default in the doc subdir])],
 	[with_doxygen=$withval])
+
+AC_ARG_WITH([debug],
+	[AS_HELP_STRING([--with-debug],
+		[build with extra debugging logging])],
+	[with_debug=$withval])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -44,6 +50,12 @@ AS_IF([test "$with_doxygen" = yes -o \( "$with_doxygen" = "" -a "$withm_doxygen"
 	     AC_SUBST([DOXYGEN])
 	     ],
 	    [AC_MSG_NOTICE([Doxygen not enabled, enable it with --with-doxygen])])
+AS_IF([test "$with_debug" = yes -o \( "$with_debug" = "" -a "$withm_debug" = yes \)],
+	    [CONTEXT_LOG_CXXFLAGS="-DCONTEXT_LOG_TEST -DCONTEXT_LOG_DEBUG -DCONTEXT_LOG_WARNING -DCONTEXT_LOG_CRITICAL"],
+	    [CONTEXT_LOG_CXXFLAGS="-DCONTEXT_LOG_WARNING -DCONTEXT_LOG_CRITICAL"
+             AC_MSG_NOTICE([Building release mode, no extra debug logging])
+            ])
+AC_SUBST(CONTEXT_LOG_CXXFLAGS)
 
 # Checks for libraries.
 PKG_CHECK_MODULES([QtCore], [QtCore])
@@ -77,7 +89,7 @@ AC_CHECK_LIB([cdb], [cdb_make_start], [],
 DEFAULT_CONTEXT_PROVIDERS="$datadir/contextkit/providers/"
 AC_SUBST(DEFAULT_CONTEXT_PROVIDERS)
 
-CXXFLAGS="-Wall -Werror"
+CXXFLAGS="-Wall -Werror \$(CONTEXT_LOG_CXXFLAGS)"
 
 #AC_CONFIG_HEADER([config.h])
 

@@ -15,8 +15,9 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h
-AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
-	'-DDEFAULT_CONTEXT_PROVIDERS="@DEFAULT_CONTEXT_PROVIDERS@"'
+AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)		\
+	'-DDEFAULT_CONTEXT_PROVIDERS="@DEFAULT_CONTEXT_PROVIDERS@"'	\
+	'-DCONTEXT_LOG_MODULE_NAME="libcontextsubscriber"'
 LIBS += -lcdb $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
 
 # moccing
