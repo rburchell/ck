@@ -1,3 +1,10 @@
+contextkit (0.1.10) unstable; urgency=low
+
+  * Update fake-context-provider to not provide keys that are now provided
+    by sensord.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Wed, 03 Jun 2009 19:07:06 +0300
+
 contextkit (0.1.9) unstable; urgency=low
 
   * context-provide's registry output file is now specified by
