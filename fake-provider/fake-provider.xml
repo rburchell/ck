@@ -44,9 +44,6 @@ neighborhood or campus, as a localized string.
     <key name="Continent" type="string">
       <doc>The name of the current continent, as a localized string.</doc>
     </key>
-    <key name="Planet" type="string">
-      <doc>The name of the current planet (or dwarf planet), as a localized string.</doc>
-    </key>
     <key name="PointOfInterest" type="string">
       <doc>
 The URI of the current point of interest, if any.  (The URI points to
@@ -178,9 +175,6 @@ The time of sun rise.
       <doc>
 The time of sun set.
       </doc>
-    </key>
-    <key name="IsDark" type="bool">
-      <doc>Whether or not it is especially dark.</doc>
     </key>
     <key name="IsBright" type="bool">
       <doc>Whether or not it is especially bright.</doc>
