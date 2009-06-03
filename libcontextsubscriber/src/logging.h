@@ -54,8 +54,22 @@ private:
 class ContextZeroLogger
 {
 public:
-    inline ContextZeroLogger() {}    
-    inline ContextZeroLogger& operator<< (const char *) { return *this;}
+    inline ContextZeroLogger() {}
+    
+    /* Stubby ops */
+   inline ContextZeroLogger &operator<< (QChar c) { return *this;}
+   inline ContextZeroLogger &operator<< (char c) { return *this;}
+   inline ContextZeroLogger &operator<< (signed short i) { return *this;}
+   inline ContextZeroLogger &operator<< (unsigned short i) { return *this;}
+   inline ContextZeroLogger &operator<< (signed int i) { return *this;}
+   inline ContextZeroLogger &operator<< (unsigned int i) { return *this;}
+   inline ContextZeroLogger &operator<< (signed long i) { return *this;}
+   inline ContextZeroLogger &operator<< (unsigned long i) { return *this;}
+   inline ContextZeroLogger &operator<< (float f) { return *this;}
+   inline ContextZeroLogger &operator<< (double f) { return *this;}
+   inline ContextZeroLogger &operator<< (const char * s) { return *this;}
+   inline ContextZeroLogger &operator<< (const QString &s) { return *this;}
+   inline ContextZeroLogger &operator<< (void * ptr) { return *this;}
 };
 
 /* Macro defs */
