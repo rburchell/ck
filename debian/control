@@ -13,9 +13,12 @@ Build-Depends: debhelper (>= 5),
                python-central,
                xsltproc,
                libhal-dev,
-               gtk-doc-tools
+               gtk-doc-tools,
+               libqt4-dev,
+               doxygen,
+               libcdb-dev
 XS-Python-Version: all
-Standards-Version: 3.8.0
+Standards-Version: 3.8.1
 
 Package: contextkit
 Architecture: any
@@ -111,10 +114,47 @@ Description: Python bindings for ContextKit APIs
 
 Package: contextkit-utils
 Section: utils
-Architecture: all
-Depends: python-contextkit, python-dbus, python
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-contextkit, python-dbus, python
 Description: Command line utilities for ContextKit
  This package contains the context-provide and context-listen
  tools. You can use context-provide to quickly provide context
  properties from the command line, while with context-listen you can
  watch properties for changes.
+
+Package: libcontextsubscriber0
+Architecture: any
+Conflicts: libcontextprovider0 (<< 0.1.9)
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Helper library for subscribers of context properties
+ The libcontextsubscriber library implements the subscriber side of the
+ org.freedesktop.ContextKit D-Bus interface.
+
+Package: libcontextsubscriber0-dbg
+Priority: extra
+Architecture: any
+Depends: libcontextsubscriber0 (= ${binary:Version}), contextkit-dbg (= ${binary:Version})
+Description: Helper library for subscribers of context properties
+ The libcontextsubscriber library implements the subscribers side of the
+ org.freedesktop.ContextKit D-Bus interface.
+ .
+ This package contains the debug symbols.
+
+Package: libcontextsubscriber-dev
+Section: libdevel
+Architecture: any
+Depends: libcontextsubscriber0 (= ${binary:Version}), libqt4-dev
+Description: Helper library for subscribers of context properties
+ The libcontextsubscriber library implements the subscriber side of the
+ org.freedesktop.ContextKit D-Bus interface.
+ .
+ This package contains the development files.
+
+Package: libcontextsubscriber-doc
+Section: doc
+Architecture: all
+Description: Helper library for subscribers of context properties
+ The libcontextsubscriber library implements the subscriber side of the
+ org.freedesktop.ContextKit D-Bus interface.
+ .
+ This package contains the documentation.

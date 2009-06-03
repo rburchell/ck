@@ -10,14 +10,15 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
 	libcontextprovider \
+	libcontextsubscriber \
 	contextd \
 	spec \
 	tests \
 	doc \
 	tools \
+	python \
 	fake-provider \
 	vapi \
-	python \
 	$(NULL)
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -33,7 +34,7 @@ DISTCLEANFILES = \
 version:
 	@echo @VERSION@
 
-.PHONEY: version
+.PHONY: version
 
 if HAVE_COVERAGE
 include tools/lcov.am

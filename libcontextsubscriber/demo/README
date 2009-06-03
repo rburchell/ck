@@ -1,0 +1,26 @@
+libcontextsubscriber is using only asynchronous DBUS calls to
+communicate with the providers/commander.  Here is the process to
+demonstrate it.
+
+You will need 3 terminals, one for the context-listen, one for a "slow
+provider" and one for a "fast provider".  Both of the providers will
+be emulated by using the flexiprovider.
+
+terminal all: start from the directory of this README file
+
+terminal fast> cd ../../python/
+terminal fast> ./context-provide com.nokia.fast int test.fast 316
+
+terminal slow> cd ../../python/
+terminal slow> ./context-provide com.nokia.slow int test.slow 530
+terminal slow (inside python)> import time; time.sleep(10)
+
+terminal cli> ../cli/context-listen test.fast test.slow
+
+terminal fast (inside python)> set('test.fast', 613)
+
+On terminal cli, you will see that the fast property is received at
+start, the change to 613 is also immediately available, in spite of we
+are waiting for the slow provider's subscription object.  After the
+sleep(10) is over in slow provider the initial value from there is
+also received.

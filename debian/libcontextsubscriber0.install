@@ -1,0 +1,3 @@
+usr/bin/update-contextkit-providers
+usr/share/man/man1/update-contextkit-providers.1
+usr/lib/libcontextsubscriber.so.*

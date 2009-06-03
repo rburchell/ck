@@ -2,15 +2,15 @@ How to provide context properties
 =================================
 
 Any component can provide its own key/value pairs and make them appear
-in the +DuiValueSpace+ (and other interfaces that expose context
-properties).
+as a +ContextProperty+ for C++ (and in other forms for other
+languages).
 
 As a provider of context properties, you need to drop one or more
-_property declaration_ files into +/usr/share/context-providers/+ to
-register your properties with the context framework.  This file
-follows a format described below and is used by DuiValueSpace and
-others to find you when someone subscribes to your properties.  The
-file is also used by the Context Commander to show descriptions of
+_property declaration_ files into +/usr/share/contextkit/providers/+
+to register your properties with the context framework.  This file
+follows a format described below and is used by +libcontextsubscriber+
+and others to find you when someone subscribes to your properties.
+The file is also used by the Context Commander to show descriptions of
 your properties and to learn about the possible values that a property
 can legally have.
 
@@ -18,40 +18,41 @@ The property declaration files also inform the context framework how
 you want to be contacted.  Right now, you have to implement the
 +org.freedesktop.ContextKit+ D-Bus interface, and register yourself on
 either the system or the session D-Bus with a suitable bus name.  The
-choice iof system or session bus and your bus name go into the
-property declaration file.
+choice of system or session bus and your bus name go into the property
+declaration file.
 
-The easiest way to implement the +org.freedesktop.ContextKit+
-interface is to use the link:libcontextprovider[+libcontextprovider+]
-library.
+The only supported way right now to implement the
++org.freedesktop.ContextKit+ interface is to use the
+link:libcontextprovider[+libcontextprovider+] library.
+
+The name of the property declaration file must be
+"__bus-name__++.context++".
 
 The property declaration file
 -----------------------------
 
 The property declaration file contains XML and must follow
 link:context-provider-schema.html[this XML schema].  A simple example
-for the +Context.Example.Random+ property looks like this:
+for the +Example.Random+ property looks like this:
 
 [source,xml]
 ------------------
 <?xml version="1.0"?>
-<provider bus="session" service="com.example.RandomProvider">
-  <node name="Example">
+<provider bus="session"
+          service="com.example.RandomProvider">
+  <key name="Example.Random">
+    <type>double</type>
     <doc>
-      A exemplary context provider.
+      A random number between 0 and 1 that changes every now and then.
     </doc>
-    <key name="Random" type="double">
-      <doc>
-        A random number between 0 and 1 that changes every now and then.
-      </doc>
-    </key>
-  </node>
+  </key>
 </provider>
 ------------------
 
-This file declares the single property +Context.Example.Random+ and
-instructs the Content Framework to connect to the
-+com.exmple.RandomProvider+ bus name on the session D-Bus.
+This file declares the single property +Example.Random+ and instructs
+the Content Framework to connect to the +com.example.RandomProvider+
+bus name on the session D-Bus.  It would be stored as
++/usr/share/contextkit/providers/com.example.RandomProvider.context+
 
 You need to be careful when choosing property name; see the
 "Guidelines for property providers" section for how to avoid
@@ -64,41 +65,28 @@ fall out of synch.  See the "Providing core properties" section for
 more about them.
 
 After installing a property declaration file into a directory +$dir+,
-you should usually execute +update-context-propoerties+ like so:
+you should usually execute +update-contextkit-providers+ like so:
 
 [source,sh]
 -----------------------
-update-context-properties $dir
+update-contextkit-providers $dir
 -----------------------
 
 This will update the various caches that clients like the
-+DuiValueSpace+ use.
++libcontextsubscriber+ library use.
 
 But, if a property declaration file is installed via a Debian package,
-you should not call +update-context-propoerties+ in your maintainer
+you should not call +update-contextkit-providers+ in your maintainer
 scripts.  Triggers in the relevant packages take care of running
-update-context-properties at the right time and only as often as
+update-contextkit-providers at the right time and only as often as
 necessary.
 
-XML structure
-~~~~~~~~~~~~~
+The XML element tree in the property declaration file simply consists
+of a list of +key+ elements.
 
-The XML element tree in the property declaration file consists of
-nested +node+ elements, and each +node+ defines the prefix for the
-names of all its children.  The top level node should always have the
-name "Context".
-
-Actual properties are defined with +key+ elements.  A +key+ element
-contains child elements that describe the possible values of the
-property, using elements such as +string+ or +float+.
-
-Documentation
-~~~~~~~~~~~~~
-
-Every +node+ and +key+ element in the property declaration tree can
-have a +doc+ element.  The contents of this element should be text
-formatted using link:http://www.methods.co.nz/asciidoc/[asccidoc]
-markup.
+A +key+ element in the property declaration tree can have a +doc+
+child element.  The contents of this element should be plain text
+without any additional markup.
 
 Types
 ~~~~~
@@ -118,11 +106,12 @@ this:
 ------------------
 <key name="Economy">
   <type>
-    <intenum>
+    <int-enum>
       <up   val="1" doc="Getting better"/>
       <down val="2" doc="Getting worse"/>
       <even val="3" doc="Getting boring"/>
-    </intenum>
+    </int-enum>
+  </type>
   <doc>
     The current economic trend, as an enumerated value.
   </doc>
@@ -133,7 +122,23 @@ this:
 Guidelines for property providers
 ---------------------------------
 
-TBW.
+Names
+~~~~~
+
+Context property names can contain any character except "/".
+
+Only core property names are allowed to start with a capital ASCII
+letter ("A" to "Z").
+
+When defining a new non-core property, you need to choose a unique
+prefix.  Start with a reversed fully qualified domainname that you
+control, such as "com.nokia."  or "org.gnome.".  Then, if the first
+component is "org" and the second component is not a top-level domain,
+drop "org".  Then convert the first character of the prefix to
+lower-case if it is one of "A" to "Z".
+
+For example, the GNOME project can use "gnome." as their prefix, KDE
+can use "kde.", and Nokia can use "com.nokia.".
 
 Providing core properties
 -------------------------
@@ -168,22 +173,22 @@ to help with this.  Running it like this
 
 [source,sh]
 ----
-check-context-properties properties.xml
+check-contextkit-properties com.example.Random.context
 ----
 
-will check every core property declared in the file +properties.xml+
-against its current official declarations.  It will output some
-diagnosis and fail if there are any discrepancies.  You should run it
-as part of your test-suite.
+will check every core property declared in the file
++com.example.Random.context+ against its current official
+declarations.  It will output some diagnosis and fail if there are any
+discrepancies.  You should run it as part of your test-suite.
 
 You can automatically update your property declaration file from the
 current official declarations by using the +--update+ option:
 
 [source,sh]
 ----
-check-context-properties --update properties.xml
+check-contextkit-properties --update com.example.Random.context
 ----
 
-This will modify +properties.xml+ in place.  You should run it
-manually when adapting your provider to changes in the official core
-property declarations.
+This will modify +com.example.Random.context+ in place.  You should
+run it manually when adapting your provider to changes in the official
+core property declarations.
