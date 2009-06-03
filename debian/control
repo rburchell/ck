@@ -13,7 +13,10 @@ Build-Depends: debhelper (>= 5),
                python-central,
                xsltproc,
                libhal-dev,
-               gtk-doc-tools
+               gtk-doc-tools,
+               libqt4-dev,
+               doxygen,
+               libcdb-dev
 XS-Python-Version: all
 Standards-Version: 3.8.1
 
