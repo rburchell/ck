@@ -36,43 +36,81 @@ qint64 NullIODevice::writeData(const char*, qint64)
 
 /* ContextRealLogger */
 
+bool ContextRealLogger::showTest = true;
+bool ContextRealLogger::showDebug = true;
+bool ContextRealLogger::showWarning = true;
+bool ContextRealLogger::showCritical = true;
+bool ContextRealLogger::hideTimestamps = false;
+bool ContextRealLogger::useColor = false;
+char* ContextRealLogger::showModule = NULL;
+char* ContextRealLogger::hideModule = NULL;
+bool ContextRealLogger::initialized = false;
+
+void ContextRealLogger::initialize()
+{
+    const char *verbosity = getenv("CONTEXT_LOG_VERBOSITY");
+    if (! verbosity)
+        return;
+        
+    if (getenv("CONTEXT_LOG_HIDE_TIMESTAMPS") != NULL)
+        hideTimestamps = true;
+
+    if (getenv("CONTEXT_LOG_USE_COLOR") != NULL)
+        useColor = true;
+        
+    showModule = getenv("CONTEXT_LOG_SHOW_MODULE");
+    hideModule = getenv("CONTEXT_LOG_HIDE_MODULE");
+        
+    if (strcmp(verbosity, "TEST") == 0) {
+        // Do nothing, all left true
+    } else if (strcmp(verbosity, "DEBUG") == 0) {
+        showTest = false;
+    } else if (strcmp(verbosity, "WARNING") == 0) {
+        showTest = false;
+        showDebug = false;
+    } else if (strcmp(verbosity, "CRITICAL") == 0) {
+        showTest = false;
+        showDebug = false;
+        showWarning = false;
+    }
+    
+    initialized = true;
+}
+
 ContextRealLogger::ContextRealLogger(int msgType, const char *func, const char *file, int line) 
     : QTextStream(stderr)
 {
     nullDevice = NULL;
     
-    static bool hideDebug = (getenv("CONTEXT_LOG_HIDE_DEBUG") != NULL);
-    static bool hideWarning = (getenv("CONTEXT_LOG_HIDE_WARNING") != NULL);
-    static bool hideCritical = (getenv("CONTEXT_LOG_HIDE_CRITICAL") != NULL);
-    static bool hideTest = (getenv("CONTEXT_LOG_HIDE_TEST") != NULL);
-    static const char* showModule = getenv("CONTEXT_LOG_SHOW_MODULE");
-    static const char* hideModule = getenv("CONTEXT_LOG_HIDE_MODULE");
-    static bool hideTimestamps = (getenv("CONTEXT_LOG_HIDE_TIMESTAMPS") != NULL);
-    static bool useColor = (getenv("CONTEXT_LOG_USE_COLOR") != NULL);
+    if (! initialized) {
+        // This is not thread safe, but our initialization depends on 
+        // non-mutable parts anyways, so we should be ok.
+        initialize();
+    }
     
     const char *msgTypeString = NULL;
     
     // Killing by msg type
     if (msgType == CONTEXT_LOG_MSG_TYPE_DEBUG) {
-        if (hideDebug) {
+        if (! showDebug) {
             killOutput();
             return;
         } else
             msgTypeString = "DEBUG";
     } else if (msgType == CONTEXT_LOG_MSG_TYPE_WARNING) {
-        if (hideWarning) {
+        if (! showWarning) {
             killOutput();
             return;
         } else
             msgTypeString = (useColor) ? "\033[1;33mWARNING\033[0m" : "WARNING";
     } else if (msgType == CONTEXT_LOG_MSG_TYPE_CRITICAL) {
-        if (hideCritical) {
+        if (! showCritical) {
             killOutput();
             return;
         } else
             msgTypeString = (useColor) ? "\033[1;31mCRITICAL\033[0m" : "CRITICAL";
     } else if (msgType == CONTEXT_LOG_MSG_TYPE_TEST) {
-        if (hideTest) {
+        if (! showTest) {
             killOutput();
             return;
         } else

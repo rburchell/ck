@@ -47,6 +47,18 @@ public:
     ~ContextRealLogger();
     void killOutput();
     
+    static bool showTest;
+    static bool showDebug;
+    static bool showWarning;
+    static bool showCritical;
+    static bool initialized;
+    static bool hideTimestamps;
+    static bool useColor;
+    static char *showModule;
+    static char *hideModule;
+    
+    static void initialize();
+    
 private:
     NullIODevice *nullDevice;
 };
