@@ -48,10 +48,6 @@ bool ContextRealLogger::initialized = false;
 
 void ContextRealLogger::initialize()
 {
-    const char *verbosity = getenv("CONTEXT_LOG_VERBOSITY");
-    if (! verbosity)
-        return;
-        
     if (getenv("CONTEXT_LOG_HIDE_TIMESTAMPS") != NULL)
         hideTimestamps = true;
 
@@ -60,7 +56,11 @@ void ContextRealLogger::initialize()
         
     showModule = getenv("CONTEXT_LOG_SHOW_MODULE");
     hideModule = getenv("CONTEXT_LOG_HIDE_MODULE");
-        
+
+    const char *verbosity = getenv("CONTEXT_LOG_VERBOSITY");
+    if (! verbosity)
+        return;
+                
     if (strcmp(verbosity, "TEST") == 0) {
         // Do nothing, all left true
     } else if (strcmp(verbosity, "DEBUG") == 0) {
