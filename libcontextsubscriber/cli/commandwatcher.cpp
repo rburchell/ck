@@ -15,7 +15,7 @@
 #include <QMap>
 
 CommandWatcher::CommandWatcher(int commandfd, QMap<QString, ContextProperty*> *properties, QObject *parent) :
-    QObject(parent), properties(properties), commandfd(commandfd)
+    QObject(parent), commandfd(commandfd), properties(properties)
 {
     fcntl(commandfd, F_SETFL, O_NONBLOCK);
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);

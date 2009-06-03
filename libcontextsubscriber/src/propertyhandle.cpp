@@ -55,7 +55,7 @@ bool PropertyHandle::typeCheckEnabled = false;
 */
 
 PropertyHandle::PropertyHandle(const QString& key)
-    : myKey(key), myProvider(0), myInfo(0), subscribeCount(0), subscribePending(false)
+    :  myProvider(0), myInfo(0), subscribeCount(0), subscribePending(false), myKey(key)
 {
     myInfo = new ContextPropertyInfo(myKey, this);
 
