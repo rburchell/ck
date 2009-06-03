@@ -1,3 +1,16 @@
+Changes in ContextKit 0.2.0
+
+- Added libcontextsubscriber, the implementation of the new
+  subscription helper library for creating context aware applications
+
+Changes in ContextKit 0.1.8
+
+- Added python-contextkit, which is a python binding for
+  libcontextprovider and (in the future) libcontextsubscriber.
+
+- Added contextkit-utils, which only contains context-provide for now,
+  it is a debug/test provider
+
 Changes in ContextKit 0.1.7
 
 - Added the "fake provider", which just declares a lot of core

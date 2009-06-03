@@ -1,15 +1,14 @@
-contextkit (0.2.0~unreleased) unstable; urgency=low
+contextkit (0.2.0) unstable; urgency=low
 
   * context-provide's registry output file is now specified by
     CONTEXT_PROVIDE_REGISTRY_FILE and not CONTEXT_FLEXI_XML
   * added libcontextsubscriber{0{,-dbg},-dev,-doc}, the implementation of
     the new subscription helper library for creating context aware
     applications
-  * 
 
     Implemented: SWP#CntFr-204
 
- -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Thu, 28 May 2009 14:24:14 +0300
+ -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Wed, 03 Jun 2009 14:24:14 +0300
 
 contextkit (0.1.8) unstable; urgency=low
 
