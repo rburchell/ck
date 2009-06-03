@@ -46,8 +46,7 @@
 #include "subscriberinterface.h"
 #include "safedbuspendingcallwatcher.h"
 #include "sconnect.h"
-
-#include <QDebug>
+#include "logging.h"
 
 const QString SubscriberSignallingInterface::interfaceName = "org.freedesktop.ContextKit.Subscriber";
 
@@ -67,12 +66,12 @@ SubscriberInterface::SubscriberInterface(const QDBusConnection::BusType busType,
     } else if (busType == QDBusConnection::SystemBus) {
         connection = QDBusConnection::systemBus();
     } else {
-        qCritical() << "Invalid bus type: " << busType;
+        contextCritical() << "Invalid bus type: " << busType;
         return;
     }
 
     if (!connection.isConnected()) {
-        qCritical() << "Couldn't connect to DBUS: ";
+        contextCritical() << "Couldn't connect to DBUS.";
         return;
     }
 
@@ -85,9 +84,10 @@ SubscriberInterface::SubscriberInterface(const QDBusConnection::BusType busType,
 /// Calls the Subscribe function over DBus asynchronously.
 void SubscriberInterface::subscribe(QSet<QString> keys)
 {
-    qDebug() << "SubscriberInterface::subscribe" << keys;
+    contextDebug() << "SubscriberInterface::subscribe";
+    // FIXME contextDebug() << "SubscriberInterface::subscribe " << keys;
     if (iface == 0 || keys.size() == 0) {
-        qDebug() << "Subscriber cannot subscribe -> emitting subscribeFinished()";
+        contextDebug() << "Subscriber cannot subscribe -> emitting subscribeFinished()";
         emit subscribeFinished(keys);
         return;
     }
@@ -129,7 +129,7 @@ QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QV
 {
     foreach (QString null, nulls) {
         if (map.contains(null))
-            qWarning() << "PROVIDER ERROR: provided unknown and a value for " << null;
+            contextWarning() << "Provider error, provided unknown and a value for " << null;
         else
             map[null] = QVariant();
     }
@@ -146,7 +146,7 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
         // The provider is not running
         // The provider didn't implement the needed interface + function
         // The function resulted in an error
-        qWarning() << "Provider error while subscribing:" << reply.error().message();
+        contextWarning() << "Provider error while subscribing:" << reply.error().message();
     } else {
         QMap<QString, QVariant> subscribeTimeValues = reply.argumentAt<0>();
         QStringList unknowns = reply.argumentAt<1>();

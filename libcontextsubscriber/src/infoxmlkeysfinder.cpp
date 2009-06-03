@@ -19,8 +19,8 @@
  *
  */
 
-#include <QDebug>
 #include "infoxmlkeysfinder.h"
+#include "logging.h"
 
 /*!
     \class InfoXmlKeysFinder
@@ -99,7 +99,7 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
     if (inKey == true && name == "key") {
         // If at least name is ok, add to list
         if (currentKeyName != "") {
-            qDebug() << "Got key:" << currentKeyName;
+            contextDebug() << "Got key:" << currentKeyName;
 
             InfoKeyData data;
             data.name = currentKeyName;
@@ -109,7 +109,7 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
             data.bus = currentBus;
 
             if (keyDataHash.contains(currentKeyName)) 
-                qDebug() << "WARNING: key" << currentKeyName << "already defined in this xml file. Overwriting.";
+                contextWarning() << "Key " << currentKeyName << " already defined in this xml file. Overwriting.";
             keyDataHash.insert(currentKeyName, data);
         }
 
@@ -140,7 +140,7 @@ bool InfoXmlKeysFinder::characters(const QString &chars)
     // <type> CHARS ...
     if (inKeyType == true) {
         if (currentKeyType != "")
-            qDebug() << "WARNING: key" << currentKeyName << "already has a type. Overwriting.";
+            contextWarning() << "Key " << currentKeyName << " already has a type. Overwriting.";
         currentKeyType = canonicalizeType (chars.trimmed());
         return true;
     }
@@ -169,9 +169,8 @@ QString InfoXmlKeysFinder::getAttrValue(const QXmlAttributes &attrs, const QStri
 }
 
 // Convert a subset of new-style type names to the currently used
-// old-style type names.  This way we can slowely fade in new-style
+// old-style type names.  This way we can slowly fade in new-style
 // types.
-
 QString InfoXmlKeysFinder::canonicalizeType (const QString &type)
 {
     if (type == "bool")

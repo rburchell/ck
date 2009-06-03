@@ -22,6 +22,7 @@
 #include "dbusnamelistener.h"
 #include "safedbuspendingcallwatcher.h"
 #include "sconnect.h"
+#include "logging.h"
 
 #include <QDBusConnectionInterface>
 #include <QPair>
@@ -58,12 +59,12 @@ DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const
     } else if (busType == QDBusConnection::SystemBus) {
         connection = QDBusConnection::systemBus();
     } else {
-        qCritical() << "Invalid bus type: " << busType;
+        contextCritical() << "Invalid bus type: " << busType;
         return;
     }
 
     if (!connection.isConnected()) {
-        qCritical() << "Couldn't connect to DBUS: ";
+        contextCritical() << "Couldn't connect to DBUS.";
         return;
     }
 

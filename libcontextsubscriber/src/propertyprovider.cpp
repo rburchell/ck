@@ -24,6 +24,7 @@
 #include "sconnect.h"
 #include "subscriberinterface.h"
 #include "dbusnamelistener.h"
+#include "logging.h"
 #include <QTimer>
 
 QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvider::providerInstances;
@@ -83,7 +84,7 @@ void PropertyProvider::onProviderDisappeared()
 /// subscribe to the currently subscribed keys.
 void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 {
-    qDebug() << "PropertyProvider::onGetSubscriberFinished" << objectPath;
+    contextDebug() << "PropertyProvider::onGetSubscriberFinished " << objectPath;
     if (objectPath != "") {
         // GetSubscriber was successful
         delete subscriberInterface;
@@ -122,7 +123,8 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 /// busyloop in <tt>waitForSubscription()</tt>.
 void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 {
-    qDebug() << "PropertyProvider::onSubscribeFinished" << keys;
+    contextDebug() << "PropertyProvider::onSubscribeFinished ";
+    // FIXME: contextDebug() << "PropertyProvider::onSubscribeFinished " << keys;
     // Drop keys which were not supposed to be subscribed to (by this provider)
     emit subscribeFinished(keys.intersect(subscribedKeys));
 }
@@ -131,13 +133,13 @@ void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 /// entered the next time.
 void PropertyProvider::subscribe(const QString &key)
 {
-    qDebug() << "PropertyProvider::subscribe, provider" << busName << key;
+    contextDebug() << "PropertyProvider::subscribe, provider" << busName << " " << key;
 
     // Note: the intention is saved in all cases; whether we can really subscribe or not.
     subscribedKeys.insert(key);
 
     if (managerInterface.isGetSubscriberFailed()) {
-        qDebug() << "GetSubscriber has failed previously";
+        contextDebug() << "GetSubscriber has failed previously";
         // The subscription will not be successful, emit the subscribeFinished
         // signal so that the handles will stop waiting.
         QSet<QString> toEmit;
@@ -165,7 +167,7 @@ void PropertyProvider::subscribe(const QString &key)
 /// entered the next time.
 void PropertyProvider::unsubscribe(const QString &key)
 {
-    qDebug() << "PropertyProvider::unsubscribe, provider" << busName << key;
+    contextDebug() << "PropertyProvider::unsubscribe, provider" << busName << " " << key;
 
     // Save the intention of the higher level
     subscribedKeys.remove(key);
@@ -202,7 +204,7 @@ void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool proc
 {
     for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
         if (subscribedKeys.contains(i.key()) == false) {
-            qWarning() << "Received a property not subscribed to:" << i.key();
+            contextWarning() << "Received a property not subscribed to:" << i.key();
         } else {
             // Note: HandleSignalRouter will catch this signal and set the value of the
             // corresponding PropertyHandle.
@@ -218,7 +220,7 @@ PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busT
             providerInstances.insert(lookupValue,
                                      new PropertyProvider(busType, busName));
 
-    qDebug() << "Returning provider instance for" << busType << ":" << busName;
+    contextDebug() << "Returning provider instance for " << busType << ":" << busName;
 
     return providerInstances[lookupValue];
 }

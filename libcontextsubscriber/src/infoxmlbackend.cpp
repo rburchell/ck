@@ -21,7 +21,6 @@
 
 #include <QFileInfo>
 #include <QDir>
-#include <QDebug>
 #include <QMutex>
 #include <QXmlSimpleReader>
 #include <QXmlInputSource>
@@ -30,6 +29,7 @@
 #include "sconnect.h"
 #include "infoxmlbackend.h"
 #include "infoxmlkeysfinder.h"
+#include "logging.h"
 
 /*!
     \class InfoXmlBackend
@@ -49,11 +49,12 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
     /* Thinking about locking... the watcher notifications are delivered synced, 
        so asuming the changes in the dir are atomic this is all we need. */
 
-    qDebug() << "XML backend with path" << InfoXmlBackend::registryPath();
+    contextDebug() << "Initializing xml backend with path:" << InfoXmlBackend::registryPath();
 
     QDir dir = QDir(InfoXmlBackend::registryPath());
     if (! dir.exists() || ! dir.isReadable()) {
-        qDebug() << "Registry path is not a directory or is not readable!";
+        contextWarning() << "Registry path " << InfoXmlBackend::registryPath() 
+                         << " is not a directory or is not readable!";
         return;
     }
 
@@ -162,7 +163,7 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     // If one of the watched xml files changed this it pretty much 
     // an unconditional reload message for us.
 
-    qDebug() << path << "changed.";
+    contextDebug() << path << " changed.";
     
     QStringList oldKeys = listKeys();
     regenerateKeyDataList();
@@ -197,7 +198,7 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
     if (dir.entryInfoList().size() == countOfFilesInLastParse)
         return;
 
-    qDebug() << registryPath() << "directory changed.";
+    contextDebug() << registryPath() << " directory changed.";
     
     QStringList oldKeys = listKeys();
     regenerateKeyDataList();
@@ -228,7 +229,7 @@ void InfoXmlBackend::regenerateKeyDataList()
     if (watchedFiles.size() > 0)
         watcher.removePaths(watchedFiles);
 
-    qDebug() << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
+    contextDebug() << "Re-reading xml contents from " << InfoXmlBackend::registryPath();
 
     // For each xml file in the registry we parse it and 
     // add it to our hash. We did some sanity checks in the constructor
@@ -254,7 +255,7 @@ void InfoXmlBackend::regenerateKeyDataList()
 /// Also adds the file to the watcher (starts observing it).
 void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
 {
-    qDebug() << "Reading keys from" << finfo.filePath();
+    contextDebug() << "Reading keys from " << finfo.filePath();
 
     InfoXmlKeysFinder handler;
     QFile f(finfo.filePath());
@@ -267,7 +268,7 @@ void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
     // Use insert here instead of unite to overwrite keys
     foreach (QString key, handler.keyDataHash.keys()) {
         if (keyDataHash.contains(key)) 
-            qDebug() << "WARNING: key" << key << "already defined in previous xml file. Overwriting.";
+            contextWarning() << "Key " << key << " already defined in previous xml file. Overwriting.";
 
         keyDataHash.insert(key, handler.keyDataHash.value(key));
     }

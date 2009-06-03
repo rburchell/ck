@@ -33,6 +33,7 @@
 #include "managerinterface.h"
 #include "safedbuspendingcallwatcher.h"
 #include "sconnect.h"
+#include "logging.h"
 
 #include <QDBusInterface>
 #include <QDBusPendingReply>
@@ -54,12 +55,12 @@ ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const
     } else if (busType == QDBusConnection::SystemBus) {
         connection = QDBusConnection::systemBus();
     } else {
-        qCritical() << "Invalid bus type: " << busType;
+        contextCritical() << "Invalid bus type: " << busType;
         return;
     }
 
     if (!connection.isConnected()) {
-        qCritical() << "Couldn't connect to DBUS: ";
+        contextCritical() << "Couldn't connect to DBUS.";
         return;
     }
 
@@ -95,7 +96,7 @@ void ManagerInterface::onGetSubscriberFinished(QDBusPendingCallWatcher* watcher)
         // The provider is not running
         // The provider didn't implement the needed interface + function
         // The function resulted in an error
-        qWarning() << "Provider error while getting the subscriber object:" << reply.error().message();
+        contextWarning() << "Provider error while getting the subscriber object:" << reply.error().message();
         getSubscriberFailed = true;
         emit getSubscriberFinished("");
     } else {

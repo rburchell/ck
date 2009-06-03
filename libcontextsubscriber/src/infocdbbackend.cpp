@@ -28,6 +28,7 @@
 #include <QHash>
 #include "sconnect.h"
 #include "infocdbbackend.h"
+#include "logging.h"
 
 /*!
     \class InfoCdbBackend
@@ -44,7 +45,7 @@
 InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
 {
-    qDebug() << "CDB backend with database" << InfoCdbBackend::databasePath();
+    contextDebug() << "Initializing cdb backend with database: " << InfoCdbBackend::databasePath();
     
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
@@ -143,7 +144,7 @@ void InfoCdbBackend::watchPath()
 void InfoCdbBackend::watchPathOrDirectory()
 {
     if (reader.isReadable() == false) {
-        qDebug() << InfoCdbBackend::databasePath() << "is not readable. Watching dir.";
+        contextDebug() << InfoCdbBackend::databasePath() << " is not readable. Watching dir instead.";
         watchDirectory();
     } else {
         watchPath();
@@ -158,7 +159,7 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
 {
     QStringList oldKeys = listKeys();
 
-    qDebug() << InfoCdbBackend::databasePath() << "changed, re-opening database.";
+    contextDebug() << InfoCdbBackend::databasePath() << " changed, re-opening database.";
 
     reader.reopen();
     watchPathOrDirectory();
