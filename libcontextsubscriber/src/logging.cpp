@@ -92,11 +92,11 @@ ContextRealLogger::ContextRealLogger(int msgType, const char *func, const char *
     }
     
     if (! hideTimestamps)
-        *this << QDateTime::currentDateTime().toString() << " ";
+        *this << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " ";
         
     *this << "[" << CONTEXT_LOG_MODULE_NAME << "]" << " ";
     *this << msgTypeString << " ";
-    *this << func << ":" << file << "[" << line << "]" << " ";
+    *this << file << "[" << line << "]" << ":" << func << " ";
 }
 
 void ContextRealLogger::killOutput()
