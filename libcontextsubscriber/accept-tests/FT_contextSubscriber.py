@@ -57,8 +57,8 @@ class Subscription(unittest.TestCase):
         self.context_client = Popen(["context-listen","test.int","test.double","test.string","test.truth"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.kill(self.flexiprovider.pid,9)
-        os.kill(self.context_client.pid,9)
+        os.system('./rec-kill.sh %d' % self.flexiprovider.pid)
+        os.system('./rec-kill.sh %d' % self.context_client.pid)
         os.unlink('context-provide.context')
 
     def testValue(self):
@@ -262,11 +262,11 @@ class MultipleSubscribers(unittest.TestCase):
 
 
     def tearDown(self):
-        os.kill(self.flexiprovider.pid,9)
-        os.kill(self.context_client1.pid,9)
-        os.kill(self.context_client2.pid,9)
-        os.kill(self.context_client3.pid,9)
-        os.kill(self.context_client4.pid,9)
+        os.system('./rec-kill.sh %d' % self.flexiprovider.pid)
+        os.system('./rec-kill.sh %d' % self.context_client1.pid)
+        os.system('./rec-kill.sh %d' % self.context_client2.pid)
+        os.system('./rec-kill.sh %d' % self.context_client3.pid)
+        os.system('./rec-kill.sh %d' % self.context_client4.pid)
         os.unlink('context-provide.context')
 
     def testInitialSubscription(self):
@@ -412,9 +412,9 @@ class MultipleProviders(unittest.TestCase):
                                     ,stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.kill(self.flexiprovider1.pid,9)
-        os.kill(self.flexiprovider2.pid,9)
-        os.kill(self.context_client.pid,9)
+        os.system('./rec-kill.sh %d' % self.flexiprovider1.pid)
+        os.system('./rec-kill.sh %d' % self.flexiprovider2.pid)
+        os.system('./rec-kill.sh %d' % self.context_client.pid)
         os.unlink('context-provide1.context')
         os.unlink('context-provide2.context')
 
@@ -450,8 +450,8 @@ class SubscriptionPause (unittest.TestCase):
         self.context_client = Popen(["context-listen","test.int"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.kill(self.flexiprovider.pid,9)
-        os.kill(self.context_client.pid,9)
+        os.system('./rec-kill.sh %d' % self.flexiprovider.pid)
+        os.system('./rec-kill.sh %d' % self.context_client.pid)
         os.unlink('context-provide.context')
 
     def testPause(self):
@@ -554,5 +554,5 @@ def runTests():
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
     signal.signal(signal.SIGALRM, timeoutHandler)
-    signal.alarm(10)
+    signal.alarm(30)
     runTests()
