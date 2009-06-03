@@ -11,7 +11,7 @@ EXTRA_DIST = providers1.context providers2.context
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = '-I$(srcdir)/../util/' '-DDEFAULT_CONTEXT_PROVIDERS="@DEFAULT_CONTEXT_PROVIDERS@"' $(QtXml_CFLAGS)
 AM_LDFLAGS = -lcdb $(QtXml_LIBS)
-FROM_SOURCE = src_contextregistryinfo.cpp src_infobackend.cpp src_infoxmlbackend.cpp src_infoxmlkeysfinder.cpp src_infocdbbackend.cpp src_cdbreader.cpp src_contextregistryinfo.h src_infobackend.h src_infoxmlbackend.h src_infocdbbackend.h src_infoxmlkeysfinder.h src_cdbreader.h # copy these files from the real source
+FROM_SOURCE = src_contextregistryinfo.cpp src_infobackend.cpp src_infoxmlbackend.cpp src_infoxmlkeysfinder.cpp src_infocdbbackend.cpp src_cdbreader.cpp src_contextregistryinfo.h src_infobackend.h src_infoxmlbackend.h src_infocdbbackend.h src_infoxmlkeysfinder.h src_cdbreader.h src_logging.cpp src_logging.h # copy these files from the real source
 LDADD =
 include $(top_srcdir)/am/tests.am
 

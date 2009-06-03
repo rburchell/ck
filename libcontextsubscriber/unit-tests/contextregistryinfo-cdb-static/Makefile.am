@@ -17,7 +17,8 @@ FROM_SOURCE = src_contextregistryinfo.cpp src_infobackend.cpp	\
 	src_infocdbbackend.cpp src_cdbreader.cpp		\
 	src_contextregistryinfo.h src_infobackend.h		\
 	src_infoxmlbackend.h src_infocdbbackend.h		\
-	src_infoxmlkeysfinder.h src_cdbreader.h
+	src_infoxmlkeysfinder.h src_cdbreader.h			\
+	src_logging.cpp src_logging.h
 LDADD = 
 include $(top_srcdir)/am/tests.am
 

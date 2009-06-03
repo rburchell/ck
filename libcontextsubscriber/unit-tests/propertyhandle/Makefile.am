@@ -12,7 +12,7 @@ COVERAGE_FILES = propertyhandle.cpp
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtDBus_CFLAGS) -DDEFAULT_CONTEXT_PROVIDERS=\"@DEFAULT_CONTEXT_PROVIDERS@\"
 AM_LDFLAGS = 
-FROM_SOURCE = src_propertyhandle.cpp src_propertyhandle.h # copy these files from the real source
+FROM_SOURCE = src_propertyhandle.cpp src_propertyhandle.h src_logging.cpp src_logging.h # copy these files from the real source
 LDADD = 
 include $(top_srcdir)/am/tests.am
 
