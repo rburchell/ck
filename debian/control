@@ -15,7 +15,7 @@ Build-Depends: debhelper (>= 5),
                libhal-dev,
                gtk-doc-tools
 XS-Python-Version: all
-Standards-Version: 3.8.0
+Standards-Version: 3.8.1
 
 Package: contextkit
 Architecture: any
