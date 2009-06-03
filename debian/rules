@@ -71,6 +71,7 @@ binary-arch: build install
 	dh_fixperms -a
 	dh_makeshlibs -a -V
 	dh_installdeb -a
+	cp `pwd`/debian/libcontextsubscriber0.triggers `pwd`/debian/libcontextsubscriber0/DEBIAN/triggers
 	dh_shlibdeps -a
 	dh_gencontrol -a
 	dh_md5sums -a
