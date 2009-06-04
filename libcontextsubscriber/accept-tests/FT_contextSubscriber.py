@@ -546,13 +546,20 @@ def runTests():
     suiteProviders = unittest.TestLoader().loadTestsFromTestCase(MultipleProviders)
     suitePause = unittest.TestLoader().loadTestsFromTestCase(SubscriptionPause)
 
-    unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
-    unittest.TextTestRunner(verbosity=2).run(suiteSubscribers)
-    unittest.TextTestRunner(verbosity=2).run(suiteProviders)
-    unittest.TextTestRunner(verbosity=2).run(suitePause)
+    errors = []
+    result = unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
+    errors += result.errors + result.failures
+    result = unittest.TextTestRunner(verbosity=2).run(suiteSubscribers)
+    errors += result.errors + result.failures
+    result = unittest.TextTestRunner(verbosity=2).run(suiteProviders)
+    errors += result.errors + result.failures
+    result = unittest.TextTestRunner(verbosity=2).run(suitePause)
+    errors += result.errors + result.failures
+
+    return len(errors)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
     signal.signal(signal.SIGALRM, timeoutHandler)
     signal.alarm(30)
-    runTests()
+    sys.exit(runTests())

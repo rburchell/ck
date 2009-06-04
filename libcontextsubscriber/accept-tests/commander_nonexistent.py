@@ -98,10 +98,11 @@ class CommanderNonExistent(unittest.TestCase):
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderNonExistent)
-    unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
+    result = unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
+    return len(result.errors + result.failures)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
     signal.signal(signal.SIGALRM, timeoutHandler)
     signal.alarm(10)
-    runTests()
+    sys.exit(runTests())
