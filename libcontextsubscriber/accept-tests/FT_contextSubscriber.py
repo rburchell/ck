@@ -65,6 +65,8 @@ class Subscription(unittest.TestCase):
         """
         Description
             Subscribe to 4 properties covering basic data types
+            Query the value of the property
+            (when it's known or unknown, with and without a default value)
 
         Pre-conditions
             Provider started via context-provide tool.
@@ -72,8 +74,10 @@ class Subscription(unittest.TestCase):
 
         Steps
             Subscribe to the properties, int, bool, double, string
-            Change value of type int from the provider
-            Assert the returned value
+            Change value of type int from the provider to a known value
+            Query the value (both with and without a default value) and assert the result
+            Change value of type int from the provider to unknown
+            Query the value (both with and without a default value) and assert the result
 
         Post-conditions
             Kill provider
@@ -95,6 +99,32 @@ class Subscription(unittest.TestCase):
         actual = [self.context_client.stdout.readline().rstrip()]
         actual.sort()
         expected = ["value: int:100"]
+        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+
+        print >> self.context_client.stdin, "value test.int defaultValue"
+        actual = [self.context_client.stdout.readline().rstrip()]
+        actual.sort()
+        expected = ["value: int:100"]
+        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+
+        print >> self.flexiprovider.stdin, "set('test.int',None)"
+        self.context_client.stdout.readline().rstrip()
+        print >> self.context_client.stdin, "value test.int"
+        actual = [self.context_client.stdout.readline().rstrip()]
+        actual.sort()
+        expected = ["value is Unknown"]
+        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+
+        print >> self.context_client.stdin, "value test.int defaultValue"
+        actual = [self.context_client.stdout.readline().rstrip()]
+        actual.sort()
+        expected = ["value: QString:defaultValue"]
+        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+
+        print >> self.context_client.stdin, "key test.int"
+        actual = [self.context_client.stdout.readline().rstrip()]
+        actual.sort()
+        expected = ["key: test.int"]
         self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
 
     def testInfos(self):
