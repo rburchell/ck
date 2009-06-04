@@ -42,6 +42,10 @@ install: build
 	# set the executable flag on to all files that have a shebang line
 	grep -rl '^#!' debian/tmp/usr/share | xargs chmod +x
 
+	mkdir -p `pwd`/debian/tmp/usr/share/doc/libcontextsubscriber-doc
+	rm -rf `pwd`/debian/tmp/usr/share/doc/libcontextsubscriber-doc/html
+	cp -a libcontextsubscriber/doc/html `pwd`/debian/tmp/usr/share/doc/libcontextsubscriber-doc
+
 	dh_install --sourcedir=`pwd`/debian/tmp/
 
 binary-indep: build install
@@ -68,7 +72,9 @@ binary-arch: build install
 	dh_installmenu -a
 	dh_installman -a
 	dh_strip -p contextkit --dbg-package="contextkit-dbg"
+	dh_strip -p contextkit-utils
 	dh_strip -p libcontextprovider0 --dbg-package="libcontextprovider0-dbg"
+	dh_strip -p libcontextsubscriber0 --dbg-package="libcontextsubscriber0-dbg"
 	dh_pycentral -ppython-contextkit
 	dh_pycentral -pcontextd-tests
 	dh_link -a
@@ -76,6 +82,8 @@ binary-arch: build install
 	dh_fixperms -a
 	dh_makeshlibs -a -V
 	dh_installdeb -a
+	cp `pwd`/debian/libcontextsubscriber0.triggers `pwd`/debian/libcontextsubscriber0/DEBIAN/triggers
+	chmod 0644 `pwd`/debian/libcontextsubscriber0/DEBIAN/triggers
 	dh_shlibdeps -a
 	dh_gencontrol -a
 	dh_md5sums -a

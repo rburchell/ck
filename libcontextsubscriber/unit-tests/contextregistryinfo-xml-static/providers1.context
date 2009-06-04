@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<provider bus="session" service="org.freedesktop.ContextKit.contextd1">
+  <key name="Battery.ChargePercentage"></key>
+  <key name="Battery.LowBattery">
+    <type>TRUTH</type>
+    <doc>
+        This is true when battery is low
+    </doc>
+  </key>
+</provider>

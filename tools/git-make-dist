@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 
 # git-make-dist -- Make a release tag in a git repository.  The tag
 #                  will have the same content as the tarball produced

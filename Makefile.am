@@ -2,19 +2,23 @@ NULL =
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
+# We exclude the caches from the uninstall check.
+distuninstallcheck_listfiles = find . -type f -a ! -name '*.cdb' -print
+
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
 	libcontextprovider \
+	libcontextsubscriber \
 	contextd \
 	spec \
 	tests \
 	doc \
 	tools \
+	python \
 	fake-provider \
 	vapi \
-	python \
 	$(NULL)
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -30,7 +34,7 @@ DISTCLEANFILES = \
 version:
 	@echo @VERSION@
 
-.PHONEY: version
+.PHONY: version
 
 if HAVE_COVERAGE
 include tools/lcov.am

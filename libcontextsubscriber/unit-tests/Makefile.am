@@ -1,0 +1,38 @@
+SUBDIRSTESTS = propertyprovider propertyhandle handlesignalrouter	\
+	cdbreader cdbwriter contextregistryinfo-xml-static		\
+	contextpropertyinfo-xml-static contextregistryinfo-cdb-static	\
+	contextpropertyinfo-cdb-static contextregistryinfo-cdb-dynamic	\
+	contextpropertyinfo-cdb-dynamic					\
+	contextregistryinfo-xml-dynamic					\
+	contextpropertyinfo-xml-dynamic
+SUBDIRS = $(SUBDIRSTESTS) util
+
+check-sum: all
+	@list='$(SUBDIRSTESTS)'; for subdir in $$list; do \
+          (cd $$subdir && tput bold && echo $$subdir:\  && tput sgr0 && ( $(MAKE) $(AM_MAKEFLAGS) check | grep '^Total' | grep -v '^make' ) ) \
+        done
+
+covoptioncheck:
+	@if test "$(GCOV)" = "" ; then \
+		echo "Wasn't configured for coverage, please rerun configure with --with-coverage"; \
+		exit 1; \
+	fi
+
+coverage: covoptioncheck
+	@list='$(SUBDIRSTESTS)'; for subdir in $$list; do \
+          (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) coverage) \
+        done
+	mkdir -p coverage
+	lcov $(patsubst %, -a %/coverage/selected.cov, $(SUBDIRSTESTS)) -o coverage/selecteds.cov
+	@echo "real sources: `cd $(abs_top_srcdir) && pwd`"
+	@echo "build: $(abs_top_builddir)"
+	cat coverage/selecteds.cov | \
+		sed "s,`cd $(abs_top_builddir) && pwd`,`cd $(abs_top_srcdir) && pwd`," | \
+		sed 's,unit-tests/.*mock_,src/,' | \
+		sed 's,unit-tests/.*src_,src/,' >coverage/sedded.cov
+	genhtml --prefix `cd $(abs_top_srcdir) && pwd` -o coverage/ coverage/sedded.cov
+
+clean-local:
+	rm -rf coverage
+
+.PHONY: covoptioncheck coverage check-sum

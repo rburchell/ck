@@ -1,9 +1,9 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.1.8], [marius.vollmer@nokia.com], ContextKit)
+AC_INIT([ContextKit], [0.2.1~unreleased], [marius.vollmer@nokia.com], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
-AM_INIT_AUTOMAKE([-Wall -Wno-portability -Werror dist-bzip2 tar-ustar 1.9])
+AM_INIT_AUTOMAKE([-Wall -Wno-portability -Wno-override -Werror dist-bzip2 tar-ustar 1.9])
 
 # Honor aclocal flags
 ACLOCAL="$ACLOCAL $ACLOCAL_FLAGS"
@@ -68,7 +68,16 @@ AC_ARG_ENABLE(debug,
 GLIB_REQUIRED=2.12.0
 GEE_REQUIRED=0.1.3
 
-PKG_CHECK_MODULES(CONTEXTD, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED dbus-glib-1 gee-1.0 >=  $GEE_REQUIRED hal)
+PKG_CHECK_MODULES(GLIBCOMMON, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED dbus-glib-1)
+PKG_CHECK_MODULES(GEE, gee-1.0 >= $GEE_REQUIRED)
+PKG_CHECK_MODULES(HAL, hal)
+
+CONTEXTD_CFLAGS="$GLIBCOMMON_CFLAGS $GEE_CFLAGS $HAL_CFLAGS"
+CONTEXTD_LIBS="$GLIBCOMMON_LIBS $GEE_LIBS $HAL_LIBS"
+
+CONTEXTPROVIDER_CFLAGS="$GLIBCOMMON_CFLAGS $GEE_CFLAGS"
+CONTEXTPROVIDER_LIBS="$GLIBCOMMON_LIBS $GEE_LIBS"
+
 
 ##################################
 # Flags for coverage measurement
@@ -97,6 +106,9 @@ fi
 
 AC_SUBST(CONTEXTD_CFLAGS)
 AC_SUBST(CONTEXTD_LIBS)
+
+AC_SUBST(CONTEXTPROVIDER_CFLAGS)
+AC_SUBST(CONTEXTPROVIDER_LIBS)
 
 have_location=no
 PKG_CHECK_MODULES(LOCATION, liblocation, [have_location=yes], [have_location=no])

@@ -131,6 +131,8 @@ tests/contextd_tests/context_provider.c
 tests/contextd_tests/plugin.c
 tests/contextd_tests/hal_plugin.c
 .project
+/py-compile
+/contextd/org.freedesktop.ContextKit.contextd.service
 /doc/use-cases.html
 /doc/context-arch.html
 /doc/context-types.html
@@ -167,3 +169,11 @@ tests/contextd_tests/hal_plugin.c
 /debian/*.prerm.debhelper
 /debian/*.preinst.debhelper
 /debian/*.substvars
+/debian/contextkit-utils/
+# flexiprovider default output
+flexi-properties.xml
+/debian/libcontextsubscriber-dev/
+/debian/libcontextsubscriber0-dbg/
+/debian/libcontextsubscriber-doc/
+/debian/libcontextsubscriber0/
+*.context

@@ -1,0 +1,14 @@
+.TH update-contextkit-providers 1 May-18-2009
+.SH NAME
+update-contextkit-providers
+- updates the cached cache.cdb context properties registry database.
+.SH SYNOPSIS
+.B update-contextkit-providers [directory]
+.SH DESCRIPTION
+update-contextkit-providers reads the context properties registry (in xml format) and produces an updated cached database - cache.cdb. The database is used by libcontextsubscrbier for quick introspection of the registry.
+.SH OPTIONS
+.TP 13
+directory
+the location containing the xml registry. The database will be written there. 
+If no directory is specified, update-contextkit-providers will use the CONTEXT_PROVIDERS environment variable. 
+If that is not preset as well, a compiled-in registry prefix path will be used (usually /usr/share/contextkit/providers).

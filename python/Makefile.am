@@ -1,3 +1,5 @@
+dist_man_MANS = context-provide.1
+
 dist_bin_SCRIPTS = context-provide \
                    context-rlwrap
 

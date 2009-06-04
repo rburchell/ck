@@ -1,0 +1,4 @@
+usr/bin/context-provide
+usr/bin/context-listen
+usr/share/man/man1/context-provide.1
+usr/share/man/man1/context-listen.1
