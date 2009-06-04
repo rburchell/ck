@@ -158,3 +158,12 @@ Description: Helper library for subscribers of context properties
  org.freedesktop.ContextKit D-Bus interface.
  .
  This package contains the documentation.
+
+Package: contextd-tests
+Section: devel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: python2.5, python (>= 2.5)
+Description: contextd automated tests
+ .
+ This package contains an automated testsuite of the contextd daemon.

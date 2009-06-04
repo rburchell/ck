@@ -1,1 +1,1 @@
-SUBDIRS = unit_tests python-test-library contextd_tests
+SUBDIRS = unit_tests python-test-library contextd_tests accept-tests

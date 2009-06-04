@@ -36,16 +36,17 @@ namespace ContextD {
 		}
 
 		static void exit (int sig) {
-			stdout.printf("contextd exiting");
+			stdout.printf("contextd exiting\n");
 			loop.quit();
 		}
 
 		static int main (string[] args) {
-			stdout.printf ("contextd starting");
+			stdout.printf ("contextd starting\n");
 			
 			// Define the set of plugins
 			plugins = new Gee.ArrayList<Plugin> ();
 			plugins.add(new Plugins.HalPlugin ());
+			plugins.add(new Plugins.LowmemPlugin ());
 
 			// TODO: define the used plugins based on which
 			// resources are detected during configure phase.
