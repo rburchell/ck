@@ -107,3 +107,12 @@ Description: Python bindings for ContextKit APIs
  .
  If you are interested in some quick test tools for the ContextKit,
  please look into the package named contextkit-utils.
+
+Package: contextd-tests
+Section: devel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: python2.5, python (>= 2.5)
+Description: contextd automated tests
+ .
+ This package contains an automated testsuite of the contextd daemon.

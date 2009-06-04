@@ -31,6 +31,20 @@ import string
 from subprocess import Popen, PIPE
 from time import sleep
 
+class LowmemKernelModule(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def testWatermarksExists(self):
+        self.failIf(not os.path.exists("/sys/kernel/low_watermark"), "/sys/kernel/low_watermark does not exist")
+        self.failIf(not os.path.exists("/sys/kernel/high_watermark"), "/sys/kernel/high_watermark does not exist")
+        self.failIf(not os.path.isfile("/sys/kernel/low_watermark"), "/sys/kernel/low_watermark is not a file")
+        self.failIf(not os.path.isfile("/sys/kernel/high_watermark"), "/sys/kernel/high_watermark is not a file")
+
 class MemoryPressure(unittest.TestCase):
 
     def setUp(self):
@@ -79,8 +93,12 @@ class MemoryPressure(unittest.TestCase):
         os.kill(self.memload2.pid,9)
 
 def runTests():
-    suiteLowMemoryPlugin = unittest.TestLoader().loadTestsFromTestCase(MemoryPressure)
-    unittest.TextTestRunner(verbosity=2).run(suiteLowMemoryPlugin)
+    testResults = unittest.TestResult
+    suiteLowMemExists = unittest.TestLoader().loadTestsFromTestCase(LowmemKernelModule)
+    testResults = unittest.TextTestRunner(verbosity=2).run(suiteLowMemExists)
+    #if testResults.wasSuccessful():
+    #    suiteLowMemoryPlugin = unittest.TestLoader().loadTestsFromTestCase(MemoryPressure)
+    #    unittest.TextTestRunner(verbosity=2).run(suiteLowMemoryPlugin)
 
 if __name__ == "__main__":
     runTests()
