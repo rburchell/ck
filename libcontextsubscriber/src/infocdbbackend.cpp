@@ -45,7 +45,7 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
 {
     qDebug() << "CDB backend with database" << InfoCdbBackend::databasePath();
-    
+
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
 
@@ -128,7 +128,7 @@ QString InfoCdbBackend::databaseDirectory()
 void InfoCdbBackend::watchDirectory()
 {
     if (! watcher.directories().contains(InfoCdbBackend::databaseDirectory()))
-        watcher.addPath(InfoCdbBackend::databaseDirectory()); 
+        watcher.addPath(InfoCdbBackend::databaseDirectory());
 }
 
 /// Start watching the database file for changes.
@@ -138,7 +138,7 @@ void InfoCdbBackend::watchPath()
         watcher.addPath(InfoCdbBackend::databasePath());
 }
 
-/// Depending on our readability status, watch either path or the 
+/// Depending on our readability status, watch either path or the
 /// directory.
 void InfoCdbBackend::watchPathOrDirectory()
 {
@@ -152,7 +152,7 @@ void InfoCdbBackend::watchPathOrDirectory()
 
 /* Slots */
 
-/// Called when the database changes. Reopens the database and emits 
+/// Called when the database changes. Reopens the database and emits
 /// the change signals. If database does not exist it bails out but keeps observing.
 void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
 {
@@ -162,9 +162,9 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
 
     reader.reopen();
     watchPathOrDirectory();
- 
+
     // If nobody is watching us anyways, drop out now and skip
-    // the further processing. This could be made more granular 
+    // the further processing. This could be made more granular
     // (ie. in many cases nobody will be watching on added/removed)
     // but will be watching on changed.
     if (connectCount == 0)
@@ -186,5 +186,5 @@ void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
     if (reader.isReadable())
         return;
 
-    onDatabaseFileChanged(path);    
+    onDatabaseFileChanged(path);
 }

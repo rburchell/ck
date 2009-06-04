@@ -33,7 +33,7 @@
 
 class InfoXmlBackend : public InfoBackend
 {
-    Q_OBJECT 
+    Q_OBJECT
 
 public:
     explicit InfoXmlBackend(QObject *parent = 0);
@@ -46,7 +46,7 @@ public:
     virtual QString docForKey(QString key) const;
     virtual QString providerForKey(QString key) const;
     virtual QString providerDBusTypeForKey(QString key) const;
-    
+
     static QString registryPath();
 
 private slots:

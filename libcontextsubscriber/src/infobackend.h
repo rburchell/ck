@@ -28,15 +28,15 @@
 
 class InfoBackend : public QObject
 {
-    Q_OBJECT 
+    Q_OBJECT
 
 public:
 
     static InfoBackend* instance(const QString &backendName = "");
 
-    /// Returns the name of the backend, ie: 'xml'. 
+    /// Returns the name of the backend, ie: 'xml'.
     virtual QString name() const = 0;
-    
+
     /// Returns the list of all the keys in the registry.
     virtual QStringList listKeys() const = 0;
 
@@ -61,25 +61,25 @@ public:
 signals:
     /// Emitted when key list changes. ContextRegistryInfo listens on that.
     void keysChanged(const QStringList& currentKeys);
-    
+
     /// Emitted when new keys are added. ContextRegistryInfo listens on that.
     void keysAdded(const QStringList& newKeys);
 
     /// Emitted when keys are removed. ContextRegistryInfo listens on that.
     void keysRemoved(const QStringList& removedKeys);
-    
+
     /// Emitted when key data changes. ContextPropertyInfo instances listen on that.
     void keyDataChanged(const QString& key);
-    
+
 protected:
     virtual void connectNotify(const char *signal);
     virtual void disconnectNotify(const char *signal);
 
 private:
     int connectCount; //< Number of connections to signals. Used to optimized signal emission when 0.
-   
+
     InfoBackend(QObject *parent = 0);
-    
+
     /// Private constructor. Do not use.
     InfoBackend(const InfoBackend&);
 
@@ -89,10 +89,10 @@ private:
 
     /// Private operator. Do not use.
     InfoBackend& operator=(const InfoBackend&);
-  
+
     static InfoBackend* backendInstance; //< Holds a pointer to the instance of the singelton.
     static void destroyInstance();
-    
+
     friend class InfoXmlBackend;
     friend class InfoCdbBackend;
 };

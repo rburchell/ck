@@ -30,9 +30,9 @@
     \brief A class to introspect the registry contents.
 
     This is a singelton class used to obtain information about the keys (properties)
-    in the registry database. The information can be provided either from xml files 
-    or from a cdb database. It's possible to list all the keys in the registry and 
-    also list all keys belonging to a one particular provider. 
+    in the registry database. The information can be provided either from xml files
+    or from a cdb database. It's possible to list all the keys in the registry and
+    also list all keys belonging to a one particular provider.
 */
 
 ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
@@ -40,32 +40,32 @@ ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
 /* Public */
 
 /// Returns the singleton instance of the ContextRegistryInfo. The object
-/// is constructed automaticall on first access. 
-/// \param backendName the optional name of the backend to use (force). 
+/// is constructed automaticall on first access.
+/// \param backendName the optional name of the backend to use (force).
 ContextRegistryInfo* ContextRegistryInfo::instance(const QString &backendName)
 {
     static QMutex mutex;
     if (!registryInstance)
     {
         mutex.lock();
- 
+
         if (! registryInstance) {
             InfoBackend::instance(backendName);
             registryInstance = new ContextRegistryInfo;
-            
-            sconnect(InfoBackend::instance(), SIGNAL(keysChanged(QStringList)), 
+
+            sconnect(InfoBackend::instance(), SIGNAL(keysChanged(QStringList)),
                      registryInstance, SLOT(onKeysChanged(QStringList)));
 
-            sconnect(InfoBackend::instance(), SIGNAL(keysAdded(QStringList)), 
+            sconnect(InfoBackend::instance(), SIGNAL(keysAdded(QStringList)),
                      registryInstance, SLOT(onKeysAdded(QStringList)));
-            
-            sconnect(InfoBackend::instance(), SIGNAL(keysRemoved(QStringList)), 
+
+            sconnect(InfoBackend::instance(), SIGNAL(keysRemoved(QStringList)),
                      registryInstance, SLOT(onKeysRemoved(QStringList)));
         }
- 
+
         mutex.unlock();
     }
- 
+
     return registryInstance;
 }
 
@@ -81,7 +81,7 @@ QStringList ContextRegistryInfo::listKeys(QString providername) const
     return InfoBackend::instance()->listKeys(providername);
 }
 
-/// Returns the list of all unique providers in the registry. 
+/// Returns the list of all unique providers in the registry.
 /// The lists consists of strings with dbus names of the providers.
 QStringList ContextRegistryInfo::listProviders() const
 {
