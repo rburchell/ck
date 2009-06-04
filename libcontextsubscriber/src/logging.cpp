@@ -22,6 +22,80 @@
 #include "logging.h"
 #include <stdio.h>
 
+/*!
+    \page Logging
+    
+    \brief The library (and ContexKit in general) use a simple logging system designed 
+    to unify the output and make the debugging easier.
+    
+    \section API
+    
+    Four types of log messages (presented here in the order of importance) are supported: 
+    \b Test, \b Debug, \b Warning and \b Critical. 
+    
+    The first one, the \b Test message requires some attention. It's meant to be used 
+    from tests and unit-tests to log various stages of the test execution. It'll make
+    the test output more easily filterable.
+    
+    The log messages can be used like this:
+    
+    \code
+    contextTest() << "This is some message";
+    contextDebug() << "My value is:" << someVariable;
+    contextWarning() << "Expecting key:" << something.getKey();
+    contextCritical() << 5 << " is bigger than " << 4;
+    \endcode
+    
+    \section compilecontrol Compile-time verbosity control
+    
+    During the compile time certain defines can be used to turn-off debug messages. 
+    Those defines are:
+    
+    \code
+    CONTEXT_LOG_HIDE_TEST
+    CONTEXT_LOG_HIDE_DEBUG
+    CONTEXT_LOG_HIDE_WARNING
+    CONTEXT_LOG_HIDE_CRITICAL
+    \endcode
+    
+    A given define makes a respective macro message evaluate to an empty code. To be precise:
+    it makes the macro message evaluate to an inline do-nothing class that is optimized by the
+    compiler to do nothing.
+    
+    When ie. \c CONTEXT_LOG_HIDE_DEBUG define is used to turn off \c contextDebug()
+    messages, the actual string content of the debug messages is \b not included in the binary 
+    and during runtime the machine does not spend time evaluating it.
+    
+    Those compile-time control defines are integrated in the build/configure system.
+    
+    \section runtimecontrol Run-time verbosity control
+    
+    During run-time, the amount of debugging can be limited (filtered) but it can't be increased
+    (expanded). In other words, if a package was compiled with warnings-only, it's not possible 
+    to make it show debug messages at runtime. But it is possible to make it criticals-only. 
+    
+    The filtering happens via env variables. The major player is the \c CONTEXT_LOG_VERBOSITY variable
+    which can be set to \c TEST, \c DEBUG, \c WARNING and \c CRITICAL. The \c CONTEXT_LOG_VERBOSITY 
+    specifies the minimal level of the messages shown. Ie. \c CONTEXT_LOG_VERBOSITY set to 
+    \c WARNING will show only warning and criticals. 
+    
+    The format of the output can be tweaked with \c CONTEXT_LOG_HIDE_TIMESTAMPS and \c CONTEXT_LOG_USE_COLOR. 
+    The first one makes the messages shorter by skipping the timestamp info. The second one adds a 
+    little bit of ANSI coloring to the messages.
+    
+    \c CONTEXT_LOG_SHOW_MODULE will filter-out (kill) all messages \b except the ones coming from the 
+    specified module. Ie.:
+    
+    \code
+    CONTEXT_LOG_SHOW_MODULE=subscriber ./some-binary
+    \endcode
+    
+    ...will run \c ./some-binary showing log messages \b only from \c subscriber module.
+    
+    Lastly, \c CONTEXT_LOG_HIDE_MODULE will hide log messages coming from the specified module. 
+    All other messages will be show.
+*/
+
 /* NullIODevice */
 
 /*!
