@@ -51,8 +51,8 @@ AS_IF([test "$with_doxygen" = yes -o \( "$with_doxygen" = "" -a "$withm_doxygen"
 	     ],
 	    [AC_MSG_NOTICE([Doxygen not enabled, enable it with --with-doxygen])])
 AS_IF([test "$with_debug" = yes -o \( "$with_debug" = "" -a "$withm_debug" = yes \)],
-	    [CONTEXT_LOG_CXXFLAGS="-DCONTEXT_LOG_TEST -DCONTEXT_LOG_DEBUG -DCONTEXT_LOG_WARNING -DCONTEXT_LOG_CRITICAL"],
-	    [CONTEXT_LOG_CXXFLAGS="-DCONTEXT_LOG_WARNING -DCONTEXT_LOG_CRITICAL"
+	    [CONTEXT_LOG_CXXFLAGS=""],
+	    [CONTEXT_LOG_CXXFLAGS="-DCONTEXT_LOG_HIDE_TEST -DCONTEXT_LOG_HIDE_DEBUG"
              AC_MSG_NOTICE([Building release mode, no extra debug logging])
             ])
 AC_SUBST(CONTEXT_LOG_CXXFLAGS)

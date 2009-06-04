@@ -86,28 +86,28 @@ public:
 
 /* Macro defs */
 
-#ifdef CONTEXT_LOG_DEBUG
-#define contextDebug() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_DEBUG, __FUNCTION__, __FILE__, __LINE__))
-#else
-#define contextDebug() (ContextZeroLogger())
-#endif
-
-#ifdef CONTEXT_LOG_WARNING
-#define contextWarning() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_WARNING, __FUNCTION__, __FILE__, __LINE__))
-#else
-#define contextWarning() (ContextZeroLogger())
-#endif
-
-#ifdef CONTEXT_LOG_CRITICAL
-#define contextCritical() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_CRITICAL, __FUNCTION__, __FILE__, __LINE__))
-#else
-#define contextCritical() (ContextZeroLogger())
-#endif
-
-#ifdef CONTEXT_LOG_TEST
-#define contextTest() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_TEST, __FUNCTION__, __FILE__, __LINE__))
-#else
+#ifdef CONTEXT_LOG_HIDE_TEST
 #define contextTest() (ContextZeroLogger())
+#else
+#define contextTest() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_TEST, __FUNCTION__, __FILE__, __LINE__))
+#endif
+
+#ifdef CONTEXT_LOG_HIDE_DEBUG
+#define contextDebug() (ContextZeroLogger())
+#else
+#define contextDebug() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_DEBUG, __FUNCTION__, __FILE__, __LINE__))
+#endif
+
+#ifdef CONTEXT_LOG_HIDE_WARNING
+#define contextWarning() (ContextZeroLogger())
+#else
+#define contextWarning() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_WARNING, __FUNCTION__, __FILE__, __LINE__))
+#endif
+
+#ifdef CONTEXT_LOG_HIDE_CRITICAL
+#define contextCritical() (ContextZeroLogger())
+#else
+#define contextCritical() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_CRITICAL, __FUNCTION__, __FILE__, __LINE__))
 #endif
 
 #endif // LOGGING_H
