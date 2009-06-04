@@ -24,6 +24,16 @@
 
 /* NullIODevice */
 
+/*!
+    \class NullIODevice  
+
+    \brief Device that kills all input.
+
+    This class is a \c QIODevice implementation that kills everything sent to it. 
+    We set this as a output device for stream in ContextRealLogger when given debug
+    message type was disabled at \b runtime. 
+*/
+
 qint64 NullIODevice::readData(char*, qint64)
 {
     return 0;
@@ -36,6 +46,14 @@ qint64 NullIODevice::writeData(const char*, qint64)
 
 /* ContextRealLogger */
 
+/*!
+    \class ContextRealLogger
+
+    \brief A real logging class.
+
+    This is used by the actual macros to print messages.
+*/
+
 bool ContextRealLogger::showTest = true;
 bool ContextRealLogger::showDebug = true;
 bool ContextRealLogger::showWarning = true;
@@ -46,6 +64,11 @@ char* ContextRealLogger::showModule = NULL;
 char* ContextRealLogger::hideModule = NULL;
 bool ContextRealLogger::initialized = false;
 
+/// Initialize the class by checking the enviornment variables and setting 
+/// the message output params. The log level is set from \c CONTEXT_LOG_VERBOSITY
+/// and from this env var the showTest, showDebug, showWarning... are set. By default
+/// everything is displayed at runtime. It's also possible to not show timestamps in 
+/// messages and spice-up the output with some color.
 void ContextRealLogger::initialize()
 {
     if (getenv("CONTEXT_LOG_HIDE_TIMESTAMPS") != NULL)
@@ -77,6 +100,8 @@ void ContextRealLogger::initialize()
     initialized = true;
 }
 
+/// Constructor. Called by the macros. \a func is the function name, \a file is
+/// is the current source file and \a line specifies the line number.
 ContextRealLogger::ContextRealLogger(int msgType, const char *func, const char *file, int line) 
     : QTextStream(stderr)
 {
@@ -137,6 +162,7 @@ ContextRealLogger::ContextRealLogger(int msgType, const char *func, const char *
     *this << file << "[" << line << "]" << ":" << func << " ";
 }
 
+/// Make sure this logger will print nothing. 
 void ContextRealLogger::killOutput()
 {
     if (nullDevice)
@@ -146,7 +172,8 @@ void ContextRealLogger::killOutput()
     setDevice(new NullIODevice());
     return;
 }
-    
+
+/// Prints \b end-of-line before going down.
 ContextRealLogger::~ContextRealLogger()
 {
     *this << "\n";

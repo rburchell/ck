@@ -47,41 +47,53 @@ public:
     ~ContextRealLogger();
     void killOutput();
     
-    static bool showTest;
-    static bool showDebug;
-    static bool showWarning;
-    static bool showCritical;
-    static bool initialized;
-    static bool hideTimestamps;
-    static bool useColor;
-    static char *showModule;
-    static char *hideModule;
+    static bool showTest; ///< Test messages enabled at runtime
+    static bool showDebug; ///< Debug messages enabled at runtime
+    static bool showWarning; ///< Warning messages enabled at runtime
+    static bool showCritical; ///< Critical messages enabled at runtime
+    static bool initialized; ///< Class initialized/env vars parsed
+    static bool hideTimestamps; ///< Don't print timestamps
+    static bool useColor; ///< Use simple colors for output (yellow for warnings, red for criticals)
+    static char *showModule; ///< Show messages \b only from the specified module
+    static char *hideModule; ///< Hide messages from the specified module
     
     static void initialize();
     
 private:
-    NullIODevice *nullDevice;
+    NullIODevice *nullDevice; ///< We use custom null-killer device when message disabled at runtime.
 };
+
+/*!
+    \class ContextZeroLogger
+
+    \brief A fake logging class.
+
+    When a certain debug message is disabled at a compile-time the debug macros expand to 
+    this class. It has all functions declared as \b inline and fundamentally kills all input
+    targeted at it. The compiler optimizes the \b inline by not calling the functions at all and
+    not storing the strings at all.
+*/
 
 class ContextZeroLogger
 {
 public:
+    /// Constructor. Does nothing.
     inline ContextZeroLogger() {}
     
     /* Stubby ops */
-   inline ContextZeroLogger &operator<< (QChar c) { return *this;}
-   inline ContextZeroLogger &operator<< (char c) { return *this;}
-   inline ContextZeroLogger &operator<< (signed short i) { return *this;}
-   inline ContextZeroLogger &operator<< (unsigned short i) { return *this;}
-   inline ContextZeroLogger &operator<< (signed int i) { return *this;}
-   inline ContextZeroLogger &operator<< (unsigned int i) { return *this;}
-   inline ContextZeroLogger &operator<< (signed long i) { return *this;}
-   inline ContextZeroLogger &operator<< (unsigned long i) { return *this;}
-   inline ContextZeroLogger &operator<< (float f) { return *this;}
-   inline ContextZeroLogger &operator<< (double f) { return *this;}
-   inline ContextZeroLogger &operator<< (const char * s) { return *this;}
-   inline ContextZeroLogger &operator<< (const QString &s) { return *this;}
-   inline ContextZeroLogger &operator<< (void * ptr) { return *this;}
+   inline ContextZeroLogger &operator<< (QChar c) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (char c) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (signed short i) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (unsigned short i) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (signed int i) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (unsigned int i) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (signed long i) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (unsigned long i) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (float f) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (double f) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (const char * s) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (const QString &s) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (void * ptr) { return *this;} ///< Does nothing.
 };
 
 /* Macro defs */
