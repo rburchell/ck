@@ -30,7 +30,7 @@
     \brief Simple storage class that groups info about a given key.
 
     This struct is not a part of the public API. It's used by the InfoXmlBackend that
-    keeps in memory a hash of InfoKeyData instances for each key. 
+    keeps in memory a hash of InfoKeyData instances for each key.
 */
 
 struct InfoKeyData

@@ -37,7 +37,7 @@
     \brief Implements the InfoBackend for reading data from a directory
     with xml files.
 
-    This class is not exported in the public API. It keeps all the data cached 
+    This class is not exported in the public API. It keeps all the data cached
     in the memory. It's assumed that this backend is not going to be used live in
     production systems and does not need to be ultra-fast (instead, implementation
     simplicity and corectness are preffered). For fast backend see the InfoCdbBackend.
@@ -46,7 +46,7 @@
 InfoXmlBackend::InfoXmlBackend(QObject *parent)
     : InfoBackend(parent)
 {
-    /* Thinking about locking... the watcher notifications are delivered synced, 
+    /* Thinking about locking... the watcher notifications are delivered synced,
        so asuming the changes in the dir are atomic this is all we need. */
 
     qDebug() << "XML backend with path" << InfoXmlBackend::registryPath();
@@ -78,13 +78,13 @@ QStringList InfoXmlBackend::listKeys() const
     foreach (QString key, keyDataHash.keys()) {
         list << keyDataHash.value(key).name;
     }
-        
+
     return list;
 }
 
 QStringList InfoXmlBackend::listKeys(QString providername) const
 {
-    // This is slow and not nice, but we're an xml backend and 
+    // This is slow and not nice, but we're an xml backend and
     // we can afford to not be the first in the run
     QStringList list;
 
@@ -98,7 +98,7 @@ QStringList InfoXmlBackend::listKeys(QString providername) const
 
 QStringList InfoXmlBackend::listProviders() const
 {
-    // Again -- slow. 
+    // Again -- slow.
     QStringList list;
 
     foreach (QString key, keyDataHash.keys()) {
@@ -155,20 +155,20 @@ QString InfoXmlBackend::registryPath()
 
 /* Slots */
 
-/// Called when one of the parsed XML files changed. This 
+/// Called when one of the parsed XML files changed. This
 /// triggers a whole registry rebuild + signal emissions.
 void InfoXmlBackend::onFileChanged(const QString &path)
 {
-    // If one of the watched xml files changed this it pretty much 
+    // If one of the watched xml files changed this it pretty much
     // an unconditional reload message for us.
 
     qDebug() << path << "changed.";
-    
+
     QStringList oldKeys = listKeys();
     regenerateKeyDataList();
     QStringList currentKeys = listKeys();
-    
-    // In the cdb (fast) backend we do check if anybody is watching 
+
+    // In the cdb (fast) backend we do check if anybody is watching
     // before doing this list processing. But in xml backend the perf
     // is not an issue.
 
@@ -184,8 +184,8 @@ void InfoXmlBackend::onFileChanged(const QString &path)
 /// when a added/removed file was not a parsed(xml) file.
 void InfoXmlBackend::onDirectoryChanged(const QString &path)
 {
-    // It could be that some other file was added to the directory which 
-    // we don't care about anyways. 
+    // It could be that some other file was added to the directory which
+    // we don't care about anyways.
 
     QDir dir = QDir(registryPath());
     dir.setFilter(QDir::Files);
@@ -198,12 +198,12 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
         return;
 
     qDebug() << registryPath() << "directory changed.";
-    
+
     QStringList oldKeys = listKeys();
     regenerateKeyDataList();
     QStringList currentKeys = listKeys();
-    
-    // In the cdb (fast) backend we do check if anybody is watching 
+
+    // In the cdb (fast) backend we do check if anybody is watching
     // before doing this list processing. But in xml backend the perf
     // is not an issue.
 
@@ -216,21 +216,21 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
 
 /* Private */
 
-/// Clears all the stored data about the registry and parses it 
+/// Clears all the stored data about the registry and parses it
 /// all over again.
 void InfoXmlBackend::regenerateKeyDataList()
 {
     keyDataHash.clear();
     countOfFilesInLastParse = 0;
 
-    // Stop watching all files. We do keep wathching the dir though. 
+    // Stop watching all files. We do keep wathching the dir though.
     QStringList watchedFiles = watcher.files();
     if (watchedFiles.size() > 0)
         watcher.removePaths(watchedFiles);
 
     qDebug() << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
 
-    // For each xml file in the registry we parse it and 
+    // For each xml file in the registry we parse it and
     // add it to our hash. We did some sanity checks in the constructor
     // so we skip them now.
 
@@ -266,7 +266,7 @@ void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
 
     // Use insert here instead of unite to overwrite keys
     foreach (QString key, handler.keyDataHash.keys()) {
-        if (keyDataHash.contains(key)) 
+        if (keyDataHash.contains(key))
             qDebug() << "WARNING: key" << key << "already defined in previous xml file. Overwriting.";
 
         keyDataHash.insert(key, handler.keyDataHash.value(key));

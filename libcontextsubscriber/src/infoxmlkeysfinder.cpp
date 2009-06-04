@@ -62,7 +62,7 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
         currentKeyName = getAttrValue(attrs, "name");
 
         inKey = true;
-            
+
         return true;
     }
 
@@ -87,13 +87,13 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
 bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString &name)
 {
     // ... </provider>
-    if (inProvider == true && name == "provider") {        
+    if (inProvider == true && name == "provider") {
         inProvider = false;
         inKey = false;
         inKeyDoc = false;
         inKeyType = false;
         return true;
-    } 
+    }
 
     // ... </key>
     if (inKey == true && name == "key") {
@@ -108,7 +108,7 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
             data.provider = currentProvider;
             data.bus = currentBus;
 
-            if (keyDataHash.contains(currentKeyName)) 
+            if (keyDataHash.contains(currentKeyName))
                 qDebug() << "WARNING: key" << currentKeyName << "already defined in this xml file. Overwriting.";
             keyDataHash.insert(currentKeyName, data);
         }
@@ -117,13 +117,13 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
         inKeyDoc = false;
         inKeyType = false;
         return true;
-    } 
+    }
 
     // ... </doc>
     if (inKeyDoc == true && name == "doc") {
         inKeyDoc = false;
         return true;
-    } 
+    }
 
     // ... </type>
     if (inKeyType == true && name == "type") {
@@ -161,10 +161,10 @@ bool InfoXmlKeysFinder::characters(const QString &chars)
 QString InfoXmlKeysFinder::getAttrValue(const QXmlAttributes &attrs, const QString &attrName)
 {
     for (int i = 0; i< attrs.count(); i++) {
-        if (attrs.localName(i) == attrName) 
+        if (attrs.localName(i) == attrName)
             return attrs.value(i);
     }
-    
+
     return "";
 }
 

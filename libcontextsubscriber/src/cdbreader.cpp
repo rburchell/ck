@@ -31,17 +31,17 @@
 
     \brief A wrapper class to read data from a tiny-cdb database.
 
-    This class is not a part of the public API. 
+    This class is not a part of the public API.
     The reader operates only on strings and can read a string value for a string key
-    or a list of string values for a string key. The reader automatically closes the 
-    underlying filesystem resource on destruction but can be also closed manually. 
+    or a list of string values for a string key. The reader automatically closes the
+    underlying filesystem resource on destruction but can be also closed manually.
 
-    Reading from a closed reader with return empty strings. 
+    Reading from a closed reader with return empty strings.
 */
 
 /// Constructs a new CDBReader reading from cdb database at \a dbpath
 /// \param dbpath Path to the database.
-CDBReader::CDBReader(const QString &dbpath, QObject *parent) 
+CDBReader::CDBReader(const QString &dbpath, QObject *parent)
     : QObject(parent), path(dbpath)
 {
     cdb = NULL;
@@ -70,7 +70,7 @@ void CDBReader::close()
     }
 }
 
-/// Reopens the reader for reading. 
+/// Reopens the reader for reading.
 /// It will first close the current reader if it's open.
 void CDBReader::reopen()
 {
@@ -90,7 +90,7 @@ void CDBReader::reopen()
     }
 }
 
-/// Returns a string value for the given \a key. 
+/// Returns a string value for the given \a key.
 /// First value is returned if there are many values for one key.
 /// \param key The key name in the database.
 QString CDBReader::valueForKey(const QString &key) const
@@ -108,7 +108,7 @@ QString CDBReader::valueForKey(const QString &key) const
         char *val = (char *) malloc(vlen + 1);
         cdb_read((struct cdb*) cdb, val, vlen, vpos);
         val[vlen] = 0;
-        
+
         QString str(val);
         free(val);
         return str;
@@ -131,7 +131,7 @@ QStringList CDBReader::valuesForKey(const QString &key) const
 
     struct cdb_find cdbf;
     cdb_findinit(&cdbf, (struct cdb*) cdb, kval, klen);
-    
+
     while(cdb_findnext(&cdbf) > 0) {
         unsigned int vpos = cdb_datapos((struct cdb*) cdb);
         unsigned int vlen = cdb_datalen((struct cdb*) cdb);

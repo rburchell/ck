@@ -34,7 +34,6 @@ class ContextProperty : public QObject
     Q_OBJECT
 
 public:
-    explicit ContextProperty(QObject *parent = 0);
     explicit ContextProperty(const QString &key, QObject *parent = 0);
 
     virtual ~ContextProperty();

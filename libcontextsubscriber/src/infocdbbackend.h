@@ -31,7 +31,7 @@
 
 class InfoCdbBackend : public InfoBackend
 {
-    Q_OBJECT 
+    Q_OBJECT
 
 public:
     explicit InfoCdbBackend(QObject *parent = 0);
