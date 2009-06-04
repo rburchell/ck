@@ -1,4 +1,4 @@
-dist_bin_SCRIPTS = FT_memoryPressure.py
+dist_bin_SCRIPTS = ft_memorypressure.py
 
 contextdtestsdir = $(datadir)/contextd-tests
 contextdtests_DATA = tests.xml
