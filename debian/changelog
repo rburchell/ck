@@ -1,8 +1,11 @@
-contextkit (0.2.2~unreleased) unstable; urgency=low
+contextkit (0.2.2) unstable; urgency=low
 
-  * 
+  * Bug fixes in the fake property declarations.
+  * Add System.MemoryPressure to new-style prop decls for contextd.
+  * Remove fake properties that are now provided by sensord, from the
+    new-style property declarations.
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 04 Jun 2009 14:48:50 +0300
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Thu, 04 Jun 2009 18:24:01 +0300
 
 contextkit (0.2.1) unstable; urgency=low
 
