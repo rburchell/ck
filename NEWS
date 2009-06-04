@@ -1,3 +1,7 @@
+Changes in ContextKit 0.2.1
+
+- Added lowmem plugin to contextd, which provides MemoryPressure property
+
 Changes in ContextKit 0.2.0
 
 - Added libcontextsubscriber, the implementation of the new

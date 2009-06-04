@@ -1,8 +1,10 @@
-contextkit (0.2.1~unreleased) unstable; urgency=low
+contextkit (0.2.1) unstable; urgency=low
 
-  * 
+  * added lowmem plugin to contextd, which provides MemoryPressure property
 
- -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Thu, 04 Jun 2009 08:44:04 +0300
+    Implemented: SWP#CntFr-61
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 04 Jun 2009 14:19:39 +0300
 
 contextkit (0.2.0) unstable; urgency=low
 
