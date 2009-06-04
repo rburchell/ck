@@ -7,4 +7,5 @@
   <key name="Battery.IsCharging" type="TRUTH"></key>
   <key name="Battery.TimeUntilLow" type="INT"></key>
   <key name="Battery.TimeUntilFull" type="INT"></key>
+  <key name="System.MemoryPressure" type="INT"></key>
 </provider>
