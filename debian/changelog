@@ -1,8 +1,8 @@
-contextkit (0.2.3~unreleased) unstable; urgency=low
+contextkit (0.2.3) unstable; urgency=low
 
-  * 
+  * contextd-tests package: bug fix in tests.xml
 
- --
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 05 Jun 2009 08:24:08 +0300
 
 contextkit (0.2.2) unstable; urgency=low
 

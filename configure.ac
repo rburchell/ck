@@ -1,5 +1,5 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.2.3~unreleased], [marius.vollmer@nokia.com], ContextKit)
+AC_INIT([ContextKit], [0.2.3], [marius.vollmer@nokia.com], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
