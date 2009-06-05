@@ -1,3 +1,9 @@
+contextkit (0.2.4~unreleased) unstable; urgency=low
+
+  * 
+
+ -- 
+
 contextkit (0.2.3) unstable; urgency=low
 
   * contextd-tests package: bug fix in tests.xml
