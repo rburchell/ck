@@ -5,9 +5,9 @@
     <!-- At least one set per suite, name and description mandatory -->
     <set name="contextd suite" description="Contextd tests">
       <!-- At least one case per set, name mandatory, description mandatory, other optional -->
-      <case name="lowmem001" description="Verify presence of lowmem kernel module in image" requirement="" timeout="5">
+      <case name="lowmem001" description="Test if lowmem kernel module is configured" requirement="" timeout="5">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
-        <step expected_result="0">/usr/share/contextd-tests/FT_memoryPressure.py</step>
+        <step expected_result="0">/usr/share/contextd-tests/ft_memorypressure.py</step>
       </case>
       <!-- Environments optional - tells where the tests are run -->
       <environments>
