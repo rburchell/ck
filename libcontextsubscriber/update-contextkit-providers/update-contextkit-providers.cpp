@@ -115,7 +115,9 @@ int main(int argc, char **argv)
     QString finalDbPath = dir.absoluteFilePath("cache.cdb"); 
     QByteArray templ = tmpDbPath.toUtf8();
 
-    CDBWriter writer(mkstemp(templ.data()));
+    char *tempPath = templ.data();
+    CDBWriter writer(mkstemp(tempPath));
+    chmod(tempPath, 0644);
     if (writer.isWritable() == false) {
         printf("ERROR: %s is not writable. No permissions?\n", templ.constData());
         exit(128);
