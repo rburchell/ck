@@ -10,7 +10,6 @@
 
 int main(int argc, char **argv)
 {
-    setenv("CONTEXT_PROVIDERS", ".", 0);
     if (getenv("CONTEXT_CLI_DISABLE_TYPE_CHECK"))
         ContextProperty::setTypeCheck(false);
     else

@@ -2,8 +2,9 @@
 
 if pkg-config contextprovider-1.0 || [ -e ../../libcontextprovider/.libs/libcontextprovider.so ]
 then
-	export LD_LIBRARY_PATH=../src/.libs:../../libcontextprovider/.libs;
-	export PATH=$PATH:../../python:../cli;
+	export CONTEXT_PROVIDERS=.
+	export LD_LIBRARY_PATH=../src/.libs:../../libcontextprovider/.libs
+	export PATH=$PATH:../../python:../cli
 	for file in *.py ; do
 		./$file || exit 1
 	done
