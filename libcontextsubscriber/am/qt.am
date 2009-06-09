@@ -15,7 +15,7 @@
 
 QT_MOCS = $(QT_TOMOC:%.h=moc_%_h.cpp)
 
-mocs.cpp: $(QT_MOCS)
+mocs.cpp: $(QT_MOCS) Makefile
 	rm -f mocs.cpp
 	for i in $(QT_MOCS); do \
 		echo "#include \"$$i\"" >>mocs.cpp; \
