@@ -28,6 +28,9 @@
 #include <QSet>
 
 class ContextPropertyInfo;
+
+namespace ContextSubscriber {;
+
 class PropertyProvider;
 class DBusNameListener;
 
@@ -73,4 +76,7 @@ private:
     static bool commandingEnabled; //< Whether the properties can be directed to ContextCommander
     static bool typeCheckEnabled; //< Whether we check the type of the value received from the provider
 };
+
+} // end namespace
+
 #endif
