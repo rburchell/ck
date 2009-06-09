@@ -1,8 +1,15 @@
-contextkit (0.2.4~unreleased) unstable; urgency=low
+contextkit (0.2.5~unreleased) unstable; urgency=low
 
   * 
 
- -- 
+ -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Tue, 09 Jun 2009 17:11:48 +0300
+
+contextkit (0.2.4) unstable; urgency=low
+
+  * fixed the bug that libcontextsubscriber0 was not installable if no
+    other components of the context framework were ever installed before
+
+ -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Tue, 09 Jun 2009 17:11:48 +0300
 
 contextkit (0.2.3) unstable; urgency=low
 
