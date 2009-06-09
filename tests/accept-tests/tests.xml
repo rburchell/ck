@@ -9,6 +9,10 @@
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">/usr/share/contextd-tests/ft_memorypressure.py</step>
       </case>
+      <case name="battery001" description="Test if the Battery.ChargePercentage property is exposed" requirement="" timeout="5">
+        <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
+        <step expected_result="0">/usr/share/contextd-tests/ft_chargepercentage.py</step>
+      </case>
       <!-- Environments optional - tells where the tests are run -->
       <environments>
         <scratchbox>false</scratchbox>
