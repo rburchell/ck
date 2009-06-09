@@ -30,16 +30,16 @@
 /*!
    \page UpdatingContextProviders
 
-   \brief The update tool (\c update-contextkit-providers) is used to regenerate the registry cache database. 
+   \brief The update tool (\c update-contextkit-providers) is used to regenerate the registry cache database.
 
    \section Overview
 
-   Information about keys and providers is normally stored in a system directory in 
+   Information about keys and providers is normally stored in a system directory in
    \b xml format. The xml (being xml) is slow to parse and not efficient as a storage format for
    data that is mostly static.
 
-   It makes sense to store a cached version of the xml registry in a constant-database 
-   fast-access format and regenerate it when the xml data changes. 
+   It makes sense to store a cached version of the xml registry in a constant-database
+   fast-access format and regenerate it when the xml data changes.
 
    Update tool does exactly that - it reads the xml registry and (re)generates a
    constant \b tiny-cdb database containing the cached version of the data in the registry.
@@ -56,19 +56,19 @@
    $> update-contextkit-providers /some/path/to/registry
    \endcode
 
-   In this case the xml will be read from \c "/some/path/to/registry" and the resulting 
+   In this case the xml will be read from \c "/some/path/to/registry" and the resulting
    database will be written to \c "/some/path/to/registry/cache.cdb" .
 
-   Lastly, the \c "CONTEXT_PROVIDERS" environment variable can be used to specify 
+   Lastly, the \c "CONTEXT_PROVIDERS" environment variable can be used to specify
    a directory containing the registry.
 
-   \section Implementation 
+   \section Implementation
 
-   To ensure the registry consistency the regeneration is happening atomically - the 
+   To ensure the registry consistency the regeneration is happening atomically - the
    new database is first written to a temp-named file and then moved-over the old one.
 */
 
-/* Make sure the given directory exists, is readable etc. 
+/* Make sure the given directory exists, is readable etc.
    If not, bail out with proper error. */
 void checkDirectory(const QDir &dir)
 {
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
     // Check args etc
     QString path;
 
-    // We first try to use first argument if present, then CONTEXT_PROVIDERS env, 
+    // We first try to use first argument if present, then CONTEXT_PROVIDERS env,
     // lastly -- the compiled-in default path.
     if (args.size() > 1) {
         path = args.at(1);
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
         writer.replace(key + ":KEYPROVIDER", keyInfo.providerDBusName());
 
         // Write bus
-        QDBusConnection::BusType t = keyInfo.providerDBusType(); 
+        QDBusConnection::BusType t = keyInfo.providerDBusType();
         if (t == QDBusConnection::SessionBus)
             writer.replace(key + ":KEYBUS", "session");
         else if (t == QDBusConnection::SystemBus)
