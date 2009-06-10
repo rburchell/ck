@@ -28,6 +28,8 @@
 #include <QString>
 #include <QVariant>
 
+namespace ContextSubscriber {
+
 class HandleSignalRouter : public QObject
 {
     Q_OBJECT
@@ -39,5 +41,6 @@ public slots:
 
 };
 
+} // end namespace
 
 #endif

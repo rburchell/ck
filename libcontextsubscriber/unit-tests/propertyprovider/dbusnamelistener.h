@@ -28,6 +28,8 @@
 #include <QDBusConnection>
 #include <QString>
 
+namespace ContextSubscriber {
+
 class DBusNameListener : public QObject
 {
     Q_OBJECT
@@ -45,5 +47,7 @@ public: // for tests
 
     friend class PropertyProviderUnitTests;
 };
+
+} // end namespace
 
 #endif

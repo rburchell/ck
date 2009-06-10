@@ -23,6 +23,8 @@
 #include <QSet>
 #include <QString>
 
+namespace ContextSubscriber {
+
 class PropertyHandle;
 
 class PropertyHandleUnitTests : public QObject
@@ -61,3 +63,5 @@ private slots:
     void commandingDisabled();
 
 };
+
+} // end namespace

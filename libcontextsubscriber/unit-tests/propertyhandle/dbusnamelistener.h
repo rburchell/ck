@@ -31,6 +31,8 @@
 template<typename P1, typename P2> class QPair;
 template<typename K, typename V> class QMap;
 
+namespace ContextSubscriber {
+
 class DBusNameListener : public QObject
 {
     Q_OBJECT
@@ -53,5 +55,7 @@ public:
     friend class PropertyHandleUnitTests;
 
 };
+
+} // end namespace
 
 #endif

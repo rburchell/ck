@@ -27,6 +27,8 @@
 #include <QObject>
 #include <QDBusConnection>
 
+namespace ContextSubscriber {
+
 class ManagerInterface : public QObject
 {
     Q_OBJECT
@@ -55,5 +57,7 @@ public:
     friend class PropertyProviderUnitTests;
 
 };
+
+} // end namespace
 
 #endif

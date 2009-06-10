@@ -38,6 +38,8 @@
 Q_DECLARE_METATYPE(QVariant);
 Q_DECLARE_METATYPE(QSet<QString>);
 
+namespace ContextSubscriber {
+
 #define MYLOGLEVEL 2
 void myMessageOutput(QtMsgType type, const char *msg)
 {
@@ -753,6 +755,6 @@ void PropertyProviderUnitTests::providerPresentAtStartup()
     // called two times when the provider was already present at startup.
 }
 
+} // end namespace
 
-
-QTEST_MAIN(PropertyProviderUnitTests);
+QTEST_MAIN(ContextSubscriber::PropertyProviderUnitTests);
