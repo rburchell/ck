@@ -206,13 +206,13 @@ ContextRealLogger::ContextRealLogger(int msgType, const char *func, const char *
             killOutput();
             return;
         } else
-            msgTypeString = (useColor) ? "\033[1;33mWARNING\033[0m" : "WARNING";
+            msgTypeString = (useColor) ? "\033[103mWARNING\033[0m" : "WARNING";
     } else if (msgType == CONTEXT_LOG_MSG_TYPE_CRITICAL) {
         if (! showCritical) {
             killOutput();
             return;
         } else
-            msgTypeString = (useColor) ? "\033[1;31mCRITICAL\033[0m" : "CRITICAL";
+            msgTypeString = (useColor) ? "\033[101mCRITICAL\033[0m" : "CRITICAL";
     } else if (msgType == CONTEXT_LOG_MSG_TYPE_TEST) {
         if (! showTest) {
             killOutput();
