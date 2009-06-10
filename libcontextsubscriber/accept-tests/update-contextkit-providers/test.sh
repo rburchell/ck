@@ -49,17 +49,29 @@ function dotest {
     compare "Battery.Charging_KEYBUS.expected" "Battery.Charging_KEYBUS.actual"
 }
 
+# Ensure that the cache file permissions are ok
+function checkperm {
+    perms=`stat -c %a cache.cdb`
+    if [ "$perms" != "644" ] ; then
+        echo "Permissions of cache.db are not 644!"
+        clean
+        exit 128
+    fi
+}
+
 BASEDIR=`dirname $0`
 
 # Test using command line param
 ../../update-contextkit-providers/update-contextkit-providers "./"
 dotest
+checkperm
 clean
 
 # Test using env var 
 export CONTEXT_PROVIDERS="./"
 ../../update-contextkit-providers/update-contextkit-providers
 dotest
+checkperm
 clean
 
 echo "All ok!"
