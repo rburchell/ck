@@ -1,7 +1,10 @@
-contextkit (0.2.6~unreleased) unstable; urgency=low
+contextkit (0.2.6) unstable; urgency=low
 
-  * 
+  * Put some internal classes into the "ContextSubscriber" namespace so
+    that they don't collide with like-named classes in libduivaluespace.
 
+  (0.2.5 was never successfully released.)
+  
  -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Tue, 09 Jun 2009 17:11:48 +0300
 
 contextkit (0.2.4) unstable; urgency=low
