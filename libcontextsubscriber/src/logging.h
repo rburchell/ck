@@ -81,19 +81,19 @@ public:
     inline ContextZeroLogger() {}
     
     /* Stubby ops */
-   inline ContextZeroLogger &operator<< (QChar c) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (char c) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (signed short i) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (unsigned short i) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (signed int i) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (unsigned int i) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (signed long i) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (unsigned long i) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (float f) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (double f) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (const char * s) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (const QString &s) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (void * ptr) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (QChar) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (char) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (signed short) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (unsigned short) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (signed int) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (unsigned int) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (signed long) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (unsigned long) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (float) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (double) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (const char *) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (const QString&) { return *this;} ///< Does nothing.
+   inline ContextZeroLogger &operator<< (void *) { return *this;} ///< Does nothing.
 };
 
 /* Macro defs */
