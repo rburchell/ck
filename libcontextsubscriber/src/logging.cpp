@@ -251,6 +251,5 @@ void ContextRealLogger::killOutput()
 ContextRealLogger::~ContextRealLogger()
 {
     *this << "\n";
-    if (nullDevice)
-        delete nullDevice;
+    delete nullDevice;
 }
