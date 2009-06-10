@@ -101,25 +101,25 @@ public:
 #ifdef CONTEXT_LOG_HIDE_TEST
 #define contextTest() (ContextZeroLogger())
 #else
-#define contextTest() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_TEST, __FUNCTION__, __FILE__, __LINE__))
+#define contextTest() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_TEST, __PRETTY_FUNCTION__, __FILE__, __LINE__))
 #endif
 
 #ifdef CONTEXT_LOG_HIDE_DEBUG
 #define contextDebug() (ContextZeroLogger())
 #else
-#define contextDebug() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_DEBUG, __FUNCTION__, __FILE__, __LINE__))
+#define contextDebug() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_DEBUG, __PRETTY_FUNCTION__, __FILE__, __LINE__))
 #endif
 
 #ifdef CONTEXT_LOG_HIDE_WARNING
 #define contextWarning() (ContextZeroLogger())
 #else
-#define contextWarning() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_WARNING, __FUNCTION__, __FILE__, __LINE__))
+#define contextWarning() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_WARNING, __PRETTY_FUNCTION__, __FILE__, __LINE__))
 #endif
 
 #ifdef CONTEXT_LOG_HIDE_CRITICAL
 #define contextCritical() (ContextZeroLogger())
 #else
-#define contextCritical() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_CRITICAL, __FUNCTION__, __FILE__, __LINE__))
+#define contextCritical() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_CRITICAL, __PRETTY_FUNCTION__, __FILE__, __LINE__))
 #endif
 
 #endif // LOGGING_H

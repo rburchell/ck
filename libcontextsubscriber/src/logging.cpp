@@ -233,7 +233,7 @@ ContextRealLogger::ContextRealLogger(int msgType, const char *func, const char *
         
     *this << "[" << CONTEXT_LOG_MODULE_NAME << "]" << " ";
     *this << msgTypeString << " ";
-    *this << file << "[" << line << "]" << ":" << func << " ";
+    *this << "[" << file << ":" << line << ":" << func << "] ";
 }
 
 /// Make sure this logger will print nothing. 
