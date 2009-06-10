@@ -169,6 +169,11 @@ void ContextRealLogger::initialize()
         showTest = false;
         showDebug = false;
         showWarning = false;
+    } else if (strcmp(verbosity, "NONE") == 0) {
+        showDebug = false;
+        showTest = false;
+        showDebug = false;
+        showWarning = false;
     }
     
     initialized = true;
