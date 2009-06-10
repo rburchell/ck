@@ -22,7 +22,9 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#include <QtCore>
+#include <QIODevice>
+#include <QString>
+#include <QTextStream>
 
 #define CONTEXT_LOG_MSG_TYPE_TEST       1
 #define CONTEXT_LOG_MSG_TYPE_DEBUG      2

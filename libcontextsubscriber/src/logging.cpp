@@ -21,6 +21,8 @@
 
 #include "logging.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <QDateTime>
 
 /*!
     \page Logging
