@@ -147,9 +147,7 @@ void InfoBackend::disconnectNotify(const char *signal)
 /// before the application terminates (otherwise weird issues follow).
 void InfoBackend::destroyInstance()
 {
-    if (backendInstance) {
-        delete backendInstance;
-        backendInstance = NULL;
-    }
+    delete backendInstance;
+    backendInstance = NULL;
 }
 

@@ -23,6 +23,8 @@
 #include <QSet>
 #include <QString>
 
+namespace ContextSubscriber {
+
 class PropertyProvider;
 
 class PropertyProviderUnitTests : public QObject
@@ -67,3 +69,5 @@ private slots:
     void providerPresentAtStartup();
 
 };
+
+} // end namespace

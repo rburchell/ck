@@ -23,6 +23,8 @@
 #include <QSet>
 #include <QString>
 
+namespace ContextSubscriber {
+
 class HandleSignalRouter;
 
 class HandleSignalRouterUnitTests : public QObject
@@ -43,3 +45,5 @@ private slots:
     // Test cases
     void routingSignals();
 };
+
+} // end namespace

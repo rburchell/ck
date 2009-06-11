@@ -23,11 +23,11 @@
 #define CONTEXTPROPERTY_H
 
 #include <QObject>
+#include <QVariant>
+#include <QString>
 
 class ContextPropertyPrivate;
 class ContextPropertyInfo;
-class QVariant;
-class QString;
 
 class ContextProperty : public QObject
 {

@@ -49,6 +49,8 @@
 
 #include <QDebug>
 
+namespace ContextSubscriber {
+
 const QString SubscriberSignallingInterface::interfaceName = "org.freedesktop.ContextKit.Subscriber";
 
 /// Constructs the SubscriberInterface. Connects to the DBus object specified
@@ -166,3 +168,4 @@ SubscriberSignallingInterface::SubscriberSignallingInterface(const QString &dbus
 {
 }
 
+} // end namespace

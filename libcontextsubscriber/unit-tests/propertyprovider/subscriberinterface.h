@@ -28,6 +28,8 @@
 
 // This is a mock implementation
 
+namespace ContextSubscriber {
+
 class SubscriberInterface : public QObject
 {
     Q_OBJECT
@@ -61,5 +63,6 @@ public:
 
 };
 
+} // end namespace
 
 #endif

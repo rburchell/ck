@@ -29,6 +29,8 @@
 #include <QString>
 #include <QSet>
 
+namespace ContextSubscriber {
+
 class PropertyHandle : public QObject
 {
     Q_OBJECT
@@ -45,4 +47,7 @@ public:
     PropertyHandle(const QString& key);
     QString myKey;
 };
+
+} // end namespace
+
 #endif

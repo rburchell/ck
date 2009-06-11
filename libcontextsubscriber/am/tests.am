@@ -2,15 +2,16 @@
 TESTS = $(check_PROGRAMS)
 
 # include header files from source as a last resource and use QTest, coverage
-AM_CXXFLAGS += -I$(top_srcdir)/src $(QtTest_CFLAGS) $(COV_CXXFLAGS)
+AM_CXXFLAGS += $(QtTest_CFLAGS) $(COV_CXXFLAGS)
 AM_LDFLAGS += $(QtTest_LIBS) $(COV_LIBS)
+
+# We need to put $(FROM_SOURCE) into BUILT_SOURCES so that header
+# files are copied before they are needed.
+BUILT_SOURCES = $(FROM_SOURCE)
 
 # recompile every file %.cpp in FROM_SOURCE as src_%.o in the current
 # test directory (so the mock objects don't have to be ABI compatible)
-src_%.cpp: $(top_srcdir)/src/%.cpp
-	ln -sf $< $@
-
-src_%.h: $(top_srcdir)/src/%.h
+$(FROM_SOURCE): %: $(top_srcdir)/src/%
 	ln -sf $< $@
 
 check_LIBRARIES = libsrc.a  # library built from files in the real source
@@ -31,17 +32,17 @@ covoptioncheck:
 		exit 2; \
 	fi
 
-SELECTED_FOR_COVERAGE = $(patsubst %.cpp, '*/unit-tests/*/src_%.cpp', $(COVERAGE_FILES))
+SELECTED_FOR_COVERAGE = $(patsubst %.cpp, '*/unit-tests/*/%.cpp', $(COVERAGE_FILES))
 coverage: covoptioncheck check
 	@echo "building coverage"
 	mkdir -p coverage
 	lcov --directory . --capture --output-file coverage/all.cov
 	lcov --extract coverage/all.cov $(SELECTED_FOR_COVERAGE) --output-file coverage/selected.cov
-	lcov --extract coverage/all.cov '*/unit-tests/*/src_*.cpp' --output-file coverage/src.cov
+	lcov --extract coverage/all.cov '*/unit-tests/*/*.cpp' --output-file coverage/src.cov
 	genhtml -o coverage/ coverage/src.cov
 
 clean-local:
-	rm -rf coverage *.gcno *.gcda *.gcov src_*
+	rm -rf coverage *.gcno *.gcda *.gcov $(FROM_SOURCE)
 
 # in maintainer mode, compile everything at make time, not at make check time
 all-am:

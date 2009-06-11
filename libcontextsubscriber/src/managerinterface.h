@@ -29,6 +29,8 @@
 class QDBusPendingCallWatcher;
 class QDBusInterface;
 
+namespace ContextSubscriber {
+
 class ManagerInterface : public QObject
 {
     Q_OBJECT
@@ -52,4 +54,7 @@ private:
     QDBusInterface* iface; //< DBus interface for the manager
     bool getSubscriberFailed; //< Previous async GetSubscriber call failed
 };
+
+} // end namespace
+
 #endif

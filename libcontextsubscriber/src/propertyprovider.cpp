@@ -26,6 +26,8 @@
 #include "dbusnamelistener.h"
 #include <QTimer>
 
+namespace ContextSubscriber {
+
 QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvider::providerInstances;
 
 /*!
@@ -223,3 +225,4 @@ PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busT
     return providerInstances[lookupValue];
 }
 
+} // end namespace

@@ -26,6 +26,8 @@
 #include "contextregistryinfo.h"
 #include "dbusnamelistener.h"
 
+namespace ContextSubscriber {
+
 QMap<QString, PropertyHandle*> PropertyHandle::handleInstances;
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
@@ -239,3 +241,5 @@ PropertyHandle* PropertyHandle::instance(const QString& key)
 
     return handleInstances[key];
 }
+
+} // end namespace

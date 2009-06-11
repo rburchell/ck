@@ -28,6 +28,8 @@
 
 class QDBusPendingCallWatcher;
 
+namespace ContextSubscriber {
+
 class DBusNameListener : public QObject
 {
     Q_OBJECT
@@ -51,5 +53,7 @@ signals:
     void nameAppeared();
     void nameDisappeared();
 };
+
+} // end namespace
 
 #endif

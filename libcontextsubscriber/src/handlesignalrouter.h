@@ -26,6 +26,8 @@
 #include <QString>
 #include <QVariant>
 
+namespace ContextSubscriber {
+
 class HandleSignalRouter : public QObject
 {
     Q_OBJECT
@@ -40,5 +42,6 @@ private:
     static HandleSignalRouter* myInstance; //< Singleton instance
 };
 
+} // end namespace
 
 #endif

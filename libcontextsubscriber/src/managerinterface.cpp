@@ -38,6 +38,8 @@
 #include <QDBusPendingReply>
 #include <QDBusObjectPath>
 
+namespace ContextSubscriber {
+
 const QString ManagerInterface::interfaceName = "org.freedesktop.ContextKit.Manager";
 const QString ManagerInterface::objectPath = "/org/freedesktop/ContextKit/Manager";
 
@@ -108,3 +110,5 @@ bool ManagerInterface::isGetSubscriberFailed() const
 {
     return getSubscriberFailed;
 }
+
+} // end namespace
