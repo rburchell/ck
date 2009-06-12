@@ -63,6 +63,9 @@ bool PropertyHandle::typeCheckEnabled = false;
 PropertyHandle::PropertyHandle(const QString& key)
     :  myProvider(0), myInfo(0), subscribeCount(0), subscribePending(false), myKey(key)
 {
+    // Move the PropertyHandle (and all children) to main thread.
+    moveToThread(QCoreApplication::instance()->thread());
+
     myInfo = new ContextPropertyInfo(myKey, this);
 
     updateProvider();
@@ -251,9 +254,6 @@ PropertyHandle* PropertyHandle::instance(const QString& key)
     if (!handleInstances.contains(key)) {
         // The handle does not exist, so create it
         handleInstances.insert(key, new PropertyHandle(key));
-
-        // Move the PropertyHandle to main thread.
-        handleInstances[key]->moveToThread(QCoreApplication::instance()->thread());
     }
 
     return handleInstances[key];

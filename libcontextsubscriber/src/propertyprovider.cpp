@@ -42,6 +42,10 @@ namespace ContextSubscriber {
 PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
     : subscriberInterface(0), managerInterface(busType, busName, this), busType(busType), busName(busName)
 {
+
+    // Move the object (and all children) to the main thread
+    moveToThread(QCoreApplication::instance()->thread());
+
     // Setup idle timer, 0: always run it when we are entering the
     // mainloop and the timer is enabled.
     idleTimer = new QTimer(this);
@@ -240,7 +244,6 @@ PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busT
     QMutexLocker locker(&providerInstancesLock);
     if (!providerInstances.contains(lookupValue)) {
         providerInstances.insert(lookupValue, new PropertyProvider(busType, busName));
-        providerInstances[lookupValue]->moveToThread(QCoreApplication::instance()->thread());
     }
 
     qDebug() << "Returning provider instance for" << busType << ":" << busName;
