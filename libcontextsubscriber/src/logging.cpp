@@ -96,6 +96,26 @@
     
     Lastly, \c CONTEXT_LOG_HIDE_MODULE will hide log messages coming from the specified module. 
     All other messages will be show.
+
+    \section modules Modules in logging
+
+    In previous section we discussed and mentioned modules. For the purpose of logging, 
+    a module is a piece of code (not neccesarily limited to one binary or shared object) that
+    forms one component (feature-wise). Specyfying and naming the modules is used
+    to set the origin of the logging messages. 
+
+    The logging module is set using the \c CONTEXT_LOG_MODULE_NAME define. It should be
+    (in most cases) defined in the build system and automatically applied to the whole source code. 
+    Typically (with autotools) this can be achieved with something similar too:
+
+    \code
+    ...
+    AM_CXXFLAGS = '-DCONTEXT_LOG_MODULE_NAME="libtest"'
+    ...
+    \endcode
+    
+    If \c CONTEXT_LOG_MODULE_NAME is undefined, the log messages will be marked as coming from an
+    \b "Undefined" module.
 */
 
 /* NullIODevice */
