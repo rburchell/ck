@@ -26,9 +26,13 @@
 #include "contextregistryinfo.h"
 #include "dbusnamelistener.h"
 
-namespace ContextSubscriber {
+#include <QThread>
+#include <QDebug>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QCoreApplication>
 
-QMap<QString, PropertyHandle*> PropertyHandle::handleInstances;
+namespace ContextSubscriber {
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
 static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
@@ -235,9 +239,22 @@ const ContextPropertyInfo* PropertyHandle::info() const
 
 PropertyHandle* PropertyHandle::instance(const QString& key)
 {
-    if (!handleInstances.contains(key))
-        handleInstances.insert(key,
-                               new PropertyHandle(key));
+    // Container for singletons
+    static QMap<QString, PropertyHandle*> handleInstances;
+
+    // Protect the handleInstances. Documentation of QMap doesn't tell
+    // if it can be read concurrently, so, read-write locking might
+    // not be enough.
+
+    static QMutex handleInstancesLock;
+    QMutexLocker locker(&handleInstancesLock);
+    if (!handleInstances.contains(key)) {
+        // The handle does not exist, so create it
+        handleInstances.insert(key, new PropertyHandle(key));
+
+        // Move the PropertyHandle to main thread.
+        handleInstances[key]->moveToThread(QCoreApplication::instance()->thread());
+    }
 
     return handleInstances[key];
 }

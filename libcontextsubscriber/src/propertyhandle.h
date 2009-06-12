@@ -70,8 +70,6 @@ private:
                            ///  (used by the waitForSubscription() feature)
     QString myKey; //< Key of this property
     QVariant myValue; //< Current value of this property
-    /// Container for singletons, see PropertyHandle::instance()
-    static QMap<QString, PropertyHandle*> handleInstances;
     static DBusNameListener *commanderListener; //< Listener for ContextCommander's (dis)appearance
     static bool commandingEnabled; //< Whether the properties can be directed to ContextCommander
     static bool typeCheckEnabled; //< Whether we check the type of the value received from the provider

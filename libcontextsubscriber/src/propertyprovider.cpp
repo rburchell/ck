@@ -25,10 +25,11 @@
 #include "subscriberinterface.h"
 #include "dbusnamelistener.h"
 #include <QTimer>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QCoreApplication>
 
 namespace ContextSubscriber {
-
-QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvider::providerInstances;
 
 /*!
    \class PropertyProvider
@@ -52,7 +53,7 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
     sconnect(idleTimer, SIGNAL(timeout()), this, SLOT(idleHandler()));
     managerInterface.getSubscriber();
 
-    // Note if the provider on the dbus comes and go
+    // Notice if the provider on the dbus comes and goes
     providerListener = new DBusNameListener(busType, busName, false, this);
     sconnect(providerListener, SIGNAL(nameAppeared()),
              this, SLOT(onProviderAppeared()));
@@ -107,7 +108,10 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
         toSubscribe.clear();
         toSubscribe += subscribedKeys;
 
+        qDebug() << "Starting the timer" << QThread::currentThread();
         idleTimer->start();
+        qDebug() << "Starting the timer done";
+
     }
     else {
         // GetSubscriber failed
@@ -155,11 +159,18 @@ void PropertyProvider::subscribe(const QString &key)
         toUnsubscribe.remove(key);
     }
     else {
+        qDebug() << "Inserting the key to toSubscribe" << QThread::currentThread();
+
         // Really schedule the key to be subscribed to
         toSubscribe.insert(key);
 
-        if (subscriberInterface != 0)
+        qDebug() << "Inserting complete";
+
+        if (subscriberInterface != 0) {
+            qDebug() << "Starting the timer" << QThread::currentThread();
             idleTimer->start();
+            qDebug() << "Starting the timer done";
+        }
     }
 }
 
@@ -191,12 +202,18 @@ void PropertyProvider::unsubscribe(const QString &key)
 /// scheduled subscriptions / unsubscriptions.
 void PropertyProvider::idleHandler()
 {
+    qDebug() << "PropertyProvider::idleHandler() in thread" << QThread::currentThread();
     if (subscriberInterface != 0) {
-        if (toSubscribe.size() > 0) subscriberInterface->subscribe(toSubscribe);
+        qDebug() << "We have a subscriber interface";
+        if (toSubscribe.size() > 0) {
+            qDebug() << "toSubscribe is not empty";
+            subscriberInterface->subscribe(toSubscribe);
+        }
         if (toUnsubscribe.size() > 0) subscriberInterface->unsubscribe(toUnsubscribe);
         toSubscribe.clear();
         toUnsubscribe.clear();
     }
+    qDebug() << "PropertyProvider::idleHandler() exiting";
 }
 
 /// Slot, handling changed values coming from the provider over DBUS.
@@ -215,10 +232,16 @@ void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool proc
 
 PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busType, const QString& busName)
 {
+    // Singleton instance container
+    static QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> providerInstances;
     QPair<QDBusConnection::BusType, QString> lookupValue(busType, busName);
-    if (!providerInstances.contains(lookupValue))
-            providerInstances.insert(lookupValue,
-                                     new PropertyProvider(busType, busName));
+
+    static QMutex providerInstancesLock;
+    QMutexLocker locker(&providerInstancesLock);
+    if (!providerInstances.contains(lookupValue)) {
+        providerInstances.insert(lookupValue, new PropertyProvider(busType, busName));
+        providerInstances[lookupValue]->moveToThread(QCoreApplication::instance()->thread());
+    }
 
     qDebug() << "Returning provider instance for" << busType << ":" << busName;
 

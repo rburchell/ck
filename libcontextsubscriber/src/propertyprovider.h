@@ -72,8 +72,6 @@ private:
     QDBusConnection::BusType busType; //< The bus type of the DBus provider connected to
     QString busName; //< The bus name of the DBus provider connected to
 
-    /// Singleton instance container
-    static QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> providerInstances;
     QSet<QString> subscribedKeys; //< The keys that should be currently subscribed to
 };
 
