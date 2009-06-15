@@ -181,3 +181,4 @@ flexi-properties.xml
 *.context
 /libcontextsubscriber/multithreading-tests/new-property-in-thread/new-property-in-thread
 /libcontextsubscriber/multithreading-tests/old-property-in-thread/old-property-in-thread
+/libcontextsubscriber/multithreading-tests/wait-for-subscription-thread/wait-for-subscription-thread
