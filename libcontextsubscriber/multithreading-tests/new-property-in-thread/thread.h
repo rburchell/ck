@@ -35,7 +35,7 @@ class Thread : public QThread
 protected:
     void run()
         {
-            qDebug() << "Thread::run(), and current thread is" << QThread::currentThread();
+            qDebug() << "SUB  THREAD:" << QThread::currentThread();
             Listener listener;
             exec();
         }
