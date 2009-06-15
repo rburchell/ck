@@ -130,41 +130,32 @@ void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
     emit subscribeFinished(keys.intersect(subscribedKeys));
 }
 
-/// Schedules a property to be subscribed to when the main loop is
-/// entered the next time.
-void PropertyProvider::subscribe(const QString &key)
+/// Schedules a property to be subscribed to.  Returns true if and
+/// only if the main loop has to run for the subscription to be
+/// finalized.
+bool PropertyProvider::subscribe(const QString &key)
 {
     qDebug() << "PropertyProvider::subscribe, provider" << busName << key;
 
     // Note: the intention is saved in all cases; whether we can really subscribe or not.
     subscribedKeys.insert(key);
 
-    if (managerInterface.isGetSubscriberFailed()) {
-        qDebug() << "GetSubscriber has failed previously";
-        // The subscription will not be successful, emit the subscribeFinished
-        // signal so that the handles will stop waiting.
-        QSet<QString> toEmit;
-        toEmit.insert(key);
-        emit subscribeFinished(toEmit);
-        return;
-    }
-
-    // Schedule the key to be subscribed to
+    // If the key was scheduled to be unsubscribed then remove that
+    // scheduling, and return false.
     if (toUnsubscribe.contains(key)) {
-        // The key was scheduled to be unsubscribed
-        // Remove that scheduling, and nothing else needs to be done.
         toUnsubscribe.remove(key);
+        return false;
     }
-    else {
-        qDebug() << "Inserting the key to toSubscribe" << QThread::currentThread();
 
-        // Really schedule the key to be subscribed to
-        toSubscribe.insert(key);
+    // Schedule the key to be subscribed to and return true
+    qDebug() << "Inserting the key to toSubscribe" << QThread::currentThread();
 
-        qDebug() << "Inserting complete";
+    // Really schedule the key to be subscribed to
+    toSubscribe.insert(key);
 
-        queueOnce("handleSubscriptions");
-    }
+    queueOnce("handleSubscriptions");
+
+    return true;
 }
 
 /// Schedules a property to be unsubscribed from when the main loop is
@@ -200,6 +191,19 @@ void PropertyProvider::handleSubscriptions()
         if (toUnsubscribe.size() > 0) subscriberInterface->unsubscribe(toUnsubscribe);
         toSubscribe.clear();
         toUnsubscribe.clear();
+    } else {
+        // subscriberInterface can be zero because we are still waiting
+        // GetSubscriber to finish, then just wait
+
+        // Or the subscription will not be successful, emit the
+        // subscribeFinished signal so that the handles will stop
+        // waiting.
+        if (managerInterface.isGetSubscriberFailed()) {
+            qDebug() << "GetSubscriber has failed previously";
+            if (toSubscribe.size() > 0) emit subscribeFinished(toSubscribe);
+            toSubscribe.clear();
+            toUnsubscribe.clear();
+        }
     }
     qDebug() << "PropertyProvider::handleSubscriptions processed";
 }

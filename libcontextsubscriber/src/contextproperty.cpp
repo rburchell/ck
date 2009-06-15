@@ -102,6 +102,7 @@
 #include "sconnect.h"
 
 #include <QCoreApplication>
+#include <QThread>
 
 using namespace ContextSubscriber;
 
@@ -262,12 +263,20 @@ void ContextProperty::waitForSubscription() const
         return;
 
     // This is not a busy loop, since the QEventLoop::WaitForMoreEvents flag
-    while (priv->handle->isSubscribePending())
-        QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    while (priv->handle->isSubscribePending()) {
+        if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
+            qDebug() << "one iteration of the main loop" << QThread::currentThread();
+            QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+        } else {
+            qDebug() << "no iteration of the main loop" << QThread::currentThread();
+            usleep(100000); // 0.1 second
+        }
+    }
 }
 
-/// Sets all of the ContextProperty instaces immune to 'commanding' (overriding
-/// values done by Context Commander)
+/// Sets all of the ContextProperty instaces immune to 'commanding'
+/// (overriding values done by Context Commander).  If you use this
+/// method, you have to use it before starting any threads.
 void ContextProperty::ignoreCommander()
 {
     PropertyHandle::ignoreCommander();
@@ -283,7 +292,8 @@ const ContextPropertyInfo* ContextProperty::info() const
 /// Enables or disables all of the ContextProperty instances'
 /// type-check feature.  If it is enabled and the received value from
 /// the provider doesn't match the expected type, you will get an
-/// error message on the stderr and the value won't be updated.
+/// error message on the stderr and the value won't be updated. If you
+/// use this method, you have to use it before starting any threads.
 void ContextProperty::setTypeCheck(bool newTypeCheck)
 {
     PropertyHandle::setTypeCheck(newTypeCheck);

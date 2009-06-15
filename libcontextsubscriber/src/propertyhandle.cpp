@@ -143,10 +143,9 @@ void PropertyHandle::subscribe()
 
     ++subscribeCount;
     if (subscribeCount == 1 && myProvider) {
-        subscribePending = true;
         sconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
                  this, SLOT(onSubscribeFinished(QSet<QString>)));
-        myProvider->subscribe(myKey);
+        subscribePending = myProvider->subscribe(myKey);
     }
 }
 
