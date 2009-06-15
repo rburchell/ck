@@ -128,12 +128,13 @@ PropertyProvider::PropertyProvider(QString name)
 {
 }
 
-void PropertyProvider::subscribe(const QString& key)
+bool PropertyProvider::subscribe(const QString& key)
 {
     qDebug() << "subscribe" << key << myName;
     ++subscribeCount;
     subscribeKeys << key;
     subscribeProviderNames << myName;
+    return true;
 }
 
 void PropertyProvider::unsubscribe(const QString& key)
