@@ -59,7 +59,7 @@ SubscriberInterface::SubscriberInterface(const QDBusConnection::BusType busType,
                                          const QString &busName,
                                          const QString& objectPath,
                                          QObject *parent)
-    : iface(0)
+    : QObject(parent), iface(0)
 {
     QDBusConnection connection("");
 

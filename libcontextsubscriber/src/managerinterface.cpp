@@ -46,7 +46,7 @@ const QString ManagerInterface::objectPath = "/org/freedesktop/ContextKit/Manage
 /// Constructs the ManagerInterface. Connects to the DBus object specified by
 /// \a busType (session or system bus) and \a busName.
 ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent)
-    : iface(0), getSubscriberFailed(false)
+    : QObject(parent), iface(0), getSubscriberFailed(false)
 {
     QDBusConnection connection("");
 
