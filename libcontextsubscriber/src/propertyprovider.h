@@ -23,12 +23,11 @@
 #define PROPERTYPROVIDER_H
 
 #include "managerinterface.h"
+#include "queuedinvoker.h"
 
 #include <QObject>
 #include <QDBusConnection>
 #include <QSet>
-
-class QEvent;
 
 namespace ContextSubscriber {
 
@@ -36,7 +35,7 @@ class PropertyHandle;
 class SubscriberInterface;
 class DBusNameListener;
 
-class PropertyProvider : public QObject
+class PropertyProvider : public QueuedInvoker
 {
     Q_OBJECT
 
@@ -44,8 +43,6 @@ public:
     void subscribe(const QString &key);
     void unsubscribe(const QString &key);
     static PropertyProvider* instance(const QDBusConnection::BusType busType, const QString& busName);
-
-    virtual bool event(QEvent* e);
 
 signals:
     void subscribeFinished(QSet<QString> keys);
@@ -60,6 +57,7 @@ private slots:
 
 private:
     PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
+    Q_INVOKABLE void handleSubscriptions();
 
     DBusNameListener *providerListener; //< Listens to provider's (dis)appearance over DBus
     SubscriberInterface *subscriberInterface; //< The DBus interface for the Subscriber object

@@ -24,7 +24,6 @@
 #include "sconnect.h"
 #include "subscriberinterface.h"
 #include "dbusnamelistener.h"
-#include <QEvent>
 #include <QMutex>
 #include <QMutexLocker>
 #include <QCoreApplication>
@@ -44,12 +43,9 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
 {
     // Call GetSubscriber asynchronously
     sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
-    managerInterface.getSubscriber();
 
     // Notice if the provider on the dbus comes and goes
-    qDebug() << "Trying to create dbusnamelistener";
     providerListener = new DBusNameListener(busType, busName, false, this);
-    qDebug() << "Done";
     sconnect(providerListener, SIGNAL(nameAppeared()),
              this, SLOT(onProviderAppeared()));
     sconnect(providerListener, SIGNAL(nameDisappeared()),
@@ -62,6 +58,12 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
 
     // Move the object (and all children) to the main thread
     moveToThread(QCoreApplication::instance()->thread());
+
+    // At startup we don't know if the provider is present or not, so
+    // we just try to get the subscriber through the managerinterface
+    // and it will turn out.  We have to use the queueOnce feature,
+    // because we are not necessarily in the main event loop's thread.
+    queueOnce("onProviderAppeared");
 }
 
 /// Provider reappeared on the DBus, so get a new subscriber interface from it
@@ -106,10 +108,7 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
         toSubscribe.clear();
         toSubscribe += subscribedKeys;
 
-        qDebug() << "Posting the event" << QThread::currentThread();
-        QCoreApplication::postEvent(this, new QEvent(QEvent::User));
-        qDebug() << "Posting done";
-
+        queueOnce("handleSubscriptions");
     }
     else {
         // GetSubscriber failed
@@ -164,11 +163,7 @@ void PropertyProvider::subscribe(const QString &key)
 
         qDebug() << "Inserting complete";
 
-        if (subscriberInterface != 0) {
-            qDebug() << "Posting the event" << QThread::currentThread();
-            QCoreApplication::postEvent(this, new QEvent(QEvent::User));
-            qDebug() << "Posting done";
-        }
+        queueOnce("handleSubscriptions");
     }
 }
 
@@ -191,30 +186,22 @@ void PropertyProvider::unsubscribe(const QString &key)
         // Really schedule the key to be unsubscribed from
         toUnsubscribe.insert(key);
 
-        if (subscriberInterface != 0) {
-            qDebug() << "Posting the event" << QThread::currentThread();
-            QCoreApplication::postEvent(this, new QEvent(QEvent::User));
-            qDebug() << "Posting done";
-        }
+        queueOnce("handleSubscriptions");
     }
 }
 
 /// Is executed when the main loop is entered and we have previously
 /// scheduled subscriptions / unsubscriptions.
-bool PropertyProvider::event(QEvent* e)
+void PropertyProvider::handleSubscriptions()
 {
-    qDebug() << "PropertyProvider::event in thread" << QThread::currentThread() << e->type();
-    if (e->type() == QEvent::User) {
-        if (subscriberInterface != 0) {
-            if (toSubscribe.size() > 0) subscriberInterface->subscribe(toSubscribe);
-            if (toUnsubscribe.size() > 0) subscriberInterface->unsubscribe(toUnsubscribe);
-            toSubscribe.clear();
-            toUnsubscribe.clear();
-        }
-        qDebug() << "PropertyProvider::event processed";
-        return true;
+    qDebug() << "PropertyProvider::handleSubscriptions in thread" << QThread::currentThread();
+    if (subscriberInterface != 0) {
+        if (toSubscribe.size() > 0) subscriberInterface->subscribe(toSubscribe);
+        if (toUnsubscribe.size() > 0) subscriberInterface->unsubscribe(toUnsubscribe);
+        toSubscribe.clear();
+        toUnsubscribe.clear();
     }
-    return QObject::event(e);
+    qDebug() << "PropertyProvider::handleSubscriptions processed";
 }
 
 /// Slot, handling changed values coming from the provider over DBUS.
