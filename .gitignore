@@ -177,4 +177,7 @@ flexi-properties.xml
 /debian/libcontextsubscriber0-dbg/
 /debian/libcontextsubscriber-doc/
 /debian/libcontextsubscriber0/
+/debian/contextd-tests/
 *.context
+/libcontextsubscriber/multithreading-tests/new-property-in-thread/new-property-in-thread
+/libcontextsubscriber/multithreading-tests/old-property-in-thread/old-property-in-thread

@@ -1,3 +1,5 @@
 propertyprovider.cpp
 propertyprovider.h
 sconnect.h
+queuedinvoker.cpp
+queuedinvoker.h
