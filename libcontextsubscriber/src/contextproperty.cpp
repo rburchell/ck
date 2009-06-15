@@ -230,7 +230,11 @@ void ContextProperty::subscribe() const
     if (priv->subscribed)
         return;
 
-    sconnect(priv->handle, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()));
+    // We create a queued connection, because otherwise we run
+    // the users' valueChanged() handlers with locks and if they do
+    // something fancy (for example unsubscribe) it can cause a
+    // deadlock.
+    sconnect(priv->handle, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()), Qt::QueuedConnection);
     priv->handle->subscribe();
     priv->subscribed = true;
 }

@@ -27,6 +27,7 @@
 #include <QVariant>
 #include <QSet>
 #include <QReadWriteLock>
+#include <QMutex>
 
 class ContextPropertyInfo;
 
@@ -67,6 +68,7 @@ private:
     PropertyProvider *myProvider; ///< Provider of this property
     ContextPropertyInfo *myInfo; ///< Metadata for this property
     unsigned int subscribeCount; ///< Number of subscribed ContextProperty objects subscribed to this property
+    QMutex subscribeCountLock;
     bool subscribePending; ///< True when the subscription has been started, but hasn't been finished yet
                            ///  (used by the waitForSubscription() feature)
     QString myKey; ///< Key of this property

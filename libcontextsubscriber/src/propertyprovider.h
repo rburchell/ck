@@ -59,18 +59,18 @@ private:
     PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
     Q_INVOKABLE void handleSubscriptions();
 
-    DBusNameListener *providerListener; //< Listens to provider's (dis)appearance over DBus
-    SubscriberInterface *subscriberInterface; //< The DBus interface for the Subscriber object
-    ManagerInterface managerInterface; //< The DBus interface for the Manager object
-    bool getSubscriberFailed; //< Whether the GetSubscriber dbus call failed on the manager interface
+    DBusNameListener *providerListener; ///< Listens to provider's (dis)appearance over DBus
+    SubscriberInterface *subscriberInterface; ///< The DBus interface for the Subscriber object
+    ManagerInterface managerInterface; ///< The DBus interface for the Manager object
+    bool getSubscriberFailed; ///< Whether the GetSubscriber dbus call failed on the manager interface
 
-    QSet<QString> toSubscribe; //< Keys pending for subscription
-    QSet<QString> toUnsubscribe; //< Keys pending for unsubscription
+    QDBusConnection::BusType busType; ///< The bus type of the DBus provider connected to
+    QString busName; ///< The bus name of the DBus provider connected to
 
-    QDBusConnection::BusType busType; //< The bus type of the DBus provider connected to
-    QString busName; //< The bus name of the DBus provider connected to
-
-    QSet<QString> subscribedKeys; //< The keys that should be currently subscribed to
+    QMutex subscriptionLock;
+    QSet<QString> toSubscribe; ///< Keys pending for subscription
+    QSet<QString> toUnsubscribe; ///< Keys pending for unsubscription
+    QSet<QString> subscribedKeys; ///< The keys that should be currently subscribed to
 };
 
 } // end namespace

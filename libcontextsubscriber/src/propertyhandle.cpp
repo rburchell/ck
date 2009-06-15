@@ -141,6 +141,7 @@ void PropertyHandle::subscribe()
 {
     qDebug() << "PropertyHandle::subscribe";
 
+    QMutexLocker locker(&subscribeCountLock);
     ++subscribeCount;
     if (subscribeCount == 1 && myProvider) {
         sconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
@@ -154,6 +155,7 @@ void PropertyHandle::subscribe()
 /// neccessary.
 void PropertyHandle::unsubscribe()
 {
+    QMutexLocker locker(&subscribeCountLock);
     --subscribeCount;
     if (subscribeCount == 0 && myProvider != 0) {
         subscribePending = false;

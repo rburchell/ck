@@ -86,6 +86,7 @@ void PropertyProvider::onProviderDisappeared()
 /// subscribe to the currently subscribed keys.
 void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 {
+    QMutexLocker lock(&subscriptionLock);
     qDebug() << "PropertyProvider::onGetSubscriberFinished" << objectPath;
     if (objectPath != "") {
         // GetSubscriber was successful
@@ -125,6 +126,7 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 /// busyloop in <tt>waitForSubscription()</tt>.
 void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 {
+    QMutexLocker lock(&subscriptionLock);
     qDebug() << "PropertyProvider::onSubscribeFinished" << keys;
     // Drop keys which were not supposed to be subscribed to (by this provider)
     emit subscribeFinished(keys.intersect(subscribedKeys));
@@ -135,6 +137,7 @@ void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 /// finalized.
 bool PropertyProvider::subscribe(const QString &key)
 {
+    QMutexLocker lock(&subscriptionLock);
     qDebug() << "PropertyProvider::subscribe, provider" << busName << key;
 
     // Note: the intention is saved in all cases; whether we can really subscribe or not.
@@ -162,6 +165,7 @@ bool PropertyProvider::subscribe(const QString &key)
 /// entered the next time.
 void PropertyProvider::unsubscribe(const QString &key)
 {
+    QMutexLocker lock(&subscriptionLock);
     qDebug() << "PropertyProvider::unsubscribe, provider" << busName << key;
 
     // Save the intention of the higher level
@@ -185,6 +189,7 @@ void PropertyProvider::unsubscribe(const QString &key)
 /// scheduled subscriptions / unsubscriptions.
 void PropertyProvider::handleSubscriptions()
 {
+    QMutexLocker lock(&subscriptionLock);
     qDebug() << "PropertyProvider::handleSubscriptions in thread" << QThread::currentThread();
     if (subscriberInterface != 0) {
         if (toSubscribe.size() > 0) subscriberInterface->subscribe(toSubscribe);
@@ -211,6 +216,7 @@ void PropertyProvider::handleSubscriptions()
 /// Slot, handling changed values coming from the provider over DBUS.
 void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription)
 {
+    QMutexLocker lock(&subscriptionLock);
     for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
         if (subscribedKeys.contains(i.key()) == false) {
             qWarning() << "Received a property not subscribed to:" << i.key();
