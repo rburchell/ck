@@ -31,6 +31,8 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QCoreApplication>
+#include <QReadLocker>
+#include <QWriteLocker>
 
 namespace ContextSubscriber {
 
@@ -178,6 +180,7 @@ QString PropertyHandle::key() const
 
 QVariant PropertyHandle::value() const
 {
+    QReadLocker lock(&valueLock);
     return myValue;
 }
 
@@ -217,6 +220,7 @@ void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
         }
     }
 
+    QWriteLocker lock(&valueLock);
     if (myValue == newValue && myValue.isNull() == newValue.isNull()) {
         // The property already has the value we received.
         // If we're processing the return values of Subscribe, this is normal,
