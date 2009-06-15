@@ -63,9 +63,6 @@ bool PropertyHandle::typeCheckEnabled = false;
 PropertyHandle::PropertyHandle(const QString& key)
     :  myProvider(0), myInfo(0), subscribeCount(0), subscribePending(false), myKey(key)
 {
-    // Move the PropertyHandle (and all children) to main thread.
-    moveToThread(QCoreApplication::instance()->thread());
-
     myInfo = new ContextPropertyInfo(myKey, this);
 
     updateProvider();
@@ -79,6 +76,9 @@ PropertyHandle::PropertyHandle(const QString& key)
              this, SLOT(updateProvider()));
     sconnect(commanderListener, SIGNAL(nameDisappeared()),
              this, SLOT(updateProvider()));
+
+    // Move the PropertyHandle (and all children) to main thread.
+    moveToThread(QCoreApplication::instance()->thread());
 }
 
 void PropertyHandle::ignoreCommander()

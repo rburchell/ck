@@ -3,11 +3,13 @@
 #include "thread.h"
 
 #include <QCoreApplication>
-
+#include <QDebug>
 
 int main(int argc, char** argv)
 {
     QCoreApplication app(argc, argv);
+
+    qDebug() << "Main thread is" << QThread::currentThread();
 
     ContextProperty* cp = new ContextProperty("test.int");
     delete cp;

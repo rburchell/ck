@@ -28,7 +28,7 @@
 #include <QDBusConnection>
 #include <QSet>
 
-class QTimer;
+class QEvent;
 
 namespace ContextSubscriber {
 
@@ -45,6 +45,8 @@ public:
     void unsubscribe(const QString &key);
     static PropertyProvider* instance(const QDBusConnection::BusType busType, const QString& busName);
 
+    virtual bool event(QEvent* e);
+
 signals:
     void subscribeFinished(QSet<QString> keys);
     void valueChanged(QString key, QVariant value, bool processingSubscription);
@@ -53,7 +55,6 @@ private slots:
     void onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
     void onGetSubscriberFinished(QString objectPath);
     void onSubscribeFinished(QSet<QString> keys);
-    void idleHandler();
     void onProviderAppeared();
     void onProviderDisappeared();
 
@@ -62,7 +63,6 @@ private:
 
     DBusNameListener *providerListener; //< Listens to provider's (dis)appearance over DBus
     SubscriberInterface *subscriberInterface; //< The DBus interface for the Subscriber object
-    QTimer *idleTimer; //< For scheduling subscriptions / unsubscriptions as idle processing
     ManagerInterface managerInterface; //< The DBus interface for the Manager object
     bool getSubscriberFailed; //< Whether the GetSubscriber dbus call failed on the manager interface
 
