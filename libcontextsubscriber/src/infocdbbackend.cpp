@@ -24,7 +24,6 @@
 #include <QDebug>
 #include <QFile>
 #include <stdlib.h>
-#include <QMutex>
 #include <QHash>
 #include "sconnect.h"
 #include "infocdbbackend.h"
