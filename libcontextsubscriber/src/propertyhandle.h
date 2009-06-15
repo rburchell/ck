@@ -26,6 +26,7 @@
 #include <QString>
 #include <QVariant>
 #include <QSet>
+#include <QReadWriteLock>
 
 class ContextPropertyInfo;
 
@@ -63,16 +64,17 @@ private slots:
 private:
     PropertyHandle(const QString& key);
 
-    PropertyProvider *myProvider; //< Provider of this property
-    ContextPropertyInfo *myInfo; //< Metadata for this property
-    unsigned int subscribeCount; //< Number of subscribed ContextProperty objects subscribed to this property
-    bool subscribePending; //< True when the subscription has been started, but hasn't been finished yet
+    PropertyProvider *myProvider; ///< Provider of this property
+    ContextPropertyInfo *myInfo; ///< Metadata for this property
+    unsigned int subscribeCount; ///< Number of subscribed ContextProperty objects subscribed to this property
+    bool subscribePending; ///< True when the subscription has been started, but hasn't been finished yet
                            ///  (used by the waitForSubscription() feature)
-    QString myKey; //< Key of this property
-    QVariant myValue; //< Current value of this property
-    static DBusNameListener *commanderListener; //< Listener for ContextCommander's (dis)appearance
-    static bool commandingEnabled; //< Whether the properties can be directed to ContextCommander
-    static bool typeCheckEnabled; //< Whether we check the type of the value received from the provider
+    QString myKey; ///< Key of this property
+    mutable QReadWriteLock valueLock;
+    QVariant myValue; ///< Current value of this property
+    static DBusNameListener *commanderListener; ///< Listener for ContextCommander's (dis)appearance
+    static bool commandingEnabled; ///< Whether the properties can be directed to ContextCommander
+    static bool typeCheckEnabled; ///< Whether we check the type of the value received from the provider
 };
 
 } // end namespace
