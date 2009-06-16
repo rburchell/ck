@@ -60,6 +60,11 @@ bool PropertyHandle::typeCheckEnabled = false;
 
   PropertyHandle and PropertyProvider instances are never deleted;
   they stick around until the process is terminated.
+
+  All of the PropertyHandle instances and Property provider instances
+  are always created with the \c QCoreApplication's thread as the
+  thread where they live.  This is needed, because user threads can go
+  away and we would like to have only one DBus connection.
 */
 
 PropertyHandle::PropertyHandle(const QString& key)
