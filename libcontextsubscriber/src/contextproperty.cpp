@@ -276,10 +276,8 @@ void ContextProperty::waitForSubscription() const
     // This is not a busy loop, since the QEventLoop::WaitForMoreEvents flag
     while (priv->handle->isSubscribePending()) {
         if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
-            qDebug() << "one iteration of the main loop" << QThread::currentThread();
             QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
         } else {
-            qDebug() << "no iteration of the main loop" << QThread::currentThread();
             usleep(100000); // 0.1 second
         }
     }
