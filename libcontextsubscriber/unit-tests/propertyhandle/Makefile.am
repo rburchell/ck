@@ -3,7 +3,7 @@ check_PROGRAMS = propertyhandle-unit-tests
 # your test's sources
 propertyhandle_unit_tests_SOURCES = testpropertyhandle.cpp		\
 	testpropertyhandle.h propertyprovider.h dbusnamelistener.h	\
-	contextpropertyinfo.h contextregistryinfo.h
+	contextpropertyinfo.h contextregistryinfo.h queuedinvoker.h
 
 # only include these files in the coverage
 COVERAGE_FILES = propertyhandle.cpp

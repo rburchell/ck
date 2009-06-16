@@ -28,15 +28,16 @@
 #include <QSet>
 #include <QReadWriteLock>
 #include <QMutex>
+#include "queuedinvoker.h"
 
 class ContextPropertyInfo;
 
-namespace ContextSubscriber {;
+namespace ContextSubscriber {
 
 class PropertyProvider;
 class DBusNameListener;
 
-class PropertyHandle : public QObject
+class PropertyHandle : public QueuedInvoker
 {
     Q_OBJECT
 
@@ -64,6 +65,7 @@ private slots:
 
 private:
     PropertyHandle(const QString& key);
+    Q_INVOKABLE void init();
 
     PropertyProvider *myProvider; ///< Provider of this property
     ContextPropertyInfo *myInfo; ///< Metadata for this property

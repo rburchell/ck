@@ -205,20 +205,17 @@ void QueuedInvoker::queueOnce(const char *method)
     }
 }
 
-bool QueuedInvoker::callAllMethodsInQueue()
+void QueuedInvoker::callAllMethodsInQueue()
 {
-    bool somethingWasCalled = false;
-    foreach (QString method, methodsToCall) {
+    while (!methodsToCall.empty()) {
+        QString method = methodsToCall.front();
+        methodsToCall.pop_front();
         if (!QMetaObject::invokeMethod(this, method.toStdString().c_str(), Qt::DirectConnection)) {
             qFatal("    *****************\n"
                    "Erroneous usage of queueOnce\n"
                    "    *****************\n");
         }
-        somethingWasCalled = true;
-        qDebug() << "Calling" << method;
     }
-    methodsToCall.clear();
-    return somethingWasCalled;
 }
 
 //
@@ -264,12 +261,13 @@ void PropertyProviderUnitTests::initializing()
 {
     // Test:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // The PropertyProvider is created (as part of initTestCase)
     // Expected results:
@@ -285,19 +283,20 @@ void PropertyProviderUnitTests::getSubscriberSucceeds()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SystemBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SystemBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Test:
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Expected results:
     // the SubscriberInterface object is created
@@ -311,26 +310,27 @@ void PropertyProviderUnitTests::getSubscriberFails()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // And subscribe to a key (so that we can test whether something interesting happened)
     propertyProvider->subscribe("Key.Which.Will.Fail");
     // Start spying on the signal subscribeFinished
     QSignalSpy spy(propertyProvider, SIGNAL(subscribeFinished(QSet<QString>)));
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Test:
     // Command the mock manager to emit the getSubscriberFinished signal
     // with an empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("");
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Expected results:
     // The provider signals that the subscription was finished for that key
@@ -345,12 +345,13 @@ void PropertyProviderUnitTests::subscription()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -368,7 +369,7 @@ void PropertyProviderUnitTests::subscription()
     // Test:
     // Simulate being idle
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Expected results:
     // The subscription really happends, i.e.,
@@ -383,12 +384,13 @@ void PropertyProviderUnitTests::subscriptionOfTwoProperties()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -408,7 +410,7 @@ void PropertyProviderUnitTests::subscriptionOfTwoProperties()
     // Test:
     // Simulate being idle
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Expected results:
     // The subscription really happends, i.e.,
@@ -425,12 +427,13 @@ void PropertyProviderUnitTests::unsubscription()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -440,7 +443,7 @@ void PropertyProviderUnitTests::unsubscription()
     propertyProvider->subscribe("Fake.Key");
     // Simulate being idle, so that the subscription will really happen
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Test:
     // Unsubscribe to the same property
@@ -454,7 +457,7 @@ void PropertyProviderUnitTests::unsubscription()
     // Test:
     // Simulate being idle
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Expected results:
     // the provider calls the SubscriberInterface::subscribe
@@ -468,12 +471,13 @@ void PropertyProviderUnitTests::unsubscriptionOfTwoProperties()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -484,7 +488,7 @@ void PropertyProviderUnitTests::unsubscriptionOfTwoProperties()
     propertyProvider->subscribe("Fake.Key.Two");
     // Simulate being idle, so that the subscription will really happen
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Test:
     // Unsubscribe to the two properties
@@ -499,7 +503,7 @@ void PropertyProviderUnitTests::unsubscriptionOfTwoProperties()
     // Test:
     // Simulate being idle
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Expected results:
     // the provider calls the SubscriberInterface::subscribe
@@ -515,12 +519,13 @@ void PropertyProviderUnitTests::immediateUnsubscription()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -540,7 +545,7 @@ void PropertyProviderUnitTests::immediateUnsubscription()
     // Test:
     // Simulate being idle
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Expected results:
     // Still no subscription / unsubscription happens
@@ -552,12 +557,13 @@ void PropertyProviderUnitTests::immediateResubscription()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -566,7 +572,7 @@ void PropertyProviderUnitTests::immediateResubscription()
     // Subscribe to a property
     propertyProvider->subscribe("Fake.Key");
     // and make the subscription really happen
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // The logs now include this initial subscription -> clear them.
     SubscriberInterface::resetLogs();
@@ -585,7 +591,7 @@ void PropertyProviderUnitTests::immediateResubscription()
     // Test:
     // Simulate being idle
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Expected results:
     // Still no subscription / unsubscription happens
@@ -597,12 +603,13 @@ void PropertyProviderUnitTests::subscriptionFinished()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -615,7 +622,7 @@ void PropertyProviderUnitTests::subscriptionFinished()
     propertyProvider->subscribe("Fake.Key");
     // Make the subscription really happen
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Test:
     // Command the subscriber to emit the subscribeFinished signal
@@ -636,12 +643,13 @@ void PropertyProviderUnitTests::subscriptionAfterGetSubscriberFailed()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with an empty subscriber object path
@@ -662,7 +670,7 @@ void PropertyProviderUnitTests::subscriptionAfterGetSubscriberFailed()
 
     // Test:
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Expected results:
     // PropertyProvider doesn't actually subscribe to it.
@@ -678,12 +686,13 @@ void PropertyProviderUnitTests::valuesChanged()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -698,7 +707,7 @@ void PropertyProviderUnitTests::valuesChanged()
 
     // Make the subscriptions really happen
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Test:
     // Command the subscriber to emit a valuesChanged signal for this key
@@ -727,12 +736,13 @@ void PropertyProviderUnitTests::valuesChangedWithUnnecessaryProperties()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -746,7 +756,7 @@ void PropertyProviderUnitTests::valuesChangedWithUnnecessaryProperties()
     propertyProvider->subscribe("Fake.Key.Two");
     // Make the subscriptions really happen
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Test:
     // Command the subscriber to emit a valuesChanged signal
@@ -765,12 +775,13 @@ void PropertyProviderUnitTests::providerDisappearsAndAppears()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -810,7 +821,7 @@ void PropertyProviderUnitTests::providerDisappearsAndAppears()
 
     // Test:
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Expected results:
     // The PropertyProvider renews the subscription to the key
@@ -825,12 +836,13 @@ void PropertyProviderUnitTests::providerPresentAtStartup()
 {
     // Setup:
     // Create the object to be tested
-    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
-    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString busName = "Fake.Bus.Name." + QString(__FUNCTION__);
+    propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
+
     // Let the provider process the deferred events
-    while (propertyProvider->callAllMethodsInQueue()) ;
+    propertyProvider->callAllMethodsInQueue();
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -844,10 +856,9 @@ void PropertyProviderUnitTests::providerPresentAtStartup()
 
     // Expected result:
     // GetSubscriber is called only once
-    QCOMPARE(ManagerInterface::getSubscriberCount, 1);
-
     // Note: This test was added because of a bug. GetSubscriber was
     // called two times when the provider was already present at startup.
+    QCOMPARE(ManagerInterface::getSubscriberCount, 1);
 }
 
 } // end namespace

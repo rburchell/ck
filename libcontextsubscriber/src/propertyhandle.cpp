@@ -70,14 +70,6 @@ bool PropertyHandle::typeCheckEnabled = false;
 PropertyHandle::PropertyHandle(const QString& key)
     :  myProvider(0), myInfo(0), subscribeCount(0), subscribePending(false), myKey(key)
 {
-    myInfo = new ContextPropertyInfo(myKey, this);
-
-    updateProvider();
-
-    // Start listening to changes in property registry (e.g., new keys, keys removed)
-    sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(const QStringList&)),
-             this, SLOT(updateProvider()));
-
     // Start listening for the beloved commander
     sconnect(commanderListener, SIGNAL(nameAppeared()),
              this, SLOT(updateProvider()));
@@ -86,6 +78,18 @@ PropertyHandle::PropertyHandle(const QString& key)
 
     // Move the PropertyHandle (and all children) to main thread.
     moveToThread(QCoreApplication::instance()->thread());
+
+    queueOnce("init");
+}
+
+void PropertyHandle::init()
+{
+    myInfo = new ContextPropertyInfo(myKey, this);
+    updateProvider();
+
+    // Start listening to changes in property registry (e.g., new keys, keys removed)
+    sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(const QStringList&)),
+             this, SLOT(updateProvider()));
 }
 
 void PropertyHandle::ignoreCommander()
