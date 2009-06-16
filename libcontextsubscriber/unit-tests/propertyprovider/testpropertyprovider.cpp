@@ -190,6 +190,35 @@ void HandleSignalRouter::onValueChanged(QString key, QVariant value, bool proces
 {
 }
 
+// Mock implementation of QueuedInvoker
+
+QueuedInvoker::QueuedInvoker()
+{
+}
+
+
+void QueuedInvoker::queueOnce(const char *method)
+{
+    qDebug() << "queueonce" << QString(method);
+    if (!methodsToCall.contains(QString(method))) {
+        methodsToCall.push_back(method);
+    }
+}
+
+
+void QueuedInvoker::callAllMethodsInQueue()
+{
+    foreach (QString method, methodsToCall) {
+        if (!QMetaObject::invokeMethod(this, method.toStdString().c_str(), Qt::DirectConnection)) {
+            qFatal("    *****************\n"
+                   "Erroneous usage of queueOnce\n"
+                   "    *****************\n");
+        }
+    }
+}
+
+
+
 //
 // Definition of testcases
 //
@@ -237,6 +266,8 @@ void PropertyProviderUnitTests::initializing()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    propertyProvider->callAllMethodsInQueue();
 
     // The PropertyProvider is created (as part of initTestCase)
     // Expected results:
