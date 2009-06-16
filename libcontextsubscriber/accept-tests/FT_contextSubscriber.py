@@ -560,15 +560,11 @@ class SubscriptionPause (unittest.TestCase):
         print >> self.context_client.stdin, "waitforsubscription test.int"
 
 
-        expected = ["test.int = int:1"]
-        actual = [self.context_client.stdout.readline().rstrip()]
-        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
-
-        expected = ["wait finished for test.int"]
-        actual = [self.context_client.stdout.readline().rstrip()]
-
-        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
-
+        actual = stdoutRead(self.context_client, 2)
+        actual.sort()
+        expected = ["test.int = int:1",
+                    "wait finished for test.int"]
+        self.assertEqual(actual, expected, "Actual key values pairs do not match expected")
 
 def runTests():
     suiteSubscription = unittest.TestLoader().loadTestsFromTestCase(Subscription)
