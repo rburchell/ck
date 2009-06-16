@@ -50,7 +50,10 @@ def update_context_providers(xml, dir='.'):
         outfilename = os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"]
     else:
         outfilename = dir + '/context-provide.context'
-    tmpdir = outfilename[:outfilename.rindex('/')]
+    if outfilename.find('/') != -1:
+        tmpdir = outfilename[:outfilename.rindex('/')]
+    else:
+        tmpdir = '.'
     tmpfd, tmpfn = tempfile.mkstemp('.contexttemp', 'context-provide-', tmpdir)
     os.write(tmpfd, xml)
     os.close(tmpfd)
