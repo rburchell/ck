@@ -261,13 +261,13 @@ void ContextProperty::unsubscribe() const
     priv->subscribed = false;
 }
 
-/// Waits until subcription is complete for this context property.
-/// This might cause the main event loop of your program to run and
-/// consequently signals might get emitted (including the
-/// valueChanged() signal of this property).  Calling this function
-/// while the subscription is not in progress (because it has
-/// completed already or because the property is currently
-/// unsubscribed) does nothing.
+/// Suspends the execution of the current thread until subcription is
+/// complete for this context property.  This might cause the main
+/// event loop of your program to run and consequently signals might
+/// get emitted (including the valueChanged() signal of this
+/// property).  Calling this function while the subscription is not in
+/// progress (because it has completed already or because the property
+/// is currently unsubscribed) does nothing.
 void ContextProperty::waitForSubscription() const
 {
     if (!priv->subscribed)
