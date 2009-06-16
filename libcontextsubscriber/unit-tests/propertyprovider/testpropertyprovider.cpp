@@ -75,10 +75,9 @@ SubscriberInterface* mockSubscriberInterface;
 
 int ManagerInterface::getSubscriberCount = 0;
 int ManagerInterface::creationCount = 0;
-QList<QDBusConnection::BusType> ManagerInterface::creationBusTypes;
 QStringList ManagerInterface::creationBusNames;
 
-ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent)
+ManagerInterface::ManagerInterface(const QDBusConnection connection, const QString &busName, QObject *parent)
     : getSubscriberFailed(false)
 {
     // Store the mock implementation (created by the tested class)
@@ -88,7 +87,6 @@ ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const
     // Log the event: Manager interface created
     ++ creationCount;
     // Log the parameters
-    creationBusTypes << busType;
     creationBusNames << busName;
 }
 
@@ -106,7 +104,6 @@ bool ManagerInterface::isGetSubscriberFailed() const
 void ManagerInterface::resetLogs()
 {
     creationCount = 0;
-    creationBusTypes.clear();
     creationBusNames.clear();
     getSubscriberCount = 0;
 }
@@ -114,7 +111,6 @@ void ManagerInterface::resetLogs()
 // Mock implementation of the SubscriberInterface
 
 int SubscriberInterface::creationCount = 0;
-QList<QDBusConnection::BusType> SubscriberInterface::creationBusTypes;
 QStringList SubscriberInterface::creationBusNames;
 QStringList SubscriberInterface::creationObjectPaths;
 
@@ -123,7 +119,7 @@ QList<QSet<QString> > SubscriberInterface::subscribeKeys;
 int SubscriberInterface::unsubscribeCount = 0;
 QList<QSet<QString> > SubscriberInterface::unsubscribeKeys;
 
-SubscriberInterface::SubscriberInterface(const QDBusConnection::BusType busType, const QString& busName,
+SubscriberInterface::SubscriberInterface(const QDBusConnection connection, const QString& busName,
                         const QString& objectPath, QObject* parent)
 {
     // Store the mock implementation (created by the tested class)
@@ -132,7 +128,6 @@ SubscriberInterface::SubscriberInterface(const QDBusConnection::BusType busType,
     // Log the event: interface created
     ++ creationCount;
     // Log the parameters
-    creationBusTypes << busType;
     creationBusNames << busName;
     creationObjectPaths << objectPath;
 }
@@ -152,7 +147,6 @@ void SubscriberInterface::unsubscribe(QSet<QString> keys)
 void SubscriberInterface::resetLogs()
 {
     creationCount = 0;
-    creationBusTypes.clear();
     creationBusNames.clear();
     creationObjectPaths.clear();
 
@@ -165,7 +159,7 @@ void SubscriberInterface::resetLogs()
 
 // Mock implementation of the DBusNameListener
 
-DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const QString &busName,
+DBusNameListener::DBusNameListener(const QDBusConnection connection, const QString &busName,
                                    bool initialCheck, QObject* parent)
     : initialCheck(initialCheck)
 {
@@ -273,7 +267,6 @@ void PropertyProviderUnitTests::initializing()
     // Expected results:
     // PropertyProvider constructed the ManagerInterface with correct parameters
     QCOMPARE(ManagerInterface::creationCount, 1);
-    QCOMPARE(ManagerInterface::creationBusTypes.at(0), QDBusConnection::SessionBus);
     QCOMPARE(ManagerInterface::creationBusNames.at(0), busName);
     // PropertyProvider also called the GetSubscriber on the Manager interface
     QCOMPARE(ManagerInterface::getSubscriberCount, 1);
@@ -301,7 +294,6 @@ void PropertyProviderUnitTests::getSubscriberSucceeds()
     // Expected results:
     // the SubscriberInterface object is created
     QCOMPARE(SubscriberInterface::creationCount, 1);
-    QCOMPARE(SubscriberInterface::creationBusTypes.at(0), QDBusConnection::SystemBus);
     QCOMPARE(SubscriberInterface::creationBusNames.at(0), busName);
     QCOMPARE(SubscriberInterface::creationObjectPaths.at(0), QString("Fake.Subscriber.Path"));
 }
@@ -815,7 +807,6 @@ void PropertyProviderUnitTests::providerDisappearsAndAppears()
     // Expected result:
     // The PropertyProvider creates the Subscriber object
     QCOMPARE(SubscriberInterface::creationCount, 1);
-    QCOMPARE(SubscriberInterface::creationBusTypes.at(0), QDBusConnection::SessionBus);
     QCOMPARE(SubscriberInterface::creationBusNames.at(0), busName);
     QCOMPARE(SubscriberInterface::creationObjectPaths.at(0), QString("Fake.Subscriber.Path"));
 

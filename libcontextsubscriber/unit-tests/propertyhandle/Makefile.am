@@ -11,7 +11,7 @@ COVERAGE_FILES = propertyhandle.cpp
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtDBus_CFLAGS) -DDEFAULT_CONTEXT_PROVIDERS=\"@DEFAULT_CONTEXT_PROVIDERS@\"
-AM_LDFLAGS = 
+AM_LDFLAGS = $(QtDBus_LIBS)
 FROM_SOURCE = propertyhandle.cpp propertyhandle.h sconnect.h # copy these files from the real source
 LDADD = 
 include $(top_srcdir)/am/tests.am

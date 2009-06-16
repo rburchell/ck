@@ -11,7 +11,7 @@ COVERAGE_FILES = propertyprovider.cpp
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtDBus_CFLAGS)
-AM_LDFLAGS = 
+AM_LDFLAGS = $(QtDBus_LIBS)
 FROM_SOURCE = propertyprovider.cpp propertyprovider.h sconnect.h
 LDADD =
 include $(top_srcdir)/am/tests.am

@@ -160,7 +160,7 @@ void PropertyProvider::resetLogs()
 
 // Mock implementation of the DBusNameListener
 
-DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType,
+DBusNameListener::DBusNameListener(const QDBusConnection busType,
                                    const QString &busName, bool initialCheck, QObject* parent)
  : servicePresent(false)
 {
