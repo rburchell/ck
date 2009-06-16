@@ -100,7 +100,7 @@ Package: python-contextkit
 Section: python
 Architecture: any
 Provides: ${python:Provides}
-Depends: ${python:Depends}, python-gobject
+Depends: ${python:Depends}, python-gobject, libcontextprovider0
 XB-Python-Version: ${python:Versions}
 Description: Python bindings for ContextKit APIs
  This package contains Python bindings for the libcontextprovider
