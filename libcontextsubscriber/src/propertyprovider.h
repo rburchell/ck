@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QDBusConnection>
 #include <QSet>
+#include <QMutex>
 
 namespace ContextSubscriber {
 

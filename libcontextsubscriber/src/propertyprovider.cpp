@@ -24,7 +24,6 @@
 #include "sconnect.h"
 #include "subscriberinterface.h"
 #include "dbusnamelistener.h"
-#include <QMutex>
 #include <QMutexLocker>
 #include <QCoreApplication>
 
