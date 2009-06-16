@@ -38,7 +38,7 @@ public:
     QueuedInvoker();
 
     // For tests
-    void callAllMethodsInQueue();
+    bool callAllMethodsInQueue();
 
 protected:
     void queueOnce(const char *method);

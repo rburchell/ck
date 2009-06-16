@@ -205,19 +205,21 @@ void QueuedInvoker::queueOnce(const char *method)
     }
 }
 
-
-void QueuedInvoker::callAllMethodsInQueue()
+bool QueuedInvoker::callAllMethodsInQueue()
 {
+    bool somethingWasCalled = false;
     foreach (QString method, methodsToCall) {
         if (!QMetaObject::invokeMethod(this, method.toStdString().c_str(), Qt::DirectConnection)) {
             qFatal("    *****************\n"
                    "Erroneous usage of queueOnce\n"
                    "    *****************\n");
         }
+        somethingWasCalled = true;
+        qDebug() << "Calling" << method;
     }
+    methodsToCall.clear();
+    return somethingWasCalled;
 }
-
-
 
 //
 // Definition of testcases
@@ -267,7 +269,7 @@ void PropertyProviderUnitTests::initializing()
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
     // Let the provider process the deferred events
-    propertyProvider->callAllMethodsInQueue();
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // The PropertyProvider is created (as part of initTestCase)
     // Expected results:
@@ -287,11 +289,15 @@ void PropertyProviderUnitTests::getSubscriberSucceeds()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SystemBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Test:
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Expected results:
     // the SubscriberInterface object is created
@@ -309,16 +315,22 @@ void PropertyProviderUnitTests::getSubscriberFails()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // And subscribe to a key (so that we can test whether something interesting happened)
     propertyProvider->subscribe("Key.Which.Will.Fail");
     // Start spying on the signal subscribeFinished
     QSignalSpy spy(propertyProvider, SIGNAL(subscribeFinished(QSet<QString>)));
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Test:
     // Command the mock manager to emit the getSubscriberFinished signal
     // with an empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("");
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Expected results:
     // The provider signals that the subscription was finished for that key
@@ -337,6 +349,9 @@ void PropertyProviderUnitTests::subscription()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
+
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
@@ -352,7 +367,8 @@ void PropertyProviderUnitTests::subscription()
 
     // Test:
     // Simulate being idle
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Expected results:
     // The subscription really happends, i.e.,
@@ -371,6 +387,9 @@ void PropertyProviderUnitTests::subscriptionOfTwoProperties()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
+
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
@@ -388,7 +407,8 @@ void PropertyProviderUnitTests::subscriptionOfTwoProperties()
 
     // Test:
     // Simulate being idle
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Expected results:
     // The subscription really happends, i.e.,
@@ -409,6 +429,9 @@ void PropertyProviderUnitTests::unsubscription()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
+
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
@@ -416,7 +439,8 @@ void PropertyProviderUnitTests::unsubscription()
     // Subscribe to a property
     propertyProvider->subscribe("Fake.Key");
     // Simulate being idle, so that the subscription will really happen
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Test:
     // Unsubscribe to the same property
@@ -429,7 +453,8 @@ void PropertyProviderUnitTests::unsubscription()
 
     // Test:
     // Simulate being idle
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Expected results:
     // the provider calls the SubscriberInterface::subscribe
@@ -447,6 +472,9 @@ void PropertyProviderUnitTests::unsubscriptionOfTwoProperties()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
+
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
@@ -455,7 +483,8 @@ void PropertyProviderUnitTests::unsubscriptionOfTwoProperties()
     propertyProvider->subscribe("Fake.Key.One");
     propertyProvider->subscribe("Fake.Key.Two");
     // Simulate being idle, so that the subscription will really happen
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Test:
     // Unsubscribe to the two properties
@@ -469,7 +498,8 @@ void PropertyProviderUnitTests::unsubscriptionOfTwoProperties()
 
     // Test:
     // Simulate being idle
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Expected results:
     // the provider calls the SubscriberInterface::subscribe
@@ -489,6 +519,9 @@ void PropertyProviderUnitTests::immediateUnsubscription()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
+
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
@@ -506,7 +539,8 @@ void PropertyProviderUnitTests::immediateUnsubscription()
 
     // Test:
     // Simulate being idle
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Expected results:
     // Still no subscription / unsubscription happens
@@ -522,6 +556,9 @@ void PropertyProviderUnitTests::immediateResubscription()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
+
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
@@ -529,12 +566,13 @@ void PropertyProviderUnitTests::immediateResubscription()
     // Subscribe to a property
     propertyProvider->subscribe("Fake.Key");
     // and make the subscription really happen
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    while (propertyProvider->callAllMethodsInQueue()) ;
+
     // The logs now include this initial subscription -> clear them.
     SubscriberInterface::resetLogs();
 
     // Test:
-    // Unsubscribe from the prooperty
+    // Unsubscribe from the property
     propertyProvider->unsubscribe("Fake.Key");
     // And subscribe to it immediately
     propertyProvider->subscribe("Fake.Key");
@@ -546,7 +584,8 @@ void PropertyProviderUnitTests::immediateResubscription()
 
     // Test:
     // Simulate being idle
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Expected results:
     // Still no subscription / unsubscription happens
@@ -562,6 +601,9 @@ void PropertyProviderUnitTests::subscriptionFinished()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
+
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
@@ -572,7 +614,8 @@ void PropertyProviderUnitTests::subscriptionFinished()
     // Subscribe to a property
     propertyProvider->subscribe("Fake.Key");
     // Make the subscription really happen
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Test:
     // Command the subscriber to emit the subscribeFinished signal
@@ -597,6 +640,8 @@ void PropertyProviderUnitTests::subscriptionAfterGetSubscriberFailed()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with an empty subscriber object path
@@ -612,6 +657,14 @@ void PropertyProviderUnitTests::subscriptionAfterGetSubscriberFailed()
     propertyProvider->subscribe("Fake.Key");
 
     // Expected results:
+    // Nothing happens yet, since the subscription (even a failed one) is not processed
+    // until the event loop is entered.
+
+    // Test:
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
+
+    // Expected results:
     // PropertyProvider doesn't actually subscribe to it.
     // PropertyProvider signals that the subscription was finished for that key.
     QCOMPARE(spy.count(), 1);
@@ -621,7 +674,6 @@ void PropertyProviderUnitTests::subscriptionAfterGetSubscriberFailed()
     QVERIFY(keysReceived.contains("Fake.Key"));
 }
 
-
 void PropertyProviderUnitTests::valuesChanged()
 {
     // Setup:
@@ -630,6 +682,9 @@ void PropertyProviderUnitTests::valuesChanged()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
+
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
     emit mockManagerInterface->getSubscriberFinished("Fake.Subscriber.Path");
@@ -640,8 +695,10 @@ void PropertyProviderUnitTests::valuesChanged()
     // Subscribe to two properties
     propertyProvider->subscribe("Fake.Key.One");
     propertyProvider->subscribe("Fake.Key.Two");
+
     // Make the subscriptions really happen
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Test:
     // Command the subscriber to emit a valuesChanged signal for this key
@@ -674,6 +731,8 @@ void PropertyProviderUnitTests::valuesChangedWithUnnecessaryProperties()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -686,7 +745,8 @@ void PropertyProviderUnitTests::valuesChangedWithUnnecessaryProperties()
     propertyProvider->subscribe("Fake.Key.One");
     propertyProvider->subscribe("Fake.Key.Two");
     // Make the subscriptions really happen
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Test:
     // Command the subscriber to emit a valuesChanged signal
@@ -709,6 +769,8 @@ void PropertyProviderUnitTests::providerDisappearsAndAppears()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
@@ -747,8 +809,8 @@ void PropertyProviderUnitTests::providerDisappearsAndAppears()
     QCOMPARE(SubscriberInterface::creationObjectPaths.at(0), QString("Fake.Subscriber.Path"));
 
     // Test:
-    // Simulate being idle
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Expected results:
     // The PropertyProvider renews the subscription to the key
@@ -767,6 +829,8 @@ void PropertyProviderUnitTests::providerPresentAtStartup()
     propertyProvider = PropertyProvider::instance(QDBusConnection::SessionBus, busName);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    // Let the provider process the deferred events
+    while (propertyProvider->callAllMethodsInQueue()) ;
 
     // Command the mock manager to emit the getSubscriberFinished signal
     // with a non-empty subscriber object path
