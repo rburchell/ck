@@ -48,39 +48,22 @@
 #include "sconnect.h"
 
 #include <QDebug>
+#include <QDBusConnection>
+#include <QDBusPendingReply>
 
 namespace ContextSubscriber {
 
-const QString SubscriberSignallingInterface::interfaceName = "org.freedesktop.ContextKit.Subscriber";
+const char *SubscriberInterface::interfaceName = "org.freedesktop.ContextKit.Subscriber";
 
 /// Constructs the SubscriberInterface. Connects to the DBus object specified
 /// by \a busType (session or system bus), \a busName and \a objectPath.
-SubscriberInterface::SubscriberInterface(const QDBusConnection::BusType busType,
+SubscriberInterface::SubscriberInterface(const QDBusConnection connection,
                                          const QString &busName,
-                                         const QString& objectPath,
+                                         const QString &objectPath,
                                          QObject *parent)
-    : QObject(parent), iface(0)
+    : QDBusAbstractInterface(busName, objectPath, interfaceName, connection, parent)
 {
-    QDBusConnection connection("");
-
-    // Create DBus connection
-    if (busType == QDBusConnection::SessionBus) {
-        connection = QDBusConnection::sessionBus();
-    } else if (busType == QDBusConnection::SystemBus) {
-        connection = QDBusConnection::systemBus();
-    } else {
-        qCritical() << "Invalid bus type: " << busType;
-        return;
-    }
-
-    if (!connection.isConnected()) {
-        qCritical() << "Couldn't connect to DBUS: ";
-        return;
-    }
-
-    // Create the DBus interface
-    iface = new SubscriberSignallingInterface(busName, objectPath, connection, this);
-    sconnect(iface, SIGNAL(Changed(const QMap<QString, QVariant>&, const QStringList &)),
+    sconnect(this, SIGNAL(Changed(const QMap<QString, QVariant>&, const QStringList &)),
              this, SLOT(onChanged(const QMap<QString, QVariant>&, const QStringList &)));
 }
 
@@ -88,7 +71,7 @@ SubscriberInterface::SubscriberInterface(const QDBusConnection::BusType busType,
 void SubscriberInterface::subscribe(QSet<QString> keys)
 {
     qDebug() << "SubscriberInterface::subscribe" << keys;
-    if (iface == 0 || keys.size() == 0) {
+    if (isValid() == false || keys.size() == 0) {
         qDebug() << "Subscriber cannot subscribe -> emitting subscribeFinished()";
         emit subscribeFinished(keys);
         return;
@@ -97,7 +80,7 @@ void SubscriberInterface::subscribe(QSet<QString> keys)
     // Construct the asynchronous call
     QStringList keyList = keys.toList();
 
-    QDBusPendingCall subscribeCall = iface->asyncCall("Subscribe", keyList);
+    QDBusPendingCall subscribeCall = asyncCall("Subscribe", keyList);
     SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(subscribeCall, this);
     sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
              this, SLOT(onSubscribeFinished(QDBusPendingCallWatcher *)));
@@ -110,11 +93,11 @@ void SubscriberInterface::subscribe(QSet<QString> keys)
 /// Calls the Unsubscribe function over DBus asynchronously.
 void SubscriberInterface::unsubscribe(QSet<QString> keys)
 {
-    if (iface != 0 && keys.size() != 0) {
+    if (isValid() && keys.size() != 0) {
         // Construct the asynchronous call
         QStringList keyList = keys.toList();
 
-        iface->asyncCall("Unsubscribe", keyList);
+        asyncCall("Unsubscribe", keyList);
         // The possible errors are not tracked, because we can't do anything if Unsubscribe fails.
     }
 }
@@ -159,13 +142,4 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
     QStringList keys = watcher->property("keysToSubscribe").toStringList();
     emit subscribeFinished(keys.toSet());
 }
-
-/// Constructs the SubscriberSignallingInterface. The only operation needed is
-/// constructing the parent QDBusAbstractInterface.
-SubscriberSignallingInterface::SubscriberSignallingInterface(const QString &dbusName, const QString& objectPath,
-                                                             const QDBusConnection &connection, QObject *parent)
-    : QDBusAbstractInterface(dbusName, objectPath, interfaceName.toStdString().c_str(), connection, parent)
-{
-}
-
 } // end namespace

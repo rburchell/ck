@@ -22,7 +22,6 @@
 #ifndef PROPERTYPROVIDER_H
 #define PROPERTYPROVIDER_H
 
-#include "managerinterface.h"
 #include "queuedinvoker.h"
 
 #include <QObject>
@@ -35,6 +34,7 @@ namespace ContextSubscriber {
 class PropertyHandle;
 class SubscriberInterface;
 class DBusNameListener;
+class ManagerInterface;
 
 class PropertyProvider : public QueuedInvoker
 {
@@ -57,14 +57,15 @@ private slots:
     void onProviderDisappeared();
 
 private:
-    PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
+    PropertyProvider(QDBusConnection::BusType busType, const QString& busName);
     Q_INVOKABLE void handleSubscriptions();
 
     DBusNameListener *providerListener; ///< Listens to provider's (dis)appearance over DBus
     SubscriberInterface *subscriberInterface; ///< The DBus interface for the Subscriber object
-    ManagerInterface managerInterface; ///< The DBus interface for the Manager object
+    ManagerInterface *managerInterface; ///< The DBus interface for the Manager object
     bool getSubscriberFailed; ///< Whether the GetSubscriber dbus call failed on the manager interface
 
+    QDBusConnection *connection; ///< The connection to DBus, generated from busType
     QDBusConnection::BusType busType; ///< The bus type of the DBus provider connected to
     QString busName; ///< The bus name of the DBus provider connected to
 

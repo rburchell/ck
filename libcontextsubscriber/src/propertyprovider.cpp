@@ -23,9 +23,11 @@
 #include "handlesignalrouter.h"
 #include "sconnect.h"
 #include "subscriberinterface.h"
+#include "managerinterface.h"
 #include "dbusnamelistener.h"
 #include <QMutexLocker>
 #include <QCoreApplication>
+#include <QThread>
 
 namespace ContextSubscriber {
 
@@ -38,13 +40,20 @@ namespace ContextSubscriber {
 */
 
 PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
-    : subscriberInterface(0), managerInterface(busType, busName, this), busType(busType), busName(busName)
+    : subscriberInterface(0), managerInterface(0), connection(0),
+      busType(busType), busName(busName)
 {
+    if (busType == QDBusConnection::SystemBus)
+        connection = new QDBusConnection(QDBusConnection::systemBus());
+    else
+        connection = new QDBusConnection(QDBusConnection::sessionBus());
+
     // Call GetSubscriber asynchronously
-    sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
+    managerInterface = new ManagerInterface(*connection, busName, this);
+    sconnect(managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
 
     // Notice if the provider on the dbus comes and goes
-    providerListener = new DBusNameListener(busType, busName, false, this);
+    providerListener = new DBusNameListener(*connection, busName, false, this);
     sconnect(providerListener, SIGNAL(nameAppeared()),
              this, SLOT(onProviderAppeared()));
     sconnect(providerListener, SIGNAL(nameDisappeared()),
@@ -70,7 +79,7 @@ void PropertyProvider::onProviderAppeared()
 {
     delete subscriberInterface;
     subscriberInterface = 0;
-    managerInterface.getSubscriber();
+    managerInterface->getSubscriber();
 }
 
 /// Delete our subscriber interface when the provider went away
@@ -90,7 +99,7 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
     if (objectPath != "") {
         // GetSubscriber was successful
         delete subscriberInterface;
-        subscriberInterface = new SubscriberInterface(busType, busName, objectPath, this);
+        subscriberInterface = new SubscriberInterface(*connection, busName, objectPath, this);
 
         sconnect(subscriberInterface,
                  SIGNAL(valuesChanged(QMap<QString, QVariant>, bool)),
@@ -202,7 +211,7 @@ void PropertyProvider::handleSubscriptions()
         // Or the subscription will not be successful, emit the
         // subscribeFinished signal so that the handles will stop
         // waiting.
-        if (managerInterface.isGetSubscriberFailed()) {
+        if (managerInterface->isGetSubscriberFailed()) {
             qDebug() << "GetSubscriber has failed previously";
             if (toSubscribe.size() > 0) emit subscribeFinished(toSubscribe);
             toSubscribe.clear();

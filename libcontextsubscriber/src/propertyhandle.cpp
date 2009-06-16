@@ -37,9 +37,10 @@
 namespace ContextSubscriber {
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
+static const QDBusConnection commanderDBusConnection = QDBusConnection::sessionBus();
 static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
 
-DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusType, commanderDBusName);
+DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusConnection, commanderDBusName);
 bool PropertyHandle::commandingEnabled = true;
 bool PropertyHandle::typeCheckEnabled = false;
 

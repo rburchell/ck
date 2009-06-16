@@ -23,10 +23,10 @@
 #define DBUSNAMELISTENER_H
 
 #include <QObject>
-#include <QDBusConnection>
 #include <QString>
 
 class QDBusPendingCallWatcher;
+class QDBusConnection;
 
 namespace ContextSubscriber {
 
@@ -34,7 +34,7 @@ class DBusNameListener : public QObject
 {
     Q_OBJECT
 public:
-    DBusNameListener(const QDBusConnection::BusType busType, const QString &busName,
+    DBusNameListener(const QDBusConnection connection, const QString &busName,
                      bool initialCheck = true, QObject *parent = 0);
     bool isServicePresent() const;
 
