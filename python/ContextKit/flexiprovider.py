@@ -51,7 +51,7 @@ def update_context_providers(xml, dir='.'):
     else:
         outfilename = dir + '/context-provide.context'
     tmpdir = outfilename[:outfilename.rindex('/')]
-    tmpfd, tmpfn = tempfile.mkstemp('.context', 'context-provide-', tmpdir)
+    tmpfd, tmpfn = tempfile.mkstemp('.contexttemp', 'context-provide-', tmpdir)
     os.write(tmpfd, xml)
     os.close(tmpfd)
     os.rename(tmpfn, outfilename)
