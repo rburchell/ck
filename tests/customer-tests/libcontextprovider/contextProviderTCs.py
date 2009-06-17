@@ -45,7 +45,7 @@ def setUp():
 
     # Make the provider stub to find the libcontextprovider.so
     # (if it is not installed)
-    os.environ['LD_LIBRARY_PATH'] = '../../libcontextprovider/.libs'
+    os.environ['LD_LIBRARY_PATH'] = '../../../libcontextprovider/.libs'
     # Start a provider stub
     if "srcdir" in os.environ:
         provider_stub_path = os.environ["srcdir"] + "/stubs/provider_stub.py"

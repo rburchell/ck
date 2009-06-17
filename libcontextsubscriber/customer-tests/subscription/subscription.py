@@ -57,8 +57,8 @@ class Subscription(unittest.TestCase):
         self.context_client = Popen(["context-listen","test.int","test.double","test.string","test.truth"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.system('./rec-kill.sh %d' % self.flexiprovider.pid)
-        os.system('./rec-kill.sh %d' % self.context_client.pid)
+        os.system('../common/rec-kill.sh %d' % self.flexiprovider.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client.pid)
         os.unlink('context-provide.context')
 
     def testValue(self):
@@ -292,11 +292,11 @@ class MultipleSubscribers(unittest.TestCase):
 
 
     def tearDown(self):
-        os.system('./rec-kill.sh %d' % self.flexiprovider.pid)
-        os.system('./rec-kill.sh %d' % self.context_client1.pid)
-        os.system('./rec-kill.sh %d' % self.context_client2.pid)
-        os.system('./rec-kill.sh %d' % self.context_client3.pid)
-        os.system('./rec-kill.sh %d' % self.context_client4.pid)
+        os.system('../common/rec-kill.sh %d' % self.flexiprovider.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client1.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client2.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client3.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client4.pid)
         os.unlink('context-provide.context')
 
     def testInitialSubscription(self):
@@ -442,9 +442,9 @@ class MultipleProviders(unittest.TestCase):
                                     ,stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.system('./rec-kill.sh %d' % self.flexiprovider1.pid)
-        os.system('./rec-kill.sh %d' % self.flexiprovider2.pid)
-        os.system('./rec-kill.sh %d' % self.context_client.pid)
+        os.system('../common/rec-kill.sh %d' % self.flexiprovider1.pid)
+        os.system('../common/rec-kill.sh %d' % self.flexiprovider2.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client.pid)
         os.unlink('context-provide1.context')
         os.unlink('context-provide2.context')
 
@@ -480,8 +480,8 @@ class SubscriptionPause (unittest.TestCase):
         self.context_client = Popen(["context-listen","test.int"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.system('./rec-kill.sh %d' % self.flexiprovider.pid)
-        os.system('./rec-kill.sh %d' % self.context_client.pid)
+        os.system('../common/rec-kill.sh %d' % self.flexiprovider.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client.pid)
         os.unlink('context-provide.context')
 
     def testPause(self):

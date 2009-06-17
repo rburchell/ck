@@ -1,3 +1,5 @@
+SUBDIRS = loadmem
+
 NULL =
 
 EXTRA_DIST = \

@@ -1,7 +1,5 @@
 contextkit (0.2.7~unreleased) unstable; urgency=low
 
-  * 
-
   * Fixes: NB#121720 - context-provide cannot provide a False value for
     a boolean from the start
 
