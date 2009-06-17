@@ -11,7 +11,7 @@ BUILT_SOURCES = $(FROM_SOURCE)
 
 # recompile every file %.cpp in FROM_SOURCE as src_%.o in the current
 # test directory (so the mock objects don't have to be ABI compatible)
-$(FROM_SOURCE): %: $(top_srcdir)/src/%
+$(FROM_SOURCE): %: $(FROM_SOURCE_DIR)/%
 	ln -sf $< $@
 
 check_LIBRARIES = libsrc.a  # library built from files in the real source

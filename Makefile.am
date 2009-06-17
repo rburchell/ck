@@ -1,9 +1,8 @@
-NULL =
-
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 # We exclude the caches from the uninstall check.
-distuninstallcheck_listfiles = find . -type f -a ! -name '*.cdb' -print
+# fixme: add this back for make distcheck
+# distuninstallcheck_listfiles = find . -type f -a ! -name '*.cdb' -print
 
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
@@ -18,24 +17,15 @@ SUBDIRS = \
 	tools \
 	python \
 	fake-provider \
-	vapi \
-	$(NULL)
+	vapi
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextprovider-1.0.pc
 
 EXTRA_DIST = contextprovider-1.0-uninstalled.pc
+DISTCLEANFILES = lcov.info lcov.html
+MAINTAINERCLEANFILES = INSTALL
 
-DISTCLEANFILES = \
-	lcov.info \
-	lcov.html \
-	$(NULL)
-
-version:
-	@echo @VERSION@
-
-.PHONY: version
-
-if HAVE_COVERAGE
-include tools/lcov.am
-endif
+#if HAVE_COVERAGE
+#include tools/lcov.am
+#endif

@@ -1,4 +1,3 @@
-ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src unit-tests accept-tests cli update-contextkit-providers doc man
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -19,18 +18,4 @@ covoptioncheck:
 coverage: covoptioncheck
 	make -C unit-tests/ coverage
 
-#deb:
-#	rm -rf debian/
-#	mkdir debian/
-#	cp -a debian-devel/rules debian/
-#	chmod a+x debian/rules
-#	cp -a debian-devel/control debian/
-#	EDITOR=/bin/true dch --create --package contextcommander-devel --newversion 0~devel --distribution unstable --force-distribution
-#	fakeroot debian/rules binary
-#	rm -rf debian/
-
-#debinst: deb
-#	sudo dpkg -i ../@PACKAGE@-devel_0~devel_`dpkg-architecture | grep BUILD_ARCH= | cut -d= -f2`.deb
-
-#.PHONY: covoptioncheck coverage check-sum deb debinst
 .PHONY: covoptioncheck coverage check-sum

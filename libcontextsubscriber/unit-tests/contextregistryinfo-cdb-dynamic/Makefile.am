@@ -19,6 +19,7 @@ FROM_SOURCE = contextregistryinfo.cpp infobackend.cpp	\
 	infoxmlbackend.h infocdbbackend.h		\
 	infoxmlkeysfinder.h cdbreader.h                 \
 	infokeydata.h sconnect.h
+FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
 include $(top_srcdir)/am/tests.am
 

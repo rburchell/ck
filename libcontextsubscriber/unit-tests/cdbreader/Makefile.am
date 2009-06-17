@@ -11,6 +11,7 @@ EXTRA_DIST = test.cdb
 AM_CXXFLAGS = '-I$(srcdir)/../util/'
 AM_LDFLAGS = -lcdb
 FROM_SOURCE = cdbreader.cpp cdbreader.h # copy these files from the real source
+FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am
 

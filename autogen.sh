@@ -1,23 +1,21 @@
-#!/bin/sh
-set -e
+#!/bin/sh -e
 
 cd $(dirname $0)
-mkdir -p libcontextsubscriber/m4
 
 . tools/autogen-helpers.sh
 
+# fixme: can we move these four out of here?
 version_check valac VALAC 'valac' 0.7.1 "http://vala-project.org"
 version_check asciidoc ASCIIDOC 'asciidoc' 8.2.7 "http://www.methods.co.nz/asciidoc/"
-existence_check gtkdocize   
 existence_check dot
 existence_check source-highlight
 
+existence_check gtkdocize   
 gtkdocize
 
-# Autoreconf will overwrite INSTALL, but we have our own version of
-# it.
-
 autoreconf -i -f
+
+# Autoreconf overwrites INSTALL, but we have our own version of it.
 cp INSTALL.real INSTALL
 
 run_configure=true

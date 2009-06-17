@@ -15,6 +15,7 @@ EXTRA_DIST = providers1v1.xml.src providers1v2.xml.src
 AM_CXXFLAGS = '-I$(srcdir)/../util/' '-DDEFAULT_CONTEXT_PROVIDERS="@DEFAULT_CONTEXT_PROVIDERS@"' $(QtXml_CFLAGS)
 AM_LDFLAGS = -lcdb $(QtXml_LIBS)
 FROM_SOURCE = contextregistryinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp cdbreader.cpp contextregistryinfo.h infobackend.h infoxmlbackend.h infocdbbackend.h infoxmlkeysfinder.h cdbreader.h infokeydata.h sconnect.h # copy these files from the real source
+FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
 include $(top_srcdir)/am/tests.am
 

@@ -7,14 +7,11 @@ html_ASCIIDOCS = context-intro.txt context-providers.txt context-types.txt conte
 
 html_DATA = $(html_EXTRA) \
 	    $(html_ASCIIDOCS:.txt=.html) \
-            $(shell awk 'match($$0, /^\[dotty,(.*)\]$$/, arr) { print arr[1] }' $(html_ASCIIDOCS))
+            $(shell sed -n '/^\[dotty,/ { s/^.*,// ; s/].*// ; p }' $(html_ASCIIDOCS))
 
 html-local: $(html_EXTRA) $(html_ASCIIDOCS:.txt=.html)
 
 %.html: %.txt
-	asciidoc -a toc --unsafe -f myfilter.conf $^
-
-context-arch.html: %.html: %.txt
 	asciidoc -a toc --unsafe -f myfilter.conf $^
 
 EXTRA_DIST = $(html_ASCIIDOCS) \
