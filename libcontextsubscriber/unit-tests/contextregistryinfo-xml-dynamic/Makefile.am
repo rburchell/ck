@@ -3,7 +3,10 @@ check_PROGRAMS = contextregistryinfounittest-xml-dynamic
 # test's sources
 contextregistryinfounittest_xml_dynamic_SOURCES = contextregistryinfounittest.cpp
 
-COVERAGE_FILES = contextregistryinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp cdbreader.cpp
+COVERAGE_FILES = contextregistryinfo.cpp 	\
+		 infobackend.cpp 		\
+		 infoxmlbackend.cpp 		\
+		 infoxmlkeysfinder.cpp
 
 EXTRA_DIST = providers1v1.xml.src providers1v2.xml.src
 

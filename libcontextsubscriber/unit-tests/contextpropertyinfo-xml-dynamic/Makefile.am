@@ -3,9 +3,10 @@ check_PROGRAMS = contextpropertyinfounittest-xml-dynamic
 # your test's sources
 contextpropertyinfounittest_xml_dynamic_SOURCES = contextpropertyinfounittest.cpp
 
-COVERAGE_FILES = contextregistryinfo.cpp contextpropertyinfo.cpp	\
-	infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp	\
-	infocdbbackend.cpp cdbreader.cpp
+COVERAGE_FILES = contextpropertyinfo.cpp	\
+		 infobackend.cpp 		\
+		 infoxmlbackend.cpp 		\
+		 infoxmlkeysfinder.cpp
 EXTRA_DIST = providers2v1.xml.src providers2v2.xml.src			\
 	providers3v1.xml.src providers3v2.xml.src providers4v1.xml.src	\
 	providers4v2.xml.src

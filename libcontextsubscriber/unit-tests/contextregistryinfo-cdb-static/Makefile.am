@@ -3,9 +3,9 @@ check_PROGRAMS = contextregistryinfounittest-cdb-static
 # your test's sources
 contextregistryinfounittest_cdb_static_SOURCES = contextregistryinfounittest.cpp
 
-COVERAGE_FILES = contextregistryinfo.cpp infobackend.cpp		\
-	infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp	\
-	cdbreader.cpp
+COVERAGE_FILES = contextregistryinfo.cpp 	\
+		 infobackend.cpp		\
+		 infocdbbackend.cpp
 EXTRA_DIST = cache.cdb
 
 # do the testing, coverage, etc. stuff

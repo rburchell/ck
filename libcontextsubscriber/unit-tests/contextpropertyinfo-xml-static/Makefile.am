@@ -3,9 +3,10 @@ check_PROGRAMS = contextpropertyinfounittest-xml-static
 # your test's sources
 contextpropertyinfounittest_xml_static_SOURCES = contextpropertyinfounittest.cpp
 
-COVERAGE_FILES = contextregistryinfo.cpp contextpropertyinfo.cpp	\
-	infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp	\
-	infocdbbackend.cpp cdbreader.cpp
+COVERAGE_FILES = contextpropertyinfo.cpp	\
+		 infobackend.cpp 		\
+		 infoxmlbackend.cpp 		\
+		 infoxmlkeysfinder.cpp
 EXTRA_DIST = providers1.context providers2.context
 
 # do the testing, coverage, etc. stuff
