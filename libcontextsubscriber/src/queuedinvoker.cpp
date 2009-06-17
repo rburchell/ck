@@ -28,7 +28,18 @@
 
 namespace ContextSubscriber {
 
-// FIXME: needs documentation
+/*! \class QueuedInvoker
+    \brief A class that can invoke its own methods in a delayed way.
+
+    Via the method QueuedInvoker::queueOnce, the given method is set
+    to be invoked when the event loop of the object is entered. Each
+    method is queued at most once. QueuedInvoker sends a signal to
+    itself, and when the signal is processed, the method is invoked.
+
+    QueuedInvoker is normally used by subclassing it.
+
+*/
+
 
 QueuedInvoker::QueuedInvoker()
 {
@@ -37,6 +48,8 @@ QueuedInvoker::QueuedInvoker()
             Qt::QueuedConnection);
 }
 
+//! Slot which is executed when the event loop of this object
+//! runs. Calls all the methods in the queue.
 void QueuedInvoker::onQueuedCall(const char *method)
 {
     QMutexLocker locker(&callQueueLock);
@@ -49,6 +62,9 @@ void QueuedInvoker::onQueuedCall(const char *method)
     }
 }
 
+//! Sets the method \a method to be invoked when the event loop of
+//! this object runs next time. If the method was already in the
+//! queue, it won't be inserted again.
 void QueuedInvoker::queueOnce(const char *method)
 {
     QMutexLocker locker(&callQueueLock);

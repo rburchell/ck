@@ -46,8 +46,8 @@ protected:
     void queueOnce(const char *method);
 
 private:
-    QMutex callQueueLock;
-    QSet<QString> callQueue;
+    QMutex callQueueLock; ///< Protects the callQueue
+    QSet<QString> callQueue; ///< Methods to be invoked
 };
 
 } // namespace
