@@ -1,0 +1,23 @@
+To demo contextd follow these steps.
+====================================
+
+lowmem plugin
+=============
+
+Install the necessary components to the device:
+    apt-get install libcontextprovider0 contextkit
+
+Copy demo/runMe.py demo/tiny_client.py and tools/loadmem/loadmem to the device.
+
+Prerequisites:
+
+Two terminals are needed for this demo.
+contextkit and libcontextprovider0 have been installed.
+
+Start:
+	First terminal:
+		contextd &
+		python tiny_client.py System.MemoryPressure
+
+	Second terminal:
+		python runMe.py
