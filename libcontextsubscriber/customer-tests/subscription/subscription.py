@@ -48,7 +48,7 @@ class Subscription(unittest.TestCase):
                "int","test.int","1",
                "string","test.string","foobar",
                "double","test.double","2.5",
-               "truth","test.truth","true"],
+               "truth","test.truth","True"],
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
         os.environ["CONTEXT_PROVIDERS"] = "."
 
@@ -277,7 +277,7 @@ class MultipleSubscribers(unittest.TestCase):
                "int","test.int","1",
                "string","test.string","foobar",
                "double","test.double","2.5",
-               "truth","test.truth","true"],
+               "truth","test.truth","True"],
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
         os.environ["CONTEXT_PROVIDERS"] = "."
         print >>self.flexiprovider.stdin, "info()"
@@ -425,7 +425,7 @@ class MultipleProviders(unittest.TestCase):
     def setUp(self):
         os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide1.context"
         self.flexiprovider1 = Popen(["context-provide","session:com.nokia.test",
-               "truth","test.truth","true"],
+               "truth","test.truth","True"],
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
 
         os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide2.context"

@@ -12,8 +12,14 @@ defaulting to the latter).
 import sys
 from ContextKit.flexiprovider import *
 
+# A custom conversion function since bool('False') == True.
+def str2bool(str):
+    if not str in ['True', 'False']:
+        raise ValueError("Invalid literal for bool conversion: '%s'" % str)
+    return bool(eval(str))
+
 types = dict(int=(INT, int),
-             truth=(TRUTH, bool),
+             truth=(TRUTH, str2bool),
              string=(STRING, str),
              double=(DOUBLE, float))
 properties = []
@@ -26,13 +32,16 @@ busaddress = sys.argv.pop(0).split(':')
 if len(busaddress) == 1:
     busaddress.insert(0, 'session')
 if busaddress[0] not in ('session', 'system'):
-    sys.exit(2)
+    raise Exception("Invalid bus type '%s', use session or system" % busaddress[0])
+if len(sys.argv) % 3 != 0:
+    raise Exception('Number of command line parameters must be 1 + 3 * number of properties')
+
 while len(sys.argv) >= 3:
     datatype, name, initvalue = sys.argv[:3]
     datatype = datatype.lower()
     del sys.argv[:3]
     if datatype not in types:
-        continue
+        raise Exception('Type %s not recognized' % datatype)
     cookiecutter, conversion = types[datatype]
     properties.append(cookiecutter(name, conversion(initvalue)))
 
