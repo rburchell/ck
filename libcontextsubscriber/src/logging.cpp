@@ -118,6 +118,38 @@
     \b "Undefined" module.
 */
 
+/* ContextFeature */
+
+/*!
+    \class ContextFeature
+
+    \brief This class represents a "feature" in the logging framework/system.
+
+    A feature can be ie. "multithreading", "introspection", "dbus" or anything that makes sense
+    in your setup. Using features you can later get more filtered debug output. You most likely
+    want to use this class like this:
+    
+    
+    \code
+    ...
+    contextDebug() << ContextFeature("introspection") << "Message";
+    ...
+    \endcode
+    
+    One message can belong to many features or to none.
+*/
+
+/// Constructor for a new feature.\a name is the feature name.
+ContextFeature::ContextFeature(QString name) : featureName(name)
+{
+}
+
+/// Returns the name of the feature.
+QString ContextFeature::getName() const
+{
+    return featureName;
+}
+
 /* NullIODevice */
 
 /*!
@@ -274,9 +306,35 @@ void ContextRealLogger::killOutput()
     return;
 }
 
+/// Print all the features, separated with commas and wrapped in brackets.
+void ContextRealLogger::printFeatures()
+{
+    if (features.length() == 0)
+        return;
+    
+    *this << " [";
+    int i;
+    
+    for (i = 0; i < features.length(); i++) {
+        *this << "#" << features.at(i);
+        if (i < features.length() - 1)
+            *this << ", ";
+    }
+    
+    *this << "]";
+}
+
+/// Operator for appending features.
+ContextRealLogger& ContextRealLogger::operator<< (const ContextFeature &f)
+{
+    features << f.getName();
+    return *this;
+}
+
 /// Prints \b end-of-line before going down.
 ContextRealLogger::~ContextRealLogger()
 {
+    printFeatures();
     *this << "\n";
     delete nullDevice;
 }

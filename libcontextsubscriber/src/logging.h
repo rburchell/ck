@@ -24,6 +24,7 @@
 
 #include <QIODevice>
 #include <QString>
+#include <QStringList>
 #include <QTextStream>
 
 #define CONTEXT_LOG_MSG_TYPE_TEST       1
@@ -40,6 +41,16 @@ class NullIODevice : public QIODevice
 public:
     virtual qint64 readData(char*, qint64);
     virtual qint64 writeData(const char*, qint64);
+};
+
+class ContextFeature
+{
+public:
+    ContextFeature(QString name);
+    QString getName() const;
+    
+private:
+    QString featureName;
 };
 
 class ContextRealLogger : public QTextStream
@@ -61,8 +72,15 @@ public:
     
     static void initialize();
     
+    ContextRealLogger &operator<< (const ContextFeature&);
+    using QTextStream::operator <<;
+
 private:
+    
+    void printFeatures();
+    
     NullIODevice *nullDevice; ///< We use custom null-killer device when message disabled at runtime.
+    QStringList features;
 };
 
 /*!
@@ -83,19 +101,20 @@ public:
     inline ContextZeroLogger() {}
     
     /* Stubby ops */
-   inline ContextZeroLogger &operator<< (QChar) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (char) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (signed short) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (unsigned short) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (signed int) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (unsigned int) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (signed long) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (unsigned long) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (float) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (double) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (const char *) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (const QString&) { return *this;} ///< Does nothing.
-   inline ContextZeroLogger &operator<< (void *) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (QChar) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (char) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (signed short) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (unsigned short) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (signed int) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (unsigned int) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (signed long) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (unsigned long) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (float) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (double) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (const char *) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (const QString&) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (void *) { return *this;} ///< Does nothing.
+    inline ContextZeroLogger &operator<< (const ContextFeature&) { return *this;} ///< Does nothing.
 };
 
 /* Macro defs */
