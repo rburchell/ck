@@ -10,5 +10,5 @@ check-accept:
 
 CLEANFILES = *.pyc
 
-EXTRA_DIST = asynchronicity commander subscription runTests.sh \
+EXTRA_DIST = asynchronicity commander subscription runTests.sh tests.xml \
 			 common
