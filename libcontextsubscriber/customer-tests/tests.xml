@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<testdefinition version="0.1">
+  <!-- Test suite, name mandatory - the same as test package name -->
+  <suite name="libcontextsubscriber-tests">
+    <!-- At least one set per suite, name and description mandatory -->
+    <set name="libcontextsubscriber suite" description="libcontextsubscriber tests">
+      <!-- At least one case per set, name mandatory, description mandatory, other optional -->
+      <case name="libsub001" description="This test verifies that the asynchronicity of the subscriber library" requirement="" timeout="5">
+        <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
+        <step expected_result="0">/usr/share/libcontextsubscriber-tests/asynchronicity/asynchronicity.py</step>
+      </case>
+      <!-- At least one case per set, name mandatory, description mandatory, other optional -->
+      <case name="libsub002" description="This test verifies that properties are overriden by commander" requirement="" timeout="5">
+        <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
+        <step expected_result="0">/usr/share/libcontextsubscriber-tests/commander/commander_appearing.py</step>
+      </case>
+      <!-- At least one case per set, name mandatory, description mandatory, other optional -->
+      <case name="libsub003" description="This test verifies that nonexistent properties are handled by commander" requirement="" timeout="5">
+        <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
+        <step expected_result="0">/usr/share/libcontextsubscriber-tests/commander/commander_nonexistent.py</step>
+      </case>
+      <!-- At least one case per set, name mandatory, description mandatory, other optional -->
+      <case name="libsub004" description="This test verifies that disabling commander restore actual properties values" requirement="" timeout="5">
+        <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
+        <step expected_result="0">/usr/share/libcontextsubscriber-tests/commander/commander_disabled.py</step>
+      </case>
+      <!-- At least one case per set, name mandatory, description mandatory, other optional -->
+      <case name="libsub005" description="This test verifies that subscription to properties" requirement="" timeout="5">
+        <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
+        <step expected_result="0">/usr/share/libcontextsubscriber-tests/subscription/subscription.py</step>
+      </case>
+      <!-- Environments optional - tells where the tests are run -->
+      <environments>
+        <scratchbox>false</scratchbox>
+        <hardware>true</hardware>
+      </environments>
+    </set>
+  </suite>
+</testdefinition>
