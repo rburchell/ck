@@ -3,7 +3,7 @@ DBUS_TESTS = $(srcdir)/contextProviderTCs.py
 TESTS =
 
 TESTS_ENVIRONMENT = \
-		PYTHONPATH=@abs_top_srcdir@/tests/dbus:@abs_top_builddir@/tests/python-test-library:@abs_top_srcdir@/tests/python-test-library
+		PYTHONPATH=@abs_top_srcdir@/tests/dbus:@abs_top_builddir@/tests/customer-tests:@abs_top_srcdir@/tests/customer-tests/libcontextprovider
 
 check-local: check-dbus
 
@@ -48,4 +48,4 @@ CLEANFILES = *.pyc */*.pyc config.py
 
 check_misc_sources = $(TESTS)
 
-SUBDIRS = testfw
+SUBDIRS = testfw stubs

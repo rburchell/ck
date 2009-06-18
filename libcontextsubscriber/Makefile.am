@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src unit-tests accept-tests cli update-contextkit-providers doc man
+SUBDIRS = src unit-tests customer-tests cli update-contextkit-providers doc man
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextsubscriber-1.0.pc
@@ -8,7 +8,7 @@ check-sum:
 	make -C unit-tests/ check-sum
 
 check-accept:
-	$(MAKE) -C accept-tests check-accept
+	$(MAKE) -C customer-tests check-accept
 
 covoptioncheck:
 	@if test "$(GCOV)" = "" ; then \

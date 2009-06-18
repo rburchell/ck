@@ -18,9 +18,9 @@ import os
 # libcontextprovider python bindings
 if "srcdir" in os.environ:
     # For vpath builds
-    sys.path.append(os.environ["srcdir"] + "/../../python/")
+    sys.path.append(os.environ["srcdir"] + "/../../../python/")
 else:
-    sys.path.append("../../python/")
+    sys.path.append("../../../python/")
 
 import ContextKit.ContextProvider as cp
 
@@ -39,10 +39,10 @@ class FakeProvider (dbus.service.Object):
             cp.ContextProvider.set_string("test.log", "Subscribed")
         else:
             cp.ContextProvider.set_string("test.log", "Unsubscribed")
-                    
+
     def py_dummy_cb (self, subscribe, d):
         pass
-    
+
     # Initializing the provider object
     def __init__(self, main_loop):
         self.log = "";
@@ -72,7 +72,7 @@ class FakeProvider (dbus.service.Object):
         print "Provider: Executing Installation for a group"
         self.subscription_changed_cb = cp.ContextProvider.SUBSCRIPTION_CHANGED_CALLBACK(self.py_subscription_changed_cb)
         self.dummy_cb = cp.ContextProvider.SUBSCRIPTION_CHANGED_CALLBACK(self.py_dummy_cb)
-        
+
         p = cp.ContextProvider.install_group(["test.double", "test.int", "test.bool",
                                  "test.string"], 1, self.subscription_changed_cb, None)
         p_other = cp.ContextProvider.install_group(["test.log"], 1, self.dummy_cb, None)
@@ -83,14 +83,14 @@ class FakeProvider (dbus.service.Object):
 
         p = cp.ContextProvider.install_group(["Context.test2.double", "Context.test2.int", "Context.test2.bool", "Context.test2.unknown"], 1, self.dummy_cb, None)
         p_other = cp.ContextProvider.install_key("Context.test2.string", 1, self.dummy_cb, None)
-    
+
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='', out_signature='')
     def DoInstallKey(self):
         print "Provider: Executing Installation for key"
         self.subscription_changed_cb = cp.ContextProvider.SUBSCRIPTION_CHANGED_CALLBACK(self.py_subscription_changed_cb)
         p = cp.ContextProvider.install_key("test.single.int", 1, self.subscription_changed_cb, None)
-            
+
     @dbus.service.method(dbus_interface=cfg.fakeProviderIfce,
                        in_signature='a{sv}as', out_signature='')
     def SendChangeSet(self, values, undetermined):
