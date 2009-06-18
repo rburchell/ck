@@ -10,9 +10,6 @@ version_check asciidoc ASCIIDOC 'asciidoc' 8.2.7 "http://www.methods.co.nz/ascii
 existence_check dot
 existence_check source-highlight
 
-existence_check gtkdocize   
-gtkdocize
-
 autoreconf -i -f
 
 # Autoreconf overwrites INSTALL, but we have our own version of it.

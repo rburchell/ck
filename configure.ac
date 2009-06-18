@@ -11,6 +11,9 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 AM_PATH_PYTHON
+# todo?: add vala version check here
+AC_PATH_PROG(VALAC, valac, valac)
+AC_SUBST(VALAC)
 
 # always build with warnings
 CXXFLAGS="$CXXFLAGS -Wall"
@@ -29,7 +32,6 @@ PKG_CHECK_MODULES_SUBST([QtXml], [QtXml])
 AC_PROG_QT_MOC
 AC_PROG_QT_UIC
 AC_PROG_QT_RCC
-
 AC_CHECK_LIB([cdb], [cdb_make_start], [], [AC_MSG_ERROR([Can't find cdb library])])
 
 # setup cflags and libs for different parts of the code
@@ -52,30 +54,43 @@ dnl AC_SUBST(LOCATION_CFLAGS)
 dnl AC_SUBST(LOCATION_LIBS)
 dnl AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
 
-# fixme: if not found, disable building of documentation
-GTK_DOC_CHECK([1.9])
-
-# todo?: add vala version check here
-AC_PATH_PROG(VALAC, valac, valac)
-AC_SUBST(VALAC)
-
 build_docs=yes
 
-AC_SUBST([XSLTPROC], [])
-AC_CHECK_PROGS([XSLTPROC], [xsltproc])
-AC_DISABLE_DOC_IF_EMPTY([XSLTPROC])
+dnl AC_ARG_ENABLE([doc],
+dnl     AS_HELP_STRING([--disable-doc],
+dnl                    [disable building of documentation [[default=no]]]),,
+dnl     [enable_gtk_doc=no])
 
-AC_SUBST([XMLLINT], [])
-AC_CHECK_PROGS([XMLLINT], [xmllint])
-AC_DISABLE_DOC_IF_EMPTY([XMLLINT])
+AC_MSG_CHECKING([for gtk-doc])
+PKG_CHECK_EXISTS([gtk-doc >= 1.9],[AC_MSG_RESULT([yes])],
+			  [GTKDOC=:
+			   AC_DISABLE_DOC_IF_COLON([GTKDOC])
+			   ])
+HTML_DIR="${datadir}/gtk-doc/html"
+AC_SUBST([HTML_DIR])
 
-AC_PROG_PERL_MODULES([XML::LibXML::Reader], [], [build_docs=no])
+AC_CHECK_PROGS([XSLTPROC], [xsltproc], [:])
+AC_DISABLE_DOC_IF_COLON([XSLTPROC])
+AC_SUBST([XSLTPROC])
+
+AC_CHECK_PROGS([XMLLINT], [xmllint], [:])
+AC_DISABLE_DOC_IF_COLON([XMLLINT])
+AC_SUBST([XMLLINT])
+
+AC_CHECK_PROGS([DOXYGEN], [doxygen], [:])
+AC_DISABLE_DOC_IF_COLON([DOXYGEN])
+AC_SUBST([DOXYGEN])
+
+# probably this is not used anymore!
+# AC_PROG_PERL_MODULES([XML::LibXML::Reader], [], [build_docs=no])
 
 # todo?: add asciidoc version check
 # todo?: add program check for dot
 # todo?: add program check for source-highlight
 
 AM_CONDITIONAL(CONTEXTKIT_BUILD_DOCS, test x$build_docs = xyes)
+AM_CONDITIONAL(GTK_DOC_USE_LIBTOOL, test x$build_docs = xyes)
+AM_CONDITIONAL(ENABLE_GTK_DOC, test x$build_docs = xyes)
 
 ######################
 # Coverage option

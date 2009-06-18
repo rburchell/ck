@@ -65,7 +65,6 @@ doc/reference/libcontextprovider/*.stamp
 doc/reference/libcontextprovider/tmpl
 doc/reference/libcontextprovider/xml
 doc/reference/libcontextprovider/libcontextprovider.types
-gtk-doc.make
 libcontextprovider/dbus_interface.[ch]
 libcontextprovider/key_usage_counter.[ch]
 libcontextprovider/manager.[ch]
@@ -79,7 +78,6 @@ contextd/plugin.[ch]
 contextd/hal_plugin.[ch]
 contextd/lowmem_plugin.[ch]
 contextd/contextd.vala.stamp
-m4/gtk-doc.m4
 contextprovider-1.0.pc
 doc/context-providers.html
 libcontextprovider/libcontextprovider.vala.stamp

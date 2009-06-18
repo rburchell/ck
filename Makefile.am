@@ -1,5 +1,4 @@
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
-
+# DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 # We exclude the caches from the uninstall check.
 # fixme: add this back for make distcheck
 # distuninstallcheck_listfiles = find . -type f -a ! -name '*.cdb' -print

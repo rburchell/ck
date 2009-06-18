@@ -1,10 +1,3 @@
-dnl Usage: AC_DISABLE_DOC_IF_EMPTY([variable])
-AC_DEFUN([AC_DISABLE_DOC_IF_EMPTY], [
-if test -z "$$1"; then
-  AC_MSG_WARN([$1 not found, not building documentation])
-  build_docs=no
-fi])
-
 dnl Usage: PKG_CHECK_MODULES_SUBST([name], [package to check for])
 AC_DEFUN([PKG_CHECK_MODULES_SUBST], [
 PKG_CHECK_MODULES([$1], [$2])
