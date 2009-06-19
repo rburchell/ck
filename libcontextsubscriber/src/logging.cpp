@@ -232,8 +232,8 @@ void ContextRealLogger::initialize()
 
 /// Constructor. Called by the macros. \a func is the function name, \a file is
 /// is the current source file and \a line specifies the line number.
-ContextRealLogger::ContextRealLogger(int type, const char *func, const char *file, int line) 
-    : QTextStream(), msgType(type)
+ContextRealLogger::ContextRealLogger(int type, const char *module, const char *func, const char *file, int line) 
+    : QTextStream(), msgType(type), moduleName(module)
 {
     if (! initialized) {
         // This is not thread safe, but our initialization depends on 
@@ -248,7 +248,7 @@ ContextRealLogger::ContextRealLogger(int type, const char *func, const char *fil
         *this << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " ";
 
     // Module name
-    *this << "[" << CONTEXT_LOG_MODULE_NAME << "]" << " ";
+    *this << "[" << module << "]" << " ";
     
     // Message name
     switch(type) {
@@ -286,10 +286,10 @@ bool ContextRealLogger::shouldPrint()
         return false;
         
     // Now try to eliminate based on module name...
-    if (showModule && strcmp(showModule, CONTEXT_LOG_MODULE_NAME) != 0) 
+    if (showModule && strcmp(showModule, moduleName) != 0) 
         return false;
     
-    if (hideModule && strcmp(hideModule, CONTEXT_LOG_MODULE_NAME) == 0) 
+    if (hideModule && strcmp(hideModule, moduleName) == 0) 
         return false;
         
     // Now try to eliminate by feature name
