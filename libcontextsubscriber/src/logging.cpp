@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <QDateTime>
+#include <QFile>
 
 /*!
     \page Logging
@@ -150,28 +151,6 @@ QString ContextFeature::getName() const
     return featureName;
 }
 
-/* NullIODevice */
-
-/*!
-    \class NullIODevice  
-
-    \brief Device that kills all input.
-
-    This class is a \c QIODevice implementation that kills everything sent to it. 
-    We set this as a output device for stream in ContextRealLogger when given debug
-    message type was disabled at \b runtime. 
-*/
-
-qint64 NullIODevice::readData(char*, qint64)
-{
-    return 0;
-}
-
-qint64 NullIODevice::writeData(const char*, qint64)
-{ 
-    return 0; 
-}
-
 /* ContextRealLogger */
 
 /*!
@@ -191,6 +170,8 @@ bool ContextRealLogger::useColor = false;
 char* ContextRealLogger::showModule = NULL;
 char* ContextRealLogger::hideModule = NULL;
 bool ContextRealLogger::initialized = false;
+QStringList ContextRealLogger::showFeatures = QStringList();
+QStringList ContextRealLogger::hideFeatures = QStringList();
 
 /// Initialize the class by checking the enviornment variables and setting 
 /// the message output params. The log level is set from \c CONTEXT_LOG_VERBOSITY
@@ -204,10 +185,26 @@ void ContextRealLogger::initialize()
 
     if (getenv("CONTEXT_LOG_USE_COLOR") != NULL)
         useColor = true;
-        
+    
+    // Check feature enablers (showFeatures)
+    const char *showFeaturesStr = getenv("CONTEXT_LOG_SHOW_FEATURES");
+    if (showFeaturesStr) {
+        foreach (QString f, QString(showFeaturesStr).split(',')) 
+            showFeatures << f.trimmed();
+    }
+    
+    // Check feature hide (hideFeatures)
+    const char *hideFeaturesStr = getenv("CONTEXT_LOG_HIDE_FEATURES");
+    if (hideFeaturesStr) {
+        foreach (QString f, QString(hideFeaturesStr).split(',')) 
+            hideFeatures << f.trimmed();
+    }
+
+    // Show/hide given module
     showModule = getenv("CONTEXT_LOG_SHOW_MODULE");
     hideModule = getenv("CONTEXT_LOG_HIDE_MODULE");
 
+    // Check and do verbosity
     const char *verbosity = getenv("CONTEXT_LOG_VERBOSITY");
     if (! verbosity)
         return;
@@ -235,79 +232,86 @@ void ContextRealLogger::initialize()
 
 /// Constructor. Called by the macros. \a func is the function name, \a file is
 /// is the current source file and \a line specifies the line number.
-ContextRealLogger::ContextRealLogger(int msgType, const char *func, const char *file, int line) 
-    : QTextStream(stderr)
+ContextRealLogger::ContextRealLogger(int type, const char *func, const char *file, int line) 
+    : QTextStream(), msgType(type)
 {
-    nullDevice = NULL;
-    
     if (! initialized) {
         // This is not thread safe, but our initialization depends on 
         // non-mutable parts anyways, so we should be ok.
         initialize();
     }
     
-    const char *msgTypeString = NULL;
+    setString(&data);
     
-    // Killing by msg type
-    if (msgType == CONTEXT_LOG_MSG_TYPE_DEBUG) {
-        if (! showDebug) {
-            killOutput();
-            return;
-        } else
-            msgTypeString = "DEBUG";
-    } else if (msgType == CONTEXT_LOG_MSG_TYPE_WARNING) {
-        if (! showWarning) {
-            killOutput();
-            return;
-        } else
-            msgTypeString = (useColor) ? "\033[103mWARNING\033[0m" : "WARNING";
-    } else if (msgType == CONTEXT_LOG_MSG_TYPE_CRITICAL) {
-        if (! showCritical) {
-            killOutput();
-            return;
-        } else
-            msgTypeString = (useColor) ? "\033[101mCRITICAL\033[0m" : "CRITICAL";
-    } else if (msgType == CONTEXT_LOG_MSG_TYPE_TEST) {
-        if (! showTest) {
-            killOutput();
-            return;
-        } else
-            msgTypeString = "TEST";
-    }
-    
-    // Killing if we're not the module we're interested in
-    if (showModule && strcmp(showModule, CONTEXT_LOG_MODULE_NAME) != 0) {
-        killOutput();
-        return;
-    }
-    
-    // Killing if we're the module we're NOT interested in
-    if (hideModule && strcmp(hideModule, CONTEXT_LOG_MODULE_NAME) == 0) {
-        killOutput();
-        return;
-    }
-    
+    // Add timestamp
     if (! hideTimestamps)
         *this << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " ";
-        
+
+    // Module name
     *this << "[" << CONTEXT_LOG_MODULE_NAME << "]" << " ";
-    *this << msgTypeString << " ";
+    
+    // Message name
+    switch(type) {
+        case CONTEXT_LOG_MSG_TYPE_DEBUG:
+            *this << "DEBUG" << " ";
+            break;
+        case CONTEXT_LOG_MSG_TYPE_WARNING:
+            *this << ((useColor) ? "\033[103mWARNING\033[0m" : "WARNING") << " ";
+            break;
+        case CONTEXT_LOG_MSG_TYPE_CRITICAL:
+            *this << ((useColor) ? "\033[101mCRITICAL\033[0m" : "CRITICAL") << " ";
+            break;
+        case CONTEXT_LOG_MSG_TYPE_TEST:
+            *this << "TEST" << " ";
+            break;
+        default:
+            *this << "UNKNOWN";
+            break;
+    }
+
+    // File, line and function...
     *this << "[" << file << ":" << line << ":" << func << "] ";
 }
 
-/// Make sure this logger will print nothing. 
-void ContextRealLogger::killOutput()
+bool ContextRealLogger::shouldPrint()
 {
-    if (nullDevice)
-        return;
+    // First try to eliminated based on message type...
+    if (msgType == CONTEXT_LOG_MSG_TYPE_DEBUG && ! showDebug)
+        return false;
+    else if (msgType == CONTEXT_LOG_MSG_TYPE_WARNING && ! showWarning) 
+        return false;
+    else if (msgType == CONTEXT_LOG_MSG_TYPE_TEST && ! showTest) 
+        return false;
+    else if (msgType == CONTEXT_LOG_MSG_TYPE_CRITICAL && ! showCritical) 
+        return false;
+        
+    // Now try to eliminate based on module name...
+    if (showModule && strcmp(showModule, CONTEXT_LOG_MODULE_NAME) != 0) 
+        return false;
+    
+    if (hideModule && strcmp(hideModule, CONTEXT_LOG_MODULE_NAME) == 0) 
+        return false;
+        
+    // Now try to eliminate by feature name
+    foreach(QString feature, features) {
+        if (hideFeatures.contains(feature))
+            return false;
+    }
+    
+    if (showFeatures.length() > 0) {
+        foreach(QString feature, showFeatures) {
+            if (features.contains(feature))
+                return true;
+            else
+                return false;
+        }
+    }
             
-    nullDevice = new NullIODevice();
-    setDevice(new NullIODevice());
-    return;
+    return true;
 }
 
-/// Print all the features, separated with commas and wrapped in brackets.
-void ContextRealLogger::printFeatures()
+/// Append (print) all the features, separated with commas and wrapped in brackets.
+void ContextRealLogger::appendFeatures()
 {
     if (features.length() == 0)
         return;
@@ -331,10 +335,14 @@ ContextRealLogger& ContextRealLogger::operator<< (const ContextFeature &f)
     return *this;
 }
 
-/// Prints \b end-of-line before going down.
+/// Destructor, prints \b end-of-line before going down.
 ContextRealLogger::~ContextRealLogger()
 {
-    printFeatures();
-    *this << "\n";
-    delete nullDevice;
+    if (shouldPrint()) {
+        appendFeatures();
+        *this << "\n";
+        QTextStream(stderr) << data;
+    }
+    
+    setDevice(NULL);
 }

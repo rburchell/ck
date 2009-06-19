@@ -26,6 +26,7 @@
 #include <QString>
 #include <QStringList>
 #include <QTextStream>
+#include <QBuffer>
 
 #define CONTEXT_LOG_MSG_TYPE_TEST       1
 #define CONTEXT_LOG_MSG_TYPE_DEBUG      2
@@ -35,13 +36,6 @@
 #ifndef CONTEXT_LOG_MODULE_NAME
 #define CONTEXT_LOG_MODULE_NAME "unknown"
 #endif
-
-class NullIODevice : public QIODevice
-{
-public:
-    virtual qint64 readData(char*, qint64);
-    virtual qint64 writeData(const char*, qint64);
-};
 
 class ContextFeature
 {
@@ -58,7 +52,6 @@ class ContextRealLogger : public QTextStream
 public:
     ContextRealLogger(int msgType, const char *func, const char *file, int line);
     ~ContextRealLogger();
-    void killOutput();
     
     static bool showTest; ///< Test messages enabled at runtime
     static bool showDebug; ///< Debug messages enabled at runtime
@@ -69,6 +62,8 @@ public:
     static bool useColor; ///< Use simple colors for output (yellow for warnings, red for criticals)
     static char *showModule; ///< Show messages \b only from the specified module
     static char *hideModule; ///< Hide messages from the specified module
+    static QStringList showFeatures; ///< Show messages with \b only the specified features
+    static QStringList hideFeatures; ///< Hide messages with the specified features
     
     static void initialize();
     
@@ -77,9 +72,11 @@ public:
 
 private:
     
-    void printFeatures();
-    
-    NullIODevice *nullDevice; ///< We use custom null-killer device when message disabled at runtime.
+    bool shouldPrint();
+    void appendFeatures();
+
+    int msgType; ///< Type of message we're representing.
+    QString data; ///< Holds the stream data.
     QStringList features;
 };
 
