@@ -117,6 +117,8 @@ public:
 
 /* Macro defs */
 
+#define contextFeature(name) (ContextFeature(name))
+
 #ifdef CONTEXT_LOG_HIDE_TEST
 #define contextTest() (ContextZeroLogger())
 #else
