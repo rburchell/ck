@@ -156,6 +156,12 @@
     \endcode
 
     ...will hide all logging messages belonging to "threads" and "util" feature groups.
+
+    \section vanilla Vanilla
+
+    If the default logging output is too much for you, it's possible to set a CONTEXT_LOG_VANILLA
+    enviornment variable. This will simply the logging output greatly -- no timestamps will be printed, 
+    no module information will be printed, no line/function/class info will be printed. 
 */
 
 /* ContextFeature */
