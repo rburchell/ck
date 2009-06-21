@@ -170,6 +170,7 @@ bool ContextRealLogger::useColor = false;
 char* ContextRealLogger::showModule = NULL;
 char* ContextRealLogger::hideModule = NULL;
 bool ContextRealLogger::initialized = false;
+bool ContextRealLogger::vanilla = false;
 QStringList ContextRealLogger::showFeatures = QStringList();
 QStringList ContextRealLogger::hideFeatures = QStringList();
 
@@ -203,6 +204,10 @@ void ContextRealLogger::initialize()
     // Show/hide given module
     showModule = getenv("CONTEXT_LOG_SHOW_MODULE");
     hideModule = getenv("CONTEXT_LOG_HIDE_MODULE");
+
+    // Vanilla
+    if (getenv("CONTEXT_LOG_VANILLA")) 
+        vanilla = true;
 
     // Check and do verbosity
     const char *verbosity = getenv("CONTEXT_LOG_VERBOSITY");
@@ -244,16 +249,18 @@ ContextRealLogger::ContextRealLogger(int type, const char *module, const char *f
     setString(&data);
     
     // Add timestamp
-    if (! hideTimestamps)
+    if (! hideTimestamps && ! vanilla)
         *this << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " ";
 
     // Module name
-    *this << "[" << module << "]" << " ";
+    if (! vanilla)
+        *this << "[" << module << "]" << " ";
     
     // Message name
     switch(type) {
         case CONTEXT_LOG_MSG_TYPE_DEBUG:
-            *this << "DEBUG" << " ";
+            if (! vanilla)
+                *this << "DEBUG" << " ";
             break;
         case CONTEXT_LOG_MSG_TYPE_WARNING:
             *this << ((useColor) ? "\033[103mWARNING\033[0m" : "WARNING") << " ";
@@ -270,7 +277,9 @@ ContextRealLogger::ContextRealLogger(int type, const char *module, const char *f
     }
 
     // File, line and function...
-    *this << "[" << file << ":" << line << ":" << func << "] ";
+    
+    if (! vanilla)
+        *this << "[" << file << ":" << line << ":" << func << "] ";
 }
 
 bool ContextRealLogger::shouldPrint()

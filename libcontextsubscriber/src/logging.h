@@ -64,6 +64,7 @@ public:
     static char *hideModule; ///< Hide messages from the specified module
     static QStringList showFeatures; ///< Show messages with \b only the specified features
     static QStringList hideFeatures; ///< Hide messages with the specified features
+    static bool vanilla; ///< Use vanilla (stripped-down) logging
     
     static void initialize();
     
