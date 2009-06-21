@@ -117,6 +117,45 @@
     
     If \c CONTEXT_LOG_MODULE_NAME is undefined, the log messages will be marked as coming from an
     \b "Undefined" module.
+
+
+    \section features Featues
+
+    It's possible also to assign logging messages to feature groups and control the output 
+    based on that. Features can be compared to tags - one message can belong to zero or more 
+    features. To add to a feature to a log message:
+
+    \code 
+    contextDebug() << contextFeature("threads") << "Message goes here" << someVariable;
+    contextDebug() << contextFeature("threads") << contextFeature("something") << "Message...";
+    \endcode
+
+    It doesn't matter where features are added to the message. There is no specific order required. 
+    This works as well also:
+
+    \code
+    contextDebug() << contextFeature("threads") << "Some message..." << contextFeature("another");
+    \endcode
+
+    There are two enviornment variables that control the output of messages vs. features: \b 
+    CONTEXT_LOG_SHOW_FEATURES and \b CONTEXT_LOG_HIDE_FEATURES. Both take a command separated
+    list of features. 
+
+    If you specify CONTEXT_LOG_SHOW_FEATURES, only messages with given features will be printed to
+    the screen. If you specify \b CONTEXT_LOG_HIDE_FEATURES, messages with the specified features
+    will be hidden (not displayed). For example: 
+
+    \code
+    CONTEXT_LOG_SHOW_FEATURES="threads,util" ./some-binary
+    \endcode
+
+    ...will make \b only the messages belonging to "threads" or "util" features displayed. 
+
+    \code
+    CONTEXT_LOG_HIDE_FEATURES="threads,util" ./some-binary
+    \endcode
+
+    ...will hide all logging messages belonging to "threads" and "util" feature groups.
 */
 
 /* ContextFeature */
