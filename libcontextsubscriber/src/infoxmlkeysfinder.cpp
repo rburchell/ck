@@ -109,7 +109,7 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
             data.bus = currentBus;
 
             if (keyDataHash.contains(currentKeyName)) 
-                contextWarning() << "Key " << currentKeyName << " already defined in this xml file. Overwriting.";
+                contextWarning() << "Key" << currentKeyName << "already defined in this xml file. Overwriting.";
             keyDataHash.insert(currentKeyName, data);
         }
 
@@ -140,7 +140,7 @@ bool InfoXmlKeysFinder::characters(const QString &chars)
     // <type> CHARS ...
     if (inKeyType == true) {
         if (currentKeyType != "")
-            contextWarning() << "Key " << currentKeyName << " already has a type. Overwriting.";
+            contextWarning() << "Key" << currentKeyName << "already has a type. Overwriting.";
         currentKeyType = canonicalizeType (chars.trimmed());
         return true;
     }

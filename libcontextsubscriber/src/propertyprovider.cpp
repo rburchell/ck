@@ -84,7 +84,7 @@ void PropertyProvider::onProviderDisappeared()
 /// subscribe to the currently subscribed keys.
 void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 {
-    contextDebug() << "PropertyProvider::onGetSubscriberFinished " << objectPath;
+    contextDebug() << "PropertyProvider::onGetSubscriberFinished" << objectPath;
     if (objectPath != "") {
         // GetSubscriber was successful
         delete subscriberInterface;
@@ -123,7 +123,7 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 /// busyloop in <tt>waitForSubscription()</tt>.
 void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 {
-    contextDebug() << "PropertyProvider::onSubscribeFinished ";
+    contextDebug() << "PropertyProvider::onSubscribeFinished";
     // FIXME: contextDebug() << "PropertyProvider::onSubscribeFinished " << keys;
     // Drop keys which were not supposed to be subscribed to (by this provider)
     emit subscribeFinished(keys.intersect(subscribedKeys));
@@ -133,7 +133,7 @@ void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 /// entered the next time.
 void PropertyProvider::subscribe(const QString &key)
 {
-    contextDebug() << "PropertyProvider::subscribe, provider" << busName << " " << key;
+    contextDebug() << "PropertyProvider::subscribe, provider" << busName << key;
 
     // Note: the intention is saved in all cases; whether we can really subscribe or not.
     subscribedKeys.insert(key);
@@ -167,7 +167,7 @@ void PropertyProvider::subscribe(const QString &key)
 /// entered the next time.
 void PropertyProvider::unsubscribe(const QString &key)
 {
-    contextDebug() << "PropertyProvider::unsubscribe, provider" << busName << " " << key;
+    contextDebug() << "PropertyProvider::unsubscribe, provider" << busName << key;
 
     // Save the intention of the higher level
     subscribedKeys.remove(key);
@@ -220,7 +220,7 @@ PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busT
             providerInstances.insert(lookupValue,
                                      new PropertyProvider(busType, busName));
 
-    contextDebug() << "Returning provider instance for " << busType << ":" << busName;
+    contextDebug() << "Returning provider instance for" << busType << ":" << busName;
 
     return providerInstances[lookupValue];
 }

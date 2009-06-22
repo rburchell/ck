@@ -66,7 +66,7 @@ SubscriberInterface::SubscriberInterface(const QDBusConnection::BusType busType,
     } else if (busType == QDBusConnection::SystemBus) {
         connection = QDBusConnection::systemBus();
     } else {
-        contextCritical() << "Invalid bus type: " << busType;
+        contextCritical() << "Invalid bus type:" << busType;
         return;
     }
 
@@ -129,7 +129,7 @@ QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QV
 {
     foreach (QString null, nulls) {
         if (map.contains(null))
-            contextWarning() << "Provider error, provided unknown and a value for " << null;
+            contextWarning() << "Provider error, provided unknown and a value for" << null;
         else
             map[null] = QVariant();
     }

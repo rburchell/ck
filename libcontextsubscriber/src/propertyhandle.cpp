@@ -204,7 +204,7 @@ void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
 
         if (!checked) {
             contextCritical() << "Provider error, bad type for " << myKey <<
-                ", wanted:" << myType << " got:" << newValue.typeName();
+                "wanted:" << myType << "got:" << newValue.typeName();
             return;
         }
     }
@@ -218,7 +218,7 @@ void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
         // Print out a message of provider error.
         // In either case, don't emit valueChanged.
         if (!allowSameValue) {
-            contextWarning() << "Provider error, received unnecessary DBUS signal for property " << myKey;
+            contextWarning() << "Provider error, received unnecessary DBUS signal for property" << myKey;
         }
     } else {
         // The value was new

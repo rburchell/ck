@@ -59,7 +59,7 @@ DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const
     } else if (busType == QDBusConnection::SystemBus) {
         connection = QDBusConnection::systemBus();
     } else {
-        contextCritical() << "Invalid bus type: " << busType;
+        contextCritical() << "Invalid bus type:" << busType;
         return;
     }
 
