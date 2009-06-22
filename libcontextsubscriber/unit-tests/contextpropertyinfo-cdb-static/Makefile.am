@@ -3,23 +3,23 @@ check_PROGRAMS = contextpropertyinfounittest-cdb-static
 # your test's sources
 contextpropertyinfounittest_cdb_static_SOURCES = contextpropertyinfounittest.cpp
 
-COVERAGE_FILES = contextregistryinfo.cpp contextpropertyinfo.cpp	\
-	infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp	\
-	infocdbbackend.cpp cdbreader.cpp
+COVERAGE_FILES = contextpropertyinfo.cpp 	\
+		 infobackend.cpp 		\
+		 infocdbbackend.cpp
 EXTRA_DIST = cache.cdb
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtDBus_CFLAGS) -DDEFAULT_CONTEXT_PROVIDERS="\"@DEFAULT_CONTEXT_PROVIDERS@\"" -I$(srcdir)/../util/
 AM_LDFLAGS = -lcdb $(QtXml_LIBS)
-FROM_SOURCE = src_contextregistryinfo.cpp src_contextpropertyinfo.cpp	\
-	src_infobackend.cpp src_infoxmlbackend.cpp			\
-	src_infoxmlkeysfinder.cpp src_infocdbbackend.cpp		\
-	src_cdbreader.cpp src_contextregistryinfo.h			\
-	src_contextpropertyinfo.h src_infobackend.h			\
-	src_infoxmlbackend.h src_infocdbbackend.h			\
-	src_infoxmlkeysfinder.h src_cdbreader.h				\
-	src_logging.cpp src_logging.h
+FROM_SOURCE = contextregistryinfo.cpp contextpropertyinfo.cpp	\
+	infobackend.cpp infoxmlbackend.cpp			\
+	infoxmlkeysfinder.cpp infocdbbackend.cpp		\
+	cdbreader.cpp contextregistryinfo.h			\
+	contextpropertyinfo.h infobackend.h			\
+	infoxmlbackend.h infocdbbackend.h			\
+	infoxmlkeysfinder.h cdbreader.h                         \
+	infokeydata.h sconnect.h logging.h logging.cpp
 LDADD =
 include $(top_srcdir)/am/tests.am
 

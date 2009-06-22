@@ -29,6 +29,8 @@
 #include <QSet>
 #include <QString>
 
+namespace ContextSubscriber {
+
 class PropertyProvider : public QObject
 {
     Q_OBJECT
@@ -64,5 +66,7 @@ public:
 
     friend class PropertyHandleUnitTests;
 };
+
+} // end namespace
 
 #endif

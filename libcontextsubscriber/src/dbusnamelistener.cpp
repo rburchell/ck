@@ -29,6 +29,8 @@
 #include <QMap>
 #include <QString>
 
+namespace ContextSubscriber {
+
 /*! \class DBusNameListener
 
   \brief Listens for changes in a specific service name on a DBus bus,
@@ -127,3 +129,5 @@ bool DBusNameListener::isServicePresent() const
 {
     return servicePresent;
 }
+
+} // end namespace

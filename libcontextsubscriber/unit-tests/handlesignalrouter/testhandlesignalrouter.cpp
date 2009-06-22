@@ -32,6 +32,11 @@
 #include <QDebug>
 #include <QDBusConnection>
 
+// Help the QSignalSpy handle QVariant
+Q_DECLARE_METATYPE(QVariant);
+
+namespace ContextSubscriber {
+
 #define MYLOGLEVEL 2
 void myMessageOutput(QtMsgType type, const char *msg)
 {
@@ -54,9 +59,6 @@ void myMessageOutput(QtMsgType type, const char *msg)
         abort();
     }
 }
-
-// Help the QSignalSpy handle QVariant
-Q_DECLARE_METATYPE(QVariant);
 
 // Mock instances
 // These will be created by the test program
@@ -171,4 +173,6 @@ void HandleSignalRouterUnitTests::routingSignals()
 
 }
 
-QTEST_MAIN(HandleSignalRouterUnitTests);
+} // end namespace
+
+QTEST_MAIN(ContextSubscriber::HandleSignalRouterUnitTests);

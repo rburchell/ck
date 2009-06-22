@@ -23,18 +23,17 @@
 #define CONTEXTPROPERTY_H
 
 #include <QObject>
+#include <QVariant>
+#include <QString>
 
 class ContextPropertyPrivate;
 class ContextPropertyInfo;
-class QVariant;
-class QString;
 
 class ContextProperty : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ContextProperty(QObject *parent = 0);
     explicit ContextProperty(const QString &key, QObject *parent = 0);
 
     virtual ~ContextProperty();

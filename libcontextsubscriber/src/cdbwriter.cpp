@@ -30,9 +30,9 @@
     \brief A wrapper class to write data (create) tiny-cdb databases.
 
     This class is not a part of the public API.
-    The writer operates only on strings. String values can be associated with string keys. 
+    The writer operates only on strings. String values can be associated with string keys.
     Several operations are supported - ading, replacing and inserting. Those operations differ
-    in how they handle existing keys with same name. 
+    in how they handle existing keys with same name.
 
     The writer automatically cloes the filesystem resource on destruction but
     can be also closed manually. Writing to a closed writer has no effect.
@@ -40,7 +40,7 @@
 
 /// Constructs a new CDBWriter to write to a cdb database at \a dbpath
 /// \param dbpath Path to the database.
-CDBWriter::CDBWriter(const QString &path, QObject *parent) 
+CDBWriter::CDBWriter(const QString &path, QObject *parent)
     : QObject(parent)
 {
     cdbm = NULL;
@@ -57,8 +57,8 @@ CDBWriter::CDBWriter(const QString &path, QObject *parent)
 /// Constructs a new CDBWriter to write to a cdb database at a file
 /// descriptor \a fd. You should not manipulate the \a fd after calling
 /// this function.
-/// \param fd An open file descriptor. 
-CDBWriter::CDBWriter(int fdd, QObject *parent) 
+/// \param fd An open file descriptor.
+CDBWriter::CDBWriter(int fdd, QObject *parent)
     : QObject(parent)
 {
     cdbm = NULL;
@@ -151,9 +151,9 @@ void CDBWriter::put(const QString &key, const QString &val, int flag)
     int vlen = valUtf8Data.size();
     const char *vval = valUtf8Data.constData();
 
-    cdb_make_put((struct cdb_make *) cdbm, 
-                 kval, klen, 
-                 vval, vlen, 
+    cdb_make_put((struct cdb_make *) cdbm,
+                 kval, klen,
+                 vval, vlen,
                  (cdb_put_mode) flag);
 }
 

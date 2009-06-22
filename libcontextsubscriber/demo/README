@@ -15,6 +15,7 @@ terminal slow> cd ../../python/
 terminal slow> ./context-provide com.nokia.slow int test.slow 530
 terminal slow (inside python)> import time; time.sleep(10)
 
+terminal cli> export CONTEXT_PROVIDERS=.
 terminal cli> ../cli/context-listen test.fast test.slow
 
 terminal fast (inside python)> set('test.fast', 613)

@@ -28,23 +28,23 @@
 
 class ContextRegistryInfo : public QObject
 {
-    Q_OBJECT 
+    Q_OBJECT
 
 public:
 
     static ContextRegistryInfo* instance(const QString &backendName = "");
- 
+
     QStringList listKeys() const;
     QStringList listKeys(QString providername) const;
     QStringList listProviders() const;
     QString backendName() const;
 
 private:
-    ContextRegistryInfo() {}; //< Private constructor. Do not use. 
-    ContextRegistryInfo(const ContextRegistryInfo&); //< Private constructor. Do not use. 
-    ContextRegistryInfo& operator=(const ContextRegistryInfo&); //< Private operator. Do not use. 
-   
-    /// Holds the actual pointer to the singelton instance. 
+    ContextRegistryInfo() {}; //< Private constructor. Do not use.
+    ContextRegistryInfo(const ContextRegistryInfo&); //< Private constructor. Do not use.
+    ContextRegistryInfo& operator=(const ContextRegistryInfo&); //< Private operator. Do not use.
+
+    /// Holds the actual pointer to the singelton instance.
     /// Mutex protected during creation.
     static ContextRegistryInfo* registryInstance;
 
@@ -61,13 +61,13 @@ signals:
     /// \param currentKeys List of all the keys that are now in the registry.
     void keysChanged(const QStringList& currentKeys);
 
-    /// Emitted when new keys become availible in the registry. 
-    /// The list contains only the new keys. 
+    /// Emitted when new keys become availible in the registry.
+    /// The list contains only the new keys.
     /// \param newKeys New keys that appeared in the regisitry.
     void keysAdded(const QStringList& newKeys);
-    
+
     /// Emitted when keys disappear (are removed) from the registry.
-    /// The list contains only the removed keys. 
+    /// The list contains only the removed keys.
     /// \param removedKeys The list of removed keys.
     void keysRemoved(const QStringList& removedKeys);
 };

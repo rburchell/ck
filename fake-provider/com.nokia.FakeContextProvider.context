@@ -56,10 +56,6 @@ neighborhood or campus, as a localized string.
     <type>string</type>
     <doc>The name of the current continent, as a localized string.</doc>
   </key>
-  <key name="Location.Planet">
-    <type>string</type>
-    <doc>The name of the current planet (or dwarf planet), as a localized string.</doc>
-  </key>
   <key name="Location.PointOfInterest">
     <type>string</type>
     <doc>
@@ -300,10 +296,6 @@ more information about codifying weather conditions.  We should lift
 something from there, if just for extra geek points.
     </doc>
   </key>
-  <key name="Environment.IsDark">
-    <type>bool</type>
-    <doc>Whether or not it is especially dark.</doc>
-  </key>
   <key name="Environment.IsBright">
     <type>bool</type>
     <doc>Whether or not it is especially bright.</doc>
@@ -319,78 +311,10 @@ The symbolic names of the currently active Situations.  Note that more
 than one situation might be active at the same time.
     </doc>
     </key>
-  <key name="Mode">
+  <key name="Use.Mode" type="string">
     <doc>
 The current main usage mode of the device.
     </doc>
-    <type>
-      <string-enum>
-	<editing>
-          <doc>
-The user is interacting closely with the device and is creating new
-content, such as when composing a email message or creating any other
-kind of document.
-          </doc>
-	</editing>
-	<recording>
-          <doc>
-The user is taking pictures, or recording video or audio.
-          </doc>
-	</recording>
-	<browsing>
-          <doc>
-The user is interacting closely with the device without
-creating new content, such as when browsing search results, or
-browsing through his/her music collection.
-          </doc>
-	</browsing>
-	<watching>
-          <doc>
-The user is watching a video, without closely interacting with the
-device.
-          </doc>
-	</watching>
-	<listening>
-          <doc>
-The user is listening to audio, without closely interacting with the
-device.
-          </doc>
-	</listening>
-        <reading>
-          <doc>
-The user is reading a document, such as when reading a article on the
-web or a e-book.
-          </doc>
-        </reading>
-	<chatting>
-          <doc>
-The user is involved in a real-time, text-based dialog with external
-parties.
-          </doc>
-	</chatting>
-	<gaming>
-          <doc>
-The user is interacting closely with the device, for entertainment.
-          </doc>
-	</gaming>
-	<calling>
-          <doc>
-The user is involved in a real-time, audio- or video-based dialog with
-external parties.
-          </doc>
-	</calling>
-	<active>
-          <doc>
-The user interacting closely with the device, for an activity that
-doesn't fit into any of the above categories.
-          </doc>
-	</active>
-	<idle>
-          <doc>
-The device is not being used.
-          </doc>
-	</idle>
-      </string-enum>
     </type>
   </key>
   <key name="Use.ConnectedContacts" type="string-list">

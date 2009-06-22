@@ -13,6 +13,7 @@ contextd_VALASOURCES = \
 	main.vala \
 	plugin.vala \
 	hal_plugin.vala \
+	lowmem_plugin.vala \
 	$(NULL)
 
 contextd_GENERATEDSOURCES = \
@@ -62,5 +63,5 @@ BUILT_SOURCES = \
 	$(NULL)
 
 install-data-hook:
-	-update-context-providers $(contextdir)
-	-update-contextkit-providers $(providersdir)
+	-update-context-providers $(DESTDIR)$(contextdir)
+	-update-contextkit-providers $(DESTDIR)$(providersdir)

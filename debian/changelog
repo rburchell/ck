@@ -1,8 +1,48 @@
-contextkit (0.2.1~unreleased) unstable; urgency=low
+contextkit (0.2.7~unreleased) unstable; urgency=low
 
-  * 
+  * Fixes: NB#121720 - context-provide cannot provide a False value for
+    a boolean from the start
 
- -- 
+ -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Mon, 15 Jun 2009 09:08:59 +0300
+
+contextkit (0.2.6) unstable; urgency=low
+
+  * Put some internal classes into the "ContextSubscriber" namespace so
+    that they don't collide with like-named classes in libduivaluespace.
+
+  (0.2.5 was never successfully released.)
+  
+ -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Tue, 09 Jun 2009 17:11:48 +0300
+
+contextkit (0.2.4) unstable; urgency=low
+
+  * fixed the bug that libcontextsubscriber0 was not installable if no
+    other components of the context framework were ever installed before
+
+ -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Tue, 09 Jun 2009 17:11:48 +0300
+
+contextkit (0.2.3) unstable; urgency=low
+
+  * contextd-tests package: bug fix in tests.xml
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 05 Jun 2009 08:24:08 +0300
+
+contextkit (0.2.2) unstable; urgency=low
+
+  * Bug fixes in the fake property declarations.
+  * Add System.MemoryPressure to new-style prop decls for contextd.
+  * Remove fake properties that are now provided by sensord, from the
+    new-style property declarations.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Thu, 04 Jun 2009 18:24:01 +0300
+
+contextkit (0.2.1) unstable; urgency=low
+
+  * added lowmem plugin to contextd, which provides MemoryPressure property
+
+    Implemented: SWP#CntFr-61
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 04 Jun 2009 14:19:39 +0300
 
 contextkit (0.2.0) unstable; urgency=low
 
@@ -14,7 +54,27 @@ contextkit (0.2.0) unstable; urgency=low
 
     Implemented: SWP#CntFr-204
 
- -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Wed, 03 Jun 2009 14:24:14 +0300
+ -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Wed, 04 Jun 2009 08:40:14 +0300
+
+contextkit (0.1.10) unstable; urgency=low
+
+  * Update fake-context-provider to not provide keys that are now provided
+    by sensord.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Wed, 03 Jun 2009 19:07:06 +0300
+
+contextkit (0.1.9) unstable; urgency=low
+
+  * context-provide's registry output file is now specified by
+    CONTEXT_PROVIDE_REGISTRY_FILE and not CONTEXT_FLEXI_XML
+
+  * Added new-style property declaration file to contextd, for use by the
+    upcoming libcontextsubscriber.
+
+  * Fixes: NB#119635 - ContextProvider library API checks it's input with
+    assertions.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Mon, 01 Jun 2009 15:17:29 +0300
 
 contextkit (0.1.8) unstable; urgency=low
 

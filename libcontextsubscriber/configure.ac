@@ -115,7 +115,7 @@ AC_CONFIG_FILES([Makefile
                  unit-tests/propertyprovider/Makefile
                  unit-tests/propertyhandle/Makefile
                  unit-tests/handlesignalrouter/Makefile
-		 		 accept-tests/Makefile
-				 accept-tests/update-contextkit-providers/Makefile])
+		 		 customer-tests/Makefile
+				 customer-tests/update-contextkit-providers/Makefile])
 
 AC_OUTPUT

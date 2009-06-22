@@ -32,6 +32,8 @@
 #include "handlesignalrouter.h"
 #include "propertyhandle.h"
 
+namespace ContextSubscriber {
+
 HandleSignalRouter* HandleSignalRouter::myInstance = 0;
 
 HandleSignalRouter::HandleSignalRouter()
@@ -51,3 +53,5 @@ void HandleSignalRouter::onValueChanged(QString key, QVariant value, bool proces
     PropertyHandle* handle = PropertyHandle::instance(key);
     handle->setValue(value, processingSubscription);
 }
+
+} // end namespace

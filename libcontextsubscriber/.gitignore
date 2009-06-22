@@ -36,8 +36,6 @@ contextsubscriber-1.0.pc
 /unit-tests/propertyhandle/propertyhandle-unit-tests
 /unit-tests/handlesignalrouter/handlesignalrouter-unit-tests
 /unit-tests/contextregistryinfo-xml-dynamic/providers.context
-/unit-tests/*/src_*.cpp
-/unit-tests/*/src_*.h
 /unit-tests/*/*.moc
 coverage/
 
@@ -49,4 +47,3 @@ coverage/
 # Docs
 doc/html
 doc/doxygen.log
-

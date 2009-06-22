@@ -1,0 +1,71 @@
+Subscription
+------------
+
+The subscription mechanism would involve sending a Subscribe()
+(preferably without reply) message to the subscriber, and one AddMatch()
+message to the D-Bus daemon for each property subscribed.  Unsubscribing
+is similarly straightforward.
+
+This is based on the fact that the provider mainly is interested in the
+fact whether there exists someone at all interested in their exposed
+properties.
+
+However, to handle ungraceful subscribers who don't send Unsubscribe()
+messages when they go away, the provider needs to know its peers.  It
+can do so by maintaining an association of property => subscribers
+(using the unique D-Bus name of the sender as subscriber).  On receipt
+of an Unsubscribe() message, or a NameOwnerChanged() signal, it needs to
+check if the sender was subscribed to some properties and remove it from
+the mapping.  If noone is interested in a property, it should cease
+updating the property to save resources.
+
+Signaling changes
+-----------------
+
+Properties would be represented as object paths.  A subscriber emits a
+ValueChanged() signal whenever a value changes.
+
+One concern is the number of match rules in the D-Bus daemon.  This
+approach effectively means one rule per each (subscriber, property)
+pair, contrary to the current way of one rule per subscriber.
+
+Suspending notifications
+
+
+Commanding
+----------
+
+Performance speculations
+------------------------
+
+However the number of messages
+
+With the current implementation, for N subscribers, there are N messages
+emitted (with different object paths).  Including the hops between the
+D-Bus daemon that totals in 2*N messages, with the D-Bus daemon having
+to dispatch N incoming messages.  Using the new scheme it's only N+1
+messages, and the daemon only has to dispatch 1 message.
+
+The D-Bus interface
+-------------------
+
+METHOD VOID Subscribe(ARRAY OF STRING properties)
+
+[ If a subscriber needs to immediately get the value of a property, it
+  should call the Get() method. ]
+
+SIGNAL ValueChanged(BOOL unknownp, VARIANT value)
+
+[ The old signature obviously has to change, as now we don't try to
+  bundle several properties into one message.  If the first boolean
+  argument determines whether the value is known or unknown.  In the
+  latter case, the second argument is to be ignored.  Alternatively, the
+  unknown value could be represented specially, like an emtpy STRUCT on
+  D-Bus, then the BOOL is omitted. ]
+
+METHOD VOID Unsubscribe(ARRAY OF STRING properties)
+
+METHOD VARIANT Get(STRING property)
+
+[ The provider shall _immediately_ return whatever value it has for the
+  named property.  If it's unknown, then that, but it must not block. ]

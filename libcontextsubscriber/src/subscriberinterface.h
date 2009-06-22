@@ -27,6 +27,8 @@
 #include <QStringList>
 #include <QtDBus>
 
+namespace ContextSubscriber {
+
 class SubscriberSignallingInterface;
 
 class SubscriberInterface : public QObject
@@ -69,5 +71,7 @@ signals:
 private:
     static const QString interfaceName; //< ContextKit protocol's subscriber dbus interface name
 };
+
+} // end namespace
 
 #endif

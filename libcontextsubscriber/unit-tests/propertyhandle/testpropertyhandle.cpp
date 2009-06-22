@@ -35,6 +35,42 @@
 #include <QDebug>
 #include <QDBusConnection>
 
+ContextRegistryInfo* mockContextRegistryInfo;
+ContextPropertyInfo* mockContextPropertyInfo;
+
+// Mock implementation of ContextPropertyInfo
+
+ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
+    : myType("")
+{
+    // Store the object created by the class to be tested
+    mockContextPropertyInfo = this;
+}
+
+QString ContextPropertyInfo::type() const
+{
+    return myType;
+}
+
+QString ContextPropertyInfo::providerDBusName() const
+{
+    return "Fake.Provider";
+}
+
+QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
+{
+    return QDBusConnection::SessionBus;
+}
+
+// Mock implementation of the ContextRegistryInfo
+
+ContextRegistryInfo* ContextRegistryInfo::instance(const QString& backendName)
+{
+    return mockContextRegistryInfo;
+}
+
+namespace ContextSubscriber {
+
 #define MYLOGLEVEL 3
 void myMessageOutput(QtMsgType type, const char *msg)
 {
@@ -62,10 +98,6 @@ void myMessageOutput(QtMsgType type, const char *msg)
 // These will be created by the test program
 PropertyProvider* mockPropertyProvider;
 PropertyProvider* mockCommanderProvider;
-
-ContextRegistryInfo* mockContextRegistryInfo;
-// These will be created by the tested class and stored here
-ContextPropertyInfo* mockContextPropertyInfo;
 DBusNameListener* mockDBusNameListener;
 
 // Mock implementation of the PropertyProvider
@@ -138,37 +170,6 @@ DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType,
 bool DBusNameListener::isServicePresent() const
 {
     return servicePresent;
-}
-
-// Mock implementation of ContextPropertyInfo
-
-ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
-    : myType("")
-{
-    // Store the object created by the class to be tested
-    mockContextPropertyInfo = this;
-}
-
-QString ContextPropertyInfo::type() const
-{
-    return myType;
-}
-
-QString ContextPropertyInfo::providerDBusName() const
-{
-    return "Fake.Provider";
-}
-
-QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
-{
-    return QDBusConnection::SessionBus;
-}
-
-// Mock implementation of the ContextRegistryInfo
-
-ContextRegistryInfo* ContextRegistryInfo::instance(const QString& backendName)
-{
-    return mockContextRegistryInfo;
 }
 
 //
@@ -873,6 +874,6 @@ void PropertyHandleUnitTests::commandingDisabled()
     QCOMPARE(PropertyProvider::subscribeCount, 0);
 }
 
+} // end namespace
 
-
-QTEST_MAIN(PropertyHandleUnitTests);
+QTEST_MAIN(ContextSubscriber::PropertyHandleUnitTests);

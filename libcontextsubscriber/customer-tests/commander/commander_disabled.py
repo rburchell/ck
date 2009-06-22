@@ -22,14 +22,9 @@
 ##
 ##
 ## This test:
-##   - starts up a client and a provider
-##   - checks for the provided values on the client stdout
+##   - starts up a client with commanding disabled and a provider
 ##   - starts a commander with a different value for that property
-##   - checks the output for the changed value
-##   - changes the value inside the commander to unknown, check it
-##   - changes the value inside the commander back to some meaningful value, check it
-##   - kills the commander
-##   - checks that value goes back to normal
+##   - checks for the provider provided value on the client stdout
 ##
 
 import sys
@@ -46,7 +41,7 @@ class Callable:
     def __init__(self, anycallable):
         self.__call__ = anycallable
 
-class CommanderAppearing(unittest.TestCase):
+class CommanderDisabled(unittest.TestCase):
     def startProvider(busname, args):
         ret = Popen(["context-provide", busname] + args,
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
@@ -67,8 +62,10 @@ class CommanderAppearing(unittest.TestCase):
     def setUp(self):
         self.flexiprovider = self.startProvider("com.nokia.test",
                                            ["int","test.int","42"])
+        self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
+                                                    ["int", "test.int", "4242"])
+        os.environ["CONTEXT_CLI_IGNORE_COMMANDER"] = ""
         self.context_client = Popen(["context-listen","test.int"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        self.context_commander = 0
 
     def tearDown(self):
         os.kill(self.flexiprovider.pid, 9)
@@ -81,37 +78,14 @@ class CommanderAppearing(unittest.TestCase):
         got = self.context_client.stdout.readline().rstrip()
         self.assertEqual(got,
                          self.wanted("test.int", "int", "42"),
-                         "Initial value is bad")
-
-        self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
-                                                    ["int", "test.int", "4242"])
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.int", "int", "4242"),
-                         "Value after commander has been started is bad")
-
-        print >>self.context_commander.stdin, "set('test.int', None)"
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wantedUnknown("test.int"),
-                         "Value after commander has changed it to unknown is bad")
-
-        print >>self.context_commander.stdin, "set('test.int', 1235)"
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.int", "int", "1235"),
-                         "Value after commander has changed it is bad")
-        os.system('./rec-kill.sh %d' % self.context_commander.pid)
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.int", "int", "42"),
-                         "Value after killing the commander is bad")
+                         "Provider provided value is wrong")
 
 def runTests():
-    suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderAppearing)
-    unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
+    suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderDisabled)
+    result = unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
+    return len(result.errors + result.failures)
 
 if __name__ == "__main__":
     signal.signal(signal.SIGALRM, timeoutHandler)
     signal.alarm(10)
-    runTests()
+    sys.exit(runTests())

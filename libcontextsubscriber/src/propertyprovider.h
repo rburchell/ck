@@ -28,10 +28,13 @@
 #include <QDBusConnection>
 #include <QSet>
 
+class QTimer;
+
+namespace ContextSubscriber {
+
 class PropertyHandle;
 class SubscriberInterface;
 class DBusNameListener;
-class QTimer;
 
 class PropertyProvider : public QObject
 {
@@ -73,5 +76,7 @@ private:
     static QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> providerInstances;
     QSet<QString> subscribedKeys; //< The keys that should be currently subscribed to
 };
+
+} // end namespace
 
 #endif

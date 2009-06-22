@@ -104,6 +104,8 @@
 
 #include <QCoreApplication>
 
+using namespace ContextSubscriber;
+
 /*!
    \class ContextPropertyPrivate
 

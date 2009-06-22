@@ -18,7 +18,7 @@ Build-Depends: debhelper (>= 5),
                doxygen,
                libcdb-dev
 XS-Python-Version: all
-Standards-Version: 3.8.1
+Standards-Version: 3.8.0
 
 Package: contextkit
 Architecture: any
@@ -100,7 +100,7 @@ Package: python-contextkit
 Section: python
 Architecture: any
 Provides: ${python:Provides}
-Depends: ${python:Depends}, python-gobject
+Depends: ${python:Depends}, python-gobject, libcontextprovider0
 XB-Python-Version: ${python:Versions}
 Description: Python bindings for ContextKit APIs
  This package contains Python bindings for the libcontextprovider
@@ -158,3 +158,21 @@ Description: Helper library for subscribers of context properties
  org.freedesktop.ContextKit D-Bus interface.
  .
  This package contains the documentation.
+
+Package: contextd-tests
+Section: devel
+Architecture: any
+Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit, contextkit
+Recommends: python2.5, python (>= 2.5)
+Description: contextd automated customer tests
+ .
+ This package contains an automated customer testsuite of the contextd daemon.
+
+Package: libcontextsubscriber-tests
+Section: devel
+Architecture: any
+Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit
+Recommends: python2.5, python (>= 2.5)
+Description: libcontextsubscriber automated customer tests
+ .
+ This package contains an automated customer testsuite of the libcontextsubscriber library.

@@ -29,26 +29,26 @@
 /*!
     \class InfoBackend
 
-    \brief An abstract (pure virtual) singleton class that represents the actual 
+    \brief An abstract (pure virtual) singleton class that represents the actual
     registry backend.
 
-    This class is not exported in the public API. It provides a list methods that need 
+    This class is not exported in the public API. It provides a list methods that need
     to be implemented by a concrete registry backend implementation. The InfoBackend instance
-    is a singleton that is created on first access. This class (the instance of it) is 
-    used by ContextRegistryInfo and ContextPropertyInfo classes. 
+    is a singleton that is created on first access. This class (the instance of it) is
+    used by ContextRegistryInfo and ContextPropertyInfo classes.
 */
 
 InfoBackend* InfoBackend::backendInstance = NULL;
 
 /// Constructs the object. The \a connectCount is 0 on start.
-InfoBackend::InfoBackend(QObject *parent) : QObject(parent) 
+InfoBackend::InfoBackend(QObject *parent) : QObject(parent)
 {
-    connectCount = 0; 
+    connectCount = 0;
 }
 
 /// Returns the actual singleton instance, creates it on first access. Mutex-protected.
 /// ContextRegistryInfo and ContextPropertyInfo use this method to access the backend.
-/// The optional \a backendName specifies the backend to force, ie: 'xml' or 'cdb'. 
+/// The optional \a backendName specifies the backend to force, ie: 'xml' or 'cdb'.
 InfoBackend* InfoBackend::instance(const QString &backendName)
 {
     static QMutex mutex;
@@ -67,20 +67,20 @@ InfoBackend* InfoBackend::instance(const QString &backendName)
                 else
                     backendInstance = new InfoXmlBackend;
             }
-            
+
             qAddPostRoutine(destroyInstance);
         }
- 
+
         mutex.unlock();
     }
- 
+
     return backendInstance;
 }
 
-/// Given the \a currentKeys list of keys and the \a oldKeys list of keys, 
-/// emit a signal containing the new keys (keys that are in \a currentKeys 
+/// Given the \a currentKeys list of keys and the \a oldKeys list of keys,
+/// emit a signal containing the new keys (keys that are in \a currentKeys
 /// but are no in \a oldKeys).
-void InfoBackend::checkAndEmitKeysAdded(const QStringList &currentKeys, 
+void InfoBackend::checkAndEmitKeysAdded(const QStringList &currentKeys,
                                         const QStringList &oldKeys)
 {
     QStringList addedKeys;
@@ -89,14 +89,14 @@ void InfoBackend::checkAndEmitKeysAdded(const QStringList &currentKeys,
             addedKeys << key;
     }
 
-    if (addedKeys.size() > 0) 
+    if (addedKeys.size() > 0)
         emit keysAdded(addedKeys);
 }
 
-/// Given the \a currentKeys list of keys and the \a oldKeys list of keys, 
-/// emit a signal containing the removed keys (keys that are in \a oldKeys 
+/// Given the \a currentKeys list of keys and the \a oldKeys list of keys,
+/// emit a signal containing the removed keys (keys that are in \a oldKeys
 /// but are no in \a currentKeys).
-void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys, 
+void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys,
                                           const QStringList &oldKeys)
 {
     QStringList removedKeys;
@@ -109,9 +109,9 @@ void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys,
         emit keysRemoved(removedKeys);
 }
 
-/// Given the \a currentKeys list of keys and the \a oldKeys list of keys, 
-/// emit a signal containing the union of those two lists. 
-void InfoBackend::checkAndEmitKeysChanged(const QStringList &currentKeys, 
+/// Given the \a currentKeys list of keys and the \a oldKeys list of keys,
+/// emit a signal containing the union of those two lists.
+void InfoBackend::checkAndEmitKeysChanged(const QStringList &currentKeys,
                                           const QStringList &oldKeys)
 {
     foreach(QString key, oldKeys) {
@@ -130,7 +130,7 @@ void InfoBackend::checkAndEmitKeysChanged(const QStringList &currentKeys,
 void InfoBackend::connectNotify(const char *signal)
 {
     QObject::connectNotify(signal);
-    connectCount++;   
+    connectCount++;
 }
 
 /// Called each time we have a signal disconnection. Decreases the connect count.
@@ -142,14 +142,12 @@ void InfoBackend::disconnectNotify(const char *signal)
 
 /* Private */
 
-/// Called before the application is destroyed. Deletes the backend instance. 
+/// Called before the application is destroyed. Deletes the backend instance.
 /// This is to ensure that the QFileSystemWatcher in backends gets deleted
 /// before the application terminates (otherwise weird issues follow).
 void InfoBackend::destroyInstance()
 {
-    if (backendInstance) {
-        delete backendInstance;
-        backendInstance = NULL;
-    }
+    delete backendInstance;
+    backendInstance = NULL;
 }
 

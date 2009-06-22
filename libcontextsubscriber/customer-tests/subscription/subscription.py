@@ -48,7 +48,7 @@ class Subscription(unittest.TestCase):
                "int","test.int","1",
                "string","test.string","foobar",
                "double","test.double","2.5",
-               "truth","test.truth","true"],
+               "truth","test.truth","True"],
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
         os.environ["CONTEXT_PROVIDERS"] = "."
 
@@ -57,14 +57,16 @@ class Subscription(unittest.TestCase):
         self.context_client = Popen(["context-listen","test.int","test.double","test.string","test.truth"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.system('./rec-kill.sh %d' % self.flexiprovider.pid)
-        os.system('./rec-kill.sh %d' % self.context_client.pid)
+        os.system('../common/rec-kill.sh %d' % self.flexiprovider.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client.pid)
         os.unlink('context-provide.context')
 
     def testValue(self):
         """
         Description
             Subscribe to 4 properties covering basic data types
+            Query the value of the property
+            (when it's known or unknown, with and without a default value)
 
         Pre-conditions
             Provider started via context-provide tool.
@@ -72,8 +74,10 @@ class Subscription(unittest.TestCase):
 
         Steps
             Subscribe to the properties, int, bool, double, string
-            Change value of type int from the provider
-            Assert the returned value
+            Change value of type int from the provider to a known value
+            Query the value (both with and without a default value) and assert the result
+            Change value of type int from the provider to unknown
+            Query the value (both with and without a default value) and assert the result
 
         Post-conditions
             Kill provider
@@ -95,6 +99,32 @@ class Subscription(unittest.TestCase):
         actual = [self.context_client.stdout.readline().rstrip()]
         actual.sort()
         expected = ["value: int:100"]
+        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+
+        print >> self.context_client.stdin, "value test.int defaultValue"
+        actual = [self.context_client.stdout.readline().rstrip()]
+        actual.sort()
+        expected = ["value: int:100"]
+        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+
+        print >> self.flexiprovider.stdin, "set('test.int',None)"
+        self.context_client.stdout.readline().rstrip()
+        print >> self.context_client.stdin, "value test.int"
+        actual = [self.context_client.stdout.readline().rstrip()]
+        actual.sort()
+        expected = ["value is Unknown"]
+        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+
+        print >> self.context_client.stdin, "value test.int defaultValue"
+        actual = [self.context_client.stdout.readline().rstrip()]
+        actual.sort()
+        expected = ["value: QString:defaultValue"]
+        self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
+
+        print >> self.context_client.stdin, "key test.int"
+        actual = [self.context_client.stdout.readline().rstrip()]
+        actual.sort()
+        expected = ["key: test.int"]
         self.assertEqual(actual,expected,"Actual key values pairs do not match expected")
 
     def testInfos(self):
@@ -247,7 +277,7 @@ class MultipleSubscribers(unittest.TestCase):
                "int","test.int","1",
                "string","test.string","foobar",
                "double","test.double","2.5",
-               "truth","test.truth","true"],
+               "truth","test.truth","True"],
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
         os.environ["CONTEXT_PROVIDERS"] = "."
         print >>self.flexiprovider.stdin, "info()"
@@ -262,11 +292,11 @@ class MultipleSubscribers(unittest.TestCase):
 
 
     def tearDown(self):
-        os.system('./rec-kill.sh %d' % self.flexiprovider.pid)
-        os.system('./rec-kill.sh %d' % self.context_client1.pid)
-        os.system('./rec-kill.sh %d' % self.context_client2.pid)
-        os.system('./rec-kill.sh %d' % self.context_client3.pid)
-        os.system('./rec-kill.sh %d' % self.context_client4.pid)
+        os.system('../common/rec-kill.sh %d' % self.flexiprovider.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client1.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client2.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client3.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client4.pid)
         os.unlink('context-provide.context')
 
     def testInitialSubscription(self):
@@ -395,7 +425,7 @@ class MultipleProviders(unittest.TestCase):
     def setUp(self):
         os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide1.context"
         self.flexiprovider1 = Popen(["context-provide","session:com.nokia.test",
-               "truth","test.truth","true"],
+               "truth","test.truth","True"],
               stdin=PIPE,stderr=PIPE,stdout=PIPE)
 
         os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide2.context"
@@ -412,9 +442,9 @@ class MultipleProviders(unittest.TestCase):
                                     ,stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.system('./rec-kill.sh %d' % self.flexiprovider1.pid)
-        os.system('./rec-kill.sh %d' % self.flexiprovider2.pid)
-        os.system('./rec-kill.sh %d' % self.context_client.pid)
+        os.system('../common/rec-kill.sh %d' % self.flexiprovider1.pid)
+        os.system('../common/rec-kill.sh %d' % self.flexiprovider2.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client.pid)
         os.unlink('context-provide1.context')
         os.unlink('context-provide2.context')
 
@@ -450,8 +480,8 @@ class SubscriptionPause (unittest.TestCase):
         self.context_client = Popen(["context-listen","test.int"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.system('./rec-kill.sh %d' % self.flexiprovider.pid)
-        os.system('./rec-kill.sh %d' % self.context_client.pid)
+        os.system('../common/rec-kill.sh %d' % self.flexiprovider.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_client.pid)
         os.unlink('context-provide.context')
 
     def testPause(self):
@@ -546,13 +576,20 @@ def runTests():
     suiteProviders = unittest.TestLoader().loadTestsFromTestCase(MultipleProviders)
     suitePause = unittest.TestLoader().loadTestsFromTestCase(SubscriptionPause)
 
-    unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
-    unittest.TextTestRunner(verbosity=2).run(suiteSubscribers)
-    unittest.TextTestRunner(verbosity=2).run(suiteProviders)
-    unittest.TextTestRunner(verbosity=2).run(suitePause)
+    errors = []
+    result = unittest.TextTestRunner(verbosity=2).run(suiteSubscription)
+    errors += result.errors + result.failures
+    result = unittest.TextTestRunner(verbosity=2).run(suiteSubscribers)
+    errors += result.errors + result.failures
+    result = unittest.TextTestRunner(verbosity=2).run(suiteProviders)
+    errors += result.errors + result.failures
+    result = unittest.TextTestRunner(verbosity=2).run(suitePause)
+    errors += result.errors + result.failures
+
+    return len(errors)
 
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
     signal.signal(signal.SIGALRM, timeoutHandler)
     signal.alarm(30)
-    runTests()
+    sys.exit(runTests())
