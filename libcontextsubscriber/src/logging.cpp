@@ -46,7 +46,20 @@
     contextTest() << "This is some message";
     contextDebug() << "My value is:" << someVariable;
     contextWarning() << "Expecting key:" << something.getKey();
-    contextCritical() << 5 << " is bigger than " << 4;
+    contextCritical() << 5 << "is bigger than" << 4;
+    \endcode
+
+    Notice that the logging framework (very much like ie \b qDebug) automatically 
+    ads whitespace. So:
+
+    \code
+    contextDebug() << "My value is" << 5 << "and should be 5";
+    \endcode
+
+    ...will actually print:
+
+    \code
+    My value is 5 and should be 5
     \endcode
     
     \section compilecontrol Compile-time verbosity control
@@ -90,7 +103,7 @@
     specified module. Ie.:
     
     \code
-    CONTEXT_LOG_SHOW_MODULE=subscriber ./some-binary
+    CONTEXT_LOG_SHOW_MODULE="subscriber" ./some-binary
     \endcode
     
     ...will run \c ./some-binary showing log messages \b only from \c subscriber module.
@@ -131,17 +144,17 @@
     \endcode
 
     It doesn't matter where features are added to the message. There is no specific order required. 
-    This works as well also:
+    The following syntax is supported as well:
 
     \code
     contextDebug() << contextFeature("threads") << "Some message..." << contextFeature("another");
     \endcode
 
     There are two enviornment variables that control the output of messages vs. features: \b 
-    CONTEXT_LOG_SHOW_FEATURES and \b CONTEXT_LOG_HIDE_FEATURES. Both take a command separated
+    CONTEXT_LOG_SHOW_FEATURES and \b CONTEXT_LOG_HIDE_FEATURES. Both take a comma-separated
     list of features. 
 
-    If you specify CONTEXT_LOG_SHOW_FEATURES, only messages with given features will be printed to
+    If you specify CONTEXT_LOG_SHOW_FEATURES only messages with given features will be printed to
     the screen. If you specify \b CONTEXT_LOG_HIDE_FEATURES, messages with the specified features
     will be hidden (not displayed). For example: 
 
@@ -160,7 +173,7 @@
     \section vanilla Vanilla
 
     If the default logging output is too much for you, it's possible to set a CONTEXT_LOG_VANILLA
-    enviornment variable. This will simply the logging output greatly -- no timestamps will be printed, 
+    enviornment variable. This will simplify the logging output greatly -- no timestamps will be printed, 
     no module information will be printed, no line/function/class info will be printed. 
 */
 
