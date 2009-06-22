@@ -69,8 +69,21 @@ public:
     static void initialize();
     
     ContextRealLogger &operator<< (const ContextFeature&);
-    using QTextStream::operator <<;
 
+    virtual ContextRealLogger &operator<< (QChar);
+    virtual ContextRealLogger &operator<< (signed short);
+    virtual ContextRealLogger &operator<< (unsigned short);
+    virtual ContextRealLogger &operator<< (signed int);
+    virtual ContextRealLogger &operator<< (unsigned int);
+    virtual ContextRealLogger &operator<< (signed long);
+    virtual ContextRealLogger &operator<< (unsigned long);
+    virtual ContextRealLogger &operator<< (float);
+    virtual ContextRealLogger &operator<< (double);
+    virtual ContextRealLogger &operator<< (void *);
+    virtual ContextRealLogger &operator<< (const QString&);
+    virtual ContextRealLogger &operator<< (const char *);
+    virtual ContextRealLogger &operator<< (char);
+ 
 private:
     
     bool shouldPrint();
