@@ -337,7 +337,7 @@ ContextRealLogger::ContextRealLogger(int type, const char *module, const char *f
     // File, line and function...
     
     if (! vanilla)
-        *this << QString("[" + QString(file) + ":" + QString(line) + ":" + QString(func) + "]");
+        *this << QString("[" + QString(file) + ":" + QString::number(line) + ":" + QString(func) + "]");
 }
 
 bool ContextRealLogger::shouldPrint()
