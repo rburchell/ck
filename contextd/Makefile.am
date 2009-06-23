@@ -15,14 +15,16 @@ contextd_VALASOURCES = main.vala plugin.vala hal_plugin.vala	\
 contextd_GENERATEDSOURCES = $(contextd_VALASOURCES:.vala=.c)
 contextd_SOURCES = $(contextd_GENERATEDSOURCES)
 
+if CONTEXTKIT_BUILD_VALA
 # FIXME: Remove the hal.vapi once the official version includes the needed functions
 contextd.vala.stamp: $(top_srcdir)/vapi/hal.vapi $(top_srcdir)/vapi/posix.vapi $(top_srcdir)/libcontextprovider/contextprovider.vapi $(contextd_VALASOURCES)
 	$(VALAC) -C -g --basedir $(top_srcdir)/contextd --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
 	touch contextd.vala.stamp
+endif
 
-AM_CFLAGS = $(CONTEXTD_CFLAGS) -I$(top_srcdir)/libcontextprovider
+AM_CFLAGS = $(GLIB_CFLAGS) $(GOBJECT_CFLAGS) $(GDBUS_CFLAGS) $(GEE_CFLAGS) $(HAL_CFLAGS) -I$(top_srcdir)/libcontextprovider
 
-LDADD = $(CONTEXTD_LIBS)						\
+LDADD = $(GLIB_LIBS) $(GOBJECT_LIBS) $(GDBUS_LIBS) $(GEE_LIBS) $(HAL_LIBS) \
 	$(top_builddir)/libcontextprovider/libcontextprovider.la -lm
 
 EXTRA_DIST = $(contextd_GENERATEDSOURCES) $(contextd_VALASOURCES)	\

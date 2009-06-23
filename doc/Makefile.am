@@ -11,8 +11,10 @@ html_DATA = $(html_EXTRA) \
 
 html-local: $(html_EXTRA) $(html_ASCIIDOCS:.txt=.html)
 
+if CONTEXTKIT_BUILD_DOCS
 %.html: %.txt
 	asciidoc -a toc --unsafe -f myfilter.conf $^
+endif
 
 EXTRA_DIST = $(html_ASCIIDOCS) \
              $(html_DATA) \

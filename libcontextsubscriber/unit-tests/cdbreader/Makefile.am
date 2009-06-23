@@ -9,7 +9,7 @@ EXTRA_DIST = test.cdb
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = '-I$(srcdir)/../util/'
-AM_LDFLAGS = -lcdb
+AM_LDFLAGS = $(CDB_LIBS)
 FROM_SOURCE = cdbreader.cpp cdbreader.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 

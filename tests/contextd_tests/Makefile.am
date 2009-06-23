@@ -27,14 +27,16 @@ test_hal_plugin_VALASOURCES = $(test_hal_plugin_real_VALASOURCES)	\
 test_hal_plugin_SOURCES = $(test_hal_plugin_test_VALASOURCES:.vala=.c)	\
 	$(test_hal_plugin_copied_VALASOURCES:.vala=.c)
 
+if CONTEXTKIT_BUILD_VALA
 test_hal_plugin.vala.stamp: $(top_srcdir)/vapi/posix.vapi $(test_hal_plugin_VALASOURCES)
 	cp $(test_hal_plugin_real_VALASOURCES) .
 	$(VALAC) $(VALA_OPTIONS) $(test_hal_plugin_test_VALASOURCES) $(test_hal_plugin_copied_VALASOURCES)
 	touch $@
 	rm $(test_hal_plugin_copied_VALASOURCES)
+endif
 
-test_hal_plugin_CFLAGS = $(CONTEXTD_CFLAGS)
-test_hal_plugin_LDADD = $(CONTEXTD_LIBS) -lm
+test_hal_plugin_CFLAGS = $(GLIB_CFLAGS) $(GOBJECT_CFLAGS) $(GDBUS_CFLAGS) $(GEE_CFLAGS) $(HAL_CFLAGS)
+test_hal_plugin_LDADD = $(GLIB_LIBS) $(GOBJECT_LIBS) $(GDBUS_LIBS) $(GEE_LIBS) $(HAL_LIBS) -lm
 
 EXTRA_DIST += $(test_hal_plugin_test_VALASOURCES)		\
 	$(test_hal_plugin_SOURCES) test_hal_plugin.vala.stamp

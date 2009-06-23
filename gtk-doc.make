@@ -172,13 +172,18 @@ uninstall-local:
 #
 # Require gtk-doc when making dist
 #
-if ENABLE_GTK_DOC
-dist-check-gtkdoc:
-else
-dist-check-gtkdoc:
-	@echo "*** gtk-doc must be installed and enabled in order to make dist"
-	@false
-endif
+#if ENABLE_GTK_DOC
+#dist-check-gtkdoc:
+#else
+#dist-check-gtkdoc:
+#	@echo "*** gtk-doc must be installed and enabled in order to make dist"
+#	@false
+#endif
+
+# contextkit note: instead of checking the availability of gtk-doc,
+# just make the procedure, without hesitation.  gtk-doc + distcheck is
+# so hacky and messed up that we haven't found out a better way yet
+dist-check-gtkdoc: html-build.stamp
 
 dist-hook: dist-check-gtkdoc dist-hook-local
 	mkdir $(distdir)/tmpl

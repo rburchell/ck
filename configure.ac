@@ -3,21 +3,20 @@ AC_INIT([ContextKit], [0.2.7~unreleased], [marius.vollmer@nokia.com], ContextKit
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign dist-bzip2 tar-ustar 1.9])
-#AM_INIT_AUTOMAKE([-Wall -Wno-portability -Wno-override -Werror dist-bzip2 tar-ustar 1.9])
 
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_CC
+CFLAGS="$CXXFLAGS -Wall"
 AC_PROG_CXX
+CXXFLAGS="$CXXFLAGS -Wall"
 AC_PROG_LIBTOOL
 AM_PATH_PYTHON
-# todo?: add vala version check here
-AC_PATH_PROG(VALAC, valac, valac)
-AC_SUBST(VALAC)
 
-# always build with warnings
-CXXFLAGS="$CXXFLAGS -Wall"
-CFLAGS="$CXXFLAGS -Wall"
+# vala compiler (>= 0.7.1)
+AC_FEATURE_DISABLEABLE([vala], [BUILD_VALA], [disable building of vala sources])
+AC_DISABLE_FEATURE_ON_PROG([Vala compiler], [BUILD_VALA], [VALAC], [valac], [0.7.1])
+AM_CONDITIONAL(CONTEXTKIT_BUILD_VALA, test "$missing_deps_BUILD_VALA" = "")
 
 # check for libraries
 PKG_CHECK_MODULES_SUBST([GLIB], [glib-2.0 >= 2.12.0])
@@ -32,65 +31,26 @@ PKG_CHECK_MODULES_SUBST([QtXml], [QtXml])
 AC_PROG_QT_MOC
 AC_PROG_QT_UIC
 AC_PROG_QT_RCC
-AC_CHECK_LIB([cdb], [cdb_make_start], [], [AC_MSG_ERROR([Can't find cdb library])])
+AC_CHECK_LIB([cdb], [cdb_make_start], [CDB_LIBS=-lcdb], [AC_MSG_ERROR([Can't find cdb library])])
+AC_SUBST([CDB_LIBS])
 
-# setup cflags and libs for different parts of the code
-# fixme: why here?  this belongs to the internals of that part of the code -> Makefile.am
-CONTEXTPROVIDER_CFLAGS="$GLIB_CFLAGS $GOBJECT_CFLAGS $GDBUS_CFLAGS $GEE_CFLAGS"
-CONTEXTPROVIDER_LIBS="$GLIB_LIBS $GOBJECT_LIBS $GDBUS_LIBS $GEE_LIBS"
-
-CONTEXTD_CFLAGS="$GLIB_CFLAGS $GOBJECT_CFLAGS $GDBUS_CFLAGS $GEE_CFLAGS $HAL_CFLAGS"
-CONTEXTD_LIBS="$GLIB_LIBS $GOBJECT_LIBS $GDBUS_LIBS $GEE_LIBS $HAL_LIBS"
-
-AC_SUBST(CONTEXTD_CFLAGS)
-AC_SUBST(CONTEXTD_LIBS)
-
-AC_SUBST(CONTEXTPROVIDER_CFLAGS)
-AC_SUBST(CONTEXTPROVIDER_LIBS)
-
-dnl have_location=no
-dnl PKG_CHECK_MODULES(LOCATION, liblocation, [have_location=yes], [have_location=no])
-dnl AC_SUBST(LOCATION_CFLAGS)
-dnl AC_SUBST(LOCATION_LIBS)
-dnl AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
-
-build_docs=yes
-
-dnl AC_ARG_ENABLE([doc],
-dnl     AS_HELP_STRING([--disable-doc],
-dnl                    [disable building of documentation [[default=no]]]),,
-dnl     [enable_gtk_doc=no])
-
+# tools for documentation
+AC_FEATURE_DISABLEABLE([doc], [BUILD_DOCS], [disable building of documentation])
 AC_MSG_CHECKING([for gtk-doc])
 PKG_CHECK_EXISTS([gtk-doc >= 1.9],[AC_MSG_RESULT([yes])],
-			  [GTKDOC=:
-			   AC_DISABLE_DOC_IF_COLON([GTKDOC])
-			   ])
+			  [AC_MSG_RESULT([no])
+			   missing_deps_BUILD_DOCS="$missing_deps_BUILD_DOCS, gtk-doc >= 1.9"])
 HTML_DIR="${datadir}/gtk-doc/html"
 AC_SUBST([HTML_DIR])
-
-AC_CHECK_PROGS([XSLTPROC], [xsltproc], [:])
-AC_DISABLE_DOC_IF_COLON([XSLTPROC])
-AC_SUBST([XSLTPROC])
-
-AC_CHECK_PROGS([XMLLINT], [xmllint], [:])
-AC_DISABLE_DOC_IF_COLON([XMLLINT])
-AC_SUBST([XMLLINT])
-
-AC_CHECK_PROGS([DOXYGEN], [doxygen], [:])
-AC_DISABLE_DOC_IF_COLON([DOXYGEN])
-AC_SUBST([DOXYGEN])
-
-# probably this is not used anymore!
-# AC_PROG_PERL_MODULES([XML::LibXML::Reader], [], [build_docs=no])
-
-# todo?: add asciidoc version check
-# todo?: add program check for dot
-# todo?: add program check for source-highlight
-
-AM_CONDITIONAL(CONTEXTKIT_BUILD_DOCS, test x$build_docs = xyes)
-AM_CONDITIONAL(GTK_DOC_USE_LIBTOOL, test x$build_docs = xyes)
-AM_CONDITIONAL(ENABLE_GTK_DOC, test x$build_docs = xyes)
+AC_DISABLE_FEATURE_ON_PROG([Dot drawing tool], [BUILD_DOCS], [DOT], [dot])
+AC_DISABLE_FEATURE_ON_PROG([Asciidoc], [BUILD_DOCS], [ASCIIDOC], [asciidoc], [8.2.7])
+AC_DISABLE_FEATURE_ON_PROG([source-highlight], [BUILD_DOCS], [SOURCE_HIGHLIGHT], [source-highlight])
+AC_DISABLE_FEATURE_ON_PROG([xsltproc], [BUILD_DOCS], [XSLTPROC], [xsltproc])
+AC_DISABLE_FEATURE_ON_PROG([xmllint], [BUILD_DOCS], [XMLLINT], [xmllint])
+AC_DISABLE_FEATURE_ON_PROG([doxygen], [BUILD_DOCS], [DOXYGEN], [doxygen])
+AM_CONDITIONAL(CONTEXTKIT_BUILD_DOCS, test "$missing_deps_BUILD_DOCS" = "")
+AM_CONDITIONAL(GTK_DOC_USE_LIBTOOL, test "$missing_deps_BUILD_DOCS" = "")
+AM_CONDITIONAL(ENABLE_GTK_DOC, test "$missing_deps_BUILD_DOCS" = "")
 
 ######################
 # Coverage option
@@ -119,9 +79,6 @@ dnl fi
 dnl enable_coverage=no
 dnl AM_CONDITIONAL(HAVE_COVERAGE, test "x$enable_coverage" != "xno")
 
-DEFAULT_CONTEXT_PROVIDERS="$datadir/contextkit/providers/"
-AC_SUBST(DEFAULT_CONTEXT_PROVIDERS)
-
 AC_CONFIG_FILES([
 	Makefile
         contextd/Makefile
@@ -133,7 +90,7 @@ AC_CONFIG_FILES([
         tests/python-test-library/testfw/Makefile
         tests/accept-tests/Makefile doc/Makefile
         doc/reference/Makefile
-        doc/reference/libcontextprovider/Makefile tools/Makefile
+        doc/reference/libcontextprovider/Makefile
         python/Makefile
         contextprovider-1.0.pc
         contextd/org.freedesktop.ContextKit.contextd.service
@@ -167,3 +124,11 @@ AC_CONFIG_FILES([
 ])
 
 AC_OUTPUT
+
+AC_FEATURE_SUMMARIZE([BUILD_DOCS],
+                     [Building of documentation is enabled],
+                     [Documentation won't be built])
+
+AC_FEATURE_SUMMARIZE([BUILD_VALA],
+                     [Building of vala sources is enabled],
+                     [Vala sources won't be built])

@@ -150,6 +150,7 @@ tests/contextd_tests/hal_plugin.c
 /debian/contextkit-dbg
 /debian/contextkit-doc
 /debian/contextkit
+/debian/contextd-tests
 /debian/fake-context-provider
 /debian/libcontextprovider-dev
 /debian/libcontextprovider-doc

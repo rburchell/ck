@@ -10,7 +10,7 @@ COVERAGE_FILES = propertyhandle.cpp
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
-AM_CXXFLAGS = $(QtDBus_CFLAGS) -DDEFAULT_CONTEXT_PROVIDERS=\"@DEFAULT_CONTEXT_PROVIDERS@\"
+AM_CXXFLAGS = $(QtDBus_CFLAGS) '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"'
 AM_LDFLAGS = 
 FROM_SOURCE = propertyhandle.cpp propertyhandle.h sconnect.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src

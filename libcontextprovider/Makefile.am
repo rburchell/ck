@@ -22,6 +22,7 @@ libcontextproviderdir=$(includedir)/contextprovider
 
 libcontextprovider_HEADERS = $(libcontextprovider_GENERATEDSOURCES_PUB)
 
+if CONTEXTKIT_BUILD_VALA
 libcontextprovider.vala.stamp contextprovider.vapi: $(libcontextprovider_VALASOURCES)
 	$(VALAC) -C -g --basedir $(top_srcdir)/libcontextprovider \
 		--vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 \
@@ -29,10 +30,11 @@ libcontextprovider.vala.stamp contextprovider.vapi: $(libcontextprovider_VALASOU
                 --header context_provider.h --internal-header context_provider-internal.h \
 	        --internal-vapi contextprovider-internal.vapi $^
 	touch libcontextprovider.vala.stamp
+endif
 
-AM_CFLAGS = -DG_LOG_DOMAIN=\"ContextKit\" $(CONTEXTPROVIDER_CFLAGS)
+AM_CFLAGS = -DG_LOG_DOMAIN=\"ContextKit\" $(GLIB_CFLAGS) $(GOBJECT_CFLAGS) $(GDBUS_CFLAGS) $(GEE_CFLAGS)
 
-AM_LDFLAGS = $(CONTEXTPROVIDER_LIBS)
+AM_LDFLAGS = $(GLIB_LIBS) $(GOBJECT_LIBS) $(GDBUS_LIBS) $(GEE_LIBS)
 
 EXTRA_DIST = $(libcontextprovider_GENERATEDSOURCES)		\
 	$(libcontextprovider_VALASOURCES)			\

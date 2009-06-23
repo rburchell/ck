@@ -16,8 +16,8 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
-	'-DDEFAULT_CONTEXT_PROVIDERS="@DEFAULT_CONTEXT_PROVIDERS@"'
-LIBS += -lcdb $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
+	'-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"'
+LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
 
 # moccing
 nodist_libcontextsubscriber_la_SOURCES = mocs.cpp
