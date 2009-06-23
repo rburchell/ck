@@ -14,8 +14,8 @@ AC_PROG_LIBTOOL
 AM_PATH_PYTHON
 
 # vala compiler (>= 0.7.1)
-AC_FEATURE_DISABLEABLE([vala], [BUILD_VALA], [disable building of vala sources])
-AC_DISABLE_FEATURE_ON_PROG([Vala compiler], [BUILD_VALA], [VALAC], [valac], [0.7.1])
+AX_FEATURE_DISABLEABLE([vala], [BUILD_VALA], [disable building of vala sources])
+AX_DISABLE_FEATURE_ON_PROG([Vala compiler], [BUILD_VALA], [VALAC], [valac], [0.7.1])
 AM_CONDITIONAL(CONTEXTKIT_BUILD_VALA, test "$missing_deps_BUILD_VALA" = "")
 
 # check for libraries
@@ -35,19 +35,19 @@ AC_CHECK_LIB([cdb], [cdb_make_start], [CDB_LIBS=-lcdb], [AC_MSG_ERROR([Can't fin
 AC_SUBST([CDB_LIBS])
 
 # tools for documentation
-AC_FEATURE_DISABLEABLE([doc], [BUILD_DOCS], [disable building of documentation])
+AX_FEATURE_DISABLEABLE([doc], [BUILD_DOCS], [disable building of documentation])
 AC_MSG_CHECKING([for gtk-doc])
 PKG_CHECK_EXISTS([gtk-doc >= 1.9],[AC_MSG_RESULT([yes])],
 			  [AC_MSG_RESULT([no])
 			   missing_deps_BUILD_DOCS="$missing_deps_BUILD_DOCS, gtk-doc >= 1.9"])
 HTML_DIR="${datadir}/gtk-doc/html"
 AC_SUBST([HTML_DIR])
-AC_DISABLE_FEATURE_ON_PROG([Dot drawing tool], [BUILD_DOCS], [DOT], [dot])
-AC_DISABLE_FEATURE_ON_PROG([Asciidoc], [BUILD_DOCS], [ASCIIDOC], [asciidoc], [8.2.7])
-AC_DISABLE_FEATURE_ON_PROG([source-highlight], [BUILD_DOCS], [SOURCE_HIGHLIGHT], [source-highlight])
-AC_DISABLE_FEATURE_ON_PROG([xsltproc], [BUILD_DOCS], [XSLTPROC], [xsltproc])
-AC_DISABLE_FEATURE_ON_PROG([xmllint], [BUILD_DOCS], [XMLLINT], [xmllint])
-AC_DISABLE_FEATURE_ON_PROG([doxygen], [BUILD_DOCS], [DOXYGEN], [doxygen])
+AX_DISABLE_FEATURE_ON_PROG([Dot drawing tool], [BUILD_DOCS], [DOT], [dot])
+AX_DISABLE_FEATURE_ON_PROG([Asciidoc], [BUILD_DOCS], [ASCIIDOC], [asciidoc], [8.2.7])
+AX_DISABLE_FEATURE_ON_PROG([source-highlight], [BUILD_DOCS], [SOURCE_HIGHLIGHT], [source-highlight])
+AX_DISABLE_FEATURE_ON_PROG([xsltproc], [BUILD_DOCS], [XSLTPROC], [xsltproc])
+AX_DISABLE_FEATURE_ON_PROG([xmllint], [BUILD_DOCS], [XMLLINT], [xmllint])
+AX_DISABLE_FEATURE_ON_PROG([doxygen], [BUILD_DOCS], [DOXYGEN], [doxygen])
 AM_CONDITIONAL(CONTEXTKIT_BUILD_DOCS, test "$missing_deps_BUILD_DOCS" = "")
 AM_CONDITIONAL(GTK_DOC_USE_LIBTOOL, test "$missing_deps_BUILD_DOCS" = "")
 AM_CONDITIONAL(ENABLE_GTK_DOC, test "$missing_deps_BUILD_DOCS" = "")
@@ -125,10 +125,10 @@ AC_CONFIG_FILES([
 
 AC_OUTPUT
 
-AC_FEATURE_SUMMARIZE([BUILD_DOCS],
+AX_FEATURE_SUMMARIZE([BUILD_DOCS],
                      [Building of documentation is enabled],
                      [Documentation won't be built])
 
-AC_FEATURE_SUMMARIZE([BUILD_VALA],
+AX_FEATURE_SUMMARIZE([BUILD_VALA],
                      [Building of vala sources is enabled],
                      [Vala sources won't be built])
