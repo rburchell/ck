@@ -4,7 +4,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextsubscriber-1.0.pc
 
 check-sum:
-	make -C unit-tests/ check-sum
+	$(MAKE) -C unit-tests check-sum
 
 check-accept:
 	$(MAKE) -C accept-tests check-accept
@@ -16,6 +16,6 @@ covoptioncheck:
 	fi
 
 coverage: covoptioncheck
-	make -C unit-tests/ coverage
+	$(MAKE) -C unit-tests coverage
 
 .PHONY: covoptioncheck coverage check-sum

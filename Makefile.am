@@ -20,3 +20,12 @@ pkgconfig_DATA = contextprovider-1.0.pc
 EXTRA_DIST = contextprovider-1.0-uninstalled.pc
 DISTCLEANFILES = lcov.info lcov.html
 MAINTAINERCLEANFILES = INSTALL
+
+check-sum:
+	$(MAKE) -C libcontextsubscriber/unit-tests check-sum
+
+check-accept:
+	$(MAKE) -C libcontextsubscriber/accept-tests check-accept
+
+coverage:
+	$(MAKE) -C libcontextsubscriber/unit-tests coverage
