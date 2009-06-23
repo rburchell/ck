@@ -1,4 +1,4 @@
-DISTCHECK_CONFIGURE_FLAGS = --disable-doc --disable-vala
+DISTCHECK_CONFIGURE_FLAGS = --disable-doc --disable-vala --disable-coverage
 
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
@@ -27,5 +27,9 @@ check-sum:
 check-accept:
 	$(MAKE) -C libcontextsubscriber/accept-tests check-accept
 
-coverage:
+coverage: covoptioncheck
 	$(MAKE) -C libcontextsubscriber/unit-tests coverage
+
+.PHONY: coverage check-accept check-sum
+
+include $(top_srcdir)/am/covoptioncheck.am

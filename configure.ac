@@ -48,36 +48,15 @@ AX_DISABLE_FEATURE_ON_PROG([source-highlight], [BUILD_DOCS], [SOURCE_HIGHLIGHT],
 AX_DISABLE_FEATURE_ON_PROG([xsltproc], [BUILD_DOCS], [XSLTPROC], [xsltproc])
 AX_DISABLE_FEATURE_ON_PROG([xmllint], [BUILD_DOCS], [XMLLINT], [xmllint])
 AX_DISABLE_FEATURE_ON_PROG([doxygen], [BUILD_DOCS], [DOXYGEN], [doxygen])
-AM_CONDITIONAL(CONTEXTKIT_BUILD_DOCS, test "$missing_deps_BUILD_DOCS" = "")
-AM_CONDITIONAL(GTK_DOC_USE_LIBTOOL, test "$missing_deps_BUILD_DOCS" = "")
-AM_CONDITIONAL(ENABLE_GTK_DOC, test "$missing_deps_BUILD_DOCS" = "")
+AM_CONDITIONAL([CONTEXTKIT_BUILD_DOCS], [test "$missing_deps_BUILD_DOCS" = ""])
+AM_CONDITIONAL([GTK_DOC_USE_LIBTOOL], [test "$missing_deps_BUILD_DOCS" = ""])
+AM_CONDITIONAL([ENABLE_GTK_DOC], [test "$missing_deps_BUILD_DOCS" = ""])
 
-######################
-# Coverage option
-######################
-
-dnl AC_ARG_ENABLE(coverage,
-dnl     AS_HELP_STRING([--enable-coverage=@<:@no/yes/auto@:>@],
-dnl     [compile with coverage profiling and debug (gcc only)]),
-dnl     enable_coverage=$enableval,enable_coverage=no)
-
-##################################
-# Flags for coverage measurement
-##################################
-
-dnl if test "x$enable_coverage" != "xno"; then          
-dnl     CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage"
-dnl     CONTEXTD_LIBS="$CONTEXTD_LIBS -lgcov"
-dnl     #FIXME: preserve non -Wall/-g/-O flags from users CFLAGS
-dnl     CFLAGS="-Wall -g -O0"
-dnl     AC_CHECK_PROGS([HAVE_LCOV], [lcov],)
-dnl     if test -z "$HAVE_LCOV"; then
-dnl       AC_MSG_ERROR([lcov is necessary for testing code coverage (http://ltp.sourceforge.net/coverage/lcov.php)])
-dnl     fi
-dnl fi
-
-dnl enable_coverage=no
-dnl AM_CONDITIONAL(HAVE_COVERAGE, test "x$enable_coverage" != "xno")
+# coverage tools
+AX_FEATURE_DISABLEABLE([coverage], [COVERAGE], [disable unittests' coverage support])
+AX_DISABLE_FEATURE_ON_PROG([GCov coverage recording tool], [COVERAGE], [GCOV], [gcov])
+AX_DISABLE_FEATURE_ON_PROG([LCov coverage visualization tool], [COVERAGE], [LCOV], [lcov])
+AM_CONDITIONAL([CONTEXTKIT_COVERAGE], [test "$missing_deps_COVERAGE" = ""])
 
 AC_CONFIG_FILES([
 	Makefile
@@ -132,3 +111,7 @@ AX_FEATURE_SUMMARIZE([BUILD_DOCS],
 AX_FEATURE_SUMMARIZE([BUILD_VALA],
                      [Building of vala sources is enabled],
                      [Vala sources won't be built])
+
+AX_FEATURE_SUMMARIZE([COVERAGE],
+                     [Unit testing coverage support is enabled],
+                     [Coverage won't be supported during unit testing])

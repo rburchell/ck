@@ -12,12 +12,6 @@ check-sum: all
           (cd $$subdir && tput bold && echo $$subdir:\  && tput sgr0 && ( $(MAKE) $(AM_MAKEFLAGS) check | grep '^Total' | grep -v '^make' ) ) \
         done
 
-covoptioncheck:
-	@if test "$(GCOV)" = "" ; then \
-		echo "Wasn't configured for coverage, please rerun configure with --with-coverage"; \
-		exit 1; \
-	fi
-
 coverage: covoptioncheck
 	@list='$(SUBDIRSTESTS)'; for subdir in $$list; do \
           (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) coverage) \
@@ -35,4 +29,6 @@ coverage: covoptioncheck
 clean-local:
 	rm -rf coverage
 
-.PHONY: covoptioncheck coverage check-sum
+.PHONY: coverage check-sum
+
+include $(top_srcdir)/am/covoptioncheck.am
