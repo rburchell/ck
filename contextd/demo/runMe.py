@@ -37,10 +37,17 @@ alloc = (memFree - lowMark) >> 10
 memload = Popen(["./loadmem",str(alloc+1)], stdin=PIPE, stderr=PIPE)
 raw_input('Press Enter...\n')
 os.kill(memload.pid, 9)
+# lowmem kernel module requires small allocation to trigger event
+memload = Popen(["./loadmem",str(2)], stdin=PIPE, stderr=PIPE)
+os.kill(memload.pid, 9)
 
 alloc = (memFree - highMark) >> 10
 memload = Popen(["./loadmem",str(alloc+1)], stdin=PIPE, stderr=PIPE)
 raw_input('Press Enter...\n')
+os.kill(memload.pid, 9)
+
+# lowmem kernel module requires small allocation to trigger event
+memload = Popen(["./loadmem",str(2)], stdin=PIPE, stderr=PIPE)
 os.kill(memload.pid, 9)
 
 alloc = (memFree - lowMark) >> 10
@@ -48,7 +55,8 @@ memload = Popen(["./loadmem",str(alloc+1)], stdin=PIPE, stderr=PIPE)
 raw_input('Press Enter...\n')
 os.kill(memload.pid, 9)
 
-memload = Popen(["./loadmem",str(20)], stdin=PIPE, stderr=PIPE)
+# lowmem kernel module requires small allocation to trigger event
+memload = Popen(["./loadmem",str(2)], stdin=PIPE, stderr=PIPE)
 raw_input('Press Enter...\n')
 os.kill(memload.pid, 9)
 
