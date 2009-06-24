@@ -11,6 +11,7 @@ SUBDIRS = \
 	tests \
 	doc \
 	python \
+	tools \
 	fake-provider \
 	vapi
 
@@ -24,12 +25,12 @@ MAINTAINERCLEANFILES = INSTALL
 check-sum:
 	$(MAKE) -C libcontextsubscriber/unit-tests check-sum
 
-check-accept:
-	$(MAKE) -C libcontextsubscriber/accept-tests check-accept
+check-customer:
+	$(MAKE) -C libcontextsubscriber/customer-tests check-customer
 
 coverage: covoptioncheck
 	$(MAKE) -C libcontextsubscriber/unit-tests coverage
 
-.PHONY: coverage check-accept check-sum
+.PHONY: coverage check-customer check-sum
 
 include $(top_srcdir)/am/covoptioncheck.am

@@ -162,8 +162,17 @@ Description: Helper library for subscribers of context properties
 Package: contextd-tests
 Section: devel
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit, contextkit
 Recommends: python2.5, python (>= 2.5)
-Description: contextd automated tests
+Description: contextd automated customer tests
  .
- This package contains an automated testsuite of the contextd daemon.
+ This package contains an automated customer testsuite of the contextd daemon.
+
+Package: libcontextsubscriber-tests
+Section: devel
+Architecture: any
+Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit
+Recommends: python2.5, python (>= 2.5)
+Description: libcontextsubscriber automated customer tests
+ .
+ This package contains an automated customer testsuite of the libcontextsubscriber library.

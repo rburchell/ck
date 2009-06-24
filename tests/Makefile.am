@@ -1,1 +1,3 @@
-SUBDIRS = unit_tests python-test-library contextd_tests accept-tests
+SUBDIRS = unit_tests contextd_tests customer-tests
+
+EXTRA_DIST = examples

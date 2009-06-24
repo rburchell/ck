@@ -101,7 +101,7 @@ class CommanderAppearing(unittest.TestCase):
         self.assertEqual(got,
                          self.wanted("test.int", "int", "1235"),
                          "Value after commander has changed it is bad")
-        os.system('./rec-kill.sh %d' % self.context_commander.pid)
+        os.system('../common/rec-kill.sh %d' % self.context_commander.pid)
         got = self.context_client.stdout.readline().rstrip()
         self.assertEqual(got,
                          self.wanted("test.int", "int", "42"),

@@ -1,4 +1,4 @@
-SUBDIRS = src unit-tests accept-tests cli update-contextkit-providers doc man
+SUBDIRS = src unit-tests customer-tests cli update-contextkit-providers doc man
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextsubscriber-1.0.pc
@@ -6,8 +6,8 @@ pkgconfig_DATA = contextsubscriber-1.0.pc
 check-sum:
 	$(MAKE) -C unit-tests check-sum
 
-check-accept:
-	$(MAKE) -C accept-tests check-accept
+check-customer:
+	$(MAKE) -C customer-tests check-customer
 
 coverage: covoptioncheck
 	$(MAKE) -C unit-tests coverage

@@ -1,5 +1,5 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.2.7~unreleased], [marius.vollmer@nokia.com], ContextKit)
+AC_INIT([ContextKit], [0.2.8~unreleased], [marius.vollmer@nokia.com], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign dist-bzip2 tar-ustar 1.9])
@@ -38,8 +38,8 @@ AC_SUBST([CDB_LIBS])
 AX_FEATURE_DISABLEABLE([doc], [BUILD_DOCS], [disable building of documentation])
 AC_MSG_CHECKING([for gtk-doc])
 PKG_CHECK_EXISTS([gtk-doc >= 1.9],[AC_MSG_RESULT([yes])],
-			  [AC_MSG_RESULT([no])
-			   missing_deps_BUILD_DOCS="$missing_deps_BUILD_DOCS, gtk-doc >= 1.9"])
+                          [AC_MSG_RESULT([no])
+                           missing_deps_BUILD_DOCS="$missing_deps_BUILD_DOCS, gtk-doc >= 1.9"])
 HTML_DIR="${datadir}/gtk-doc/html"
 AC_SUBST([HTML_DIR])
 AX_DISABLE_FEATURE_ON_PROG([Dot drawing tool], [BUILD_DOCS], [DOT], [dot])
@@ -59,47 +59,52 @@ AX_DISABLE_FEATURE_ON_PROG([LCov coverage visualization tool], [COVERAGE], [LCOV
 AM_CONDITIONAL([CONTEXTKIT_COVERAGE], [test "$missing_deps_COVERAGE" = ""])
 
 AC_CONFIG_FILES([
-	Makefile
+        Makefile
         contextd/Makefile
-        spec/Makefile
-        tests/Makefile
-        tests/unit_tests/Makefile
-        tests/contextd_tests/Makefile
-        tests/python-test-library/Makefile
-        tests/python-test-library/testfw/Makefile
-        tests/accept-tests/Makefile doc/Makefile
+        contextd/org.freedesktop.ContextKit.contextd.service
+        contextprovider-1.0.pc
+        doc/Makefile
         doc/reference/Makefile
         doc/reference/libcontextprovider/Makefile
-        python/Makefile
-        contextprovider-1.0.pc
-        contextd/org.freedesktop.ContextKit.contextd.service
         fake-provider/Makefile
-        vapi/Makefile
         libcontextprovider/Makefile
-	libcontextsubscriber/Makefile
-        libcontextsubscriber/src/Makefile
+        libcontextsubscriber/Makefile
         libcontextsubscriber/cli/Makefile
-        libcontextsubscriber/update-contextkit-providers/Makefile
-        libcontextsubscriber/unit-tests/Makefile
+        libcontextsubscriber/contextsubscriber-1.0.pc
+        libcontextsubscriber/customer-tests/Makefile
+        libcontextsubscriber/customer-tests/update-contextkit-providers/Makefile
         libcontextsubscriber/doc/Makefile
         libcontextsubscriber/man/Makefile
-        libcontextsubscriber/contextsubscriber-1.0.pc
-        libcontextsubscriber/unit-tests/util/Makefile
+        libcontextsubscriber/src/Makefile
+        libcontextsubscriber/unit-tests/Makefile
         libcontextsubscriber/unit-tests/cdbreader/Makefile
         libcontextsubscriber/unit-tests/cdbwriter/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-xml-static/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-xml-static/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-xml-dynamic/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-xml-dynamic/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-cdb-static/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-static/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-cdb-dynamic/Makefile
         libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
-        libcontextsubscriber/unit-tests/propertyprovider/Makefile
-        libcontextsubscriber/unit-tests/propertyhandle/Makefile
+        libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-static/Makefile
+        libcontextsubscriber/unit-tests/contextpropertyinfo-xml-dynamic/Makefile
+        libcontextsubscriber/unit-tests/contextpropertyinfo-xml-static/Makefile
+        libcontextsubscriber/unit-tests/contextregistryinfo-cdb-dynamic/Makefile
+        libcontextsubscriber/unit-tests/contextregistryinfo-cdb-static/Makefile
+        libcontextsubscriber/unit-tests/contextregistryinfo-xml-dynamic/Makefile
+        libcontextsubscriber/unit-tests/contextregistryinfo-xml-static/Makefile
         libcontextsubscriber/unit-tests/handlesignalrouter/Makefile
-        libcontextsubscriber/accept-tests/Makefile
-        libcontextsubscriber/accept-tests/update-contextkit-providers/Makefile
+        libcontextsubscriber/unit-tests/propertyhandle/Makefile
+        libcontextsubscriber/unit-tests/propertyprovider/Makefile
+        libcontextsubscriber/unit-tests/util/Makefile
+        libcontextsubscriber/update-contextkit-providers/Makefile
+        python/Makefile
+        spec/Makefile
+        tests/Makefile
+        tests/contextd_tests/Makefile
+        tests/customer-tests/Makefile
+        tests/customer-tests/contextd/Makefile
+        tests/customer-tests/libcontextprovider/Makefile
+        tests/customer-tests/libcontextprovider/stubs/Makefile
+        tests/customer-tests/libcontextprovider/testfw/Makefile
+        tests/unit_tests/Makefile
+        tools/Makefile
+        tools/loadmem/Makefile
+        vapi/Makefile
 ])
 
 AC_OUTPUT
