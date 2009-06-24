@@ -11,7 +11,7 @@ then
 	for dir in $DIRS; do
 		cd $dir
 		for file in *.py; do
-			./$file || exit 1
+			python2.5 $file || exit 1
 		done
 		cd ..
 	done

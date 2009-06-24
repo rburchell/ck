@@ -32,6 +32,12 @@ from subprocess import Popen, PIPE
 import time
 import signal
 
+def proc_kill(pid):
+    if os.path.exists("/targets"):
+        os.system('../common/rec-kill.sh %d' % pid)
+    else:
+        os.kill(pid,9)
+
 def timeoutHandler(signum, frame):
     raise Exception('tests has been running for too long')
 
@@ -57,8 +63,8 @@ class Subscription(unittest.TestCase):
         self.context_client = Popen(["context-listen","test.int","test.double","test.string","test.truth"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.system('../common/rec-kill.sh %d' % self.flexiprovider.pid)
-        os.system('../common/rec-kill.sh %d' % self.context_client.pid)
+        proc_kill(self.flexiprovider.pid)
+        proc_kill(self.context_client.pid)
         os.unlink('context-provide.context')
 
     def testValue(self):
@@ -292,11 +298,11 @@ class MultipleSubscribers(unittest.TestCase):
 
 
     def tearDown(self):
-        os.system('../common/rec-kill.sh %d' % self.flexiprovider.pid)
-        os.system('../common/rec-kill.sh %d' % self.context_client1.pid)
-        os.system('../common/rec-kill.sh %d' % self.context_client2.pid)
-        os.system('../common/rec-kill.sh %d' % self.context_client3.pid)
-        os.system('../common/rec-kill.sh %d' % self.context_client4.pid)
+        proc_kill(self.flexiprovider.pid)
+        proc_kill(self.context_client1.pid)
+        proc_kill(self.context_client2.pid)
+        proc_kill(self.context_client3.pid)
+        proc_kill(self.context_client4.pid)
         os.unlink('context-provide.context')
 
     def testInitialSubscription(self):
@@ -442,9 +448,9 @@ class MultipleProviders(unittest.TestCase):
                                     ,stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.system('../common/rec-kill.sh %d' % self.flexiprovider1.pid)
-        os.system('../common/rec-kill.sh %d' % self.flexiprovider2.pid)
-        os.system('../common/rec-kill.sh %d' % self.context_client.pid)
+        proc_kill(self.context_client.pid)
+        proc_kill(self.flexiprovider1.pid)
+        proc_kill(self.flexiprovider2.pid)
         os.unlink('context-provide1.context')
         os.unlink('context-provide2.context')
 
@@ -480,8 +486,8 @@ class SubscriptionPause (unittest.TestCase):
         self.context_client = Popen(["context-listen","test.int"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
     def tearDown(self):
-        os.system('../common/rec-kill.sh %d' % self.flexiprovider.pid)
-        os.system('../common/rec-kill.sh %d' % self.context_client.pid)
+        proc_kill(self.flexiprovider.pid)
+        proc_kill(self.context_client.pid)
         os.unlink('context-provide.context')
 
     def testPause(self):
