@@ -50,29 +50,29 @@ namespace Plugins {
 		 */
 		private bool ioc_ready(IOChannel source, IOCondition condition) {
 			if ((condition & (IOCondition.PRI | IOCondition.ERR)) !=
-			    (IOCondition.PRI | IOCondition.ERR))
+				(IOCondition.PRI | IOCondition.ERR))
 				return true;
-			Tristate new_state;
+			state_changed();
+			return true;
+
+		}
+
+		public void readFile() {
 			try {
 				char[] buf = new char[32];
 				size_t bread;
 
-				source.read_chars(buf, out bread);
+				this.ioc.read_chars(buf, out bread);
 				if (buf[0] == '0')
-					new_state = Tristate.FALSE;
+					state = Tristate.FALSE;
 				else if (buf[0] == '1')
-					new_state = Tristate.TRUE;
+					state = Tristate.TRUE;
 				else
-					new_state = Tristate.UNKNOWN;
-				source.seek_position(0, SeekType.SET);
+					state = Tristate.UNKNOWN;
+				this.ioc.seek_position(0, SeekType.SET);
 			} catch {
-				new_state = Tristate.UNKNOWN;
+				state = Tristate.UNKNOWN;
 			}
-			if (new_state != state) {
-				state = new_state;
-				state_changed();
-			}
-			return true;
 		}
 
 		BoolSysfsPoller(string filename) {
@@ -90,16 +90,16 @@ namespace Plugins {
 
 	/*
 	 * The LowmemPlugin implements the System.MemoryPressure context property that has three possible
-	 * values: normal, high, and critical.  It works by poll(2)ing the (Maemo specific)
+	 * values: normal, high, and critical.	It works by poll(2)ing the (Maemo specific)
 	 * /sys/kernel/{low,high}_watermark sysfs attributes.  The following table describes the correspondence
 	 * between the attributes and the value of the context property:
 	 *
 	 * low_watermark | high_watermark | System.MemoryPressure
 	 * --------------+----------------+-------------------------
-	 *       0       |       0        |       normal (0)
-	 *       1       |       0        |       high (1)
-	 *       1       |       1        |       critical (2)
-         *       x       |       x        |       unspecified (null)
+	 *		 0		 |		 0		  |		  normal (0)
+	 *		 1		 |		 0		  |		  high (1)
+	 *		 1		 |		 1		  |		  critical (2)
+	 *		 x		 |		 x		  |		  unspecified (null)
 	 */
 
 	internal class LowmemPlugin: Object, ContextD.Plugin {
@@ -119,6 +119,8 @@ namespace Plugins {
 
 		private void attr_changed(BoolSysfsPoller sp) {
 			int val;
+			low_wm.readFile();
+			high_wm.readFile();
 			if (low_wm.state == Tristate.FALSE && high_wm.state == Tristate.FALSE) {
 				/* normal */
 				val = 0;
@@ -128,6 +130,9 @@ namespace Plugins {
 			} else if (low_wm.state == Tristate.TRUE && high_wm.state == Tristate.TRUE) {
 				/* critical */
 				val = 2;
+			} else if (low_wm.state == Tristate.FALSE && high_wm.state == Tristate.TRUE) {
+				/* ignore rogue state */
+				return;
 			} else {
 				/* undefined */
 				ContextProvider.set_null(lowmem_key);
@@ -147,6 +152,5 @@ namespace Plugins {
 			high_wm = new BoolSysfsPoller("/sys/kernel/high_watermark");
 			high_wm.state_changed.connect(attr_changed);
 		}
-
 	}
 }
