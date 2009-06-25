@@ -1,0 +1,16 @@
+context_provider-internal.h
+contextprovider-internal.vapi
+intset_binding.c
+contextprovider.gir
+contextprovider.vapi
+dbus_interface.[ch]
+key_usage_counter.[ch]
+manager.[ch]
+string_set.[ch]
+subscriber.[ch]
+context_provider.[ch]
+grouplist.[ch]
+group.[ch]
+libcontextprovider.vala.stamp
+value_compare.[ch]
+

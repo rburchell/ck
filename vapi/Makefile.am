@@ -1,3 +1,1 @@
-EXTRA_DIST = \
-	hal.vapi \
-	posix.vapi
+EXTRA_DIST = hal.vapi posix.vapi

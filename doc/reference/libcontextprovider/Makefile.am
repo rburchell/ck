@@ -67,8 +67,8 @@ expand_content_files=
 # signals and properties.
 # e.g. INCLUDES=-I$(top_srcdir) -I$(top_builddir) $(GTK_DEBUG_FLAGS)
 # e.g. GTKDOC_LIBS=$(top_builddir)/gtk/$(gtktargetlib)
-AM_CPPFLAGS=$(CONTEXTD_CFLAGS)
-GTKDOC_LIBS=$(CONEXTD_LDFLAGS) $(top_builddir)/libcontextprovider.la
+AM_CPPFLAGS=$(GLIB_CFLAGS) $(GOBJECT_CFLAGS) $(GDBUS_CFLAGS) $(GEE_CFLAGS) $(HAL_CFLAGS)
+GTKDOC_LIBS=$(GLIB_LIBS) $(GOBJECT_LIBS) $(GDBUS_LIBS) $(GEE_LIBS) $(HAL_LIBS) $(top_builddir)/libcontextprovider.la
 
 # This includes the standard gtk-doc make rules, copied by gtkdocize.
 include $(top_srcdir)/gtk-doc.make

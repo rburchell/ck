@@ -1,0 +1,7 @@
+test_hal_plugin
+test_hal_plugin.[ch]
+test_hal_plugin.vala.stamp
+libhal.c
+context_provider.c
+plugin.c
+hal_plugin.c

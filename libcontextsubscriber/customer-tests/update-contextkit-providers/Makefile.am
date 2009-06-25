@@ -1,5 +1,5 @@
 
-check-accept:
+check-customer:
 	$(MAKE) -C @abs_top_srcdir@ all
 	./test.sh
 
