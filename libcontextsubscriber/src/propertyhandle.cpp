@@ -69,7 +69,7 @@ bool PropertyHandle::typeCheckEnabled = false;
 */
 
 PropertyHandle::PropertyHandle(const QString& key)
-    :  myProvider(0), myInfo(0), subscribeCount(0), subscribePending(false), myKey(key)
+    :  myProvider(0), myInfo(0), subscribeCount(0), subscribePending(true), myKey(key)
 {
     // Start listening for the beloved commander
     sconnect(commanderListener, SIGNAL(nameAppeared()),
@@ -131,7 +131,23 @@ void PropertyHandle::updateProvider()
             // provider even though the key is no longer in the
             // registry.
             newProvider = myProvider;
+
+            if (newProvider == 0) {
+                // This is the first place where we can know that the
+                // provider for this property doesn't exist. We
+                // shouldn't block waiting for subscription for such a property.
+                subscribePending = false;
+            }
         }
+    }
+
+    if (myProvider) {
+        disconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
+                   this, SLOT(onSubscribeFinished(QSet<QString>)));
+    }
+    if (newProvider) {
+        sconnect(newProvider, SIGNAL(subscribeFinished(QSet<QString>)),
+                 this, SLOT(onSubscribeFinished(QSet<QString>)));
     }
 
     if (newProvider != myProvider && subscribeCount > 0) {
@@ -139,7 +155,7 @@ void PropertyHandle::updateProvider()
         // Unsubscribe from the old provider
         if (myProvider) myProvider->unsubscribe(myKey);
         // And subscribe to the new provider
-        if (newProvider) newProvider->subscribe(myKey);
+        if (newProvider) subscribePending = newProvider->subscribe(myKey);
     }
 
     myProvider = newProvider;
@@ -149,13 +165,11 @@ void PropertyHandle::updateProvider()
 /// subscribe to it through the \c myProvider instance if neccessary.
 void PropertyHandle::subscribe()
 {
-    qDebug() << "PropertyHandle::subscribe";
+    qDebug() << "PropertyHandle::subscribe" << QThread::currentThread();
 
     QMutexLocker locker(&subscribeCountLock);
     ++subscribeCount;
-    if (subscribeCount == 1 && myProvider) {
-        sconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
-                 this, SLOT(onSubscribeFinished(QSet<QString>)));
+    if (subscribeCount == 1 && myProvider != 0) {
         subscribePending = myProvider->subscribe(myKey);
     }
 }
@@ -170,8 +184,6 @@ void PropertyHandle::unsubscribe()
     if (subscribeCount == 0 && myProvider != 0) {
         subscribePending = false;
         myProvider->unsubscribe(myKey);
-        disconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
-                   this, SLOT(onSubscribeFinished(QSet<QString>)));
     }
 }
 
