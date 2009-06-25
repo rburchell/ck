@@ -20,6 +20,7 @@ contextkit.substvars
 *.preinst.debhelper
 *.substvars
 contextkit-utils/
+libcontextsubscriber-tests/
 libcontextsubscriber-dev/
 libcontextsubscriber0-dbg/
 libcontextsubscriber-doc/
