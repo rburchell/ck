@@ -71,6 +71,10 @@ bool PropertyHandle::typeCheckEnabled = false;
 PropertyHandle::PropertyHandle(const QString& key)
     :  myProvider(0), myInfo(0), subscribeCount(0), subscribePending(true), myKey(key)
 {
+    // Note: We set subscribePending to true, assuming that the
+    // intention of the upper layer is to subscribe construction time.
+    // If this intention is changed, changes are needed here as well.
+
     // Start listening for the beloved commander
     sconnect(commanderListener, SIGNAL(nameAppeared()),
              this, SLOT(updateProvider()));
