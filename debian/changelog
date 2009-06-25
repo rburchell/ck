@@ -20,14 +20,14 @@ contextkit (0.2.6) unstable; urgency=low
 
   (0.2.5 was never successfully released.)
   
- -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Tue, 09 Jun 2009 17:11:48 +0300
+ -- Gergely Risko <gergely+context@risko.hu>  Tue, 09 Jun 2009 17:11:48 +0300
 
 contextkit (0.2.4) unstable; urgency=low
 
   * fixed the bug that libcontextsubscriber0 was not installable if no
     other components of the context framework were ever installed before
 
- -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Tue, 09 Jun 2009 17:11:48 +0300
+ -- Gergely Risko <gergely+context@risko.hu>  Tue, 09 Jun 2009 17:11:48 +0300
 
 contextkit (0.2.3) unstable; urgency=low
 
@@ -62,7 +62,7 @@ contextkit (0.2.0) unstable; urgency=low
 
     Implemented: SWP#CntFr-204
 
- -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Wed, 04 Jun 2009 08:40:14 +0300
+ -- Gergely Risko <gergely+context@risko.hu>  Wed, 04 Jun 2009 08:40:14 +0300
 
 contextkit (0.1.10) unstable; urgency=low
 
@@ -93,7 +93,7 @@ contextkit (0.1.8) unstable; urgency=low
 
     Implemented: SWP#CntFr-216
 
- -- Gergely Risko <ext-gergely.2.risko@nokia.com>  Thu, 28 May 2009 11:25:27 +0300
+ -- Gergely Risko <gergely+context@risko.hu>  Thu, 28 May 2009 11:25:27 +0300
 
 contextkit (0.1.7) unstable; urgency=low
 
