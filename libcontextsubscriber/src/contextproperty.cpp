@@ -173,16 +173,20 @@ struct ContextPropertyPrivate
    creation of ContextPropertys with calls to waitForSubscription()
    would prevent this optimization.
 
-   \note The \c ContextProperty class is not thread safe, but
-   reentrant.  This means, that you can create a new ContextProperty
-   class in any thread, but you should only use it from the same
-   thread through its lifetime.  If needed, you can use \c QObject's
-   \c moveToThread method.  Please note that the \c valueChanged()
-   signal has to be connected via \c QueuedConnection if the property
-   is not created in the \c QApplication's main thread (this setting
-   is the default).  Because of the queued connection the thread of
-   the \c ContextProperty has to have an event loop running to get the
-   slots connected to the valueChange signal called.
+   \note The \c ContextProperty class follows the usual QObject rules
+   for non-GUI classes in multi-threaded programs.  In Qt terminology,
+   the ContextProperty class is reentrant but not thread-safe.  This
+   means that you can create ContextProperty instances in any thread
+   and then freely use these instance in their threads, but you can
+   not use a single instance concurrently from multiple threads.
+
+   \note Please pay special attention to how signals and slots work in
+   a multi-threaded program: by default, a slot is emitted in the
+   thread that called QObject::connect().  For this to happen
+   reliably, the thread needs to run a event loop.
+
+   \note See the Qt documentation for \c QThread and related classes
+   for more details.
  */
 
 /// Constructs a new ContextProperty for \a key (e.g. Screen.TopEdge)
