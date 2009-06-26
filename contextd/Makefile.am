@@ -1,10 +1,10 @@
 bin_PROGRAMS = contextd
 
-contextddir = $(datadir)/context-providers
-contextd_DATA = contextd.xml
+providerdir = $(datadir)/contextkit/providers/
+oldproviderdir = $(datadir)/context-providers/
 
-providersdir = $(datadir)/contextkit/providers
-dist_providers_DATA = org.freedesktop.ContextKit.contextd.context
+dist_provider_DATA = org.freedesktop.ContextKit.contextd.context
+dist_oldprovider_DATA = contextd.xml
 
 servicedir = $(datadir)/dbus-1/services
 service_DATA = org.freedesktop.ContextKit.contextd.service
@@ -39,5 +39,11 @@ MAINTAINERCLEANFILES = $(contextd_GENERATEDSOURCES)	\
 BUILT_SOURCES = contextd.vala.stamp
 
 install-data-hook:
-	-update-context-providers $(DESTDIR)$(contextdir)
-	-update-contextkit-providers $(DESTDIR)$(providersdir)
+	-update-context-providers $(DESTDIR)$(oldproviderdir)
+	-update-contextkit-providers $(DESTDIR)$(providerdir)
+
+uninstall-hook:
+	-update-context-providers $(DESTDIR)$(oldproviderdir)
+	-update-contextkit-providers $(DESTDIR)$(providerdir)
+	[ 0 -lt `find $(DESTDIR)$(oldproviderdir) -name '*.xml' | wc -l` ] || rm -f $(DESTDIR)$(oldproviderdir)/context-providers.cdb
+	[ 0 -lt `find $(DESTDIR)$(providerdir) -name '*.context' | wc -l` ] || rm -f $(DESTDIR)$(providerdir)/cache.cdb
