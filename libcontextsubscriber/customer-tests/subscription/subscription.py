@@ -33,10 +33,7 @@ import time
 import signal
 
 def proc_kill(pid):
-    if os.path.exists("/targets"):
-        os.system('../common/rec-kill.sh %d' % pid)
-    else:
-        os.kill(pid,9)
+	os.system('../common/rec-kill.sh %d' % pid)
 
 def timeoutHandler(signum, frame):
     raise Exception('tests has been running for too long')

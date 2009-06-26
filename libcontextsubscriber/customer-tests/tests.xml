@@ -6,8 +6,7 @@
     <set name="libcontextsubscriber suite" description="libcontextsubscriber tests">
 	  <!-- Possibly some pre-steps to execute before running the test cases -->
       <pre_steps>
-        <step>export SESSION_BUS_ADDRESS_FILE=/tmp/session_bus_address.user</step>
-        <step>export DBUS_SESSION_BUS_ADDRESS=unix:path=/tmp/session_bus_socket</step>
+        <step>. /tmp/session_bus_address.user</step>
         <step>export CONTEXT_PROVIDERS=.</step>
       </pre_steps>
       <!-- At least one case per set, name mandatory, description mandatory, other optional -->
