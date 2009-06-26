@@ -1,8 +1,9 @@
-contextkit (0.2.8~unreleased) unstable; urgency=low
+contextkit (0.2.8) unstable; urgency=low
 
-  * 
+  * lowmem plugin optimization
+  * build system clean up
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Mon, 22 Jun 2009 09:13:01 +0300
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 26 Jun 2009 15:15:04 +0300
 
 contextkit (0.2.7) unstable; urgency=low
 
