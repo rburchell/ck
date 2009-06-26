@@ -1,14 +1,16 @@
-all: doxygen-maint
+if CONTEXTKIT_BUILD_DOCS
+all-local: doxygen
+endif
 
 DOXYCFG = $(srcdir)/doxy.cfg
 
-doxygen-maint:
-	if test "$(DOXYGEN)" = doxygen; then \
-		$(MAKE) $(AM_MAKEFLAGS) doxygen; \
-	fi
-
 doxygen:
-	srcdir=$(srcdir) doxygen $(DOXYCFG)
+	@if test x$(srcdir) = x. ; then \
+		echo srcdir=$(srcdir) $(DOXYGEN) $(DOXYCFG); \
+		srcdir=$(srcdir) $(DOXYGEN) $(DOXYCFG); \
+	else \
+		echo This is a VPATH build, so not building doxygen; \
+	fi
 
 EXTRA_DIST = $(DOXYCFG) html
 
@@ -16,6 +18,6 @@ distclean-local:
 	rm -f doxygen.log
 
 maintainer-clean-local:
-	-rm -rf html
+	rm -rf html
 
-.PHONY: doxygen doxygen-maint
+.PHONY: doxygen

@@ -2,7 +2,7 @@ bin_PROGRAMS = update-contextkit-providers
 
 update_contextkit_providers_SOURCES = update-contextkit-providers.cpp
 
-AM_CXXFLAGS = -I$(srcdir)/../src $(QtXml_CFLAGS) $(QtCore_CFLAGS) $(QtDBus_CFLAGS) '-DDEFAULT_CONTEXT_PROVIDERS="@DEFAULT_CONTEXT_PROVIDERS@"'
+AM_CXXFLAGS = -I$(srcdir)/../src $(QtXml_CFLAGS) $(QtCore_CFLAGS) $(QtDBus_CFLAGS) '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"'
 AM_LDFLAGS = $(QtXml_LIBS) $(QtCore_LIBS)
 
 # library dependency hack for seamless make in update-contextkit-providers/

@@ -23,7 +23,6 @@ AC_ARG_WITH([doxygen],
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 AM_PATH_PYTHON
-AC_CHECK_PROGS([BC], [bc])
 AS_IF([test "$with_coverage" = yes -o \( "$with_coverage" = "" -a "$withm_coverage" = yes \)],
 	    [AC_CHECK_PROGS([GCOV], [gcov], [:])
 	     AC_CHECK_PROGS([LCOV], [lcov], [:])
@@ -103,7 +102,7 @@ AC_CONFIG_FILES([Makefile
                  unit-tests/propertyprovider/Makefile
                  unit-tests/propertyhandle/Makefile
                  unit-tests/handlesignalrouter/Makefile
-		 		 customer-tests/Makefile
-				 customer-tests/update-contextkit-providers/Makefile])
+ 		 customer-tests/Makefile
+		 customer-tests/update-contextkit-providers/Makefile])
 
 AC_OUTPUT

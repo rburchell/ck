@@ -13,6 +13,7 @@ COVERAGE_FILES = propertyprovider.cpp
 AM_CXXFLAGS = $(QtDBus_CFLAGS)
 AM_LDFLAGS = 
 FROM_SOURCE = propertyprovider.cpp propertyprovider.h sconnect.h # copy these files from the real source
+FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
 include $(top_srcdir)/am/tests.am
 
