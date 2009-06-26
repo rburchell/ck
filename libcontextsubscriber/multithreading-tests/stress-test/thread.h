@@ -45,8 +45,12 @@ protected:
             cp->waitForSubscription();
             value =  cp->value().toInt();
             realValue = time(0);
-            if (value != realValue && value != 0)
-                qDebug() << "*** value mismatch:" << propertyName << value << realValue;
+            if (value != realValue && value != 0) {
+                msleep(100); // give it 0.1 sec to arrive
+                value =  cp->value().toInt();
+                if (value != realValue && value != 0) 
+                    qDebug() << "*** value mismatch:" << propertyName << value << realValue;
+            }
             break;
 
             case 2: // wait 0-2000 msec before deleting
