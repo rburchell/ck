@@ -3,12 +3,11 @@
 
 #include <contextproperty.h>
 
+#include <time.h>
 #include <QThread>
 #include <QDebug>
-#include <QTimer>
 
-#define NUM_TESTS 6
-
+#define NUM_TESTS 8
 
 class ValueChecker : public QObject
 {
@@ -33,17 +32,21 @@ class Thread : public QThread
     Q_OBJECT
 
 public:
-    Thread(const int task, const QString& name) : task(task), name(name) {};
-    static int value1;
+    Thread(const int task, const QString& propertyName) : task(task), propertyName(propertyName) {};
 
 protected:
     void run() {
         // create property do something and delete it
-        ContextProperty* cp = new ContextProperty(name);
+        ContextProperty* cp = new ContextProperty(propertyName);
+        int value, realValue;
+
         switch (task) {
-            case 1: // get value
+            case 1: // check value
             cp->waitForSubscription();
-            qDebug() << "** value =" << cp->value();
+            value =  cp->value().toInt();
+            realValue = time(0);
+            if (value != realValue && value != 0)
+                qDebug() << "*** value mismatch:" << propertyName << value << realValue;
             break;
 
             case 2: // wait 0-2000 msec before deleting
@@ -64,22 +67,33 @@ protected:
             cp->subscribe();
             break;
 
-            case 6: // unsubscribe, wait a bit then subscribe
+            case 6: // unsubscribe, wait a bit then subscribe and wait some more
             cp->unsubscribe();
             msleep(qrand()%2000);
             cp->subscribe();
             msleep(qrand()%2000);
             break;
 
+            case 7: // subscribe
+            cp->subscribe();
+            break;
+
+            case 8: // subscribe
+            msleep(qrand()%100);
+            cp->subscribe();
+            msleep(qrand()%100);
+            break;
+
             default:; // just create and delete
         }
+
         delete(cp);
         exit();
     }
 
 private:
     int task;
-    QString name;
+    QString propertyName;
 
 };
 
@@ -97,13 +111,13 @@ private:
 public:
     TestRunner(const int maxThreads, const QString& propertyName) :
         maxThreads(maxThreads), propertyName(propertyName), count(0) {
-//        QTimer::singleShot(100, this, SLOT(start()));
-        start();
+        for (int i = 0; i < maxThreads; i++)
+            addThread();
     }
 
     void addThread() {
         int task = qrand() % NUM_TESTS;
-        qDebug() << "** starting task: " << task << "/" << ++count;
+        qDebug() << "** starting" << propertyName << task << "/" << ++count;
         Thread* t = new Thread(task, propertyName);
         QObject::connect(t, SIGNAL(finished()), this, SLOT(onThreadFinished()));
         threads.insert(t);
@@ -111,11 +125,6 @@ public:
     }
 
 public slots:
-    void start() {
-        for (int i = 0; i < maxThreads; i++)
-            addThread();
-    }
-
     void onThreadFinished() {
         Thread* t = (Thread*) QObject::sender();
         if (threads.remove(t)) {
