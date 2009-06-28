@@ -1,7 +1,5 @@
-ContextKit - a new Kit on the Block
-===================================
-
-(Sorry for the title, my inner child wants to play.)
+ContextKit
+==========
 
 -------------------------
 Context and Conversations
@@ -25,8 +23,8 @@ Context and Computers
 
 * Conversation between Man and Machine.  Also has context.
 
-* Memory: what has the user done recently with the computer?  "Recent
-  documents", "Browsing history", "Recently written emails", ...
+* What has the user done with the computer?  "Recent documents",
+  "Browsing history", "Recently written emails", ...
 
 * Getting additional clues without help from user: time of day, day of
   week, geographical location, sitting still or moving, holding like a
@@ -40,7 +38,7 @@ Context and Computers
 
 
 -------------------------
-Context and Connections
+Context and Connecting People
 
 * Computers facilitate conversations between people
 
@@ -55,21 +53,27 @@ Context and Connections
   to see his face and what's happening around him.  Sometimes.)
 
 * Mobile devices make this interesting.  "At his computer" no longer
-  means anything.
+  means much.
 
 -------------------------
 So?
 
-* Just a small matter of programming.
+* Bring together context providers
 
-* DeviceKit, GeoClue, Meta tracker, Telepathy, BlueZ, ConnMan, oFono,
-  Sensors, ...
+  - DeviceKit, GeoClue, Meta tracker, Telepathy, BlueZ, ConnMan, oFono,
+    Sensors, ...
 
-* GNOME, KDE, Maemo, Moblin, 
+* Standardize high-level interfaces across desktops
 
-* C, Glib, Qt, Python, Perl, JavaScript, C#, ...
+  - GNOME, KDE, Maemo, Moblin, Sugar, ...
 
-* Not so small!
+* With bindings for all languages
+
+  - C, Glib, Qt, Python, Perl, JavaScript, C#, ...
+
+* No silver bullet
+
+* Restrict, simplify, do the minimal useful thing
 
 -------------------------
 ContextKit
@@ -89,9 +93,123 @@ Status
 
 * First generation framework done
 
-* 
+* Some properties defined
+
+* Some buy in from other Nokia research projects. 
+
+* Only for Qt / C++  (sorry)
+
+* A bit too static still
 
 -------------------------
-Where
+Architecture
+
+* Decoupled
+
+* Publish/subscribe for property values
+
+* Run-time introspection 
+
+* XML property declarations with cache
+ 
+* No central daemon
+
+-------------------------
+Context Commander
+
+* Extended example
+
+  (Demo)
+
+
+-------------------------
+Subcriber example
+
+  (Code)
+
+-------------------------
+Provider example
+
+  (Code)
+
+-------------------------
+Desktop Types
+
+* Little hobby of mine
+
+* Intersect a number of dynamic type systems to find the core
+
+  - Null, numbers, strings, lists, maps
+
+  Missing: association lists, turn out to be more useful
+           than maps for interchange.
+
+* Define language neutral static types
+
+  - Enums, time, coordinates, ...
+
+* Write bindings of static types for static languages, documentation
+  systems, introspection APIs.
+
+-------------------------
+Nano-DOM
+
+* Mapping of subset of XML into Desktop Types.
+
+* Used to define context properties
+
+  <key name="Battery.ChargeLevel"
+       type="percentage">
+    <doc>...</doc>
+  </key>
+
+  <key>
+    <name>Battery.ChargeLevel</name>
+    <type>percentage</type>
+    <doc>...</doc>
+  </key>
+
+  "key", { "name": "Battery.ChargeLevel", "type": "percentage",
+           "doc": "..." }
+
+-------------------------
+Static Desktop Type
+
+* Dynamic desktop types: simple, fixed.
+
+* Static desktop types: expressive, extensible
+
+* Hierarchy, parameters.
+
+  <type name="uniform-list" base="list">
+    <params>
+      <type doc="Type of the elements"/>
+    </params>
+    <doc>...</doc>
+  </type>
+
+  <key name="Use.RecentDocuments">
+    <type>
+      <uniform-list type="nepomuk-uri"/>
+    </type>
+    <doc>...</doc>
+  </key>
+
+-------------------------
+Future
+
+* Finding a home on freedesktop.org
+
+* Lobbying for mind share
+
+* Adding GVariant and Python into the picture
+
+* Getting the D-Bus protocol right
+
+* Simple aggregation in client, maybe
+
+  (Sum, append, average, max, ...)
+
+* 'Context Cron'
 
 -------------------------
