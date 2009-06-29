@@ -270,15 +270,16 @@ void ContextProperty::unsubscribe() const
 /// get emitted (including the valueChanged() signal of this
 /// property).  Calling this function while the subscription is not in
 /// progress (because it has completed already or because the property
-/// is currently unsubscribed) does nothing.
+/// is currently unsubscribed) does nothing. Calling this function
+/// from a thread which is not the main thread results in busy looping.
 void ContextProperty::waitForSubscription() const
 {
     if (!priv->subscribed)
         return;
 
-    // This is not a busy loop, since the QEventLoop::WaitForMoreEvents flag
     while (priv->handle->isSubscribePending()) {
         if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
+            // This is not a busy loop, since the QEventLoop::WaitForMoreEvents flag
             QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
         } else {
             usleep(100000); // 0.1 second
