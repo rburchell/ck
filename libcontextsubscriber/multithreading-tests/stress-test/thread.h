@@ -7,26 +7,14 @@
 #include <QThread>
 #include <QDebug>
 
-#define NUM_TESTS 8
+#define NUM_TESTS 9
 
-class ValueChecker : public QObject
-{
-    Q_OBJECT
-    ContextProperty* property;
-
-public:
-    ValueChecker(ContextProperty* cp, QObject* parent) : QObject(parent), property(cp) {
-        connect(property, SIGNAL(valueChanged()), this, SLOT(onValueChanged()));
-    }
-
-public slots:
-    void onValueChanged() {
-        qDebug() << "VALUE:" << property->value();
-        // check value somehow XXX
-    }
-};
-
-
+/*
+ * A thread doing something with a ContextProperty.
+ *
+ * First creates  a ContextProperty tracking \c propertyName, then does some simple thing 
+ * with it based on the \c task number, then  finally the ContextProperty is deleted.
+ */
 class Thread : public QThread
 {
     Q_OBJECT
@@ -102,6 +90,11 @@ private:
 };
 
 
+/*
+ * Starts \c maxThreads number of threads doing simple tests wit ContextProperty \c propertyName
+ * until stopped. The tasks are choosen randomly with equal weight. Whenever a thread stops
+ * an other one will start, ad infinitum.
+ */
 class TestRunner : public QObject
 {
     Q_OBJECT
