@@ -1,0 +1,4 @@
+com.nokia.ContextProviderExample.service
+exec-with-log.sh
+tmp-session-bus.conf
+tmp-system-bus.conf

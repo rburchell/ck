@@ -7,7 +7,7 @@ _dll = CDLL("libcontextprovider.so.0")
 class ContextProvider:
     SUBSCRIPTION_CHANGED_CALLBACK = CFUNCTYPE(None, c_int, c_void_p)
 
-    init = cfunc('context_provider_init', _dll, None,
+    init = cfunc('context_provider_init', _dll, c_int,
                  ('bus_type', c_int, 1),
                  ('bus_name', c_char_p, 1))
     install_group = cfunc('context_provider_install_group', _dll, None,

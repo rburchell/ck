@@ -1,9 +1,4 @@
-NULL =
-
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
-
-# We exclude the caches from the uninstall check.
-distuninstallcheck_listfiles = find . -type f -a ! -name '*.cdb' -print
+DISTCHECK_CONFIGURE_FLAGS = --disable-doc --disable-vala --disable-coverage
 
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
@@ -15,27 +10,27 @@ SUBDIRS = \
 	spec \
 	tests \
 	doc \
-	tools \
 	python \
+	tools \
 	fake-provider \
-	vapi \
-	$(NULL)
+	vapi
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextprovider-1.0.pc
 
 EXTRA_DIST = contextprovider-1.0-uninstalled.pc
+DISTCLEANFILES = lcov.info lcov.html
+MAINTAINERCLEANFILES = INSTALL
 
-DISTCLEANFILES = \
-	lcov.info \
-	lcov.html \
-	$(NULL)
+check-sum:
+	$(MAKE) -C libcontextsubscriber/unit-tests check-sum
 
-version:
-	@echo @VERSION@
+check-customer:
+	$(MAKE) -C libcontextsubscriber/customer-tests check-customer
 
-.PHONY: version
+coverage: covoptioncheck
+	$(MAKE) -C libcontextsubscriber/unit-tests coverage
 
-if HAVE_COVERAGE
-include tools/lcov.am
-endif
+.PHONY: coverage check-customer check-sum
+
+include $(top_srcdir)/am/covoptioncheck.am

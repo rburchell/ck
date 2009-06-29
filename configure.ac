@@ -1,144 +1,122 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.2.7~unreleased], [marius.vollmer@nokia.com], ContextKit)
+AC_INIT([ContextKit], [0.2.9~unreleased], [marius.vollmer@nokia.com], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
-AC_CONFIG_HEADERS(config.h)
-AM_INIT_AUTOMAKE([-Wall -Wno-portability -Wno-override -Werror dist-bzip2 tar-ustar 1.9])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign dist-bzip2 tar-ustar 1.9])
 
-# Honor aclocal flags
-ACLOCAL="$ACLOCAL $ACLOCAL_FLAGS"
-AC_CONFIG_MACRO_DIR(m4)
+AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_CC
-AM_PROG_CC_C_O
-AC_DISABLE_STATIC
-
+CFLAGS="$CXXFLAGS -Wall"
+AC_PROG_CXX
+CXXFLAGS="$CXXFLAGS -Wall"
 AC_PROG_LIBTOOL
+AM_PATH_PYTHON
 
-GTK_DOC_CHECK([1.9])
+# vala compiler (>= 0.7.1)
+AX_FEATURE_DISABLEABLE([vala], [BUILD_VALA], [disable building of vala sources])
+AX_DISABLE_FEATURE_ON_PROG([Vala compiler], [BUILD_VALA], [VALAC], [valac], [0.7.1])
+AM_CONDITIONAL(CONTEXTKIT_BUILD_VALA, test "$missing_deps_BUILD_VALA" = "")
 
-AC_PATH_PROG(VALAC, valac, valac)
-AC_SUBST(VALAC)
+# check for libraries
+PKG_CHECK_MODULES_SUBST([GLIB], [glib-2.0 >= 2.12.0])
+PKG_CHECK_MODULES_SUBST([GOBJECT], [gobject-2.0 >= 2.12.0])
+PKG_CHECK_MODULES_SUBST([GDBUS], [dbus-glib-1])
+PKG_CHECK_MODULES_SUBST([GEE], [gee-1.0 >= 0.1.3])
+PKG_CHECK_MODULES_SUBST([HAL], [hal])
+PKG_CHECK_MODULES_SUBST([QtTest], [QtTest])
+PKG_CHECK_MODULES_SUBST([QtCore], [QtCore])
+PKG_CHECK_MODULES_SUBST([QtDBus], [QtDBus])
+PKG_CHECK_MODULES_SUBST([QtXml], [QtXml])
+AC_PROG_QT_MOC
+AC_PROG_QT_UIC
+AC_PROG_QT_RCC
+AC_CHECK_LIB([cdb], [cdb_make_start], [CDB_LIBS=-lcdb], [AC_MSG_ERROR([Can't find cdb library])])
+AC_SUBST([CDB_LIBS])
 
-build_docs=yes
+# tools for documentation
+AX_FEATURE_DISABLEABLE([doc], [BUILD_DOCS], [disable building of documentation])
+AC_MSG_CHECKING([for gtk-doc])
+PKG_CHECK_EXISTS([gtk-doc >= 1.9],[AC_MSG_RESULT([yes])],
+                          [AC_MSG_RESULT([no])
+                           missing_deps_BUILD_DOCS="$missing_deps_BUILD_DOCS, gtk-doc >= 1.9"])
+HTML_DIR="${datadir}/gtk-doc/html"
+AC_SUBST([HTML_DIR])
+AX_DISABLE_FEATURE_ON_PROG([Dot drawing tool], [BUILD_DOCS], [DOT], [dot])
+AX_DISABLE_FEATURE_ON_PROG([Asciidoc], [BUILD_DOCS], [ASCIIDOC], [asciidoc], [8.2.7])
+AX_DISABLE_FEATURE_ON_PROG([source-highlight], [BUILD_DOCS], [SOURCE_HIGHLIGHT], [source-highlight])
+AX_DISABLE_FEATURE_ON_PROG([xsltproc], [BUILD_DOCS], [XSLTPROC], [xsltproc])
+AX_DISABLE_FEATURE_ON_PROG([xmllint], [BUILD_DOCS], [XMLLINT], [xmllint])
+AX_DISABLE_FEATURE_ON_PROG([doxygen], [BUILD_DOCS], [DOXYGEN], [doxygen])
+AM_CONDITIONAL([CONTEXTKIT_BUILD_DOCS], [test "$missing_deps_BUILD_DOCS" = ""])
+AM_CONDITIONAL([GTK_DOC_USE_LIBTOOL], [test "$missing_deps_BUILD_DOCS" = ""])
+AM_CONDITIONAL([ENABLE_GTK_DOC], [test "$missing_deps_BUILD_DOCS" = ""])
 
-XSLTPROC=
-AC_CHECK_PROGS([XSLTPROC], [xsltproc])
-if test -z "$XSLTPROC"; then
-  AC_MSG_WARN([xsltproc (from the libxslt source package) not found, not building documentation])
-  build_docs=no
-fi
+# coverage tools
+AX_FEATURE_DISABLEABLE([coverage], [COVERAGE], [disable unittests' coverage support])
+AX_DISABLE_FEATURE_ON_PROG([GCov coverage recording tool], [COVERAGE], [GCOV], [gcov])
+AX_DISABLE_FEATURE_ON_PROG([LCov coverage visualization tool], [COVERAGE], [LCOV], [lcov])
+AM_CONDITIONAL([CONTEXTKIT_COVERAGE], [test "$missing_deps_COVERAGE" = ""])
 
-XMLLINT=
-AC_CHECK_PROGS([XMLLINT], [xmllint])
-if test -z "$XMLLINT"; then
-  AC_MSG_WARN([xmllint (from the libxml2-utils source package) not found, not building documentation])
-  build_docs=no
-fi
-
-AC_PROG_PERL_MODULES([XML::LibXML::Reader], [],
-[
-  build_docs=no
+AC_CONFIG_FILES([
+        Makefile
+        contextd/Makefile
+        contextd/org.freedesktop.ContextKit.contextd.service
+        contextprovider-1.0.pc
+        doc/Makefile
+        doc/reference/Makefile
+        doc/reference/libcontextprovider/Makefile
+        fake-provider/Makefile
+        libcontextprovider/Makefile
+        libcontextsubscriber/Makefile
+        libcontextsubscriber/cli/Makefile
+        libcontextsubscriber/contextsubscriber-1.0.pc
+        libcontextsubscriber/customer-tests/Makefile
+        libcontextsubscriber/customer-tests/update-contextkit-providers/Makefile
+        libcontextsubscriber/doc/Makefile
+        libcontextsubscriber/man/Makefile
+        libcontextsubscriber/src/Makefile
+        libcontextsubscriber/unit-tests/Makefile
+        libcontextsubscriber/unit-tests/cdbreader/Makefile
+        libcontextsubscriber/unit-tests/cdbwriter/Makefile
+        libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
+        libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-static/Makefile
+        libcontextsubscriber/unit-tests/contextpropertyinfo-xml-dynamic/Makefile
+        libcontextsubscriber/unit-tests/contextpropertyinfo-xml-static/Makefile
+        libcontextsubscriber/unit-tests/contextregistryinfo-cdb-dynamic/Makefile
+        libcontextsubscriber/unit-tests/contextregistryinfo-cdb-static/Makefile
+        libcontextsubscriber/unit-tests/contextregistryinfo-xml-dynamic/Makefile
+        libcontextsubscriber/unit-tests/contextregistryinfo-xml-static/Makefile
+        libcontextsubscriber/unit-tests/handlesignalrouter/Makefile
+        libcontextsubscriber/unit-tests/propertyhandle/Makefile
+        libcontextsubscriber/unit-tests/propertyprovider/Makefile
+        libcontextsubscriber/unit-tests/util/Makefile
+        libcontextsubscriber/update-contextkit-providers/Makefile
+        python/Makefile
+        spec/Makefile
+        tests/Makefile
+        tests/contextd_tests/Makefile
+        tests/customer-tests/Makefile
+        tests/customer-tests/contextd/Makefile
+        tests/customer-tests/libcontextprovider/Makefile
+        tests/customer-tests/libcontextprovider/stubs/Makefile
+        tests/customer-tests/libcontextprovider/testfw/Makefile
+        tests/unit_tests/Makefile
+        tools/Makefile
+        tools/loadmem/Makefile
+        vapi/Makefile
 ])
-
-AM_CONDITIONAL(CONTEXTKIT_BUILD_DOCS, test x$build_docs = xyes)
-
-AC_SUBST(CFLAGS)
-AC_SUBST(CPPFLAGS)
-AC_SUBST(LDFLAGS)
-
-######################
-# Coverage option
-######################
-
-AC_ARG_ENABLE(coverage,
-	AS_HELP_STRING([--enable-coverage=@<:@no/yes/auto@:>@],
-	[compile with coverage profiling and debug (gcc only)]),
-	enable_coverage=$enableval,enable_coverage=no)
-
-######################
-# Debug option
-######################
-
-AC_ARG_ENABLE(debug,
-	AS_HELP_STRING([--enable-debug=@<:@no/yes/auto@:>@],
-	[compile with debug profiling]),
-	enable_debug=$enableval,enable_debug=no)
-
-GLIB_REQUIRED=2.12.0
-GEE_REQUIRED=0.1.3
-
-PKG_CHECK_MODULES(GLIBCOMMON, glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED dbus-glib-1)
-PKG_CHECK_MODULES(GEE, gee-1.0 >= $GEE_REQUIRED)
-PKG_CHECK_MODULES(HAL, hal)
-
-CONTEXTD_CFLAGS="$GLIBCOMMON_CFLAGS $GEE_CFLAGS $HAL_CFLAGS"
-CONTEXTD_LIBS="$GLIBCOMMON_LIBS $GEE_LIBS $HAL_LIBS"
-
-CONTEXTPROVIDER_CFLAGS="$GLIBCOMMON_CFLAGS $GEE_CFLAGS"
-CONTEXTPROVIDER_LIBS="$GLIBCOMMON_LIBS $GEE_LIBS"
-
-
-##################################
-# Flags for coverage measurement
-##################################
-
-if test "x$enable_coverage" != "xno"; then   	
-	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -fprofile-arcs -ftest-coverage"
-	CONTEXTD_LIBS="$CONTEXTD_LIBS -lgcov"
-	#FIXME: preserve non -Wall/-g/-O flags from users CFLAGS
-	CFLAGS="-Wall -g -O0"
-	AC_CHECK_PROGS([HAVE_LCOV], [lcov],)
-	if test -z "$HAVE_LCOV"; then
-	  AC_MSG_ERROR([lcov is necessary for testing code coverage (http://ltp.sourceforge.net/coverage/lcov.php)])
-	fi
-fi
-
-AM_CONDITIONAL(HAVE_COVERAGE, test "x$enable_coverage" != "xno")
-
-##################################
-# Flags for debugging
-##################################
-
-if test "x$enable_debug" != "xno" ; then
-   	CONTEXTD_CFLAGS="$CONTEXTD_CFLAGS -g -Wall -Werror"
-fi 
-
-AC_SUBST(CONTEXTD_CFLAGS)
-AC_SUBST(CONTEXTD_LIBS)
-
-AC_SUBST(CONTEXTPROVIDER_CFLAGS)
-AC_SUBST(CONTEXTPROVIDER_LIBS)
-
-have_location=no
-PKG_CHECK_MODULES(LOCATION, liblocation, [have_location=yes], [have_location=no])
-AC_SUBST(LOCATION_CFLAGS)
-AC_SUBST(LOCATION_LIBS)
-
-AM_CONDITIONAL(HAVE_LOCATION, test x$have_location = xyes)
-
-AC_CONFIG_SUBDIRS([libcontextsubscriber])
-AM_PATH_PYTHON(,, [:])
-
-AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([libcontextprovider/Makefile])
-AC_CONFIG_FILES([contextd/Makefile])
-AC_CONFIG_FILES([spec/Makefile])
-AC_CONFIG_FILES([tests/Makefile])
-AC_CONFIG_FILES([tests/unit_tests/Makefile])
-AC_CONFIG_FILES([tests/contextd_tests/Makefile])
-AC_CONFIG_FILES([tests/python-test-library/Makefile])
-AC_CONFIG_FILES([tests/python-test-library/testfw/Makefile])
-AC_CONFIG_FILES([tests/accept-tests/Makefile])
-AC_CONFIG_FILES([doc/Makefile])
-AC_CONFIG_FILES([doc/reference/Makefile])
-AC_CONFIG_FILES([doc/reference/libcontextprovider/Makefile])
-AC_CONFIG_FILES([tools/Makefile])
-AC_CONFIG_FILES([python/Makefile])
-AC_CONFIG_FILES([contextprovider-1.0.pc])
-AC_CONFIG_FILES([contextd/org.freedesktop.ContextKit.contextd.service])
-AC_CONFIG_FILES([fake-provider/Makefile])
-AC_CONFIG_FILES([vapi/Makefile])
 
 AC_OUTPUT
 
+AX_FEATURE_SUMMARIZE([BUILD_DOCS],
+                     [Building of documentation is enabled],
+                     [Documentation won't be built])
+
+AX_FEATURE_SUMMARIZE([BUILD_VALA],
+                     [Building of vala sources is enabled],
+                     [Vala sources won't be built])
+
+AX_FEATURE_SUMMARIZE([COVERAGE],
+                     [Unit testing coverage support is enabled],
+                     [Coverage won't be supported during unit testing])

@@ -1,5 +1,3 @@
-NULL =
-
 dist_noinst_DATA = context.valid.stamp $(INTROSPECT)
 
 htmldir = $(datadir)/doc/contextkit/html/
@@ -16,13 +14,11 @@ SPEC_TOOLS = spec-to-introspect.xsl \
 
 INTERFACES = \
 	Manager.xml \
-	Subscriber.xml \
-	$(NULL)
+	Subscriber.xml
 
 SPEC_FILES = \
 	$(INTERFACES) \
-	generic-types.xml \
-	$(NULL)
+	generic-types.xml
 
 INTROSPECT = $(INTERFACES:%.xml=introspect/%.xml)
 
@@ -61,14 +57,14 @@ EXTRA_DIST = \
 	context.xml \
 	context.xsd \
 	$(SPEC_TOOLS) \
-        myfilter.conf \
-	$(NULL)
+        myfilter.conf
 
 MAINTAINERCLEANFILES = \
 	$(INTROSPECT) \
 	context.valid.stamp \
         context-properties.html \
         contextkit.html \
-        context-provider-schema.html \
-	$(NULL)
+        context-provider-schema.html
 
+maintainer-clean-local:
+	rmdir introspect

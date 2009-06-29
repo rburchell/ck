@@ -46,8 +46,11 @@ def update_context_providers(xml, dir='.'):
         outfilename = os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"]
     else:
         outfilename = dir + '/context-provide.context'
-    tmpdir = outfilename[:outfilename.rindex('/')]
-    tmpfd, tmpfn = tempfile.mkstemp('.context', 'context-provide-', tmpdir)
+    if outfilename.find('/') != -1:
+        tmpdir = outfilename[:outfilename.rindex('/')]
+    else:
+        tmpdir = '.'
+    tmpfd, tmpfn = tempfile.mkstemp('.contexttemp', 'context-provide-', tmpdir)
     os.write(tmpfd, xml)
     os.close(tmpfd)
     os.rename(tmpfn, outfilename)
@@ -101,7 +104,9 @@ class Flexiprovider(object):
                             DOUBLE=CP.ContextProvider.set_double,
                             TRUTH=CP.ContextProvider.set_boolean)
         self.subscribed_cb = CP.ContextProvider.SUBSCRIPTION_CHANGED_CALLBACK(lambda x, y: None)
-        CP.ContextProvider.init(dict(session=0, system=1)[self.bus], self.busname)
+        retval = CP.ContextProvider.init(dict(session=0, system=1)[self.bus], self.busname)
+        if retval == 0:
+            raise Exception("libcontextprovider.init returned false")
         # Add properties and set the initial values.
         for p in properties:
             self.addproperty(p)

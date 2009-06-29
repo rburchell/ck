@@ -3,17 +3,18 @@ check_PROGRAMS = contextpropertyinfounittest-xml-dynamic
 # your test's sources
 contextpropertyinfounittest_xml_dynamic_SOURCES = contextpropertyinfounittest.cpp
 
-COVERAGE_FILES = contextregistryinfo.cpp contextpropertyinfo.cpp	\
-	infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp	\
-	infocdbbackend.cpp cdbreader.cpp
+COVERAGE_FILES = contextpropertyinfo.cpp	\
+		 infobackend.cpp 		\
+		 infoxmlbackend.cpp 		\
+		 infoxmlkeysfinder.cpp
 EXTRA_DIST = providers2v1.xml.src providers2v2.xml.src			\
 	providers3v1.xml.src providers3v2.xml.src providers4v1.xml.src	\
 	providers4v2.xml.src
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
-AM_CXXFLAGS = $(QtDBus_CFLAGS) -I$(srcdir)/../util/ -DDEFAULT_CONTEXT_PROVIDERS="\"@DEFAULT_CONTEXT_PROVIDERS@\""
-AM_LDFLAGS = -lcdb $(QtXml_LIBS)
+AM_CXXFLAGS = $(QtDBus_CFLAGS) -I$(srcdir)/../util/ '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"'
+AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = contextregistryinfo.cpp contextpropertyinfo.cpp	\
 	infobackend.cpp infoxmlbackend.cpp			\
 	infoxmlkeysfinder.cpp infocdbbackend.cpp		\
@@ -22,6 +23,7 @@ FROM_SOURCE = contextregistryinfo.cpp contextpropertyinfo.cpp	\
 	infoxmlbackend.h infocdbbackend.h			\
 	infoxmlkeysfinder.h cdbreader.h                         \
 	infokeydata.h sconnect.h
+FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
 include $(top_srcdir)/am/tests.am
 
