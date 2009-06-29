@@ -104,16 +104,17 @@ private:
    QSet<Thread*> threads;
    QString propertyName;
    int count;
+   int defaultTask;
 
 public:
-    TestRunner(const int maxThreads, const QString& propertyName) :
-        maxThreads(maxThreads), propertyName(propertyName), count(0) {
+    TestRunner(const int maxThreads, const QString& propertyName, int task = -1) :
+        maxThreads(maxThreads), propertyName(propertyName), count(0), defaultTask(task) {
         for (int i = 0; i < maxThreads; i++)
             addThread();
     }
 
     void addThread() {
-        int task = qrand() % NUM_TESTS;
+        int task = defaultTask != -1 ? defaultTask : qrand() % NUM_TESTS ;
         qDebug() << "** starting" << propertyName << task << "/" << ++count;
         Thread* t = new Thread(task, propertyName);
         QObject::connect(t, SIGNAL(finished()), this, SLOT(onThreadFinished()));
