@@ -35,7 +35,7 @@ class ManagerInterface : public QObject
 
 
 public:
-    ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    ManagerInterface(const QDBusConnection connection, const QString &busName, QObject *parent = 0);
 
     void getSubscriber();
     bool isGetSubscriberFailed() const;
@@ -47,7 +47,6 @@ public:
     // Logging
     static int getSubscriberCount;
     static int creationCount;
-    static QList<QDBusConnection::BusType> creationBusTypes;
     static QStringList creationBusNames;
 
     // For tests

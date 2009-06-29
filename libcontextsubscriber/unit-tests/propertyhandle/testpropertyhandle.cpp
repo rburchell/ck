@@ -128,12 +128,13 @@ PropertyProvider::PropertyProvider(QString name)
 {
 }
 
-void PropertyProvider::subscribe(const QString& key)
+bool PropertyProvider::subscribe(const QString& key)
 {
     qDebug() << "subscribe" << key << myName;
     ++subscribeCount;
     subscribeKeys << key;
     subscribeProviderNames << myName;
+    return true;
 }
 
 void PropertyProvider::unsubscribe(const QString& key)
@@ -159,7 +160,7 @@ void PropertyProvider::resetLogs()
 
 // Mock implementation of the DBusNameListener
 
-DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType,
+DBusNameListener::DBusNameListener(const QDBusConnection busType,
                                    const QString &busName, bool initialCheck, QObject* parent)
  : servicePresent(false)
 {
@@ -170,6 +171,33 @@ DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType,
 bool DBusNameListener::isServicePresent() const
 {
     return servicePresent;
+}
+
+// Mock implementation of QueuedInvoker
+
+QueuedInvoker::QueuedInvoker()
+{
+}
+
+void QueuedInvoker::queueOnce(const char *method)
+{
+    qDebug() << "queueonce" << QString(method);
+    if (!methodsToCall.contains(QString(method))) {
+        methodsToCall.push_back(method);
+    }
+}
+
+void QueuedInvoker::callAllMethodsInQueue()
+{
+    while (!methodsToCall.empty()) {
+        QString method = methodsToCall.front();
+        methodsToCall.pop_front();
+        if (!QMetaObject::invokeMethod(this, method.toStdString().c_str(), Qt::DirectConnection)) {
+            qFatal("    *****************\n"
+                   "Erroneous usage of queueOnce\n"
+                   "    *****************\n");
+        }
+    }
 }
 
 //
@@ -222,10 +250,13 @@ void PropertyHandleUnitTests::initializing()
 {
     // Test:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Expected results:
     // The PropertyProvider with the correct DBusName and DBusType was created.
@@ -238,10 +269,13 @@ void PropertyHandleUnitTests::key()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Test and expected results:
     // The key() function returns the correct key
@@ -252,10 +286,13 @@ void PropertyHandleUnitTests::info()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Test and expected results:
     // The info() function returns the correct ContextPropertyInfo
@@ -266,10 +303,13 @@ void PropertyHandleUnitTests::subscribe()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -286,10 +326,13 @@ void PropertyHandleUnitTests::subscribeAndUnsubscribe()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -309,10 +352,13 @@ void PropertyHandleUnitTests::subscribeTwice()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -332,10 +378,13 @@ void PropertyHandleUnitTests::subscriptionPendingAndFinished()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -372,10 +421,13 @@ void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribe()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -398,10 +450,13 @@ void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribeTwice()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -426,10 +481,13 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Start listening to the valueChanged signal
     QSignalSpy spy(propertyHandle, SIGNAL(valueChanged()));
@@ -549,10 +607,13 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Enable the type checks
     PropertyHandle::setTypeCheck(true);
@@ -689,10 +750,13 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Enable the type checks
     PropertyHandle::setTypeCheck(true);
@@ -785,10 +849,13 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Subscribe to the PropertyHandle
     propertyHandle->subscribe();
@@ -835,10 +902,13 @@ void PropertyHandleUnitTests::commandingDisabled()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
+
+    // Let the provider process the deferred events
+    propertyHandle->callAllMethodsInQueue();
 
     // Subscribe to the handle
     propertyHandle->subscribe();

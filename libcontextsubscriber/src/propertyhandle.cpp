@@ -26,14 +26,21 @@
 #include "contextregistryinfo.h"
 #include "dbusnamelistener.h"
 
+#include <QThread>
+#include <QDebug>
+#include <QMutex>
+#include <QMutexLocker>
+#include <QCoreApplication>
+#include <QReadLocker>
+#include <QWriteLocker>
+
 namespace ContextSubscriber {
 
-QMap<QString, PropertyHandle*> PropertyHandle::handleInstances;
-
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
+static const QDBusConnection commanderDBusConnection = QDBusConnection::sessionBus();
 static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
 
-DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusType, commanderDBusName);
+DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusConnection, commanderDBusName);
 bool PropertyHandle::commandingEnabled = true;
 bool PropertyHandle::typeCheckEnabled = false;
 
@@ -54,23 +61,39 @@ bool PropertyHandle::typeCheckEnabled = false;
 
   PropertyHandle and PropertyProvider instances are never deleted;
   they stick around until the process is terminated.
+
+  All of the PropertyHandle instances and Property provider instances
+  are always created with the \c QCoreApplication's thread as the
+  thread where they live.  This is needed, because user threads can go
+  away and we would like to have only one DBus connection.
 */
 
 PropertyHandle::PropertyHandle(const QString& key)
-    :  myProvider(0), myInfo(0), subscribeCount(0), subscribePending(false), myKey(key)
+    :  myProvider(0), myInfo(0), subscribeCount(0), subscribePending(true), myKey(key)
 {
-    myInfo = new ContextPropertyInfo(myKey, this);
-
-    updateProvider();
-
-    // Start listening to changes in property registry (e.g., new keys, keys removed)
-    sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(const QStringList&)),
-             this, SLOT(updateProvider()));
+    // Note: We set subscribePending to true, assuming that the
+    // intention of the upper layer is to subscribe construction time.
+    // If this intention is changed, changes are needed here as well.
 
     // Start listening for the beloved commander
     sconnect(commanderListener, SIGNAL(nameAppeared()),
              this, SLOT(updateProvider()));
     sconnect(commanderListener, SIGNAL(nameDisappeared()),
+             this, SLOT(updateProvider()));
+
+    // Move the PropertyHandle (and all children) to main thread.
+    moveToThread(QCoreApplication::instance()->thread());
+
+    queueOnce("init");
+}
+
+void PropertyHandle::init()
+{
+    myInfo = new ContextPropertyInfo(myKey, this);
+    updateProvider();
+
+    // Start listening to changes in property registry (e.g., new keys, keys removed)
+    sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(const QStringList&)),
              this, SLOT(updateProvider()));
 }
 
@@ -112,7 +135,23 @@ void PropertyHandle::updateProvider()
             // provider even though the key is no longer in the
             // registry.
             newProvider = myProvider;
+
+            if (newProvider == 0) {
+                // This is the first place where we can know that the
+                // provider for this property doesn't exist. We
+                // shouldn't block waiting for subscription for such a property.
+                subscribePending = false;
+            }
         }
+    }
+
+    if (myProvider) {
+        disconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
+                   this, SLOT(onSubscribeFinished(QSet<QString>)));
+    }
+    if (newProvider) {
+        sconnect(newProvider, SIGNAL(subscribeFinished(QSet<QString>)),
+                 this, SLOT(onSubscribeFinished(QSet<QString>)));
     }
 
     if (newProvider != myProvider && subscribeCount > 0) {
@@ -120,7 +159,7 @@ void PropertyHandle::updateProvider()
         // Unsubscribe from the old provider
         if (myProvider) myProvider->unsubscribe(myKey);
         // And subscribe to the new provider
-        if (newProvider) newProvider->subscribe(myKey);
+        if (newProvider) subscribePending = newProvider->subscribe(myKey);
     }
 
     myProvider = newProvider;
@@ -130,14 +169,12 @@ void PropertyHandle::updateProvider()
 /// subscribe to it through the \c myProvider instance if neccessary.
 void PropertyHandle::subscribe()
 {
-    qDebug() << "PropertyHandle::subscribe";
+    qDebug() << "PropertyHandle::subscribe" << QThread::currentThread();
 
+    QMutexLocker locker(&subscribeCountLock);
     ++subscribeCount;
-    if (subscribeCount == 1 && myProvider) {
-        subscribePending = true;
-        sconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
-                 this, SLOT(onSubscribeFinished(QSet<QString>)));
-        myProvider->subscribe(myKey);
+    if (subscribeCount == 1 && myProvider != 0) {
+        subscribePending = myProvider->subscribe(myKey);
     }
 }
 
@@ -146,12 +183,11 @@ void PropertyHandle::subscribe()
 /// neccessary.
 void PropertyHandle::unsubscribe()
 {
+    QMutexLocker locker(&subscribeCountLock);
     --subscribeCount;
     if (subscribeCount == 0 && myProvider != 0) {
         subscribePending = false;
         myProvider->unsubscribe(myKey);
-        disconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
-                   this, SLOT(onSubscribeFinished(QSet<QString>)));
     }
 }
 
@@ -171,6 +207,7 @@ QString PropertyHandle::key() const
 
 QVariant PropertyHandle::value() const
 {
+    QReadLocker lock(&valueLock);
     return myValue;
 }
 
@@ -210,6 +247,7 @@ void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
         }
     }
 
+    QWriteLocker lock(&valueLock);
     if (myValue == newValue && myValue.isNull() == newValue.isNull()) {
         // The property already has the value we received.
         // If we're processing the return values of Subscribe, this is normal,
@@ -235,9 +273,19 @@ const ContextPropertyInfo* PropertyHandle::info() const
 
 PropertyHandle* PropertyHandle::instance(const QString& key)
 {
-    if (!handleInstances.contains(key))
-        handleInstances.insert(key,
-                               new PropertyHandle(key));
+    // Container for singletons
+    static QMap<QString, PropertyHandle*> handleInstances;
+
+    // Protect the handleInstances. Documentation of QMap doesn't tell
+    // if it can be read concurrently, so, read-write locking might
+    // not be enough.
+
+    static QMutex handleInstancesLock;
+    QMutexLocker locker(&handleInstancesLock);
+    if (!handleInstances.contains(key)) {
+        // The handle does not exist, so create it
+        handleInstances.insert(key, new PropertyHandle(key));
+    }
 
     return handleInstances[key];
 }

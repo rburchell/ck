@@ -22,7 +22,6 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
-#include <QMutex>
 #include <QXmlSimpleReader>
 #include <QXmlInputSource>
 #include <QFile>

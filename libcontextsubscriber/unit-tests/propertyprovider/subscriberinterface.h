@@ -35,7 +35,7 @@ class SubscriberInterface : public QObject
     Q_OBJECT
 
 public:
-    SubscriberInterface(const QDBusConnection::BusType busType, const QString& busName,
+    SubscriberInterface(const QDBusConnection connection, const QString& busName,
                         const QString& objectPath, QObject* parent = 0);
 
     void subscribe(QSet<QString> keys);
@@ -48,7 +48,6 @@ signals:
 public:
     // Logging
     static int creationCount;
-    static QList<QDBusConnection::BusType> creationBusTypes;
     static QStringList creationBusNames;
     static QStringList creationObjectPaths;
 

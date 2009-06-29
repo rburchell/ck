@@ -22,26 +22,26 @@
 #ifndef PROPERTYPROVIDER_H
 #define PROPERTYPROVIDER_H
 
-#include "managerinterface.h"
+#include "queuedinvoker.h"
 
 #include <QObject>
 #include <QDBusConnection>
 #include <QSet>
-
-class QTimer;
+#include <QMutex>
 
 namespace ContextSubscriber {
 
 class PropertyHandle;
 class SubscriberInterface;
 class DBusNameListener;
+class ManagerInterface;
 
-class PropertyProvider : public QObject
+class PropertyProvider : public QueuedInvoker
 {
     Q_OBJECT
 
 public:
-    void subscribe(const QString &key);
+    bool subscribe(const QString &key);
     void unsubscribe(const QString &key);
     static PropertyProvider* instance(const QDBusConnection::BusType busType, const QString& busName);
 
@@ -53,28 +53,26 @@ private slots:
     void onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
     void onGetSubscriberFinished(QString objectPath);
     void onSubscribeFinished(QSet<QString> keys);
-    void idleHandler();
     void onProviderAppeared();
     void onProviderDisappeared();
 
 private:
-    PropertyProvider (QDBusConnection::BusType busType, const QString& busName);
+    PropertyProvider(QDBusConnection::BusType busType, const QString& busName);
+    Q_INVOKABLE void handleSubscriptions();
 
-    DBusNameListener *providerListener; //< Listens to provider's (dis)appearance over DBus
-    SubscriberInterface *subscriberInterface; //< The DBus interface for the Subscriber object
-    QTimer *idleTimer; //< For scheduling subscriptions / unsubscriptions as idle processing
-    ManagerInterface managerInterface; //< The DBus interface for the Manager object
-    bool getSubscriberFailed; //< Whether the GetSubscriber dbus call failed on the manager interface
+    DBusNameListener *providerListener; ///< Listens to provider's (dis)appearance over DBus
+    SubscriberInterface *subscriberInterface; ///< The DBus interface for the Subscriber object
+    ManagerInterface *managerInterface; ///< The DBus interface for the Manager object
+    bool getSubscriberFailed; ///< Whether the GetSubscriber dbus call failed on the manager interface
 
-    QSet<QString> toSubscribe; //< Keys pending for subscription
-    QSet<QString> toUnsubscribe; //< Keys pending for unsubscription
+    QDBusConnection *connection; ///< The connection to DBus, generated from busType
+    QDBusConnection::BusType busType; ///< The bus type of the DBus provider connected to
+    QString busName; ///< The bus name of the DBus provider connected to
 
-    QDBusConnection::BusType busType; //< The bus type of the DBus provider connected to
-    QString busName; //< The bus name of the DBus provider connected to
-
-    /// Singleton instance container
-    static QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> providerInstances;
-    QSet<QString> subscribedKeys; //< The keys that should be currently subscribed to
+    QMutex subscriptionLock;
+    QSet<QString> toSubscribe; ///< Keys pending for subscription
+    QSet<QString> toUnsubscribe; ///< Keys pending for unsubscription
+    QSet<QString> subscribedKeys; ///< The keys that should be currently subscribed to
 };
 
 } // end namespace

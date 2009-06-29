@@ -42,6 +42,9 @@ ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
 /// Returns the singleton instance of the ContextRegistryInfo. The object
 /// is constructed automaticall on first access.
 /// \param backendName the optional name of the backend to use (force).
+
+// FIXME: we don't yet 100% sure if this double locking pattern implementation is safe
+// FIXME: the instance should always be created in the main thread
 ContextRegistryInfo* ContextRegistryInfo::instance(const QString &backendName)
 {
     static QMutex mutex;

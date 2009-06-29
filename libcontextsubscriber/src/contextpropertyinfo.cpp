@@ -243,11 +243,9 @@ QString ContextPropertyInfo::providerDBusName() const
 /// Ie. if it's a session bus or a system bus.
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
-    if (cachedProviderDBusType == "session")
-        return QDBusConnection::SessionBus;
-    else if (cachedProviderDBusType == "system")
+    if (cachedProviderDBusType == "system")
         return QDBusConnection::SystemBus;
-    else
+    else /* if (cachedProviderDBusType == "session") */
         return QDBusConnection::SessionBus;
 }
 

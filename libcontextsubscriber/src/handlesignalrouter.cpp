@@ -34,7 +34,7 @@
 
 namespace ContextSubscriber {
 
-HandleSignalRouter* HandleSignalRouter::myInstance = 0;
+HandleSignalRouter HandleSignalRouter::myInstance;
 
 HandleSignalRouter::HandleSignalRouter()
 {
@@ -42,10 +42,7 @@ HandleSignalRouter::HandleSignalRouter()
 
 HandleSignalRouter* HandleSignalRouter::instance()
 {
-    if (myInstance == 0) {
-        myInstance = new HandleSignalRouter();
-    }
-    return myInstance;
+    return &myInstance;
 }
 
 void HandleSignalRouter::onValueChanged(QString key, QVariant value, bool processingSubscription)

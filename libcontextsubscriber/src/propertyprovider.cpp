@@ -23,12 +23,13 @@
 #include "handlesignalrouter.h"
 #include "sconnect.h"
 #include "subscriberinterface.h"
+#include "managerinterface.h"
 #include "dbusnamelistener.h"
-#include <QTimer>
+#include <QMutexLocker>
+#include <QCoreApplication>
+#include <QThread>
 
 namespace ContextSubscriber {
-
-QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvider::providerInstances;
 
 /*!
    \class PropertyProvider
@@ -39,21 +40,20 @@ QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> PropertyProvid
 */
 
 PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
-    : subscriberInterface(0), managerInterface(busType, busName, this), busType(busType), busName(busName)
+    : subscriberInterface(0), managerInterface(0), connection(0),
+      busType(busType), busName(busName)
 {
-    // Setup idle timer, 0: always run it when we are entering the
-    // mainloop and the timer is enabled.
-    idleTimer = new QTimer(this);
-    idleTimer->setSingleShot(true);
-    idleTimer->setInterval(0);
+    if (busType == QDBusConnection::SystemBus)
+        connection = new QDBusConnection(QDBusConnection::systemBus());
+    else
+        connection = new QDBusConnection(QDBusConnection::sessionBus());
 
     // Call GetSubscriber asynchronously
-    sconnect(&managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
-    sconnect(idleTimer, SIGNAL(timeout()), this, SLOT(idleHandler()));
-    managerInterface.getSubscriber();
+    managerInterface = new ManagerInterface(*connection, busName, this);
+    sconnect(managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
 
-    // Note if the provider on the dbus comes and go
-    providerListener = new DBusNameListener(busType, busName, false, this);
+    // Notice if the provider on the dbus comes and goes
+    providerListener = new DBusNameListener(*connection, busName, false, this);
     sconnect(providerListener, SIGNAL(nameAppeared()),
              this, SLOT(onProviderAppeared()));
     sconnect(providerListener, SIGNAL(nameDisappeared()),
@@ -63,6 +63,15 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
     HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
     sconnect(this, SIGNAL(valueChanged(QString, QVariant, bool)),
              handleSignalRouter, SLOT(onValueChanged(QString, QVariant, bool)));
+
+    // Move the object (and all children) to the main thread
+    moveToThread(QCoreApplication::instance()->thread());
+
+    // At startup we don't know if the provider is present or not, so
+    // we just try to get the subscriber through the managerinterface
+    // and it will turn out.  We have to use the queueOnce feature,
+    // because we are not necessarily in the main event loop's thread.
+    queueOnce("onProviderAppeared");
 }
 
 /// Provider reappeared on the DBus, so get a new subscriber interface from it
@@ -70,7 +79,7 @@ void PropertyProvider::onProviderAppeared()
 {
     delete subscriberInterface;
     subscriberInterface = 0;
-    managerInterface.getSubscriber();
+    managerInterface->getSubscriber();
 }
 
 /// Delete our subscriber interface when the provider went away
@@ -85,11 +94,12 @@ void PropertyProvider::onProviderDisappeared()
 /// subscribe to the currently subscribed keys.
 void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 {
+    QMutexLocker lock(&subscriptionLock);
     qDebug() << "PropertyProvider::onGetSubscriberFinished" << objectPath;
     if (objectPath != "") {
         // GetSubscriber was successful
         delete subscriberInterface;
-        subscriberInterface = new SubscriberInterface(busType, busName, objectPath, this);
+        subscriberInterface = new SubscriberInterface(*connection, busName, objectPath, this);
 
         sconnect(subscriberInterface,
                  SIGNAL(valuesChanged(QMap<QString, QVariant>, bool)),
@@ -107,7 +117,7 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
         toSubscribe.clear();
         toSubscribe += subscribedKeys;
 
-        idleTimer->start();
+        queueOnce("handleSubscriptions");
     }
     else {
         // GetSubscriber failed
@@ -124,49 +134,46 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 /// busyloop in <tt>waitForSubscription()</tt>.
 void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 {
+    QMutexLocker lock(&subscriptionLock);
     qDebug() << "PropertyProvider::onSubscribeFinished" << keys;
     // Drop keys which were not supposed to be subscribed to (by this provider)
     emit subscribeFinished(keys.intersect(subscribedKeys));
 }
 
-/// Schedules a property to be subscribed to when the main loop is
-/// entered the next time.
-void PropertyProvider::subscribe(const QString &key)
+/// Schedules a property to be subscribed to.  Returns true if and
+/// only if the main loop has to run for the subscription to be
+/// finalized.
+bool PropertyProvider::subscribe(const QString &key)
 {
+    QMutexLocker lock(&subscriptionLock);
     qDebug() << "PropertyProvider::subscribe, provider" << busName << key;
 
     // Note: the intention is saved in all cases; whether we can really subscribe or not.
     subscribedKeys.insert(key);
 
-    if (managerInterface.isGetSubscriberFailed()) {
-        qDebug() << "GetSubscriber has failed previously";
-        // The subscription will not be successful, emit the subscribeFinished
-        // signal so that the handles will stop waiting.
-        QSet<QString> toEmit;
-        toEmit.insert(key);
-        emit subscribeFinished(toEmit);
-        return;
-    }
-
-    // Schedule the key to be subscribed to
+    // If the key was scheduled to be unsubscribed then remove that
+    // scheduling, and return false.
     if (toUnsubscribe.contains(key)) {
-        // The key was scheduled to be unsubscribed
-        // Remove that scheduling, and nothing else needs to be done.
         toUnsubscribe.remove(key);
+        return false;
     }
-    else {
-        // Really schedule the key to be subscribed to
-        toSubscribe.insert(key);
 
-        if (subscriberInterface != 0)
-            idleTimer->start();
-    }
+    // Schedule the key to be subscribed to and return true
+    qDebug() << "Inserting the key to toSubscribe" << QThread::currentThread();
+
+    // Really schedule the key to be subscribed to
+    toSubscribe.insert(key);
+
+    queueOnce("handleSubscriptions");
+
+    return true;
 }
 
 /// Schedules a property to be unsubscribed from when the main loop is
 /// entered the next time.
 void PropertyProvider::unsubscribe(const QString &key)
 {
+    QMutexLocker lock(&subscriptionLock);
     qDebug() << "PropertyProvider::unsubscribe, provider" << busName << key;
 
     // Save the intention of the higher level
@@ -182,26 +189,42 @@ void PropertyProvider::unsubscribe(const QString &key)
         // Really schedule the key to be unsubscribed from
         toUnsubscribe.insert(key);
 
-        if (subscriberInterface != 0)
-            idleTimer->start();
+        queueOnce("handleSubscriptions");
     }
 }
 
 /// Is executed when the main loop is entered and we have previously
 /// scheduled subscriptions / unsubscriptions.
-void PropertyProvider::idleHandler()
+void PropertyProvider::handleSubscriptions()
 {
+    QMutexLocker lock(&subscriptionLock);
+    qDebug() << "PropertyProvider::handleSubscriptions in thread" << QThread::currentThread();
     if (subscriberInterface != 0) {
         if (toSubscribe.size() > 0) subscriberInterface->subscribe(toSubscribe);
         if (toUnsubscribe.size() > 0) subscriberInterface->unsubscribe(toUnsubscribe);
         toSubscribe.clear();
         toUnsubscribe.clear();
+    } else {
+        // subscriberInterface can be zero because we are still waiting
+        // GetSubscriber to finish, then just wait
+
+        // Or the subscription will not be successful, emit the
+        // subscribeFinished signal so that the handles will stop
+        // waiting.
+        if (managerInterface->isGetSubscriberFailed()) {
+            qDebug() << "GetSubscriber has failed previously";
+            if (toSubscribe.size() > 0) emit subscribeFinished(toSubscribe);
+            toSubscribe.clear();
+            toUnsubscribe.clear();
+        }
     }
+    qDebug() << "PropertyProvider::handleSubscriptions processed";
 }
 
 /// Slot, handling changed values coming from the provider over DBUS.
 void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription)
 {
+    QMutexLocker lock(&subscriptionLock);
     for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
         if (subscribedKeys.contains(i.key()) == false) {
             qWarning() << "Received a property not subscribed to:" << i.key();
@@ -215,14 +238,22 @@ void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool proc
 
 PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busType, const QString& busName)
 {
+    // Singleton instance container
+    static QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> providerInstances;
     QPair<QDBusConnection::BusType, QString> lookupValue(busType, busName);
-    if (!providerInstances.contains(lookupValue))
-            providerInstances.insert(lookupValue,
-                                     new PropertyProvider(busType, busName));
+
+    static QMutex providerInstancesLock;
+    QMutexLocker locker(&providerInstancesLock);
+    if (!providerInstances.contains(lookupValue)) {
+        providerInstances.insert(lookupValue, new PropertyProvider(busType, busName));
+    }
 
     qDebug() << "Returning provider instance for" << busType << ":" << busName;
 
     return providerInstances[lookupValue];
 }
 
+
 } // end namespace
+
+

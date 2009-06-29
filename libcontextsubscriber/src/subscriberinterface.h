@@ -23,20 +23,22 @@
 #define SUBSCRIBERINTERFACE_H
 
 #include <QObject>
+#include <QMap>
 #include <QString>
 #include <QStringList>
-#include <QtDBus>
+#include <QDBusAbstractInterface>
+
+class QDBusConnection;
+class QDBusPendingCallWatcher;
 
 namespace ContextSubscriber {
 
-class SubscriberSignallingInterface;
-
-class SubscriberInterface : public QObject
+class SubscriberInterface : public QDBusAbstractInterface
 {
     Q_OBJECT
 
 public:
-    SubscriberInterface(const QDBusConnection::BusType busType, const QString& busName,
+    SubscriberInterface(const QDBusConnection connection, const QString& busName,
                         const QString& objectPath, QObject* parent = 0);
 
     void subscribe(QSet<QString> keys);
@@ -45,6 +47,7 @@ public:
 signals:
     void valuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
     void subscribeFinished(QSet<QString> keys);
+    void Changed(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);
 
 private slots:
     void onSubscribeFinished(QDBusPendingCallWatcher* watcher);
@@ -55,23 +58,7 @@ private:
     SubscriberInterface& operator=(const SubscriberInterface& other);
     QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
 
-    SubscriberSignallingInterface* iface; //< DBus interface to the subscriber
+    static const char* interfaceName;
 };
-
-class SubscriberSignallingInterface: public QDBusAbstractInterface
-{
-    Q_OBJECT
-
-public:
-    SubscriberSignallingInterface(const QString &dBusName, const QString &path, const QDBusConnection &connection, QObject *parent = 0);
-
-signals:
-    void Changed(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);
-
-private:
-    static const QString interfaceName; //< ContextKit protocol's subscriber dbus interface name
-};
-
 } // end namespace
-
 #endif

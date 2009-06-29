@@ -3,7 +3,7 @@ check_PROGRAMS = propertyhandle-unit-tests
 # your test's sources
 propertyhandle_unit_tests_SOURCES = testpropertyhandle.cpp		\
 	testpropertyhandle.h propertyprovider.h dbusnamelistener.h	\
-	contextpropertyinfo.h contextregistryinfo.h
+	contextpropertyinfo.h contextregistryinfo.h queuedinvoker.h
 
 # only include these files in the coverage
 COVERAGE_FILES = propertyhandle.cpp
@@ -11,10 +11,10 @@ COVERAGE_FILES = propertyhandle.cpp
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtDBus_CFLAGS) '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"'
-AM_LDFLAGS = 
+AM_LDFLAGS = $(QtDBus_LIBS)
 FROM_SOURCE = propertyhandle.cpp propertyhandle.h sconnect.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
-LDADD = 
+LDADD =
 include $(top_srcdir)/am/tests.am
 
 nodist_propertyhandle_unit_tests_SOURCES = mocs.cpp

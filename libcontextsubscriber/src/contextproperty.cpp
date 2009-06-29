@@ -102,6 +102,7 @@
 #include "sconnect.h"
 
 #include <QCoreApplication>
+#include <QThread>
 
 using namespace ContextSubscriber;
 
@@ -172,9 +173,20 @@ struct ContextPropertyPrivate
    creation of ContextPropertys with calls to waitForSubscription()
    would prevent this optimization.
 
-   \note
-   The ContextProperty class is not thread safe and may only be used from
-   an application's main thread.
+   \note The \c ContextProperty class follows the usual QObject rules
+   for non-GUI classes in multi-threaded programs.  In Qt terminology,
+   the ContextProperty class is reentrant but not thread-safe.  This
+   means that you can create ContextProperty instances in any thread
+   and then freely use these instance in their threads, but you can
+   not use a single instance concurrently from multiple threads.
+
+   \note Please pay special attention to how signals and slots work in
+   a multi-threaded program: by default, a slot is emitted in the
+   thread that called QObject::connect().  For this to happen
+   reliably, the thread needs to run a event loop.
+
+   \note See the Qt documentation for \c QThread and related classes
+   for more details.
  */
 
 /// Constructs a new ContextProperty for \a key and subscribes to it.
@@ -228,7 +240,11 @@ void ContextProperty::subscribe() const
     if (priv->subscribed)
         return;
 
-    sconnect(priv->handle, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()));
+    // We create a queued connection, because otherwise we run
+    // the users' valueChanged() handlers with locks and if they do
+    // something fancy (for example unsubscribe) it can cause a
+    // deadlock.
+    sconnect(priv->handle, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()), Qt::QueuedConnection);
     priv->handle->subscribe();
     priv->subscribed = true;
 }
@@ -248,21 +264,27 @@ void ContextProperty::unsubscribe() const
     priv->subscribed = false;
 }
 
-/// Waits until subcription is complete for this context property.
-/// This might cause the main event loop of your program to run and
-/// consequently signals might get emitted (including the
-/// valueChanged() signal of this property).  Calling this function
-/// while the subscription is not in progress (because it has
-/// completed already or because the property is currently
-/// unsubscribed) does nothing.
+/// Suspends the execution of the current thread until subcription is
+/// complete for this context property.  This might cause the main
+/// event loop of your program to run and consequently signals might
+/// get emitted (including the valueChanged() signal of this
+/// property).  Calling this function while the subscription is not in
+/// progress (because it has completed already or because the property
+/// is currently unsubscribed) does nothing. Calling this function
+/// from a thread which is not the main thread results in busy looping.
 void ContextProperty::waitForSubscription() const
 {
     if (!priv->subscribed)
         return;
 
-    // This is not a busy loop, since the QEventLoop::WaitForMoreEvents flag
-    while (priv->handle->isSubscribePending())
-        QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+    while (priv->handle->isSubscribePending()) {
+        if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
+            // This is not a busy loop, since the QEventLoop::WaitForMoreEvents flag
+            QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
+        } else {
+            usleep(100000); // 0.1 second
+        }
+    }
 }
 
 /// Sets all of the ContextProperty instances immune to 'external
@@ -284,7 +306,8 @@ const ContextPropertyInfo* ContextProperty::info() const
 /// Enables or disables all of the ContextProperty instances'
 /// type-check feature.  If it is enabled and the received value from
 /// the provider doesn't match the expected type, you will get an
-/// error message on the stderr and the value won't be updated.
+/// error message on the stderr and the value won't be updated. If you
+/// use this method, you have to use it before starting any threads.
 void ContextProperty::setTypeCheck(bool newTypeCheck)
 {
     PropertyHandle::setTypeCheck(newTypeCheck);
