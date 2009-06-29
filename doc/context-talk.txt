@@ -1,0 +1,215 @@
+ContextKit
+==========
+
+-------------------------
+Context and Conversations
+
+
+* The stuff that happens around you.
+
+* Shared by the people that you interact with.
+
+* Implicit part of a conversation.
+
+* Ignoring context makes you look absent minded or outright inhuman.
+
+  "Aren't you paying attention?  Why do you keep suggesting to go to
+   McD's?  We are on an effing boat in the middle of the ocean."
+
+  [Better example here.]
+
+-------------------------
+Context and Computers
+
+* Conversation between Man and Machine.  Also has context.
+
+* What has the user done with the computer?  "Recent documents",
+  "Browsing history", "Recently written emails", ...
+
+* Getting additional clues without help from user: time of day, day of
+  week, geographical location, sitting still or moving, holding like a
+  camera or like a phone, Internet connectivity, ..
+
+* Use that to improve the Man / Machine conversation.
+
+* "Essential Digital Companion".  (Yeah, right)
+
+* Quite fuzzy, experimentation should be easy.
+
+
+-------------------------
+Context and Connecting People
+
+* Computers facilitate conversations between people
+
+* People want to share their context with their peers.
+
+  * Friendface status updates.
+
+* Computers should help share the context of a conversation between
+  people as well.
+
+* (Think video calls: You not only want to hear the guy, you also want
+  to see his face and what's happening around him.  Sometimes.)
+
+* Mobile devices make this interesting.  "At his computer" no longer
+  means much.
+
+-------------------------
+So?
+
+* Bring together context providers
+
+  - DeviceKit, GeoClue, Meta tracker, Telepathy, BlueZ, ConnMan, oFono,
+    Sensors, ...
+
+* Standardize high-level interfaces across desktops
+
+  - GNOME, KDE, Maemo, Moblin, Sugar, ...
+
+* With bindings for all languages
+
+  - C, Glib, Qt, Python, Perl, JavaScript, C#, ...
+
+* No silver bullet
+
+* Restrict, simplify, do the minimal useful thing
+
+-------------------------
+ContextKit
+
+* "Global variables for the Desktop"
+
+* Disciplined way of 'setting' those variables
+
+* Concrete list of variables
+
+* Rich type system
+
+* Well integrated into many languages
+
+-------------------------
+Status
+
+* First generation framework done
+
+* Some properties defined
+
+* Some buy in from other Nokia research projects. 
+
+* Only for Qt / C++  (sorry)
+
+* A bit too static still
+
+-------------------------
+Architecture
+
+* Decoupled
+
+* Publish/subscribe for property values
+
+* Run-time introspection 
+
+* XML property declarations with cache
+ 
+* No central daemon
+
+-------------------------
+Context Commander
+
+* Extended example
+
+  (Demo)
+
+
+-------------------------
+Subcriber example
+
+  (Code)
+
+-------------------------
+Provider example
+
+  (Code)
+
+-------------------------
+Desktop Types
+
+* Little hobby of mine
+
+* Intersect a number of dynamic type systems to find the core
+
+  - Null, numbers, strings, lists, maps
+
+  Missing: association lists, turn out to be more useful
+           than maps for interchange.
+
+* Define language neutral static types
+
+  - Enums, time, coordinates, ...
+
+* Write bindings of static types for static languages, documentation
+  systems, introspection APIs.
+
+-------------------------
+Nano-DOM
+
+* Mapping of subset of XML into Desktop Types.
+
+* Used to define context properties
+
+  <key name="Battery.ChargeLevel"
+       type="percentage">
+    <doc>...</doc>
+  </key>
+
+  <key>
+    <name>Battery.ChargeLevel</name>
+    <type>percentage</type>
+    <doc>...</doc>
+  </key>
+
+  "key", { "name": "Battery.ChargeLevel", "type": "percentage",
+           "doc": "..." }
+
+-------------------------
+Static Desktop Type
+
+* Dynamic desktop types: simple, fixed.
+
+* Static desktop types: expressive, extensible
+
+* Hierarchy, parameters.
+
+  <type name="uniform-list" base="list">
+    <params>
+      <type doc="Type of the elements"/>
+    </params>
+    <doc>...</doc>
+  </type>
+
+  <key name="Use.RecentDocuments">
+    <type>
+      <uniform-list type="nepomuk-uri"/>
+    </type>
+    <doc>...</doc>
+  </key>
+
+-------------------------
+Future
+
+* Finding a home on freedesktop.org
+
+* Lobbying for mind share
+
+* Adding GVariant and Python into the picture
+
+* Getting the D-Bus protocol right
+
+* Simple aggregation in client, maybe
+
+  (Sum, append, average, max, ...)
+
+* 'Context Cron'
+
+-------------------------

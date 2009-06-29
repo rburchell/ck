@@ -177,8 +177,7 @@ struct ContextPropertyPrivate
    an application's main thread.
  */
 
-/// Constructs a new ContextProperty for \a key (e.g. Screen.TopEdge)
-/// and subscribes to it.
+/// Constructs a new ContextProperty for \a key and subscribes to it.
 ContextProperty::ContextProperty(const QString &key, QObject* parent)
     : QObject(parent), priv(0)
 {
@@ -266,8 +265,10 @@ void ContextProperty::waitForSubscription() const
         QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents);
 }
 
-/// Sets all of the ContextProperty instaces immune to 'commanding' (overriding
-/// values done by Context Commander)
+/// Sets all of the ContextProperty instances immune to 'external
+/// commanding'.  This is only intended to be used by the Context
+/// Commander itself, so that it can use ContextProperties without
+/// tripping over itself.  Don't use this.
 void ContextProperty::ignoreCommander()
 {
     PropertyHandle::ignoreCommander();
