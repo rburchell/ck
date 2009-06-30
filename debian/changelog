@@ -1,8 +1,10 @@
-contextkit (0.2.9~unreleased) unstable; urgency=low
+contextkit (0.2.9) unstable; urgency=low
 
-  * 
+  * libcontextsubscriber is thread safe
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 26 Jun 2009 15:29:20 +0300
+  * Implemented: SWP#CntFr-231, SWP#CntFr-265
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 30 Jun 2009 09:09:41 +0300
 
 contextkit (0.2.8) unstable; urgency=low
 
