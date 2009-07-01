@@ -26,11 +26,11 @@ def chgRegistry():
     global pcnt
     pcnt += 1
     if pcnt % 2:
-        print "1 provider"
-        os.system('cp 1provider.cdb  cache.cdb')
+		print "1 provider"
+		os.system('cp 1provider.cdb tmp.cdb; mv tmp.cdb cache.cdb')
     else:
         print "2 providers"
-        os.system('cp 2providers.cdb cache.cdb')
+        os.system('cp 2providers.cdb tmp.cdb; mv tmp.cdb cache.cdb')
     return True
 
 
