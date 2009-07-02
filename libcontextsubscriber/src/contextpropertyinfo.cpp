@@ -196,12 +196,13 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
     keyName = key;
 
     if (key != "") {
-        sconnect(InfoBackend::instance(), SIGNAL(keyDataChanged(QString)),
+        InfoBackend* infoBackend = InfoBackend::instance();
+        sconnect(infoBackend, SIGNAL(keyDataChanged(QString)),
                  this, SLOT(onKeyDataChanged(QString)));
 
-        cachedType = InfoBackend::instance()->typeForKey(keyName);
-        cachedProvider = InfoBackend::instance()->providerForKey(keyName);
-        cachedProviderDBusType = InfoBackend::instance()->providerDBusTypeForKey(keyName);
+        cachedType = infoBackend->typeForKey(keyName);
+        cachedProvider = infoBackend->providerForKey(keyName);
+        cachedProviderDBusType = infoBackend->providerDBusTypeForKey(keyName);
     }
 }
 

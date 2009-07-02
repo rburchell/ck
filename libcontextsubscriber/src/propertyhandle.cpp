@@ -81,20 +81,15 @@ PropertyHandle::PropertyHandle(const QString& key)
     sconnect(commanderListener, SIGNAL(nameDisappeared()),
              this, SLOT(updateProvider()));
 
-    // Move the PropertyHandle (and all children) to main thread.
-    moveToThread(QCoreApplication::instance()->thread());
-
-    queueOnce("init");
-}
-
-void PropertyHandle::init()
-{
     myInfo = new ContextPropertyInfo(myKey, this);
     updateProvider();
 
     // Start listening to changes in property registry (e.g., new keys, keys removed)
     sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(const QStringList&)),
              this, SLOT(updateProvider()));
+
+    // Move the PropertyHandle (and all children) to main thread.
+    moveToThread(QCoreApplication::instance()->thread());
 }
 
 void PropertyHandle::ignoreCommander()
