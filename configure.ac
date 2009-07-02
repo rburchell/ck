@@ -96,6 +96,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/multithreading-tests/old-property-in-thread/Makefile
         libcontextsubscriber/multithreading-tests/single-thread/Makefile
         libcontextsubscriber/multithreading-tests/stress-test/Makefile
+        libcontextsubscriber/multithreading-tests/using-backend-from-thread/Makefile
         libcontextsubscriber/multithreading-tests/wait-for-subscription-only-in-thread/Makefile
         libcontextsubscriber/multithreading-tests/wait-for-subscription-thread/Makefile
         libcontextsubscriber/update-contextkit-providers/Makefile
