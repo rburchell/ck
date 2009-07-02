@@ -91,6 +91,13 @@ AC_CONFIG_FILES([
         libcontextsubscriber/unit-tests/propertyhandle/Makefile
         libcontextsubscriber/unit-tests/propertyprovider/Makefile
         libcontextsubscriber/unit-tests/util/Makefile
+        libcontextsubscriber/multithreading-tests/Makefile
+        libcontextsubscriber/multithreading-tests/new-property-in-thread/Makefile
+        libcontextsubscriber/multithreading-tests/old-property-in-thread/Makefile
+        libcontextsubscriber/multithreading-tests/single-thread/Makefile
+        libcontextsubscriber/multithreading-tests/stress-test/Makefile
+        libcontextsubscriber/multithreading-tests/wait-for-subscription-only-in-thread/Makefile
+        libcontextsubscriber/multithreading-tests/wait-for-subscription-thread/Makefile
         libcontextsubscriber/update-contextkit-providers/Makefile
         python/Makefile
         spec/Makefile
