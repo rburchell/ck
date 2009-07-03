@@ -25,11 +25,14 @@ int main(int argc, char **argv)
             return 1;
         }
         out << "Key: " << key << endl;
-        out << "Existence: " << (info->exists() ? "true" : "false")  << endl;
-        QDBusConnection::BusType busType = info->providerDBusType();
-        out << "Provider DBus type: " << (busType == QDBusConnection::SessionBus ? "session" : "system") << endl;
-        out << "Provider DBus name: " << info->providerDBusName() << endl;
-        out << "Documentation: " << info->doc() << endl;
+        bool exists = info->exists();
+        out << "Existence: " << (exists ? "true" : "false")  << endl;
+        if (exists) {
+            QDBusConnection::BusType busType = info->providerDBusType();
+            out << "Provider DBus type: " << (busType == QDBusConnection::SessionBus ? "session" : "system") << endl;
+            out << "Provider DBus name: " << info->providerDBusName() << endl;
+            out << "Documentation: " << info->doc() << endl;
+        }
         out << "----------" << endl;
     }
 

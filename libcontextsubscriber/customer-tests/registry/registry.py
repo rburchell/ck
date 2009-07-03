@@ -97,9 +97,6 @@ class PrintingProperties(unittest.TestCase):
                             "----------",
                             "Key: test.nothing",
                             "Existence: false",
-                            "Provider DBus type: session",
-                            "Provider DBus name: ",
-                            "Documentation: ",
                             "----------"]
 
         for i in range(len(expected_results)):
