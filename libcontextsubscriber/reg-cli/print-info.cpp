@@ -30,6 +30,7 @@ int main(int argc, char **argv)
         out << "Provider DBus type: " << (busType == QDBusConnection::SessionBus ? "session" : "system") << endl;
         out << "Provider DBus name: " << info->providerDBusName() << endl;
         out << "Documentation: " << info->doc() << endl;
+        out << "----------" << endl;
     }
 
     return 0;
