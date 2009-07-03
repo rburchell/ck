@@ -46,18 +46,36 @@ class Callable:
     def __init__(self, anycallable):
         self.__call__ = anycallable
 
-class PrintingProperties(unittest.TestCase):
-    def startProvider(busname, args):
-        ret = Popen(["context-provide", busname] + args,
-              stdin=PIPE,stderr=PIPE,stdout=PIPE)
-        # wait for it
-        print >>ret.stdin, "info()"
-        ret.stdout.readline().rstrip()
-        return ret
-    startProvider = Callable(startProvider)
+def startProvider(busname, args):
+    ret = Popen(["context-provide", busname] + args,
+                stdin=PIPE,stderr=PIPE,stdout=PIPE)
+    # wait for it
+    print >>ret.stdin, "info()"
+    ret.stdout.readline().rstrip()
+    return ret
+startProvider = Callable(startProvider)
 
+class PrintInfoRunning(unittest.TestCase):
     def setUp(self):
-        self.flexiprovider = self.startProvider("com.nokia.test",
+        pass
+    def tearDown(self):
+        os.kill(self.flexiprovider.pid, 9)
+        os.unlink('context-provide.context')
+
+    def testReturnValue(self):
+        self.flexiprovider = startProvider("com.nokia.test",
+                                           ["int", "test.int", "-5", 
+                                            "string", "test.string", "something",
+                                            "double", "test.double", "4.231",
+                                            "truth", "test.truth", "False"])
+        self.info_client = Popen(["context-print-info","test.int", "test.string", "test.double", "test.truth", "test.nothing"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+
+        returnValue = self.info_client.wait()
+        self.assertEqual(returnValue, 0, "context-print-info exited with return value != 0")
+
+class PrintingProperties(unittest.TestCase):
+    def setUp(self):
+        self.flexiprovider = startProvider("com.nokia.test",
                                            ["int", "test.int", "-5", 
                                             "string", "test.string", "something",
                                             "double", "test.double", "4.231",
@@ -104,9 +122,16 @@ class PrintingProperties(unittest.TestCase):
             self.assertEqual(got, expected_results[i].rstrip())
 
 def runTests():
-    suite = unittest.TestLoader().loadTestsFromTestCase(PrintingProperties)
-    result = unittest.TextTestRunner(verbosity=2).run(suite)
-    return len(result.errors + result.failures)
+    suitePrintInfoRunning = unittest.TestLoader().loadTestsFromTestCase(PrintInfoRunning)
+    suiteProperties = unittest.TestLoader().loadTestsFromTestCase(PrintingProperties)
+
+    errors = []
+    result = unittest.TextTestRunner(verbosity=2).run(suitePrintInfoRunning) 
+    errors += result.errors + result.failures
+    result = unittest.TextTestRunner(verbosity=2).run(suiteProperties)
+    errors += result.errors + result.failures
+
+    return len(errors)
 
 if __name__ == "__main__":
     signal.signal(signal.SIGALRM, timeoutHandler)
