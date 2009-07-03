@@ -1,3 +1,9 @@
+contextkit (0.2.11~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 03 Jul 2009 15:06:45 +0300
+
 contextkit (0.2.10) unstable; urgency=low
 
   * Fixes: NB#126195 - Context Commander won't start if latest 
