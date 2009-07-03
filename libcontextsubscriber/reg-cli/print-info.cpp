@@ -25,9 +25,9 @@ int main(int argc, char **argv)
             return 1;
         }
         out << "Key: " << key << endl;
-        out << "Existance: " << info->exists();
+        out << "Existance: " << (info->exists() ? "true" : "false")  << endl;
         QDBusConnection::BusType busType = info->providerDBusType();
-        out << "Provider DBus type: " << busType << endl;
+        out << "Provider DBus type: " << (busType == QDBusConnection::SessionBus ? "session" : "system") << endl;
         out << "Provider DBus name: " << info->providerDBusName() << endl;
         out << "Documentation: " << info->doc() << endl;
     }
