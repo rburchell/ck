@@ -23,6 +23,8 @@
 #include "infobackend.h"
 #include "sconnect.h"
 #include <QMutex>
+#include <QMutexLocker>
+#include <QCoreApplication>
 
 /*!
     \class ContextRegistryInfo
@@ -43,30 +45,27 @@ ContextRegistryInfo* ContextRegistryInfo::registryInstance = NULL;
 /// is constructed automaticall on first access.
 /// \param backendName the optional name of the backend to use (force).
 
-// FIXME: we don't yet 100% sure if this double locking pattern implementation is safe
-// FIXME: the instance should always be created in the main thread
 ContextRegistryInfo* ContextRegistryInfo::instance(const QString &backendName)
 {
     static QMutex mutex;
-    if (!registryInstance)
-    {
-        mutex.lock();
+    QMutexLocker locker(&mutex);
+    if (! registryInstance) {
+        InfoBackend::instance(backendName);
+        registryInstance = new ContextRegistryInfo;
 
-        if (! registryInstance) {
-            InfoBackend::instance(backendName);
-            registryInstance = new ContextRegistryInfo;
+        InfoBackend* infoBackend = InfoBackend::instance();
 
-            sconnect(InfoBackend::instance(), SIGNAL(keysChanged(QStringList)),
-                     registryInstance, SLOT(onKeysChanged(QStringList)));
+        sconnect(infoBackend, SIGNAL(keysChanged(QStringList)),
+                 registryInstance, SLOT(onKeysChanged(QStringList)));
 
-            sconnect(InfoBackend::instance(), SIGNAL(keysAdded(QStringList)),
-                     registryInstance, SLOT(onKeysAdded(QStringList)));
+        sconnect(infoBackend, SIGNAL(keysAdded(QStringList)),
+                 registryInstance, SLOT(onKeysAdded(QStringList)));
 
-            sconnect(InfoBackend::instance(), SIGNAL(keysRemoved(QStringList)),
-                     registryInstance, SLOT(onKeysRemoved(QStringList)));
-        }
+        sconnect(infoBackend, SIGNAL(keysRemoved(QStringList)),
+                 registryInstance, SLOT(onKeysRemoved(QStringList)));
 
-        mutex.unlock();
+        // Move the backend to the main thread
+        registryInstance->moveToThread(QCoreApplication::instance()->thread());
     }
 
     return registryInstance;

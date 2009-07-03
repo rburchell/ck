@@ -2,4 +2,5 @@ usr/share/libcontextsubscriber-tests/*.xml
 usr/share/libcontextsubscriber-tests/commander/*.py
 usr/share/libcontextsubscriber-tests/subscription/*.py
 usr/share/libcontextsubscriber-tests/asynchronicity/*.py
+usr/share/libcontextsubscriber-tests/registry/*.py
 usr/share/libcontextsubscriber-tests/common/*.sh

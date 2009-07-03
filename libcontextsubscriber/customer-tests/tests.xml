@@ -44,6 +44,12 @@
         <step expected_result="0">python subscription.py</step>
         <step expected_result="0">cd ..</step>
       </case>
+      <case name="libsub006" description="This test verifies that " requirement="" timeout="5">
+        <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
+        <step expected_result="0">cd /usr/share/libcontextsubscriber-tests/registry</step>
+        <step expected_result="0">python registry.py</step>
+        <step expected_result="0">cd ..</step>
+      </case>
       <!-- Environments optional - tells where the tests are run -->
       <environments>
         <scratchbox>false</scratchbox>
