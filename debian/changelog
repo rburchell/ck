@@ -1,8 +1,9 @@
-contextkit (0.2.10~unreleased) unstable; urgency=low
+contextkit (0.2.10) unstable; urgency=low
 
-  * 
+  * Fixes: NB#126195 - Context Commander won't start if latest 
+    libcontextsubscriber is installed.
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 30 Jun 2009 09:24:15 +0300
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 03 Jul 2009 14:51:02 +0300
 
 contextkit (0.2.9) unstable; urgency=low
 
