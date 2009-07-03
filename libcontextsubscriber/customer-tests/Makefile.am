@@ -10,5 +10,5 @@ check-customer:
 
 CLEANFILES = *.pyc
 
-EXTRA_DIST = asynchronicity commander subscription runTests.sh tests.xml \
-			 common
+EXTRA_DIST = asynchronicity commander subscription runTests.sh	\
+			 tests.xml common registry
