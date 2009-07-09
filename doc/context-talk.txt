@@ -1,9 +1,27 @@
-ContextKit
-==========
+-----------------------
+
+                                   ContextKit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -------------------------
 Context and Conversations
-
 
 * The stuff that happens around you.
 
@@ -11,17 +29,23 @@ Context and Conversations
 
 * Implicit part of a conversation.
 
-* Ignoring context makes you look absent minded or outright inhuman.
+* Ignoring context makes you look absent minded.
 
-  "Aren't you paying attention?  Why do you keep suggesting to go to
-   McD's?  We are on an effing boat in the middle of the ocean."
 
-  [Better example here.]
+
+
+
+
+
+
+
+
+
 
 -------------------------
 Context and Computers
 
-* Conversation between Man and Machine.  Also has context.
+* Conversation between Man and Machine also has context.
 
 * What has the user done with the computer?  "Recent documents",
   "Browsing history", "Recently written emails", ...
@@ -30,11 +54,14 @@ Context and Computers
   week, geographical location, sitting still or moving, holding like a
   camera or like a phone, Internet connectivity, ..
 
-* Use that to improve the Man / Machine conversation.
+* Use those clues to improve the Man / Machine conversation.
 
 * "Essential Digital Companion".  (Yeah, right)
 
 * Quite fuzzy, experimentation should be easy.
+
+
+
 
 
 -------------------------
@@ -44,21 +71,25 @@ Context and Connecting People
 
 * People want to share their context with their peers.
 
-  * Friendface status updates.
-
 * Computers should help share the context of a conversation between
   people as well.
 
-* (Think video calls: You not only want to hear the guy, you also want
-  to see his face and what's happening around him.  Sometimes.)
 
-* Mobile devices make this interesting.  "At his computer" no longer
-  means much.
+
+
+
+
+
+
+
+
+
+
 
 -------------------------
 So?
 
-* Bring together context providers
+* Bring together 'context providers'
 
   - DeviceKit, GeoClue, Meta tracker, Telepathy, BlueZ, ConnMan, oFono,
     Sensors, ...
@@ -71,9 +102,11 @@ So?
 
   - C, Glib, Qt, Python, Perl, JavaScript, C#, ...
 
-* No silver bullet
+* No silver bullet, regular programming, no magic enabler needed.
 
 * Restrict, simplify, do the minimal useful thing
+
+
 
 -------------------------
 ContextKit
@@ -88,6 +121,15 @@ ContextKit
 
 * Well integrated into many languages
 
+
+
+
+
+
+
+
+
+
 -------------------------
 Status
 
@@ -100,6 +142,15 @@ Status
 * Only for Qt / C++  (sorry)
 
 * A bit too static still
+
+
+
+
+
+
+
+
+
 
 -------------------------
 Architecture
@@ -114,23 +165,36 @@ Architecture
  
 * No central daemon
 
--------------------------
-Context Commander
-
-* Extended example
-
-  (Demo)
 
 
--------------------------
-Subcriber example
 
-  (Code)
+
+
+
+
+
 
 -------------------------
-Provider example
+Demo and Docs
 
-  (Code)
+* Context Commander
+
+* Subscriber
+
+* Provider
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -------------------------
 Desktop Types
@@ -150,6 +214,9 @@ Desktop Types
 
 * Write bindings of static types for static languages, documentation
   systems, introspection APIs.
+
+
+
 
 -------------------------
 Nano-DOM
@@ -171,6 +238,7 @@ Nano-DOM
 
   "key", { "name": "Battery.ChargeLevel", "type": "percentage",
            "doc": "..." }
+
 
 -------------------------
 Static Desktop Type
@@ -212,4 +280,3 @@ Future
 
 * 'Context Cron'
 
--------------------------
