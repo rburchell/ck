@@ -391,8 +391,8 @@ void ContextRealLogger::appendFeatures()
         if (i < features.length() - 1)
             *this << ",";
     }
-    
-    *this << "]";
+
+    QTextStream::operator<<(']');
 }
 
 /// Operator for appending features.
