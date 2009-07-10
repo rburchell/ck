@@ -5,11 +5,7 @@ import tempfile
 import subprocess
 import gobject
 import dbus, dbus.service, dbus.mainloop.glib
-try:
-    import ContextProvider as CP
-except IOError:
-    raise ImportError ("Could not import ContextProvider module")
-    sys.exit(1)
+import ContextProvider as CP
 
 class _property(object):
     """Kind-of a template for property types."""

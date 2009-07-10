@@ -57,7 +57,6 @@ signals:
 
 private:
     ContextPropertyPrivate *priv;
-    static bool typeCheck;
 };
 
 #endif

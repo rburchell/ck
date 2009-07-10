@@ -128,12 +128,13 @@ PropertyProvider::PropertyProvider(QString name)
 {
 }
 
-void PropertyProvider::subscribe(const QString& key)
+bool PropertyProvider::subscribe(const QString& key)
 {
     qDebug() << "subscribe" << key << myName;
     ++subscribeCount;
     subscribeKeys << key;
     subscribeProviderNames << myName;
+    return true;
 }
 
 void PropertyProvider::unsubscribe(const QString& key)
@@ -159,7 +160,7 @@ void PropertyProvider::resetLogs()
 
 // Mock implementation of the DBusNameListener
 
-DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType,
+DBusNameListener::DBusNameListener(const QDBusConnection busType,
                                    const QString &busName, bool initialCheck, QObject* parent)
  : servicePresent(false)
 {
@@ -222,10 +223,10 @@ void PropertyHandleUnitTests::initializing()
 {
     // Test:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Expected results:
     // The PropertyProvider with the correct DBusName and DBusType was created.
@@ -238,10 +239,10 @@ void PropertyHandleUnitTests::key()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Test and expected results:
     // The key() function returns the correct key
@@ -252,10 +253,10 @@ void PropertyHandleUnitTests::info()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Test and expected results:
     // The info() function returns the correct ContextPropertyInfo
@@ -266,10 +267,10 @@ void PropertyHandleUnitTests::subscribe()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -286,10 +287,10 @@ void PropertyHandleUnitTests::subscribeAndUnsubscribe()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -309,10 +310,10 @@ void PropertyHandleUnitTests::subscribeTwice()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -332,10 +333,10 @@ void PropertyHandleUnitTests::subscriptionPendingAndFinished()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -372,10 +373,10 @@ void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribe()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -398,10 +399,10 @@ void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribeTwice()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Test:
     // Command the PropertyHandle to subscribe
@@ -426,10 +427,10 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Start listening to the valueChanged signal
     QSignalSpy spy(propertyHandle, SIGNAL(valueChanged()));
@@ -549,10 +550,10 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Enable the type checks
     PropertyHandle::setTypeCheck(true);
@@ -689,10 +690,10 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Enable the type checks
     PropertyHandle::setTypeCheck(true);
@@ -785,10 +786,10 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Subscribe to the PropertyHandle
     propertyHandle->subscribe();
@@ -835,10 +836,10 @@ void PropertyHandleUnitTests::commandingDisabled()
 {
     // Setup:
     // Create the object to be tested
-    QString key = "Property." + QString(__FUNCTION__);
-    propertyHandle = PropertyHandle::instance(key);
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
+    QString key = "Property." + QString(__FUNCTION__);
+    propertyHandle = PropertyHandle::instance(key);
 
     // Subscribe to the handle
     propertyHandle->subscribe();

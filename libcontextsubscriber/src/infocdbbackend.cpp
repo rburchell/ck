@@ -24,7 +24,6 @@
 #include <QDebug>
 #include <QFile>
 #include <stdlib.h>
-#include <QMutex>
 #include <QHash>
 #include "sconnect.h"
 #include "infocdbbackend.h"
@@ -109,7 +108,7 @@ QString InfoCdbBackend::databasePath()
     if (! regpath)
         regpath = DEFAULT_CONTEXT_PROVIDERS;
 
-    return QString(regpath) + "cache.cdb";
+    return QDir(regpath).filePath("cache.cdb");
 }
 
 /// Returns the full path to the database directory.

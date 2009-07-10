@@ -23,23 +23,23 @@
 #define MANAGERINTERFACE_H
 
 #include <QObject>
-#include <QString>
-#include <QDBusConnection>
+#include <QDBusAbstractInterface>
 
 class QDBusPendingCallWatcher;
-class QDBusInterface;
+class QDBusConnection;
+class QString;
 
 namespace ContextSubscriber {
 
-class ManagerInterface : public QObject
+class ManagerInterface : public QDBusAbstractInterface
 {
     Q_OBJECT
 
-    static const QString interfaceName;
+    static const char *interfaceName;
     static const QString objectPath;
 
 public:
-    ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    ManagerInterface(const QDBusConnection connection, const QString &busName, QObject *parent = 0);
 
     void getSubscriber();
     bool isGetSubscriberFailed() const;
@@ -51,7 +51,6 @@ private slots:
     void onGetSubscriberFinished(QDBusPendingCallWatcher* watcher);
 
 private:
-    QDBusInterface* iface; //< DBus interface for the manager
     bool getSubscriberFailed; //< Previous async GetSubscriber call failed
 };
 

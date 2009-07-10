@@ -37,7 +37,7 @@ class DBusNameListener : public QObject
 {
     Q_OBJECT
 public:
-    DBusNameListener(const QDBusConnection::BusType busType,
+    DBusNameListener(const QDBusConnection connection,
                      const QString &busName,
                      bool initialCheck = true,
                      QObject* parent = 0);

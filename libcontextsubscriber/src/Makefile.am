@@ -11,14 +11,15 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  cdbwriter.h cdbwriter.cpp cdbreader.cpp cdbreader.h		\
 	  infocdbbackend.cpp infocdbbackend.h dbusnamelistener.h	\
 	  dbusnamelistener.cpp handlesignalrouter.cpp			\
-	  handlesignalrouter.h sconnect.h logging.h logging.cpp
+	  handlesignalrouter.h sconnect.h queuedinvoker.cpp		\
+	  queuedinvoker.h logging.h logging.cpp
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h
-AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)		\
-	'-DDEFAULT_CONTEXT_PROVIDERS="@DEFAULT_CONTEXT_PROVIDERS@"'	\
+AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
+	'-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"' \
 	'-DCONTEXT_LOG_MODULE_NAME="libcontextsubscriber"'
-LIBS += -lcdb $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
+LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
 
 # moccing
 nodist_libcontextsubscriber_la_SOURCES = mocs.cpp

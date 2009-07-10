@@ -25,6 +25,8 @@
 #include <QMutex>
 #include <QDebug>
 #include <QCoreApplication>
+#include <QMutexLocker>
+
 
 /*!
     \class InfoBackend
@@ -52,26 +54,25 @@ InfoBackend::InfoBackend(QObject *parent) : QObject(parent)
 InfoBackend* InfoBackend::instance(const QString &backendName)
 {
     static QMutex mutex;
+    QMutexLocker locker(&mutex);
     if (!backendInstance)
     {
-        mutex.lock();
-
-        if (! backendInstance) {
-            if (backendName == "xml")
-                backendInstance = new InfoXmlBackend;
-            else if (backendName == "cdb")
+        // Backend instance doesn't exist -> create it
+        if (backendName == "xml")
+            backendInstance = new InfoXmlBackend;
+        else if (backendName == "cdb")
+            backendInstance = new InfoCdbBackend;
+        else {
+            if (InfoCdbBackend::databaseExists())
                 backendInstance = new InfoCdbBackend;
-            else {
-                if (InfoCdbBackend::databaseExists())
-                    backendInstance = new InfoCdbBackend;
-                else
-                    backendInstance = new InfoXmlBackend;
-            }
-
-            qAddPostRoutine(destroyInstance);
+            else
+                backendInstance = new InfoXmlBackend;
         }
 
-        mutex.unlock();
+        // Move the backend to the main thread
+        backendInstance->moveToThread(QCoreApplication::instance()->thread());
+
+        qAddPostRoutine(destroyInstance);
     }
 
     return backendInstance;

@@ -22,12 +22,7 @@
 /*!
   \class ManagerInterface
 
-  \brief Proxy class for using the DBus interface
-  org.freedesktop.ContextKit.Manager asynchronously.
-
-  Implements methods for constructing the interface objects (given the DBus
-  type (session or system), and bus name) and calling the function GetSubscriber
-  asynchronously.
+  \brief Proxy for calling the GetSubscriber asynchronously on ManagerInterface.
 */
 
 #include "managerinterface.h"
@@ -41,51 +36,27 @@
 
 namespace ContextSubscriber {
 
-const QString ManagerInterface::interfaceName = "org.freedesktop.ContextKit.Manager";
 const QString ManagerInterface::objectPath = "/org/freedesktop/ContextKit/Manager";
+const char *ManagerInterface::interfaceName = "org.freedesktop.ContextKit.Manager";
 
 /// Constructs the ManagerInterface. Connects to the DBus object specified by
-/// \a busType (session or system bus) and \a busName.
-ManagerInterface::ManagerInterface(const QDBusConnection::BusType busType, const QString &busName, QObject *parent)
-    : iface(0), getSubscriberFailed(false)
+/// \a connection and \a busName.
+ManagerInterface::ManagerInterface(const QDBusConnection connection, const QString &busName, QObject *parent)
+    : QDBusAbstractInterface(busName, objectPath, interfaceName, connection, parent), getSubscriberFailed(false)
 {
-    QDBusConnection connection("");
-
-    // Create DBus connection
-    if (busType == QDBusConnection::SessionBus) {
-        connection = QDBusConnection::sessionBus();
-    } else if (busType == QDBusConnection::SystemBus) {
-        connection = QDBusConnection::systemBus();
-    } else {
-        contextCritical() << "Invalid bus type:" << busType;
-        return;
-    }
-
-    if (!connection.isConnected()) {
-        contextCritical() << "Couldn't connect to DBUS.";
-        return;
-    }
-
-    // Create the DBus interface
-    iface = new QDBusInterface(busName, objectPath, interfaceName, connection, this);
 }
 
 /// Calls the GetSubscriber function over DBus asynchronously.
 void ManagerInterface::getSubscriber()
 {
-    if (iface == 0) {
-        getSubscriberFailed = true;
-        emit getSubscriberFinished("");
-    } else {
-        getSubscriberFailed = false;
+    getSubscriberFailed = false;
 
-        // Construct the asynchronous call
-        // FIXME: this four lines are repeated everywhere, should have a util function for it
-        QDBusPendingCall getSubscriberCall = iface->asyncCall("GetSubscriber");
-        SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(getSubscriberCall, this);
-        sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
-                 this, SLOT(onGetSubscriberFinished(QDBusPendingCallWatcher *)));
-    }
+    // Construct the asynchronous call
+    // FIXME: this four lines are repeated everywhere, should have a util function for it
+    QDBusPendingCall getSubscriberCall = asyncCall("GetSubscriber");
+    SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(getSubscriberCall, this);
+    sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
+             this, SLOT(onGetSubscriberFinished(QDBusPendingCallWatcher *)));
 }
 
 /// Is called when the asynchronous call to GetSubscriber has finished. Emits

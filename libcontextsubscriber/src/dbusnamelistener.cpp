@@ -37,7 +37,7 @@ namespace ContextSubscriber {
   optionally gets the initial state of the service name.
 
   When you create an instance of this class, it will open a connection
-  to DBus bus \c busType, and will start to listen to name changes of
+  to DBus bus \c connection, and will start to listen to name changes of
   service name \c busName.  If a service appears, it will emit the \c
   nameAppeared() signal, if disappears, then the nameDisappeared()
   signal.  An initial query and signal emission will be done if \c
@@ -49,27 +49,10 @@ namespace ContextSubscriber {
   <tt>isServicePresent()</tt> can return false, even though the service
   is present.
 */
-DBusNameListener::DBusNameListener(const QDBusConnection::BusType busType, const QString &busName,
+DBusNameListener::DBusNameListener(QDBusConnection connection, const QString &busName,
                                    bool initialCheck, QObject *parent) :
     QObject(parent), servicePresent(false), busName(busName)
 {
-    QDBusConnection connection("");
-
-    // Create DBus connection
-    if (busType == QDBusConnection::SessionBus) {
-        connection = QDBusConnection::sessionBus();
-    } else if (busType == QDBusConnection::SystemBus) {
-        connection = QDBusConnection::systemBus();
-    } else {
-        contextCritical() << "Invalid bus type:" << busType;
-        return;
-    }
-
-    if (!connection.isConnected()) {
-        contextCritical() << "Couldn't connect to DBUS.";
-        return;
-    }
-
     sconnect(connection.interface(),
              SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
              this,

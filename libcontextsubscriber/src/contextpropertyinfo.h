@@ -46,10 +46,10 @@ public:
     QDBusConnection::BusType providerDBusType() const;
 
 private:
-    QString keyName; //< The name of the key his ContextPropertyInfo represents.
-    QString cachedType; //< Cached (stored) type of the key.
-    QString cachedProvider; //< Cached (stored) provider of the key.
-    QString cachedProviderDBusType; //< Cached (stored) provider dbus type of the key.
+    QString keyName; ///< The name of the key his ContextPropertyInfo represents.
+    QString cachedType; ///< Cached (stored) type of the key.
+    QString cachedProvider; ///< Cached (stored) provider of the key.
+    QString cachedProviderDBusType; ///< Cached (stored) provider dbus type of the key.
 
 private slots:
     void onKeyDataChanged(const QString& key);

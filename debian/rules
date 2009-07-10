@@ -4,15 +4,11 @@
 #export DH_VERBOSE=1
 
 Makefile:
-	./configure --prefix /usr --sysconfdir=/etc
+	./configure --prefix /usr --sysconfdir=/etc --disable-vala --disable-doc --disable-coverage
 
 build: build-stamp
 build-stamp: Makefile
 	dh_testdir
-	# We know that we don't want to run vala when building the
-	# package, but the timestamps sometimes lie.
-	find . -name '*.vala.stamp' -o -name '*.vapi'
-	touch `find . -name '*.vala.stamp' -o -name '*.vapi'`
 	$(MAKE) all
 	touch build-stamp
 
@@ -40,6 +36,7 @@ install: build
 	cp -rf libcontextsubscriber/customer-tests/commander debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/asynchronicity debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/subscription debian/tmp/usr/share/libcontextsubscriber-tests/
+	cp -rf libcontextsubscriber/customer-tests/registry debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/common debian/tmp/usr/share/libcontextsubscriber-tests/
 
 	chown -R root:root debian/tmp/usr/share/libcontextsubscriber-tests

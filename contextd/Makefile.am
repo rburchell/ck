@@ -1,67 +1,49 @@
 bin_PROGRAMS = contextd
 
-contextddir = $(datadir)/context-providers
-contextd_DATA = contextd.xml
+providerdir = $(datadir)/contextkit/providers/
+oldproviderdir = $(datadir)/context-providers/
 
-providersdir = $(datadir)/contextkit/providers
-dist_providers_DATA = org.freedesktop.ContextKit.contextd.context
+dist_provider_DATA = org.freedesktop.ContextKit.contextd.context
+dist_oldprovider_DATA = contextd.xml
 
 servicedir = $(datadir)/dbus-1/services
 service_DATA = org.freedesktop.ContextKit.contextd.service
 
-contextd_VALASOURCES = \
-	main.vala \
-	plugin.vala \
-	hal_plugin.vala \
-	lowmem_plugin.vala \
-	$(NULL)
+contextd_VALASOURCES = main.vala plugin.vala hal_plugin.vala	\
+	lowmem_plugin.vala
 
-contextd_GENERATEDSOURCES = \
-	$(contextd_VALASOURCES:.vala=.c) \
-	$(NULL)
+contextd_GENERATEDSOURCES = $(contextd_VALASOURCES:.vala=.c)
+contextd_SOURCES = $(contextd_GENERATEDSOURCES)
 
-contextd_SOURCES = \
-	$(contextd_GENERATEDSOURCES) \
-	$(NULL)
-
+if CONTEXTKIT_BUILD_VALA
 # FIXME: Remove the hal.vapi once the official version includes the needed functions
 contextd.vala.stamp: $(top_srcdir)/vapi/hal.vapi $(top_srcdir)/vapi/posix.vapi $(top_srcdir)/libcontextprovider/contextprovider.vapi $(contextd_VALASOURCES)
 	$(VALAC) -C -g --basedir $(top_srcdir)/contextd --vapidir=$(top_srcdir)/vapi --pkg dbus-glib-1 --pkg gee-1.0 --disable-dbus-transformation $^
 	touch contextd.vala.stamp
+endif
 
-contextd_CFLAGS = \
-	$(CONTEXTD_CFLAGS) \
-	-I$(top_srcdir)/libcontextprovider \
-	$(NULL)
+AM_CFLAGS = $(GLIB_CFLAGS) $(GOBJECT_CFLAGS) $(GDBUS_CFLAGS) $(GEE_CFLAGS) $(HAL_CFLAGS) -I$(top_srcdir)/libcontextprovider
 
-contextd_LDADD = \
-	$(CONTEXTD_LIBS) \
-	$(top_builddir)/libcontextprovider/libcontextprovider.la \
-	-lm \
-	$(NULL)
+LDADD = $(GLIB_LIBS) $(GOBJECT_LIBS) $(GDBUS_LIBS) $(GEE_LIBS) $(HAL_LIBS) \
+	$(top_builddir)/libcontextprovider/libcontextprovider.la -lm
 
-EXTRA_DIST = \
-	$(contextd_GENERATEDSOURCES) \
-	$(contextd_VALASOURCES) \
-	contextd.xml \
-	contextd.vala.stamp \
-	org.freedesktop.ContextKit.contextd.service \
-	$(NULL)
+EXTRA_DIST = $(contextd_GENERATEDSOURCES) $(contextd_VALASOURCES)	\
+	contextd.xml contextd.vala.stamp				\
+	org.freedesktop.ContextKit.contextd.service
 
-DISTCLEANFILES = \
-	*.gcno \
-	*.gcda \
-	$(NULL)
+DISTCLEANFILES = *.gcno *.gcda
 
-MAINTAINERCLEANFILES = \
-	$(contextd_GENERATEDSOURCES) \
-	contextd.vala.stamp \
-	$(NULL)
+MAINTAINERCLEANFILES = $(contextd_GENERATEDSOURCES)	\
+	contextd.vala.stamp
 
-BUILT_SOURCES = \
-	contextd.vala.stamp \
-	$(NULL)
+BUILT_SOURCES = contextd.vala.stamp
 
 install-data-hook:
-	-update-context-providers $(DESTDIR)$(contextdir)
-	-update-contextkit-providers $(DESTDIR)$(providersdir)
+	-update-context-providers $(DESTDIR)$(oldproviderdir)
+	-update-contextkit-providers $(DESTDIR)$(providerdir)
+
+uninstall-hook:
+	-update-context-providers $(DESTDIR)$(oldproviderdir)
+	-update-contextkit-providers $(DESTDIR)$(providerdir)
+	[ 0 -lt `find $(DESTDIR)$(oldproviderdir) -name '*.xml' | wc -l` ] || rm -f $(DESTDIR)$(oldproviderdir)/context-providers.cdb
+	[ 0 -lt `find $(DESTDIR)$(providerdir) -name '*.context' | wc -l` ] || rm -f $(DESTDIR)$(providerdir)/cache.cdb

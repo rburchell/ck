@@ -3,7 +3,7 @@ check_PROGRAMS = propertyprovider-unit-tests
 # your test's sources
 propertyprovider_unit_tests_SOURCES = testpropertyprovider.cpp		\
 	testpropertyprovider.h managerinterface.h dbusnamelistener.h	\
-	subscriberinterface.h handlesignalrouter.h
+	subscriberinterface.h handlesignalrouter.h queuedinvoker.h
 
 # only include these files in the coverage
 COVERAGE_FILES = propertyprovider.cpp
@@ -11,8 +11,9 @@ COVERAGE_FILES = propertyprovider.cpp
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtDBus_CFLAGS)
-AM_LDFLAGS = 
+AM_LDFLAGS = $(QtDBus_LIBS)
 FROM_SOURCE = propertyprovider.cpp propertyprovider.h sconnect.h logging.h logging.cpp # copy these files from the real source
+FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
 include $(top_srcdir)/am/tests.am
 
