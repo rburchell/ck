@@ -2,3 +2,4 @@ cdbwriter.cpp
 cdbwriter.h
 logging.cpp
 logging.h
+loggingfeatures.h

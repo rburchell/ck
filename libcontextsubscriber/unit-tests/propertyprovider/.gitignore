@@ -3,3 +3,4 @@ propertyprovider.h
 sconnect.h
 logging.cpp
 logging.h
+loggingfeatures.h

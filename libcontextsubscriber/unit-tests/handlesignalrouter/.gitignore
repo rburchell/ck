@@ -1,2 +1,5 @@
 handlesignalrouter.cpp
 handlesignalrouter.h
+logging.cpp
+logging.h
+loggingfeatures.h
