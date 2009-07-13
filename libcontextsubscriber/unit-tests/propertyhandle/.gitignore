@@ -1,3 +1,5 @@
 propertyhandle.cpp
 propertyhandle.h
 sconnect.h
+logging.cpp
+logging.h

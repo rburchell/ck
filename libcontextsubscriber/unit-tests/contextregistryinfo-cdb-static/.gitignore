@@ -12,3 +12,5 @@ infoxmlbackend.h
 infoxmlkeysfinder.cpp
 infoxmlkeysfinder.h
 sconnect.h
+logging.cpp
+logging.h
