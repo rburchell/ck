@@ -23,6 +23,8 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include "cdbwriter.h"
+#include "logging.h"
+#include "loggingfeatures.h"
 
 /*!
     \class CDBWriter
@@ -43,6 +45,8 @@
 CDBWriter::CDBWriter(const QString &path, QObject *parent)
     : QObject(parent)
 {
+    contextDebug() << F_CDB << "cdb writer created for:" << path;
+
     cdbm = NULL;
     fd = 0;
 
@@ -61,6 +65,8 @@ CDBWriter::CDBWriter(const QString &path, QObject *parent)
 CDBWriter::CDBWriter(int fdd, QObject *parent)
     : QObject(parent)
 {
+    contextDebug() << F_CDB << "cdb writer created for file descriptor:" << fdd;
+
     cdbm = NULL;
     fd = fdd;
 
@@ -73,6 +79,7 @@ CDBWriter::CDBWriter(int fdd, QObject *parent)
 /// Destroys the object closing the file beforehand.
 CDBWriter::~CDBWriter()
 {
+    contextDebug() << F_CDB << F_DESTROY << "CDBWriter::~CDBWriter";
     close();
 }
 

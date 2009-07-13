@@ -21,6 +21,7 @@
 
 #include "infoxmlkeysfinder.h"
 #include "logging.h"
+#include "loggingfeatures.h"
 
 /*!
     \class InfoXmlKeysFinder
@@ -99,7 +100,7 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
     if (inKey == true && name == "key") {
         // If at least name is ok, add to list
         if (currentKeyName != "") {
-            contextDebug() << "Got key:" << currentKeyName;
+            contextDebug() << F_XML << "Got key:" << currentKeyName;
 
             InfoKeyData data;
             data.name = currentKeyName;

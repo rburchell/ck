@@ -101,6 +101,7 @@
 #include "propertyhandle.h"
 #include "sconnect.h"
 #include "logging.h"
+#include "loggingfeatures.h"
 
 #include <QCoreApplication>
 #include <QThread>
@@ -205,7 +206,7 @@ ContextProperty::ContextProperty(const QString &key, QObject* parent)
 /// Unsubscribes from the ContextProperty and destroys it.
 ContextProperty::~ContextProperty()
 {
-    contextDebug() << "ContextProperty::~ContextProperty";
+    contextDebug() << F_DESTROY << "ContextProperty::~ContextProperty";
     unsubscribe();
     delete priv;
 }

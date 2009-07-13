@@ -14,7 +14,7 @@ EXTRA_DIST = providers1v1.xml.src providers1v2.xml.src
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = '-I$(srcdir)/../util/' '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"' $(QtXml_CFLAGS)
 AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
-FROM_SOURCE = contextregistryinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp cdbreader.cpp contextregistryinfo.h infobackend.h infoxmlbackend.h infocdbbackend.h infoxmlkeysfinder.h cdbreader.h infokeydata.h sconnect.h logging.cpp logging.h # copy these files from the real source
+FROM_SOURCE = contextregistryinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp cdbreader.cpp contextregistryinfo.h infobackend.h infoxmlbackend.h infocdbbackend.h infoxmlkeysfinder.h cdbreader.h infokeydata.h sconnect.h logging.cpp logging.h loggingfeatures.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
 include $(top_srcdir)/am/tests.am

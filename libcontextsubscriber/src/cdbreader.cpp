@@ -25,6 +25,9 @@
 #include <QDebug>
 #include <QFile>
 #include "cdbreader.h"
+#include "logging.h"
+#include "loggingfeatures.h"
+
 
 /*!
     \class CDBReader
@@ -44,6 +47,7 @@
 CDBReader::CDBReader(const QString &dbpath, QObject *parent)
     : QObject(parent), path(dbpath)
 {
+    contextDebug() << F_CDB << "cdb reader created for:" << dbpath;
     cdb = NULL;
     fd = 0;
 
@@ -53,6 +57,7 @@ CDBReader::CDBReader(const QString &dbpath, QObject *parent)
 /// Destroys the object automatically closing the database and file.
 CDBReader::~CDBReader()
 {
+    contextDebug() << F_CDB << F_DESTROY << "CDBReader::~CDBReader, dbpath:" << path;
     close();
 }
 
@@ -95,8 +100,10 @@ void CDBReader::reopen()
 /// \param key The key name in the database.
 QString CDBReader::valueForKey(const QString &key) const
 {
-    if (! cdb)
+    if (! cdb) {
+        contextDebug() << F_CDB << "Trying to read value key:" << key << "from database that is closed!";
         return "";
+    }
 
     QByteArray utf8Data = key.toUtf8();
     unsigned int klen = utf8Data.size();
@@ -122,8 +129,10 @@ QStringList CDBReader::valuesForKey(const QString &key) const
 {
     QStringList list;
 
-    if (! cdb)
-       return list;
+    if (! cdb) {
+        contextDebug() << F_CDB << "Trying to read values for key:" << key << "from database that is closed!";
+        return list;
+    }
 
     QByteArray utf8Data = key.toUtf8();
     unsigned int klen = utf8Data.size();

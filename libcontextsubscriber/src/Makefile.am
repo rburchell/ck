@@ -12,7 +12,7 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  infocdbbackend.cpp infocdbbackend.h dbusnamelistener.h	\
 	  dbusnamelistener.cpp handlesignalrouter.cpp			\
 	  handlesignalrouter.h sconnect.h queuedinvoker.cpp		\
-	  queuedinvoker.h logging.h logging.cpp
+	  queuedinvoker.h logging.h logging.cpp loggingfeatures.h
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h

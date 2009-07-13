@@ -26,6 +26,7 @@
 #include "contextregistryinfo.h"
 #include "dbusnamelistener.h"
 #include "logging.h"
+#include "loggingfeatures.h"
 
 #include <QThread>
 #include <QDebug>
@@ -165,7 +166,7 @@ void PropertyHandle::updateProvider()
 /// subscribe to it through the \c myProvider instance if neccessary.
 void PropertyHandle::subscribe()
 {
-    contextDebug() << "PropertyHandle::subscribe" << QThread::currentThread();
+    contextDebug() << F_THREADS << "PropertyHandle::subscribe" << QThread::currentThread();
 
     QMutexLocker locker(&subscribeCountLock);
     ++subscribeCount;

@@ -30,6 +30,7 @@
 #include "infoxmlbackend.h"
 #include "infoxmlkeysfinder.h"
 #include "logging.h"
+#include "loggingfeatures.h"
 
 /*!
     \class InfoXmlBackend
@@ -49,7 +50,7 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
     /* Thinking about locking... the watcher notifications are delivered synced,
        so asuming the changes in the dir are atomic this is all we need. */
 
-    contextDebug() << "Initializing xml backend with path:" << InfoXmlBackend::registryPath();
+    contextDebug() << F_XML << "Initializing xml backend with path:" << InfoXmlBackend::registryPath();
 
     QDir dir = QDir(InfoXmlBackend::registryPath());
     if (! dir.exists() || ! dir.isReadable()) {
@@ -163,7 +164,7 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     // If one of the watched xml files changed this it pretty much
     // an unconditional reload message for us.
 
-    contextDebug() << path << "changed.";
+    contextDebug() << F_XML << path << "changed.";
     
     QStringList oldKeys = listKeys();
     regenerateKeyDataList();
@@ -198,7 +199,7 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
     if (dir.entryInfoList().size() == countOfFilesInLastParse)
         return;
 
-    contextDebug() << registryPath() << "directory changed.";
+    contextDebug() << F_XML << registryPath() << "directory changed.";
     
     QStringList oldKeys = listKeys();
     regenerateKeyDataList();
@@ -229,7 +230,7 @@ void InfoXmlBackend::regenerateKeyDataList()
     if (watchedFiles.size() > 0)
         watcher.removePaths(watchedFiles);
 
-    contextDebug() << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
+    contextDebug() << F_XML << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
 
     // For each xml file in the registry we parse it and
     // add it to our hash. We did some sanity checks in the constructor
@@ -255,7 +256,7 @@ void InfoXmlBackend::regenerateKeyDataList()
 /// Also adds the file to the watcher (starts observing it).
 void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
 {
-    contextDebug() << "Reading keys from" << finfo.filePath();
+    contextDebug() << F_XML << "Reading keys from" << finfo.filePath();
 
     InfoXmlKeysFinder handler;
     QFile f(finfo.filePath());
