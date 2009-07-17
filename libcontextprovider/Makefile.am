@@ -22,6 +22,9 @@ libcontextproviderdir=$(includedir)/contextprovider
 
 libcontextprovider_HEADERS = $(libcontextprovider_GENERATEDSOURCES_PUB)
 
+vapidir=$(datadir)/vala/vapi/
+vapi_HEADERS = contextprovider.vapi
+
 if CONTEXTKIT_BUILD_VALA
 libcontextprovider.vala.stamp contextprovider.vapi: $(libcontextprovider_VALASOURCES)
 	$(VALAC) -C -g --basedir $(top_srcdir)/libcontextprovider \
