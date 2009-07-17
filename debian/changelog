@@ -1,8 +1,8 @@
-contextkit (0.2.11~unreleased) unstable; urgency=low
+contextkit (0.2.11) unstable; urgency=low
 
-  * 
+  * Include contextprovider.vapi in -dev package.
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 03 Jul 2009 15:06:45 +0300
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Fri, 17 Jul 2009 18:11:00 +0300
 
 contextkit (0.2.10) unstable; urgency=low
 
