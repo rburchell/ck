@@ -61,8 +61,6 @@ AM_CONDITIONAL([CONTEXTKIT_COVERAGE], [test "$missing_deps_COVERAGE" = ""])
 AC_CONFIG_FILES([
         Makefile
         doc/Makefile
-        doc/reference/Makefile
-        doc/reference/libcontextprovider/Makefile
         fake-provider/Makefile
         libcontextprovider/contextprovider-1.0.pc
         libcontextprovider/Makefile
@@ -113,14 +111,6 @@ AC_CONFIG_FILES([
         libcontextsubscriber/update-contextkit-providers/Makefile
         python/Makefile
         spec/Makefile
-        tests/Makefile
-        tests/contextd_tests/Makefile
-        tests/customer-tests/Makefile
-        tests/customer-tests/contextd/Makefile
-        tests/customer-tests/libcontextprovider/Makefile
-        tests/customer-tests/libcontextprovider/stubs/Makefile
-        tests/customer-tests/libcontextprovider/testfw/Makefile
-        tests/unit_tests/Makefile
         tools/Makefile
         tools/loadmem/Makefile
         vapi/Makefile

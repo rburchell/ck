@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=com.nokia.ContextProviderExample
-Exec=@abs_top_builddir@/tests/dbus/tools/exec-with-log.sh

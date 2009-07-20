@@ -1,5 +1,3 @@
-SUBDIRS=reference
-
 htmldir = $(datadir)/doc/contextkit/html/
 html_ASCIIDOCS = context-intro.txt context-providers.txt context-types.txt context-arch.txt use-cases.txt
 
