@@ -60,14 +60,24 @@ AM_CONDITIONAL([CONTEXTKIT_COVERAGE], [test "$missing_deps_COVERAGE" = ""])
 
 AC_CONFIG_FILES([
         Makefile
-        contextd/Makefile
-        contextd/org.freedesktop.ContextKit.contextd.service
-        contextprovider-1.0.pc
         doc/Makefile
         doc/reference/Makefile
         doc/reference/libcontextprovider/Makefile
         fake-provider/Makefile
+        libcontextprovider/contextprovider-1.0.pc
         libcontextprovider/Makefile
+        libcontextprovider/doc/Makefile
+        libcontextprovider/src/Makefile
+        libcontextprovider/unit-tests/Makefile
+        libcontextprovider/unit-tests/manager/Makefile
+        libcontextprovider/unit-tests/subscriber/Makefile
+        libcontextprovider/unit-tests/signalgrouper/Makefile
+        libcontextprovider/unit-tests/context/Makefile
+        libcontextprovider/unit-tests/contextc/Makefile
+        libcontextprovider/customer-tests/Makefile
+        libcontextprovider/customer-tests/subscription/Makefile
+        libcontextprovider/customer-tests/client/Makefile
+        libcontextprovider/test-cli/Makefile
         libcontextsubscriber/Makefile
         libcontextsubscriber/cli/Makefile
         libcontextsubscriber/reg-cli/Makefile
