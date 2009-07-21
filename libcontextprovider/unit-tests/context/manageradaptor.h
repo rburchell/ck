@@ -27,6 +27,8 @@
 #include <QDBusConnection>
 #include "manager.h"
 
+namespace ContextProvider {
+
 class ManagerAdaptor: public QDBusAbstractAdaptor
 {
     Q_OBJECT
@@ -35,5 +37,7 @@ class ManagerAdaptor: public QDBusAbstractAdaptor
 public:
     ManagerAdaptor (Manager* manager, QDBusConnection *connection);
 };
+
+} // namespace ContextProvider
 
 #endif

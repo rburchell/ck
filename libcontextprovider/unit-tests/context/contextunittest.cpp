@@ -26,6 +26,8 @@
 #include "manager.h"
 #include "manageradaptor.h"
 
+namespace ContextProvider {
+
 Manager *firstManagerCreated = NULL;
 QVariant *lastVariantSet = NULL;
 
@@ -92,6 +94,10 @@ ManagerAdaptor::ManagerAdaptor(Manager* manager, QDBusConnection *conn)
     : QDBusAbstractAdaptor(manager)
 {
 }
+
+} // namespace ContextProvider
+
+using namespace ContextProvider;
 
 class ContextUnitTest : public QObject
 {

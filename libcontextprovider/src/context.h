@@ -29,7 +29,9 @@
 #include <QHash>
 #include <QVariant>
 
-class Manager;
+namespace ContextProvider {
+    class Manager;
+}
 
 class Context : public QObject
 {
@@ -55,12 +57,12 @@ public:
     static void stopService(const QString &busName);
    
 private:
-    static QHash<QString, Manager*> busesToManagers; ///< Hash mapping of bus names to Manager objects.
-    static QHash<QString, QDBusConnection*> busesToConnections; ///< Hash mapping of bus names to connection objects.
-    static QHash<QString, Manager*> keysToManagers; ///< Hash mapping of key names to Manager objects.
+    static QHash<QString, ContextProvider::Manager*> busesToManagers;
+    static QHash<QString, QDBusConnection*> busesToConnections;
+    static QHash<QString, ContextProvider::Manager*> keysToManagers;
     bool keyCheck() const;
 
-    Manager *manager; ///< This property Manager (service).
+    ContextProvider::Manager *manager; ///< This property Manager (service).
     QString key; ///< The key name for this property.
 
 private slots:

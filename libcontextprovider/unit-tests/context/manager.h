@@ -29,6 +29,8 @@
 #include <QDBusConnection>
 #include <QStringList>
 
+namespace ContextProvider {
+
 class Subscriber;
 
 class Manager : public QObject
@@ -54,5 +56,7 @@ signals:
 private:
     QStringList keys;
 };
+
+} // namespace ContextProvider
 
 #endif

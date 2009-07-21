@@ -24,6 +24,8 @@
 #include "subscriber.h"
 #include "loggingfeatures.h"
 
+namespace ContextProvider {
+
 /*!
     \class Manager
     \brief Manager implements the org.freedesktop.ContextKit.Manager DBus
@@ -220,3 +222,4 @@ QStringList Manager::getKeys()
     return QStringList(keysToValues.keys());
 }
 
+} // namespace ContextProvider

@@ -27,6 +27,8 @@
 #include <QSet>
 #include <QString>
 
+namespace ContextProvider {
+
 class QueuedInvoker : public QObject
 {
     Q_OBJECT
@@ -47,5 +49,7 @@ private:
     QMutex callQueueLock; ///< Protects the callQueue
     QSet<QString> callQueue; ///< Methods to be invoked
 };
+
+} // namespace ContextProvider
 
 #endif

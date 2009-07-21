@@ -29,6 +29,8 @@
 #include <QVariant>
 #include "queuedinvoker.h"
 
+namespace ContextProvider {
+
 class Manager;
 
 class Subscriber : public QueuedInvoker
@@ -63,5 +65,7 @@ signals:
     /// that actually changed value.
     void changed(const QMap<QString, QVariant> &values, const QStringList &undetermined);
 };
+
+} // namespace ContextProvider
 
 #endif

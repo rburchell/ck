@@ -26,6 +26,8 @@
 #include <QDebug>
 #include <QMutexLocker>
 
+namespace ContextProvider {
+
 /*! \class QueuedInvoker
     \brief A class that can invoke its own methods in a delayed way.
 
@@ -70,3 +72,5 @@ void QueuedInvoker::queueOnce(const char *method)
         callQueue.insert(method);
     }
 }
+
+} // namespace ContextProvider

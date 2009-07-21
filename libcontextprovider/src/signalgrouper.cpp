@@ -25,6 +25,8 @@
 #include "logging.h"
 #include "loggingfeatures.h"
 
+using namespace ContextProvider;
+
 /*! \class SignalGrouper
 
     \brief Groups the firstSubscriberAppeared and

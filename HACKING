@@ -124,6 +124,7 @@ We follow the DUI coding style for C++ code.  In brief:
  - Indentation offset is 4 and
  - Maximum line length is 120.
  - No editor specific settings in the files.
+ - Code inside a namespace is not indented.
 
 For Python:
 

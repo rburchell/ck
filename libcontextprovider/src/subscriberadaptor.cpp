@@ -22,6 +22,8 @@
 #include "subscriberadaptor.h"
 #include "sconnect.h"
 
+namespace ContextProvider {
+
 /*!
     \class SubscriberAdaptor
     \brief A DBus adaptor for implementing the org.freedesktop.ContextKit.Subscriber
@@ -49,3 +51,4 @@ void SubscriberAdaptor::Unsubscribe(const QStringList &keys)
     return subscriber->unsubscribe(keys);
 }
 
+} // namespace ContextProvider

@@ -29,6 +29,8 @@
 #include <QDBusConnection>
 #include <QStringList>
 
+namespace ContextProvider {
+
 class Subscriber;
 
 class Manager : public QObject
@@ -50,5 +52,7 @@ public:
 signals:
     void keyValueChanged(const QString &key, const QVariant& newValue);
 };
+
+} // namespace ContextProvider
 
 #endif

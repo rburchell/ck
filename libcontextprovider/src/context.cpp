@@ -26,6 +26,8 @@
 #include "sconnect.h"
 #include "loggingfeatures.h"
 
+using namespace ContextProvider;
+
 /*!
     \class Context
 

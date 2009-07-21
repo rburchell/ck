@@ -1,6 +1,8 @@
 #include <QCoreApplication>
 #include "test-cli.h"
 
+using namespace ContextProvider;
+
 ContextD::ContextD() : QObject(NULL), batStat(true)
 {
     QStringList keys;

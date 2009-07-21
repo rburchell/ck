@@ -27,6 +27,8 @@
 #include <QStringList>
 #include <QVariant>
 
+namespace ContextProvider {
+
 class Subscriber;
 
 class Manager : public QObject
@@ -64,5 +66,7 @@ private:
     QHash<QString, int> keysToSubscriptionCount; ///< Subscription count. Key name to integer mapping.
     int subscriberCounter; ///< A simple counter (iterator) to name the subscribers uniquely.
 };
+
+} // namespace ContextProvider
 
 #endif

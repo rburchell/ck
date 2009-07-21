@@ -27,6 +27,8 @@
 #include "sconnect.h"
 #include "loggingfeatures.h"
 
+namespace ContextProvider {
+
 /*!
     \class Subscriber
     \brief Subscriber implements the org.freedesktop.ContextKit.Subscriber DBus
@@ -155,3 +157,5 @@ void Subscriber::handleChanged()
     emit changed(map, undetermined);
     changedKeys.clear();
 }
+
+} // namespace ContextProvider

@@ -28,6 +28,8 @@
 #include <QTextStream>
 #include <QBuffer>
 
+namespace ContextProvider {
+
 #define CONTEXT_LOG_MSG_TYPE_TEST       1
 #define CONTEXT_LOG_MSG_TYPE_DEBUG      2
 #define CONTEXT_LOG_MSG_TYPE_WARNING    3
@@ -156,5 +158,7 @@ public:
 #else
 #define contextCritical() (ContextRealLogger(CONTEXT_LOG_MSG_TYPE_CRITICAL, CONTEXT_LOG_MODULE_NAME, __PRETTY_FUNCTION__, __FILE__, __LINE__))
 #endif
+
+} // namespace ContextProvider
 
 #endif // LOGGING_H

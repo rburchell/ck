@@ -25,6 +25,8 @@
 #include "manager.h"
 #include "subscriber.h"
 
+using namespace ContextProvider;
+
 class ManagerUnitTest : public QObject
 {
     Q_OBJECT

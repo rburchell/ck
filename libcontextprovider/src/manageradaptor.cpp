@@ -25,6 +25,8 @@
 #include "logging.h"
 #include "sconnect.h"
 
+namespace ContextProvider {
+
 /*!
     \class ManagerAdaptor
     \brief A DBus adaptor for implementing the org.freedesktop.ContextKit.Manager
@@ -64,3 +66,4 @@ void ManagerAdaptor::OnServiceOwnerChanged(const QString &name, const QString &o
         manager->busNameIsGone(name);
 }
 
+} // namespace ContextProvider

@@ -28,6 +28,8 @@
 #include <QString>
 #include <QStringList>
 
+namespace ContextProvider {
+
 class QueuedInvoker : public QObject
 {
     Q_OBJECT
@@ -42,5 +44,7 @@ protected:
 private:
     QStringList methodsToCall;
 };
+
+} // namespace ContextProvider
 
 #endif

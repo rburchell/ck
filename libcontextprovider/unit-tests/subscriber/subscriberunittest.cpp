@@ -29,6 +29,8 @@
 
 /* Queued invoker mock implementation */
 
+namespace ContextProvider {
+
 QueuedInvoker::QueuedInvoker()
 {
 }
@@ -87,7 +89,11 @@ void Manager::emitKeyValueChanged(const QString &key, const QVariant& newValue)
     emit keyValueChanged(key, newValue);
 }
 
+} // namespace ContextProvider
+
 /* SubscriberUnitTest */
+
+using namespace ContextProvider;
 
 class SubscriberUnitTest : public QObject
 {

@@ -36,7 +36,7 @@ signals:
     void firstSubscriberAppeared(const QString &key);
     void lastSubscriberDisappeared(const QString &key);
 
-friend class SignalGrouperUnitTest;
+    friend class SignalGrouperUnitTest;
 };
 
 #endif

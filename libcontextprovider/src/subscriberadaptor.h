@@ -28,6 +28,8 @@
 #include <QMap>
 #include <QStringList>
 
+namespace ContextProvider {
+
 class SubscriberAdaptor: public QDBusAbstractAdaptor
 {
     Q_OBJECT
@@ -46,5 +48,7 @@ private:
 signals:
     void Changed(const QMap<QString, QVariant> &values, const QStringList &undetermined);
 };
+
+} // namespace ContextProvider
 
 #endif
