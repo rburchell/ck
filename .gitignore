@@ -24,8 +24,10 @@ missing
 .dirstamp
 .deps
 *.o
+*.a
 *.lo
 *.la
+*.moc
 stamp-h1
 _package
 *.libs
