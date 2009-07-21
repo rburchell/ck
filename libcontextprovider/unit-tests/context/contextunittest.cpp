@@ -102,6 +102,7 @@ private slots:
     void registerAgain();
     void registerSystem();
     void badServiceName();
+    void stopService();
     void getContext();
     void getNonExistantContext();
     void checkSignals();
@@ -142,6 +143,21 @@ void ContextUnitTest::badServiceName()
     QStringList keys;
     keys.append("Battery.Whatever");
     QCOMPARE(Context::initService(QDBusConnection::SessionBus, "!!!", keys), false);
+}
+
+void ContextUnitTest::stopService()
+{
+    Context::stopService("com.test.stopper"); // Bolox.
+
+    QStringList keys;
+    keys.append("Some.Key");
+    QCOMPARE(Context::initService(QDBusConnection::SessionBus, "com.test.stopper", keys), true);
+    QCOMPARE(Context::initService(QDBusConnection::SessionBus, "com.test.stopper", keys), false);
+
+    Context::stopService("com.test.stopper");
+    QCOMPARE(Context::initService(QDBusConnection::SessionBus, "com.test.stopper", keys), true);
+
+    Context::stopService("com.test.stopper");
 }
 
 void ContextUnitTest::getContext()
