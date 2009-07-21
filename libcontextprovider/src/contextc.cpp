@@ -23,8 +23,11 @@
 #include "context.h"
 #include "logging.h"
 
-QHash<QString, QStringList*> busNameToKeyList;
-QHash<QString, QDBusConnection::BusType> busNameToBusType;
+using namespace ContextProvider;
+
+QStringList *serviceKeyList = NULL;
+QString *serviceBusName = NULL;
+QDBusConnection::BusType serviceBusType;
 
 /// Initializes the service for the given \a name. \a is_system 
 /// (1 or 0) specifies if this is a system service (system bus or session bus). The \a keys
@@ -181,43 +184,39 @@ int context_get_double (ContextPtr *ptr, double *v)
     }    
 }
 
-static int reinitialize_service(const QString &busName)
+static int reinitialize_service()
 {
-    QStringList *keys = busNameToKeyList.value(busName);
-    QDBusConnection::BusType busType = busNameToBusType.value(busName);
+    if (serviceKeyList->length() > 0) 
+        Context::stopService(*serviceBusName);
 
-    if (keys->length() > 0) 
-        Context::stopService(busName);
-
-    return Context::initService(busType, busName, *keys);
+    return Context::initService(serviceBusType, *serviceBusName, *serviceKeyList);
 }
 
 int context_provider_init (DBusBusType bus_type, const char* bus_name)
 {
-    if (busNameToKeyList.contains(QString(bus_name))) {
-        contextCritical() << "Service with name" << bus_name << "already initialized!";
+    if (serviceBusName != NULL) {
+    contextCritical() << "Service already initialize. You can only initialize one service with C API";
         return 0;
     }
 
-    QDBusConnection::BusType busType = (bus_type == DBUS_BUS_SESSION) ? 
-                                        QDBusConnection::SessionBus   :
-                                        QDBusConnection::SystemBus;
-    QString busName = QString(bus_name);
+    serviceBusType = (bus_type == DBUS_BUS_SESSION) ? 
+                      QDBusConnection::SessionBus   :
+                      QDBusConnection::SystemBus;
+    serviceBusName = new QString(bus_name);
+    serviceKeyList = new QStringList();
 
-    busNameToKeyList.insert(busName, new QStringList());
-    busNameToBusType.insert(busName, busType);
-    return reinitialize_service(busName);
+    return reinitialize_service();
 }
 
 void context_provider_stop (void)
 {
-    contextDebug() << "Stopping all services";
+    contextDebug() << "Stopping service";
 
-    foreach(QString key, busNameToKeyList.keys()) {
-        Context::stopService(key);
+    if (serviceBusName) {
+        Context::stopService(*serviceBusName);
     }
 
-    busNameToKeyList.clear();
-    busNameToBusType.clear();
+    delete serviceBusName; serviceBusName = NULL;
+    delete serviceKeyList; serviceKeyList = NULL;
 }
 
