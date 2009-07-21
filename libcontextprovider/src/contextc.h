@@ -69,6 +69,21 @@ context_provider_install_group  (char** key_group,
                                  ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
                                  void* subscription_changed_cb_target);
 
+void 
+context_provider_set_integer    (const char* key, int value);
+
+void 
+context_provider_set_double     (const char* key, double value);
+
+void 
+context_provider_set_boolean    (const char* key, int value);
+
+void
+context_provider_set_string     (const char* key, const char* value);
+
+void
+context_provider_set_null       (const char* key);
+
 #ifdef __cplusplus
 }
 #endif 

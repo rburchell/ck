@@ -342,3 +342,33 @@ context_provider_install_group  (char** key_group,
     listeners->append(new ContextGroupListener(keys, subscription_changed_cb, subscription_changed_cb_target));
 }
 
+void 
+context_provider_set_integer (const char* key, int value)
+{
+    Context(key).set(value);
+}
+
+void 
+context_provider_set_double (const char* key, double value)
+{
+    Context(key).set(value);
+}
+
+void 
+context_provider_set_boolean (const char* key, int value)
+{
+    Context(key).set(value);
+}
+
+void 
+context_provider_set_string (const char* key, const char* value)
+{
+    Context(key).set(value);
+}
+
+void 
+context_provider_set_null (const char* key)
+{
+    Context(key).unset();
+}
+
