@@ -22,12 +22,44 @@
 #include "contextc.h"
 #include "context.h"
 #include "logging.h"
+#include "sconnect.h"
 
 using namespace ContextProvider;
+class ContextListener;
 
 QStringList *serviceKeyList = NULL;
 QString *serviceBusName = NULL;
 QDBusConnection::BusType serviceBusType;
+QList<ContextListener*> *contextListeners = NULL;
+
+class ContextListener : public QObject 
+{
+    Q_OBJECT
+
+public:
+    ContextListener(const QString &k, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
+        callback(cb), user_data(dt), key(k)
+    {
+        sconnect(&key, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared));
+        sconnect(&key, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared));
+    }
+
+public slots:
+    void onFirstSubscriberAppeared()
+    {
+        callback(1, user_data);
+    }
+
+    void onLastSubscriberDisappeared()
+    {
+        callback(0, user_data);
+    }
+
+private:
+    ContextProviderSubscriptionChangedCallback callback;
+    void *user_data;
+    Context key;
+};
 
 /// Initializes the service for the given \a name. \a is_system 
 /// (1 or 0) specifies if this is a system service (system bus or session bus). The \a keys
@@ -204,6 +236,7 @@ int context_provider_init (DBusBusType bus_type, const char* bus_name)
                       QDBusConnection::SystemBus;
     serviceBusName = new QString(bus_name);
     serviceKeyList = new QStringList();
+    contextListeners = new QList<ContextListener*>;
 
     return reinitialize_service();
 }
@@ -216,8 +249,13 @@ void context_provider_stop (void)
         Context::stopService(*serviceBusName);
     }
 
+    // Delete all listeners
+    foreach (ContextListener *listener, *contextListeners)
+        delete listener;
+
     delete serviceBusName; serviceBusName = NULL;
     delete serviceKeyList; serviceKeyList = NULL;
+    delete contextListeners; contextListeners = NULL;
 }
 
 void context_provider_install_key (const char* key, 
@@ -238,6 +276,6 @@ void context_provider_install_key (const char* key,
     serviceKeyList->append(key);
     reinitialize_service();
 
-    // FIXME Does not register the callback yet
+    contextListeners->append(new ContextListener(key, subscription_changed_cb, subscription_changed_cb_target));
 }
 
