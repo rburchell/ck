@@ -52,6 +52,7 @@ public:
     QVariant get();
 
     static bool initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys);
+    static void stopService(const QString &busName);
    
 private:
     static QHash<QString, Manager*> busesToManagers; ///< Hash mapping of bus names to Manager objects.

@@ -243,3 +243,28 @@ bool Context::initService(QDBusConnection::BusType busType, const QString &busNa
     return true;
 }
 
+/// Stops the previously started (with initService) service with the given \a busName.
+void Context::stopService(const QString &busName)
+{
+    contextDebug() << F_CONTEXT << "Stopping service for bus:" << busName;
+
+    // Basic sanity check
+    if (! busesToManagers.contains(busName)) {
+        contextCritical() << busName << "service is not started!";
+        return;
+    }
+
+    // The manager...
+    Manager *manager = busesToManagers.value(busName);
+
+    // Remove all key mappings
+    foreach(QString key, QStringList(manager->getKeys())) {
+        keysToManagers.remove(key);
+    }
+
+    // Remove the bus name itself
+    busesToManagers.remove(busName);
+
+    // FIXME We also need to unregister the manager object and service
+}
+

@@ -46,6 +46,7 @@ public:
     int getSubscriptionCount(const QString &key) const;
     void busNameIsGone(const QString &key);
     bool hasSubscriberWithBusName(const QString &name) const;
+    QStringList getKeys();
 
 signals:
     /// Emitted when the first subscriber appears for the specified \a key.

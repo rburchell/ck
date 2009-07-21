@@ -214,3 +214,9 @@ int Manager::getSubscriptionCount(const QString &key) const
     return keysToSubscriptionCount.value(key);
 }
 
+/// Returns the list of keys handled by this Manager.
+QStringList Manager::getKeys()
+{
+    return QStringList(keysToValues.keys());
+}
+
