@@ -38,6 +38,7 @@ private slots:
     void subscriptionCount();
     void subscriptionCountNonExistent();
     void getSubscriber();
+    void getKeys();
     void busNameIsGone();
     void subscribeAndUnsubscribe();
     void setKeyValue();
@@ -73,6 +74,15 @@ void ManagerUnitTest::keys()
     QVERIFY(manager->keyIsValid("Battery.Voltage"));
     QVERIFY(manager->keyIsValid("Battery.AboutToExplode"));
     QVERIFY(manager->keyIsValid("Battery.Something") == false);
+}
+
+void ManagerUnitTest::getKeys()
+{
+    QStringList keys = manager->getKeys();
+    QCOMPARE(keys.length(), 3);
+    QVERIFY(keys.contains("Battery.Power"));
+    QVERIFY(keys.contains("Battery.Voltage"));
+    QVERIFY(keys.contains("Battery.AboutToExplode"));
 }
 
 void ManagerUnitTest::duplicateKeys()
