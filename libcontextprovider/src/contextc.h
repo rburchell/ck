@@ -63,6 +63,12 @@ context_provider_install_key    (const char* key,
                                  ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
                                  void* subscription_changed_cb_target);
 
+void 
+context_provider_install_group  (char** key_group, 
+                                 int clear_values_on_subscribe, 
+                                 ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
+                                 void* subscription_changed_cb_target);
+
 #ifdef __cplusplus
 }
 #endif 

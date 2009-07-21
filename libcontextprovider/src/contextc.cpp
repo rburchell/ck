@@ -23,42 +23,76 @@
 #include "context.h"
 #include "logging.h"
 #include "sconnect.h"
+#include "signalgrouper.h"
 
 using namespace ContextProvider;
 class ContextListener;
+class Listener;
+class ContextGroupListener;
 
 QStringList *serviceKeyList = NULL;
 QString *serviceBusName = NULL;
 QDBusConnection::BusType serviceBusType;
-QList<ContextListener*> *contextListeners = NULL;
+QList<Listener*> *listeners = NULL;
 
-class ContextListener : public QObject 
+class Listener : public QObject
 {
     Q_OBJECT
 
 public:
-    ContextListener(const QString &k, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
-        callback(cb), user_data(dt), key(k)
+    Listener(ContextProviderSubscriptionChangedCallback cb, void *dt) : 
+        callback(cb), user_data(dt)
     {
-        sconnect(&key, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared));
-        sconnect(&key, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared));
     }
 
-public slots:
+private slots:
     void onFirstSubscriberAppeared()
     {
-        callback(1, user_data);
+        if (callback)
+            callback(1, user_data);
     }
 
     void onLastSubscriberDisappeared()
     {
-        callback(0, user_data);
+        if (callback)
+            callback(0, user_data);
     }
 
 private:
     ContextProviderSubscriptionChangedCallback callback;
     void *user_data;
+};
+
+class ContextListener : public Listener
+{
+    Q_OBJECT
+
+public:
+    ContextListener(const QString &k, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
+        Listener(cb, dt), key(k)
+    {
+        sconnect(&key, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared));
+        sconnect(&key, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared));
+    }
+
+private:
     Context key;
+};
+
+class ContextGroupListener : public Listener 
+{
+    Q_OBJECT
+
+public:
+    ContextGroupListener(const QStringList &keys, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
+        Listener(cb, dt), groupper(keys)
+    {
+        sconnect(&groupper, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared));
+        sconnect(&groupper, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared));
+    }
+
+private:
+    SignalGrouper groupper;
 };
 
 /// Initializes the service for the given \a name. \a is_system 
@@ -236,7 +270,7 @@ int context_provider_init (DBusBusType bus_type, const char* bus_name)
                       QDBusConnection::SystemBus;
     serviceBusName = new QString(bus_name);
     serviceKeyList = new QStringList();
-    contextListeners = new QList<ContextListener*>;
+    listeners = new QList<Listener*>;
 
     return reinitialize_service();
 }
@@ -250,12 +284,12 @@ void context_provider_stop (void)
     }
 
     // Delete all listeners
-    foreach (ContextListener *listener, *contextListeners)
+    foreach (Listener *listener, *listeners)
         delete listener;
 
     delete serviceBusName; serviceBusName = NULL;
     delete serviceKeyList; serviceKeyList = NULL;
-    delete contextListeners; contextListeners = NULL;
+    delete listeners; listeners = NULL;
 }
 
 void context_provider_install_key (const char* key, 
@@ -276,6 +310,35 @@ void context_provider_install_key (const char* key,
     serviceKeyList->append(key);
     reinitialize_service();
 
-    contextListeners->append(new ContextListener(key, subscription_changed_cb, subscription_changed_cb_target));
+    listeners->append(new ContextListener(key, subscription_changed_cb, subscription_changed_cb_target));
+}
+
+void 
+context_provider_install_group  (char** key_group, 
+                                 int clear_values_on_subscribe, 
+                                 ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
+                                 void* subscription_changed_cb_target)
+{
+    if (! serviceKeyList) {
+        contextCritical() << "Can't install key group because no service started.";
+        return;
+    }
+
+    QStringList keys;
+    int i = 0;
+    while(key_group[i] != NULL) {
+        QString key = QString(key_group[i]);
+
+        if (serviceKeyList->contains(key)) {
+            contextCritical() << "Key:" << key << "is already installed";
+            return;
+        }
+
+        keys << key;
+        i++;
+    }
+
+    reinitialize_service();
+    listeners->append(new ContextGroupListener(keys, subscription_changed_cb, subscription_changed_cb_target));
 }
 
