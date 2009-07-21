@@ -33,11 +33,11 @@
 */
 
 /// Constructor. Creates new adaptor for the given manager with the given 
-/// dbus connection.
-ManagerAdaptor::ManagerAdaptor(Manager* manager, QDBusConnection conn)
+/// dbus connection. The connection \a conn is not retained.
+ManagerAdaptor::ManagerAdaptor(Manager* manager, QDBusConnection *conn)
     : QDBusAbstractAdaptor(manager), manager(manager), connection(conn)
 {
-    sconnect((QObject*) connection.interface(), SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
+    sconnect((QObject*) connection->interface(), SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
              this, SLOT(OnServiceOwnerChanged(const QString &, const QString&, const QString&)));
 }
 
@@ -46,9 +46,9 @@ QDBusObjectPath ManagerAdaptor::GetSubscriber(const QDBusMessage &msg)
 {
     Subscriber *subscriber = manager->getSubscriber(msg.service());
 
-    if (!connection.objectRegisteredAt(subscriber->dbusPath())) {
+    if (!connection->objectRegisteredAt(subscriber->dbusPath())) {
         new SubscriberAdaptor(subscriber);
-        connection.registerObject(subscriber->dbusPath(), subscriber);
+        connection->registerObject(subscriber->dbusPath(), subscriber);
     }
     
     return QDBusObjectPath(subscriber->dbusPath());

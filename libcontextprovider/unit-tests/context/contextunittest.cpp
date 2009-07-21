@@ -59,6 +59,11 @@ void Manager::setKeyValue(const QString &key, const QVariant &v)
     lastVariantSet = new QVariant(v);
 }
 
+QStringList Manager::getKeys()
+{
+    return keys;
+}
+
 QVariant Manager::getKeyValue(const QString &key)
 {
     if (lastVariantSet)
@@ -77,13 +82,13 @@ void Manager::fakeLast(const QString &key)
     emit lastSubscriberDisappeared(key);
 }
 
-Manager::Manager(const QStringList &keys)
+Manager::Manager(const QStringList &k) : keys(k)
 {
     if (firstManagerCreated == NULL)
         firstManagerCreated = this;
 }
 
-ManagerAdaptor::ManagerAdaptor(Manager* manager, QDBusConnection conn)
+ManagerAdaptor::ManagerAdaptor(Manager* manager, QDBusConnection *conn)
     : QDBusAbstractAdaptor(manager)
 {
 }

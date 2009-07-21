@@ -35,7 +35,7 @@ class ManagerAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Interface", "org.freedesktop.ContextKit.Manager")
 
 public:
-    ManagerAdaptor (Manager* manager, QDBusConnection connection);
+    ManagerAdaptor (Manager* manager, QDBusConnection *connection);
 
 public slots:
     QDBusObjectPath GetSubscriber(const QDBusMessage &msg);
@@ -43,7 +43,7 @@ public slots:
 
 private:
     Manager *manager; ///< The managed object.
-    QDBusConnection connection; ///< The connection to operate on.
+    QDBusConnection *connection; ///< The connection to operate on.
 };
 
 #endif

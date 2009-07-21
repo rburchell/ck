@@ -33,7 +33,7 @@ class ManagerAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Interface", "org.freedesktop.ContextKit.Manager")
 
 public:
-    ManagerAdaptor (Manager* manager, QDBusConnection connection);
+    ManagerAdaptor (Manager* manager, QDBusConnection *connection);
 };
 
 #endif

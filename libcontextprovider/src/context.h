@@ -56,6 +56,7 @@ public:
    
 private:
     static QHash<QString, Manager*> busesToManagers; ///< Hash mapping of bus names to Manager objects.
+    static QHash<QString, QDBusConnection*> busesToConnections; ///< Hash mapping of bus names to connection objects.
     static QHash<QString, Manager*> keysToManagers; ///< Hash mapping of key names to Manager objects.
     bool keyCheck() const;
 

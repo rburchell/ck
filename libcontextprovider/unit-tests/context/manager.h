@@ -45,10 +45,14 @@ public:
     QVariant getKeyValue(const QString &key);
     void fakeFirst(const QString &key);
     void fakeLast(const QString &key);
+    QStringList getKeys();
 
 signals:
     void firstSubscriberAppeared(const QString &key);
     void lastSubscriberDisappeared(const QString &key);
+
+private:
+    QStringList keys;
 };
 
 #endif

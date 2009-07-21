@@ -51,6 +51,7 @@
 */
 
 QHash<QString, Manager*> Context::busesToManagers;
+QHash<QString, QDBusConnection*> Context::busesToConnections;
 QHash<QString, Manager*> Context::keysToManagers;
 
 /// Constructor. This creates a new context property that should
@@ -211,24 +212,25 @@ bool Context::initService(QDBusConnection::BusType busType, const QString &busNa
         return false;
     }
     
-    QDBusConnection connection = QDBusConnection::connectToBus(busType, busName);
+    QDBusConnection *connection = new QDBusConnection(QDBusConnection::connectToBus(busType, busName));
 
     Manager *manager = new Manager(keys);
     ManagerAdaptor *managerAdaptor = new ManagerAdaptor(manager, connection);
 
     // Register service
-    if (! connection.registerService(busName)) {
+    if (! connection->registerService(busName)) {
         contextCritical() << "Failed to register service with name" << busName;
         return false;
     }
 
     // Register object
-    if (managerAdaptor && !connection.registerObject("/org/freedesktop/ContextKit/Manager", manager)) {
+    if (managerAdaptor && !connection->registerObject("/org/freedesktop/ContextKit/Manager", manager)) {
         contextCritical() << "Failed to register the Manager object for" << busName;
         return false;
     }
 
     busesToManagers.insert(busName, manager);
+    busesToConnections.insert(busName, connection);
 
     // Add a mapping for all the keys -> manager
     foreach(QString key, keys) {
@@ -262,9 +264,19 @@ void Context::stopService(const QString &busName)
         keysToManagers.remove(key);
     }
 
-    // Remove the bus name itself
-    busesToManagers.remove(busName);
+    // The connection...
+    QDBusConnection *connection = busesToConnections.value(busName);
 
-    // FIXME We also need to unregister the manager object and service
+    // Unregister
+    connection->unregisterObject("/org/freedesktop/ContextKit/Manager");
+    connection->unregisterService(busName);
+
+    // Remove the remaining mappings
+    busesToManagers.remove(busName);
+    busesToConnections.remove(busName);
+
+    // Dealloc
+    delete manager;
+    delete connection;
 }
 
