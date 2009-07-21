@@ -220,3 +220,24 @@ void context_provider_stop (void)
     delete serviceKeyList; serviceKeyList = NULL;
 }
 
+void context_provider_install_key (const char* key, 
+                                   int clear_values_on_subscribe, 
+                                   ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
+                                   void* subscription_changed_cb_target)
+{
+    if (! serviceKeyList) {
+        contextCritical() << "Can't install key:" << key << "because no service started.";
+        return;
+    }
+    
+    if (serviceKeyList->contains(QString(key))) {
+        contextCritical() << "Key:" << key << "is already installed";
+        return;
+    }
+
+    serviceKeyList->append(key);
+    reinitialize_service();
+
+    // FIXME Does not register the callback yet
+}
+
