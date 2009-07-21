@@ -21,6 +21,10 @@
 
 #include "contextc.h"
 #include "context.h"
+#include "logging.h"
+
+QHash<QString, QStringList*> busNameToKeyList;
+QHash<QString, QDBusConnection::BusType> busNameToBusType;
 
 /// Initializes the service for the given \a name. \a is_system 
 /// (1 or 0) specifies if this is a system service (system bus or session bus). The \a keys
@@ -138,7 +142,7 @@ int context_get_string (ContextPtr *ptr, char **v)
     if (var.isValid()) {
         QString str = var.toString();
         *v = qstrdup(str.toUtf8().constData());
-        return 1;
+    return 1;
     } else {
         *v = 0;
         return 0;
@@ -176,3 +180,44 @@ int context_get_double (ContextPtr *ptr, double *v)
         return 0;
     }    
 }
+
+static int reinitialize_service(const QString &busName)
+{
+    QStringList *keys = busNameToKeyList.value(busName);
+    QDBusConnection::BusType busType = busNameToBusType.value(busName);
+
+    if (keys->length() > 0) 
+        Context::stopService(busName);
+
+    return Context::initService(busType, busName, *keys);
+}
+
+int context_provider_init (DBusBusType bus_type, const char* bus_name)
+{
+    if (busNameToKeyList.contains(QString(bus_name))) {
+        contextCritical() << "Service with name" << bus_name << "already initialized!";
+        return 0;
+    }
+
+    QDBusConnection::BusType busType = (bus_type == DBUS_BUS_SESSION) ? 
+                                        QDBusConnection::SessionBus   :
+                                        QDBusConnection::SystemBus;
+    QString busName = QString(bus_name);
+
+    busNameToKeyList.insert(busName, new QStringList());
+    busNameToBusType.insert(busName, busType);
+    return reinitialize_service(busName);
+}
+
+void context_provider_stop (void)
+{
+    contextDebug() << "Stopping all services";
+
+    foreach(QString key, busNameToKeyList.keys()) {
+        Context::stopService(key);
+    }
+
+    busNameToKeyList.clear();
+    busNameToBusType.clear();
+}
+

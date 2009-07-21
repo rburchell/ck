@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
 #include <stdlib.h>
+#include <dbus/dbus.h>
 
 struct ContextPtr;
 
@@ -45,6 +46,22 @@ int         context_get_int         (ContextPtr *ptr, int *v);
 int         context_get_bool        (ContextPtr *ptr, int *v);
 int         context_get_string      (ContextPtr *ptr, char **v);
 int         context_get_double      (ContextPtr *ptr, double *v);
+
+// NEW API, TEMPORARILY HERE
+typedef void (*ContextProviderSubscriptionChangedCallback) (int subscribe, void* user_data);
+
+int
+context_provider_init           (DBusBusType bus_type, 
+                                 const char* bus_name);
+
+void        
+context_provider_stop           (void);
+
+void
+context_provider_install_key    (const char* key, 
+                                 int clear_values_on_subscribe, 
+                                 ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
+                                 void* subscription_changed_cb_target);
 
 #ifdef __cplusplus
 }
