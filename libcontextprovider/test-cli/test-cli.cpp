@@ -13,7 +13,7 @@ ContextD::ContextD() : QObject(NULL), batStat(true)
                          "org.freedesktop.ContextKit.contextd", 
                          keys);
                          
-    group = new SignalGrouper(keys);
+    group = new ContextGroup(keys);
 
     onBattery = new Context("Battery.OnBattery");
     chargePercentage = new Context("Battery.ChargePercentage");

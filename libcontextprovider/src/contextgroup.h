@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SIGNALGROUPER_H
-#define SIGNALGROUPER_H
+#ifndef CONTEXTGROUP_H
+#define CONTEXTGROUP_H
 
 // FIXME: Add this class (and others) to a namespace.
 
@@ -30,14 +30,14 @@
 
 class Context;
 
-class SignalGrouper : public QObject
+class ContextGroup : public QObject
 {
     Q_OBJECT
     
 public:
-    explicit SignalGrouper(QSet<Context*> propertiesToWatch, QObject* parent = 0);
-    explicit SignalGrouper(QStringList propertiesToWatch, QObject* parent = 0);
-    ~SignalGrouper();
+    explicit ContextGroup(QSet<Context*> propertiesToWatch, QObject* parent = 0);
+    explicit ContextGroup(QStringList propertiesToWatch, QObject* parent = 0);
+    ~ContextGroup();
 
     bool isSubscribedTo() const;
 

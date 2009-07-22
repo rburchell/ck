@@ -9,8 +9,8 @@ libcontextprovider_la_SOURCES = logging.h               \
                                 manager.cpp             \
                                 manageradaptor.h        \
                                 manageradaptor.cpp      \
-                                signalgrouper.h         \
-                                signalgrouper.cpp       \
+                                contextgroup.h		\
+                                contextgroup.cpp	\
                                 subscriber.cpp          \
                                 subscriber.h            \
                                 subscriberadaptor.h     \
@@ -24,7 +24,7 @@ libcontextprovider_la_SOURCES = logging.h               \
                                 listeners.cpp
 
 includecontextproviderdir=$(includedir)/contextprovider
-includecontextprovider_HEADERS = context.h contextc.h signalgrouper.h
+includecontextprovider_HEADERS = context.h contextc.h contextgroup.h
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS) \
               '-DCONTEXT_LOG_MODULE_NAME="libcontextprovider"'
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS)

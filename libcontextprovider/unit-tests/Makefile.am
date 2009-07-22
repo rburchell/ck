@@ -1,7 +1,7 @@
 SUBDIRS = manager	\
 	  subscriber	\
 	  context	\
-	  signalgrouper	\
+	  contextgroup	\
 	  contextc
 
 check-sum: all

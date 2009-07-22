@@ -23,7 +23,7 @@
 #include "context.h"
 #include "logging.h"
 #include "sconnect.h"
-#include "signalgrouper.h"
+#include "contextgroup.h"
 #include "listeners.h"
 
 using namespace ContextProvider;

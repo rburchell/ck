@@ -27,7 +27,7 @@
 #include <QString>
 #include <QStringList>
 #include "contextc.h"
-#include "signalgrouper.h"
+#include "contextgroup.h"
 
 class ContextListener;
 class Listener;
@@ -68,7 +68,7 @@ public:
     ContextGroupListener(const QStringList &keys, ContextProviderSubscriptionChangedCallback cb, void *dt);
 
 private:
-    SignalGrouper groupper;
+    ContextGroup group;
 };
 
 #endif

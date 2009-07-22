@@ -1,7 +1,7 @@
 #include <QStringList>
 #include <QObject>
 #include "context.h"
-#include "signalgrouper.h"
+#include "contextgroup.h"
 #include "sconnect.h"
 #include "logging.h"
 #include <QDebug>
@@ -20,7 +20,7 @@ public slots:
     void onTimeout();
 
 private:
-    SignalGrouper *group;
+    ContextGroup *group;
     Context *onBattery;
     Context *chargePercentage;
     QTimer timer;

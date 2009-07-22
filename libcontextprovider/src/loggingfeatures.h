@@ -25,7 +25,7 @@
 #define F_CONTEXT       (ContextFeature("context"))
 #define F_MANAGER       (ContextFeature("manager"))
 #define F_SUBSCRIBER    (ContextFeature("subscriber"))
-#define F_SIGNALGROUPER (ContextFeature("signalgrouper"))
+#define F_CONTEXTGROUP  (ContextFeature("contextgroup"))
 #define F_DESTROY       (ContextFeature("destroy"))
 #define F_SIGNALS       (ContextFeature("signals"))
 #define F_DBUS          (ContextFeature("dbus"))

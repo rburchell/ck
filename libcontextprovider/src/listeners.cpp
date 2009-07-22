@@ -47,9 +47,9 @@ ContextListener::ContextListener(const QString &k, ContextProviderSubscriptionCh
 }
 
 ContextGroupListener::ContextGroupListener(const QStringList &keys, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
-        Listener(cb, dt), groupper(keys)
+        Listener(cb, dt), group(keys)
 {
-    sconnect(&groupper, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared));
-    sconnect(&groupper, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared));
+    sconnect(&group, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared));
+    sconnect(&group, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared));
 }
 
