@@ -25,6 +25,8 @@
 #include "context.h"
 #include "contextc.h"
 
+QList<Context*> contextList;
+
 QString *lastBusName = NULL;
 QStringList *lastKeysList = NULL;
 QDBusConnection::BusType lastConnectionType;
@@ -32,12 +34,28 @@ QVariant *lastVariantSet = NULL;
 int lastSubscribed = 0;
 void *lastUserData = NULL;
 
-/* Mocked implementation of ContextC */
+/* Mocked implementation of Context */
 
 void resetVariants()
 {
     delete lastVariantSet;
     lastVariantSet = NULL;
+}
+
+void emitFirstOn(const QString &k)
+{
+    foreach (Context* c, contextList) {
+        if (c->getKey() == k)
+            c->fakeFirst();
+    }
+}
+
+void emitLastOn(const QString &k)
+{
+    foreach (Context* c, contextList) {
+        if (c->getKey() == k)
+            c->fakeLast();
+    }
 }
 
 bool Context::initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys)
@@ -81,6 +99,27 @@ Context::Context(const QString &name, QObject *obj) : QObject(obj), key(name)
 {
     delete lastVariantSet;
     lastVariantSet = NULL;
+    contextList.append(this);
+}
+
+Context::~Context()
+{
+    contextList.removeAll(this);
+}
+
+QString Context::getKey()
+{
+    return key;
+}
+
+void Context::fakeFirst()
+{
+    emit firstSubscriberAppeared(key);
+}
+
+void Context::fakeLast()
+{
+    emit lastSubscriberDisappeared(key);
 }
 
 class ContextCUnitTest : public QObject
@@ -137,6 +176,18 @@ void ContextCUnitTest::installKey()
     QVERIFY(lastKeysList->contains("Battery.OnBattery"));
     QVERIFY(lastKeysList->contains("Battery.Power"));
     QCOMPARE(lastKeysList->length(), 2);
+
+    emitFirstOn("Battery.OnBattery");
+    QCOMPARE(lastSubscribed, 1);
+    QCOMPARE(lastUserData, this);
+
+    emitLastOn("Battery.Power");
+    QCOMPARE(lastSubscribed, 0);
+    QCOMPARE(lastUserData, this);
+
+    emitFirstOn("Battery.Something");
+    QCOMPARE(lastSubscribed, 0);
+    QCOMPARE(lastUserData, this);
 }
 
 /*

@@ -37,12 +37,17 @@ class Context : public QObject
 
 public:
     explicit Context(const QString &key, QObject *parent = 0);
+    ~Context();
     
     void set(const QVariant &v);
     void unset();
+    QString getKey();
 
     static bool initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys);
     static void stopService(const QString &name);
+
+    void fakeFirst();
+    void fakeLast();
 
 signals:
     void firstSubscriberAppeared(const QString &key); 
