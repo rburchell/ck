@@ -67,8 +67,10 @@ void context_provider_stop (void)
     }
 
     // Delete all listeners
-    foreach (Listener *listener, *listeners)
-        delete listener;
+    if (listeners) {
+        foreach (Listener *listener, *listeners)
+            delete listener;
+    }
 
     delete serviceBusName; serviceBusName = NULL;
     delete serviceKeyList; serviceKeyList = NULL;
