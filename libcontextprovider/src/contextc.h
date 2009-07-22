@@ -29,25 +29,6 @@ extern "C" {
 #include <stdlib.h>
 #include <dbus/dbus.h>
 
-struct ContextPtr;
-
-ContextPtr* context_new             (const char *name);
-int         context_init_service    (int is_system, const char *name, const char** keys, int key_count);
-void        context_free            (ContextPtr *ptr);
-int         context_is_valid        (ContextPtr *ptr);
-int         context_is_set          (ContextPtr *ptr);
-void        context_unset           (ContextPtr *ptr);
-char*       context_get_key         (ContextPtr *ptr);
-void        context_set_int         (ContextPtr *ptr, int v);
-void        context_set_bool        (ContextPtr *ptr, int v);
-void        context_set_string      (ContextPtr *ptr, const char *v);
-void        context_set_double      (ContextPtr *ptr, double v);
-int         context_get_int         (ContextPtr *ptr, int *v);
-int         context_get_bool        (ContextPtr *ptr, int *v);
-int         context_get_string      (ContextPtr *ptr, char **v);
-int         context_get_double      (ContextPtr *ptr, double *v);
-
-// NEW API, TEMPORARILY HERE
 typedef void (*ContextProviderSubscriptionChangedCallback) (int subscribe, void* user_data);
 
 int

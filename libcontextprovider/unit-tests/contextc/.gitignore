@@ -5,3 +5,7 @@ sconnect.h
 logging.h
 logging.cpp
 loggingfeatures.h
+listeners.h
+listeners.cpp
+signalgrouper.h
+signalgrouper.cpp

@@ -19,33 +19,56 @@
  *
  */
 
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#ifndef LISTENERS_H
+#define LISTENERS_H
 
+#include "context.h"
 #include <QObject>
 #include <QString>
 #include <QStringList>
-#include <QDBusConnection>
-#include <QHash>
-#include <QVariant>
+#include "contextc.h"
+#include "signalgrouper.h"
 
-class Manager;
+class ContextListener;
+class Listener;
+class ContextGroupListener;
 
-class Context : public QObject
+class Listener : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Context(const QString &key, QObject *parent = 0);
-    
-    void set(const QVariant &v);
-    void unset();
+    Listener(ContextProviderSubscriptionChangedCallback cb, void *dt);
 
-    static bool initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys);
-    static void stopService(const QString &name);
+private slots:
+    void onFirstSubscriberAppeared();
+    void onLastSubscriberDisappeared();
 
 private:
-    QString key;
+    ContextProviderSubscriptionChangedCallback callback;
+    void *user_data;
+};
+
+class ContextListener : public Listener
+{
+    Q_OBJECT
+
+public:
+    ContextListener(const QString &k, ContextProviderSubscriptionChangedCallback cb, void *dt);
+
+private:
+    Context key;
+};
+
+class ContextGroupListener : public Listener 
+{
+    Q_OBJECT
+
+public:
+    ContextGroupListener(const QStringList &keys, ContextProviderSubscriptionChangedCallback cb, void *dt);
+
+private:
+    SignalGrouper groupper;
 };
 
 #endif

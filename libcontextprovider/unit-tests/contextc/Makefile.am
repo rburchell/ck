@@ -7,9 +7,9 @@ COVERAGE_FILES = contextc.cpp
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
-AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)
+AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS)
 AM_LDFLAGS = $(QtCore_LIBS) $(QtDBus_LIBS)
-FROM_SOURCE = logging.cpp logging.h loggingfeatures.h contextc.h contextc.cpp
+FROM_SOURCE = logging.cpp logging.h loggingfeatures.h contextc.h contextc.cpp sconnect.h signalgrouper.h signalgrouper.cpp listeners.h listeners.cpp
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am

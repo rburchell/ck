@@ -19,7 +19,9 @@ libcontextprovider_la_SOURCES = logging.h               \
                                 queuedinvoker.cpp       \
                                 sconnect.h              \
                                 contextc.h              \
-                                contextc.cpp
+                                contextc.cpp            \
+                                listeners.h             \
+                                listeners.cpp
 
 includecontextproviderdir=$(includedir)/contextprovider
 includecontextprovider_HEADERS = context.h contextc.h signalgrouper.h
