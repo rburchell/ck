@@ -44,6 +44,10 @@ public:
     static bool initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys);
     static void stopService(const QString &name);
 
+signals:
+    void firstSubscriberAppeared(const QString &key); 
+    void lastSubscriberDisappeared(const QString &key);
+
 private:
     QString key;
 };

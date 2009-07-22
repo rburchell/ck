@@ -29,6 +29,8 @@ QString *lastBusName = NULL;
 QStringList *lastKeysList = NULL;
 QDBusConnection::BusType lastConnectionType;
 QVariant *lastVariantSet = NULL;
+int lastSubscribed = 0;
+void *lastUserData = NULL;
 
 /* Mocked implementation of ContextC */
 
@@ -88,6 +90,7 @@ class ContextCUnitTest : public QObject
 private slots:
     void initTestCase();
     void startStopStart();
+    void installKey();
     /*
     void isValid();
     void isSet();
@@ -98,7 +101,14 @@ private slots:
     void setGetString();
     void setGetDouble();
     */
+    
 };
+
+void MagicCallback(int subscribed, void *user_data)
+{
+    lastSubscribed = subscribed;
+    lastUserData = user_data;
+}
 
 // Before all tests
 void ContextCUnitTest::initTestCase()
@@ -118,6 +128,11 @@ void ContextCUnitTest::startStopStart()
     QCOMPARE(context_provider_init(DBUS_BUS_SESSION, "com.test.provider"), 0);
     context_provider_stop();
     QCOMPARE(context_provider_init(DBUS_BUS_SESSION, "com.test.provider"), 1);
+}
+
+void ContextCUnitTest::installKey()
+{
+    context_provider_install_key("Battery.OnBattery", 0, MagicCallback, this);
 }
 
 /*
