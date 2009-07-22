@@ -119,6 +119,7 @@ void context_provider_install_group (const char** key_group,
         }
 
         keys << key;
+        serviceKeyList->append(key);
         i++;
     }
 

@@ -36,10 +36,16 @@ class ContextGroup : public QObject
     
 public:
     explicit ContextGroup(QStringList propertiesToWatch, QObject* parent = 0);
+    ~ContextGroup();
+    QStringList keyList;
+    void fakeFirst();
+    void fakeLast();
     
 signals:
     void firstSubscriberAppeared();
     void lastSubscriberDisappeared();
+
+private:
 };
 
 #endif

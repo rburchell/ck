@@ -27,6 +27,7 @@
 #include "contextgroup.h"
 
 QList<Context*> contextList;
+QList<ContextGroup*> contextGroupList;
 
 QString *lastBusName = NULL;
 QStringList *lastKeysList = NULL;
@@ -37,8 +38,24 @@ void *lastUserData = NULL;
 
 /* Mocked implementation of ContextGroup */
 
-ContextGroup::ContextGroup(QStringList propertiesToWatch, QObject *parent)
+ContextGroup::ContextGroup(QStringList propertiesToWatch, QObject *parent) : keyList(propertiesToWatch)
 {
+    contextGroupList.append(this);
+}
+
+ContextGroup::~ContextGroup()
+{
+    contextGroupList.removeAll(this);
+}
+
+void ContextGroup::fakeFirst()
+{
+    emit firstSubscriberAppeared();
+}
+
+void ContextGroup::fakeLast()
+{
+    emit lastSubscriberDisappeared();
 }
 
 /* Mocked implementation of Context */
@@ -55,6 +72,11 @@ void emitFirstOn(const QString &k)
         if (c->getKey() == k)
             c->fakeFirst();
     }
+
+    foreach (ContextGroup* cg, contextGroupList) {
+        if (cg->keyList.contains(k))
+            cg->fakeFirst();
+    }
 }
 
 void emitLastOn(const QString &k)
@@ -62,6 +84,11 @@ void emitLastOn(const QString &k)
     foreach (Context* c, contextList) {
         if (c->getKey() == k)
             c->fakeLast();
+    }
+
+    foreach (ContextGroup* cg, contextGroupList) {
+        if (cg->keyList.contains(k))
+            cg->fakeLast();
     }
 }
 
@@ -134,9 +161,10 @@ class ContextCUnitTest : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase();
+    void init();
     void startStopStart();
     void installKey();
+    void installGroup();
     /*
     void isValid();
     void isSet();
@@ -156,8 +184,8 @@ void MagicCallback(int subscribed, void *user_data)
     lastUserData = user_data;
 }
 
-// Before all tests
-void ContextCUnitTest::initTestCase()
+// Before each test
+void ContextCUnitTest::init()
 {
     context_provider_stop();
     int res = context_provider_init(DBUS_BUS_SESSION, "com.test.provider");
@@ -193,6 +221,27 @@ void ContextCUnitTest::installKey()
     QCOMPARE(lastUserData, this);
 
     emitFirstOn("Battery.Something");
+    QCOMPARE(lastSubscribed, 0);
+    QCOMPARE(lastUserData, this);
+}
+
+void ContextCUnitTest::installGroup()
+{
+    const char *keys[3];
+    keys[0] = "Location.Lat";
+    keys[1] = "Location.Lon";
+    keys[2] = NULL;
+
+    context_provider_install_group(keys, 0, MagicCallback, this);
+    QVERIFY(lastKeysList->contains("Location.Lat"));
+    QVERIFY(lastKeysList->contains("Location.Lon"));
+    QCOMPARE(lastKeysList->length(), 2);
+
+    emitFirstOn("Location.Lat");
+    QCOMPARE(lastSubscribed, 1);
+    QCOMPARE(lastUserData, this);
+
+    emitLastOn("Location.Lat");
     QCOMPARE(lastSubscribed, 0);
     QCOMPARE(lastUserData, this);
 }
