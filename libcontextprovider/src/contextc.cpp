@@ -98,11 +98,10 @@ void context_provider_install_key (const char* key,
     listeners->append(new ContextListener(key, subscription_changed_cb, subscription_changed_cb_target));
 }
 
-void 
-context_provider_install_group  (char** key_group, 
-                                 int clear_values_on_subscribe, 
-                                 ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
-                                 void* subscription_changed_cb_target)
+void context_provider_install_group (const char** key_group, 
+                                     int clear_values_on_subscribe, 
+                                     ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
+                                     void* subscription_changed_cb_target)
 {
     if (! serviceKeyList) {
         contextCritical() << "Can't install key group because no service started.";
