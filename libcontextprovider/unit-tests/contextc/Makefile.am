@@ -1,15 +1,15 @@
 check_PROGRAMS = contextcunittest
 
 # test's sources
-contextcunittest_SOURCES = contextcunittest.cpp context.h
+contextcunittest_SOURCES = contextcunittest.cpp context.h contextgroup.h
 
-COVERAGE_FILES = contextc.cpp 
+COVERAGE_FILES = contextc.cpp listeners.cpp 
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS)
 AM_LDFLAGS = $(QtCore_LIBS) $(QtDBus_LIBS)
-FROM_SOURCE = logging.cpp logging.h loggingfeatures.h contextc.h contextc.cpp sconnect.h contextgroup.h contextgroup.cpp listeners.h listeners.cpp
+FROM_SOURCE = logging.cpp logging.h loggingfeatures.h contextc.h contextc.cpp sconnect.h listeners.h listeners.cpp
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am

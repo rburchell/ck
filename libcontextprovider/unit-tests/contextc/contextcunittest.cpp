@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include "context.h"
 #include "contextc.h"
+#include "contextgroup.h"
 
 QList<Context*> contextList;
 
@@ -33,6 +34,12 @@ QDBusConnection::BusType lastConnectionType;
 QVariant *lastVariantSet = NULL;
 int lastSubscribed = 0;
 void *lastUserData = NULL;
+
+/* Mocked implementation of ContextGroup */
+
+ContextGroup::ContextGroup(QStringList propertiesToWatch, QObject *parent)
+{
+}
 
 /* Mocked implementation of Context */
 
