@@ -133,6 +133,10 @@ void ContextCUnitTest::startStopStart()
 void ContextCUnitTest::installKey()
 {
     context_provider_install_key("Battery.OnBattery", 0, MagicCallback, this);
+    context_provider_install_key("Battery.Power", 0, MagicCallback, this);
+    QVERIFY(lastKeysList->contains("Battery.OnBattery"));
+    QVERIFY(lastKeysList->contains("Battery.Power"));
+    QCOMPARE(lastKeysList->length(), 2);
 }
 
 /*
