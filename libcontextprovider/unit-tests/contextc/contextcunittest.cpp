@@ -40,6 +40,9 @@ void resetVariants()
 
 bool Context::initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys)
 {
+    if (lastBusName && lastBusName == busName)
+        return false;
+
     delete lastBusName;
     lastBusName = new QString(busName);
 
@@ -52,7 +55,6 @@ bool Context::initService(QDBusConnection::BusType busType, const QString &busNa
 
 void Context::stopService(const QString &name)
 {
-
     if (lastBusName && name == lastBusName) {
         delete lastBusName;
         lastBusName = NULL;
@@ -85,6 +87,7 @@ class ContextCUnitTest : public QObject
 
 private slots:
     void initTestCase();
+    void startStopStart();
     /*
     void isValid();
     void isSet();
@@ -100,6 +103,7 @@ private slots:
 // Before all tests
 void ContextCUnitTest::initTestCase()
 {
+    context_provider_stop();
     int res = context_provider_init(DBUS_BUS_SESSION, "com.test.provider");
     QCOMPARE(res, 1);
     QCOMPARE(*lastBusName, QString("com.test.provider"));
@@ -107,9 +111,17 @@ void ContextCUnitTest::initTestCase()
     QCOMPARE(lastConnectionType, QDBusConnection::SessionBus);
 }
 
-/*
-void ContextCUnitTest::isValid()
+void ContextCUnitTest::startStopStart()
 {
+    context_provider_stop();
+    QCOMPARE(context_provider_init(DBUS_BUS_SESSION, "com.test.provider"), 1);
+    QCOMPARE(context_provider_init(DBUS_BUS_SESSION, "com.test.provider"), 0);
+    context_provider_stop();
+    QCOMPARE(context_provider_init(DBUS_BUS_SESSION, "com.test.provider"), 1);
+}
+
+/*
+void ContextCUnitTest::isValid({
     ContextPtr *c1 = context_new("Battery.OnBattery");
     QCOMPARE(context_is_valid(c1), 1);
     context_free(c1);
