@@ -3,6 +3,9 @@ dist_noinst_DATA = context.valid.stamp $(INTROSPECT)
 htmldir = $(datadir)/doc/contextkit/html/
 dist_html_DATA = context-properties.html contextkit.html context-provider-schema.html
 
+contextdir = $(datadir)/contextkit/
+dist_context_DATA = core.context
+
 XSLTPROC = xsltproc --xinclude --nonet
 DROP_NAMESPACE = perl -pe '$$hash = chr(35); s{xmlns:tp="http://telepathy\.freedesktop\.org/wiki/DbusSpec$${hash}extensions-v0"}{}g'
 RST2HTML = rst2html
@@ -32,13 +35,13 @@ $(INTROSPECT): introspect/%.xml: %.xml spec-to-introspect.xsl
 
 # Validating our core property list
 
-context.valid.stamp: context.xsd context.xml
+context.valid.stamp: context.xsd core.context
 	$(XMLLINT) $^
 	touch $@
 
 # Creating docs from a property declaration file
 
-context-properties.html: context.xml context2asciidoc.pl
+context-properties.html: core.context context2asciidoc.pl
 	$(srcdir)/context2asciidoc.pl < $< | asciidoc -f $(srcdir)/myfilter.conf -o $@ -
 
 # Creating docs from a DbusSpec
@@ -54,7 +57,6 @@ context-provider-schema.html: context.xsd
 EXTRA_DIST = \
 	$(SPEC_FILES) \
 	all.xml \
-	context.xml \
 	context.xsd \
 	$(SPEC_TOOLS) \
         myfilter.conf
