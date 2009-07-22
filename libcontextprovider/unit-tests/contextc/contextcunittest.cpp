@@ -165,6 +165,11 @@ private slots:
     void startStopStart();
     void installKey();
     void installGroup();
+    void setInterger();
+    void setBoolean();
+    void setString();
+    void setDouble();
+        
 };
 
 void MagicCallback(int subscribed, void *user_data)
@@ -233,6 +238,34 @@ void ContextCUnitTest::installGroup()
     emitLastOn("Location.Lat");
     QCOMPARE(lastSubscribed, 0);
     QCOMPARE(lastUserData, this);
+}
+
+void ContextCUnitTest::setInterger()
+{
+    context_provider_install_key("Battery.OnBattery", 0, MagicCallback, this);
+    context_provider_set_integer("Battery.OnBattery", 666);
+    QCOMPARE(*lastVariantSet, QVariant(666));
+}
+
+void ContextCUnitTest::setBoolean()
+{
+    context_provider_install_key("Battery.OnBattery", 0, MagicCallback, this);
+    context_provider_set_boolean("Battery.OnBattery", 1);
+    QCOMPARE(*lastVariantSet, QVariant(1));
+}
+
+void ContextCUnitTest::setString()
+{
+    context_provider_install_key("Battery.OnBattery", 0, MagicCallback, this);
+    context_provider_set_string("Battery.OnBattery", "testing");
+    QCOMPARE(*lastVariantSet, QVariant("testing"));
+}
+
+void ContextCUnitTest::setDouble()
+{
+    context_provider_install_key("Battery.OnBattery", 0, MagicCallback, this);
+    context_provider_set_double("Battery.OnBattery", 1.23);
+    QCOMPARE(*lastVariantSet, QVariant(1.23));
 }
 
 #include "contextcunittest.moc"
