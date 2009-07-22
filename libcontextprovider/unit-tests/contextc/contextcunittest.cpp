@@ -165,17 +165,6 @@ private slots:
     void startStopStart();
     void installKey();
     void installGroup();
-    /*
-    void isValid();
-    void isSet();
-    void unset();
-    void getKey();
-    void setGetInt();
-    void setGetBool();
-    void setGetString();
-    void setGetDouble();
-    */
-    
 };
 
 void MagicCallback(int subscribed, void *user_data)
@@ -245,114 +234,6 @@ void ContextCUnitTest::installGroup()
     QCOMPARE(lastSubscribed, 0);
     QCOMPARE(lastUserData, this);
 }
-
-/*
-void ContextCUnitTest::isValid({
-    ContextPtr *c1 = context_new("Battery.OnBattery");
-    QCOMPARE(context_is_valid(c1), 1);
-    context_free(c1);
-
-    ContextPtr *c2 = context_new("Battery.SomethingWeird");
-    QCOMPARE(context_is_valid(c2), 0);
-    context_free(c2);
-}
-
-void ContextCUnitTest::isSet()
-{
-    resetVariants();
-    ContextPtr *c = context_new("Battery.OnBattery");
-    QCOMPARE(context_is_set(c), 0);
-    context_set_int(c, 999);
-    QCOMPARE(context_is_set(c), 1);
-    context_free(c);
-}
-
-void ContextCUnitTest::unset()
-{
-    resetVariants();
-    ContextPtr *c = context_new("Battery.OnBattery");
-    QCOMPARE(context_is_set(c), 0);
-    context_set_int(c, 999);
-    QCOMPARE(context_is_set(c), 1);
-    context_unset(c);
-    QCOMPARE(context_is_set(c), 0);
-    context_free(c);
-}
-
-void ContextCUnitTest::getKey()
-{
-    ContextPtr *c = context_new("Battery.OnBattery");
-    char *k = context_get_key(c);
-    QVERIFY(strcmp(k, "Battery.OnBattery") == 0);
-    context_free(c);
-}
-
-void ContextCUnitTest::setGetInt()
-{
-    int v;
-    ContextPtr *c = context_new("Battery.OnBattery");
-    QCOMPARE(context_get_int(c, &v), 0);
-    QCOMPARE(v, 0);
-    
-    context_set_int(c, 666);
-    QCOMPARE(*lastVariantSet, QVariant(666));
-    
-    QCOMPARE(context_get_int(c, &v), 1);
-    QCOMPARE(v, 666);
-    
-    context_free(c);
-}
-
-void ContextCUnitTest::setGetDouble()
-{
-    double v;
-    ContextPtr *c = context_new("Battery.OnBattery");
-    QCOMPARE(context_get_double(c, &v), 0);
-    QCOMPARE(v, 0.0);
-    
-    context_set_double(c, 0.666);
-    QCOMPARE(*lastVariantSet, QVariant(0.666));
-
-    QCOMPARE(context_get_double(c, &v), 1);
-    QCOMPARE(v, 0.666);
-
-    context_free(c);
-}
-
-void ContextCUnitTest::setGetString()
-{
-    char *v;
-    ContextPtr *c = context_new("Battery.OnBattery");
-    QCOMPARE(context_get_string(c, &v), 0);
-    QVERIFY(v == NULL);
-
-    context_set_string(c, "Hello!");
-    QCOMPARE(*lastVariantSet, QVariant(QString("Hello!")));
-
-    QCOMPARE(context_get_string(c, &v), 1);
-    QVERIFY(v != NULL);
-    QVERIFY(strcmp(v, "Hello!") == 0);
-
-    free(v);
-    context_free(c);
-}
-
-void ContextCUnitTest::setGetBool()
-{
-    int v;
-    ContextPtr *c = context_new("Battery.OnBattery");
-    QCOMPARE(context_get_bool(c, &v), 0);
-    QCOMPARE(v, 0);
-    
-    context_set_bool(c, 1);
-    QCOMPARE(*lastVariantSet, QVariant(true));
-    
-    QCOMPARE(context_get_bool(c, &v), 1);
-    QCOMPARE(v, 1);
-    
-    context_free(c);
-}
-*/
 
 #include "contextcunittest.moc"
 QTEST_MAIN(ContextCUnitTest);
