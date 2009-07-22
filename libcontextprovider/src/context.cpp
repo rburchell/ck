@@ -31,8 +31,9 @@ using namespace ContextProvider;
 /*!
     \class Context
 
-    \brief The main class used to provide context data. Typically, to provide
-    some keys you would:
+    \brief The main class used to provide context data.
+
+    Typically, to provide some keys you would:
 
     \code
     QStringList keys;
