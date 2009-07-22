@@ -42,14 +42,14 @@ void Listener::onLastSubscriberDisappeared()
 ContextListener::ContextListener(const QString &k, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
         Listener(cb, dt), key(k)
 {
-    sconnect(&key, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared));
-    sconnect(&key, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared));
+    sconnect(&key, SIGNAL(firstSubscriberAppeared(QString)), this, SLOT(onFirstSubscriberAppeared()));
+    sconnect(&key, SIGNAL(lastSubscriberDisappeared(QString)), this, SLOT(onLastSubscriberDisappeared()));
 }
 
 ContextGroupListener::ContextGroupListener(const QStringList &keys, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
         Listener(cb, dt), group(keys)
 {
-    sconnect(&group, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared));
-    sconnect(&group, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared));
+    sconnect(&group, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared()));
+    sconnect(&group, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared()));
 }
 
