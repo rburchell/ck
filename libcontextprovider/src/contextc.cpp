@@ -28,6 +28,51 @@
 
 using namespace ContextProvider;
 
+/*!
+    \page CApi C Api
+    
+    \brief The libcontextprovider library offers a simple plain-C API to be used
+    from any C program.
+    
+    \section Usage
+
+    \code
+    context_provider_init(DBUS_BUS_SESSION, "org.test.provider");
+    
+    context_provider_install_key("Battery.OnBattery", 0, NULL, NULL);
+    context_provider_install_key("Battery.ChargePercentage", 0, NULL, NULL);
+    
+    context_provider_set_boolean("Battery.OnBattery", 1);
+    context_provider_set_integer("Battery.ChargePercentage", 55);
+    \endcode
+
+    The above code snippet starts a service at "org.test.provider" with two
+    keys ("Battery.OnBattery", "Battery.ChargePercentage") and sets their
+    respective values.
+
+    \section Callbacks
+
+    The context_provider_install_key function and context_provider_install_group function
+    take arguments specyfying the callback function. The callback is executed when the
+    subscription status changes for the key or the key group (first subscriber 
+    appears or last subscriber goes away). Basing on this info the provider can 
+    manage it's resources. It's okay also to use the callback function to actually 
+    set the value.
+
+    \code
+    void callback_function_example(int subscribed, void* user_data)
+    {
+        if (subscribed) {
+            // First subscriber appeared.
+            // Start ie. pooling the data.
+        } else {
+            // Last subscribed disappeared.
+            // Stop  pooling data, release resources.
+        }
+    }
+    \endcode
+*/
+
 QStringList *serviceKeyList = NULL;
 QString *serviceBusName = NULL;
 QDBusConnection::BusType serviceBusType;
