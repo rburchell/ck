@@ -42,6 +42,9 @@ void HalProvider::initialize()
 {
     contextDebug() << F_HAL << "Initializing hal provider";
     group = new ContextGroup(keys(), this);
+    onBattery = new Context("Battery.OnBattery", this);
+    lowBattery = new Context("Battery.LowBattery", this);
+    chargePercentage = new Context("Battery.ChargePercentage", this);
 
     sconnect(group, SIGNAL(firstSubscriberAppeared()),
             this, SLOT(onFirstSubscriberAppeared()));
@@ -87,33 +90,33 @@ void HalProvider::onDevicePropertyModified()
 
 void HalProvider::updateProperties()
 {
-    QVariant chargePercentage = batteryDevice->readValue("battery.charge_level.percentage");
-    QVariant isDischarging = batteryDevice->readValue("battery.rechargeable.is_discharging");
-    QVariant isCharging = batteryDevice->readValue("battery.rechargeable.is_charging");
+    QVariant chargePercentageV = batteryDevice->readValue("battery.charge_level.percentage");
+    QVariant isDischargingV = batteryDevice->readValue("battery.rechargeable.is_discharging");
+    QVariant isChargingV = batteryDevice->readValue("battery.rechargeable.is_charging");
 
     // Calculate and set ChargePercentage
-    if (chargePercentage != QVariant()) 
-        Context("Battery.ChargePercentage").set(chargePercentage.toInt());
+    if (chargePercentageV != QVariant()) 
+        chargePercentage->set(chargePercentageV.toInt());
     else
-        Context("Battery.ChargePercentage").unset();
+        chargePercentage->unset();
 
     // Calculate and set OnBattery
-    if (isDischarging != QVariant()) 
-        Context("Battery.OnBattery").set(isDischarging.toBool());
+    if (isDischargingV != QVariant()) 
+        onBattery->set(isDischargingV.toBool());
     else
-        Context("Battery.OnBattery").unset();
+        onBattery->unset();
 
     // Calculate the LowBattery
-    if (isDischarging == QVariant()) 
-        Context("Battery.LowBattery").unset();
-    else if (isDischarging.toBool() == false) 
-        Context("Battery.LowBattery").set(false);
-    else if (chargePercentage == QVariant())
-        Context("Battery.LowBattery").unset();
-    else if (chargePercentage.toInt() < LOW_BATTERY_THRESHOLD)
-        Context("Battery.LowBattery").set(true);
+    if (isDischargingV == QVariant()) 
+        lowBattery->unset();
+    else if (isDischargingV.toBool() == false) 
+        lowBattery->set(false);
+    else if (chargePercentageV == QVariant())
+        lowBattery->unset();
+    else if (chargePercentageV.toInt() < LOW_BATTERY_THRESHOLD)
+        lowBattery->set(true);
     else {
-        Context("Battery.LowBattery").set(false);
+        lowBattery->set(false);
     }
 }
 

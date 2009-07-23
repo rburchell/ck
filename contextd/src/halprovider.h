@@ -43,7 +43,11 @@ private:
     void updateProperties();
     
     ContextGroup *group;
+    Context *onBattery;
+    Context *lowBattery;
+    Context *chargePercentage;
     HalDeviceInterface *batteryDevice;
+
 
 private slots:
     void onFirstSubscriberAppeared();
