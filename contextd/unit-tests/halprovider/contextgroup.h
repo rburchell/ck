@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SIGNALGROUPER_H
-#define SIGNALGROUPER_H
+#ifndef CONTEXTGROUP_H
+#define CONTEXTGROUP_H
 
 #include <QObject>
 #include <QSet>
@@ -28,12 +28,12 @@
 
 class Context;
 
-class SignalGrouper : public QObject
+class ContextGroup : public QObject
 {
     Q_OBJECT
     
 public:
-    explicit SignalGrouper(QStringList propertiesToWatch, QObject* parent = 0);
+    explicit ContextGroup(QStringList propertiesToWatch, QObject* parent = 0);
 
 signals:
     void firstSubscriberAppeared();

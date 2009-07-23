@@ -73,9 +73,9 @@ QStringList HalManagerInterface::findDeviceByCapability(const QString &capabilit
     return QStringList();
 }
 
-/* Mocked SignalGrouper */
+/* Mocked ContextGroup */
 
-SignalGrouper::SignalGrouper(QStringList propertiesToWatch, QObject* parent)
+ContextGroup::ContextGroup(QStringList propertiesToWatch, QObject* parent)
 {
 }
 

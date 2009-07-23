@@ -1,7 +1,7 @@
 check_PROGRAMS = halproviderunittest
 
 # test's sources
-halproviderunittest_SOURCES = halproviderunittest.cpp context.h haldeviceinterface.h halmanagerinterface.h signalgrouper.h
+halproviderunittest_SOURCES = halproviderunittest.cpp context.h haldeviceinterface.h halmanagerinterface.h contextgroup.h
 
 COVERAGE_FILES = halprovider.cpp 
 
