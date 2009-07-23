@@ -34,6 +34,7 @@ class ContextGroup : public QObject
     
 public:
     explicit ContextGroup(QStringList propertiesToWatch, QObject* parent = 0);
+    void fakeFirst();
 
 signals:
     void firstSubscriberAppeared();

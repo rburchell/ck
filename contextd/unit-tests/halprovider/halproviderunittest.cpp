@@ -25,6 +25,18 @@
 #include "context.h"
 #include "halmanagerinterface.h"
 
+QVariant *chargeLevel = NULL;
+QVariant *isCharging = NULL;
+QVariant *isDischarging = NULL;
+ContextGroup *lastContextGroup = NULL;
+
+void clearVariants()
+{
+    delete chargeLevel; chargeLevel = NULL;
+    delete isCharging; isCharging = NULL;
+    delete isDischarging; isDischarging = NULL;
+}
+
 /* Mocked Context */
 
 QHash<QString, QVariant> values;
@@ -59,7 +71,14 @@ HalDeviceInterface::HalDeviceInterface(const QDBusConnection connection, const Q
 
 QVariant HalDeviceInterface::readValue(const QString &prop)
 {
-    return QVariant();
+    if (prop == "battery.charge_level.percentage" && chargeLevel != NULL)
+        return QVariant(*chargeLevel);
+    else if (prop == "battery.rechargeable.is_discharging" && isDischarging != NULL)
+        return QVariant(*isDischarging);
+    else if (prop == "battery.rechargeable.is_charging" && isCharging != NULL)
+        return QVariant(*isCharging);
+    else
+        return QVariant();
 }
 
 /* Mocked HalManagerInterface */
@@ -70,13 +89,22 @@ HalManagerInterface::HalManagerInterface(const QDBusConnection connection, const
 
 QStringList HalManagerInterface::findDeviceByCapability(const QString &capability)
 {
-    return QStringList();
+    QString b("battery1");
+    QStringList lst;
+    lst.append(b);
+    return lst;
 }
 
 /* Mocked ContextGroup */
 
 ContextGroup::ContextGroup(QStringList propertiesToWatch, QObject* parent)
 {
+    lastContextGroup = this;
+}
+
+void ContextGroup::fakeFirst()
+{
+    emit firstSubscriberAppeared();
 }
 
 class HalProviderUnitTest : public QObject
@@ -88,6 +116,7 @@ private slots:
     void cleanup();
     void keys();
     void initialValues();
+    void checkBasic();
 
 private:
     HalProvider *provider;
@@ -98,6 +127,7 @@ void HalProviderUnitTest::init()
 {
     provider = new HalProvider();
     provider->initialize();
+    clearVariants();
 }
 
 // After each test
@@ -119,6 +149,18 @@ void HalProviderUnitTest::initialValues()
     QCOMPARE(Context("Battery.OnBattery").get(), QVariant());
     QCOMPARE(Context("Battery.LowBattery").get(), QVariant());
     QCOMPARE(Context("Battery.ChargePercentage").get(), QVariant());
+}
+
+void HalProviderUnitTest::checkBasic()
+{
+    isCharging = new QVariant(true);
+    isDischarging = new QVariant(false);
+    chargeLevel = new QVariant(99);
+    lastContextGroup->fakeFirst();
+
+    QVERIFY(Context("Battery.OnBattery").get() != QVariant());
+    QVERIFY(Context("Battery.LowBattery").get() != QVariant());
+    QVERIFY(Context("Battery.ChargePercentage").get() != QVariant());
 }
 
 #include "halproviderunittest.moc"
