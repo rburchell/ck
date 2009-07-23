@@ -110,6 +110,10 @@ AC_CONFIG_FILES([
         libcontextsubscriber/multithreading-tests/wait-for-subscription-only-in-thread/Makefile
         libcontextsubscriber/multithreading-tests/wait-for-subscription-thread/Makefile
         libcontextsubscriber/update-contextkit-providers/Makefile
+	contextd/Makefile
+	contextd/src/Makefile
+	contextd/unit-tests/Makefile
+	contextd/unit-tests/halprovider/Makefile
         python/Makefile
         spec/Makefile
         tools/Makefile
