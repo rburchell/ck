@@ -41,3 +41,5 @@ lcov.info
 INSTALL
 build-stamp
 flexi-properties.xml
+mocs.cpp
+moc_*
