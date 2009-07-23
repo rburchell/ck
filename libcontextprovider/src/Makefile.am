@@ -21,10 +21,11 @@ libcontextprovider_la_SOURCES = logging.h               \
                                 contextc.h              \
                                 contextc.cpp            \
                                 listeners.h             \
-                                listeners.cpp
+                                listeners.cpp		\
+				context_provider.h
 
 includecontextproviderdir=$(includedir)/contextprovider
-includecontextprovider_HEADERS = context.h contextc.h contextgroup.h
+includecontextprovider_HEADERS = context.h contextc.h contextgroup.h context_provider.h
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS) \
               '-DCONTEXT_LOG_MODULE_NAME="libcontextprovider"'
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS)
