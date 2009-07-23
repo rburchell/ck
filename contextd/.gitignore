@@ -1,7 +1,0 @@
-main.[ch]
-plugin.[ch]
-hal_plugin.[ch]
-lowmem_plugin.[ch]
-contextd.vala.stamp
-org.freedesktop.ContextKit.contextd.service
-contextd
