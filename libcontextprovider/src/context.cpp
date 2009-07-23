@@ -119,43 +119,7 @@ void Context::unset()
     manager->setKeyValue(key, QVariant());
 }
 
-/// Sets the key value to boolean \a v.
-void Context::set(bool v)
-{
-    if (! keyCheck())
-        return;
-        
-    manager->setKeyValue(key, QVariant(v));
-}
-
-/// Sets the key value to integer \a v.
-void Context::set(int v)
-{
-    if (! keyCheck())
-        return;
-        
-    manager->setKeyValue(key, QVariant(v));
-}
-
-/// Sets the key value to double \a v.
-void Context::set(double v)
-{
-    if (! keyCheck())
-        return;
-        
-    manager->setKeyValue(key, QVariant(v));
-}
-
-/// Sets the key value to QString \a v.
-void Context::set(const QString &v)
-{
-    if (! keyCheck())
-        return;
-        
-    manager->setKeyValue(key, QVariant(v));
    
-}
-    
 /// Sets the key value to QVariant \a v.
 void Context::set(const QVariant &v)
 {

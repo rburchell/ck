@@ -44,10 +44,6 @@ public:
     bool isValid() const;
     bool isSet() const;
     
-    void set(bool v);
-    void set(int v);
-    void set(double v);
-    void set(const QString &v);
     void set(const QVariant &v);
     void unset();
     
