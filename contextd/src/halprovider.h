@@ -26,7 +26,7 @@
 #include <QStringList>
 #include <QObject>
 #include "provider.h"
-#include "signalgrouper.h"
+#include "contextgroup.h"
 #include "haldeviceinterface.h"
 
 struct BatteryInfo;
@@ -42,7 +42,7 @@ public:
 private:
     void updateProperties();
     
-    SignalGrouper *group;
+    ContextGroup *group;
     HalDeviceInterface *batteryDevice;
 
 private slots:

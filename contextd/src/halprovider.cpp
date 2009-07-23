@@ -41,7 +41,7 @@ QStringList HalProvider::keys()
 void HalProvider::initialize()
 {
     contextDebug() << F_HAL << "Initializing hal provider";
-    group = new SignalGrouper(keys(), this);
+    group = new ContextGroup(keys(), this);
 
     sconnect(group, SIGNAL(firstSubscriberAppeared()),
             this, SLOT(onFirstSubscriberAppeared()));
