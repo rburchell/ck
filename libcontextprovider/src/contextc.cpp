@@ -33,6 +33,8 @@ QString *serviceBusName = NULL;
 QDBusConnection::BusType serviceBusType;
 QList<Listener*> *listeners = NULL;
 
+/// Stops and restarts the service with proper key. Not part of the
+/// public API.
 static int reinitialize_service()
 {
     if (serviceKeyList->length() > 0) 
@@ -41,6 +43,9 @@ static int reinitialize_service()
     return Context::initService(serviceBusType, *serviceBusName, *serviceKeyList);
 }
 
+/// Initializes and starts the service with a given \a bus_type and a \a bus_name.
+/// Te \a bus_type can be DBUS_BUS_SESSION or DBUS_BUS_SYSTEM. This function can be 
+/// called only once till a matching context_provider_stop is called. 
 int context_provider_init (DBusBusType bus_type, const char* bus_name)
 {
     if (serviceBusName != NULL) {
@@ -58,6 +63,8 @@ int context_provider_init (DBusBusType bus_type, const char* bus_name)
     return reinitialize_service();
 }
 
+/// Stops the currently started service with context_provider_init. After calling
+/// this function a new service can be started by calling context_provider_init. 
 void context_provider_stop (void)
 {
     contextDebug() << "Stopping service";
@@ -77,6 +84,10 @@ void context_provider_stop (void)
     delete listeners; listeners = NULL;
 }
 
+/// Installs (adds) a \a key to be provided by the service. The callback function \a 
+/// subscription_changed_cb will be called with the passed user data \a subscription_changed_cb_target
+/// when the status of the subscription changes -- when the first subscriber appears or the
+/// last subscriber disappears.
 void context_provider_install_key (const char* key, 
                                    int clear_values_on_subscribe, 
                                    ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
@@ -98,6 +109,10 @@ void context_provider_install_key (const char* key,
     listeners->append(new ContextListener(key, subscription_changed_cb, subscription_changed_cb_target));
 }
 
+/// Installs (adds) a \a key_group to be provided by the service. The \a key_group is a NULL-terminated 
+/// array containing the keys. The callback function \a subscription_changed_cb will be called with the 
+/// passed user data \a subscription_changed_cb_target when the status of the subscription changes -- 
+/// when the first subscriber appears or the last subscriber disappears.
 void context_provider_install_group (const char** key_group, 
                                      int clear_values_on_subscribe, 
                                      ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
@@ -127,32 +142,32 @@ void context_provider_install_group (const char** key_group,
     listeners->append(new ContextGroupListener(keys, subscription_changed_cb, subscription_changed_cb_target));
 }
 
-void 
-context_provider_set_integer (const char* key, int value)
+/// Sets the \a key to a specified integer \a value.
+void context_provider_set_integer (const char* key, int value)
 {
     Context(key).set(value);
 }
 
-void 
-context_provider_set_double (const char* key, double value)
+/// Sets the \a key to a specified double \a value.
+void context_provider_set_double (const char* key, double value)
 {
     Context(key).set(value);
 }
 
-void 
-context_provider_set_boolean (const char* key, int value)
+/// Sets the \a key to a specified boolean \a value.
+void context_provider_set_boolean (const char* key, int value)
 {
     Context(key).set(value);
 }
 
-void 
-context_provider_set_string (const char* key, const char* value)
+/// Sets the \a key to a specified string \a value.
+void context_provider_set_string (const char* key, const char* value)
 {
     Context(key).set(value);
 }
 
-void 
-context_provider_set_null (const char* key)
+/// Sets the \a key to NULL. In other words - unsets the key.
+void context_provider_set_null (const char* key)
 {
     Context(key).unset();
 }
