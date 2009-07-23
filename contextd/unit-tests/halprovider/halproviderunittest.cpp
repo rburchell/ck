@@ -117,6 +117,7 @@ private slots:
     void keys();
     void initialValues();
     void checkBasic();
+    void verifyOnBattery();
 
 private:
     HalProvider *provider;
@@ -161,6 +162,34 @@ void HalProviderUnitTest::checkBasic()
     QVERIFY(Context("Battery.OnBattery").get() != QVariant());
     QVERIFY(Context("Battery.LowBattery").get() != QVariant());
     QVERIFY(Context("Battery.ChargePercentage").get() != QVariant());
+}
+
+void HalProviderUnitTest::verifyOnBattery()
+{
+    // Power on, full charge
+    isCharging = new QVariant(true);
+    isDischarging = new QVariant(false);
+    chargeLevel = new QVariant(100);
+    lastContextGroup->fakeFirst();
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(true));
+
+    // Power on, half charge
+    isCharging = new QVariant(true);
+    isDischarging = new QVariant(false);
+    chargeLevel = new QVariant(50);
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(true));
+
+    // Power off, half charge
+    isCharging = new QVariant(false);
+    isDischarging = new QVariant(true);
+    chargeLevel = new QVariant(50);
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(false));
+
+    // Power off, full charge
+    isCharging = new QVariant(false);
+    isDischarging = new QVariant(true);
+    chargeLevel = new QVariant(100);
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(false));
 }
 
 #include "halproviderunittest.moc"
