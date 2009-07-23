@@ -50,6 +50,11 @@ using namespace ContextProvider;
     and creates a Manager object on it. The clients obtain Subscriber objects through this
     Manager. 
 
+    The Context objects are proxy interfaces to actual keys. It's recommended that you create
+    Context objects to represent keys and keep them around in your class/object. Remember that
+    once the Context object is destroyed, it will not fire the proper signals about
+    subscription status changing. 
+
     For each service there is one Manager object.
 */
 
