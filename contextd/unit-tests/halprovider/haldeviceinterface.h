@@ -34,6 +34,7 @@ class HalDeviceInterface : public QObject
 
 public:
     HalDeviceInterface(const QDBusConnection connection, const QString &busName, const QString objectPath, QObject *parent = 0);
+    void fakeModified();
 
 signals:
     void PropertyModified();

@@ -29,6 +29,7 @@ QVariant *chargeLevel = NULL;
 QVariant *isCharging = NULL;
 QVariant *isDischarging = NULL;
 ContextGroup *lastContextGroup = NULL;
+HalDeviceInterface *lastDeviceInterface = NULL;
 
 void clearVariants()
 {
@@ -67,6 +68,7 @@ QVariant Context::get()
 
 HalDeviceInterface::HalDeviceInterface(const QDBusConnection connection, const QString &busName, const QString objectPath, QObject *parent)
 {
+    lastDeviceInterface = this;
 }
 
 QVariant HalDeviceInterface::readValue(const QString &prop)
@@ -79,6 +81,11 @@ QVariant HalDeviceInterface::readValue(const QString &prop)
         return QVariant(*isCharging);
     else
         return QVariant();
+}
+
+void HalDeviceInterface::fakeModified()
+{
+    emit PropertyModified();
 }
 
 /* Mocked HalManagerInterface */
@@ -171,25 +178,28 @@ void HalProviderUnitTest::verifyOnBattery()
     isDischarging = new QVariant(false);
     chargeLevel = new QVariant(100);
     lastContextGroup->fakeFirst();
-    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(true));
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(false));
 
     // Power on, half charge
     isCharging = new QVariant(true);
     isDischarging = new QVariant(false);
     chargeLevel = new QVariant(50);
-    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(true));
+    lastDeviceInterface->fakeModified();
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(false));
 
     // Power off, half charge
     isCharging = new QVariant(false);
     isDischarging = new QVariant(true);
     chargeLevel = new QVariant(50);
-    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(false));
+    lastDeviceInterface->fakeModified();
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(true));
 
     // Power off, full charge
     isCharging = new QVariant(false);
     isDischarging = new QVariant(true);
     chargeLevel = new QVariant(100);
-    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(false));
+    lastDeviceInterface->fakeModified();
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(true));
 }
 
 #include "halproviderunittest.moc"
