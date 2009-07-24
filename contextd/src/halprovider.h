@@ -46,6 +46,7 @@ private:
     Context *onBattery;
     Context *lowBattery;
     Context *chargePercentage;
+    Context *timeUntilLow;
     HalDeviceInterface *batteryDevice;
 
 

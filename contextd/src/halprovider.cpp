@@ -35,6 +35,7 @@ QStringList HalProvider::keys()
     list << "Battery.OnBattery";
     list << "Battery.ChargePercentage";
     list << "Battery.LowBattery";
+    list << "Battery.TimeUntilLow";
     return list;
 }
 
@@ -45,6 +46,7 @@ void HalProvider::initialize()
     onBattery = new Context("Battery.OnBattery", this);
     lowBattery = new Context("Battery.LowBattery", this);
     chargePercentage = new Context("Battery.ChargePercentage", this);
+    timeUntilLow = new Context("Battery.TimeUntilLow", this);
 
     sconnect(group, SIGNAL(firstSubscriberAppeared()),
             this, SLOT(onFirstSubscriberAppeared()));
@@ -90,10 +92,15 @@ void HalProvider::onDevicePropertyModified()
 
 void HalProvider::updateProperties()
 {
+    contextDebug() << F_HAL << "Updating properties";
+
     QVariant chargePercentageV = batteryDevice->readValue("battery.charge_level.percentage");
+    QVariant chargeCurrentV = batteryDevice->readValue("battery.charge_level.current");
     QVariant isDischargingV = batteryDevice->readValue("battery.rechargeable.is_discharging");
     QVariant isChargingV = batteryDevice->readValue("battery.rechargeable.is_charging");
-
+    QVariant lastFullV = batteryDevice->readValue("battery.charge_level.last_full");
+    QVariant rateV = batteryDevice->readValue("battery.charge_level.rate");
+   
     // Calculate and set ChargePercentage
     if (chargePercentageV != QVariant()) 
         chargePercentage->set(chargePercentageV.toInt());
@@ -118,5 +125,22 @@ void HalProvider::updateProperties()
     else {
         lowBattery->set(false);
     }
+
+    // Calculate the time until low. 
+    if (chargeCurrentV != QVariant() && 
+        isDischargingV != QVariant() && isDischargingV.toBool() == true &&
+        lastFullV != QVariant() && lastFullV.toInt() != 0 &&
+        rateV != QVariant() && rateV.toInt() != 0) {
+
+        double timeUntilLowV = (chargeCurrentV.toDouble() - LOW_BATTERY_THRESHOLD / 100.0 * lastFullV.toDouble()) / 
+                               rateV.toDouble();
+        if (timeUntilLowV < 0)
+            timeUntilLowV = 0;
+
+        timeUntilLowV *= 3600; // Seconds
+        timeUntilLow->set((int) timeUntilLowV);
+    } else
+        timeUntilLow->unset();
+
 }
 
