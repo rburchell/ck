@@ -151,7 +151,7 @@ void context_provider_install_key (const char* key,
     serviceKeyList->append(key);
     reinitialize_service();
 
-    listeners->append(new ContextListener(key, subscription_changed_cb, subscription_changed_cb_target));
+    listeners->append(new ContextListener(key, clear_values_on_subscribe, subscription_changed_cb, subscription_changed_cb_target));
 }
 
 /// Installs (adds) a \a key_group to be provided by the service. The \a key_group is a NULL-terminated 
@@ -184,7 +184,7 @@ void context_provider_install_group (const char** key_group,
     }
 
     reinitialize_service();
-    listeners->append(new ContextGroupListener(keys, subscription_changed_cb, subscription_changed_cb_target));
+    listeners->append(new ContextGroupListener(keys, clear_values_on_subscribe, subscription_changed_cb, subscription_changed_cb_target));
 }
 
 /// Sets the \a key to a specified integer \a value.

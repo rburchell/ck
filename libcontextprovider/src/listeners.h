@@ -38,15 +38,19 @@ class Listener : public QObject
     Q_OBJECT
 
 public:
-    Listener(ContextProviderSubscriptionChangedCallback cb, void *dt);
+    Listener(bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
 
 private slots:
     void onFirstSubscriberAppeared();
     void onLastSubscriberDisappeared();
 
+protected:
+    virtual void clear() = 0;
+
 private:
     ContextProviderSubscriptionChangedCallback callback;
     void *user_data;
+    bool clearsOnSubscribe;
 };
 
 class ContextListener : public Listener
@@ -54,7 +58,10 @@ class ContextListener : public Listener
     Q_OBJECT
 
 public:
-    ContextListener(const QString &k, ContextProviderSubscriptionChangedCallback cb, void *dt);
+    ContextListener(const QString &k, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
+
+protected:
+    virtual void clear();
 
 private:
     Context key;
@@ -65,10 +72,14 @@ class ContextGroupListener : public Listener
     Q_OBJECT
 
 public:
-    ContextGroupListener(const QStringList &keys, ContextProviderSubscriptionChangedCallback cb, void *dt);
+    ContextGroupListener(const QStringList &keys, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
+
+protected:
+    virtual void clear();
 
 private:
     ContextGroup group;
+    QStringList keyList;
 };
 
 #endif
