@@ -169,7 +169,7 @@ private slots:
     void setBoolean();
     void setString();
     void setDouble();
-        
+    void clearKeyOnSubscribe();
 };
 
 void MagicCallback(int subscribed, void *user_data)
@@ -266,6 +266,14 @@ void ContextCUnitTest::setDouble()
     context_provider_install_key("Battery.OnBattery", 0, MagicCallback, this);
     context_provider_set_double("Battery.OnBattery", 1.23);
     QCOMPARE(*lastVariantSet, QVariant(1.23));
+}
+
+void ContextCUnitTest::clearKeyOnSubscribe()
+{
+    context_provider_install_key("Battery.OnBattery", 1, MagicCallback, this);
+    context_provider_set_integer("Battery.OnBattery", 666);
+    emitFirstOn("Battery.OnBattery");
+    QVERIFY(lastVariantSet == NULL);
 }
 
 #include "contextcunittest.moc"
