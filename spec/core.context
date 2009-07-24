@@ -449,7 +449,7 @@ The symbolic names of the currently active Situations.  Note that more
 than one situation might be active at the same time.
     </doc>
     </key>
-  <key name="Mode">
+  <key name="Use.Mode">
     <doc>
 The current main usage mode of the device.
     </doc>
