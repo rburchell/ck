@@ -169,7 +169,8 @@ private slots:
     void setBoolean();
     void setString();
     void setDouble();
-        
+    void clearKeyOnSubscribeKey();
+    void clearKeyOnSubscribeGroup();
 };
 
 void MagicCallback(int subscribed, void *user_data)
@@ -266,6 +267,29 @@ void ContextCUnitTest::setDouble()
     context_provider_install_key("Battery.OnBattery", 0, MagicCallback, this);
     context_provider_set_double("Battery.OnBattery", 1.23);
     QCOMPARE(*lastVariantSet, QVariant(1.23));
+}
+
+void ContextCUnitTest::clearKeyOnSubscribeKey()
+{
+    context_provider_install_key("Battery.OnBattery", 1, MagicCallback, this);
+    context_provider_set_integer("Battery.OnBattery", 666);
+    emitFirstOn("Battery.OnBattery");
+    QVERIFY(lastVariantSet == NULL);
+}
+
+void ContextCUnitTest::clearKeyOnSubscribeGroup()
+{
+    const char *keys[3];
+    keys[0] = "Location.Lat";
+    keys[1] = "Location.Lon";
+    keys[2] = NULL;
+
+    context_provider_install_group(keys, 1, MagicCallback, this);
+
+    context_provider_set_integer("Location.Lat", 123);
+    context_provider_set_integer("Location.Lat", 456);
+    emitFirstOn("Location.Lat");
+    QVERIFY(lastVariantSet == NULL);
 }
 
 #include "contextcunittest.moc"

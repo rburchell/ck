@@ -22,13 +22,16 @@
 #include "listeners.h"
 #include "sconnect.h"
 
-Listener::Listener(ContextProviderSubscriptionChangedCallback cb, void *dt) :
-        callback(cb), user_data(dt)
+Listener::Listener(bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt) :
+        callback(cb), user_data(dt), clearsOnSubscribe(clears)
 {
 }
 
 void Listener::onFirstSubscriberAppeared()
 {
+    if (clearsOnSubscribe)
+        clear();
+
     if (callback)
         callback(1, user_data);
 }
@@ -39,17 +42,30 @@ void Listener::onLastSubscriberDisappeared()
         callback(0, user_data);
 }
 
-ContextListener::ContextListener(const QString &k, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
-        Listener(cb, dt), key(k)
+ContextListener::ContextListener(const QString &k, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
+        Listener(clears, cb, dt), key(k)
 {
     sconnect(&key, SIGNAL(firstSubscriberAppeared(QString)), this, SLOT(onFirstSubscriberAppeared()));
     sconnect(&key, SIGNAL(lastSubscriberDisappeared(QString)), this, SLOT(onLastSubscriberDisappeared()));
 }
 
-ContextGroupListener::ContextGroupListener(const QStringList &keys, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
-        Listener(cb, dt), group(keys)
+void ContextListener::clear()
+{
+    key.unset();
+}
+
+ContextGroupListener::ContextGroupListener(const QStringList &keys, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt) : 
+        Listener(clears, cb, dt), group(keys), keyList(keys)
 {
     sconnect(&group, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared()));
     sconnect(&group, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared()));
+}
+
+void ContextGroupListener::clear()
+{
+    foreach(QString k, keyList)
+    {
+        Context(k).unset();
+    }
 }
 
