@@ -48,6 +48,7 @@ public:
     virtual QString providerDBusTypeForKey(QString key) const;
 
     static QString registryPath();
+    static QString coreDeclPath();
 
 private slots:
     void onDirectoryChanged(const QString &path);
@@ -59,7 +60,7 @@ private:
     int countOfFilesInLastParse; //< The number of xml files we parsed in last registry update.
 
     void regenerateKeyDataList();
-    void readKeyDataFromXml(const QFileInfo &f);
+    void readKeyDataFromXml(const QString &path);
 };
 
 #endif // INFOXMLBACKEND_H
