@@ -114,6 +114,11 @@ void ContextGroup::fakeFirst()
     emit firstSubscriberAppeared();
 }
 
+void ContextGroup::fakeLast()
+{
+    emit lastSubscriberDisappeared();
+}
+
 class HalProviderUnitTest : public QObject
 {
     Q_OBJECT
@@ -125,6 +130,7 @@ private slots:
     void initialValues();
     void checkBasic();
     void verifyProperties();
+    void firstLastFirst();
 
 private:
     HalProvider *provider;
@@ -216,6 +222,31 @@ void HalProviderUnitTest::verifyProperties()
     lastDeviceInterface->fakeModified();
     QCOMPARE(Context("Battery.OnBattery").get(), QVariant(true));
     QCOMPARE(Context("Battery.ChargePercentage").get(), QVariant(1));
+    QCOMPARE(Context("Battery.LowBattery").get(), QVariant(true));
+
+    lastContextGroup->fakeLast();
+}
+
+void HalProviderUnitTest::firstLastFirst()
+{
+    isCharging = new QVariant(true);
+    isDischarging = new QVariant(false);
+    chargeLevel = new QVariant(100);
+    lastContextGroup->fakeFirst();
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(false));
+    QCOMPARE(Context("Battery.ChargePercentage").get(), QVariant(100));
+    QCOMPARE(Context("Battery.LowBattery").get(), QVariant(false));
+
+    lastContextGroup->fakeLast();
+
+    isCharging = new QVariant(false);
+    isDischarging = new QVariant(true);
+    chargeLevel = new QVariant(4);
+    
+    lastContextGroup->fakeFirst();
+    
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant(true));
+    QCOMPARE(Context("Battery.ChargePercentage").get(), QVariant(4));
     QCOMPARE(Context("Battery.LowBattery").get(), QVariant(true));
 }
 
