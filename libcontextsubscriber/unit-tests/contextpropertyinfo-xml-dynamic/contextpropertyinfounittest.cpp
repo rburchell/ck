@@ -66,6 +66,7 @@ void ContextPropertyInfoUnitTest::initTestCase()
     qInstallMsgHandler(myMessageOutput);
 
     utilSetEnv("CONTEXT_PROVIDERS", "./");
+    utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     ContextRegistryInfo::instance("xml");
 }
 

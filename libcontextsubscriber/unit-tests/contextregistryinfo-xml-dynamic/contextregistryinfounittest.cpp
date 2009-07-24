@@ -68,6 +68,7 @@ void ContextRegistryInfoUnitTest::initTestCase()
     qInstallMsgHandler(myMessageOutput);
 
     utilSetEnv("CONTEXT_PROVIDERS", "./");
+    utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
 
     // Setup state
     utilCopyLocalWithRemove("providers1v1.xml.src", "providers.context");

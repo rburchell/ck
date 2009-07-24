@@ -62,7 +62,7 @@ private slots:
     void checkNewTypeInt32();
     void checkNewTypeString();
     void checkNewTypeDouble();
-    void checkNewTypeMulti();
+    void checkNewTypeComplex();
 };
 
 void ContextPropertyInfoUnitTest::initTestCase()
@@ -70,6 +70,7 @@ void ContextPropertyInfoUnitTest::initTestCase()
     qInstallMsgHandler(myMessageOutput);
 
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
+    utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     ContextRegistryInfo::instance();
 }
 
@@ -127,10 +128,10 @@ void ContextPropertyInfoUnitTest::checkNewTypeDouble()
     QCOMPARE(prop.type(), QString("DOUBLE"));
 }
 
-void ContextPropertyInfoUnitTest::checkNewTypeMulti()
+void ContextPropertyInfoUnitTest::checkNewTypeComplex()
 {
-    ContextPropertyInfo prop("Key.With.Multi");
-    QCOMPARE(prop.type(), QString("SECOND"));
+    ContextPropertyInfo prop("Key.With.complex");
+    QCOMPARE(prop.type(), QString(""));
 }
 
 #include "contextpropertyinfounittest.moc"

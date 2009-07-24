@@ -12,7 +12,7 @@
   <key name="Key.With.int32" type="int32"/>
   <key name="Key.With.string" type="string"/>
   <key name="Key.With.double" type="double"/>
-  <key name="Key.With.Multi">
-    <type>FIRST<a/>SECOND</type>
+  <key name="Key.With.complex">
+    <type><sub>SUB</sub></type>
   </key>
 </provider>
