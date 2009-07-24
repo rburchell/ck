@@ -36,6 +36,7 @@ QStringList HalProvider::keys()
     list << "Battery.ChargePercentage";
     list << "Battery.LowBattery";
     list << "Battery.TimeUntilLow";
+    list << "Battery.TimeUntilFull";
     return list;
 }
 
@@ -47,6 +48,7 @@ void HalProvider::initialize()
     lowBattery = new Context("Battery.LowBattery", this);
     chargePercentage = new Context("Battery.ChargePercentage", this);
     timeUntilLow = new Context("Battery.TimeUntilLow", this);
+    timeUntilFull = new Context("Battery.TimeUntilFull", this);
 
     sconnect(group, SIGNAL(firstSubscriberAppeared()),
             this, SLOT(onFirstSubscriberAppeared()));
@@ -142,5 +144,16 @@ void HalProvider::updateProperties()
     } else
         timeUntilLow->unset();
 
+    // Calculate the time until full.
+    if (chargeCurrentV != QVariant() &&
+        isChargingV != QVariant() && isChargingV.toBool() == true &&
+        lastFullV != QVariant() && lastFullV.toInt() != 0 &&
+        rateV != QVariant() && rateV.toInt() != 0) {
+
+        double timeUntilFullV = (lastFullV.toDouble() - chargeCurrentV.toDouble()) / rateV.toDouble();
+        timeUntilFullV *= 3600; // Seconds
+        timeUntilFull->set((int) timeUntilFullV);
+    } else
+        timeUntilFull->unset();
 }
 
