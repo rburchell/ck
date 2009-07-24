@@ -66,7 +66,6 @@ AC_CONFIG_FILES([
         doc/Makefile
         doc/reference/Makefile
         doc/reference/libcontextprovider/Makefile
-        fake-provider/Makefile
         libcontextprovider/Makefile
         libcontextsubscriber/Makefile
         libcontextsubscriber/cli/Makefile
