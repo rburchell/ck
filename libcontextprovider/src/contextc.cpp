@@ -132,7 +132,8 @@ void context_provider_stop (void)
 /// Installs (adds) a \a key to be provided by the service. The callback function \a 
 /// subscription_changed_cb will be called with the passed user data \a subscription_changed_cb_target
 /// when the status of the subscription changes -- when the first subscriber appears or the
-/// last subscriber disappears.
+/// last subscriber disappears. The \a clear_values_on_subscribe when enabled will automatically 
+/// clear (set to null/undetermined) the group keys on first subscribe.
 void context_provider_install_key (const char* key, 
                                    int clear_values_on_subscribe, 
                                    ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
@@ -157,7 +158,8 @@ void context_provider_install_key (const char* key,
 /// Installs (adds) a \a key_group to be provided by the service. The \a key_group is a NULL-terminated 
 /// array containing the keys. The callback function \a subscription_changed_cb will be called with the 
 /// passed user data \a subscription_changed_cb_target when the status of the subscription changes -- 
-/// when the first subscriber appears or the last subscriber disappears.
+/// when the first subscriber appears or the last subscriber disappears. The \a clear_values_on_subscribe 
+/// when enabled will automatically clear (set to null/undetermined) the group keys on first subscribe.
 void context_provider_install_group (const char** key_group, 
                                      int clear_values_on_subscribe, 
                                      ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
