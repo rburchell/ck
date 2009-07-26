@@ -5,3 +5,4 @@ lowmem_plugin.[ch]
 contextd.vala.stamp
 org.freedesktop.ContextKit.contextd.service
 contextd
+coverage
