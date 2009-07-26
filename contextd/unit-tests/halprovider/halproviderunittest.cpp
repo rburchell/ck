@@ -137,6 +137,7 @@ private slots:
     void verifyProperties();
     void firstLastFirst();
     void noBattery();
+    void noHalInfo();
 
 private:
     HalProvider *provider;
@@ -267,6 +268,17 @@ void HalProviderUnitTest::noBattery()
 
     lastContextGroup->fakeFirst();
 
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant());
+    QCOMPARE(Context("Battery.LowBattery").get(), QVariant());
+    QCOMPARE(Context("Battery.ChargePercentage").get(), QVariant());
+}
+
+void HalProviderUnitTest::noHalInfo()
+{
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant());
+    QCOMPARE(Context("Battery.LowBattery").get(), QVariant());
+    QCOMPARE(Context("Battery.ChargePercentage").get(), QVariant());
+    lastContextGroup->fakeFirst();
     QCOMPARE(Context("Battery.OnBattery").get(), QVariant());
     QCOMPARE(Context("Battery.LowBattery").get(), QVariant());
     QCOMPARE(Context("Battery.ChargePercentage").get(), QVariant());
