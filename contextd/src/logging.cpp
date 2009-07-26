@@ -389,7 +389,7 @@ void ContextRealLogger::appendFeatures()
     for (i = 0; i < features.length(); i++) {
         QTextStream::operator<<(QString("#" + features.at(i)));
         if (i < features.length() - 1)
-            QTextStream::operator<<(",");
+            QTextStream::operator<<(", ");
     }
     
     QTextStream::operator<<(']');
