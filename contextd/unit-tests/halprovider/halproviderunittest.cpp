@@ -30,17 +30,19 @@ QVariant *isCharging = NULL;
 QVariant *isDischarging = NULL;
 ContextGroup *lastContextGroup = NULL;
 HalDeviceInterface *lastDeviceInterface = NULL;
+bool hasBattery = true;
 
-void clearVariants()
+QHash<QString, QVariant> values;
+
+void clearVariantsAndValues()
 {
     delete chargeLevel; chargeLevel = NULL;
     delete isCharging; isCharging = NULL;
     delete isDischarging; isDischarging = NULL;
+    values.clear();
 }
 
 /* Mocked Context */
-
-QHash<QString, QVariant> values;
 
 Context::Context(const QString &k, QObject *parent) : key(k)
 {
@@ -96,10 +98,13 @@ HalManagerInterface::HalManagerInterface(const QDBusConnection connection, const
 
 QStringList HalManagerInterface::findDeviceByCapability(const QString &capability)
 {
-    QString b("battery1");
-    QStringList lst;
-    lst.append(b);
-    return lst;
+    if (hasBattery) {
+        QString b("battery1");
+        QStringList lst;
+        lst.append(b);
+        return lst;
+    } else
+        return QStringList();
 }
 
 /* Mocked ContextGroup */
@@ -131,6 +136,7 @@ private slots:
     void checkBasic();
     void verifyProperties();
     void firstLastFirst();
+    void noBattery();
 
 private:
     HalProvider *provider;
@@ -141,7 +147,8 @@ void HalProviderUnitTest::init()
 {
     provider = new HalProvider();
     provider->initialize();
-    clearVariants();
+    clearVariantsAndValues();
+    hasBattery = true;
 }
 
 // After each test
@@ -248,6 +255,21 @@ void HalProviderUnitTest::firstLastFirst()
     QCOMPARE(Context("Battery.OnBattery").get(), QVariant(true));
     QCOMPARE(Context("Battery.ChargePercentage").get(), QVariant(4));
     QCOMPARE(Context("Battery.LowBattery").get(), QVariant(true));
+}
+
+void HalProviderUnitTest::noBattery()
+{
+    hasBattery = false;
+
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant());
+    QCOMPARE(Context("Battery.LowBattery").get(), QVariant());
+    QCOMPARE(Context("Battery.ChargePercentage").get(), QVariant());
+
+    lastContextGroup->fakeFirst();
+
+    QCOMPARE(Context("Battery.OnBattery").get(), QVariant());
+    QCOMPARE(Context("Battery.LowBattery").get(), QVariant());
+    QCOMPARE(Context("Battery.ChargePercentage").get(), QVariant());
 }
 
 #include "halproviderunittest.moc"
