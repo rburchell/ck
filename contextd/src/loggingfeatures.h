@@ -22,6 +22,7 @@
 #ifndef FEATURES_H
 #define FEATURES_H
 
-#define F_HAL           (ContextFeature("hal"))
+#define F_HAL       (ContextFeature("hal"))
+#define F_LOWMEM    (ContextFeature("lowmem"))
 
 #endif

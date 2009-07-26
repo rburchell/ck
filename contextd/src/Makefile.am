@@ -11,7 +11,9 @@ contextd_SOURCES = contextd.cpp		        \
 		   halmanagerinterface.cpp      \
 		   haldeviceinterface.cpp	\
 		   haldeviceinterface.h         \
-		   sconnect.h
+		   sconnect.h			\
+		   lowmemprovider.cpp		\
+		   lowmemprovider.h
 
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(HAL_CFLAGS)
 LIBS += $(QtCore_LIBS) $(HAL_LIBS)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Nokia Corporation.
+ * Copyright (C) 2008 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,33 +19,20 @@
  *
  */
 
-#include <QCoreApplication>
-#include "halprovider.h"
 #include "lowmemprovider.h"
-#include "context.h"
+#include "logging.h"
+#include "loggingfeatures.h"
+#include "sconnect.h"
 
-int main(int argc, char **argv)
+QStringList LowMemProvider::keys()
 {
-    QCoreApplication app(argc, argv);
+    QStringList list;
+    list << "System.MemoryPressure";
+    return list;
+}
 
-    QList<Provider*> providerList;
-    providerList << new HalProvider();
-    providerList << new LowMemProvider();
-    QStringList keys;
-
-    // First collect all keys
-    foreach (Provider *provider, providerList) {
-        keys << provider->keys();
-    }
-
-    // Now init service
-    Context::initService(QDBusConnection::SessionBus, QString("org.freedesktop.ContextKit.contextd"), keys);
-
-    // Now init all providers
-    foreach (Provider *provider, providerList) {
-        provider->initialize();
-    }
-    
-    return app.exec();
+void LowMemProvider::initialize()
+{
+    contextDebug() << F_LOWMEM << "Initializing lowmem plugin";
 }
 
