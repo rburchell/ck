@@ -84,7 +84,6 @@ void HalProvider::onFirstSubscriberAppeared()
     }
 }
 
-
 void HalProvider::onLastSubscriberDisappeared()
 {
     contextDebug() << F_HAL << "Last subscriber gone, destroying HAL connections";

@@ -29,8 +29,6 @@
 #include "contextgroup.h"
 #include "haldeviceinterface.h"
 
-struct BatteryInfo;
-
 class HalProvider : public Provider
 {
     Q_OBJECT
@@ -49,7 +47,6 @@ private:
     Context *timeUntilLow;
     Context *timeUntilFull;
     HalDeviceInterface *batteryDevice;
-
 
 private slots:
     void onFirstSubscriberAppeared();
