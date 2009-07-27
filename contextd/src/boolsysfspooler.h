@@ -19,21 +19,34 @@
  *
  */
 
-#include "lowmemprovider.h"
-#include "logging.h"
-#include "loggingfeatures.h"
-#include "sconnect.h"
-#include "boolsysfspooler.h"
+#ifndef BOOLSYSFSPOOLER_H
+#define BOOLSYSFSPOOLER_H
 
-QStringList LowMemProvider::keys()
+#include <QVariant>
+#include <QStringList>
+#include <QObject>
+#include <QFile>
+#include <QFileSystemWatcher>
+
+class BoolSysFsPooler : public QObject
 {
-    QStringList list;
-    list << "System.MemoryPressure";
-    return list;
-}
+    Q_OBJECT
+    
+    enum TriState { TriStateTrue, TriStateFalse, TriStateUnknown};
 
-void LowMemProvider::initialize()
-{
-    contextDebug() << F_LOWMEM << "Initializing lowmem plugin";
-}
+public:
+    BoolSysFsPooler(const QString &fname);
+    TriState getState();
 
+private:
+    QFile input;
+    QFileSystemWatcher watcher;
+    TriState state;
+
+    void readState();
+
+private slots:
+    void onFileChanged();
+};
+
+#endif // BOOLSYSFSPOOLER_H
