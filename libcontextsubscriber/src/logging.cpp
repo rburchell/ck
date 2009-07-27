@@ -387,9 +387,9 @@ void ContextRealLogger::appendFeatures()
     int i;
     
     for (i = 0; i < features.length(); i++) {
-        *this << QString ("#" + features.at(i));
+        QTextStream::operator<<(QString ("#" + features.at(i)));
         if (i < features.length() - 1)
-            *this << ",";
+            QTextStream::operator<<(", ");
     }
 
     QTextStream::operator<<(']');
