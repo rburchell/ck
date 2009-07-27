@@ -47,6 +47,9 @@ private:
 
 private slots:
     void onFileChanged();
+
+signals:
+    void stateChanged(TriState newState);
 };
 
 #endif // BOOLSYSFSPOOLER_H
