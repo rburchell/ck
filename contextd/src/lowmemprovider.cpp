@@ -23,7 +23,13 @@
 #include "logging.h"
 #include "loggingfeatures.h"
 #include "sconnect.h"
-#include "boolsysfspooler.h"
+
+#define LOW_WATERMARK   "/sys/kernel/low_watermark"
+#define HIGH_WATERMARK  "/sys/kernel/high_watermark"
+
+LowMemProvider::LowMemProvider() : lowWM(LOW_WATERMARK), highWM(HIGH_WATERMARK)
+{
+}
 
 QStringList LowMemProvider::keys()
 {

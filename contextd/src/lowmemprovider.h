@@ -27,14 +27,20 @@
 #include <QObject>
 #include "provider.h"
 #include "contextgroup.h"
+#include "boolsysfspooler.h"
 
 class LowMemProvider : public Provider
 {
     Q_OBJECT
 
 public:
+    LowMemProvider();
     virtual QStringList keys();
     virtual void initialize();
+
+private:
+    BoolSysFsPooler lowWM;
+    BoolSysFsPooler highWM;
 };
 
 #endif // LOWMEMPROVIDER_H
