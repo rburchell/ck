@@ -48,14 +48,17 @@ void BoolSysFsPooler::onFileChanged()
 void BoolSysFsPooler::readState()
 {
     contextDebug() << F_LOWMEM << "Reading" << input.fileName() << "state";
-    static char data[32];
-    qint64 bytesRead = input.peek(data, 32);
+    char data[32];
+    qint64 bytesRead = input.read(data, 32);
     TriState newState;
 
+    if (bytesRead > 0)
+        contextDebug() << "READ:" << data[0];
+
     if (bytesRead > 0 && data[0] == '0')
-        newState = TriStateTrue;
-    else if (bytesRead > 0 && data[0] == '1')
         newState = TriStateFalse;
+    else if (bytesRead > 0 && data[0] == '1')
+        newState = TriStateTrue;
     else
         newState = TriStateUnknown;
 
@@ -63,6 +66,8 @@ void BoolSysFsPooler::readState()
         state = newState;
         emit stateChanged(newState);
     }
+
+    input.reset();
 }
 
 BoolSysFsPooler::TriState BoolSysFsPooler::getState()

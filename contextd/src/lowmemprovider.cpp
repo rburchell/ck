@@ -44,9 +44,9 @@ void LowMemProvider::initialize()
     
     memoryPressure = new Context("System.MemoryPressure", this);
     
-    sconnect(memoryPressure, SIGNAL(onFirstSubscriberAppeared(QString)),
+    sconnect(memoryPressure, SIGNAL(firstSubscriberAppeared(QString)),
              this, SLOT(onFirstSubscriberAppeared()));
-    sconnect(memoryPressure, SIGNAL(onLastSubscriberDisappeared(QString)),
+    sconnect(memoryPressure, SIGNAL(lastSubscriberDisappeared(QString)),
              this, SLOT(onLastSubscriberDisappeared()));
 }
 
@@ -55,9 +55,9 @@ void LowMemProvider::onFirstSubscriberAppeared()
     lowWM = new BoolSysFsPooler(LOW_WATERMARK);
     highWM = new BoolSysFsPooler(HIGH_WATERMARK);
 
-    sconnect(lowWM, SIGNAL(onStateChanged(BoolSysFsPooler::TriState)), 
+    sconnect(lowWM, SIGNAL(stateChanged(TriState)), 
              this, SLOT(onWatermarkStateChanged()));
-    sconnect(lowWM, SIGNAL(onStateChanged(BoolSysFsPooler::TriState)), 
+    sconnect(highWM, SIGNAL(stateChanged(TriState)), 
              this, SLOT(onWatermarkStateChanged()));
 
     onWatermarkStateChanged();
