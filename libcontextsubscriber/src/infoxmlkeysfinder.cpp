@@ -91,7 +91,7 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
 
     // complex types
     if (inKeyType == true && complexKeyType == false) {
-        contextWarning() << "Key" << currentKeyName << "has a complex type, which is unsupported for now.";
+        contextWarning() << F_XML << "Key" << currentKeyName << "has a complex type, which is unsupported for now.";
         complexKeyType = true;
         currentKeyType = "";
     }
@@ -125,7 +125,7 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
             data.bus = currentBus;
 
             if (keyDataHash.contains(currentKeyName)) 
-                contextWarning() << "Key" << currentKeyName << "already defined in this xml file. Overwriting.";
+                contextWarning() << F_XML << "Key" << currentKeyName << "already defined in this xml file. Overwriting.";
             
             keyDataHash.insert(currentKeyName, data);
         }
@@ -158,7 +158,7 @@ bool InfoXmlKeysFinder::characters(const QString &chars)
     // <type> CHARS ...
     if (inKeyType == true && complexKeyType == false) {
         if (currentKeyType != "")
-            contextWarning() << "Key" << currentKeyName << "already has a type. Overwriting.";
+            contextWarning() << F_XML << "Key" << currentKeyName << "already has a type. Overwriting.";
         currentKeyType = canonicalizeType (chars.trimmed());
         return true;
     }
