@@ -29,7 +29,7 @@ BoolSysFsPooler::BoolSysFsPooler(const QString &fname) :
 {
     contextDebug() << F_LOWMEM << "Opening" << fname << "in read mode.";
 
-    if (! input.open(QIODevice::ReadOnly)) {
+    if (! input.open(QIODevice::ReadOnly | QIODevice::Unbuffered)) {
         contextWarning() << F_LOWMEM << "Failed to open" << fname << "for reading.";
         return;
     }
