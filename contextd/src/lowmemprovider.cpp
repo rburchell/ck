@@ -27,7 +27,7 @@
 #define LOW_WATERMARK   "/sys/kernel/low_watermark"
 #define HIGH_WATERMARK  "/sys/kernel/high_watermark"
 
-LowMemProvider::LowMemProvider() : lowWM(LOW_WATERMARK), highWM(HIGH_WATERMARK)
+LowMemProvider::LowMemProvider()
 {
 }
 
@@ -41,5 +41,62 @@ QStringList LowMemProvider::keys()
 void LowMemProvider::initialize()
 {
     contextDebug() << F_LOWMEM << "Initializing lowmem plugin";
+    
+    memoryPressure = new Context("System.MemoryPressure", this);
+    
+    sconnect(memoryPressure, SIGNAL(onFirstSubscriberAppeared(QString)),
+             this, SLOT(onFirstSubscriberAppeared()));
+    sconnect(memoryPressure, SIGNAL(onLastSubscriberDisappeared(QString)),
+             this, SLOT(onLastSubscriberDisappeared()));
 }
 
+void LowMemProvider::onFirstSubscriberAppeared()
+{
+    lowWM = new BoolSysFsPooler(LOW_WATERMARK);
+    highWM = new BoolSysFsPooler(HIGH_WATERMARK);
+
+    sconnect(lowWM, SIGNAL(onStateChanged(BoolSysFsPooler::TriState)), 
+             this, SLOT(onWatermarkStateChanged()));
+    sconnect(lowWM, SIGNAL(onStateChanged(BoolSysFsPooler::TriState)), 
+             this, SLOT(onWatermarkStateChanged()));
+
+    onWatermarkStateChanged();
+}
+
+void LowMemProvider::onLastSubscriberDisappeared()
+{
+    delete lowWM;
+    lowWM = NULL;
+    delete highWM;
+    highWM = NULL;
+}
+
+void LowMemProvider::onWatermarkStateChanged()
+{
+    contextDebug() << F_LOWMEM << "Watermarks state change";
+
+    BoolSysFsPooler::TriState lowWMState = lowWM->getState();
+    BoolSysFsPooler::TriState highWMState = highWM->getState();
+
+    if (lowWMState == BoolSysFsPooler::TriStateFalse && 
+        highWMState == BoolSysFsPooler::TriStateFalse) {
+        // normal
+        memoryPressure->set(0);
+    } else if (lowWMState == BoolSysFsPooler::TriStateTrue && 
+               highWMState == BoolSysFsPooler::TriStateFalse) {
+        // high
+        memoryPressure->set(1);
+    } else if (lowWMState == BoolSysFsPooler::TriStateTrue && 
+               highWMState == BoolSysFsPooler::TriStateTrue) {
+        // critical
+        memoryPressure->set(2);
+    } else if (lowWMState == BoolSysFsPooler::TriStateFalse && 
+               highWMState == BoolSysFsPooler::TriStateTrue) {
+        // ignore rogue state
+        return;
+    } else {
+        // undefined */
+        memoryPressure->unset();
+        return;
+    }
+}

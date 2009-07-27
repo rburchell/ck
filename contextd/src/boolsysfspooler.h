@@ -32,9 +32,9 @@ class BoolSysFsPooler : public QObject
 {
     Q_OBJECT
     
-    enum TriState { TriStateTrue, TriStateFalse, TriStateUnknown};
 
 public:
+    enum TriState { TriStateTrue, TriStateFalse, TriStateUnknown};
     BoolSysFsPooler(const QString &fname);
     TriState getState();
 

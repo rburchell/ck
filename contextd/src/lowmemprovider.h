@@ -26,7 +26,7 @@
 #include <QStringList>
 #include <QObject>
 #include "provider.h"
-#include "contextgroup.h"
+#include "context.h"
 #include "boolsysfspooler.h"
 
 class LowMemProvider : public Provider
@@ -39,8 +39,14 @@ public:
     virtual void initialize();
 
 private:
-    BoolSysFsPooler lowWM;
-    BoolSysFsPooler highWM;
+    Context *memoryPressure;
+    BoolSysFsPooler *lowWM;
+    BoolSysFsPooler *highWM;
+
+private slots:
+    void onFirstSubscriberAppeared();
+    void onLastSubscriberDisappeared();
+    void onWatermarkStateChanged();
 };
 
 #endif // LOWMEMPROVIDER_H
