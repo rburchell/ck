@@ -52,9 +52,6 @@ void BoolSysFsPooler::readState()
     qint64 bytesRead = input.read(data, 32);
     TriState newState;
 
-    if (bytesRead > 0)
-        contextDebug() << "READ:" << data[0];
-
     if (bytesRead > 0 && data[0] == '0')
         newState = TriStateFalse;
     else if (bytesRead > 0 && data[0] == '1')
