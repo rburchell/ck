@@ -115,6 +115,7 @@ AC_CONFIG_FILES([
 	contextd/unit-tests/Makefile
 	contextd/unit-tests/halprovider/Makefile
 	contextd/unit-tests/boolsysfspooler/Makefile
+	contextd/unit-tests/lowmemprovider/Makefile
 	python/Makefile
 	spec/Makefile
 	tools/Makefile
