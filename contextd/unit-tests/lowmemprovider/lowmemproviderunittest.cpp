@@ -128,6 +128,7 @@ private slots:
     void normalState();
     void highState();
     void criticalState();
+    void rogueState();
 
 private:
     LowMemProvider *provider;
@@ -166,6 +167,8 @@ void LowMemProviderUnitTest::normalState()
     lowWatermark->setState(BoolSysFsPooler::TriStateFalse);
     highWatermark->setState(BoolSysFsPooler::TriStateFalse);
     QCOMPARE(Context("System.MemoryPressure").get().toInt(), 0);
+
+    emitLastOn("System.MemoryPressure");
 }
 
 void LowMemProviderUnitTest::highState()
@@ -177,6 +180,8 @@ void LowMemProviderUnitTest::highState()
     lowWatermark->setState(BoolSysFsPooler::TriStateTrue);
     highWatermark->setState(BoolSysFsPooler::TriStateFalse);
     QCOMPARE(Context("System.MemoryPressure").get().toInt(), 1);
+
+    emitLastOn("System.MemoryPressure");
 }
 
 void LowMemProviderUnitTest::criticalState()
@@ -188,6 +193,25 @@ void LowMemProviderUnitTest::criticalState()
     lowWatermark->setState(BoolSysFsPooler::TriStateTrue);
     highWatermark->setState(BoolSysFsPooler::TriStateTrue);
     QCOMPARE(Context("System.MemoryPressure").get().toInt(), 2);
+
+    emitLastOn("System.MemoryPressure");
+}
+
+void LowMemProviderUnitTest::rogueState()
+{
+    emitFirstOn("System.MemoryPressure");
+    QVERIFY(lowWatermark != NULL);
+    QVERIFY(highWatermark != NULL);
+    
+    lowWatermark->setState(BoolSysFsPooler::TriStateFalse);
+    highWatermark->setState(BoolSysFsPooler::TriStateTrue);
+    QCOMPARE(Context("System.MemoryPressure").get(), QVariant(0));
+
+    lowWatermark->setState(BoolSysFsPooler::TriStateTrue);
+    highWatermark->setState(BoolSysFsPooler::TriStateTrue);
+    QCOMPARE(Context("System.MemoryPressure").get(), QVariant(2));
+
+    emitLastOn("System.MemoryPressure");
 }
 
 #include "lowmemproviderunittest.moc"
