@@ -26,6 +26,8 @@
 
 QHash<QString, QVariant> values;
 QList<Context*> contexts;
+BoolSysFsPooler *lowWatermark;
+BoolSysFsPooler *highWatermark;
 
 /* Helpers */
 
@@ -49,6 +51,11 @@ void emitLastOn(const QString &name)
 
 BoolSysFsPooler::BoolSysFsPooler(const QString &f)
 {
+    if (f == "/sys/kernel/low_watermark")
+        lowWatermark = this;
+
+    if (f == "/sys/kernel/high_watermark")
+        highWatermark = this;
 }
 
 BoolSysFsPooler::TriState BoolSysFsPooler::getState()
