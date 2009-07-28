@@ -25,6 +25,25 @@
 #include "boolsysfspooler.h"
 
 QHash<QString, QVariant> values;
+QList<Context*> contexts;
+
+/* Helpers */
+
+void emitFirstOn(const QString &name)
+{
+    foreach(Context* context, contexts) {
+        if (context->getKey() == name)
+            context->fakeFirst();
+    }
+}
+
+void emitLastOn(const QString &name)
+{
+    foreach(Context* context, contexts) {
+        if (context->getKey() == name)
+            context->fakeLast();
+    }
+}
 
 /* Mocked BoolSysFsPooler */
 
@@ -41,6 +60,12 @@ BoolSysFsPooler::TriState BoolSysFsPooler::getState()
 
 Context::Context(const QString &k, QObject *parent) : key(k)
 {
+    contexts.append(this);
+}
+
+Context::~Context()
+{
+    contexts.removeAll(this);
 }
 
 void Context::set(const QVariant &v)
@@ -59,6 +84,22 @@ QVariant Context::get()
         return values.value(key);
     else
         return QVariant();
+}
+
+QString Context::getKey()
+{
+    return key;
+}
+
+void Context::fakeFirst()
+{
+    emit firstSubscriberAppeared(key);
+}
+
+
+void Context::fakeLast()
+{
+    emit lastSubscriberDisappeared(key);
 }
 
 /* LowMemProviderUnitTest */

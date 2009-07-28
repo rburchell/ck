@@ -7,4 +7,3 @@ provider.cpp
 provider.h
 sconnect.h
 lowmemproviderunittest
-context.h
