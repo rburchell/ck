@@ -30,6 +30,7 @@ class BoolSysFsPoolerUnitTest : public QObject
 private slots:
     void basic();
     void fileMissing();
+    void incorrectData();
 };
 
 void BoolSysFsPoolerUnitTest::basic()
@@ -41,6 +42,12 @@ void BoolSysFsPoolerUnitTest::basic()
 void BoolSysFsPoolerUnitTest::fileMissing()
 {
     BoolSysFsPooler pooler("does-not-exist.txt");
+    QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateUnknown);
+}
+
+void BoolSysFsPoolerUnitTest::incorrectData()
+{
+    BoolSysFsPooler pooler("input2.txt");
     QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateUnknown);
 }
 
