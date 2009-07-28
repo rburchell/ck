@@ -33,6 +33,8 @@ private slots:
 
 void BoolSysFsPoolerUnitTest::basic()
 {
+    BoolSysFsPooler pooler("input1.txt");
+    QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateTrue);
 }
 
 #include "boolsysfspoolerunittest.moc"
