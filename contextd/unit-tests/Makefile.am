@@ -1,4 +1,4 @@
-SUBDIRS = halprovider
+SUBDIRS = halprovider boolsysfspooler
 
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
