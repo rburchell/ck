@@ -29,12 +29,19 @@ class BoolSysFsPoolerUnitTest : public QObject
 
 private slots:
     void basic();
+    void fileMissing();
 };
 
 void BoolSysFsPoolerUnitTest::basic()
 {
     BoolSysFsPooler pooler("input1.txt");
     QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateTrue);
+}
+
+void BoolSysFsPoolerUnitTest::fileMissing()
+{
+    BoolSysFsPooler pooler("does-not-exist.txt");
+    QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateUnknown);
 }
 
 #include "boolsysfspoolerunittest.moc"
