@@ -36,19 +36,25 @@ private slots:
 void BoolSysFsPoolerUnitTest::basic()
 {
     BoolSysFsPooler pooler("input1.txt");
+    QSignalSpy spy(&pooler, SIGNAL(stateChanged(TriState)));
     QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateTrue);
+    QCOMPARE(spy.count(), 0);
 }
 
 void BoolSysFsPoolerUnitTest::fileMissing()
 {
     BoolSysFsPooler pooler("does-not-exist.txt");
+    QSignalSpy spy(&pooler, SIGNAL(stateChanged(TriState)));
     QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateUnknown);
+    QCOMPARE(spy.count(), 0);
 }
 
 void BoolSysFsPoolerUnitTest::incorrectData()
 {
     BoolSysFsPooler pooler("input2.txt");
+    QSignalSpy spy(&pooler, SIGNAL(stateChanged(TriState)));
     QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateUnknown);
+    QCOMPARE(spy.count(), 0);
 }
 
 #include "boolsysfspoolerunittest.moc"
