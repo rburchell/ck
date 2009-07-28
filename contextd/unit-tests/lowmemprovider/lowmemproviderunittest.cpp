@@ -56,6 +56,12 @@ BoolSysFsPooler::TriState BoolSysFsPooler::getState()
     return TriStateUnknown;
 }
 
+void BoolSysFsPooler::setState(TriState s)
+{
+    state = s;
+    emit stateChanged(s);
+}
+
 /* Mocked Context */
 
 Context::Context(const QString &k, QObject *parent) : key(k)

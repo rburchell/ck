@@ -33,6 +33,10 @@ public:
     enum TriState { TriStateTrue, TriStateFalse, TriStateUnknown };
     BoolSysFsPooler(const QString &fname);
     TriState getState();
+    void setState(TriState s);
+
+private:
+    TriState state;
 
 signals:
     void stateChanged(TriState newState);
