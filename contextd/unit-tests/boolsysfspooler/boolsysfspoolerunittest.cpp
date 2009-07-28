@@ -21,7 +21,23 @@
 
 #include <QtTest/QtTest>
 #include <QtCore>
+#include <QDir>
+#include <QTest>
 #include "boolsysfspooler.h"
+
+#define DEFAULT_WAIT_PERIOD 100
+
+void utilWriteToFile(const char *file, const char *data, int waitPeriod = DEFAULT_WAIT_PERIOD)
+{
+    QFile f(file);
+    f.open(QIODevice::WriteOnly | QIODevice::Unbuffered);
+    f.write(data);
+    f.flush();
+    f.close();
+
+    if (waitPeriod > 0)
+        QTest::qWait(waitPeriod);
+}
 
 class BoolSysFsPoolerUnitTest : public QObject
 {
@@ -31,6 +47,7 @@ private slots:
     void basic();
     void fileMissing();
     void incorrectData();
+    void changing();
 };
 
 void BoolSysFsPoolerUnitTest::basic()
@@ -55,6 +72,20 @@ void BoolSysFsPoolerUnitTest::incorrectData()
     QSignalSpy spy(&pooler, SIGNAL(stateChanged(TriState)));
     QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateUnknown);
     QCOMPARE(spy.count(), 0);
+}
+
+void BoolSysFsPoolerUnitTest::changing()
+{
+    utilWriteToFile("input3.txt", "0");
+    BoolSysFsPooler pooler("input3.txt");
+    QSignalSpy spy(&pooler, SIGNAL(stateChanged(TriState)));
+    
+    QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateFalse); 
+
+    utilWriteToFile("input3.txt", "1");
+    
+    QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateTrue); 
+    QCOMPARE(spy.count(), 1);
 }
 
 #include "boolsysfspoolerunittest.moc"
