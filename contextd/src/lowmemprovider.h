@@ -39,9 +39,9 @@ public:
     virtual void initialize();
 
 private:
-    Context *memoryPressure;
-    BoolSysFsPooler *lowWM;
-    BoolSysFsPooler *highWM;
+    Context *memoryPressure; ///< Context property for the System.MemoryPressure
+    BoolSysFsPooler *lowWM; ///< Pooler for the low watermark.
+    BoolSysFsPooler *highWM; ///< Pooler for the high watermark.
 
 private slots:
     void onFirstSubscriberAppeared();

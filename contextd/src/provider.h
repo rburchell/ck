@@ -26,13 +26,27 @@
 #include <QStringList>
 #include <QObject>
 
+/*!
+    \class Provider
+
+    \brief Base class for all the providers.
+
+    The Provider subclass is expected to provide a list of keys it provides and
+    respond to a Provider::initialize() call.
+*/
+
 class Provider : public QObject
 {
     Q_OBJECT
 
 public:
-
+    /// Returns the list of keys that this provider will provide.
+    /// The provider should return here only the keys that it supports and
+    /// handles later on.
     virtual QStringList keys() = 0;
+
+    /// Called once to initialize the provider. The provider should here create
+    /// the Context property instances and do all the setup work it needs to do.
     virtual void initialize() = 0;
 };
 

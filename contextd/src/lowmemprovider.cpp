@@ -24,9 +24,37 @@
 #include "loggingfeatures.h"
 #include "sconnect.h"
 
+/*!
+    \class LowMemProvider
+
+    \brief Provider the System.MemoryPressure key.
+
+    The LowMemProvider implements the System.MemoryPressure context property that has three possible
+    values: normal, high, and critical.  It works by poll(2)ing the (Maemo specific)
+    /sys/kernel/{low,high}_watermark sysfs attributes. The following table describes the correspondence
+    between the attributes and the value of the context property:
+
+    \code
+    low_watermark | high_watermark | System.MemoryPressure
+    --------------+----------------+-------------------------
+          0       |       0        |       normal (0)
+          1       |       0        |       high (1)
+          1       |       1        |       critical (2)
+          x       |       x        |       unspecified (null)
+    \endcode
+
+    As a side note, in Maemo terms:
+    * low_watermark means `background killing' is active
+    * high_watermark is `low memory condition' (expect the oom killer soon)
+    
+    Note that these are advisory, and there are cases when the OOM killer strikes without
+    high_watermark being 1.
+*/
+
 #define LOW_WATERMARK   "/sys/kernel/low_watermark"
 #define HIGH_WATERMARK  "/sys/kernel/high_watermark"
 
+/// Constructor.
 LowMemProvider::LowMemProvider()
 {
 }
@@ -50,6 +78,8 @@ void LowMemProvider::initialize()
              this, SLOT(onLastSubscriberDisappeared()));
 }
 
+/// This is called when the first subscriber for System.MemoryPressure appears.
+/// Here we create the watchers on the pool files and start observing.
 void LowMemProvider::onFirstSubscriberAppeared()
 {
     lowWM = new BoolSysFsPooler(LOW_WATERMARK);
@@ -63,6 +93,8 @@ void LowMemProvider::onFirstSubscriberAppeared()
     onWatermarkStateChanged();
 }
 
+/// This is called when the last subscriber for System.MemoryPressure disappears.
+/// We stop observing the pool files and free the resources.
 void LowMemProvider::onLastSubscriberDisappeared()
 {
     delete lowWM;
@@ -71,9 +103,12 @@ void LowMemProvider::onLastSubscriberDisappeared()
     highWM = NULL;
 }
 
+/// Slot called by the pools when one of them changes state. We get 
+/// the current state of the pools and, based on that, we compute 
+/// the current value for the property (normal, high, critical).
 void LowMemProvider::onWatermarkStateChanged()
 {
-    contextDebug() << F_LOWMEM << "Watermarks state change";
+    contextDebug() << F_LOWMEM << "Watermarks state changed";
 
     BoolSysFsPooler::TriState lowWMState = lowWM->getState();
     BoolSysFsPooler::TriState highWMState = highWM->getState();
