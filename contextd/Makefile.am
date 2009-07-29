@@ -1,4 +1,4 @@
-SUBDIRS = src doc
+SUBDIRS = src doc unit-tests
 
 check-sum:
 	$(MAKE) -C unit-tests check-sum
