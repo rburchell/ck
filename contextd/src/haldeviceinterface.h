@@ -32,12 +32,12 @@ class HalDeviceInterface : public QDBusAbstractInterface
 {
     Q_OBJECT
 
-    static const char *interfaceName;
-
 public:
     HalDeviceInterface(const QDBusConnection connection, const QString &busName, const QString objectPath, QObject *parent = 0);
 
 signals:
+    /// Emitted when a property of the device was modified. 
+    /// Any property was modified.
     void PropertyModified();
 
 public:

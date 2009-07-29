@@ -20,22 +20,26 @@
  */
 
 #include "haldeviceinterface.h"
-#include "logging.h"
-#include <QDBusInterface>
 
-const char *HalDeviceInterface::interfaceName = "org.freedesktop.Hal.Device";
+#define INTERFACE_NAME "org.freedesktop.Hal.Device"
 
+/*!
+    \class HalDeviceInterface
+
+    \brief The interface to a specified Hal Device dbus object.
+   
+    Hal device is a basic object in the hal subsystem. In HalProvider
+    we create interfaces to hal battery devices.
+*/
+
+/// Creates a new interface to the specified device with \a objectPath at
+/// \a busName with a given \a connection dbus connection.
 HalDeviceInterface::HalDeviceInterface(const QDBusConnection connection, const QString &busName, const QString objectPath, QObject *parent)
-    : QDBusAbstractInterface(busName, objectPath, interfaceName, connection, parent)
+    : QDBusAbstractInterface(busName, objectPath, INTERFACE_NAME, connection, parent)
 {
 }
 
-int HalDeviceInterface::readIntValue(const QString &prop)
-{
-    QDBusMessage msg = call(QDBus::Block, "GetPropertyInteger", prop);
-    return msg.arguments().at(0).toInt();
-}
-
+/// Returns the current value for the given \a prop property.
 QVariant HalDeviceInterface::readValue(const QString &prop)
 {
     QDBusMessage msg = call(QDBus::Block, "GetPropertyInteger", prop);
