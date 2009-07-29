@@ -149,6 +149,7 @@ private slots:
     void checkBasic();
     void verifyBaseProperties();
     void verifyTillFullProperties();
+    void verifyTillLowProperties();
     void firstLastFirst();
     void noBattery();
     void noHalInfo();
@@ -276,6 +277,29 @@ void HalProviderUnitTest::verifyTillFullProperties()
     halIsDischarging = new QVariant(true);
     lastDeviceInterface->fakeModified();
     QCOMPARE(Context("Battery.TimeUntilFull").get(), QVariant());
+}
+
+void HalProviderUnitTest::verifyTillLowProperties()
+{
+    // 4h
+    halIsCharging = new QVariant(false);
+    halIsDischarging = new QVariant(true);
+    halLastFull = new QVariant(1000);
+    halChargeCurrent = new QVariant(500);
+    halRate = new QVariant(100);
+    lastContextGroup->fakeFirst();
+    QCOMPARE(Context("Battery.TimeUntilLow").get(), QVariant(4 * 3600));
+
+    // Low already
+    halChargeCurrent = new QVariant(1);
+    lastDeviceInterface->fakeModified();
+    QCOMPARE(Context("Battery.TimeUntilLow").get(), QVariant(0));
+
+    // Charging
+    halIsCharging = new QVariant(true);
+    halIsDischarging = new QVariant(false);
+    lastDeviceInterface->fakeModified();
+    QCOMPARE(Context("Battery.TimeUntilLow").get(), QVariant());
 }
 
 void HalProviderUnitTest::firstLastFirst()
