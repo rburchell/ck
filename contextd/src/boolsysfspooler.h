@@ -33,14 +33,16 @@ class BoolSysFsPooler : public QObject
     Q_OBJECT
 
 public:
+    /// Represents a state of the observed file (1, 0, ?)
     enum TriState { TriStateTrue, TriStateFalse, TriStateUnknown };
+
     BoolSysFsPooler(const QString &fname);
     TriState getState();
 
 private:
-    QFile input; //< Input file.
-    QFileSystemWatcher watcher; //< Watcher that observes the file for changes.
-    TriState state; //< Current (last read) state.
+    QFile input; ///< Input file.
+    QFileSystemWatcher watcher; ///< Watcher that observes the file for changes.
+    TriState state; ///< Current (last read) state.
 
     void readState();
 
