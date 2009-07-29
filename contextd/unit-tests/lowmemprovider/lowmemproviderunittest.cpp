@@ -49,7 +49,7 @@ void emitLastOn(const QString &name)
 
 /* Mocked BoolSysFsPooler */
 
-BoolSysFsPooler::BoolSysFsPooler(const QString &f)
+BoolSysFsPooler::BoolSysFsPooler(const QString &f) : state(TriStateUnknown)
 {
     if (f == "/sys/kernel/low_watermark")
         lowWatermark = this;
@@ -205,7 +205,7 @@ void LowMemProviderUnitTest::rogueState()
     
     lowWatermark->setState(BoolSysFsPooler::TriStateFalse);
     highWatermark->setState(BoolSysFsPooler::TriStateTrue);
-    QCOMPARE(Context("System.MemoryPressure").get(), QVariant(0));
+    QCOMPARE(Context("System.MemoryPressure").get(), QVariant());
 
     lowWatermark->setState(BoolSysFsPooler::TriStateTrue);
     highWatermark->setState(BoolSysFsPooler::TriStateTrue);
