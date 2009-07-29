@@ -13,11 +13,6 @@ CXXFLAGS="$CXXFLAGS -Wall"
 AC_PROG_LIBTOOL
 AM_PATH_PYTHON
 
-# vala compiler (>= 0.7.1)
-AX_FEATURE_DISABLEABLE([vala], [BUILD_VALA], [disable building of vala sources])
-AX_DISABLE_FEATURE_ON_PROG([Vala compiler], [BUILD_VALA], [VALAC], [valac], [0.7.1])
-AM_CONDITIONAL(CONTEXTKIT_BUILD_VALA, test "$missing_deps_BUILD_VALA" = "")
-
 # check for libraries
 PKG_CHECK_MODULES_SUBST([GLIB], [glib-2.0 >= 2.12.0])
 PKG_CHECK_MODULES_SUBST([GOBJECT], [gobject-2.0 >= 2.12.0])
@@ -121,7 +116,6 @@ AC_CONFIG_FILES([
 	spec/Makefile
 	tools/Makefile
 	tools/loadmem/Makefile
-	vapi/Makefile
 ])
 
 AC_OUTPUT
@@ -129,10 +123,6 @@ AC_OUTPUT
 AX_FEATURE_SUMMARIZE([BUILD_DOCS],
 		     [Building of documentation is enabled],
 		     [Documentation won't be built])
-
-AX_FEATURE_SUMMARIZE([BUILD_VALA],
-		     [Building of vala sources is enabled],
-		     [Vala sources won't be built])
 
 AX_FEATURE_SUMMARIZE([COVERAGE],
 		     [Unit testing coverage support is enabled],
