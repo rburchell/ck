@@ -20,18 +20,28 @@
  */
 
 #include "halmanagerinterface.h"
-//#include "sconnect.h"
-#include "logging.h"
 #include <QDBusInterface>
+#include <QStringList>
 
 #define INTERFACE_NAME  "org.freedesktop.Hal.Manager"
 #define OBJECT_PATH     "/org/freedesktop/Hal/Manager"
 
+/*!
+    \class HalManagerInterface
+
+    \brief The interface to the Hal Manager dbus object.
+   
+    It's used to get a list of devices (ie. batteries).
+*/
+
+/// Constructor. Creates a new interface to the Hal Manager object. 
 HalManagerInterface::HalManagerInterface(const QDBusConnection connection, const QString &busName, QObject *parent)
     : QDBusAbstractInterface(busName, OBJECT_PATH, INTERFACE_NAME, connection, parent)
 {
 }
 
+/// Returns a list of devices matching the \a capability existing in Hal.
+/// It's used to get the list of batteries.
 QStringList HalManagerInterface::findDeviceByCapability(const QString &capability)
 {
     QDBusMessage msg = call(QDBus::Block, "FindDeviceByCapability", capability);
