@@ -24,6 +24,17 @@
 #include "logging.h"
 #include "loggingfeatures.h"
 
+/*!
+    \class BoolSysFsPooler
+
+    \brief Watches for changes in content of a sysfs attribute.
+    
+    The values of the sysfs attribute are {"0", "1"}. The BoolSysfsPoller emits the 
+    stateChanged signal whenever the attribute value changes.
+
+*/
+
+/// Contructor. Will watch the specified \a fname.
 BoolSysFsPooler::BoolSysFsPooler(const QString &fname) :
     input(fname), state(TriStateUnknown)
 {
@@ -39,12 +50,15 @@ BoolSysFsPooler::BoolSysFsPooler(const QString &fname) :
     readState();
 }
 
+/// Gets called when the watcher notices a file change.
 void BoolSysFsPooler::onFileChanged()
 {
     contextDebug() << F_LOWMEM << "New data on" << input.fileName();
     readState();
 }
 
+/// Reads the current state from the observed file (0, 1 or Unknown). Emits 
+/// the stateChanged if the new state is different then the previous one.
 void BoolSysFsPooler::readState()
 {
     contextDebug() << F_LOWMEM << "Reading" << input.fileName() << "state";
@@ -67,6 +81,7 @@ void BoolSysFsPooler::readState()
     input.reset();
 }
 
+/// Returns the current state.
 BoolSysFsPooler::TriState BoolSysFsPooler::getState()
 {
     return state;

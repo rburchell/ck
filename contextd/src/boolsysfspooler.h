@@ -31,7 +31,6 @@
 class BoolSysFsPooler : public QObject
 {
     Q_OBJECT
-    
 
 public:
     enum TriState { TriStateTrue, TriStateFalse, TriStateUnknown };
@@ -39,9 +38,9 @@ public:
     TriState getState();
 
 private:
-    QFile input;
-    QFileSystemWatcher watcher;
-    TriState state;
+    QFile input; //< Input file.
+    QFileSystemWatcher watcher; //< Watcher that observes the file for changes.
+    TriState state; //< Current (last read) state.
 
     void readState();
 
@@ -49,7 +48,8 @@ private slots:
     void onFileChanged();
 
 signals:
-    void stateChanged(TriState newState);
+    /// Emitted automatically when the state changes. \a newState contains the new state.
+    void stateChanged(TriState newState); 
 };
 
 #endif // BOOLSYSFSPOOLER_H
