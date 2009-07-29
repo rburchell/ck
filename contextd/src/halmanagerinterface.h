@@ -32,9 +32,6 @@ class HalManagerInterface : public QDBusAbstractInterface
 {
     Q_OBJECT
 
-    static const char *interfaceName;
-    static const QString objectPath;
-
 public:
     HalManagerInterface(const QDBusConnection connection, const QString &busName, QObject *parent = 0);
     QStringList findDeviceByCapability(const QString &capability);

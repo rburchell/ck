@@ -24,11 +24,11 @@
 #include "logging.h"
 #include <QDBusInterface>
 
-const QString HalManagerInterface::objectPath = "/org/freedesktop/Hal/Manager";
-const char *HalManagerInterface::interfaceName = "org.freedesktop.Hal.Manager";
+#define INTERFACE_NAME  "org.freedesktop.Hal.Manager"
+#define OBJECT_PATH     "/org/freedesktop/Hal/Manager"
 
 HalManagerInterface::HalManagerInterface(const QDBusConnection connection, const QString &busName, QObject *parent)
-    : QDBusAbstractInterface(busName, objectPath, interfaceName, connection, parent)
+    : QDBusAbstractInterface(busName, OBJECT_PATH, INTERFACE_NAME, connection, parent)
 {
 }
 
