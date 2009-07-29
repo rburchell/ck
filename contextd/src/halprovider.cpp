@@ -35,6 +35,25 @@
 #define BATTERY_IS_CHARGING         "battery.rechargeable.is_charging"
 #define BATTERY_LAST_FULL           "battery.charge_level.last_full"
 
+/*!
+    \class HalProvider
+
+    \brief Provides the hal information about power.
+
+    This provider provides information about the power & battery. The info
+    is obtained from the Hal subsystem. The following properties are provided:
+
+    \code
+    Battery.OnBattery - is machine is running on battery power
+    Battery.ChargePercentage - battery charge percentage
+    Battery.LowBattery - is battery low?
+    Battery.TimeUntilLow - time (in seconds) until battery is low
+    Battery.TimeUntilFull - time (in seconds) until battery is full
+    \endcode
+
+    Communication with Hal happens over DBus.
+*/
+
 QStringList HalProvider::keys()
 {
     QStringList list;
@@ -63,6 +82,9 @@ void HalProvider::initialize()
             this, SLOT(onLastSubscriberDisappeared()));
 }
 
+/// Called when the first subscriber for any of the keys appears. We initialize
+/// the connection to Hal and pick the first battery to inspect. We keep this connection
+/// and listen for updates as long as there is an active subscriber.
 void HalProvider::onFirstSubscriberAppeared()
 {
     contextDebug() << F_HAL << "First subscriber appeared, connecting to HAL";
@@ -84,6 +106,9 @@ void HalProvider::onFirstSubscriberAppeared()
     }
 }
 
+/// Called when the last subscriber stops watching any of our properties. 
+/// We terminate the connection to Hal, stop watching for battery changes 
+/// and free the resources.
 void HalProvider::onLastSubscriberDisappeared()
 {
     contextDebug() << F_HAL << "Last subscriber gone, destroying HAL connections";
@@ -91,12 +116,15 @@ void HalProvider::onLastSubscriberDisappeared()
     batteryDevice = NULL;
 }
 
+/// Called when a battery property changed. We recompute all our properties.
 void HalProvider::onDevicePropertyModified()
 {
     contextDebug() << F_HAL << "Battery property changed.";
     updateProperties();
 }
 
+/// This fetches values of the relevant battery properties and recomputes the context 
+/// info based on that. It recomputes all data (all context properties). 
 void HalProvider::updateProperties()
 {
     contextDebug() << F_HAL << "Updating properties";

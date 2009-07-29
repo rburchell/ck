@@ -40,13 +40,13 @@ public:
 private:
     void updateProperties();
     
-    ContextGroup *group;
-    Context *onBattery;
-    Context *lowBattery;
-    Context *chargePercentage;
-    Context *timeUntilLow;
-    Context *timeUntilFull;
-    HalDeviceInterface *batteryDevice;
+    Context *onBattery; ///< Battery.OnBattery
+    Context *lowBattery; ///< Battery.LowBattery
+    Context *chargePercentage; ///< Battery.ChargePercentage
+    Context *timeUntilLow; ///< Battery.TimeUntilLow
+    Context *timeUntilFull; ///< Battery.TimeUntilFull
+    ContextGroup *group; ///< Group with all the context properties
+    HalDeviceInterface *batteryDevice; ///< The interface to the battery device
 
 private slots:
     void onFirstSubscriberAppeared();
