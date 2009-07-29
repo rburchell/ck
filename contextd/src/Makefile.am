@@ -17,8 +17,8 @@ contextd_SOURCES = contextd.cpp		        \
 		   boolsysfspooler.h		\
 		   boolsysfspooler.cpp
 
-AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(HAL_CFLAGS)
-LIBS += $(QtCore_LIBS) $(HAL_LIBS)
+AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)
+LIBS += $(QtCore_LIBS)
 
 # library dependency hack for seamless make in contextd
 AM_CXXFLAGS += -I$(srcdir)/../../libcontextprovider/src		\
