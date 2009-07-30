@@ -139,6 +139,12 @@ our own XML schema.
 Representational types
 ----------------------
 
+Converting a value from one representation to another is not
+guaranteed to be loss-less: if you convert the value back, it might be
+different and even have a different type.  Intentional types are used
+to make sense of the value anyway.  [ XXX - so maybe we shouldn't
+bother with representational types at all... ]
+
 Whenever there is a choice of representation in the following table,
 it should be taken to mean: Represent the value with the first
 alternative in the list that is possible, even if that loses
