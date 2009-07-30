@@ -14,6 +14,10 @@ FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am
 
+EXTRA_DIST=input1.txt	\
+	   input2.txt	\
+	   input3.txt
+
 nodist_boolsysfspoolerunittest_SOURCES = mocs.cpp
 QT_TOMOC = $(filter %.h, $(boolsysfspoolerunittest_SOURCES) $(FROM_SOURCE))
 include $(top_srcdir)/am/qt.am

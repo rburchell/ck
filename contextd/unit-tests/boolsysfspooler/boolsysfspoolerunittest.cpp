@@ -26,9 +26,21 @@
 #include "boolsysfspooler.h"
 
 #define DEFAULT_WAIT_PERIOD 100
+#define LOCAL_FILE(f) (utilPathForLocalFile(f))
 
-void utilWriteToFile(const char *file, const char *data, int waitPeriod = DEFAULT_WAIT_PERIOD)
+QString utilPathForLocalFile(QString fname)
 {
+    const char *srcdir = getenv("srcdir");
+    if (srcdir) {
+        return QString(srcdir) + QDir::separator() + fname;
+    } else {
+        return QString("./") + QString(fname);
+    }
+}
+
+void utilWriteToFile(const QString &file, const char *data, int waitPeriod = DEFAULT_WAIT_PERIOD)
+{
+    qDebug() << "COPYING TO:" << file;
     QFile f(file);
     f.open(QIODevice::WriteOnly | QIODevice::Unbuffered);
     f.write(data);
@@ -48,11 +60,12 @@ private slots:
     void fileMissing();
     void incorrectData();
     void changing();
+    void cleanupTestCase();
 };
 
 void BoolSysFsPoolerUnitTest::basic()
 {
-    BoolSysFsPooler pooler("input1.txt");
+    BoolSysFsPooler pooler(LOCAL_FILE("input1.txt"));
     QSignalSpy spy(&pooler, SIGNAL(stateChanged(TriState)));
     QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateTrue);
     QCOMPARE(spy.count(), 0);
@@ -68,7 +81,7 @@ void BoolSysFsPoolerUnitTest::fileMissing()
 
 void BoolSysFsPoolerUnitTest::incorrectData()
 {
-    BoolSysFsPooler pooler("input2.txt");
+    BoolSysFsPooler pooler(LOCAL_FILE("input2.txt"));
     QSignalSpy spy(&pooler, SIGNAL(stateChanged(TriState)));
     QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateUnknown);
     QCOMPARE(spy.count(), 0);
@@ -76,17 +89,23 @@ void BoolSysFsPoolerUnitTest::incorrectData()
 
 void BoolSysFsPoolerUnitTest::changing()
 {
-    utilWriteToFile("input3.txt", "0");
-    BoolSysFsPooler pooler("input3.txt");
+    utilWriteToFile("input-temp.txt", "0");
+    BoolSysFsPooler pooler("input-temp.txt");
     QSignalSpy spy(&pooler, SIGNAL(stateChanged(TriState)));
     
     QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateFalse); 
 
-    utilWriteToFile("input3.txt", "1");
+    utilWriteToFile("input-temp.txt", "1");
     
     QCOMPARE(pooler.getState(), BoolSysFsPooler::TriStateTrue); 
     QCOMPARE(spy.count(), 1);
 }
+    
+void BoolSysFsPoolerUnitTest::cleanupTestCase()
+{
+    QFile::remove("input-temp.txt");
+}
 
 #include "boolsysfspoolerunittest.moc"
 QTEST_MAIN(BoolSysFsPoolerUnitTest);
+
