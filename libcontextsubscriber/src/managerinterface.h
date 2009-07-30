@@ -51,7 +51,7 @@ private slots:
     void onGetSubscriberFinished(QDBusPendingCallWatcher* watcher);
 
 private:
-    bool getSubscriberFailed; //< Previous async GetSubscriber call failed
+    bool getSubscriberFailed; ///< Previous async GetSubscriber call failed
 };
 
 } // end namespace

@@ -35,11 +35,11 @@
 
 struct InfoKeyData
 {
-    QString name; //< Name of the we're storing data for.
-    QString type; //< Type of the key.
-    QString doc; //< Doc for the key.
-    QString provider; //< Provider for the key.
-    QString bus; //< Bus (ie. 'session' or 'system') for the key.
+    QString name; ///< Name of the we're storing data for.
+    QString type; ///< Type of the key.
+    QString doc; ///< Doc for the key.
+    QString provider; ///< Provider for the key.
+    QString bus; ///< Bus (ie. 'session' or 'system') for the key.
 };
 
 #endif // INFOKEYDATA_H
