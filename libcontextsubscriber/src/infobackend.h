@@ -76,7 +76,7 @@ protected:
     virtual void disconnectNotify(const char *signal);
 
 private:
-    int connectCount; //< Number of connections to signals. Used to optimized signal emission when 0.
+    int connectCount; ///< Number of connections to signals. Used to optimized signal emission when 0.
 
     InfoBackend(QObject *parent = 0);
 
@@ -90,7 +90,7 @@ private:
     /// Private operator. Do not use.
     InfoBackend& operator=(const InfoBackend&);
 
-    static InfoBackend* backendInstance; //< Holds a pointer to the instance of the singelton.
+    static InfoBackend* backendInstance; ///< Holds a pointer to the instance of the singelton.
     static void destroyInstance();
 
     friend class InfoXmlBackend;

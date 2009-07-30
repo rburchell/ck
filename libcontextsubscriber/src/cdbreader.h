@@ -41,9 +41,9 @@ public:
     int fileDescriptor() const;
 
 private:
-    QString path; //< Path pointing to the database.
-    void *cdb; //< Cdb library object used for reading.
-    int fd; //< A file descriptor to the database.
+    QString path; ///< Path pointing to the database.
+    void *cdb; ///< Cdb library object used for reading.
+    int fd; ///< A file descriptor to the database.
 };
 
 #endif
