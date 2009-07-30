@@ -36,18 +36,18 @@ public:
     virtual bool endElement(const QString&, const QString&, const QString &name);
     virtual bool characters(const QString &ch);
 
-    QHash <QString, InfoKeyData> keyDataHash; //< A hash containing keyname -> InfoKeyData mapping. This is parse output.
+    QHash <QString, InfoKeyData> keyDataHash; ///< A hash containing keyname -> InfoKeyData mapping. This is parse output.
 
 private:
-    bool inProvider; //< Are we in the <provider>...
-    bool inKey; //< Are we in the <key>...
-    bool inKeyType; //< Are we in the <key><type>...
-    bool inKeyDoc; //< Are we in the <key><doc>...
-    QString currentProvider; //< For our current parse position, the <provider service=?>.
-    QString currentKeyName; //< For our current parse position, the <key>? name.
-    QString currentKeyType; //< For our current parse position, the <key><type>? type.
-    QString currentKeyDoc; //< For our current parse position, the <key><doc>? documentation.
-    QString currentBus; //< For our current parse position, the <provider bus=?>.
+    bool inProvider; ///< Are we in the <provider>...
+    bool inKey; ///< Are we in the <key>...
+    bool inKeyType; ///< Are we in the <key><type>...
+    bool inKeyDoc; ///< Are we in the <key><doc>...
+    QString currentProvider; ///< For our current parse position, the <provider service=?>.
+    QString currentKeyName; ///< For our current parse position, the <key>? name.
+    QString currentKeyType; ///< For our current parse position, the <key><type>? type.
+    QString currentKeyDoc; ///< For our current parse position, the <key><doc>? documentation.
+    QString currentBus; ///< For our current parse position, the <provider bus=?>.
 
     QString getAttrValue(const QXmlAttributes &attrs, const QString &attrName);
 

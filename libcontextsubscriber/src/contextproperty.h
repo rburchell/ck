@@ -53,7 +53,7 @@ public:
     static void setTypeCheck(bool typeCheck);
 
 signals:
-    void valueChanged(); //< Emitted whenever the value of the property changes and the property is subscribed.
+    void valueChanged(); ///< Emitted whenever the value of the property changes and the property is subscribed.
 
 private:
     ContextPropertyPrivate *priv;

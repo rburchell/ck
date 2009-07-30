@@ -43,8 +43,8 @@ private slots:
     void onNameHasOwnerFinished(QDBusPendingCallWatcher* watcher);
 
 private:
-    bool servicePresent; //< Our current understanding about the service name's state
-    QString busName; //< The service name we are interested in
+    bool servicePresent; ///< Our current understanding about the service name's state
+    QString busName; ///< The service name we are interested in
 
     void setServicePresent();
     void setServiceGone();
