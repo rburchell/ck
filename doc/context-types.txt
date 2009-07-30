@@ -287,78 +287,72 @@ Mapping from strings to values, with no duplicated keys.
   Python:     dict
   CL:	      alist
 
-A Mini-DOM
+A Nano-DOM
 ----------
 
-The representational types can be used as a Mini-DOM for a small
-subset of XML.  This is useful when the small subset suffices but you
-still want to be enterprise ready.  Intentional type definitions use
-this subset, for example, and are thus easily handled at run-time.
+The representational types can be used as a Nano-DOM for a subset of
+XML.  This is useful when the small subset suffices but you still want
+to be enterprise ready.  Intentional type definitions use this subset,
+for example, and are thus easily handled at run-time.
 
-The limitiations of the subset as compared to full XML are: it can't
-represent lists, only maps, and attributes can't be distinguished from
-identically-named child elements.
+Converting a piece of XML into its Nano-DOM representation proceeds
+according to simple rules:
 
-Thus, this piece of XML can't be represented in the Mini-DOM
+ - First, all attributes of elements are converted to child elements,
+   in order and at the beginning.  Thus, the following XML fragments
+   are quivalent:
 
-  <nums><num>1</num><num>2</num></nums>
+     <bar size="12">...</bar>
 
-and these two pieces are equivalent
+     <bar><size>12</size>...</bar>
 
-  <foo bar="12"/>   ==   <foo><bar>12</bar></foo>
+ - Then, text is turned into strings, and elements are turned into
+   lists with the first element being a string with the name of the
+   element.  For example, this XML
 
-The first limitation is quite severe, and we should maybe find ways to
-distinguish lists from maps, or just handle lists in the parser API.
-The second limitation is considered a feature.
+     <foo>hello</foo>
 
-Converting a piece of XML produces two things: a 'tag' and a 'value'.
-The tag is a string or null, and the value is either a string or a
-map, according to the following rules:
+   would be turned into this Python value
 
-  TEXT                -> tag: null, value: TEXT
-  <foo>TEXT</foo>     -> tag: foo, value: TEXT
-  <foo>ELT...</foo>   -> no ELT must be TEXT
-                         tag: foo, value: map from the
-                         tags of the ELTs to their values.
-			 NOTE: order is not preserved and
-                         duplicates are not allowed.
-  <foo attr="TEXT">ELT...</foo>
-                      -> equivalent to <foo><attr>TEXT</attr>ELT...</foo>
+     ['foo', 'hello']
 
-Examples, showing how XML maps to Python and to Common Lisp.
+   When creating the strings for text, surrounding whitespace is
+   removed.
 
-  <foo>bar</foo>
-  => ('foo', 'bar')
-  => (foo bar)
+More examples:
 
-  <foo>
-    <bar>Hi</bar>
-  </foo>
-  => ('foo', {'bar': 'Hi'})
-  => (foo (bar "Hi"))
+  <key name="Example.Random"
+       type="string">
+    <doc>
+      A random property.
+    </doc>
+  </key>
 
-  <foo bar="Hi"/>
-  => ('foo', {'bar': 'Hi'})   (Same thing)
-  => (foo (bar "Hi"))
+  =>
 
-  <contact online="true">
-    <name>
-      <first>Foo</foo>
-      <last>Bar</last>
-    </name>
-  </contact>
-  => ('contact', {'online': 'true',
-     		  'name': {'first': 'Foo',
-                           'last': 'Bar'}})
-  => (contact (online "true")
-              (name (first "Foo")
-	            (last "Bar")))
+  ['key',
+     ['name', 'Example.Random' ],
+     ['type', 'string' ],
+     ['doc', 'A random property.']
+  ]
 
-  <cat>
-    dog
-    <ernie>bert</ernie>
-  </cat>
-  => ERROR: dog has no tag.
+  <key name="Example.Random">
+    <type>
+      <uniform-list type="number"/>
+    </type>
+  </key>
+
+  => 
+
+  ['key',
+     ['name', 'Example.Random' ],
+     ['type',
+       ['uniform-list', ['type', 'number' ] ]
+     ]
+  ]
+
+You can think of the Nano-DOM representation as a simple abstract
+syntax tree for XML.
 
 
 Intentional types
@@ -392,14 +386,10 @@ Another example are enumerations: the documentation of
 "compass-direction" can say that the value is one of the four "int32"
 values 0, 90, 180, 270 where 0 means North, 90 means East, etc.
 
-As shown in the examples, intentional types usually have names, so
-that you can refer to them in the documentation of other types and in
-other places that refer to intentional types, such as in D-Bus
-introspection declarations.
-
-Names are optional however: if you use a type in only one place, you
-can write its definition right there, without having to give it a
-name.
+As shown in the examples, intentional types have names, so that you
+can refer to them in the documentation of other types and in other
+places that refer to intentional types, such as in D-Bus introspection
+declarations.
 
 When other people refer to your type, they can provide a set of
 parameters to specialize it.  You should document which parameters are
@@ -433,10 +423,6 @@ In a context where a type is expected:
   NAME                          - refers to type named NAME
   <NAME>PARM...</NAME>          - refers to type named NAME, specialized
                                   with PARM...
-  <name/><parms/><doc/><base/>  - anonymous type with inline definition
-
-Note that this means that types can't be named "name", "parms", "doc",
-or "base".  This might be a bit too clever.
 
 Attributes for type definitions:
 
@@ -447,7 +433,7 @@ Attributes for type definitions:
 
 As an example, consider a hypothetical XML schema for describing
 key-value pairs.  Let's also assume that this schema follows our
-Mini-DOM rules.  It has a "key" element which needs name, doc and type
+Nano-DOM rules.  It has a "key" element which needs name, doc and type
 attributes.  The "type" attribute should refer to an intentional type
 of course.  We can describe a key for the current temperature,
 expressed as one of "low", "medium", "high", in the following ways.
@@ -463,7 +449,7 @@ tell us that they are the strings "low", "medium", and "high".
     <type>three-level-enum</type>
   <key>
 
-Using the Mini-DOM rules, this can be shortened to:
+Using the Nano-DOM rules, this can be shortened to:
 
   <key name="Temperature"
        doc="The current temperature"
@@ -484,31 +470,11 @@ pre-defined generic types.
     </type>
   </key>
 
-If we want to, we can define a new type right in the key definition,
-but that should rarely be needed.  (XXX - Maybe we can disallow this
-altogether.)
-
-  <key name="Temperature"
-       doc="The current temperature">
-    <type>
-      <doc>
-        A temperature expressed as one of three levels: low, medium, or high.
-      </doc>
-      <base>
-        <string-enum>
-          <low doc="Brrrr"/>
-	  <medium doc="Comfy."/>
-	  <high doc="Siesta!"/>
-        </string-enum>
-      </base>
-    </type>
-  </key>
-
 The common intentional types are defined in XML, as a list of "type"
 elements that have "name", "parms", "doc", and "base" child elements,
 as expected.
 
-In the following, we give the type definitons verbatim, as XML, as an
+In the following, we give the type definitions verbatim, as XML, as an
 extended example (and because the real XML definition of the types
 does not exist yet).  In the future, this part of the document will be
 generated from the type definitions and will look nicer.
@@ -517,30 +483,18 @@ Fundamental types
 ~~~~~~~~~~~~~~~~~
 
   <typedef name="int32">
-    <params>
-      <min doc="Minimum value"/>
-      <max doc="Maximum value"/>
-    <params>
     <doc>
-      A int32 value within the given limits.
+      A int32 value.
     </doc>
   </type>
 
   <type name="int64">
-    <params>
-      <min doc="Minimum value"/>
-      <max doc="Maximum value"/>
-    <params>
     <doc>
-      A int64 value within the given limits.
+      A int64 value.
     </doc>
   </type>
 
   <type name="uint32">
-    <params>
-      <min doc="Minimum value"/>
-      <max doc="Maximum value"/>
-    <params>
     <doc>
       A uint32 value within the given limits.
     </doc>
@@ -671,7 +625,7 @@ Specific types
 
   <type name="type">
     <doc>
-      A type, represented as a map.  The map is the one you get as the Mini-DOM 
+      A type, represented as a map.  The map is the one you get as the Nano-DOM 
       for the type definiton.  E.g., it will have "doc" mapped to a string,
       and "base" mapped to either a string or another map, etc.
     </doc>
