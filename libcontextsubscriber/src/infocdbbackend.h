@@ -50,8 +50,8 @@ public:
     static bool databaseExists();
 
 private:
-    QFileSystemWatcher watcher; //< A watched object obsering the database file. Delivers synced notifications.
-    CDBReader reader; //< The cdb reader object used to access the cdb database.
+    QFileSystemWatcher watcher; ///< A watched object obsering the database file. Delivers synced notifications.
+    CDBReader reader; ///< The cdb reader object used to access the cdb database.
     void watchPathOrDirectory();
     void watchDirectory();
     void watchPath();

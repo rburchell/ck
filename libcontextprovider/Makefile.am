@@ -1,4 +1,4 @@
-SUBDIRS = src test-cli unit-tests doc customer-tests
+SUBDIRS = src unit-tests doc customer-tests
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextprovider-1.0.pc

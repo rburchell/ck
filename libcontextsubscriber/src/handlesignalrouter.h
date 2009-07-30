@@ -39,7 +39,7 @@ public slots:
 
 private:
     HandleSignalRouter();
-    static HandleSignalRouter myInstance; //< Singleton instance
+    static HandleSignalRouter myInstance; ///< Singleton instance
 };
 
 } // end namespace

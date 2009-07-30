@@ -40,9 +40,9 @@ public:
     QString backendName() const;
 
 private:
-    ContextRegistryInfo() {}; //< Private constructor. Do not use.
-    ContextRegistryInfo(const ContextRegistryInfo&); //< Private constructor. Do not use.
-    ContextRegistryInfo& operator=(const ContextRegistryInfo&); //< Private operator. Do not use.
+    ContextRegistryInfo() {}; ///< Private constructor. Do not use.
+    ContextRegistryInfo(const ContextRegistryInfo&); ///< Private constructor. Do not use.
+    ContextRegistryInfo& operator=(const ContextRegistryInfo&); ///< Private operator. Do not use.
 
     /// Holds the actual pointer to the singelton instance.
     /// Mutex protected during creation.

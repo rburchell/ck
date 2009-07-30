@@ -41,8 +41,8 @@ public:
     int fileDescriptor() const;
 
 private:
-    void *cdbm; //< A cdb library structure used to read data.
-    int fd; //< A file descriptor pointing to the database.
+    void *cdbm; ///< A cdb library structure used to read data.
+    int fd; ///< A file descriptor pointing to the database.
 
     void put(const QString &key, const QString &val, int flag);
 };

@@ -54,9 +54,9 @@ private slots:
     void onFileChanged(const QString &path);
 
 private:
-    QFileSystemWatcher watcher; //< A watched object obsering the database file. Delivers synced notifications.
-    QHash <QString, InfoKeyData> keyDataHash; //< This hash contains the full state of registry in memory.
-    int countOfFilesInLastParse; //< The number of xml files we parsed in last registry update.
+    QFileSystemWatcher watcher; ///< A watched object obsering the database file. Delivers synced notifications.
+    QHash <QString, InfoKeyData> keyDataHash; ///< This hash contains the full state of registry in memory.
+    int countOfFilesInLastParse; ///< The number of xml files we parsed in last registry update.
 
     void regenerateKeyDataList();
     void readKeyDataFromXml(const QFileInfo &f);
