@@ -1,9 +1,9 @@
 noinst_PROGRAMS = client
 
-client_SOURCES = client.cpp sconnect.h commandwatcher.h	\
-commandwatcher.cpp
+client_SOURCES = client.cpp commandwatcher.h commandwatcher.cpp
 
-AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)
+AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) -I$(srcdir)/../../../common
+
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS)
 
 # moccing

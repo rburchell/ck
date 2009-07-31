@@ -1,17 +1,24 @@
 bin_PROGRAMS = subscriptiontests
 
-subscriptiontests_SOURCES = subscriptiontests.cpp sconnect.h \
-							subscriptiontests.h
+subscriptiontests_SOURCES = subscriptiontests.cpp \
+			    subscriptiontests.h
 
 check-customer:
 	export PATH=$$PATH:../client ; ./subscriptiontests
 
-AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)  $(QtTest_CFLAGS) -I$(srcdir)/../../src
+AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)  $(QtTest_CFLAGS) -I$(srcdir)/../../src \
+	      -I$(srcdir)/../../../common
+
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) $(QtTest_LIBS)
-subscriptiontests_LDADD = ../../src/libcontextprovider.la
+subscriptiontests_LDADD = ../../src/libcontextprovider.la ../../../common/libcommon.a
+
 ../../src/libcontextprovider.la:
 	$(MAKE) -C ../../src libcontextprovider.la
-.PHONY: ../../libcontextprovider.la
+
+../../../common/libcommon.a:
+	$(MAKE) -C ../../../common libcommon.a
+	
+.PHONY: ../../libcontextprovider.la ../../../libcommon.a
 
 # moccing
 nodist_subscriptiontests_SOURCES = mocs.cpp
