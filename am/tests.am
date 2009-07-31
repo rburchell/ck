@@ -10,7 +10,8 @@ COV_LIBS=
 endif
 
 # include header files from source as a last resource and use QTest, coverage
-AM_CXXFLAGS += $(QtTest_CFLAGS) $(COV_CXXFLAGS)
+AM_CXXFLAGS += $(QtTest_CFLAGS) $(COV_CXXFLAGS) -I$(top_srcdir)/common
+
 AM_LDFLAGS += $(QtTest_LIBS) $(COV_LIBS)
 
 # We need to put $(FROM_SOURCE) into BUILT_SOURCES so that header
@@ -24,7 +25,7 @@ $(FROM_SOURCE): %: $(FROM_SOURCE_DIR)/%
 
 check_LIBRARIES = libsrc.a  # library built from files in the real source
 nodist_libsrc_a_SOURCES = $(FROM_SOURCE)
-LDADD += $(check_LIBRARIES)    # add it to the linking
+LDADD += $(check_LIBRARIES) ../../../common/libcommon.a # add it to the linking
 
 # tests should be always debuggable, can't use AM_CXXFLAGS, because
 # that is too early
