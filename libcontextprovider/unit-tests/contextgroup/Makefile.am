@@ -9,7 +9,7 @@ COVERAGE_FILES = contextgroup.cpp
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtCore_CFLAGS)
 AM_LDFLAGS = $(QtCore_LIBS)
-FROM_SOURCE = logging.cpp logging.h loggingfeatures.h contextgroup.h contextgroup.cpp sconnect.h # copy these files from the real source
+FROM_SOURCE = loggingfeatures.h contextgroup.h contextgroup.cpp # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am

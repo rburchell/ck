@@ -26,6 +26,9 @@
 #include "contextgroup.h"
 #include "listeners.h"
 
+namespace ContextProvider {
+}
+
 using namespace ContextProvider;
 
 /*!

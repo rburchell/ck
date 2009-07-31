@@ -28,6 +28,9 @@
 #include <QSet>
 #include <QStringList>
 
+namespace ContextProvider {
+}
+
 class Context;
 
 class ContextGroup : public QObject
