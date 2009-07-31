@@ -10,7 +10,7 @@ EXTRA_DIST = test.cdb
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = '-I$(srcdir)/../util/'
 AM_LDFLAGS = $(CDB_LIBS)
-FROM_SOURCE = cdbreader.cpp cdbreader.h logging.cpp logging.h loggingfeatures.h # copy these files from the real source
+FROM_SOURCE = cdbreader.cpp cdbreader.h loggingfeatures.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am
