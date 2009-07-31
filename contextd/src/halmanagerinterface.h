@@ -28,6 +28,8 @@
 class QDBusConnection;
 class QString;
 
+namespace ContextD {
+
 class HalManagerInterface : public QDBusAbstractInterface
 {
     Q_OBJECT
@@ -36,5 +38,7 @@ public:
     HalManagerInterface(const QDBusConnection connection, const QString &busName, QObject *parent = 0);
     QStringList findDeviceByCapability(const QString &capability);
 };
+
+}
 
 #endif

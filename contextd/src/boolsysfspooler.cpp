@@ -24,6 +24,8 @@
 #include "logging.h"
 #include "loggingfeatures.h"
 
+namespace ContextD {
+
 /*!
     \class BoolSysFsPooler
 
@@ -87,3 +89,4 @@ BoolSysFsPooler::TriState BoolSysFsPooler::getState()
     return state;
 }
 
+}

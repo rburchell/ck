@@ -28,6 +28,8 @@
 #include <QFile>
 #include <QFileSystemWatcher>
 
+namespace ContextD {
+
 class BoolSysFsPooler : public QObject
 {
     Q_OBJECT
@@ -53,5 +55,7 @@ signals:
     /// Emitted automatically when the state changes. \a newState contains the new state.
     void stateChanged(TriState newState); 
 };
+
+}
 
 #endif // BOOLSYSFSPOOLER_H

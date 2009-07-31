@@ -29,6 +29,8 @@
 #include "context.h"
 #include "boolsysfspooler.h"
 
+namespace ContextD {
+
 class LowMemProvider : public Provider
 {
     Q_OBJECT
@@ -48,5 +50,7 @@ private slots:
     void onLastSubscriberDisappeared();
     void onWatermarkStateChanged();
 };
+
+}
 
 #endif // LOWMEMPROVIDER_H

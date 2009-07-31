@@ -21,6 +21,8 @@
 
 #include "haldeviceinterface.h"
 
+namespace ContextD {
+
 #define INTERFACE_NAME "org.freedesktop.Hal.Device"
 
 /*!
@@ -49,3 +51,4 @@ QVariant HalDeviceInterface::readValue(const QString &prop)
         return msg.arguments().at(0);
 }
 
+}

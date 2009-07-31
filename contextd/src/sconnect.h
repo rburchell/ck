@@ -25,6 +25,8 @@
 #include <QObject>
 #include <QDebug>
 
+namespace ContextD {
+
 inline void sconnect(const QObject *from, const char* fromSignal,
                      const QObject *to, const char* toSignal)
 {
@@ -34,6 +36,8 @@ inline void sconnect(const QObject *from, const char* fromSignal,
                "enable debug (qmake CONFIG+=debug), recompile, rerun and then use the\n"
                "core file with gdb's backtrace to see the location.\n"
                "    *****************\n");
+}
+
 }
 
 #endif

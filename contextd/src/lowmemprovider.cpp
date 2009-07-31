@@ -24,6 +24,8 @@
 #include "loggingfeatures.h"
 #include "sconnect.h"
 
+namespace ContextD {
+
 /*!
     \class LowMemProvider
 
@@ -134,4 +136,6 @@ void LowMemProvider::onWatermarkStateChanged()
         memoryPressure->unset();
         return;
     }
+}
+
 }

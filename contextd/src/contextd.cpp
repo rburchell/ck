@@ -24,6 +24,8 @@
 #include "lowmemprovider.h"
 #include "context.h"
 
+using namespace ContextD;
+
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);

@@ -22,6 +22,7 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
+
 #include <QIODevice>
 #include <QString>
 #include <QStringList>
@@ -36,6 +37,8 @@
 #ifndef CONTEXT_LOG_MODULE_NAME
 #define CONTEXT_LOG_MODULE_NAME "unknown"
 #endif
+
+namespace ContextD {
 
 class ContextFeature
 {
@@ -158,3 +161,5 @@ public:
 #endif
 
 #endif // LOGGING_H
+
+}

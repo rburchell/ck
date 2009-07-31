@@ -23,6 +23,8 @@
 #include <QDBusInterface>
 #include <QStringList>
 
+namespace ContextD {
+
 #define INTERFACE_NAME  "org.freedesktop.Hal.Manager"
 #define OBJECT_PATH     "/org/freedesktop/Hal/Manager"
 
@@ -48,3 +50,4 @@ QStringList HalManagerInterface::findDeviceByCapability(const QString &capabilit
     return msg.arguments().at(0).toStringList();
 }
 
+}

@@ -27,6 +27,8 @@
 #include "context.h"
 #include "sconnect.h"
 
+namespace ContextD {
+
 #define BATTERY_LOW_THRESHOLD       10
 #define BATTERY_CHARGE_PERCENTAGE   "battery.charge_level.percentage"
 #define BATTERY_CHARGE_CURRENT      "battery.charge_level.current" 
@@ -190,3 +192,4 @@ void HalProvider::updateProperties()
         timeUntilFull->unset();
 }
 
+}

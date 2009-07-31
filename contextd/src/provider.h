@@ -26,6 +26,8 @@
 #include <QStringList>
 #include <QObject>
 
+namespace ContextD {
+
 /*!
     \class Provider
 
@@ -49,5 +51,7 @@ public:
     /// the Context property instances and do all the setup work it needs to do.
     virtual void initialize() = 0;
 };
+
+}
 
 #endif // PROVIDER_H

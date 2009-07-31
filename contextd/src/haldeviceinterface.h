@@ -25,8 +25,10 @@
 #include <QObject>
 #include <QDBusAbstractInterface>
 
-class QDBusConnection;
 class QString;
+class QDBusConnection;
+
+namespace ContextD {
 
 class HalDeviceInterface : public QDBusAbstractInterface
 {
@@ -44,5 +46,7 @@ public:
     int readIntValue(const QString &prop);
     QVariant readValue(const QString &prop);
 };
+
+}
 
 #endif

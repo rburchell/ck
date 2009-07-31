@@ -25,6 +25,8 @@
 #include <QDateTime>
 #include <QFile>
 
+namespace ContextD {
+
 /*!
     \page Logging
     
@@ -518,3 +520,4 @@ ContextRealLogger& ContextRealLogger::operator<< (char v)
     return *this;
 }
 
+}

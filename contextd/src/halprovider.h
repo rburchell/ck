@@ -29,6 +29,8 @@
 #include "contextgroup.h"
 #include "haldeviceinterface.h"
 
+namespace ContextD {
+
 class HalProvider : public Provider
 {
     Q_OBJECT
@@ -53,5 +55,7 @@ private slots:
     void onLastSubscriberDisappeared();
     void onDevicePropertyModified();
 };
+
+}
 
 #endif // HALPROVIDER_H
