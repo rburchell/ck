@@ -18,10 +18,9 @@
  * 02110-1301 USA
  *
  */
- 
+
 #ifndef LOGGING_H
 #define LOGGING_H
-
 
 #include <QIODevice>
 #include <QString>

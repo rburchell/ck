@@ -1,8 +1,6 @@
 bin_PROGRAMS = contextd
 contextd_SOURCES = contextd.cpp		        \
 		   provider.h		        \
-		   logging.cpp		        \
-		   logging.h		        \
 		   loggingfeatures.h	        \
 		   halprovider.h	        \
 		   halprovider.cpp	        \
@@ -10,7 +8,6 @@ contextd_SOURCES = contextd.cpp		        \
 		   halmanagerinterface.cpp      \
 		   haldeviceinterface.cpp	\
 		   haldeviceinterface.h         \
-		   sconnect.h			\
 		   lowmemprovider.cpp		\
 		   lowmemprovider.h		\
 		   boolsysfspooler.h		\
@@ -20,8 +17,9 @@ AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)
 LIBS += $(QtCore_LIBS)
 
 # library dependency hack for seamless make in contextd
-AM_CXXFLAGS += -I$(srcdir)/../../libcontextprovider/src		\
-	      '-DCONTEXT_LOG_MODULE_NAME="contextd"'
+AM_CXXFLAGS += -I$(srcdir)/../../common				\
+               -I$(srcdir)/../../libcontextprovider/src		\
+	       '-DCONTEXT_LOG_MODULE_NAME="contextd"'
 
 contextd_LDADD = ../../libcontextprovider/src/libcontextprovider.la
 ../../libcontextprovider/src/libcontextprovider.la:
@@ -30,5 +28,5 @@ contextd_LDADD = ../../libcontextprovider/src/libcontextprovider.la
 
 # moccing
 nodist_contextd_SOURCES = mocs.cpp
-QT_TOMOC = $(filter %.h, $(contextd_SOURCES))
+QT_TOMOC = $(filter %.h, $(contextd_SOURCES)) ../../common/logging.cpp
 include $(top_srcdir)/am/qt.am
