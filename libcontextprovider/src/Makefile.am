@@ -26,7 +26,8 @@ includecontextprovider_HEADERS = context.h contextc.h contextgroup.h context_pro
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS) \
 	      -I$(srcdir)/../../common			       \
               '-DCONTEXT_LOG_MODULE_NAME="libcontextprovider"'
-LIBS += $(QtCore_LIBS) $(QtDBus_LIBS)
+
+LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) ../../common/libcommon.a
 
 ../../common/libcommon.a:
 	$(MAKE) -C ../../common libcommon.a
