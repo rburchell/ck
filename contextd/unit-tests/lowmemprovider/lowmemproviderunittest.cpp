@@ -24,6 +24,8 @@
 #include "lowmemprovider.h"
 #include "boolsysfspooler.h"
 
+using namespace ContextD;
+
 QHash<QString, QVariant> values;
 QList<Context*> contexts;
 BoolSysFsPooler *lowWatermark;

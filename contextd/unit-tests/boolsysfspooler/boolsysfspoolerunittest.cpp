@@ -25,6 +25,8 @@
 #include <QTest>
 #include "boolsysfspooler.h"
 
+using namespace ContextD;
+
 #define DEFAULT_WAIT_PERIOD 100
 #define LOCAL_FILE(f) (utilPathForLocalFile(f))
 

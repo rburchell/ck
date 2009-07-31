@@ -25,6 +25,8 @@
 #include "context.h"
 #include "halmanagerinterface.h"
 
+using namespace ContextD;
+
 QVariant *halChargePercentage = NULL;
 QVariant *halChargeCurrent = NULL;
 QVariant *halIsCharging = NULL;
