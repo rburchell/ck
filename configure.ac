@@ -53,6 +53,7 @@ AC_CONFIG_FILES([
 	Makefile
 	doc/Makefile
 	fake-provider/Makefile
+	common/Makefile
 	libcontextprovider/contextprovider-1.0.pc
 	libcontextprovider/Makefile
 	libcontextprovider/doc/Makefile

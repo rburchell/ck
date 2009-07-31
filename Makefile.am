@@ -11,7 +11,8 @@ SUBDIRS = \
 	doc \
 	python \
 	tools \
-	fake-provider
+	fake-provider \
+	common
 
 DISTCLEANFILES = lcov.info lcov.html
 MAINTAINERCLEANFILES = INSTALL

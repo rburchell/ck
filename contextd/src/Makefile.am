@@ -21,12 +21,15 @@ AM_CXXFLAGS += -I$(srcdir)/../../common				\
                -I$(srcdir)/../../libcontextprovider/src		\
 	       '-DCONTEXT_LOG_MODULE_NAME="contextd"'
 
-contextd_LDADD = ../../libcontextprovider/src/libcontextprovider.la
+contextd_LDADD = ../../libcontextprovider/src/libcontextprovider.la \
+		 ../../common/libcommon.a
+
 ../../libcontextprovider/src/libcontextprovider.la:
 	$(MAKE) -C ../../libcontextprovider/src libcontextprovider.la
+
 .PHONY: ../../libcontextprovider/src/libcontextprovider.la
 
 # moccing
 nodist_contextd_SOURCES = mocs.cpp
-QT_TOMOC = $(filter %.h, $(contextd_SOURCES)) ../../common/logging.cpp
+QT_TOMOC = $(filter %.h, $(contextd_SOURCES)) 
 include $(top_srcdir)/am/qt.am
