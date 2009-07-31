@@ -37,8 +37,6 @@
 #define CONTEXT_LOG_MODULE_NAME "unknown"
 #endif
 
-namespace ContextD {
-
 class ContextFeature
 {
 public:
@@ -160,5 +158,3 @@ public:
 #endif
 
 #endif // LOGGING_H
-
-}
