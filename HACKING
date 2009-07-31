@@ -46,14 +46,6 @@ all 'interesting' files just before building.  Let's see.
 Anyway, you can disable generating of documentation by passing
 --disable-doc to configure.
 
-Vala
-----
-
-Finding a good vala compiler is hard too, sometimes harder than
-finding the documentation tools.  So we distribute or vala generated C
-sources too, the same timestamp issues applies, you can disable
-compilation of .vala files with --disable-vala.
-
 Environments
 ------------
 
@@ -129,11 +121,6 @@ We follow the DUI coding style for C++ code.  In brief:
 For Python:
 
  - PEP 8, but
- - Maximum line length is 120.
-
-For Vala:
-
- - Linux style with indentation offset 8, but
  - Maximum line length is 120.
 
 Generated files
