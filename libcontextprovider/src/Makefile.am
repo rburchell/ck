@@ -27,7 +27,8 @@ AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS) \
 	      -I$(srcdir)/../../common			       \
               '-DCONTEXT_LOG_MODULE_NAME="libcontextprovider"'
 
-LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) ../../common/libcommon.la
+LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) 
+libcontextprovider_la_LIBADD=../../common/libcommon.la
 
 ../../common/libcommon.la:
 	$(MAKE) -C ../../common libcommon.la
