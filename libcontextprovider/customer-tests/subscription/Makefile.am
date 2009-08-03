@@ -7,18 +7,18 @@ check-customer:
 	export PATH=$$PATH:../client ; ./subscriptiontests
 
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)  $(QtTest_CFLAGS) -I$(srcdir)/../../src \
-	      -I$(srcdir)/../../../common
+	      -I$(top_srcdir)/common
 
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) $(QtTest_LIBS)
-subscriptiontests_LDADD = ../../src/libcontextprovider.la ../../../common/libcommon.la
+subscriptiontests_LDADD = ../../src/libcontextprovider.la $(top_builddir)/common/libcommon.la
 
 ../../src/libcontextprovider.la:
 	$(MAKE) -C ../../src libcontextprovider.la
 
-../../../common/libcommon.la:
-	$(MAKE) -C ../../../common libcommon.la
+$(top_builddir)/common/libcommon.la:
+	$(MAKE) -C $(top_builddir)/common libcommon.la
 	
-.PHONY: ../../libcontextprovider.la ../../../libcommon.la
+.PHONY: ../../libcontextprovider.la $(top_builddir)/libcommon.la
 
 # moccing
 nodist_subscriptiontests_SOURCES = mocs.cpp

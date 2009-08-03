@@ -24,16 +24,16 @@ libcontextprovider_la_SOURCES = loggingfeatures.h       \
 includecontextproviderdir=$(includedir)/contextprovider
 includecontextprovider_HEADERS = context.h contextc.h contextgroup.h context_provider.h
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS) \
-	      -I$(srcdir)/../../common			       \
+	      -I$(top_srcdir)/common			       \
               '-DCONTEXT_LOG_MODULE_NAME="libcontextprovider"'
 
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) 
-libcontextprovider_la_LIBADD=../../common/libcommon.la
+libcontextprovider_la_LIBADD=$(top_builddir)/common/libcommon.la
 
-../../common/libcommon.la:
-	$(MAKE) -C ../../common libcommon.la
+$(top_builddir)/common/libcommon.la:
+	$(MAKE) -C $(top_builddir)/common libcommon.la
 
-.PHONY: ../../common/libcommon.la
+.PHONY: $(top_builddir)/common/libcommon.la
 
 # moccing
 nodist_libcontextprovider_la_SOURCES = mocs.cpp
