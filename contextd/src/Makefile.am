@@ -22,15 +22,15 @@ AM_CXXFLAGS += -I$(srcdir)/../../common				\
 	       '-DCONTEXT_LOG_MODULE_NAME="contextd"'
 
 contextd_LDADD = ../../libcontextprovider/src/libcontextprovider.la \
-		 ../../common/libcommon.a
+		 ../../common/libcommon.la
 
 ../../libcontextprovider/src/libcontextprovider.la:
 	$(MAKE) -C ../../libcontextprovider/src libcontextprovider.la
 
-../../common/libcommon.a:
-	$(MAKE) -C ../../common libcommon.a
+../../common/libcommon.la:
+	$(MAKE) -C ../../common libcommon.la
 
-.PHONY: ../../libcontextprovider/src/libcontextprovider.la ../../common/libcommon.a
+.PHONY: ../../libcontextprovider/src/libcontextprovider.la ../../common/libcommon.la
 
 # moccing
 nodist_contextd_SOURCES = mocs.cpp

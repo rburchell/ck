@@ -25,9 +25,9 @@ AM_CXXFLAGS = -I$(srcdir)/../../common \
 ../../common/libcommon.a:
 	$(MAKE) -C ../../common libcommon.a
 
-LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS) ../../common/libcommon.a
+LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS) ../../common/libcommon.la
 
-.PHONY: ../../common/libcommon.a
+.PHONY: ../../common/libcommon.la
 
 # moccing
 nodist_libcontextsubscriber_la_SOURCES = mocs.cpp

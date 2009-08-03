@@ -27,12 +27,12 @@ AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS) \
 	      -I$(srcdir)/../../common			       \
               '-DCONTEXT_LOG_MODULE_NAME="libcontextprovider"'
 
-LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) ../../common/libcommon.a
+LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) ../../common/libcommon.la
 
-../../common/libcommon.a:
-	$(MAKE) -C ../../common libcommon.a
+../../common/libcommon.la:
+	$(MAKE) -C ../../common libcommon.la
 
-.PHONY: ../../common/libcommon.a
+.PHONY: ../../common/libcommon.la
 
 # moccing
 nodist_libcontextprovider_la_SOURCES = mocs.cpp

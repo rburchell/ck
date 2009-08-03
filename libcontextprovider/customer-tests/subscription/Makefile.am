@@ -10,15 +10,15 @@ AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)  $(QtTest_CFLAGS) -I$(srcdir)/..
 	      -I$(srcdir)/../../../common
 
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) $(QtTest_LIBS)
-subscriptiontests_LDADD = ../../src/libcontextprovider.la ../../../common/libcommon.a
+subscriptiontests_LDADD = ../../src/libcontextprovider.la ../../../common/libcommon.la
 
 ../../src/libcontextprovider.la:
 	$(MAKE) -C ../../src libcontextprovider.la
 
-../../../common/libcommon.a:
-	$(MAKE) -C ../../../common libcommon.a
+../../../common/libcommon.la:
+	$(MAKE) -C ../../../common libcommon.la
 	
-.PHONY: ../../libcontextprovider.la ../../../libcommon.a
+.PHONY: ../../libcontextprovider.la ../../../libcommon.la
 
 # moccing
 nodist_subscriptiontests_SOURCES = mocs.cpp
