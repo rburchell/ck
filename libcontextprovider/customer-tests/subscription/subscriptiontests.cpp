@@ -75,7 +75,9 @@ void SubscriptionTests::testGetSubscriber()
     clientName = "client";
     sconnect(client, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
     client->start(clientName);
-    client->waitForStarted();
+    bool successfullyStarted = client->waitForStarted();
+    QVERIFY(successfullyStarted);
+
     client->write("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
     client->waitForBytesWritten();
     // Blocking for reading operation is bad idea since the client
@@ -85,7 +87,7 @@ void SubscriptionTests::testGetSubscriber()
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
     }
     QString actual(client->readAll());
-    QString expected("GetSubscriber returned /org/freedesktop/ContextKit/Subscriber/1");
+    QString expected("GetSubscriber returned /org/freedesktop/ContextKit/Subscriber/0");
     QCOMPARE(actual.simplified(),expected.simplified());
     client->kill();
     client->waitForFinished();
