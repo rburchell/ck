@@ -28,16 +28,18 @@
 #include <QSet>
 #include <QStringList>
 
-class Context;
+namespace ContextProvider {
 
-class ContextGroup : public QObject
+class Property;
+
+class Group : public QObject
 {
     Q_OBJECT
     
 public:
-    explicit ContextGroup(QSet<Context*> propertiesToWatch, QObject* parent = 0);
-    explicit ContextGroup(QStringList propertiesToWatch, QObject* parent = 0);
-    ~ContextGroup();
+    explicit Group(QSet<Property*> propertiesToWatch, QObject* parent = 0);
+    explicit Group(QStringList propertiesToWatch, QObject* parent = 0);
+    ~Group();
 
     bool isSubscribedTo() const;
 
@@ -60,5 +62,6 @@ private:
     int propertiesSubscribedTo; ///< Number of Context objects currently subscribed to.
 };
 
+} // end namespace
 
 #endif

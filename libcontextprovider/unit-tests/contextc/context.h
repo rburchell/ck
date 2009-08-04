@@ -29,15 +29,17 @@
 #include <QHash>
 #include <QVariant>
 
+namespace ContextProvider {
+
 class Manager;
 
-class Context : public QObject
+class Property : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Context(const QString &key, QObject *parent = 0);
-    ~Context();
+    explicit Property(const QString &key, QObject *parent = 0);
+    ~Property();
     
     void set(const QVariant &v);
     void unset();
@@ -56,5 +58,7 @@ signals:
 private:
     QString key;
 };
+
+} // end namespace
 
 #endif

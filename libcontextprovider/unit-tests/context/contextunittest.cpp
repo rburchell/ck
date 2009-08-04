@@ -95,10 +95,6 @@ ManagerAdaptor::ManagerAdaptor(Manager* manager, QDBusConnection *conn)
 {
 }
 
-} // namespace ContextProvider
-
-using namespace ContextProvider;
-
 class ContextUnitTest : public QObject
 {
     Q_OBJECT
@@ -109,8 +105,8 @@ private slots:
     void registerSystem();
     void badServiceName();
     void stopService();
-    void getContext();
-    void getNonExistantContext();
+    void getProperty();
+    void getNonExistentProperty();
     void checkSignals();
     void setGetBool();
     void setGetInt();
@@ -127,56 +123,56 @@ void ContextUnitTest::initTestCase()
 {
     QStringList keys;
     keys.append("Battery.Voltage");
-    QCOMPARE(Context::initService(QDBusConnection::SessionBus, "com.test.provider", keys), true);
+    QCOMPARE(Property::initService(QDBusConnection::SessionBus, "com.test.provider", keys), true);
 }
 
 void ContextUnitTest::registerAgain()
 {
     QStringList keys;
     keys.append("Battery.Voltage");
-    QCOMPARE(Context::initService(QDBusConnection::SessionBus, "com.test.provider", keys), false);
+    QCOMPARE(Property::initService(QDBusConnection::SessionBus, "com.test.provider", keys), false);
 }
 
 void ContextUnitTest::registerSystem()
 {
     QStringList keys;
     keys.append("Battery.Power");
-    QCOMPARE(Context::initService(QDBusConnection::SystemBus, "com.test.provider", keys), false);
+    QCOMPARE(Property::initService(QDBusConnection::SystemBus, "com.test.provider", keys), false);
 }
 
 void ContextUnitTest::badServiceName()
 {
     QStringList keys;
     keys.append("Battery.Whatever");
-    QCOMPARE(Context::initService(QDBusConnection::SessionBus, "!!!", keys), false);
+    QCOMPARE(Property::initService(QDBusConnection::SessionBus, "!!!", keys), false);
 }
 
 void ContextUnitTest::stopService()
 {
-    Context::stopService("com.test.stopper"); // Bolox.
+    Property::stopService("com.test.stopper"); // Bolox.
 
     QStringList keys;
     keys.append("Some.Key");
-    QCOMPARE(Context::initService(QDBusConnection::SessionBus, "com.test.stopper", keys), true);
-    QCOMPARE(Context::initService(QDBusConnection::SessionBus, "com.test.stopper", keys), false);
+    QCOMPARE(Property::initService(QDBusConnection::SessionBus, "com.test.stopper", keys), true);
+    QCOMPARE(Property::initService(QDBusConnection::SessionBus, "com.test.stopper", keys), false);
 
-    Context::stopService("com.test.stopper");
-    QCOMPARE(Context::initService(QDBusConnection::SessionBus, "com.test.stopper", keys), true);
+    Property::stopService("com.test.stopper");
+    QCOMPARE(Property::initService(QDBusConnection::SessionBus, "com.test.stopper", keys), true);
 
-    Context::stopService("com.test.stopper");
+    Property::stopService("com.test.stopper");
 }
 
-void ContextUnitTest::getContext()
+void ContextUnitTest::getProperty()
 {
-    Context c("Battery.Voltage");
+    Property c("Battery.Voltage");
     QCOMPARE(c.getKey(), QString("Battery.Voltage"));
     QCOMPARE(c.isValid(), true);
 }
     
-void ContextUnitTest::getNonExistantContext()
+void ContextUnitTest::getNonExistentProperty()
 {
     resetVariants();
-    Context c("Battery.NonExistent");
+    Property c("Battery.NonExistent");
     QCOMPARE(c.getKey(), QString("Battery.NonExistent"));
     QCOMPARE(c.isValid(), false);
 }
@@ -184,7 +180,7 @@ void ContextUnitTest::getNonExistantContext()
 void ContextUnitTest::checkSignals()
 {
     resetVariants();
-    Context c("Battery.Voltage");
+    Property c("Battery.Voltage");
    
     QSignalSpy spy1(&c, SIGNAL(firstSubscriberAppeared(QString)));
     QSignalSpy spy2(&c, SIGNAL(lastSubscriberDisappeared(QString)));
@@ -205,80 +201,80 @@ void ContextUnitTest::checkSignals()
 void ContextUnitTest::setGetBool()
 {
     resetVariants();
-    Context("Battery.Voltage").set(true);
+    Property("Battery.Voltage").set(true);
     QCOMPARE(*lastVariantSet, QVariant(true));
-    QCOMPARE(Context("Battery.Voltage").get(), QVariant(true));
+    QCOMPARE(Property("Battery.Voltage").get(), QVariant(true));
 
     // Set on invalid
-    Context("Battery.NonExistent").set(false);
+    Property("Battery.NonExistent").set(false);
     QCOMPARE(*lastVariantSet, QVariant(true));
 }
 
 void ContextUnitTest::setGetInt()
 {
     resetVariants();
-    Context("Battery.Voltage").set(666);
+    Property("Battery.Voltage").set(666);
     QCOMPARE(*lastVariantSet, QVariant(666));
-    QCOMPARE(Context("Battery.Voltage").get(), QVariant(666));
-    QVERIFY(Context("Battery.Voltage").isSet());
+    QCOMPARE(Property("Battery.Voltage").get(), QVariant(666));
+    QVERIFY(Property("Battery.Voltage").isSet());
     
     // Set on invalid
-    Context("Battery.NonExistent").set(999);
+    Property("Battery.NonExistent").set(999);
     QCOMPARE(*lastVariantSet, QVariant(666));
 }
 
 void ContextUnitTest::setGetDouble()
 {
     resetVariants();
-    Context("Battery.Voltage").set(0.456);
+    Property("Battery.Voltage").set(0.456);
     QCOMPARE(*lastVariantSet, QVariant(0.456));
-    QCOMPARE(Context("Battery.Voltage").get(), QVariant(0.456));
-    QVERIFY(Context("Battery.Voltage").isSet());
+    QCOMPARE(Property("Battery.Voltage").get(), QVariant(0.456));
+    QVERIFY(Property("Battery.Voltage").isSet());
 
     // Set on invalid
-    Context("Battery.NonExistent").set(0.666);
+    Property("Battery.NonExistent").set(0.666);
     QCOMPARE(*lastVariantSet, QVariant(0.456));
 }
 
 void ContextUnitTest::setGetString()
 {
     resetVariants();
-    Context("Battery.Voltage").set(QString("Hello!"));
+    Property("Battery.Voltage").set(QString("Hello!"));
     QCOMPARE(*lastVariantSet, QVariant(QString("Hello!")));
-    QCOMPARE(Context("Battery.Voltage").get(), QVariant("Hello!"));
-    QVERIFY(Context("Battery.Voltage").isSet());
+    QCOMPARE(Property("Battery.Voltage").get(), QVariant("Hello!"));
+    QVERIFY(Property("Battery.Voltage").isSet());
    
     // Set on invalid
-    Context("Battery.NonExistent").set(QString("World"));
+    Property("Battery.NonExistent").set(QString("World"));
     QCOMPARE(*lastVariantSet, QVariant(QString("Hello!")));
 }
 
 void ContextUnitTest::setGetQVariant()
 {
     resetVariants();
-    Context("Battery.Voltage").set(QVariant(123));
+    Property("Battery.Voltage").set(QVariant(123));
     QCOMPARE(*lastVariantSet, QVariant(123));
-    QCOMPARE(Context("Battery.Voltage").get(), QVariant(123));
-    QVERIFY(Context("Battery.Voltage").isSet());
+    QCOMPARE(Property("Battery.Voltage").get(), QVariant(123));
+    QVERIFY(Property("Battery.Voltage").isSet());
     
     // Set on invalid
-    Context("Battery.NonExistent").set(QVariant("Hey!"));
+    Property("Battery.NonExistent").set(QVariant("Hey!"));
     QCOMPARE(*lastVariantSet, QVariant(123));
 }
 
 void ContextUnitTest::unset()
 {
     resetVariants();
-    QVERIFY(Context("Battery.Voltage").isSet() == false);
-    Context("Battery.Voltage").set(QVariant(123));
-    QVERIFY(Context("Battery.Voltage").isSet());
-    QCOMPARE(Context("Battery.Voltage").get(), QVariant(123));
-    Context("Battery.Voltage").unset();
-    QCOMPARE(Context("Battery.Voltage").get(), QVariant());
-    QVERIFY(! Context("Battery.Voltage").isSet());
+    QVERIFY(Property("Battery.Voltage").isSet() == false);
+    Property("Battery.Voltage").set(QVariant(123));
+    QVERIFY(Property("Battery.Voltage").isSet());
+    QCOMPARE(Property("Battery.Voltage").get(), QVariant(123));
+    Property("Battery.Voltage").unset();
+    QCOMPARE(Property("Battery.Voltage").get(), QVariant());
+    QVERIFY(! Property("Battery.Voltage").isSet());
 
     // Unset invalid
-    Context c("Battery.Invalid");
+    Property c("Battery.Invalid");
     QCOMPARE(c.isValid(), false);
     QCOMPARE(c.isSet(), false);
     c.unset();
@@ -288,15 +284,18 @@ void ContextUnitTest::unset()
 void ContextUnitTest::getInvalid()
 {
     resetVariants();
-    QCOMPARE(Context("Battery.NonExistent").get(), QVariant());
+    QCOMPARE(Property("Battery.NonExistent").get(), QVariant());
 }
 
 void ContextUnitTest::registerKeyAgain()
 {
     QStringList keys;
     keys.append("Battery.Voltage");
-    QCOMPARE(Context::initService(QDBusConnection::SessionBus, "com.test.provider2", keys), false);
+    QCOMPARE(Property::initService(QDBusConnection::SessionBus, "com.test.provider2", keys), false);
 }
 
 #include "contextunittest.moc"
-QTEST_MAIN(ContextUnitTest);
+
+} // end namespace
+
+QTEST_MAIN(ContextProvider::ContextUnitTest);

@@ -26,8 +26,10 @@
 #include "contextc.h"
 #include "contextgroup.h"
 
-QList<Context*> contextList;
-QList<ContextGroup*> contextGroupList;
+namespace ContextProvider {
+
+QList<Property*> propertyList;
+QList<Group*> groupList;
 
 QString *lastBusName = NULL;
 QStringList *lastKeysList = NULL;
@@ -36,29 +38,29 @@ QVariant *lastVariantSet = NULL;
 int lastSubscribed = 0;
 void *lastUserData = NULL;
 
-/* Mocked implementation of ContextGroup */
+/* Mocked implementation of Group */
 
-ContextGroup::ContextGroup(QStringList propertiesToWatch, QObject *parent) : keyList(propertiesToWatch)
+Group::Group(QStringList propertiesToWatch, QObject *parent) : keyList(propertiesToWatch)
 {
-    contextGroupList.append(this);
+    groupList.append(this);
 }
 
-ContextGroup::~ContextGroup()
+Group::~Group()
 {
-    contextGroupList.removeAll(this);
+    groupList.removeAll(this);
 }
 
-void ContextGroup::fakeFirst()
+void Group::fakeFirst()
 {
     emit firstSubscriberAppeared();
 }
 
-void ContextGroup::fakeLast()
+void Group::fakeLast()
 {
     emit lastSubscriberDisappeared();
 }
 
-/* Mocked implementation of Context */
+/* Mocked implementation of Property */
 
 void resetVariants()
 {
@@ -68,12 +70,12 @@ void resetVariants()
 
 void emitFirstOn(const QString &k)
 {
-    foreach (Context* c, contextList) {
+    foreach (Property* c, propertyList) {
         if (c->getKey() == k)
             c->fakeFirst();
     }
 
-    foreach (ContextGroup* cg, contextGroupList) {
+    foreach (Group* cg, groupList) {
         if (cg->keyList.contains(k))
             cg->fakeFirst();
     }
@@ -81,18 +83,18 @@ void emitFirstOn(const QString &k)
 
 void emitLastOn(const QString &k)
 {
-    foreach (Context* c, contextList) {
+    foreach (Property* c, propertyList) {
         if (c->getKey() == k)
             c->fakeLast();
     }
 
-    foreach (ContextGroup* cg, contextGroupList) {
+    foreach (Group* cg, groupList) {
         if (cg->keyList.contains(k))
             cg->fakeLast();
     }
 }
 
-bool Context::initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys)
+bool Property::initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys)
 {
     if (lastBusName && lastBusName == busName)
         return false;
@@ -107,7 +109,7 @@ bool Context::initService(QDBusConnection::BusType busType, const QString &busNa
     return true;
 }
 
-void Context::stopService(const QString &name)
+void Property::stopService(const QString &name)
 {
     if (lastBusName && name == lastBusName) {
         delete lastBusName;
@@ -117,41 +119,41 @@ void Context::stopService(const QString &name)
     }
 }
 
-void Context::set(const QVariant &v)
+void Property::set(const QVariant &v)
 {
     delete lastVariantSet;
     lastVariantSet = new QVariant(v);
 }
 
-void Context::unset()
+void Property::unset()
 {
     delete lastVariantSet;
     lastVariantSet = NULL;
 }
 
-Context::Context(const QString &name, QObject *obj) : QObject(obj), key(name)
+Property::Property(const QString &name, QObject *obj) : QObject(obj), key(name)
 {
     delete lastVariantSet;
     lastVariantSet = NULL;
-    contextList.append(this);
+    propertyList.append(this);
 }
 
-Context::~Context()
+Property::~Property()
 {
-    contextList.removeAll(this);
+    propertyList.removeAll(this);
 }
 
-QString Context::getKey()
+QString Property::getKey()
 {
     return key;
 }
 
-void Context::fakeFirst()
+void Property::fakeFirst()
 {
     emit firstSubscriberAppeared(key);
 }
 
-void Context::fakeLast()
+void Property::fakeLast()
 {
     emit lastSubscriberDisappeared(key);
 }
@@ -293,4 +295,7 @@ void ContextCUnitTest::clearKeyOnSubscribeGroup()
 }
 
 #include "contextcunittest.moc"
-QTEST_MAIN(ContextCUnitTest);
+
+} // end namespace
+
+QTEST_MAIN(ContextProvider::ContextCUnitTest);

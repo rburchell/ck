@@ -26,12 +26,13 @@
 #include <QSignalSpy>
 #include <QTest>
 
+namespace ContextProvider {
 
-// Mock implementation of the Context class
+// Mock implementation of the Property class
 
-QMap<QString, Context*> createdObjects;
+QMap<QString, Property*> createdObjects;
 
-Context::Context(QString key, QObject* parent)
+Property::Property(QString key, QObject* parent)
 {
     // Store the created object
     createdObjects.insert(key, this);
@@ -52,17 +53,17 @@ private slots:
 
 private:
     // Object to be tested
-    ContextGroup* contextGroup;
+    Group* contextGroup;
     // Mock objects
-    Context* property1;
-    Context* property2;
+    Property* property1;
+    Property* property2;
 };
 
 // Before each test
 void ContextGroupUnitTest::init()
 {
-    property1 = new Context("test.key.1");
-    property2 = new Context("test.key.2");
+    property1 = new Property("test.key.1");
+    property2 = new Property("test.key.2");
     createdObjects.clear();
 }
 
@@ -80,9 +81,9 @@ void ContextGroupUnitTest::cleanup()
 void ContextGroupUnitTest::oneProperty()
 {
     // Create the object to be tested
-    QSet<Context*> propertySet;
+    QSet<Property*> propertySet;
     propertySet.insert(property1);
-    contextGroup = new ContextGroup(propertySet);
+    contextGroup = new Group(propertySet);
     // Start spying on signals
     QSignalSpy firstSpy(contextGroup, SIGNAL(firstSubscriberAppeared()));
     QSignalSpy lastSpy(contextGroup, SIGNAL(lastSubscriberDisappeared()));
@@ -94,7 +95,7 @@ void ContextGroupUnitTest::oneProperty()
     // Test: property is subscribed to
     emit property1->firstSubscriberAppeared("test.key.1");
 
-    // Expected result: the ContextGroup emits the firstSubscriberAppeared signal
+    // Expected result: the Group emits the firstSubscriberAppeared signal
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 0);
     // And the group is subscribed to
@@ -103,7 +104,7 @@ void ContextGroupUnitTest::oneProperty()
     // Test: property is unsubscribed from
     emit property1->lastSubscriberDisappeared("test.key.1");
 
-    // Expected result: the ContextGroup emits the lastSubscriberDisappeared signal
+    // Expected result: the Group emits the lastSubscriberDisappeared signal
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 1);
     // And the group is not subscribed to
@@ -113,10 +114,10 @@ void ContextGroupUnitTest::oneProperty()
 void ContextGroupUnitTest::twoProperties()
 {
     // Create the object to be tested
-    QSet<Context*> propertySet;
+    QSet<Property*> propertySet;
     propertySet.insert(property1);
     propertySet.insert(property2);
-    contextGroup = new ContextGroup(propertySet);
+    contextGroup = new Group(propertySet);
     // Start spying on signals
     QSignalSpy firstSpy(contextGroup, SIGNAL(firstSubscriberAppeared()));
     QSignalSpy lastSpy(contextGroup, SIGNAL(lastSubscriberDisappeared()));
@@ -124,7 +125,7 @@ void ContextGroupUnitTest::twoProperties()
     // Test: property 1 is subscribed to
     emit property1->firstSubscriberAppeared("test.key.1");
 
-    // Expected result: the ContextGroup emits the firstSubscriberAppeared signal
+    // Expected result: the Group emits the firstSubscriberAppeared signal
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 0);
     // And the group is subscribed to
@@ -133,7 +134,7 @@ void ContextGroupUnitTest::twoProperties()
     // Test: property 2 is subscribed to
     emit property2->firstSubscriberAppeared("test.key.2");
 
-    // Expected result: the ContextGroup doesn't emit anything
+    // Expected result: the Group doesn't emit anything
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 0);
     // And the group is still subscribed to
@@ -142,7 +143,7 @@ void ContextGroupUnitTest::twoProperties()
     // Test: property 1 is unsubscribed from
     emit property1->lastSubscriberDisappeared("test.key.1");
 
-    // Expected result: the ContextGroup doesn't emit anything
+    // Expected result: the Group doesn't emit anything
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 0);
     // And the group is still subscribed to
@@ -151,7 +152,7 @@ void ContextGroupUnitTest::twoProperties()
     // Test: property 2 is unsubscribed from
     emit property2->lastSubscriberDisappeared("test.key.2");
 
-    // Expected result: the ContextGroup emits the lastSubscriberDisappeared signal
+    // Expected result: the Group emits the lastSubscriberDisappeared signal
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 1);
     // And the group is not subscribed to
@@ -163,13 +164,13 @@ void ContextGroupUnitTest::stringListApiOneProperty()
     // Create the object to be tested
     QStringList list;
     list << "first.key";
-    contextGroup = new ContextGroup(list);
+    contextGroup = new Group(list);
     // Start spying on signals
     QSignalSpy firstSpy(contextGroup, SIGNAL(firstSubscriberAppeared()));
     QSignalSpy lastSpy(contextGroup, SIGNAL(lastSubscriberDisappeared()));
 
-    // Test: check that ContextGroup created the Context objects
-    // Expected result: the ContextGroup created the Context object with the correct name
+    // Test: check that Group created the Property objects
+    // Expected result: the Group created the Property object with the correct name
     QVERIFY(createdObjects.contains("first.key"));
     QVERIFY(createdObjects.size() == 1);
 
@@ -178,10 +179,10 @@ void ContextGroupUnitTest::stringListApiOneProperty()
     QCOMPARE(contextGroup->isSubscribedTo(), false);
 
     // Test: property is subscribed to
-    Context* propertyFirst = createdObjects.value("first.key");
+    Property* propertyFirst = createdObjects.value("first.key");
     emit propertyFirst->firstSubscriberAppeared("test.key.1");
 
-    // Expected result: the ContextGroup emits the firstSubscriberAppeared signal
+    // Expected result: the Group emits the firstSubscriberAppeared signal
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 0);
     // And the group is subscribed to
@@ -190,7 +191,7 @@ void ContextGroupUnitTest::stringListApiOneProperty()
     // Test: property is unsubscribed from
     emit propertyFirst->lastSubscriberDisappeared("test.key.1");
 
-    // Expected result: the ContextGroup emits the lastSubscriberDisappeared signal
+    // Expected result: the Group emits the lastSubscriberDisappeared signal
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 1);
     // And the group is not subscribed to
@@ -202,32 +203,32 @@ void ContextGroupUnitTest::stringListApiTwoProperties()
     // Create the object to be tested
     QStringList list;
     list << "first.key" << "second.key";
-    contextGroup = new ContextGroup(list);
+    contextGroup = new Group(list);
     // Start spying on signals
     QSignalSpy firstSpy(contextGroup, SIGNAL(firstSubscriberAppeared()));
     QSignalSpy lastSpy(contextGroup, SIGNAL(lastSubscriberDisappeared()));
 
-    // Test: check that ContextGroup created the Context objects
-    // Expected result: the ContextGroup created the Context object with the correct name
+    // Test: check that Group created the Property objects
+    // Expected result: the Group created the Property object with the correct name
     QVERIFY(createdObjects.contains("first.key"));
     QVERIFY(createdObjects.contains("second.key"));
     QVERIFY(createdObjects.size() == 2);
 
     // Test: property 1 is subscribed to
-    Context* propertyFirst = createdObjects.value("first.key");
+    Property* propertyFirst = createdObjects.value("first.key");
     emit propertyFirst->firstSubscriberAppeared("first.key");
 
-    // Expected result: the ContextGroup emits the firstSubscriberAppeared signal
+    // Expected result: the Group emits the firstSubscriberAppeared signal
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 0);
     // And the group is subscribed to
     QCOMPARE(contextGroup->isSubscribedTo(), true);
 
     // Test: property 2 is subscribed to
-    Context* propertySecond = createdObjects.value("second.key");
+    Property* propertySecond = createdObjects.value("second.key");
     emit propertySecond->firstSubscriberAppeared("second.key");
 
-    // Expected result: the ContextGroup doesn't emit anything
+    // Expected result: the Group doesn't emit anything
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 0);
     // And the group is still subscribed to
@@ -236,7 +237,7 @@ void ContextGroupUnitTest::stringListApiTwoProperties()
     // Test: property 1 is unsubscribed from
     emit propertyFirst->lastSubscriberDisappeared("first.key");
 
-    // Expected result: the ContextGroup doesn't emit anything
+    // Expected result: the Group doesn't emit anything
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 0);
     // And the group is still subscribed to
@@ -245,13 +246,15 @@ void ContextGroupUnitTest::stringListApiTwoProperties()
     // Test: property 2 is unsubscribed from
     emit propertySecond->lastSubscriberDisappeared("second.key");
 
-    // Expected result: the ContextGroup emits the lastSubscriberDisappeared signal
+    // Expected result: the Group emits the lastSubscriberDisappeared signal
     QCOMPARE(firstSpy.count(), 1);
     QCOMPARE(lastSpy.count(), 1);
     // And the group is not subscribed to
     QCOMPARE(contextGroup->isSubscribedTo(), false);
 }
 
-
 #include "contextgroupunittest.moc"
-QTEST_MAIN(ContextGroupUnitTest);
+
+} // end namespace
+
+QTEST_MAIN(ContextProvider::ContextGroupUnitTest);

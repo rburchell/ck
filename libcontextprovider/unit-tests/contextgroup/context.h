@@ -26,11 +26,13 @@
 
 #include <QObject>
 
-class Context : public QObject
+namespace ContextProvider {
+
+class Property : public QObject
 {
     Q_OBJECT
 public:
-    Context(QString key, QObject* parent = 0);
+    Property(QString key, QObject* parent = 0);
 
 signals:
     void firstSubscriberAppeared(const QString &key);
@@ -38,5 +40,7 @@ signals:
 
     friend class ContextGroupUnitTest;
 };
+
+} // end namespace
 
 #endif

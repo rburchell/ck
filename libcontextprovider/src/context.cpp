@@ -26,10 +26,10 @@
 #include "sconnect.h"
 #include "loggingfeatures.h"
 
-using namespace ContextProvider;
+namespace ContextProvider {
 
 /*!
-    \class Context
+    \class Property
 
     \brief The main class used to provide context data.
 
@@ -40,34 +40,34 @@ using namespace ContextProvider;
     keys.append("Some.Key1");
     keys.append("Some.Key2");
 
-    Context::initService(QDBusConnection::SessionBus, "org.test.somename", keys);
-    Context someKey1("Some.Key1");
-    Context someKey2("Some.Key2");
+    Property::initService(QDBusConnection::SessionBus, "org.test.somename", keys);
+    Property someKey1("Some.Key1");
+    Property someKey2("Some.Key2");
     // Do something with someKey1, someKey2...
     \endcode
 
-    \c Context::initService initializes a new bus connection with a specified service name
+    \c Property::initService initializes a new bus connection with a specified service name
     and creates a Manager object on it. The clients obtain Subscriber objects through this
     Manager. 
 
-    The Context objects are proxy interfaces to actual keys. It's recommended that you create
-    Context objects to represent keys and keep them around in your class/object. Remember that
-    once the Context object is destroyed, it will not fire the proper signals about
+    The Property objects are proxy interfaces to actual keys. It's recommended that you create
+    Property objects to represent keys and keep them around in your class/object. Remember that
+    once the Property object is destroyed, it will not fire the proper signals about
     subscription status changing. 
 
     For each service there is one Manager object.
 */
 
-QHash<QString, Manager*> Context::busesToManagers;
-QHash<QString, QDBusConnection*> Context::busesToConnections;
-QHash<QString, Manager*> Context::keysToManagers;
+QHash<QString, Manager*> Property::busesToManagers;
+QHash<QString, QDBusConnection*> Property::busesToConnections;
+QHash<QString, Manager*> Property::keysToManagers;
 
 /// Constructor. This creates a new context property that should
 /// be used to provide/set values and get notified about subscribers appearing.
-Context::Context(const QString &k, QObject* parent)
+Property::Property(const QString &k, QObject* parent)
     : QObject(parent), key(k)
 {
-    contextDebug() << F_CONTEXT << "Creating new Context for key:" << key;
+    contextDebug() << F_CONTEXT << "Creating new Property for key:" << key;
 
     manager = keysToManagers.value(key);
     if (manager == NULL) {
@@ -82,10 +82,10 @@ Context::Context(const QString &k, QObject* parent)
              this, SLOT(onManagerLastSubscriberDisappeared(const QString&)));
 }
 
-/// Checks if a Context is valid (can be set/get/manipulated), prints an error message if not.
-/// Returns true if the Context is valid. False otherwise. Helper for the Context::set 
-/// and Context::get familly of functions.
-bool Context::keyCheck() const
+/// Checks if a Property is valid (can be set/get/manipulated), prints an error message if not.
+/// Returns true if the Property is valid. False otherwise. Helper for the Property::set 
+/// and Property::get familly of functions.
+bool Property::keyCheck() const
 {
     if (manager == NULL) {
         contextWarning() << "Trying to manipulate an invalid key:" << key;
@@ -95,13 +95,13 @@ bool Context::keyCheck() const
 }
 
 /// Returns true if the key is valid.
-bool Context::isValid() const
+bool Property::isValid() const
 {
     return (manager != NULL);
 }
 
 /// Returns true if the key is set (it's value is determined).
-bool Context::isSet() const
+bool Property::isSet() const
 {
     if (! keyCheck())
         return false;
@@ -109,14 +109,14 @@ bool Context::isSet() const
     return (manager->getKeyValue(key) != QVariant());
 }
 
-/// Returns the name of the key this Context represents.
-QString Context::getKey() const
+/// Returns the name of the key this Property represents.
+QString Property::getKey() const
 {
     return key;
 }
 
 /// Unsets the key value. The key value becomes undetermined.
-void Context::unset()
+void Property::unset()
 {
     if (! keyCheck())
         return;
@@ -126,7 +126,7 @@ void Context::unset()
 
    
 /// Sets the key value to QVariant \a v.
-void Context::set(const QVariant &v)
+void Property::set(const QVariant &v)
 {
     if (! keyCheck())
         return;
@@ -135,8 +135,8 @@ void Context::set(const QVariant &v)
 }
 
 /// Returns the current value of the key. The returned QVariant is invalid 
-/// if the key value is undetermined or the Context is invalid.
-QVariant Context::get()
+/// if the key value is undetermined or the Property is invalid.
+QVariant Property::get()
 {
     if (! keyCheck())
         return QVariant();
@@ -146,7 +146,7 @@ QVariant Context::get()
 
 /// Called by Manager when first subscriber appears. Delegated if 
 /// this concerns us.
-void Context::onManagerFirstSubscriberAppeared(const QString &key)
+void Property::onManagerFirstSubscriberAppeared(const QString &key)
 {
     if (key == this->key) {
         contextDebug() << F_SIGNALS << F_CONTEXT << "First subscriber appeared for key:" << key;
@@ -156,7 +156,7 @@ void Context::onManagerFirstSubscriberAppeared(const QString &key)
 
 /// Called by Manager when last subscriber disappears. Delegate if
 /// this concerns us.
-void Context::onManagerLastSubscriberDisappeared(const QString &key)
+void Property::onManagerLastSubscriberDisappeared(const QString &key)
 {
     if (key == this->key) {
         contextDebug() << F_SIGNALS << F_CONTEXT << "Last subscriber disappeared for key:" << key;
@@ -165,16 +165,16 @@ void Context::onManagerLastSubscriberDisappeared(const QString &key)
 }
 
 /// Destructor.
-Context::~Context()
+Property::~Property()
 {
-    contextDebug() << F_CONTEXT << F_DESTROY << "Destroying Context for key:" << key;
+    contextDebug() << F_CONTEXT << F_DESTROY << "Destroying Property for key:" << key;
 }
 
 /// Initialize a new service on a bus \a busType with service name \a busName and a given
 /// set of \a keys. This is the main method used to setup/bootstrap the keys that 
 /// we want to provide. 
 /// Returns true if service was registered, false otherwise.
-bool Context::initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys)
+bool Property::initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys)
 {
     contextDebug() << F_CONTEXT << "Initializing service for bus:" << busName;
 
@@ -218,7 +218,7 @@ bool Context::initService(QDBusConnection::BusType busType, const QString &busNa
 }
 
 /// Stops the previously started (with initService) service with the given \a busName.
-void Context::stopService(const QString &busName)
+void Property::stopService(const QString &busName)
 {
     contextDebug() << F_CONTEXT << "Stopping service for bus:" << busName;
 
@@ -252,3 +252,4 @@ void Context::stopService(const QString &busName)
     delete connection;
 }
 
+} // end namespace
