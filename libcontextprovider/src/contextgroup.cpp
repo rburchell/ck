@@ -78,6 +78,7 @@ Group::Group(QSet<Property*> propertiesToWatch, QObject* parent)
     contextDebug() << F_CONTEXTGROUP << "Creating new Group with" << propertiesToWatch.size() << "keys";
     
     foreach(Property* property, propertiesToWatch) {
+        properties << property;
         sconnect(property, SIGNAL(firstSubscriberAppeared(const QString&)),
                  this, SLOT(onFirstSubscriberAppeared()));
         sconnect(property, SIGNAL(lastSubscriberDisappeared(const QString&)),
@@ -86,18 +87,24 @@ Group::Group(QSet<Property*> propertiesToWatch, QObject* parent)
 }
 
 /// Constructs a Group which listens to the given set of context keys
-Group::Group(QStringList propertiesToWatch, QObject* parent)
+Group::Group(Service &service, QStringList propertiesToWatch, QObject* parent)
     : QObject(parent), propertiesSubscribedTo(0)
 {
     contextDebug() << F_CONTEXTGROUP << "Creating new Group with" << propertiesToWatch.size() << "keys";
 
     foreach(QString key, propertiesToWatch) {
-        Property* property = new Property(key, this);
+        Property* property = new Property(service, key, this);
+        properties << property;
         sconnect(property, SIGNAL(firstSubscriberAppeared(const QString&)),
                  this, SLOT(onFirstSubscriberAppeared()));
         sconnect(property, SIGNAL(lastSubscriberDisappeared(const QString&)),
                  this, SLOT(onLastSubscriberDisappeared()));
     }
+}
+
+QSet<Property *> Group::getProperties()
+{
+    return properties;
 }
 
 /// Called when any of the watched Property objects is subscribed to.

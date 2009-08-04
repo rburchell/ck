@@ -31,6 +31,7 @@
 namespace ContextProvider {
 
 class Property;
+class Service;
 
 class Group : public QObject
 {
@@ -38,10 +39,11 @@ class Group : public QObject
     
 public:
     explicit Group(QSet<Property*> propertiesToWatch, QObject* parent = 0);
-    explicit Group(QStringList propertiesToWatch, QObject* parent = 0);
+    explicit Group(Service &service, QStringList propertiesToWatch, QObject* parent = 0);
     ~Group();
 
     bool isSubscribedTo() const;
+    QSet<Property *> getProperties();
 
 signals:
     /// Emitted when the group of Context objects is subscribed
@@ -60,6 +62,7 @@ private slots:
 
 private:
     int propertiesSubscribedTo; ///< Number of Context objects currently subscribed to.
+    QSet<Property *> properties;
 };
 
 } // end namespace

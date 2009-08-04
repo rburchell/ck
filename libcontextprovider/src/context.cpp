@@ -29,6 +29,102 @@
 namespace ContextProvider {
 
 /*!
+    \class Service
+
+*/
+
+static Service *defaultService;
+
+Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
+    : QObject(parent), busType(busType), busName(busName), manager(NULL), connection(NULL)
+{
+    contextDebug() << F_CONTEXT << "Creating new Service for" << busName;
+}
+
+Service::~Service()
+{
+    stop();
+}
+
+void Service::add(Property *prop)
+{
+    props << prop;
+    prop->setManager(manager);
+}
+
+void Service::setAsDefault()
+{
+    if (defaultService) {
+        contextCritical() << "Default service already set.";
+        return;
+    }
+
+    defaultService = this;
+}
+
+void Service::start()
+{
+    if (manager)
+        return;
+
+    QStringList keys;
+    foreach (Property *p, props)
+        keys << p->getKey();
+
+    connection = new QDBusConnection(QDBusConnection::connectToBus(busType, busName));
+    manager = new Manager(keys);
+
+    ManagerAdaptor *managerAdaptor = new ManagerAdaptor(manager, connection);
+
+    // Register service
+    if (! connection->registerService(busName)) {
+        contextCritical() << "Failed to register service with name" << busName;
+        stop();
+        return;
+    }
+
+    // Register object
+    if (managerAdaptor && !connection->registerObject("/org/freedesktop/ContextKit/Manager", manager)) {
+        contextCritical() << "Failed to register the Manager object for" << busName;
+        stop();
+        return;
+    }
+
+    foreach(Property *p, props)
+        p->setManager(manager);
+}
+
+void Service::stop()
+{
+    if (manager == NULL)
+        return;
+
+    contextDebug() << F_CONTEXT << "Stopping service for bus:" << busName;
+
+    foreach(Property *p, props)
+        p->setManager(NULL);
+
+    // Unregister
+    connection->unregisterObject("/org/freedesktop/ContextKit/Manager");
+    connection->unregisterService(busName);
+
+    // Dealloc
+    delete manager;
+    delete connection;
+    
+    manager = NULL;
+    connection = NULL;
+}
+
+void Service::restart()
+{
+    if (manager) {
+        stop();
+        start();
+    }
+}
+
+/*!
     \class Property
 
     \brief The main class used to provide context data.
@@ -58,28 +154,36 @@ namespace ContextProvider {
     For each service there is one Manager object.
 */
 
-QHash<QString, Manager*> Property::busesToManagers;
-QHash<QString, QDBusConnection*> Property::busesToConnections;
-QHash<QString, Manager*> Property::keysToManagers;
-
 /// Constructor. This creates a new context property that should
 /// be used to provide/set values and get notified about subscribers appearing.
-Property::Property(const QString &k, QObject* parent)
-    : QObject(parent), key(k)
+Property::Property(Service &service, const QString &k, QObject* parent)
+    : QObject(parent), manager(NULL), key(k)
 {
     contextDebug() << F_CONTEXT << "Creating new Property for key:" << key;
 
-    manager = keysToManagers.value(key);
-    if (manager == NULL) {
-        contextCritical() << key << "is currently not provided by any service";
-        return;
+    service.add(this);
+}
+
+Property::Property(const QString &k, QObject* parent)
+    : QObject(parent), manager(NULL), key(k)
+{
+    if (defaultService == NULL)
+        contextCritical() << "No default service set.";
+    else {
+        contextDebug() << F_CONTEXT << "Creating new Property for key:" << key;
+        defaultService->add(this);
     }
+}
 
-    sconnect(manager, SIGNAL(firstSubscriberAppeared(const QString&)),
-             this, SLOT(onManagerFirstSubscriberAppeared(const QString&)));
-
-    sconnect(manager, SIGNAL(lastSubscriberDisappeared(const QString&)),
-             this, SLOT(onManagerLastSubscriberDisappeared(const QString&)));
+void Property::setManager(Manager *manager)
+{
+    this->manager = manager;
+    if (manager) {
+        sconnect(manager, SIGNAL(firstSubscriberAppeared(const QString&)),
+                 this, SLOT(onManagerFirstSubscriberAppeared(const QString&)));
+        sconnect(manager, SIGNAL(lastSubscriberDisappeared(const QString&)),
+                 this, SLOT(onManagerLastSubscriberDisappeared(const QString&)));
+    }
 }
 
 /// Checks if a Property is valid (can be set/get/manipulated), prints an error message if not.
@@ -168,88 +272,6 @@ void Property::onManagerLastSubscriberDisappeared(const QString &key)
 Property::~Property()
 {
     contextDebug() << F_CONTEXT << F_DESTROY << "Destroying Property for key:" << key;
-}
-
-/// Initialize a new service on a bus \a busType with service name \a busName and a given
-/// set of \a keys. This is the main method used to setup/bootstrap the keys that 
-/// we want to provide. 
-/// Returns true if service was registered, false otherwise.
-bool Property::initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys)
-{
-    contextDebug() << F_CONTEXT << "Initializing service for bus:" << busName;
-
-    // Basic sanity check
-    if (busesToManagers.contains(busName)) {
-        contextCritical() << busName << "service is already registered";
-        return false;
-    }
-    
-    QDBusConnection *connection = new QDBusConnection(QDBusConnection::connectToBus(busType, busName));
-
-    Manager *manager = new Manager(keys);
-    ManagerAdaptor *managerAdaptor = new ManagerAdaptor(manager, connection);
-
-    // Register service
-    if (! connection->registerService(busName)) {
-        contextCritical() << "Failed to register service with name" << busName;
-        return false;
-    }
-
-    // Register object
-    if (managerAdaptor && !connection->registerObject("/org/freedesktop/ContextKit/Manager", manager)) {
-        contextCritical() << "Failed to register the Manager object for" << busName;
-        return false;
-    }
-
-    busesToManagers.insert(busName, manager);
-    busesToConnections.insert(busName, connection);
-
-    // Add a mapping for all the keys -> manager
-    foreach(QString key, keys) {
-        if (keysToManagers.contains(key)) {
-            contextCritical() << key << "is already provided by another manager/service!";
-            return false;
-        } else {
-            keysToManagers.insert(key, manager);
-        }
-    }
-
-    return true;
-}
-
-/// Stops the previously started (with initService) service with the given \a busName.
-void Property::stopService(const QString &busName)
-{
-    contextDebug() << F_CONTEXT << "Stopping service for bus:" << busName;
-
-    // Basic sanity check
-    if (! busesToManagers.contains(busName)) {
-        contextCritical() << busName << "service is not started!";
-        return;
-    }
-
-    // The manager...
-    Manager *manager = busesToManagers.value(busName);
-
-    // Remove all key mappings
-    foreach(QString key, QStringList(manager->getKeys())) {
-        keysToManagers.remove(key);
-    }
-
-    // The connection...
-    QDBusConnection *connection = busesToConnections.value(busName);
-
-    // Unregister
-    connection->unregisterObject("/org/freedesktop/ContextKit/Manager");
-    connection->unregisterService(busName);
-
-    // Remove the remaining mappings
-    busesToManagers.remove(busName);
-    busesToConnections.remove(busName);
-
-    // Dealloc
-    delete manager;
-    delete connection;
 }
 
 } // end namespace

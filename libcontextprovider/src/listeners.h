@@ -60,13 +60,12 @@ class PropertyListener : public Listener
     Q_OBJECT
 
 public:
-    PropertyListener(const QString &k, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
+    PropertyListener(Service &service, const QString &key,
+                     bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
+    Property prop;
 
 protected:
     virtual void clear();
-
-private:
-    Property key;
 };
 
 class GroupListener : public Listener 
@@ -74,7 +73,8 @@ class GroupListener : public Listener
     Q_OBJECT
 
 public:
-    GroupListener(const QStringList &keys, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
+    GroupListener(Service &service, const QStringList &keys,
+                  bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
 
 protected:
     virtual void clear();

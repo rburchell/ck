@@ -73,39 +73,27 @@ using namespace ContextProvider;
     \endcode
 */
 
-QStringList *serviceKeyList = NULL;
-QString *serviceBusName = NULL;
-QDBusConnection::BusType serviceBusType;
+static Service *cService;
+
 QList<Listener*> *listeners = NULL;
-
-/// Stops and restarts the service with proper key. Not part of the
-/// public API.
-static int reinitialize_service()
-{
-    if (serviceKeyList->length() > 0) 
-        Property::stopService(*serviceBusName);
-
-    return Property::initService(serviceBusType, *serviceBusName, *serviceKeyList);
-}
 
 /// Initializes and starts the service with a given \a bus_type and a \a bus_name.
 /// Te \a bus_type can be DBUS_BUS_SESSION or DBUS_BUS_SYSTEM. This function can be 
 /// called only once till a matching context_provider_stop is called. 
 int context_provider_init (DBusBusType bus_type, const char* bus_name)
 {
-    if (serviceBusName != NULL) {
-    contextCritical() << "Service already initialize. You can only initialize one service with C API";
+    if (cService != NULL) {
+        contextCritical() << "Service already initialize. You can only initialize one service with C API";
         return 0;
     }
 
-    serviceBusType = (bus_type == DBUS_BUS_SESSION) ? 
-                      QDBusConnection::SessionBus   :
-                      QDBusConnection::SystemBus;
-    serviceBusName = new QString(bus_name);
-    serviceKeyList = new QStringList();
+    cService = new Service(bus_type == DBUS_BUS_SESSION
+                           ? QDBusConnection::SessionBus   
+                           : QDBusConnection::SystemBus,
+                           bus_name);
     listeners = new QList<Listener*>;
 
-    return reinitialize_service();
+    return 1;
 }
 
 /// Stops the currently started service with context_provider_init. After calling
@@ -114,19 +102,15 @@ void context_provider_stop (void)
 {
     contextDebug() << "Stopping service";
 
-    if (serviceBusName) {
-        Property::stopService(*serviceBusName);
-    }
-
     // Delete all listeners
     if (listeners) {
         foreach (Listener *listener, *listeners)
             delete listener;
     }
-
-    delete serviceBusName; serviceBusName = NULL;
-    delete serviceKeyList; serviceKeyList = NULL;
     delete listeners; listeners = NULL;
+
+    delete cService;
+    cService = NULL;
 }
 
 /// Installs (adds) a \a key to be provided by the service. The callback function \a 
@@ -139,21 +123,15 @@ void context_provider_install_key (const char* key,
                                    ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
                                    void* subscription_changed_cb_target)
 {
-    if (! serviceKeyList) {
+    if (! cService) {
         contextCritical() << "Can't install key:" << key << "because no service started.";
         return;
     }
     
-    if (serviceKeyList->contains(QString(key))) {
-        contextCritical() << "Key:" << key << "is already installed";
-        return;
-    }
-
-    serviceKeyList->append(key);
-    reinitialize_service();
-
-    listeners->append(new PropertyListener(key, clear_values_on_subscribe,
+    listeners->append(new PropertyListener(*cService, key,
+                                           clear_values_on_subscribe,
                                            subscription_changed_cb, subscription_changed_cb_target));
+    cService->restart();
 }
 
 /// Installs (adds) a \a key_group to be provided by the service. The \a key_group is a NULL-terminated 
@@ -166,7 +144,7 @@ void context_provider_install_group (const char** key_group,
                                      ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
                                      void* subscription_changed_cb_target)
 {
-    if (! serviceKeyList) {
+    if (! cService) {
         contextCritical() << "Can't install key group because no service started.";
         return;
     }
@@ -176,47 +154,47 @@ void context_provider_install_group (const char** key_group,
     while(key_group[i] != NULL) {
         QString key = QString(key_group[i]);
 
-        if (serviceKeyList->contains(key)) {
-            contextCritical() << "Key:" << key << "is already installed";
-            return;
-        }
-
         keys << key;
-        serviceKeyList->append(key);
         i++;
     }
 
-    reinitialize_service();
-    listeners->append(new GroupListener(keys, clear_values_on_subscribe,
+    listeners->append(new GroupListener(*cService, keys,
+                                        clear_values_on_subscribe,
                                         subscription_changed_cb, subscription_changed_cb_target));
+    cService->restart();
 }
 
 /// Sets the \a key to a specified integer \a value.
 void context_provider_set_integer (const char* key, int value)
 {
-    Property(key).set(value);
+    if (cService)
+        Property(*cService, key).set(value);
 }
 
 /// Sets the \a key to a specified double \a value.
 void context_provider_set_double (const char* key, double value)
 {
-    Property(key).set(value);
+    if (cService)
+        Property(*cService, key).set(value);
 }
 
 /// Sets the \a key to a specified boolean \a value.
 void context_provider_set_boolean (const char* key, int value)
 {
-    Property(key).set(value);
+    if (cService)
+        Property(*cService, key).set(value);
 }
 
 /// Sets the \a key to a specified string \a value.
 void context_provider_set_string (const char* key, const char* value)
 {
-    Property(key).set(value);
+    if (cService)
+        Property(*cService, key).set(value);
 }
 
 /// Sets the \a key to NULL. In other words - unsets the key.
 void context_provider_set_null (const char* key)
 {
-    Property(key).unset();
+    if (cService)
+        Property(*cService, key).unset();
 }

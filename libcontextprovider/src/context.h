@@ -32,14 +32,43 @@
 namespace ContextProvider {
 
 class Manager;
+class Property;
+
+class Service : public QObject
+{
+    Q_OBJECT
+
+public:
+    explicit Service(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    virtual ~Service();
+
+    void start();
+    void stop();
+    void restart();
+
+    void setAsDefault();
+
+private:
+    QList<Property *> props;
+    QDBusConnection::BusType busType;
+    const QString &busName;
+    Manager *manager;
+    QDBusConnection *connection;
+
+    void add(Property *prop);
+
+    friend class Property;
+};
 
 class Property : public QObject
 {
     Q_OBJECT
 
 public:
+    explicit Property(Service &service, const QString &key, QObject *parent = 0);
     explicit Property(const QString &key, QObject *parent = 0);
     virtual ~Property();
+
     QString getKey() const;
     bool isValid() const;
     bool isSet() const;
@@ -48,18 +77,15 @@ public:
     void unset();
     
     QVariant get();
-
-    static bool initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys);
-    static void stopService(const QString &busName);
    
 private:
-    static QHash<QString, Manager*> busesToManagers;
-    static QHash<QString, QDBusConnection*> busesToConnections;
-    static QHash<QString, Manager*> keysToManagers;
+    void setManager(Manager *manager);
     bool keyCheck() const;
 
-    ContextProvider::Manager *manager; ///< This property Manager (service).
-    QString key; ///< The key name for this property.
+    Manager *manager;
+    QString key;
+
+    friend class Service;
 
 private slots:
     void onManagerFirstSubscriberAppeared(const QString &key);
