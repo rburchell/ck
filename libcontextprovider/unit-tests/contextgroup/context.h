@@ -28,11 +28,17 @@
 
 namespace ContextProvider {
 
+class Service : public QObject
+{
+    Q_OBJECT
+};
+
 class Property : public QObject
 {
     Q_OBJECT
 public:
     Property(QString key, QObject* parent = 0);
+    Property(Service &service, QString key, QObject* parent = 0);
 
 signals:
     void firstSubscriberAppeared(const QString &key);

@@ -26,39 +26,25 @@
 
 namespace ContextProvider {
 
+SubscriptionTests::SubscriptionTests()
+    : service1 (QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1", this),
+      test_int (service1, "Test.Int", this),
+      test_double (service1, "Test.Double", this),
+      service2 (QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider2", this),
+      test_string (service2, "Test.String", this),
+      test_bool (service2, "Test.Bool", this)
+{
+    service1.start();
+    service2.start();
+}
+
 void SubscriptionTests::initTestCase()
 {
     isReadyToRead = false;
-    QStringList keysProvider1;
-    keysProvider1.append("test.Int");
-    keysProvider1.append("test.Double");
-
-    QStringList keysProvider2;
-    keysProvider2.append("test.String");
-    keysProvider2.append("test.Bool");
-
-    Property::initService(QDBusConnection::SessionBus,
-            "org.freedesktop.ContextKit.testProvider1",
-            keysProvider1);
-
-    Property::initService(QDBusConnection::SessionBus,
-            "org.freedesktop.ContextKit.testProvider2",
-            keysProvider2);
-
-    intItem = new Property("test.Int");
-    doubleItem = new Property("test.Double");
-
-    stringItem = new Property("test.String");
-    boolItem = new Property("test.Bool");
 }
 
 void SubscriptionTests::cleanupTestCase()
 {
-    delete intItem;
-    delete doubleItem;
-    delete stringItem;
-    delete boolItem;
-    delete client;
 }
 
 void SubscriptionTests::init()

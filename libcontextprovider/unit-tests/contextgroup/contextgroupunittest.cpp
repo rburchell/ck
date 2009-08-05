@@ -32,6 +32,12 @@ namespace ContextProvider {
 
 QMap<QString, Property*> createdObjects;
 
+Property::Property(Service &service, QString key, QObject* parent)
+{
+    // Store the created object
+    createdObjects.insert(key, this);
+}
+
 Property::Property(QString key, QObject* parent)
 {
     // Store the created object
@@ -161,10 +167,12 @@ void ContextGroupUnitTest::twoProperties()
 
 void ContextGroupUnitTest::stringListApiOneProperty()
 {
+    Service service;
+
     // Create the object to be tested
     QStringList list;
     list << "first.key";
-    contextGroup = new Group(list);
+    contextGroup = new Group(service, list);
     // Start spying on signals
     QSignalSpy firstSpy(contextGroup, SIGNAL(firstSubscriberAppeared()));
     QSignalSpy lastSpy(contextGroup, SIGNAL(lastSubscriberDisappeared()));
@@ -200,10 +208,12 @@ void ContextGroupUnitTest::stringListApiOneProperty()
 
 void ContextGroupUnitTest::stringListApiTwoProperties()
 {
+    Service service;
+
     // Create the object to be tested
     QStringList list;
     list << "first.key" << "second.key";
-    contextGroup = new Group(list);
+    contextGroup = new Group(service,list);
     // Start spying on signals
     QSignalSpy firstSpy(contextGroup, SIGNAL(firstSubscriberAppeared()));
     QSignalSpy lastSpy(contextGroup, SIGNAL(lastSubscriberDisappeared()));

@@ -36,16 +36,20 @@ class Group : public QObject
     
 public:
     explicit Group(QStringList propertiesToWatch, QObject* parent = 0);
+    explicit Group(Service &, QStringList propertiesToWatch, QObject* parent = 0);
     ~Group();
     QStringList keyList;
     void fakeFirst();
     void fakeLast();
     
+    QSet<Property *> getProperties();
+
 signals:
     void firstSubscriberAppeared();
     void lastSubscriberDisappeared();
 
 private:
+    QSet<Property *> props;
 };
 
 } // end namespace
