@@ -125,7 +125,6 @@ class LowMemProviderUnitTest : public QObject
 private slots:
     void init();
     void cleanup();
-    void keys();
     void initialValues();
     void normalState();
     void highState();
@@ -140,19 +139,12 @@ private:
 void LowMemProviderUnitTest::init()
 {
     provider = new LowMemProvider();
-    provider->initialize();
 }
 
 // After each test
 void LowMemProviderUnitTest::cleanup()
 {
     delete provider;
-}
-
-void LowMemProviderUnitTest::keys()
-{
-    QStringList keys = provider->keys();
-    QVERIFY(keys.contains("System.MemoryPressure"));
 }
 
 void LowMemProviderUnitTest::initialValues()
