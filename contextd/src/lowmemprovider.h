@@ -31,6 +31,8 @@
 
 namespace ContextD {
 
+using namespace ContextProvider;
+
 class LowMemProvider : public Provider
 {
     Q_OBJECT
@@ -41,7 +43,7 @@ public:
     virtual void initialize();
 
 private:
-    Context *memoryPressure; ///< Context property for the System.MemoryPressure
+    Property *memoryPressure; ///< Property for the System.MemoryPressure
     BoolSysFsPooler *lowWM; ///< Pooler for the low watermark.
     BoolSysFsPooler *highWM; ///< Pooler for the high watermark.
 

@@ -70,12 +70,12 @@ QStringList HalProvider::keys()
 void HalProvider::initialize()
 {
     contextDebug() << F_HAL << "Initializing hal provider";
-    group = new ContextGroup(keys(), this);
-    onBattery = new Context("Battery.OnBattery", this);
-    lowBattery = new Context("Battery.LowBattery", this);
-    chargePercentage = new Context("Battery.ChargePercentage", this);
-    timeUntilLow = new Context("Battery.TimeUntilLow", this);
-    timeUntilFull = new Context("Battery.TimeUntilFull", this);
+    group = new Group(keys(), this);
+    onBattery = new Property("Battery.OnBattery", this);
+    lowBattery = new Property("Battery.LowBattery", this);
+    chargePercentage = new Property("Battery.ChargePercentage", this);
+    timeUntilLow = new Property("Battery.TimeUntilLow", this);
+    timeUntilFull = new Property("Battery.TimeUntilFull", this);
 
     sconnect(group, SIGNAL(firstSubscriberAppeared()),
             this, SLOT(onFirstSubscriberAppeared()));

@@ -25,6 +25,7 @@
 #include "context.h"
 
 using namespace ContextD;
+using namespace ContextProvider;
 
 int main(int argc, char **argv)
 {
@@ -41,7 +42,7 @@ int main(int argc, char **argv)
     }
 
     // Now init service
-    Context::initService(QDBusConnection::SessionBus, QString("org.freedesktop.ContextKit.contextd"), keys);
+    Property::initService(QDBusConnection::SessionBus, QString("org.freedesktop.ContextKit.contextd"), keys);
 
     // Now init all providers
     foreach (Provider *provider, providerList) {

@@ -31,6 +31,8 @@
 
 namespace ContextD {
 
+using namespace ContextProvider;
+
 class HalProvider : public Provider
 {
     Q_OBJECT
@@ -42,12 +44,12 @@ public:
 private:
     void updateProperties();
     
-    Context *onBattery; ///< Battery.OnBattery
-    Context *lowBattery; ///< Battery.LowBattery
-    Context *chargePercentage; ///< Battery.ChargePercentage
-    Context *timeUntilLow; ///< Battery.TimeUntilLow
-    Context *timeUntilFull; ///< Battery.TimeUntilFull
-    ContextGroup *group; ///< Group with all the context properties
+    Property *onBattery; ///< Battery.OnBattery
+    Property *lowBattery; ///< Battery.LowBattery
+    Property *chargePercentage; ///< Battery.ChargePercentage
+    Property *timeUntilLow; ///< Battery.TimeUntilLow
+    Property *timeUntilFull; ///< Battery.TimeUntilFull
+    Group *group; ///< Group with all the context properties
     HalDeviceInterface *batteryDevice; ///< The interface to the battery device
 
 private slots:

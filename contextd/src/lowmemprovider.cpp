@@ -72,7 +72,7 @@ void LowMemProvider::initialize()
 {
     contextDebug() << F_LOWMEM << "Initializing lowmem plugin";
     
-    memoryPressure = new Context("System.MemoryPressure", this);
+    memoryPressure = new Property("System.MemoryPressure", this);
     
     sconnect(memoryPressure, SIGNAL(firstSubscriberAppeared(QString)),
              this, SLOT(onFirstSubscriberAppeared()));
