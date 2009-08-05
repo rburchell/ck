@@ -2,19 +2,23 @@
 
 class QProcess;
 
-namespace ContextProvider {
+#include "context.h"
 
-class Property;
+namespace ContextProvider {
 
 class SubscriptionTests : public QObject
 {
     Q_OBJECT
 
 private:
-    Property *intItem;
-    Property *boolItem;
-    Property *doubleItem;
-    Property *stringItem;
+    Service service1;
+    Property test_int;
+    Property test_double;
+
+    Service service2;
+    Property test_string;
+    Property test_bool;
+
     QProcess *client;
     bool isReadyToRead;
 
@@ -32,6 +36,9 @@ private slots:
     void subscribeReturnValueForInvalidProperty();
 
     void subscriberNotifications();
+
+public:
+    SubscriptionTests();
 
 public slots:
     void readStandardOutput();

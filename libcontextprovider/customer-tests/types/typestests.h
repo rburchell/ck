@@ -1,6 +1,8 @@
 #include <QString>
 #include <QObject>
 
+#include "context.h"
+
 class QProcess;
 
 namespace ContextProvider {
@@ -12,14 +14,16 @@ class TypesTests : public QObject
     Q_OBJECT
 
 private:
-    Property *intItem;
-    Property *boolItem;
-    Property *doubleItem;
-    Property *stringItem;
-    Property *stringListItem;
-    Property *charItem;
-    Property *dateItem;
-    Property *timeItem;
+    Service service;
+    Property intItem;
+    Property stringItem;
+    Property boolItem;
+    Property doubleItem;
+    Property stringListItem;
+    Property charItem;
+    Property dateItem;
+    Property timeItem;
+
     QProcess *client;
     bool isReadyToRead;
 
@@ -40,6 +44,9 @@ private:
 
 private:
     bool clientStarted;
+
+public:
+    TypesTests();
 };
 
 } // end namespace

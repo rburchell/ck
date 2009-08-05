@@ -22,10 +22,11 @@
 #ifndef FEATURES_H
 #define FEATURES_H
 
-#define F_CONTEXT       (ContextFeature("context"))
+#define F_SERVICE       (ContextFeature("service"))
+#define F_PROPERTY      (ContextFeature("property"))
 #define F_MANAGER       (ContextFeature("manager"))
 #define F_SUBSCRIBER    (ContextFeature("subscriber"))
-#define F_CONTEXTGROUP  (ContextFeature("contextgroup"))
+#define F_GROUP         (ContextFeature("group"))
 #define F_DESTROY       (ContextFeature("destroy"))
 #define F_SIGNALS       (ContextFeature("signals"))
 #define F_DBUS          (ContextFeature("dbus"))

@@ -30,9 +30,9 @@ namespace ContextProvider {
 
 QList<Property*> propertyList;
 QList<Group*> groupList;
+QStringList keysList;
 
-QString *lastBusName = NULL;
-QStringList *lastKeysList = NULL;
+QString lastBusName = NULL;
 QDBusConnection::BusType lastConnectionType;
 QVariant *lastVariantSet = NULL;
 int lastSubscribed = 0;
@@ -43,11 +43,25 @@ void *lastUserData = NULL;
 Group::Group(QStringList propertiesToWatch, QObject *parent) : keyList(propertiesToWatch)
 {
     groupList.append(this);
+    foreach (const QString &key, propertiesToWatch)
+        props.insert (new Property(key, this));
+}
+
+Group::Group(Service &service, QStringList propertiesToWatch, QObject *parent) : keyList(propertiesToWatch)
+{
+    groupList.append(this);
+    foreach (const QString &key, propertiesToWatch)
+        props.insert (new Property(service, key, this));
 }
 
 Group::~Group()
 {
     groupList.removeAll(this);
+}
+
+QSet<Property *> Group::getProperties()
+{
+    return props;
 }
 
 void Group::fakeFirst()
@@ -94,29 +108,23 @@ void emitLastOn(const QString &k)
     }
 }
 
-bool Property::initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys)
+Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject *parent)
 {
-    if (lastBusName && lastBusName == busName)
-        return false;
-
-    delete lastBusName;
-    lastBusName = new QString(busName);
-
-    delete lastKeysList;
-    lastKeysList = new QStringList(keys);
-
+    lastBusName = busName;
     lastConnectionType = busType;
-    return true;
+    keysList.clear();
 }
 
-void Property::stopService(const QString &name)
+void Service::start()
 {
-    if (lastBusName && name == lastBusName) {
-        delete lastBusName;
-        lastBusName = NULL;
-        delete lastKeysList;
-        lastKeysList = NULL;
-    }
+}
+
+void Service::stop()
+{
+}
+
+void Service::restart()
+{
 }
 
 void Property::set(const QVariant &v)
@@ -131,11 +139,22 @@ void Property::unset()
     lastVariantSet = NULL;
 }
 
-Property::Property(const QString &name, QObject *obj) : QObject(obj), key(name)
+Property::Property(const QString &name, QObject *obj)
+    : QObject(obj), key(name)
 {
     delete lastVariantSet;
     lastVariantSet = NULL;
     propertyList.append(this);
+    keysList.append(name);
+}
+
+Property::Property(Service &, const QString &name, QObject *obj)
+    : QObject(obj), key(name)
+{
+    delete lastVariantSet;
+    lastVariantSet = NULL;
+    propertyList.append(this);
+    keysList.append(name);
 }
 
 Property::~Property()
@@ -187,8 +206,8 @@ void ContextCUnitTest::init()
     context_provider_stop();
     int res = context_provider_init(DBUS_BUS_SESSION, "com.test.provider");
     QCOMPARE(res, 1);
-    QCOMPARE(*lastBusName, QString("com.test.provider"));
-    QCOMPARE(lastKeysList->size(), 0);
+    QCOMPARE(lastBusName, QString("com.test.provider"));
+    QCOMPARE(keysList.size(), 0);
     QCOMPARE(lastConnectionType, QDBusConnection::SessionBus);
 }
 
@@ -205,9 +224,9 @@ void ContextCUnitTest::installKey()
 {
     context_provider_install_key("Battery.OnBattery", 0, MagicCallback, this);
     context_provider_install_key("Battery.Power", 0, MagicCallback, this);
-    QVERIFY(lastKeysList->contains("Battery.OnBattery"));
-    QVERIFY(lastKeysList->contains("Battery.Power"));
-    QCOMPARE(lastKeysList->length(), 2);
+    QVERIFY(keysList.contains("Battery.OnBattery"));
+    QVERIFY(keysList.contains("Battery.Power"));
+    QCOMPARE(keysList.length(), 2);
 
     emitFirstOn("Battery.OnBattery");
     QCOMPARE(lastSubscribed, 1);
@@ -230,9 +249,9 @@ void ContextCUnitTest::installGroup()
     keys[2] = NULL;
 
     context_provider_install_group(keys, 0, MagicCallback, this);
-    QVERIFY(lastKeysList->contains("Location.Lat"));
-    QVERIFY(lastKeysList->contains("Location.Lon"));
-    QCOMPARE(lastKeysList->length(), 2);
+    QVERIFY(keysList.contains("Location.Lat"));
+    QVERIFY(keysList.contains("Location.Lon"));
+    QCOMPARE(keysList.length(), 2);
 
     emitFirstOn("Location.Lat");
     QCOMPARE(lastSubscribed, 1);

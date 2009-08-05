@@ -19,39 +19,26 @@
  *
  */
 
-#ifndef CONTEXTGROUP_H
-#define CONTEXTGROUP_H
+#ifndef MANAGERADAPTOR_H
+#define MANAGERADAPTOR_H
 
 #include <QObject>
-#include <QSet>
-#include <QStringList>
+#include <QDBusAbstractAdaptor>
+#include <QDBusMessage>
+#include <QDBusConnection>
+#include <QDBusObjectPath>
+#include "manager.h"
 
 namespace ContextProvider {
 
-class Property;
-
-class Group : public QObject
+class ManagerAdaptor: public QObject
 {
     Q_OBJECT
-    
+
 public:
-    explicit Group(QStringList propertiesToWatch, QObject* parent = 0);
-    explicit Group(Service &, QStringList propertiesToWatch, QObject* parent = 0);
-    ~Group();
-    QStringList keyList;
-    void fakeFirst();
-    void fakeLast();
-    
-    QSet<Property *> getProperties();
-
-signals:
-    void firstSubscriberAppeared();
-    void lastSubscriberDisappeared();
-
-private:
-    QSet<Property *> props;
+    ManagerAdaptor (Manager* manager, QDBusConnection *connection);
 };
 
-} // end namespace
+} // namespace ContextProvider
 
 #endif
