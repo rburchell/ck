@@ -22,9 +22,9 @@
 #include "contextc.h"
 #include "service.h"
 #include "property.h"
+#include "group.h"
 #include "logging.h"
 #include "sconnect.h"
-#include "contextgroup.h"
 #include "listeners.h"
 
 using namespace ContextProvider;

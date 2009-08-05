@@ -19,7 +19,7 @@
  *
  */
 
-#include "contextgroup.h"
+#include "group.h"
 #include "service.h"
 #include "property.h"
 #include "sconnect.h"
