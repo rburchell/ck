@@ -122,10 +122,10 @@ void SubscriptionTests::subscribeReturnValueForUnknownProperty()
 
     // Ask the client to call Subscribe with 1 valid key. The property
     // is currently unknown since we haven't set a value for it.
-    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.int\n");
+    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int\n");
 
     // Expected result: The return value of Subscribe contains the key as unknown.
-    QString expected("Known keys: Unknown keys: test.int");
+    QString expected("Known keys: Unknown keys: Test.Int");
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
@@ -143,10 +143,10 @@ void SubscriptionTests::subscribeReturnValueForKnownProperty()
 
     // Ask the client to call Subscribe with 1 valid key. The property
     // has a value we just set.
-    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.double\n");
+    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
 
     // Expected result: The return value of Subscribe contains the key and its value.
-    QString expected("Known keys: test.double(double:-8.22) Unknown keys: ");
+    QString expected("Known keys: Test.Double(double:-8.22) Unknown keys: ");
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
@@ -160,7 +160,7 @@ void SubscriptionTests::subscribeReturnValueForInvalidProperty()
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Ask the client to call Subscribe with 1 invalid key.
-    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.invalid\n");
+    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Invalid\n");
 
     // Expected result: The return value of Subscribe doesn't contain the key.
     QString expected("Known keys: Unknown keys: ");
@@ -173,21 +173,21 @@ void SubscriptionTests::subscriberNotifications()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
-    QSignalSpy intItemFirst(intItem, SIGNAL(firstSubscriberAppeared(const QString&)));
-    QSignalSpy intItemLast(intItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
-    QSignalSpy doubleItemFirst(doubleItem, SIGNAL(firstSubscriberAppeared(const QString&)));
-    QSignalSpy doubleItemLast(doubleItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
-    QSignalSpy stringItemFirst(stringItem, SIGNAL(firstSubscriberAppeared(const QString&)));
-    QSignalSpy stringItemLast(stringItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
-    QSignalSpy boolItemFirst(boolItem, SIGNAL(firstSubscriberAppeared(const QString&)));
-    QSignalSpy boolItemLast(boolItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy intItemFirst(&test_int, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy intItemLast(&test_int, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy doubleItemFirst(&test_double, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy doubleItemLast(&test_double, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy stringItemFirst(&test_string, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy stringItemLast(&test_string, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy boolItemFirst(&test_bool, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy boolItemLast(&test_bool, SIGNAL(lastSubscriberDisappeared(const QString&)));
 
     // Ask the client to call GetSubscriber (for both provider bus names), ignore the result
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider2\n");
 
     // Test: ask the client to call Subscribe with 2 valid keys
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.int test.double\n");
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double\n");
 
     // Expected result: we get the notifications for the subscribed keys
     QCOMPARE(intItemFirst.count(), 1);
@@ -208,7 +208,7 @@ void SubscriptionTests::subscriberNotifications()
     doubleItemFirst.clear();
 
     // Test: subscribe to one more key (note different bus name)
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider2 test.bool\n");
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider2 Test.Bool\n");
 
     // Expected result: a notification for the corresponding property, not for others
     QCOMPARE(intItemFirst.count(), 0);
@@ -227,7 +227,7 @@ void SubscriptionTests::subscriberNotifications()
     boolItemFirst.clear();
 
     // Test: Unsubscribe from one of the keys
-    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 test.double\n");
+    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
 
     // Expected result:
     QCOMPARE(intItemFirst.count(), 0);
@@ -246,8 +246,8 @@ void SubscriptionTests::subscriberNotifications()
     doubleItemLast.clear();
 
     // Unsubscribe from the rest of the keys, too
-    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 test.int\n");
-    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider2 test.bool\n");
+    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 Test.Int\n");
+    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider2 Test.Bool\n");
 
     // Expected result:
     QCOMPARE(intItemFirst.count(), 0);

@@ -2,9 +2,9 @@
 
 class QProcess;
 
-namespace ContextProvider {
+#include "context.h"
 
-class Property;
+namespace ContextProvider {
 
 class SubscriptionTests : public QObject
 {

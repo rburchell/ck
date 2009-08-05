@@ -1,6 +1,8 @@
 #include <QString>
 #include <QObject>
 
+#include "context.h"
+
 class QProcess;
 
 namespace ContextProvider {
@@ -12,12 +14,19 @@ class ValueChangesTests : public QObject
     Q_OBJECT
 
 private:
-    Property *intItem;
-    Property *boolItem;
-    Property *doubleItem;
-    Property *stringItem;
+    Service service1;
+    Property test_int;
+    Property test_double;
+
+    Service service2;
+    Property test_string;
+    Property test_bool;
+
     QProcess *client;
     bool isReadyToRead;
+    bool clientStarted;
+
+    QString writeToClient(const char* input);
 
 private slots:
     void initTestCase();
@@ -35,11 +44,8 @@ private slots:
 public slots:
     void readStandardOutput();
 
-private:
-    QString writeToClient(const char* input);
-
-private:
-    bool clientStarted;
+public:
+    ValueChangesTests();
 };
 
 } // end namespace
