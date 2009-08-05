@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#ifndef SERVICE_H
+#define SERVICE_H
 
 #include <QObject>
 #include <QString>
@@ -58,49 +58,6 @@ private:
     void add(Property *prop);
 
     friend class Property;
-};
-
-class Property : public QObject
-{
-    Q_OBJECT
-
-public:
-    explicit Property(Service &service, const QString &key, QObject *parent = 0);
-    explicit Property(const QString &key, QObject *parent = 0);
-    virtual ~Property();
-
-    QString getKey() const;
-    bool isValid() const;
-    bool isSet() const;
-    
-    void set(const QVariant &v);
-    void unset();
-    
-    QVariant get();
-   
-private:
-    void setManager(Manager *manager);
-    bool keyCheck() const;
-
-    Manager *manager;
-    QString key;
-
-    friend class Service;
-
-private slots:
-    void onManagerFirstSubscriberAppeared(const QString &key);
-    void onManagerLastSubscriberDisappeared(const QString &key);
-
-signals:
-    /// This is emitted when the first subscriber appears for this Property.
-    /// It can be used ie. to start the actual process of harvesting the 
-    /// data needed for this Property.
-    void firstSubscriberAppeared(const QString &key); 
-    
-    /// This is emitted when the last subscriber disappears for this Property.
-    /// It can be used ie. to stop the process of harvesting the 
-    /// data needed for this Property (and save resources).
-    void lastSubscriberDisappeared(const QString &key);
 };
 
 } // end namespace

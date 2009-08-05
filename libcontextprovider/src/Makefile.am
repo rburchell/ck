@@ -3,7 +3,8 @@ lib_LTLIBRARIES = libcontextprovider.la
 libcontextprovider_la_SOURCES = logging.h               \
                                 logging.cpp             \
                                 loggingfeatures.h       \
-                                context.h               \
+                                service.h               \
+                                property.h              \
                                 context.cpp             \
                                 manager.h               \
                                 manager.cpp             \
@@ -27,7 +28,7 @@ libcontextprovider_la_SOURCES = logging.h               \
 includecontextproviderdir=$(includedir)/contextprovider
 includecontextprovider_HEADERS = ContextProvider contextc.h context_provider.h
 includecontextprovidercontextdir=$(includecontextproviderdir)/context
-includecontextprovidercontext_HEADERS = context.h contextgroup.h
+includecontextprovidercontext_HEADERS = service.h property.h contextgroup.h
 
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS) \
               '-DCONTEXT_LOG_MODULE_NAME="libcontextprovider"'
