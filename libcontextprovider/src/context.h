@@ -51,7 +51,7 @@ public:
 private:
     QList<Property *> props;
     QDBusConnection::BusType busType;
-    const QString &busName;
+    const QString busName;
     Manager *manager;
     QDBusConnection *connection;
 
