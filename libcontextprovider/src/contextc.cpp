@@ -100,17 +100,19 @@ int context_provider_init (DBusBusType bus_type, const char* bus_name)
 /// this function a new service can be started by calling context_provider_init. 
 void context_provider_stop (void)
 {
-    contextDebug() << "Stopping service";
+    if (cService) {
+        contextDebug() << "Stopping service";
 
-    // Delete all listeners
-    if (listeners) {
-        foreach (Listener *listener, *listeners)
-            delete listener;
+        // Delete all listeners
+        if (listeners) {
+            foreach (Listener *listener, *listeners)
+                delete listener;
+        }
+        delete listeners; listeners = NULL;
+        
+        delete cService;
+        cService = NULL;
     }
-    delete listeners; listeners = NULL;
-
-    delete cService;
-    cService = NULL;
 }
 
 /// Installs (adds) a \a key to be provided by the service. The callback function \a 
