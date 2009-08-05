@@ -72,11 +72,11 @@ Property::Property(Service &service, const QString &k, QObject* parent)
 Property::Property(const QString &k, QObject* parent)
     : QObject(parent), manager(NULL), key(k)
 {
-    if (defaultService == NULL)
+    if (Service::defaultService == NULL)
         contextCritical() << "No default service set.";
     else {
         contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
-        defaultService->add(this);
+        Service::defaultService->add(this);
     }
 }
 

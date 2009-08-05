@@ -57,6 +57,8 @@ private:
 
     void add(Property *prop);
 
+    static Service *defaultService;
+
     friend class Property;
 };
 

@@ -34,7 +34,7 @@ namespace ContextProvider {
 
 */
 
-static Service *defaultService;
+Service *Service::defaultService;
 
 Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
     : QObject(parent), busType(busType), busName(busName), manager(NULL), connection(NULL)
