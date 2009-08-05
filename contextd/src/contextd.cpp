@@ -35,6 +35,8 @@ int main(int argc, char **argv)
     service.setAsDefault();
     HalProvider halProvider(service);
     LowMemProvider lowMemProvider;
+
+    service.start();
     return app.exec();
 }
 
