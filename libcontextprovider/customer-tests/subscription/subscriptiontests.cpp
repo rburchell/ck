@@ -126,7 +126,7 @@ void SubscriptionTests::testGetSubscriberTwice()
 // Note: These tests don't verify that different clients get different
 // subscribers. We might want to add a test case here.
 
-void SubscriptionTests::subscribeToUnknownProperty()
+void SubscriptionTests::subscribeReturnValueForUnknownProperty()
 {
     // Check that the initialization went well.
     // Doing this only in init() is not enough; doesn't stop the test case.
@@ -144,7 +144,7 @@ void SubscriptionTests::subscribeToUnknownProperty()
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
-void SubscriptionTests::subscribeToKnownProperty()
+void SubscriptionTests::subscribeReturnValueForKnownProperty()
 {
     // Check that the initialization went well.
     // Doing this only in init() is not enough; doesn't stop the test case.
@@ -165,7 +165,7 @@ void SubscriptionTests::subscribeToKnownProperty()
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
-void SubscriptionTests::subscribeToInvalidProperty()
+void SubscriptionTests::subscribeReturnValueForInvalidProperty()
 {
     // Check that the initialization went well.
     // Doing this only in init() is not enough; doesn't stop the test case.
@@ -180,6 +180,106 @@ void SubscriptionTests::subscribeToInvalidProperty()
     // Expected result: The return value of Subscribe doesn't contain the key.
     QString expected("Known keys: Unknown keys: ");
     QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void SubscriptionTests::subscriberNotifications()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    QSignalSpy intItemFirst(intItem, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy intItemLast(intItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy doubleItemFirst(doubleItem, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy doubleItemLast(doubleItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy stringItemFirst(stringItem, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy stringItemLast(stringItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy boolItemFirst(boolItem, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy boolItemLast(boolItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
+
+    // Ask the client to call GetSubscriber (for both provider bus names), ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider2\n");
+
+    // Test: ask the client to call Subscribe with 2 valid keys
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.int test.double\n");
+
+    // Expected result: we get the notifications for the subscribed keys
+    QCOMPARE(intItemFirst.count(), 1);
+    QCOMPARE(intItemLast.count(), 0);
+
+    QCOMPARE(doubleItemFirst.count(), 1);
+    QCOMPARE(doubleItemLast.count(), 0);
+
+    // But not for the other ones
+    QCOMPARE(stringItemFirst.count(), 0);
+    QCOMPARE(stringItemLast.count(), 0);
+
+    QCOMPARE(boolItemFirst.count(), 0);
+    QCOMPARE(boolItemLast.count(), 0);
+
+    // Clear the results
+    intItemFirst.clear();
+    doubleItemFirst.clear();
+
+    // Test: subscribe to one more key (note different bus name)
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider2 test.bool\n");
+
+    // Expected result: a notification for the corresponding property, not for others
+    QCOMPARE(intItemFirst.count(), 0);
+    QCOMPARE(intItemLast.count(), 0);
+
+    QCOMPARE(doubleItemFirst.count(), 0);
+    QCOMPARE(doubleItemLast.count(), 0);
+
+    QCOMPARE(boolItemFirst.count(), 1);
+    QCOMPARE(boolItemLast.count(), 0);
+
+    QCOMPARE(stringItemFirst.count(), 0);
+    QCOMPARE(stringItemLast.count(), 0);
+
+    // Clear the results
+    boolItemFirst.clear();
+
+    // Test: Unsubscribe from one of the keys
+    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 test.double\n");
+
+    // Expected result:
+    QCOMPARE(intItemFirst.count(), 0);
+    QCOMPARE(intItemLast.count(), 0);
+
+    QCOMPARE(doubleItemFirst.count(), 0);
+    QCOMPARE(doubleItemLast.count(), 1);
+
+    QCOMPARE(boolItemFirst.count(), 0);
+    QCOMPARE(boolItemLast.count(), 0);
+
+    QCOMPARE(stringItemFirst.count(), 0);
+    QCOMPARE(stringItemLast.count(), 0);
+
+    // Clear the results
+    doubleItemLast.clear();
+
+    // Unsubscribe from the rest of the keys, too
+    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 test.int\n");
+    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider2 test.bool\n");
+
+    // Expected result:
+    QCOMPARE(intItemFirst.count(), 0);
+    QCOMPARE(intItemLast.count(), 1);
+
+    QCOMPARE(doubleItemFirst.count(), 0);
+    QCOMPARE(doubleItemLast.count(), 0);
+
+    QCOMPARE(boolItemFirst.count(), 0);
+    QCOMPARE(boolItemLast.count(), 1);
+
+    QCOMPARE(stringItemFirst.count(), 0);
+    QCOMPARE(stringItemLast.count(), 0);
+
+    // Clear the results
+    intItemLast.clear();
+    boolItemLast.clear();
 }
 
 void SubscriptionTests::readStandardOutput()

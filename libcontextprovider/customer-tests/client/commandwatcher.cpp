@@ -198,6 +198,8 @@ void CommandWatcher::callUnsubscribe(const QString& busName, const QStringList& 
                                   "org.freedesktop.ContextKit.Subscriber", connection);
         // Call Unsubscribe synchronously
         subscriber.call("Unsubscribe", args);
+
+        out << "Unsubscribe called" << endl;
     }
     else {
         out << "Unsubscribe error: we don't have a subscriber for bus name " << busName << endl;

@@ -30,9 +30,11 @@ private slots:
     void testGetSubscriber();
     void testGetSubscriberTwice();
 
-    void subscribeToUnknownProperty();
-    void subscribeToKnownProperty();
-    void subscribeToInvalidProperty();
+    void subscribeReturnValueForUnknownProperty();
+    void subscribeReturnValueForKnownProperty();
+    void subscribeReturnValueForInvalidProperty();
+
+    void subscriberNotifications();
 
 public slots:
     void readStandardOutput();
