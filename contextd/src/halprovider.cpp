@@ -59,8 +59,14 @@ namespace ContextD {
 HalProvider::HalProvider(Service &service)
 {
     contextDebug() << F_HAL << "Initializing hal provider";
+    QStringList list;
+    list << "Battery.OnBattery";
+    list << "Battery.ChargePercentage";
+    list << "Battery.LowBattery";
+    list << "Battery.TimeUntilLow";
+    list << "Battery.TimeUntilFull";
 
-    group = new Group(service, keys(), this); // FIXME DEFAULT
+    group = new Group(service, list, this); // FIXME DEFAULT
     onBattery = new Property("Battery.OnBattery", this);
     lowBattery = new Property("Battery.LowBattery", this);
     chargePercentage = new Property("Battery.ChargePercentage", this);
@@ -72,21 +78,6 @@ HalProvider::HalProvider(Service &service)
 
     sconnect(group, SIGNAL(lastSubscriberDisappeared()),
             this, SLOT(onLastSubscriberDisappeared()));
-}
-
-QStringList HalProvider::keys()
-{
-    QStringList list;
-    list << "Battery.OnBattery";
-    list << "Battery.ChargePercentage";
-    list << "Battery.LowBattery";
-    list << "Battery.TimeUntilLow";
-    list << "Battery.TimeUntilFull";
-    return list;
-}
-
-void HalProvider::initialize()
-{
 }
 
 /// Called when the first subscriber for any of the keys appears. We initialize

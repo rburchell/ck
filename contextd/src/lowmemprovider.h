@@ -25,7 +25,6 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include "provider.h"
 #include "context.h"
 #include "boolsysfspooler.h"
 
@@ -33,14 +32,12 @@ namespace ContextD {
 
 using namespace ContextProvider;
 
-class LowMemProvider : public Provider
+class LowMemProvider : public QObject
 {
     Q_OBJECT
 
 public:
     LowMemProvider();
-    virtual QStringList keys();
-    virtual void initialize();
 
 private:
     Property *memoryPressure; ///< Property for the System.MemoryPressure

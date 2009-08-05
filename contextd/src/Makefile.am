@@ -1,6 +1,5 @@
 bin_PROGRAMS = contextd
 contextd_SOURCES = contextd.cpp			\
-		   provider.h			\
 		   loggingfeatures.h		\
 		   halprovider.h		\
 		   halprovider.cpp		\

@@ -25,7 +25,6 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include "provider.h"
 #include "contextgroup.h"
 #include "haldeviceinterface.h"
 #include "context.h"
@@ -34,14 +33,12 @@ namespace ContextD {
 
 using namespace ContextProvider;
 
-class HalProvider : public Provider
+class HalProvider : public QObject
 {
     Q_OBJECT
 
 public:
     HalProvider(Service &service);
-    virtual QStringList keys();
-    virtual void initialize();
 
 private:
     void updateProperties();

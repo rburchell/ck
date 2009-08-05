@@ -61,13 +61,16 @@ LowMemProvider::LowMemProvider()
 {
 }
 
+/*
 QStringList LowMemProvider::keys()
 {
     QStringList list;
     list << "System.MemoryPressure";
     return list;
 }
+*/
 
+/*
 void LowMemProvider::initialize()
 {
     contextDebug() << F_LOWMEM << "Initializing lowmem plugin";
@@ -79,6 +82,7 @@ void LowMemProvider::initialize()
     sconnect(memoryPressure, SIGNAL(lastSubscriberDisappeared(QString)),
              this, SLOT(onLastSubscriberDisappeared()));
 }
+*/
 
 /// This is called when the first subscriber for System.MemoryPressure appears.
 /// Here we create the watchers on the pool files and start observing.
