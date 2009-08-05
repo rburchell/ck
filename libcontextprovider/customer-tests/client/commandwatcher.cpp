@@ -171,7 +171,8 @@ void CommandWatcher::callSubscribe(const QString& busName, const QStringList& ar
 
         out << "Known keys: ";
         foreach (const QString& key, knownKeys) {
-            out << key << " ";
+            QVariant value = knownValues[key];
+            out << key << "(" << value.typeName() << ":" << value.toString() << ") ";
         }
 
         out << " Unknown keys: ";

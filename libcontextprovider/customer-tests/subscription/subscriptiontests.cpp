@@ -139,7 +139,46 @@ void SubscriptionTests::subscribeToUnknownProperty()
     // is currently unknown since we haven't set a value for it.
     QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.int\n");
 
+    // Expected result: The return value of Subscribe contains the key as unknown.
     QString expected("Known keys: Unknown keys: test.int");
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void SubscriptionTests::subscribeToKnownProperty()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call GetSubscriber, ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // Set a value for a property
+    doubleItem->set(-8.22);
+
+    // Ask the client to call Subscribe with 1 valid key. The property
+    // has a value we just set.
+    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.double\n");
+
+    // Expected result: The return value of Subscribe contains the key and its value.
+    QString expected("Known keys: test.double(double:-8.22) Unknown keys: ");
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void SubscriptionTests::subscribeToInvalidProperty()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call GetSubscriber, ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // Ask the client to call Subscribe with 1 invalid key.
+    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.invalid\n");
+
+    // Expected result: The return value of Subscribe doesn't contain the key.
+    QString expected("Known keys: Unknown keys: ");
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
@@ -154,7 +193,7 @@ QString SubscriptionTests::writeToClient(const char* input)
     client->write(input);
     client->waitForBytesWritten();
     // Blocking for reading operation is bad idea since the client
-    // expects provider to reply to getsubscriber dbus call
+    // expects provider to reply to dbus calls
 
     while (!isReadyToRead) {
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);

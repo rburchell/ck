@@ -29,7 +29,10 @@ private slots:
 
     void testGetSubscriber();
     void testGetSubscriberTwice();
+
     void subscribeToUnknownProperty();
+    void subscribeToKnownProperty();
+    void subscribeToInvalidProperty();
 
 public slots:
     void readStandardOutput();
