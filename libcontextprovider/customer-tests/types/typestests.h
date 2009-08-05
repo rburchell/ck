@@ -1,3 +1,4 @@
+#include <QString>
 #include <QObject>
 
 class QProcess;
@@ -6,7 +7,7 @@ namespace ContextProvider {
 
 class Property;
 
-class SubscriptionTests : public QObject
+class TypesTests : public QObject
 {
     Q_OBJECT
 
@@ -15,6 +16,10 @@ private:
     Property *boolItem;
     Property *doubleItem;
     Property *stringItem;
+    Property *stringListItem;
+    Property *charItem;
+    Property *dateItem;
+    Property *timeItem;
     QProcess *client;
     bool isReadyToRead;
 
@@ -24,14 +29,8 @@ private slots:
     void init();
     void cleanup();
 
-    void testGetSubscriber();
-    void testGetSubscriberTwice();
-
-    void subscribeReturnValueForUnknownProperty();
-    void subscribeReturnValueForKnownProperty();
-    void subscribeReturnValueForInvalidProperty();
-
-    void subscriberNotifications();
+    void typesInReturnValueOfSubscribe();
+    void typesInChangeSignal();
 
 public slots:
     void readStandardOutput();

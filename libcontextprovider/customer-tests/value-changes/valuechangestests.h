@@ -1,3 +1,4 @@
+#include <QString>
 #include <QObject>
 
 class QProcess;
@@ -6,7 +7,7 @@ namespace ContextProvider {
 
 class Property;
 
-class SubscriptionTests : public QObject
+class ValueChangesTests : public QObject
 {
     Q_OBJECT
 
@@ -24,14 +25,12 @@ private slots:
     void init();
     void cleanup();
 
-    void testGetSubscriber();
-    void testGetSubscriberTwice();
+    void subscribedPropertyChanges();
+    void nonsubscribedPropertyChanges();
+    void unsubscribedPropertyChanges();
 
-    void subscribeReturnValueForUnknownProperty();
-    void subscribeReturnValueForKnownProperty();
-    void subscribeReturnValueForInvalidProperty();
-
-    void subscriberNotifications();
+    void twoPropertiesChange();
+    void sameValueSet();
 
 public slots:
     void readStandardOutput();

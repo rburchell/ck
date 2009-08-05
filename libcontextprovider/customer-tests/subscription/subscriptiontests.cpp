@@ -22,20 +22,38 @@
  */
 
 #include "subscriptiontests.h"
+
+#include "context.h"
+#include "sconnect.h"
+
 #include <QtTest/QtTest>
+#include <QProcess>
+#include <QStringList>
 
 namespace ContextProvider {
 
 void SubscriptionTests::initTestCase()
 {
+}
+
+void SubscriptionTests::cleanupTestCase()
+{
+}
+
+// Before each test
+void SubscriptionTests::init()
+{
+    // Initialize test program state
     isReadyToRead = false;
+
+    // Start the provider
     QStringList keysProvider1;
-    keysProvider1.append("test.Int");
-    keysProvider1.append("test.Double");
+    keysProvider1.append("test.int");
+    keysProvider1.append("test.double");
 
     QStringList keysProvider2;
-    keysProvider2.append("test.String");
-    keysProvider2.append("test.Bool");
+    keysProvider2.append("test.string");
+    keysProvider2.append("test.bool");
 
     Property::initService(QDBusConnection::SessionBus,
             "org.freedesktop.ContextKit.testProvider1",
@@ -45,56 +63,247 @@ void SubscriptionTests::initTestCase()
             "org.freedesktop.ContextKit.testProvider2",
             keysProvider2);
 
-    intItem = new Property("test.Int");
-    doubleItem = new Property("test.Double");
+    intItem = new Property("test.int");
+    doubleItem = new Property("test.double");
 
-    stringItem = new Property("test.String");
-    boolItem = new Property("test.Bool");
+    stringItem = new Property("test.string");
+    boolItem = new Property("test.bool");
+
+    // Start the client
+    client = new QProcess();
+    sconnect(client, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
+    client->start("client");
+    // Record whether the client was successfully started
+    clientStarted = client->waitForStarted();
 }
 
-void SubscriptionTests::cleanupTestCase()
+// After each test
+void SubscriptionTests::cleanup()
 {
+    // Stop the client
+    if (clientStarted) {
+        client->kill();
+        client->waitForFinished();
+    }
+    delete client; client = NULL;
+
+    // Stop the provider
+    Property::stopService("org.freedesktop.ContextKit.testProvider1");
+    Property::stopService("org.freedesktop.ContextKit.testProvider2");
+
     delete intItem;
     delete doubleItem;
     delete stringItem;
     delete boolItem;
-    delete client;
-}
-
-void SubscriptionTests::init()
-{
-}
-
-void SubscriptionTests::cleanup()
-{
 }
 
 void SubscriptionTests::testGetSubscriber()
 {
-    client = new QProcess();
-    clientName = "client";
-    sconnect(client, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
-    client->start(clientName);
-    client->waitForStarted();
-    client->write("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-    client->waitForBytesWritten();
-    // Blocking for reading operation is bad idea since the client
-    // expects provider to reply to getsubscriber dbus call
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
 
-    while (!isReadyToRead) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-    }
-    QString actual(client->readAll());
-    QString expected("GetSubscriber returned /org/freedesktop/ContextKit/Subscriber/1");
-    QCOMPARE(actual.simplified(),expected.simplified());
-    client->kill();
-    client->waitForFinished();
+    QString actual = writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    QString expected("GetSubscriber returned /org/freedesktop/ContextKit/Subscriber/0");
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void SubscriptionTests::testGetSubscriberTwice()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call GetSubscriber
+    QString result1 = writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // Ask the client to call GetSubscriber again
+    QString result2 = writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // Expected result: the client got the same subscriber path twice
+    QCOMPARE(result1, result2);
+}
+
+// Note: These tests don't verify that different clients get different
+// subscribers. We might want to add a test case here.
+
+void SubscriptionTests::subscribeReturnValueForUnknownProperty()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call GetSubscriber, ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // Ask the client to call Subscribe with 1 valid key. The property
+    // is currently unknown since we haven't set a value for it.
+    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.int\n");
+
+    // Expected result: The return value of Subscribe contains the key as unknown.
+    QString expected("Known keys: Unknown keys: test.int");
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void SubscriptionTests::subscribeReturnValueForKnownProperty()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call GetSubscriber, ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // Set a value for a property
+    doubleItem->set(-8.22);
+
+    // Ask the client to call Subscribe with 1 valid key. The property
+    // has a value we just set.
+    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.double\n");
+
+    // Expected result: The return value of Subscribe contains the key and its value.
+    QString expected("Known keys: test.double(double:-8.22) Unknown keys: ");
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void SubscriptionTests::subscribeReturnValueForInvalidProperty()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call GetSubscriber, ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // Ask the client to call Subscribe with 1 invalid key.
+    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.invalid\n");
+
+    // Expected result: The return value of Subscribe doesn't contain the key.
+    QString expected("Known keys: Unknown keys: ");
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void SubscriptionTests::subscriberNotifications()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    QSignalSpy intItemFirst(intItem, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy intItemLast(intItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy doubleItemFirst(doubleItem, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy doubleItemLast(doubleItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy stringItemFirst(stringItem, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy stringItemLast(stringItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy boolItemFirst(boolItem, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy boolItemLast(boolItem, SIGNAL(lastSubscriberDisappeared(const QString&)));
+
+    // Ask the client to call GetSubscriber (for both provider bus names), ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider2\n");
+
+    // Test: ask the client to call Subscribe with 2 valid keys
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.int test.double\n");
+
+    // Expected result: we get the notifications for the subscribed keys
+    QCOMPARE(intItemFirst.count(), 1);
+    QCOMPARE(intItemLast.count(), 0);
+
+    QCOMPARE(doubleItemFirst.count(), 1);
+    QCOMPARE(doubleItemLast.count(), 0);
+
+    // But not for the other ones
+    QCOMPARE(stringItemFirst.count(), 0);
+    QCOMPARE(stringItemLast.count(), 0);
+
+    QCOMPARE(boolItemFirst.count(), 0);
+    QCOMPARE(boolItemLast.count(), 0);
+
+    // Clear the results
+    intItemFirst.clear();
+    doubleItemFirst.clear();
+
+    // Test: subscribe to one more key (note different bus name)
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider2 test.bool\n");
+
+    // Expected result: a notification for the corresponding property, not for others
+    QCOMPARE(intItemFirst.count(), 0);
+    QCOMPARE(intItemLast.count(), 0);
+
+    QCOMPARE(doubleItemFirst.count(), 0);
+    QCOMPARE(doubleItemLast.count(), 0);
+
+    QCOMPARE(boolItemFirst.count(), 1);
+    QCOMPARE(boolItemLast.count(), 0);
+
+    QCOMPARE(stringItemFirst.count(), 0);
+    QCOMPARE(stringItemLast.count(), 0);
+
+    // Clear the results
+    boolItemFirst.clear();
+
+    // Test: Unsubscribe from one of the keys
+    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 test.double\n");
+
+    // Expected result:
+    QCOMPARE(intItemFirst.count(), 0);
+    QCOMPARE(intItemLast.count(), 0);
+
+    QCOMPARE(doubleItemFirst.count(), 0);
+    QCOMPARE(doubleItemLast.count(), 1);
+
+    QCOMPARE(boolItemFirst.count(), 0);
+    QCOMPARE(boolItemLast.count(), 0);
+
+    QCOMPARE(stringItemFirst.count(), 0);
+    QCOMPARE(stringItemLast.count(), 0);
+
+    // Clear the results
+    doubleItemLast.clear();
+
+    // Unsubscribe from the rest of the keys, too
+    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 test.int\n");
+    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider2 test.bool\n");
+
+    // Expected result:
+    QCOMPARE(intItemFirst.count(), 0);
+    QCOMPARE(intItemLast.count(), 1);
+
+    QCOMPARE(doubleItemFirst.count(), 0);
+    QCOMPARE(doubleItemLast.count(), 0);
+
+    QCOMPARE(boolItemFirst.count(), 0);
+    QCOMPARE(boolItemLast.count(), 1);
+
+    QCOMPARE(stringItemFirst.count(), 0);
+    QCOMPARE(stringItemLast.count(), 0);
+
+    // Clear the results
+    intItemLast.clear();
+    boolItemLast.clear();
 }
 
 void SubscriptionTests::readStandardOutput()
 {
     isReadyToRead = true;
 }
+
+QString SubscriptionTests::writeToClient(const char* input)
+{
+    isReadyToRead = false;
+    client->write(input);
+    client->waitForBytesWritten();
+    // Blocking for reading operation is bad idea since the client
+    // expects provider to reply to dbus calls
+
+    while (!isReadyToRead) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    }
+    // Return the output from the client
+    return client->readAll();
+}
+
 
 } // end namespace
 

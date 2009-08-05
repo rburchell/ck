@@ -73,6 +73,8 @@ AC_CONFIG_FILES([
 	libcontextsubscriber/contextsubscriber-1.0.pc
 	libcontextsubscriber/customer-tests/Makefile
 	libcontextsubscriber/customer-tests/update-contextkit-providers/Makefile
+	libcontextprovider/customer-tests/value-changes/Makefile
+	libcontextprovider/customer-tests/types/Makefile
 	libcontextsubscriber/doc/Makefile
 	libcontextsubscriber/man/Makefile
 	libcontextsubscriber/src/Makefile
