@@ -25,7 +25,8 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include "context.h"
+#include "manager.h"
+#include "property.h"
 #include "boolsysfspooler.h"
 
 namespace ContextD {

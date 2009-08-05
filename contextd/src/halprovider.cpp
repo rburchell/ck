@@ -24,7 +24,6 @@
 #include "halmanagerinterface.h"
 #include "logging.h"
 #include "loggingfeatures.h"
-#include "context.h"
 #include "sconnect.h"
 
 namespace ContextD {

@@ -20,9 +20,9 @@
  */
 
 #include <QCoreApplication>
+#include "service.h"
 #include "halprovider.h"
 #include "lowmemprovider.h"
-#include "context.h"
 
 using namespace ContextD;
 using namespace ContextProvider;
