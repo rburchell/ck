@@ -26,14 +26,16 @@
 #include <QSet>
 #include <QStringList>
 
-class Context;
+namespace ContextProvider {
 
-class ContextGroup : public QObject
+class Property;
+
+class Group : public QObject
 {
     Q_OBJECT
     
 public:
-    explicit ContextGroup(QStringList propertiesToWatch, QObject* parent = 0);
+    explicit Group(QStringList propertiesToWatch, QObject* parent = 0);
     void fakeFirst();
     void fakeLast();
 
@@ -41,5 +43,7 @@ signals:
     void firstSubscriberAppeared();
     void lastSubscriberDisappeared();
 };
+
+}
 
 #endif
