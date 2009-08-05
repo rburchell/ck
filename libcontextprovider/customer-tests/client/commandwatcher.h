@@ -29,6 +29,7 @@ private:
     // Helpers
     QDBusConnection getConnection(const QString& busType);
     QString describeValuesAndUnknowns(const QMap<QString, QVariant>& knownValues, QStringList unknownKeys);
+    QString describeQVariant(QVariant value);
 
 private slots:
     void onActivated();

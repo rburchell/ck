@@ -238,7 +238,7 @@ QString CommandWatcher::describeValuesAndUnknowns(const QMap<QString, QVariant>&
     parameterDescription += "Known keys: ";
     foreach (const QString& key, knownKeys) {
         QVariant value = knownValues[key];
-        parameterDescription += (key + "(" + value.typeName() + ":" + value.toString() + ") ");
+        parameterDescription += (key + "(" + value.typeName() + ":" + describeQVariant(value) + ") ");
     }
 
     parameterDescription +=" Unknown keys: ";
@@ -249,7 +249,33 @@ QString CommandWatcher::describeValuesAndUnknowns(const QMap<QString, QVariant>&
     return parameterDescription;
 }
 
+QString CommandWatcher::describeQVariant(QVariant value)
+{
+    QVariant::Type type = value.type();
 
+    if (type == QVariant::Bool || type == QVariant::Int || type == QVariant::Double || type == QVariant::String) {
+        // Automatic conversion is OK
+        return value.toString();
+    }
+    if (type == QVariant::StringList) {
+        return value.toStringList().join("/");
+    }
+    if (type == QVariant::UserType) {
+        QDBusArgument dbusArgument = value.value<QDBusArgument >();
+
+        return "";
+        /* FIXME: How to extract types like QDate, QTime from this?
+        If we know, what type to expect, it goes like this:
+
+        QDate date;
+        dbusArgument >> date;
+        return date.toString();
+
+        But how do we find out what type to expect?
+        */
+    }
+    return "";
+}
 
 QDBusConnection CommandWatcher::getConnection(const QString& busType)
 {
