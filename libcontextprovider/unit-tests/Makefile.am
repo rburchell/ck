@@ -2,7 +2,8 @@ SUBDIRS = manager	\
 	  subscriber	\
 	  context	\
 	  contextgroup	\
-	  contextc
+	  contextc	\
+	  service
 
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
