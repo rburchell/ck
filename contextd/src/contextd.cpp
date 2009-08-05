@@ -31,24 +31,9 @@ int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
 
-    QList<Provider*> providerList;
-    providerList << new HalProvider();
-    providerList << new LowMemProvider();
-    QStringList keys;
-
-    // First collect all keys
-    foreach (Provider *provider, providerList) {
-        keys << provider->keys();
-    }
-
-    // Now init service
-    Property::initService(QDBusConnection::SessionBus, QString("org.freedesktop.ContextKit.contextd"), keys);
-
-    // Now init all providers
-    foreach (Provider *provider, providerList) {
-        provider->initialize();
-    }
-    
+    Service service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.contextd");
+    service.setAsDefault();
+    HalProvider halProvider(service);
     return app.exec();
 }
 

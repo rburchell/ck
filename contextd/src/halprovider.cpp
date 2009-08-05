@@ -56,6 +56,24 @@ namespace ContextD {
     Communication with Hal happens over DBus.
 */
 
+HalProvider::HalProvider(Service &service)
+{
+    contextDebug() << F_HAL << "Initializing hal provider";
+
+    group = new Group(service, keys(), this); // FIXME DEFAULT
+    onBattery = new Property("Battery.OnBattery", this);
+    lowBattery = new Property("Battery.LowBattery", this);
+    chargePercentage = new Property("Battery.ChargePercentage", this);
+    timeUntilLow = new Property("Battery.TimeUntilLow", this);
+    timeUntilFull = new Property("Battery.TimeUntilFull", this);
+
+    sconnect(group, SIGNAL(firstSubscriberAppeared()),
+            this, SLOT(onFirstSubscriberAppeared()));
+
+    sconnect(group, SIGNAL(lastSubscriberDisappeared()),
+            this, SLOT(onLastSubscriberDisappeared()));
+}
+
 QStringList HalProvider::keys()
 {
     QStringList list;
@@ -69,19 +87,6 @@ QStringList HalProvider::keys()
 
 void HalProvider::initialize()
 {
-    contextDebug() << F_HAL << "Initializing hal provider";
-    group = new Group(keys(), this);
-    onBattery = new Property("Battery.OnBattery", this);
-    lowBattery = new Property("Battery.LowBattery", this);
-    chargePercentage = new Property("Battery.ChargePercentage", this);
-    timeUntilLow = new Property("Battery.TimeUntilLow", this);
-    timeUntilFull = new Property("Battery.TimeUntilFull", this);
-
-    sconnect(group, SIGNAL(firstSubscriberAppeared()),
-            this, SLOT(onFirstSubscriberAppeared()));
-
-    sconnect(group, SIGNAL(lastSubscriberDisappeared()),
-            this, SLOT(onLastSubscriberDisappeared()));
 }
 
 /// Called when the first subscriber for any of the keys appears. We initialize

@@ -28,6 +28,7 @@
 #include "provider.h"
 #include "contextgroup.h"
 #include "haldeviceinterface.h"
+#include "context.h"
 
 namespace ContextD {
 
@@ -38,6 +39,7 @@ class HalProvider : public Provider
     Q_OBJECT
 
 public:
+    HalProvider(Service &service);
     virtual QStringList keys();
     virtual void initialize();
 
