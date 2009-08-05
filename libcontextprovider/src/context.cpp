@@ -38,11 +38,12 @@ static Service *defaultService;
 Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
     : QObject(parent), busType(busType), busName(busName), manager(NULL), connection(NULL)
 {
-    contextDebug() << F_CONTEXT << "Creating new Service for" << busName;
+    contextDebug() << F_SERVICE << "Creating new Service for" << busName;
 }
 
 Service::~Service()
 {
+    contextDebug() << F_SERVICE << F_DESTROY << "Destroying Service";
     stop();
 }
 
@@ -55,7 +56,7 @@ void Service::add(Property *prop)
 void Service::setAsDefault()
 {
     if (defaultService) {
-        contextCritical() << "Default service already set.";
+        contextCritical() << F_SERVICE << "Default service already set.";
         return;
     }
 
@@ -78,14 +79,14 @@ void Service::start()
 
     // Register service
     if (! connection->registerService(busName)) {
-        contextCritical() << "Failed to register service with name" << busName;
+        contextCritical() << F_SERVICE << "Failed to register service with name" << busName;
         stop();
         return;
     }
 
     // Register object
     if (managerAdaptor && !connection->registerObject("/org/freedesktop/ContextKit/Manager", manager)) {
-        contextCritical() << "Failed to register the Manager object for" << busName;
+        contextCritical() << F_SERVICE << "Failed to register the Manager object for" << busName;
         stop();
         return;
     }
@@ -99,7 +100,7 @@ void Service::stop()
     if (manager == NULL)
         return;
 
-    contextDebug() << F_CONTEXT << "Stopping service for bus:" << busName;
+    contextDebug() << F_SERVICE << "Stopping service for bus:" << busName;
 
     foreach(Property *p, props)
         p->setManager(NULL);
@@ -159,7 +160,7 @@ void Service::restart()
 Property::Property(Service &service, const QString &k, QObject* parent)
     : QObject(parent), manager(NULL), key(k)
 {
-    contextDebug() << F_CONTEXT << "Creating new Property for key:" << key;
+    contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
 
     service.add(this);
 }
@@ -170,7 +171,7 @@ Property::Property(const QString &k, QObject* parent)
     if (defaultService == NULL)
         contextCritical() << "No default service set.";
     else {
-        contextDebug() << F_CONTEXT << "Creating new Property for key:" << key;
+        contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
         defaultService->add(this);
     }
 }
@@ -253,7 +254,7 @@ QVariant Property::get()
 void Property::onManagerFirstSubscriberAppeared(const QString &key)
 {
     if (key == this->key) {
-        contextDebug() << F_SIGNALS << F_CONTEXT << "First subscriber appeared for key:" << key;
+        contextDebug() << F_SIGNALS << F_PROPERTY << "First subscriber appeared for key:" << key;
         emit firstSubscriberAppeared(key);
     }
 }
@@ -263,7 +264,7 @@ void Property::onManagerFirstSubscriberAppeared(const QString &key)
 void Property::onManagerLastSubscriberDisappeared(const QString &key)
 {
     if (key == this->key) {
-        contextDebug() << F_SIGNALS << F_CONTEXT << "Last subscriber disappeared for key:" << key;
+        contextDebug() << F_SIGNALS << F_PROPERTY << "Last subscriber disappeared for key:" << key;
         emit lastSubscriberDisappeared(key);
     }
 }
@@ -271,7 +272,7 @@ void Property::onManagerLastSubscriberDisappeared(const QString &key)
 /// Destructor.
 Property::~Property()
 {
-    contextDebug() << F_CONTEXT << F_DESTROY << "Destroying Property for key:" << key;
+    contextDebug() << F_PROPERTY << F_DESTROY << "Destroying Property for key:" << key;
 }
 
 } // end namespace
