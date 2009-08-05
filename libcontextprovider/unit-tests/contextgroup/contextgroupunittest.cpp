@@ -19,8 +19,9 @@
  *
  */
 
-#include "contextgroup.h" // Object to be tested
-#include "context.h"
+#include "group.h" // Object to be tested
+#include "service.h"
+#include "property.h"
 
 #include <QObject>
 #include <QSignalSpy>

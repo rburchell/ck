@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#ifndef PROPERTY_H
+#define PROPERTY_H
 
 // This is a mock implementation
 
@@ -28,10 +28,8 @@
 
 namespace ContextProvider {
 
-class Service : public QObject
-{
-    Q_OBJECT
-};
+class Manager;
+class Service;
 
 class Property : public QObject
 {
@@ -40,11 +38,13 @@ public:
     Property(QString key, QObject* parent = 0);
     Property(Service &service, QString key, QObject* parent = 0);
 
+    void setManager(Manager *);
+
+    QString getKey();
+
 signals:
     void firstSubscriberAppeared(const QString &key);
     void lastSubscriberDisappeared(const QString &key);
-
-    friend class ContextGroupUnitTest;
 };
 
 } // end namespace

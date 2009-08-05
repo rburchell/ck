@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#ifndef SERVICE_H
+#define SERVICE_H
 
 #include <QObject>
 #include <QString>
@@ -45,33 +45,6 @@ public:
     void restart();
 
     void setAsDefault();
-};
-
-class Property : public QObject
-{
-    Q_OBJECT
-
-public:
-    explicit Property(const QString &key, QObject *parent = 0);
-    explicit Property(Service &, const QString &key, QObject *parent = 0);
-    ~Property();
-    
-    void set(const QVariant &v);
-    void unset();
-    QString getKey();
-
-    static bool initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys);
-    static void stopService(const QString &name);
-
-    void fakeFirst();
-    void fakeLast();
-
-signals:
-    void firstSubscriberAppeared(const QString &key); 
-    void lastSubscriberDisappeared(const QString &key);
-
-private:
-    QString key;
 };
 
 } // end namespace

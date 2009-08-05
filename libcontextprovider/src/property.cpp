@@ -19,7 +19,8 @@
  *
  */
 
-#include "context.h"
+#include "service.h"
+#include "property.h"
 #include "logging.h"
 #include "manager.h"
 #include "manageradaptor.h"
@@ -27,103 +28,6 @@
 #include "loggingfeatures.h"
 
 namespace ContextProvider {
-
-/*!
-    \class Service
-
-*/
-
-static Service *defaultService;
-
-Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
-    : QObject(parent), busType(busType), busName(busName), manager(NULL), connection(NULL)
-{
-    contextDebug() << F_SERVICE << "Creating new Service for" << busName;
-}
-
-Service::~Service()
-{
-    contextDebug() << F_SERVICE << F_DESTROY << "Destroying Service";
-    stop();
-}
-
-void Service::add(Property *prop)
-{
-    props << prop;
-    prop->setManager(manager);
-}
-
-void Service::setAsDefault()
-{
-    if (defaultService) {
-        contextCritical() << F_SERVICE << "Default service already set.";
-        return;
-    }
-
-    defaultService = this;
-}
-
-void Service::start()
-{
-    if (manager)
-        return;
-
-    QStringList keys;
-    foreach (Property *p, props)
-        keys << p->getKey();
-
-    connection = new QDBusConnection(QDBusConnection::connectToBus(busType, busName));
-    manager = new Manager(keys);
-
-    ManagerAdaptor *managerAdaptor = new ManagerAdaptor(manager, connection);
-
-    // Register service
-    if (! connection->registerService(busName)) {
-        contextCritical() << F_SERVICE << "Failed to register service with name" << busName;
-        stop();
-        return;
-    }
-
-    // Register object
-    if (managerAdaptor && !connection->registerObject("/org/freedesktop/ContextKit/Manager", manager)) {
-        contextCritical() << F_SERVICE << "Failed to register the Manager object for" << busName;
-        stop();
-        return;
-    }
-
-    foreach(Property *p, props)
-        p->setManager(manager);
-}
-
-void Service::stop()
-{
-    if (manager == NULL)
-        return;
-
-    contextDebug() << F_SERVICE << "Stopping service for bus:" << busName;
-
-    foreach(Property *p, props)
-        p->setManager(NULL);
-
-    // Unregister
-    connection->unregisterObject("/org/freedesktop/ContextKit/Manager");
-    connection->unregisterService(busName);
-
-    // Dealloc
-    delete manager;
-    delete connection;
-    
-    manager = NULL;
-    connection = NULL;
-}
-
-void Service::restart()
-{
-    if (manager) {
-        stop();
-        start();
-    }
-}
 
 /*!
     \class Property
@@ -168,11 +72,11 @@ Property::Property(Service &service, const QString &k, QObject* parent)
 Property::Property(const QString &k, QObject* parent)
     : QObject(parent), manager(NULL), key(k)
 {
-    if (defaultService == NULL)
+    if (Service::defaultService == NULL)
         contextCritical() << "No default service set.";
     else {
         contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
-        defaultService->add(this);
+        Service::defaultService->add(this);
     }
 }
 

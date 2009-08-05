@@ -1,7 +1,8 @@
 #include <QString>
 #include <QObject>
 
-#include "context.h"
+#include "service.h"
+#include "property.h"
 
 class QProcess;
 
@@ -14,11 +15,9 @@ class ValueChangesTests : public QObject
     Q_OBJECT
 
 private:
-    Service service1;
+    Service service;
     Property test_int;
     Property test_double;
-
-    Service service2;
     Property test_string;
     Property test_bool;
 

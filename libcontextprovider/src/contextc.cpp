@@ -20,10 +20,11 @@
  */
 
 #include "contextc.h"
-#include "context.h"
+#include "service.h"
+#include "property.h"
+#include "group.h"
 #include "logging.h"
 #include "sconnect.h"
-#include "contextgroup.h"
 #include "listeners.h"
 
 namespace ContextProvider {

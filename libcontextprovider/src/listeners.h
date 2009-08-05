@@ -22,12 +22,14 @@
 #ifndef LISTENERS_H
 #define LISTENERS_H
 
-#include "context.h"
 #include <QObject>
 #include <QString>
 #include <QStringList>
+
+#include "service.h"
+#include "property.h"
+#include "group.h"
 #include "contextc.h"
-#include "contextgroup.h"
 
 namespace ContextProvider {
 

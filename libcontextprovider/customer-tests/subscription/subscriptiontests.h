@@ -2,7 +2,8 @@
 
 class QProcess;
 
-#include "context.h"
+#include "service.h"
+#include "property.h"
 
 namespace ContextProvider {
 

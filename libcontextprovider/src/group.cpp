@@ -19,8 +19,9 @@
  *
  */
 
-#include "contextgroup.h"
-#include "context.h"
+#include "group.h"
+#include "service.h"
+#include "property.h"
 #include "sconnect.h"
 #include "logging.h"
 #include "loggingfeatures.h"

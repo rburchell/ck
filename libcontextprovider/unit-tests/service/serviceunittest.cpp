@@ -23,7 +23,8 @@
 #include <QtCore>
 #include <stdlib.h>
 #include "manager.h"
-#include "context.h"
+#include "service.h"
+#include "property.h"
 #include "manageradaptor.h"
 
 using namespace ContextProvider;
@@ -47,6 +48,17 @@ QVariant Manager::getKeyValue(const QString &key)
 
 ManagerAdaptor::ManagerAdaptor(Manager *m, QDBusConnection *c) 
 {
+}
+
+/* Mocked Property */
+
+void Property::setManager(Manager *)
+{
+}
+
+QString Property::getKey()
+{
+    return "XXX";
 }
 
 /* Service unit test */

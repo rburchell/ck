@@ -22,8 +22,6 @@
  */
 
 #include "valuechangestests.h"
-
-#include "context.h"
 #include "sconnect.h"
 
 #include <QtTest/QtTest>
@@ -33,13 +31,13 @@
 namespace ContextProvider {
 
 ValueChangesTests::ValueChangesTests()
-    : service1 (QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1", this),
-      test_int (service1, "Test.Int", this),
-      test_double (service1, "Test.Double", this),
-      service2 (QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider2", this),
-      test_string (service2, "Test.String", this),
-      test_bool (service2, "Test.Bool", this)
+    : service (QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1", this),
+      test_int (service, "Test.Int", this),
+      test_double (service, "Test.Double", this),
+      test_string (service, "Test.String", this),
+      test_bool (service, "Test.Bool", this)
 {
+    service.start();
 }
 
 void ValueChangesTests::initTestCase()
@@ -73,9 +71,6 @@ void ValueChangesTests::cleanup()
         client->waitForFinished();
     }
     delete client; client = NULL;
-
-    service1.stop();
-    service2.stop();
 }
 
 void ValueChangesTests::subscribedPropertyChanges()
@@ -209,7 +204,7 @@ void ValueChangesTests::twoPropertiesChange()
 
     // Expected result: the client gets one Changed signal with both properties
     QString expected = "Changed signal received, parameters: Known keys: Test.Double(double:4.111) "
-        "test.int(int:100) Unknown keys:";
+        "Test.Int(int:100) Unknown keys:";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 

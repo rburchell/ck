@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef CONTEXTGROUP_H
-#define CONTEXTGROUP_H
+#ifndef GROUP_H
+#define GROUP_H
 
 #include <QObject>
 #include <QSet>
