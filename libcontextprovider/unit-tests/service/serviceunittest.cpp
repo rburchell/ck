@@ -50,6 +50,17 @@ ManagerAdaptor::ManagerAdaptor(Manager *m, QDBusConnection *c)
 {
 }
 
+/* Mocked Property */
+
+void Property::setManager(Manager *)
+{
+}
+
+QString Property::getKey()
+{
+    return "XXX";
+}
+
 /* Service unit test */
 
 class ServiceUnitTest : public QObject
