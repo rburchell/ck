@@ -1,7 +1,7 @@
 check_PROGRAMS = contextcunittest
 
 # test's sources
-contextcunittest_SOURCES = contextcunittest.cpp service.h property.h contextgroup.h
+contextcunittest_SOURCES = contextcunittest.cpp service.h property.h group.h
 
 COVERAGE_FILES = contextc.cpp listeners.cpp 
 

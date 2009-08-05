@@ -19,7 +19,7 @@
  *
  */
 
-#include "contextgroup.h" // Object to be tested
+#include "group.h" // Object to be tested
 #include "service.h"
 #include "property.h"
 
