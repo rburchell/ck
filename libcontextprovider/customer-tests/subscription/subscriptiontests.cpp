@@ -32,6 +32,18 @@
 
 namespace ContextProvider {
 
+SubscriptionTests::SubscriptionTests()
+    : service1 (QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1", this),
+      test_int (service1, "Test.Int", this),
+      test_double (service1, "Test.Double", this),
+      service2 (QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider2", this),
+      test_string (service2, "Test.String", this),
+      test_bool (service2, "Test.Bool", this)
+{
+    service1.start();
+    service2.start();
+}
+
 void SubscriptionTests::initTestCase()
 {
 }
@@ -45,29 +57,6 @@ void SubscriptionTests::init()
 {
     // Initialize test program state
     isReadyToRead = false;
-
-    // Start the provider
-    QStringList keysProvider1;
-    keysProvider1.append("test.int");
-    keysProvider1.append("test.double");
-
-    QStringList keysProvider2;
-    keysProvider2.append("test.string");
-    keysProvider2.append("test.bool");
-
-    Property::initService(QDBusConnection::SessionBus,
-            "org.freedesktop.ContextKit.testProvider1",
-            keysProvider1);
-
-    Property::initService(QDBusConnection::SessionBus,
-            "org.freedesktop.ContextKit.testProvider2",
-            keysProvider2);
-
-    intItem = new Property("test.int");
-    doubleItem = new Property("test.double");
-
-    stringItem = new Property("test.string");
-    boolItem = new Property("test.bool");
 
     // Start the client
     client = new QProcess();
@@ -87,14 +76,8 @@ void SubscriptionTests::cleanup()
     }
     delete client; client = NULL;
 
-    // Stop the provider
-    Property::stopService("org.freedesktop.ContextKit.testProvider1");
-    Property::stopService("org.freedesktop.ContextKit.testProvider2");
-
-    delete intItem;
-    delete doubleItem;
-    delete stringItem;
-    delete boolItem;
+    service1.stop();
+    service2.stop();
 }
 
 void SubscriptionTests::testGetSubscriber()
@@ -156,7 +139,7 @@ void SubscriptionTests::subscribeReturnValueForKnownProperty()
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Set a value for a property
-    doubleItem->set(-8.22);
+    test_double.set(-8.22);
 
     // Ask the client to call Subscribe with 1 valid key. The property
     // has a value we just set.

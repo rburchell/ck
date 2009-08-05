@@ -19,39 +19,29 @@
  *
  */
 
-#ifndef CONTEXTGROUP_H
-#define CONTEXTGROUP_H
+#ifndef MANAGER_H
+#define MANAGER_H
 
+#include <QHash>
 #include <QObject>
-#include <QSet>
 #include <QStringList>
+#include <QVariant>
 
 namespace ContextProvider {
 
-class Property;
+class Subscriber;
 
-class Group : public QObject
+class Manager : public QObject
 {
     Q_OBJECT
-    
+
 public:
-    explicit Group(QStringList propertiesToWatch, QObject* parent = 0);
-    explicit Group(Service &, QStringList propertiesToWatch, QObject* parent = 0);
-    ~Group();
-    QStringList keyList;
-    void fakeFirst();
-    void fakeLast();
-    
-    QSet<Property *> getProperties();
+    Manager(const QStringList &keys);
 
-signals:
-    void firstSubscriberAppeared();
-    void lastSubscriberDisappeared();
-
-private:
-    QSet<Property *> props;
+    void setKeyValue(const QString &key, const QVariant &v);
+    QVariant getKeyValue(const QString &key);
 };
 
-} // end namespace
+} // namespace ContextProvider
 
 #endif

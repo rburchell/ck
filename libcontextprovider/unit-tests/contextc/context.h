@@ -33,12 +33,27 @@ namespace ContextProvider {
 
 class Manager;
 
+class Service : QObject
+{
+    Q_OBJECT
+
+public:
+    explicit Service(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+
+    void start();
+    void stop();
+    void restart();
+
+    void setAsDefault();
+};
+
 class Property : public QObject
 {
     Q_OBJECT
 
 public:
     explicit Property(const QString &key, QObject *parent = 0);
+    explicit Property(Service &, const QString &key, QObject *parent = 0);
     ~Property();
     
     void set(const QVariant &v);

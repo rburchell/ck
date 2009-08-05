@@ -44,20 +44,22 @@ void Listener::onLastSubscriberDisappeared()
         callback(0, user_data);
 }
 
-PropertyListener::PropertyListener(const QString &k, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt) 
-    : Listener(clears, cb, dt), key(k)
+PropertyListener::PropertyListener(Service &service, const QString &key,
+                                   bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt) 
+    : Listener(clears, cb, dt), prop(service, key, this)
 {
-    sconnect(&key, SIGNAL(firstSubscriberAppeared(QString)), this, SLOT(onFirstSubscriberAppeared()));
-    sconnect(&key, SIGNAL(lastSubscriberDisappeared(QString)), this, SLOT(onLastSubscriberDisappeared()));
+    sconnect(&prop, SIGNAL(firstSubscriberAppeared(QString)), this, SLOT(onFirstSubscriberAppeared()));
+    sconnect(&prop, SIGNAL(lastSubscriberDisappeared(QString)), this, SLOT(onLastSubscriberDisappeared()));
 }
 
 void PropertyListener::clear()
 {
-    key.unset();
+    prop.unset();
 }
 
-GroupListener::GroupListener(const QStringList &keys, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt)
-    : Listener(clears, cb, dt), group(keys), keyList(keys)
+GroupListener::GroupListener(Service &service, const QStringList &keys,
+                             bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt)
+    : Listener(clears, cb, dt), group(service, keys, this)
 {
     sconnect(&group, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared()));
     sconnect(&group, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared()));
@@ -65,10 +67,8 @@ GroupListener::GroupListener(const QStringList &keys, bool clears, ContextProvid
 
 void GroupListener::clear()
 {
-    foreach(QString k, keyList)
-    {
-        Property(k).unset();
-    }
+    foreach(Property *p, group.getProperties())
+        p->unset();
 }
 
 } // end namespace
