@@ -40,7 +40,7 @@ public:
     LowMemProvider();
 
 private:
-    Property *memoryPressure; ///< Property for the System.MemoryPressure
+    Property memoryPressure; ///< Property for the System.MemoryPressure
     BoolSysFsPooler *lowWM; ///< Pooler for the low watermark.
     BoolSysFsPooler *highWM; ///< Pooler for the high watermark.
 

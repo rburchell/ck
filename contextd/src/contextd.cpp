@@ -34,6 +34,7 @@ int main(int argc, char **argv)
     Service service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.contextd");
     service.setAsDefault();
     HalProvider halProvider(service);
+    LowMemProvider lowMemProvider;
     return app.exec();
 }
 

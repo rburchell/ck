@@ -57,32 +57,15 @@ namespace ContextD {
 #define HIGH_WATERMARK  "/sys/kernel/high_watermark"
 
 /// Constructor.
-LowMemProvider::LowMemProvider()
-{
-}
-
-/*
-QStringList LowMemProvider::keys()
-{
-    QStringList list;
-    list << "System.MemoryPressure";
-    return list;
-}
-*/
-
-/*
-void LowMemProvider::initialize()
+LowMemProvider::LowMemProvider() : memoryPressure("System.MemoryPressure")
 {
     contextDebug() << F_LOWMEM << "Initializing lowmem plugin";
-    
-    memoryPressure = new Property("System.MemoryPressure", this);
-    
-    sconnect(memoryPressure, SIGNAL(firstSubscriberAppeared(QString)),
+
+    sconnect(&memoryPressure, SIGNAL(firstSubscriberAppeared(QString)),
              this, SLOT(onFirstSubscriberAppeared()));
-    sconnect(memoryPressure, SIGNAL(lastSubscriberDisappeared(QString)),
+    sconnect(&memoryPressure, SIGNAL(lastSubscriberDisappeared(QString)),
              this, SLOT(onLastSubscriberDisappeared()));
 }
-*/
 
 /// This is called when the first subscriber for System.MemoryPressure appears.
 /// Here we create the watchers on the pool files and start observing.
@@ -122,22 +105,22 @@ void LowMemProvider::onWatermarkStateChanged()
     if (lowWMState == BoolSysFsPooler::TriStateFalse && 
         highWMState == BoolSysFsPooler::TriStateFalse) {
         // normal
-        memoryPressure->set(0);
+        memoryPressure.set(0);
     } else if (lowWMState == BoolSysFsPooler::TriStateTrue && 
                highWMState == BoolSysFsPooler::TriStateFalse) {
         // high
-        memoryPressure->set(1);
+        memoryPressure.set(1);
     } else if (lowWMState == BoolSysFsPooler::TriStateTrue && 
                highWMState == BoolSysFsPooler::TriStateTrue) {
         // critical
-        memoryPressure->set(2);
+        memoryPressure.set(2);
     } else if (lowWMState == BoolSysFsPooler::TriStateFalse && 
                highWMState == BoolSysFsPooler::TriStateTrue) {
         // ignore rogue state
         return;
     } else {
         // undefined */
-        memoryPressure->unset();
+        memoryPressure.unset();
         return;
     }
 }
