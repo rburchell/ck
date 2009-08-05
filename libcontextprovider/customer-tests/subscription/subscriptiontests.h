@@ -26,10 +26,19 @@ private slots:
     void cleanupTestCase();
     void init();
     void cleanup();
+
     void testGetSubscriber();
+    void testGetSubscriberTwice();
+    void subscribeToUnknownProperty();
 
 public slots:
     void readStandardOutput();
+
+private:
+    QString writeToClient(const char* input);
+
+private:
+    bool clientStarted;
 };
 
 } // end namespace
