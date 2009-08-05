@@ -116,6 +116,9 @@ void CommandWatcher::interpret(const QString& command)
                 out << "Error: wrong number of parameters" << endl;
             }
         }
+        else {
+            out << "Error: invalid command" << endl;
+        }
     }
 }
 
@@ -134,7 +137,7 @@ void CommandWatcher::callGetSubscriber(QDBusConnection connection, const QString
 
         // Start listening to the Changed signal
         connection.connect(busName, subscriberPath, "org.freedesktop.ContextKit.Subscriber", "Changed",
-                           this, SLOT(onChanged()));
+                           this, SLOT(onChanged(QMap<QString, QVariant>, QStringList)));
     }
     else {
         out << "GetSubscriber error: invalid reply" << endl;
@@ -168,22 +171,8 @@ void CommandWatcher::callSubscribe(const QString& busName, const QStringList& ar
 
         QMap<QString, QVariant> knownValues = reply.argumentAt<0>();
         QStringList unknownKeys = reply.argumentAt<1>();
-        unknownKeys.sort();
-
-        QStringList knownKeys(knownValues.keys());
-        knownKeys.sort();
-
-        out << "Known keys: ";
-        foreach (const QString& key, knownKeys) {
-            QVariant value = knownValues[key];
-            out << key << "(" << value.typeName() << ":" << value.toString() << ") ";
-        }
-
-        out << " Unknown keys: ";
-        foreach (const QString& key, unknownKeys) {
-            out << key << " ";
-        }
-        out << endl;
+        // Print the return value description
+        out << describeValuesAndUnknowns(knownValues, unknownKeys) << endl;
     }
     else {
         out << "Subscribe error: we don't have a subscriber for bus name " << busName << endl;
@@ -213,6 +202,8 @@ void CommandWatcher::callUnsubscribe(const QString& busName, const QStringList& 
 void CommandWatcher::resetSignalStatus()
 {
     changedSignalReceived = false;
+    changedSignalParameters.clear();
+    out << "Signal status resetted" << endl;
 }
 
 void CommandWatcher::waitForChanged(int timeout)
@@ -223,17 +214,42 @@ void CommandWatcher::waitForChanged(int timeout)
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
     if (changedSignalReceived) {
-        out << "Changed signal received" << endl;
+        out << "Changed signal received, parameters: " << changedSignalParameters.at(0) << endl;
     }
     else {
         out << "Timeout" << endl;
     }
 }
 
-void CommandWatcher::onChanged()
+void CommandWatcher::onChanged(QMap<QString, QVariant> knownValues, QStringList unknownKeys)
 {
     changedSignalReceived = true;
+    changedSignalParameters.append(describeValuesAndUnknowns(knownValues, unknownKeys));
 }
+
+QString CommandWatcher::describeValuesAndUnknowns(const QMap<QString, QVariant>& knownValues, QStringList unknownKeys)
+{
+    // Compose a string representation of the parameters
+    QString parameterDescription;
+
+    QStringList knownKeys(knownValues.keys());
+    knownKeys.sort();
+
+    parameterDescription += "Known keys: ";
+    foreach (const QString& key, knownKeys) {
+        QVariant value = knownValues[key];
+        parameterDescription += (key + "(" + value.typeName() + ":" + value.toString() + ") ");
+    }
+
+    parameterDescription +=" Unknown keys: ";
+    foreach (const QString& key, unknownKeys) {
+        parameterDescription += (key + " ");
+    }
+
+    return parameterDescription;
+}
+
+
 
 QDBusConnection CommandWatcher::getConnection(const QString& busType)
 {

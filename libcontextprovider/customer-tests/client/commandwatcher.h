@@ -5,6 +5,7 @@
 #include <QString>
 #include <QDBusConnection>
 #include <QTextStream>
+#include <QStringList>
 
 class QSocketNotifier;
 
@@ -27,10 +28,11 @@ private:
 
     // Helpers
     QDBusConnection getConnection(const QString& busType);
+    QString describeValuesAndUnknowns(const QMap<QString, QVariant>& knownValues, QStringList unknownKeys);
 
 private slots:
     void onActivated();
-    void onChanged();
+    void onChanged(QMap<QString, QVariant> knownValues, QStringList unknownKeys);
 
 private:
     // The subscriber paths we get from different connections. Note: a
@@ -42,6 +44,9 @@ private:
     QMap<QString, QString> connectionTypes;
 
     QTextStream out;
+
+    // Stored data about recevied Changed signals
     bool changedSignalReceived;
+    QStringList changedSignalParameters;
 };
 #endif

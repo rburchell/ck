@@ -106,10 +106,98 @@ void ValueChangesTests::subscribedPropertyChanges()
     // Test: Change the value of the property
     doubleItem->set(51.987);
     // and tell the client to wait for the Changed signal
-    QString actual = writeToClient("waitforchanged 5000\n");
+    QString actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: the client got the Changed signal
-    QString expected = "Changed signal received";
+    QString expected = "Changed signal received, parameters: Known keys: test.double(double:51.987) Unknown keys:";
+
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Reset the signal status of the client (makes it forget that it has received the signal)
+    writeToClient("resetsignalstatus\n");
+
+    // Test: Change a property to unknown
+    doubleItem->unset();
+    // and tell the client to wait for the Changed signal
+    actual = writeToClient("waitforchanged 3000\n");
+
+    // Expected result: the client got the Changed signal
+    expected = "Changed signal received, parameters: Known keys: Unknown keys: test.double";
+
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void ValueChangesTests::nonsubscribedPropertyChanges()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call GetSubscriber, ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // Subscribe to a property (which is currently unknown)
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.double\n");
+
+    // Test: Change the value of the property
+    intItem->set(100);
+    // and tell the client to wait for the Changed signal
+    QString actual = writeToClient("waitforchanged 3000\n");
+
+    // Expected result: the client didn't get the Changed signal since it wasn't subscribed
+    QString expected = "Timeout";
+
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Reset the signal status of the client (makes it forget that it has received the signal)
+    writeToClient("resetsignalstatus\n");
+
+    // Test: Change a property to unknown
+    intItem->unset();
+    // and tell the client to wait for the Changed signal
+    actual = writeToClient("waitforchanged 3000\n");
+
+    // Expected result: the client didn't get the Changed signal since it wasn't subscribed
+    expected = "Timeout";
+
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void ValueChangesTests::unsubscribedPropertyChanges()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call GetSubscriber, ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // Subscribe to a property (which is currently unknown)
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.double\n");
+
+    // Unsubscribe from the property
+    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 test.double\n");
+
+    // Test: Change the value of the property
+    intItem->set(100);
+    // and tell the client to wait for the Changed signal
+    QString actual = writeToClient("waitforchanged 3000\n");
+
+    // Expected result: the client didn't get the Changed signal since it wasn't subscribed
+    QString expected = "Timeout";
+
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Reset the signal status of the client (makes it forget that it has received the signal)
+    writeToClient("resetsignalstatus\n");
+
+    // Test: Change a property to unknown
+    intItem->unset();
+    // and tell the client to wait for the Changed signal
+    actual = writeToClient("waitforchanged 3000\n");
+
+    // Expected result: the client didn't get the Changed signal since it wasn't subscribed
+    expected = "Timeout";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 }

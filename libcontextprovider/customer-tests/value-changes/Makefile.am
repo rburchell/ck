@@ -4,7 +4,7 @@ valuechangestests_SOURCES = valuechangestests.cpp sconnect.h \
 							valuechangestests.h
 
 check-customer:
-	export PATH=$$PATH:../client ; ./valuechangestests
+	PATH=$$PATH:../client CONTEXT_LOG_VERBOSITY=WARNING ./valuechangestests
 
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)  $(QtTest_CFLAGS) -I$(srcdir)/../../src
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) $(QtTest_LIBS)

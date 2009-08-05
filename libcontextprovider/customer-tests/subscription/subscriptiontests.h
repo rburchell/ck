@@ -18,7 +18,6 @@ private:
     Property *doubleItem;
     Property *stringItem;
     QProcess *client;
-    QString clientName;
     bool isReadyToRead;
 
 private slots:

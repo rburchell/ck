@@ -4,7 +4,7 @@ subscriptiontests_SOURCES = subscriptiontests.cpp sconnect.h \
 							subscriptiontests.h
 
 check-customer:
-	export PATH=$$PATH:../client ; ./subscriptiontests
+	PATH=$$PATH:../client CONTEXT_LOG_VERBOSITY=WARNING ./subscriptiontests
 
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)  $(QtTest_CFLAGS) -I$(srcdir)/../../src
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) $(QtTest_LIBS)

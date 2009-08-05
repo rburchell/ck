@@ -65,9 +65,8 @@ void SubscriptionTests::init()
 
     // Start the client
     client = new QProcess();
-    clientName = "client";
     sconnect(client, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
-    client->start(clientName);
+    client->start("client");
     // Record whether the client was successfully started
     clientStarted = client->waitForStarted();
 }
@@ -98,13 +97,10 @@ void SubscriptionTests::testGetSubscriber()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
-    qDebug() << "testgetsubs";
     QString actual = writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     QString expected("GetSubscriber returned /org/freedesktop/ContextKit/Subscriber/0");
     QCOMPARE(actual.simplified(), expected.simplified());
-    qDebug() << "testgetsubs done";
-
 }
 
 void SubscriptionTests::testGetSubscriberTwice()

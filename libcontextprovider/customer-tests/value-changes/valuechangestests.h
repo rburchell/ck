@@ -26,6 +26,8 @@ private slots:
     void cleanup();
 
     void subscribedPropertyChanges();
+    void nonsubscribedPropertyChanges();
+    void unsubscribedPropertyChanges();
 
 public slots:
     void readStandardOutput();
