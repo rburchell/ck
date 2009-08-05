@@ -15,7 +15,7 @@
 #include <QtDBus/QtDBus>
 
 CommandWatcher::CommandWatcher(int commandfd, QObject *parent) :
-    QObject(parent), commandfd(commandfd), out(stdout)
+    QObject(parent), commandfd(commandfd), out(stdout), changedSignalReceived(false)
 {
     fcntl(commandfd, F_SETFL, O_NONBLOCK);
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
@@ -103,7 +103,7 @@ void CommandWatcher::interpret(const QString& command)
         } else if (QString("resetsignalstatus").startsWith(commandName)) {
             resetSignalStatus();
         } else if (QString("waitforchanged").startsWith(commandName)) {
-            if (args.size() == 2) {
+            if (args.size() == 1) {
                 bool conversionOk = false;
                 int timeout = args.at(0).toInt(&conversionOk);
                 if (! conversionOk) {
@@ -131,6 +131,10 @@ void CommandWatcher::callGetSubscriber(QDBusConnection connection, const QString
         subscriberPaths.insert(busName, subscriberPath);
         // And print it out
         out << "GetSubscriber returned " << subscriberPath << endl;
+
+        // Start listening to the Changed signal
+        connection.connect(busName, subscriberPath, "org.freedesktop.ContextKit.Subscriber", "Changed",
+                           this, SLOT(onChanged()));
     }
     else {
         out << "GetSubscriber error: invalid reply" << endl;
