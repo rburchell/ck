@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#ifndef PROPERTY_H
+#define PROPERTY_H
 
 #include <QObject>
 #include <QString>
@@ -32,20 +32,6 @@
 namespace ContextProvider {
 
 class Manager;
-
-class Service : QObject
-{
-    Q_OBJECT
-
-public:
-    explicit Service(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
-
-    void start();
-    void stop();
-    void restart();
-
-    void setAsDefault();
-};
 
 class Property : public QObject
 {

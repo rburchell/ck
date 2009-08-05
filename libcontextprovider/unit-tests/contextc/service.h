@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Nokia Corporation.
+ * Copyright (C) 2008 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,32 +19,32 @@
  *
  */
 
-#ifndef CONTEXT_H
-#define CONTEXT_H
-
-// This is a mock implementation
+#ifndef SERVICE_H
+#define SERVICE_H
 
 #include <QObject>
+#include <QString>
+#include <QStringList>
+#include <QDBusConnection>
+#include <QHash>
+#include <QVariant>
 
 namespace ContextProvider {
 
-class Service : public QObject
-{
-    Q_OBJECT
-};
+class Manager;
 
-class Property : public QObject
+class Service : QObject
 {
     Q_OBJECT
+
 public:
-    Property(QString key, QObject* parent = 0);
-    Property(Service &service, QString key, QObject* parent = 0);
+    explicit Service(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
 
-signals:
-    void firstSubscriberAppeared(const QString &key);
-    void lastSubscriberDisappeared(const QString &key);
+    void start();
+    void stop();
+    void restart();
 
-    friend class ContextGroupUnitTest;
+    void setAsDefault();
 };
 
 } // end namespace

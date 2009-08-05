@@ -23,7 +23,8 @@
 #include <QtCore>
 #include <stdlib.h>
 #include "manager.h"
-#include "context.h"
+#include "service.h"
+#include "property.h"
 #include "manageradaptor.h"
 
 using namespace ContextProvider;

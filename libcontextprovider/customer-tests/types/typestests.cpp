@@ -22,8 +22,6 @@
  */
 
 #include "typestests.h"
-
-#include "context.h"
 #include "sconnect.h"
 
 #include <QtTest/QtTest>

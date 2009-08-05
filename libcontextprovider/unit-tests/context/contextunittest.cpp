@@ -22,7 +22,8 @@
 #include <QtTest/QtTest>
 #include <QtCore>
 #include <stdlib.h>
-#include "context.h"
+#include "service.h"
+#include "property.h"
 #include "manager.h"
 #include "manageradaptor.h"
 

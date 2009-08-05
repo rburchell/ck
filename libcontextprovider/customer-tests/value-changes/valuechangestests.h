@@ -1,7 +1,8 @@
 #include <QString>
 #include <QObject>
 
-#include "context.h"
+#include "service.h"
+#include "property.h"
 
 class QProcess;
 
