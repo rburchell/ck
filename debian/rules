@@ -26,13 +26,17 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	$(MAKE) DESTDIR=`pwd`/debian/tmp/ install
-	mkdir -p `pwd`/debian/tmp/usr/share/gtk-doc/html
-	rm -rf `pwd`/debian/tmp/usr/share/gtk-doc/html/libcontextprovider
-	cp -a doc/reference/libcontextprovider/html `pwd`/debian/tmp/usr/share/gtk-doc/html/libcontextprovider
+
+	mkdir -p `pwd`/debian/tmp/usr/share/doc/libcontextprovider-doc
+	rm -rf `pwd`/debian/tmp/usr/share/doc/libcontextprovider-doc/html
+	cp -a libcontextprovider/doc/html `pwd`/debian/tmp/usr/share/doc/libcontextprovider-doc
 
 	# install testsets under /usr/share
 	mkdir -p debian/tmp/usr/share
-	cp -f tests/customer-tests/contextd/*.py debian/tmp/usr/share/contextd-tests
+
+	# FIXME customer tests for contextd needed...
+	mkdir -p debian/tmp/usr/share/contextd-tests
+
 	cp -rf libcontextsubscriber/customer-tests/commander debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/asynchronicity debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/subscription debian/tmp/usr/share/libcontextsubscriber-tests/

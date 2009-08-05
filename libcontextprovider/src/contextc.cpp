@@ -86,9 +86,9 @@ QList<Listener*> *listeners = NULL;
 static int reinitialize_service()
 {
     if (serviceKeyList->length() > 0) 
-        Context::stopService(*serviceBusName);
+        Property::stopService(*serviceBusName);
 
-    return Context::initService(serviceBusType, *serviceBusName, *serviceKeyList);
+    return Property::initService(serviceBusType, *serviceBusName, *serviceKeyList);
 }
 
 /// Initializes and starts the service with a given \a bus_type and a \a bus_name.
@@ -118,7 +118,7 @@ void context_provider_stop (void)
     contextDebug() << "Stopping service";
 
     if (serviceBusName) {
-        Context::stopService(*serviceBusName);
+        Property::stopService(*serviceBusName);
     }
 
     // Delete all listeners
@@ -155,7 +155,8 @@ void context_provider_install_key (const char* key,
     serviceKeyList->append(key);
     reinitialize_service();
 
-    listeners->append(new ContextListener(key, clear_values_on_subscribe, subscription_changed_cb, subscription_changed_cb_target));
+    listeners->append(new PropertyListener(key, clear_values_on_subscribe,
+                                           subscription_changed_cb, subscription_changed_cb_target));
 }
 
 /// Installs (adds) a \a key_group to be provided by the service. The \a key_group is a NULL-terminated 
@@ -189,36 +190,36 @@ void context_provider_install_group (const char** key_group,
     }
 
     reinitialize_service();
-    listeners->append(new ContextGroupListener(keys, clear_values_on_subscribe, subscription_changed_cb, subscription_changed_cb_target));
+    listeners->append(new GroupListener(keys, clear_values_on_subscribe,
+                                        subscription_changed_cb, subscription_changed_cb_target));
 }
 
 /// Sets the \a key to a specified integer \a value.
 void context_provider_set_integer (const char* key, int value)
 {
-    Context(key).set(value);
+    Property(key).set(value);
 }
 
 /// Sets the \a key to a specified double \a value.
 void context_provider_set_double (const char* key, double value)
 {
-    Context(key).set(value);
+    Property(key).set(value);
 }
 
 /// Sets the \a key to a specified boolean \a value.
 void context_provider_set_boolean (const char* key, int value)
 {
-    Context(key).set(value);
+    Property(key).set(value);
 }
 
 /// Sets the \a key to a specified string \a value.
 void context_provider_set_string (const char* key, const char* value)
 {
-    Context(key).set(value);
+    Property(key).set(value);
 }
 
 /// Sets the \a key to NULL. In other words - unsets the key.
 void context_provider_set_null (const char* key)
 {
-    Context(key).unset();
+    Property(key).unset();
 }
-

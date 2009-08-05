@@ -30,16 +30,16 @@
 #include <QVariant>
 
 namespace ContextProvider {
-    class Manager;
-}
 
-class Context : public QObject
+class Manager;
+
+class Property : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Context(const QString &key, QObject *parent = 0);
-    virtual ~Context();
+    explicit Property(const QString &key, QObject *parent = 0);
+    virtual ~Property();
     QString getKey() const;
     bool isValid() const;
     bool isSet() const;
@@ -53,9 +53,9 @@ public:
     static void stopService(const QString &busName);
    
 private:
-    static QHash<QString, ContextProvider::Manager*> busesToManagers;
+    static QHash<QString, Manager*> busesToManagers;
     static QHash<QString, QDBusConnection*> busesToConnections;
-    static QHash<QString, ContextProvider::Manager*> keysToManagers;
+    static QHash<QString, Manager*> keysToManagers;
     bool keyCheck() const;
 
     ContextProvider::Manager *manager; ///< This property Manager (service).
@@ -66,15 +66,17 @@ private slots:
     void onManagerLastSubscriberDisappeared(const QString &key);
 
 signals:
-    /// This is emitted when the first subscriber appears for this Context.
+    /// This is emitted when the first subscriber appears for this Property.
     /// It can be used ie. to start the actual process of harvesting the 
-    /// data needed for this Context.
+    /// data needed for this Property.
     void firstSubscriberAppeared(const QString &key); 
     
-    /// This is emitted when the last subscriber disappears for this Context.
+    /// This is emitted when the last subscriber disappears for this Property.
     /// It can be used ie. to stop the process of harvesting the 
-    /// data needed for this Context (and save resources).
+    /// data needed for this Property (and save resources).
     void lastSubscriberDisappeared(const QString &key);
 };
+
+} // end namespace
 
 #endif

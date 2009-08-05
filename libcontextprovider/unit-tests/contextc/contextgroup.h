@@ -22,21 +22,21 @@
 #ifndef CONTEXTGROUP_H
 #define CONTEXTGROUP_H
 
-// FIXME: Add this class (and others) to a namespace.
-
 #include <QObject>
 #include <QSet>
 #include <QStringList>
 
-class Context;
+namespace ContextProvider {
 
-class ContextGroup : public QObject
+class Property;
+
+class Group : public QObject
 {
     Q_OBJECT
     
 public:
-    explicit ContextGroup(QStringList propertiesToWatch, QObject* parent = 0);
-    ~ContextGroup();
+    explicit Group(QStringList propertiesToWatch, QObject* parent = 0);
+    ~Group();
     QStringList keyList;
     void fakeFirst();
     void fakeLast();
@@ -47,5 +47,7 @@ signals:
 
 private:
 };
+
+} // end namespace
 
 #endif

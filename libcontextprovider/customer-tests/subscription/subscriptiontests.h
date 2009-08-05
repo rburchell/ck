@@ -6,15 +6,17 @@
 #include <QDebug>
 #include <QProcess>
 
+namespace ContextProvider {
+
 class SubscriptionTests : public QObject
 {
     Q_OBJECT
 
 private:
-    Context *intItem;
-    Context *boolItem;
-    Context *doubleItem;
-    Context *stringItem;
+    Property *intItem;
+    Property *boolItem;
+    Property *doubleItem;
+    Property *stringItem;
     QProcess *client;
     QString clientName;
     bool isReadyToRead;
@@ -30,3 +32,4 @@ public slots:
     void readStandardOutput();
 };
 
+} // end namespace

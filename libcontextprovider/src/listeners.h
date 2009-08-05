@@ -29,7 +29,9 @@
 #include "contextc.h"
 #include "contextgroup.h"
 
-class ContextListener;
+namespace ContextProvider {
+
+class PropertyListener;
 class Listener;
 class ContextGroupListener;
 
@@ -53,33 +55,35 @@ private:
     bool clearsOnSubscribe;
 };
 
-class ContextListener : public Listener
+class PropertyListener : public Listener
 {
     Q_OBJECT
 
 public:
-    ContextListener(const QString &k, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
+    PropertyListener(const QString &k, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
 
 protected:
     virtual void clear();
 
 private:
-    Context key;
+    Property key;
 };
 
-class ContextGroupListener : public Listener 
+class GroupListener : public Listener 
 {
     Q_OBJECT
 
 public:
-    ContextGroupListener(const QStringList &keys, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
+    GroupListener(const QStringList &keys, bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
 
 protected:
     virtual void clear();
 
 private:
-    ContextGroup group;
+    Group group;
     QStringList keyList;
 };
+
+} // end namespace
 
 #endif

@@ -24,6 +24,8 @@
 #include "subscriptiontests.h"
 #include <QtTest/QtTest>
 
+namespace ContextProvider {
+
 void SubscriptionTests::initTestCase()
 {
     isReadyToRead = false;
@@ -35,19 +37,19 @@ void SubscriptionTests::initTestCase()
     keysProvider2.append("test.String");
     keysProvider2.append("test.Bool");
 
-    Context::initService(QDBusConnection::SessionBus,
+    Property::initService(QDBusConnection::SessionBus,
             "org.freedesktop.ContextKit.testProvider1",
             keysProvider1);
 
-    Context::initService(QDBusConnection::SessionBus,
+    Property::initService(QDBusConnection::SessionBus,
             "org.freedesktop.ContextKit.testProvider2",
             keysProvider2);
 
-    intItem = new Context("test.Int");
-    doubleItem = new Context("test.Double");
+    intItem = new Property("test.Int");
+    doubleItem = new Property("test.Double");
 
-    stringItem = new Context("test.String");
-    boolItem = new Context("test.Bool");
+    stringItem = new Property("test.String");
+    boolItem = new Property("test.Bool");
 }
 
 void SubscriptionTests::cleanupTestCase()
@@ -94,4 +96,6 @@ void SubscriptionTests::readStandardOutput()
     isReadyToRead = true;
 }
 
-QTEST_MAIN(SubscriptionTests);
+} // end namespace
+
+QTEST_MAIN(ContextProvider::SubscriptionTests);
