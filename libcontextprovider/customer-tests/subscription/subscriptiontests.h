@@ -1,12 +1,10 @@
-#include "context.h"
-#include "sconnect.h"
-#include "logging.h"
-#include <QStringList>
 #include <QObject>
-#include <QDebug>
-#include <QProcess>
+
+class QProcess;
 
 namespace ContextProvider {
+
+class Property;
 
 class SubscriptionTests : public QObject
 {

@@ -22,7 +22,13 @@
  */
 
 #include "subscriptiontests.h"
+
+#include "context.h"
+#include "sconnect.h"
+
 #include <QtTest/QtTest>
+#include <QProcess>
+#include <QStringList>
 
 namespace ContextProvider {
 

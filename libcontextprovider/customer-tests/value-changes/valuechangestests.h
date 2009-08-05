@@ -1,11 +1,11 @@
-#include "context.h"
-#include "sconnect.h"
-#include <QStringList>
+#include <QString>
 #include <QObject>
-#include <QDebug>
-#include <QProcess>
+
+class QProcess;
 
 namespace ContextProvider {
+
+class Property;
 
 class ValueChangesTests : public QObject
 {

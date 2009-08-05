@@ -22,7 +22,13 @@
  */
 
 #include "valuechangestests.h"
+
+#include "context.h"
+#include "sconnect.h"
+
 #include <QtTest/QtTest>
+#include <QStringList>
+#include <QProcess>
 
 namespace ContextProvider {
 
