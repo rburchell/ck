@@ -143,6 +143,61 @@ void TypesTests::typesInReturnValueOfSubscribe()
 
 void TypesTests::typesInChangeSignal()
 {
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call GetSubscriber, ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // Set some values to the properties
+    intItem->set(4510);
+    doubleItem->set(-9.031);
+    stringItem->set("this-is-a-test-string");
+    boolItem->set(false);
+    QStringList temp;
+    temp << "string1" << "string2";
+    stringListItem->set(temp);
+    charItem->set(QChar('g'));
+    dateItem->set(QDate(2009, 8, 5));
+    timeItem->set(QTime(14, 30, 20));
+
+    // Subscribe to properties, ignore the return values
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.int test.double "
+                                   "test.string test.bool\n");
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.stringlist\n");
+    //writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.char test.date test.time\n");
+    // FIXME: Complex types not working yet!
+
+    // Test: modify the properties
+    intItem->set(-11);
+    doubleItem->set(4.88);
+    stringItem->set("anotherstring");
+    boolItem->set(true);
+    // And tell the client to wait for Changed signal
+    QString actual = writeToClient("waitforchanged 3000\n");
+
+    // Expected result: The client got the Changed signal with correct values
+    QString expected = "Changed signal received, parameters: Known keys: test.bool(bool:true) test.double(double:4.88) "
+        "test.int(int:-11) test.string(QString:anotherstring) Unknown keys:";
+
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Reset the client (make it forget the previous Changed signal)
+    writeToClient("resetsignalstatus\n");
+
+    // Test: modify the properties
+    temp.clear();
+    temp << "something" << "else" << "here";
+    stringListItem->set(temp);
+    // And tell the client to wait for Changed signal
+    actual = writeToClient("waitforchanged 3000\n");
+
+    // Expected result: The client got the Changed signal with correct values
+    expected = "Changed signal received, parameters: Known keys: "
+        "test.stringlist(QStringList:something/else/here) Unknown keys:";
+
+    QCOMPARE(actual.simplified(), expected.simplified());
 }
 
 

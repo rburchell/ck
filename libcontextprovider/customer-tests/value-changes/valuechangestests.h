@@ -29,6 +29,9 @@ private slots:
     void nonsubscribedPropertyChanges();
     void unsubscribedPropertyChanges();
 
+    void twoPropertiesChange();
+    void sameValueSet();
+
 public slots:
     void readStandardOutput();
 

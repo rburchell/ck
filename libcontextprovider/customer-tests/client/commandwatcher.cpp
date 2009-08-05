@@ -234,6 +234,7 @@ QString CommandWatcher::describeValuesAndUnknowns(const QMap<QString, QVariant>&
 
     QStringList knownKeys(knownValues.keys());
     knownKeys.sort();
+    unknownKeys.sort();
 
     parameterDescription += "Known keys: ";
     foreach (const QString& key, knownKeys) {
