@@ -4,8 +4,9 @@ libcontextprovider_la_SOURCES = logging.h               \
                                 logging.cpp             \
                                 loggingfeatures.h       \
                                 service.h               \
+                                service.cpp             \
                                 property.h              \
-                                context.cpp             \
+                                property.cpp            \
                                 manager.h               \
                                 manager.cpp             \
                                 manageradaptor.h        \
