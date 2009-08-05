@@ -75,9 +75,6 @@ void SubscriptionTests::cleanup()
         client->waitForFinished();
     }
     delete client; client = NULL;
-
-    service1.stop();
-    service2.stop();
 }
 
 void SubscriptionTests::testGetSubscriber()
@@ -162,8 +159,8 @@ void SubscriptionTests::subscribeReturnValueForInvalidProperty()
     // Ask the client to call Subscribe with 1 invalid key.
     QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Invalid\n");
 
-    // Expected result: The return value of Subscribe doesn't contain the key.
-    QString expected("Known keys: Unknown keys: ");
+    // Expected result: The return value of Subscribe contains the key as unknown.
+    QString expected("Known keys: Unknown keys: Test.Invalid");
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 

@@ -38,7 +38,7 @@ TypesTests::TypesTests()
       stringItem (service, "Test.String", this),
       boolItem (service, "Test.Bool", this),
       doubleItem (service, "Test.Double", this),
-      stringListItem (service, "Test.Stringlist", this),
+      stringListItem (service, "Test.StringList", this),
       charItem (service, "Test.Char", this),
       dateItem (service, "Test.Date", this),
       timeItem (service, "Test.Time", this)
@@ -77,8 +77,6 @@ void TypesTests::cleanup()
         client->waitForFinished();
     }
     delete client; client = NULL;
-
-    service.stop();
 }
 
 void TypesTests::typesInReturnValueOfSubscribe()
@@ -103,19 +101,19 @@ void TypesTests::typesInReturnValueOfSubscribe()
     timeItem.set(QTime(14, 30, 20));
 
     // Test: subscribe to properties
-    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.int test.double "
-                                   "test.string test.bool\n");
+    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double "
+                                   "Test.String Test.Bool\n");
 
     // Expected result: the values are printed correctly
-    QString expected ="Known keys: test.bool(bool:false) test.double(double:-9.031) test.int(int:4510) "
-                     "test.string(QString:this-is-a-test-string) Unknown keys: ";
+    QString expected ="Known keys: Test.Bool(bool:false) Test.Double(double:-9.031) Test.Int(int:4510) "
+                     "Test.String(QString:this-is-a-test-string) Unknown keys: ";
     QCOMPARE(actual.simplified(), expected.simplified());
 
     // Test: subscribe to more properties
-    actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.stringlist\n");
+    actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.StringList\n");
 
     // Expected result: the values are printed correctly
-    expected = "Known keys: test.stringlist(QStringList:string1/string2) Unknown keys: ";
+    expected = "Known keys: Test.StringList(QStringList:string1/string2) Unknown keys: ";
     QCOMPARE(actual.simplified(), expected.simplified());
 
     /* FIXME: Other types are not working yet.
@@ -150,9 +148,9 @@ void TypesTests::typesInChangeSignal()
     timeItem.set(QTime(14, 30, 20));
 
     // Subscribe to properties, ignore the return values
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.int test.double "
-                                   "test.string test.bool\n");
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.stringlist\n");
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double "
+                                   "Test.String Test.Bool\n");
+    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.StringList\n");
     //writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.char test.date test.time\n");
     // FIXME: Complex types not working yet!
 
@@ -165,8 +163,8 @@ void TypesTests::typesInChangeSignal()
     QString actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: The client got the Changed signal with correct values
-    QString expected = "Changed signal received, parameters: Known keys: test.bool(bool:true) test.double(double:4.88) "
-        "test.int(int:-11) test.string(QString:anotherstring) Unknown keys:";
+    QString expected = "Changed signal received, parameters: Known keys: Test.Bool(bool:true) Test.Double(double:4.88) "
+        "Test.Int(int:-11) Test.String(QString:anotherstring) Unknown keys:";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 
@@ -182,7 +180,7 @@ void TypesTests::typesInChangeSignal()
 
     // Expected result: The client got the Changed signal with correct values
     expected = "Changed signal received, parameters: Known keys: "
-        "test.stringlist(QStringList:something/else/here) Unknown keys:";
+        "Test.StringList(QStringList:something/else/here) Unknown keys:";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 }
