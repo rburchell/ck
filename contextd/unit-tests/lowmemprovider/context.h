@@ -29,13 +29,15 @@
 #include <QHash>
 #include <QVariant>
 
-class Context : public QObject
+namespace ContextProvider {
+
+class Property : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Context(const QString &key, QObject *parent = 0);
-    ~Context();
+    explicit Property(const QString &key, QObject *parent = 0);
+    ~Property();
         
     void set(const QVariant &v);
     void unset();
@@ -51,5 +53,7 @@ signals:
     void firstSubscriberAppeared(const QString &key); 
     void lastSubscriberDisappeared(const QString &key);
 };
+
+}
 
 #endif

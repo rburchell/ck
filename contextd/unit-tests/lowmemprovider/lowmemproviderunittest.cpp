@@ -27,7 +27,7 @@
 using namespace ContextD;
 
 QHash<QString, QVariant> values;
-QList<Context*> contexts;
+QList<Property*> contexts;
 BoolSysFsPooler *lowWatermark;
 BoolSysFsPooler *highWatermark;
 
@@ -35,7 +35,7 @@ BoolSysFsPooler *highWatermark;
 
 void emitFirstOn(const QString &name)
 {
-    foreach(Context* context, contexts) {
+    foreach(Property* context, contexts) {
         if (context->getKey() == name)
             context->fakeFirst();
     }
@@ -43,7 +43,7 @@ void emitFirstOn(const QString &name)
 
 void emitLastOn(const QString &name)
 {
-    foreach(Context* context, contexts) {
+    foreach(Property* context, contexts) {
         if (context->getKey() == name)
             context->fakeLast();
     }
@@ -70,29 +70,29 @@ void BoolSysFsPooler::setState(TriState s)
     emit stateChanged(s);
 }
 
-/* Mocked Context */
+/* Mocked Property */
 
-Context::Context(const QString &k, QObject *parent) : key(k)
+Property::Property(const QString &k, QObject *parent) : key(k)
 {
     contexts.append(this);
 }
 
-Context::~Context()
+Property::~Property()
 {
     contexts.removeAll(this);
 }
 
-void Context::set(const QVariant &v)
+void Property::set(const QVariant &v)
 {
     values.insert(key, v);
 }
 
-void Context::unset()
+void Property::unset()
 {
     values.insert(key, QVariant());
 }
 
-QVariant Context::get()
+QVariant Property::get()
 {
     if (values.contains(key))
         return values.value(key);
@@ -100,18 +100,18 @@ QVariant Context::get()
         return QVariant();
 }
 
-QString Context::getKey()
+QString Property::getKey()
 {
     return key;
 }
 
-void Context::fakeFirst()
+void Property::fakeFirst()
 {
     emit firstSubscriberAppeared(key);
 }
 
 
-void Context::fakeLast()
+void Property::fakeLast()
 {
     emit lastSubscriberDisappeared(key);
 }
@@ -157,7 +157,7 @@ void LowMemProviderUnitTest::keys()
 
 void LowMemProviderUnitTest::initialValues()
 {
-    QCOMPARE(Context("System.MemoryPressure").get(), QVariant());
+    QCOMPARE(Property("System.MemoryPressure").get(), QVariant());
 }
 
 void LowMemProviderUnitTest::normalState()
@@ -168,7 +168,7 @@ void LowMemProviderUnitTest::normalState()
     
     lowWatermark->setState(BoolSysFsPooler::TriStateFalse);
     highWatermark->setState(BoolSysFsPooler::TriStateFalse);
-    QCOMPARE(Context("System.MemoryPressure").get().toInt(), 0);
+    QCOMPARE(Property("System.MemoryPressure").get().toInt(), 0);
 
     emitLastOn("System.MemoryPressure");
 }
@@ -181,7 +181,7 @@ void LowMemProviderUnitTest::highState()
     
     lowWatermark->setState(BoolSysFsPooler::TriStateTrue);
     highWatermark->setState(BoolSysFsPooler::TriStateFalse);
-    QCOMPARE(Context("System.MemoryPressure").get().toInt(), 1);
+    QCOMPARE(Property("System.MemoryPressure").get().toInt(), 1);
 
     emitLastOn("System.MemoryPressure");
 }
@@ -194,7 +194,7 @@ void LowMemProviderUnitTest::criticalState()
     
     lowWatermark->setState(BoolSysFsPooler::TriStateTrue);
     highWatermark->setState(BoolSysFsPooler::TriStateTrue);
-    QCOMPARE(Context("System.MemoryPressure").get().toInt(), 2);
+    QCOMPARE(Property("System.MemoryPressure").get().toInt(), 2);
 
     emitLastOn("System.MemoryPressure");
 }
@@ -207,11 +207,11 @@ void LowMemProviderUnitTest::rogueState()
     
     lowWatermark->setState(BoolSysFsPooler::TriStateFalse);
     highWatermark->setState(BoolSysFsPooler::TriStateTrue);
-    QCOMPARE(Context("System.MemoryPressure").get(), QVariant());
+    QCOMPARE(Property("System.MemoryPressure").get(), QVariant());
 
     lowWatermark->setState(BoolSysFsPooler::TriStateTrue);
     highWatermark->setState(BoolSysFsPooler::TriStateTrue);
-    QCOMPARE(Context("System.MemoryPressure").get(), QVariant(2));
+    QCOMPARE(Property("System.MemoryPressure").get(), QVariant(2));
 
     emitLastOn("System.MemoryPressure");
 }
