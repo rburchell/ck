@@ -34,6 +34,8 @@ namespace ContextProvider {
 class Service;
 class Manager;
 
+class PropertyPrivate;
+
 class Property : public QObject
 {
     Q_OBJECT
@@ -51,11 +53,12 @@ public:
     void unsetValue();
    
 private:
-    void init (Service *service);
-    Manager *manager;
-    QString myKey;
+    PropertyPrivate *priv;
+
+    void init (Service *service, const QString &key);
 
     friend class Service;
+    friend class PropertyPrivate;
 
 private slots:
     void onManagerFirstSubscriberAppeared(const QString &key);
