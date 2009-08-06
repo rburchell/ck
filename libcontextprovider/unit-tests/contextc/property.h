@@ -44,7 +44,7 @@ public:
     
     void setValue(const QVariant &v);
     void unsetValue();
-    QString getKey();
+    const QString getKey() const;
 
     static bool initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys);
     static void stopService(const QString &name);

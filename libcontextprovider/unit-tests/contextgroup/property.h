@@ -35,6 +35,10 @@ public:
     Property(QString key, QObject* parent = 0);
     Property(Service &service, QString key, QObject* parent = 0);
 
+    const QString &key() const;
+
+    QString myKey;
+
 signals:
     void firstSubscriberAppeared(const QString &key);
     void lastSubscriberDisappeared(const QString &key);

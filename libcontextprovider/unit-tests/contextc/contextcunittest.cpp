@@ -41,18 +41,15 @@ void *lastUserData = NULL;
 
 /* Mocked implementation of Group */
 
-Group::Group(QStringList propertiesToWatch, QObject *parent) : keyList(propertiesToWatch)
+Group::Group(QObject *parent)
 {
     groupList.append(this);
-    foreach (const QString &key, propertiesToWatch)
-        props.insert (new Property(key, this));
 }
 
-Group::Group(Service &service, QStringList propertiesToWatch, QObject *parent) : keyList(propertiesToWatch)
+void Group::add(const Property &prop)
 {
-    groupList.append(this);
-    foreach (const QString &key, propertiesToWatch)
-        props.insert (new Property(service, key, this));
+    props.insert (&prop);
+    keyList.append (prop.getKey());
 }
 
 Group::~Group()
@@ -60,7 +57,7 @@ Group::~Group()
     groupList.removeAll(this);
 }
 
-QSet<Property *> Group::getProperties()
+QSet<const Property *> Group::getProperties()
 {
     return props;
 }
@@ -170,7 +167,7 @@ Property::~Property()
     propertyList.removeAll(this);
 }
 
-QString Property::getKey()
+const QString Property::getKey() const
 {
     return key;
 }
