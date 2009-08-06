@@ -45,6 +45,8 @@ public:
     void restart();
 
     void setAsDefault();
+
+    void setValue (const QString &key, const QVariant &val);
 };
 
 } // end namespace

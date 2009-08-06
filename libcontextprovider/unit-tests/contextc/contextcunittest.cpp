@@ -128,6 +128,13 @@ void Service::restart()
 {
 }
 
+
+void Service::setValue (const QString &key, const QVariant &val)
+{
+    delete lastVariantSet;
+    lastVariantSet = new QVariant(val);    
+}
+
 void Property::setValue(const QVariant &v)
 {
     delete lastVariantSet;
