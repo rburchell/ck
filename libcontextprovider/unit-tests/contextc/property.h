@@ -42,8 +42,8 @@ public:
     explicit Property(Service &, const QString &key, QObject *parent = 0);
     ~Property();
     
-    void set(const QVariant &v);
-    void unset();
+    void setValue(const QVariant &v);
+    void unsetValue();
     QString getKey();
 
     static bool initService(QDBusConnection::BusType busType, const QString &busName, const QStringList &keys);

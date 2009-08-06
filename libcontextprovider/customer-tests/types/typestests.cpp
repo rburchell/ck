@@ -87,16 +87,16 @@ void TypesTests::typesInReturnValueOfSubscribe()
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Set some values to the properties
-    intItem.set(4510);
-    doubleItem.set(-9.031);
-    stringItem.set("this-is-a-test-string");
-    boolItem.set(false);
+    intItem.setValue(4510);
+    doubleItem.setValue(-9.031);
+    stringItem.setValue("this-is-a-test-string");
+    boolItem.setValue(false);
     QStringList temp;
     temp << "string1" << "string2";
-    stringListItem.set(temp);
-    charItem.set(QChar('g'));
-    dateItem.set(QDate(2009, 8, 5));
-    timeItem.set(QTime(14, 30, 20));
+    stringListItem.setValue(temp);
+    charItem.setValue(QChar('g'));
+    dateItem.setValue(QDate(2009, 8, 5));
+    timeItem.setValue(QTime(14, 30, 20));
 
     // Test: subscribe to properties
     QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double "
@@ -134,16 +134,16 @@ void TypesTests::typesInChangeSignal()
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Set some values to the properties
-    intItem.set(4510);
-    doubleItem.set(-9.031);
-    stringItem.set("this-is-a-test-string");
-    boolItem.set(false);
+    intItem.setValue(4510);
+    doubleItem.setValue(-9.031);
+    stringItem.setValue("this-is-a-test-string");
+    boolItem.setValue(false);
     QStringList temp;
     temp << "string1" << "string2";
-    stringListItem.set(temp);
-    charItem.set(QChar('g'));
-    dateItem.set(QDate(2009, 8, 5));
-    timeItem.set(QTime(14, 30, 20));
+    stringListItem.setValue(temp);
+    charItem.setValue(QChar('g'));
+    dateItem.setValue(QDate(2009, 8, 5));
+    timeItem.setValue(QTime(14, 30, 20));
 
     // Subscribe to properties, ignore the return values
     writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double "
@@ -153,10 +153,10 @@ void TypesTests::typesInChangeSignal()
     // FIXME: Complex types not working yet!
 
     // Test: modify the properties
-    intItem.set(-11);
-    doubleItem.set(4.88);
-    stringItem.set("anotherstring");
-    boolItem.set(true);
+    intItem.setValue(-11);
+    doubleItem.setValue(4.88);
+    stringItem.setValue("anotherstring");
+    boolItem.setValue(true);
     // And tell the client to wait for Changed signal
     QString actual = writeToClient("waitforchanged 3000\n");
 
@@ -172,7 +172,7 @@ void TypesTests::typesInChangeSignal()
     // Test: modify the properties
     temp.clear();
     temp << "something" << "else" << "here";
-    stringListItem.set(temp);
+    stringListItem.setValue(temp);
     // And tell the client to wait for Changed signal
     actual = writeToClient("waitforchanged 3000\n");
 

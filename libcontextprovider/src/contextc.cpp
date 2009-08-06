@@ -171,33 +171,33 @@ void context_provider_install_group (const char** key_group,
 void context_provider_set_integer (const char* key, int value)
 {
     if (cService)
-        Property(*cService, key).set(value);
+        Property(*cService, key).setValue(value);
 }
 
 /// Sets the \a key to a specified double \a value.
 void context_provider_set_double (const char* key, double value)
 {
     if (cService)
-        Property(*cService, key).set(value);
+        Property(*cService, key).setValue(value);
 }
 
 /// Sets the \a key to a specified boolean \a value.
 void context_provider_set_boolean (const char* key, int value)
 {
     if (cService)
-        Property(*cService, key).set(value);
+        Property(*cService, key).setValue(value);
 }
 
 /// Sets the \a key to a specified string \a value.
 void context_provider_set_string (const char* key, const char* value)
 {
     if (cService)
-        Property(*cService, key).set(value);
+        Property(*cService, key).setValue(value);
 }
 
 /// Sets the \a key to NULL. In other words - unsets the key.
 void context_provider_set_null (const char* key)
 {
     if (cService)
-        Property(*cService, key).unset();
+        Property(*cService, key).unsetValue();
 }

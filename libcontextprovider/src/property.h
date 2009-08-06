@@ -47,10 +47,9 @@ public:
     bool isValid() const;
     bool isSet() const;
     
-    void set(const QVariant &v);
-    void unset();
-    
-    QVariant get();
+    void setValue(const QVariant &v);
+    QVariant getValue();
+    void unsetValue();
    
 private:
     void setManager(Manager *manager);

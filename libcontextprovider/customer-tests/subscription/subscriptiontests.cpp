@@ -134,7 +134,7 @@ void SubscriptionTests::subscribeReturnValueForKnownProperty()
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Set a value for a property
-    test_double.set(-8.22);
+    test_double.setValue(-8.22);
 
     // Ask the client to call Subscribe with 1 valid key. The property
     // has a value we just set.

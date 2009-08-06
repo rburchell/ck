@@ -54,7 +54,7 @@ PropertyListener::PropertyListener(Service &service, const QString &key,
 
 void PropertyListener::clear()
 {
-    prop.unset();
+    prop.unsetValue();
 }
 
 GroupListener::GroupListener(Service &service, const QStringList &keys,
@@ -68,7 +68,7 @@ GroupListener::GroupListener(Service &service, const QStringList &keys,
 void GroupListener::clear()
 {
     foreach(Property *p, group.getProperties())
-        p->unset();
+        p->unsetValue();
 }
 
 } // end namespace

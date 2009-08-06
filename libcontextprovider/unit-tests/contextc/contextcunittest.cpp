@@ -128,13 +128,13 @@ void Service::restart()
 {
 }
 
-void Property::set(const QVariant &v)
+void Property::setValue(const QVariant &v)
 {
     delete lastVariantSet;
     lastVariantSet = new QVariant(v);
 }
 
-void Property::unset()
+void Property::unsetValue()
 {
     delete lastVariantSet;
     lastVariantSet = NULL;
