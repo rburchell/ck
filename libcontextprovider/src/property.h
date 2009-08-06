@@ -32,6 +32,7 @@
 namespace ContextProvider {
 
 class Service;
+class Manager;
 
 class Property : public QObject
 {
