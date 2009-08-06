@@ -40,12 +40,19 @@ class Group : public QObject
     Q_OBJECT
     
 public:
-    explicit Group(QSet<Property*> propertiesToWatch, QObject* parent = 0);
-    explicit Group(Service &service, QStringList propertiesToWatch, QObject* parent = 0);
+    explicit Group(QObject* parent = 0);
     ~Group();
 
+    void add(const Property &prop);
+
     bool isSubscribedTo() const;
-    QSet<Property *> getProperties();
+    QSet<const Property *> getProperties();
+
+    inline Group &operator<<(const Property &prop)
+    { add(prop); return *this; }
+
+    inline Group &operator<<(const Property *prop)
+    { add(*prop); return *this; }
 
 signals:
     /// Emitted when the group of Context objects is subscribed

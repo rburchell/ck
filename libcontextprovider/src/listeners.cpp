@@ -59,16 +59,18 @@ void PropertyListener::clear()
 
 GroupListener::GroupListener(Service &service, const QStringList &keys,
                              bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt)
-    : Listener(clears, cb, dt), group(service, keys, this)
+    : Listener(clears, cb, dt)
 {
+    foreach (const QString &key, keys)
+        group << new Property(service, key, this);
     sconnect(&group, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared()));
     sconnect(&group, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared()));
 }
 
 void GroupListener::clear()
 {
-    foreach(Property *p, group.getProperties())
-        p->unsetValue();
+    foreach(const Property *p, group.getProperties())
+        ((Property *)p)->unsetValue();
 }
 
 } // end namespace

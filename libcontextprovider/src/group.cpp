@@ -33,32 +33,22 @@ namespace ContextProvider {
     \brief Groups the firstSubscriberAppeared and
     lastSubscriberDisappeared from multiple Property objects together.
 
-    Group is useful in cases when multiple properties are
-    provided by the same sensor. When any of these properties is
-    subscribed to, the sensor needs to be turned on, and when none of
-    these properties are subscribed to, the sensor needs to be turned
-    off.
+    Group is useful in cases when multiple properties are provided by
+    the same source, such as a hardware sensor.  When any of these
+    properties is subscribed to, the source needs to be turned on, and
+    when none of these properties are subscribed to, the source needs
+    to be turned off.
 
     For example,
     \code
-    Property* location("Location");
-    Property* altitude("Altitude");
+    Property location("Location");
+    Property altitude("Altitude");
 
-    QSet<Property*> gpsGroup;
-    gpsGroup.insert(location);
-    gpsGroup.insert(altitude);
+    Group gps;
+    gps << location << altitude;
 
-    Group* gpsGrouper = new Group(gpsGroup);
-    connect(gpsGrouper, SIGNAL(firstSubscriberAppeared()), this, SLOT(onGpsNeeded()));
-    connect(gpsGrouper, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onGpsNotNeeded()));
-
-    void SomeClass::onGpsNeeded() {
-        turnGpsOn();
-    }
-
-    void SomeClass::onGpsNotNeeded() {
-        turnGpsOff();
-    }
+    connect(gps, SIGNAL(firstSubscriberAppeared()), this, SLOT(turnGpsOn()));
+    connect(gps, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onGpsOff()));
     \endcode
 
     This way, the provider doesn't need to store the subscription
@@ -74,47 +64,30 @@ namespace ContextProvider {
 
 struct GroupPrivate {
     int propertiesSubscribedTo;
-    QSet<Property *> properties;
+    QSet<const Property *> properties;
 };
 
-/// Constructs a Group which watches the given set of Property objects.
-Group::Group(QSet<Property*> propertiesToWatch, QObject* parent)
+Group::Group(QObject* parent)
     : QObject(parent)
 {
-    contextDebug() << F_GROUP << "Creating new Group with" << propertiesToWatch.size() << "keys";
+    contextDebug() << F_GROUP << "Creating new Group";
 
     priv = new GroupPrivate;
     priv->propertiesSubscribedTo = 0;
-
-    foreach(Property* property, propertiesToWatch) {
-        priv->properties << property;
-        sconnect(property, SIGNAL(firstSubscriberAppeared(const QString&)),
-                 this, SLOT(onFirstSubscriberAppeared()));
-        sconnect(property, SIGNAL(lastSubscriberDisappeared(const QString&)),
-                 this, SLOT(onLastSubscriberDisappeared()));
-    }
 }
 
-/// Constructs a Group which listens to the given set of context keys
-Group::Group(Service &service, QStringList propertiesToWatch, QObject* parent)
-    : QObject(parent)
+void Group::add(const Property &property)
 {
-    contextDebug() << F_GROUP << "Creating new Group with" << propertiesToWatch.size() << "keys";
+    contextDebug() << F_GROUP << "Adding property" << property.key();
 
-    priv = new GroupPrivate;
-    priv->propertiesSubscribedTo = 0;
-
-    foreach(QString key, propertiesToWatch) {
-        Property* property = new Property(service, key, this);
-        priv->properties << property;
-        sconnect(property, SIGNAL(firstSubscriberAppeared(const QString&)),
-                 this, SLOT(onFirstSubscriberAppeared()));
-        sconnect(property, SIGNAL(lastSubscriberDisappeared(const QString&)),
-                 this, SLOT(onLastSubscriberDisappeared()));
-    }
+    priv->properties << &property;
+    sconnect(&property, SIGNAL(firstSubscriberAppeared(const QString&)),
+             this, SLOT(onFirstSubscriberAppeared()));
+    sconnect(&property, SIGNAL(lastSubscriberDisappeared(const QString&)),
+             this, SLOT(onLastSubscriberDisappeared()));
 }
 
-QSet<Property *> Group::getProperties()
+QSet<const Property *> Group::getProperties()
 {
     return priv->properties;
 }
