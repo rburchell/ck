@@ -173,7 +173,7 @@ void SubscriberUnitTest::subscribeToInvalid()
     QStringList undetermined;
 
     QMap<QString, QVariant> map = subscriber->subscribe(keys1, undetermined);
-    QCOMPARE(undetermined.size(), 3);
+    QCOMPARE(undetermined.size(), 2);
     QVERIFY(subscriber->isSubscribedToKey("Battery.OnBattery"));
     QVERIFY(subscriber->isSubscribedToKey("Battery.Voltage"));
     QVERIFY(subscriber->isSubscribedToKey("Battery.NonExistant") == false);

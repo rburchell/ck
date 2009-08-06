@@ -56,7 +56,7 @@ void Property::setManager(Manager *)
 {
 }
 
-QString Property::getKey()
+QString Property::key()
 {
     return "XXX";
 }
