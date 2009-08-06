@@ -44,16 +44,14 @@ void SubscriptionTests::cleanupTestCase()
 // Before each test
 void SubscriptionTests::init()
 {
-    // Start the services
+    // Create the services
     service1 = new Service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1");
     test_int = new Property(*service1, "Test.Int");
     test_double = new Property(*service1, "Test.Double");
-    service1->start();
 
     service2 = new Service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider2");
     test_string = new Property (*service2, "Test.String");
     test_bool = new Property(*service2, "Test.Bool");
-    service2->start();
 
     // Initialize test program state
     isReadyToRead = false;
@@ -75,10 +73,6 @@ void SubscriptionTests::cleanup()
         client->waitForFinished();
     }
     delete client; client = NULL;
-
-    // Stop the services
-    service1->stop();
-    service2->stop();
 
     delete service1; service1 = NULL;
     delete service2; service2 = NULL;

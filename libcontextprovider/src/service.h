@@ -59,6 +59,9 @@ private:
     static Service *defaultService;
 
     friend class Property;
+
+private slots:
+    void startMe();
 };
 
 } // end namespace

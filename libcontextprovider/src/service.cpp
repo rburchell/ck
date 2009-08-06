@@ -149,7 +149,7 @@ Service::Service(QDBusConnection::BusType busType, const QString &busName, QObje
     priv->manager = new Manager();
     priv->connection = NULL;
 
-    QTimer::singleShot(0, this, SLOT(start()));
+    QTimer::singleShot(0, this, SLOT(startMe()));
 }
 
 Service::~Service()
@@ -226,6 +226,11 @@ void Service::stop()
     // Dealloc
     delete priv->connection;
     priv->connection = NULL;
+}
+
+void Service::startMe()
+{
+    start();
 }
 
 /// If the service is running, stop and start it.
