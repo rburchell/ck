@@ -54,11 +54,7 @@ public:
    
 private:
     PropertyPrivate *priv;
-
     void init (Service *service, const QString &key);
-
-    friend class Service;
-    friend class PropertyPrivate;
 
 private slots:
     void onManagerFirstSubscriberAppeared(const QString &key);

@@ -59,7 +59,6 @@ private:
     static Service *defaultService;
 
     friend class Property;
-    friend class ServicePrivate;
 };
 
 } // end namespace
