@@ -95,7 +95,7 @@ QSet<const Property *> Group::getProperties()
 /// Called when any of the watched Property objects is subscribed to.
 void Group::onFirstSubscriberAppeared()
 {
-    ++priv->propertiesSubscribedTo;
+    ++(priv->propertiesSubscribedTo);
     if (priv->propertiesSubscribedTo == 1) {
         contextDebug() << F_GROUP << F_SIGNALS << "First subscriber appeared for group";
         emit firstSubscriberAppeared();
@@ -105,7 +105,7 @@ void Group::onFirstSubscriberAppeared()
 /// Called when any of the watched Property objects is unsubscribed from.
 void Group::onLastSubscriberDisappeared()
 {
-    --priv->propertiesSubscribedTo;
+    --(priv->propertiesSubscribedTo);
     if (priv->propertiesSubscribedTo == 0) {
         contextDebug() << F_GROUP << F_SIGNALS << "Last subscriber gone for group";
         emit lastSubscriberDisappeared();
