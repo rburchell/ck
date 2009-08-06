@@ -1,7 +1,7 @@
 check_PROGRAMS = lowmemproviderunittest
 
 # test's sources
-lowmemproviderunittest_SOURCES = lowmemproviderunittest.cpp context.h boolsysfspooler.h
+lowmemproviderunittest_SOURCES = lowmemproviderunittest.cpp property.h boolsysfspooler.h
 
 COVERAGE_FILES = lowmemprovider.cpp 
 

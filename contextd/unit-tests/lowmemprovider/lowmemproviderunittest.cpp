@@ -82,12 +82,12 @@ Property::~Property()
     contexts.removeAll(this);
 }
 
-void Property::set(const QVariant &v)
+void Property::setValue(const QVariant &v)
 {
     values.insert(key, v);
 }
 
-void Property::unset()
+void Property::unsetValue()
 {
     values.insert(key, QVariant());
 }

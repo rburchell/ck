@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef CONTEXT_H
-#define CONTEXT_H
+#ifndef PROPERTY_H
+#define PROPERTY_H
 
 #include <QObject>
 #include <QString>
@@ -39,8 +39,8 @@ public:
     explicit Property(const QString &key, QObject *parent = 0);
     ~Property();
         
-    void set(const QVariant &v);
-    void unset();
+    void setValue(const QVariant &v);
+    void unsetValue();
     QVariant get();
     void fakeFirst();
     void fakeLast();
