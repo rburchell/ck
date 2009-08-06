@@ -43,21 +43,21 @@ namespace ContextProvider {
     org.freedesktop.ContextKit.Manager on the bus belonging to the service.
 */
 
-/// Creates a new Manager object with the given list of \a keys. Those 
-/// keys will be managed by this manager. Duplicate keys are ignored with a 
-/// warning.
-Manager::Manager(const QStringList &keys) : subscriberCounter(0)
+Manager::Manager() : subscriberCounter(0)
 {
-    contextDebug() << F_MANAGER << "Creating new Manager with" << keys.size() << "keys";
+    contextDebug() << F_MANAGER << "Creating new Manager";
+}
 
-    foreach (QString key, keys) {
-        if (keysToValues.contains(key))
-            contextWarning() << "Key:" << key << "is already provided, duplicate?";
-        else {
-            contextDebug() << F_MANAGER << "Adding key:" << key << "to the list of provided keys";
-            keysToValues.insert(key, QVariant());
-            keysToSubscriptionCount.insert(key, 0);
-        }
+/// Add a key to this Manager.  Duplicate keys will be ignored with a
+/// warning.
+void Manager::addKey(const QString &key)
+{
+    if (keysToValues.contains(key))
+        contextWarning() << "Key:" << key << "is already provided, duplicate?";
+    else {
+        contextDebug() << F_MANAGER << "Adding key:" << key << "to the list of provided keys";
+        keysToValues.insert(key, QVariant());
+        keysToSubscriptionCount.insert(key, 0);
     }
 }
 

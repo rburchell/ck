@@ -56,12 +56,10 @@ private:
 // Before each test
 void ManagerUnitTest::init()
 {
-    QStringList keys;
-    keys.append("Battery.Power");
-    keys.append("Battery.Voltage");
-    keys.append("Battery.AboutToExplode");
-
-    manager = new Manager(keys);
+    manager = new Manager();
+    manager->addKey("Battery.Power");
+    manager->addKey("Battery.Voltage");
+    manager->addKey("Battery.AboutToExplode");
 }
 
 // After each test
@@ -89,12 +87,10 @@ void ManagerUnitTest::getKeys()
 
 void ManagerUnitTest::duplicateKeys()
 {    
-    QStringList keys;
-    keys.append("Battery.Voltage");
-    keys.append("Battery.Voltage");
-    keys.append("Battery.Power");
-
-    Manager *m = new Manager(keys);
+    Manager *m = new Manager();
+    m->addKey("Battery.Voltage");
+    m->addKey("Battery.Voltage");
+    m->addKey("Battery.Power");
 
     QVERIFY(m->keyIsValid("Battery.Power"));
     QVERIFY(m->keyIsValid("Battery.Voltage"));

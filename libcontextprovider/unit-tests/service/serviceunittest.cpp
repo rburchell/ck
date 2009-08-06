@@ -31,7 +31,11 @@ using namespace ContextProvider;
 
 /* Mocked Manager */
 
-Manager::Manager(const QStringList &list)
+Manager::Manager()
+{
+}
+
+void Manager::addKey(const QString &key)
 {
 }
 

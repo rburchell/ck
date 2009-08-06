@@ -36,8 +36,9 @@ class Manager : public QObject
     Q_OBJECT
 
 public:
-    Manager(const QStringList &keys);
+    Manager();
 
+    void addKey(const QString &key);
     void setKeyValue(const QString &key, const QVariant &v);
     QVariant getKeyValue(const QString &key);
 };

@@ -31,89 +31,48 @@ namespace ContextProvider {
 /*!
     \class Property
 
-    \brief The main class used to provide context data.
+    \brief A Property object represents a Context property.
 
-    Typically, to provide some keys you would:
-
-    \code
-    QStringList keys;
-    keys.append("Some.Key1");
-    keys.append("Some.Key2");
-
-    Property::initService(QDBusConnection::SessionBus, "org.test.somename", keys);
-    Property someKey1("Some.Key1");
-    Property someKey2("Some.Key2");
-    // Do something with someKey1, someKey2...
-    \endcode
-
-    \c Property::initService initializes a new bus connection with a specified service name
-    and creates a Manager object on it. The clients obtain Subscriber objects through this
-    Manager. 
-
-    The Property objects are proxy interfaces to actual keys. It's recommended that you create
-    Property objects to represent keys and keep them around in your class/object. Remember that
-    once the Property object is destroyed, it will not fire the proper signals about
-    subscription status changing. 
-
-    For each service there is one Manager object.
+    Each Property object is associated with a Service object at
+    construction time.
 */
 
-/// Constructor. This creates a new context property that should
-/// be used to provide/set values and get notified about subscribers appearing.
+/// Create a Property object on \a service for the key \a k.
 Property::Property(Service &service, const QString &k, QObject* parent)
-    : QObject(parent), manager(NULL), myKey(k)
+    : QObject(parent), myKey(k)
+{
+    init (&service);
+}
+
+/// Create a Property object on the default service for the key \a k.
+/// The default service can be set with Service::setAsDefault().
+Property::Property(const QString &k, QObject* parent)
+    : QObject(parent), myKey(k)
+{
+    if (Service::defaultService == NULL) {
+        contextCritical() << "No default service set.";
+        abort();
+    }
+
+    init (Service::defaultService);
+}
+
+void Property::init (Service *service)
 {
     contextDebug() << F_PROPERTY << "Creating new Property for key:" << myKey;
+    
+    service->add(this);
+    manager = service->manager;
 
-    service.add(this);
-}
-
-Property::Property(const QString &k, QObject* parent)
-    : QObject(parent), manager(NULL), myKey(k)
-{
-    if (Service::defaultService == NULL)
-        contextCritical() << "No default service set.";
-    else {
-        contextDebug() << F_PROPERTY << "Creating new Property for key:" << myKey;
-        Service::defaultService->add(this);
-    }
-}
-
-void Property::setManager(Manager *manager)
-{
-    this->manager = manager;
-    if (manager) {
-        sconnect(manager, SIGNAL(firstSubscriberAppeared(const QString&)),
-                 this, SLOT(onManagerFirstSubscriberAppeared(const QString&)));
-        sconnect(manager, SIGNAL(lastSubscriberDisappeared(const QString&)),
-                 this, SLOT(onManagerLastSubscriberDisappeared(const QString&)));
-    }
-}
-
-/// Checks if a Property is valid (can be set/get/manipulated), prints an error message if not.
-/// Returns true if the Property is valid. False otherwise. Helper for the Property::set 
-/// and Property::get familly of functions.
-bool Property::keyCheck() const
-{
-    if (manager == NULL) {
-        contextWarning() << "Trying to manipulate an invalid key:" << myKey;
-        return false;
-    } else
-        return true;
-}
-
-/// Returns true if the key is valid.
-bool Property::isValid() const
-{
-    return (manager != NULL);
+    sconnect(manager, SIGNAL(firstSubscriberAppeared(const QString&)),
+             this, SLOT(onManagerFirstSubscriberAppeared(const QString&)));
+    sconnect(manager, SIGNAL(lastSubscriberDisappeared(const QString&)),
+             this, SLOT(onManagerLastSubscriberDisappeared(const QString&)));
 }
 
 /// Returns true if the key is set (it's value is determined).
 bool Property::isSet() const
 {
-    if (! keyCheck())
-        return false;
-        
     return (manager->getKeyValue(myKey) != QVariant());
 }
 
@@ -123,22 +82,16 @@ QString Property::key() const
     return myKey;
 }
 
-/// Unsets the value. The key value becomes undetermined.
+/// Unsets the value. This is equivalent to setting it to a null
+/// QVariant.
 void Property::unsetValue()
 {
-    if (! keyCheck())
-        return;
-
     manager->setKeyValue(myKey, QVariant());
 }
 
-   
 /// Sets the property value to QVariant \a v.
 void Property::setValue(const QVariant &v)
 {
-    if (! keyCheck())
-        return;
-        
     manager->setKeyValue(myKey, v);
 }
 
@@ -146,9 +99,6 @@ void Property::setValue(const QVariant &v)
 /// if the key value is undetermined or the Property is invalid.
 QVariant Property::value()
 {
-    if (! keyCheck())
-        return QVariant();
-        
     return manager->getKeyValue(myKey);
 }
 

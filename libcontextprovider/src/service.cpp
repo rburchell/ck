@@ -19,6 +19,8 @@
  *
  */
 
+#include <QTimer>
+
 #include "service.h"
 #include "property.h"
 #include "logging.h"
@@ -30,16 +32,111 @@
 namespace ContextProvider {
 
 /*!
+
+  \mainpage Providing values for Context properties
+
+  This library implements the provider side of the Context Framework.
+  It has both a C++ and a C interface, so you can choose which you
+  prefer.
+
+  The C++ interface consists mainly of the three classes Service,
+  Property, and Group in the namespace ContextProvider.  They are
+  declared in the ContextProvider header file.
+
+  Thus, you would typically gain access to the classes like this
+  
+  \code
+  #include <ContextProvider>
+
+  using namespace ContextProvider;
+
+  Service my_service (...);
+  \endcode
+
+  If you prefer not to have generic names like "Service" in your code,
+  you can of course skip the "using" declaration and refer to the
+  classes as "ContextProvider::Service", etc.  If that is too long,
+  consider a namespace alias like this:
+
+  \code
+  #include <ContextProvider>
+
+  namespace CP = ContextProvider;
+
+  CP::Service my_service (...);
+  \endcode
+  
+  
+  The basic pattern to use this library is to create a Service
+  instance to represent you on D-Bus and then to add Property
+  instances to it for the keys that you want to provide.  Once this is
+  done, you can call Property::set() at any time to change the value
+  of the property.
+
+  Communication with clients happens asynchronously and this library
+  needs a running event loop for that.
+
+  Thus, a simple provider might look like this:
+
+  \code
+  #include <ContextProvider>
+
+  using namespace ContextProvider;
+
+  void main (int argc, char **argv)
+  {
+      QApplication app (argc, argv);
+
+      Service my_service (Service::session_bus, "com.example.simple");
+      Property my_property (my_service, "Example.Simple");
+
+      // set initial value of property
+      my_property.set (100);
+
+      app.exec();
+  }
+  \endcode
+
+  If you need to know when someone is actually subscribes to one of
+  your values, you can connect to the firstSubscriberAppeared and
+  lastSubscriberDisappeared signals of the Property instances.  You
+  can also use a Group if you are only interested in whether at least
+  one of a set of Property objects is subscribed to.
+
+*/
+
+/*!
     \class Service
 
+    \brief A Service object represents a service name on D-Bus that
+    implements the Context Framework interface.
+
+    Every Property object must be associated with a Service object.
+
+    A Service can be running or stopped.  When it is running, it is
+    visible via D-Bus and clients can subscribe to its properties.
+
+    It is undefined what happens when you add a Property object to a
+    running service after a client has already tried to subscribe to
+    it.  The client might be notified about changes to that property,
+    or it might not.  (XXX - we remove this undefinedness.)
+
+    Thus, it is best to create a Service object, add all Property
+    objects to it immediately, and then enter the main loop, which
+    will cause the Service to start.
 */
 
 Service *Service::defaultService;
 
+/// Creates a Service object for \a busName on the bus indicated by \a
+/// busType.  The service will be initially stopped and will
+/// automatically start itself when the main loop is entered.
 Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
-    : QObject(parent), busType(busType), busName(busName), manager(NULL), connection(NULL)
+    : QObject(parent), busType(busType), busName(busName), connection(NULL)
 {
     contextDebug() << F_SERVICE << "Creating new Service for" << busName;
+    manager = new Manager();
+    QTimer::singleShot(0, this, SLOT(start()));
 }
 
 Service::~Service()
@@ -51,9 +148,13 @@ Service::~Service()
 void Service::add(Property *prop)
 {
     props << prop;
-    prop->setManager(manager);
+    manager->addKey(prop->key());
 }
 
+/// Sets the Service object as the default one to use when
+/// constructing Property objects.  You can only set the default
+/// Service once and the Service object that is the default must never
+/// be deallocated.
 void Service::setAsDefault()
 {
     if (defaultService) {
@@ -64,18 +165,14 @@ void Service::setAsDefault()
     defaultService = this;
 }
 
+/// Start the Service again after it has been stopped.  All clients
+/// will resubscribe to its properties.
 void Service::start()
 {
-    if (manager)
+    if (connection)
         return;
 
-    QStringList keys;
-    foreach (Property *p, props)
-        keys << p->key();
-
     connection = new QDBusConnection(QDBusConnection::connectToBus(busType, busName));
-    manager = new Manager(keys);
-
     ManagerAdaptor *managerAdaptor = new ManagerAdaptor(manager, connection);
 
     // Register service
@@ -91,36 +188,29 @@ void Service::start()
         stop();
         return;
     }
-
-    foreach(Property *p, props)
-        p->setManager(manager);
 }
 
+/// Stop the service.  This will cause it to disappear from D-Bus.
 void Service::stop()
 {
-    if (manager == NULL)
+    if (connection == NULL)
         return;
 
     contextDebug() << F_SERVICE << "Stopping service for bus:" << busName;
-
-    foreach(Property *p, props)
-        p->setManager(NULL);
 
     // Unregister
     connection->unregisterObject("/org/freedesktop/ContextKit/Manager");
     connection->unregisterService(busName);
 
     // Dealloc
-    delete manager;
     delete connection;
-    
-    manager = NULL;
     connection = NULL;
 }
 
+/// If the service is running, stop and start it.
 void Service::restart()
 {
-    if (manager) {
+    if (connection) {
         stop();
         start();
     }

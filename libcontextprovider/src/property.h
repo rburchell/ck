@@ -44,7 +44,6 @@ public:
     virtual ~Property();
 
     QString key() const;
-    bool isValid() const;
     bool isSet() const;
     
     void setValue(const QVariant &v);
@@ -52,9 +51,7 @@ public:
     void unsetValue();
    
 private:
-    void setManager(Manager *manager);
-    bool keyCheck() const;
-
+    void init (Service *service);
     Manager *manager;
     QString myKey;
 

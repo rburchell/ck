@@ -36,7 +36,7 @@ class Manager : public QObject
     Q_OBJECT
 
 public:
-    Manager(const QStringList &keys);
+    Manager();
     ~Manager();
 
     Subscriber* getSubscriber(const QString &busName);
@@ -48,6 +48,7 @@ public:
     int getSubscriptionCount(const QString &key) const;
     void busNameIsGone(const QString &key);
     bool hasSubscriberWithBusName(const QString &name) const;
+    void addKey(const QString &key);
     QStringList getKeys();
 
 signals:
