@@ -78,21 +78,26 @@ QMap<QString, QVariant> Subscriber::subscribe(const QStringList &keys, QStringLi
     contextDebug() << F_SUBSCRIBER << F_DBUS << "Subscribe called with" << keys.size() << "keys";
 
     QStringList newKeys;
+    QStringList valueKeys;
+
     foreach(QString key, keys) {
         if (! manager->keyIsValid(key)) 
             contextWarning() << "Key:" << key << "is not a valid key";
         else if (! subscribedKeys.contains(key) && ! newKeys.contains(key)) {
             contextDebug() << F_SUBSCRIBER << "Key:" << key << "not yet subscribed, adding to new keys to subscribe";
             newKeys.append(key);
+            valueKeys.append(key);
             manager->increaseSubscriptionCount(key);
-        } else 
+        } else {
             contextWarning() << "Trying to subscribe to key:" << key << "but it's already subscribed";
+            valueKeys.append(key);
+        }
     }
 
     subscribedKeys += newKeys;
     
     QMap<QString, QVariant> map;
-    buildMapAndUndetermined(keys, map, undetermined);
+    buildMapAndUndetermined(valueKeys, map, undetermined);
     
     return map;
 }
