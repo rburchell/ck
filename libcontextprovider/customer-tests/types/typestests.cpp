@@ -30,20 +30,6 @@
 
 namespace ContextProvider {
 
-TypesTests::TypesTests()
-    : service (QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1", this),
-      intItem (service, "Test.Int", this),
-      stringItem (service, "Test.String", this),
-      boolItem (service, "Test.Bool", this),
-      doubleItem (service, "Test.Double", this),
-      stringListItem (service, "Test.StringList", this),
-      charItem (service, "Test.Char", this),
-      dateItem (service, "Test.Date", this),
-      timeItem (service, "Test.Time", this)
-{
-    service.start();
-}
-
 void TypesTests::initTestCase()
 {
 }
@@ -55,6 +41,19 @@ void TypesTests::cleanupTestCase()
 // Before each test
 void TypesTests::init()
 {
+    // Start the services
+    service = new Service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1");
+
+    intItem = new Property(*service, "Test.Int");
+    stringItem = new Property(*service, "Test.String");
+    boolItem = new Property(*service, "Test.Bool");
+    doubleItem = new Property(*service, "Test.Double");
+    stringListItem = new Property(*service, "Test.StringList");
+    charItem = new Property(*service, "Test.Char");
+    dateItem = new Property(*service, "Test.Date");
+    timeItem = new Property (*service, "Test.Time");
+    service->start();
+
     // Initialize test program state
     isReadyToRead = false;
 
@@ -75,6 +74,20 @@ void TypesTests::cleanup()
         client->waitForFinished();
     }
     delete client; client = NULL;
+
+    // Stop the service
+    service->stop();
+
+    delete service; service = NULL;
+
+    delete intItem; intItem = NULL;
+    delete doubleItem; doubleItem = NULL;
+    delete boolItem; boolItem = NULL;
+    delete stringItem; stringItem = NULL;
+    delete stringListItem; stringListItem = NULL;
+    delete charItem; charItem = NULL;
+    delete timeItem; timeItem = NULL;
+    delete dateItem; dateItem = NULL;
 }
 
 void TypesTests::typesInReturnValueOfSubscribe()
@@ -87,16 +100,16 @@ void TypesTests::typesInReturnValueOfSubscribe()
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Set some values to the properties
-    intItem.setValue(4510);
-    doubleItem.setValue(-9.031);
-    stringItem.setValue("this-is-a-test-string");
-    boolItem.setValue(false);
+    intItem->setValue(4510);
+    doubleItem->setValue(-9.031);
+    stringItem->setValue("this-is-a-test-string");
+    boolItem->setValue(false);
     QStringList temp;
     temp << "string1" << "string2";
-    stringListItem.setValue(temp);
-    charItem.setValue(QChar('g'));
-    dateItem.setValue(QDate(2009, 8, 5));
-    timeItem.setValue(QTime(14, 30, 20));
+    stringListItem->setValue(temp);
+    charItem->setValue(QChar('g'));
+    dateItem->setValue(QDate(2009, 8, 5));
+    timeItem->setValue(QTime(14, 30, 20));
 
     // Test: subscribe to properties
     QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double "
@@ -134,16 +147,16 @@ void TypesTests::typesInChangeSignal()
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Set some values to the properties
-    intItem.setValue(4510);
-    doubleItem.setValue(-9.031);
-    stringItem.setValue("this-is-a-test-string");
-    boolItem.setValue(false);
+    intItem->setValue(4510);
+    doubleItem->setValue(-9.031);
+    stringItem->setValue("this-is-a-test-string");
+    boolItem->setValue(false);
     QStringList temp;
     temp << "string1" << "string2";
-    stringListItem.setValue(temp);
-    charItem.setValue(QChar('g'));
-    dateItem.setValue(QDate(2009, 8, 5));
-    timeItem.setValue(QTime(14, 30, 20));
+    stringListItem->setValue(temp);
+    charItem->setValue(QChar('g'));
+    dateItem->setValue(QDate(2009, 8, 5));
+    timeItem->setValue(QTime(14, 30, 20));
 
     // Subscribe to properties, ignore the return values
     writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double "
@@ -153,10 +166,10 @@ void TypesTests::typesInChangeSignal()
     // FIXME: Complex types not working yet!
 
     // Test: modify the properties
-    intItem.setValue(-11);
-    doubleItem.setValue(4.88);
-    stringItem.setValue("anotherstring");
-    boolItem.setValue(true);
+    intItem->setValue(-11);
+    doubleItem->setValue(4.88);
+    stringItem->setValue("anotherstring");
+    boolItem->setValue(true);
     // And tell the client to wait for Changed signal
     QString actual = writeToClient("waitforchanged 3000\n");
 
@@ -172,7 +185,7 @@ void TypesTests::typesInChangeSignal()
     // Test: modify the properties
     temp.clear();
     temp << "something" << "else" << "here";
-    stringListItem.setValue(temp);
+    stringListItem->setValue(temp);
     // And tell the client to wait for Changed signal
     actual = writeToClient("waitforchanged 3000\n");
 
