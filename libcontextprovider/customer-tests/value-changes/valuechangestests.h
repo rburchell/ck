@@ -40,6 +40,8 @@ private slots:
     void twoPropertiesChange();
     void sameValueSet();
 
+    void changesBetweenZeroAndUnknown();
+
 public slots:
     void readStandardOutput();
 

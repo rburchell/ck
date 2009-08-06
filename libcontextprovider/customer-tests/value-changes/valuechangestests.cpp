@@ -263,6 +263,50 @@ void ValueChangesTests::sameValueSet()
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
+void ValueChangesTests::changesBetweenZeroAndUnknown()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call GetSubscriber, ignore the result
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+
+    // FIXME: Tests are dependent! This should be removed!
+    test_int.unset();
+
+    // Subscribe to a property (which is currently unknown)
+    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int\n");
+
+    // Verify that the property really was unknown
+    QString expected = "Known keys: Unknown keys: Test.Int";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Test: Change the value of the property to 0
+    test_int.set(0);
+    // and tell the client to wait for the Changed signal
+    actual = writeToClient("waitforchanged 3000\n");
+
+    // Expected result: the client got the Changed signal
+    expected = "Changed signal received, parameters: Known keys: Test.Int(int:0) Unknown keys:";
+
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Reset the signal status of the client (makes it forget that it has received the signal)
+    writeToClient("resetsignalstatus\n");
+
+    // Test: Change the property to unknown again
+    test_int.unset();
+    // and tell the client to wait for the Changed signal
+    actual = writeToClient("waitforchanged 3000\n");
+
+    // Expected result: the client got the Changed signal
+    expected = "Changed signal received, parameters: Known keys: Unknown keys: Test.Int";
+
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+
 void ValueChangesTests::readStandardOutput()
 {
     isReadyToRead = true;
