@@ -165,6 +165,9 @@ void Service::setAsDefault()
     defaultService = this;
 }
 
+/// Set the value of \a key to \a val.  A property named \a key must
+/// have been registered already, by creating a Property object for
+/// it.
 void Service::setValue(const QString &key, const QVariant &val)
 {
     manager->setKeyValue(key, val);
