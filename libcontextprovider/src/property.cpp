@@ -124,8 +124,8 @@ QString Property::getKey() const
     return key;
 }
 
-/// Unsets the key value. The key value becomes undetermined.
-void Property::unset()
+/// Unsets the value. The key value becomes undetermined.
+void Property::unsetValue()
 {
     if (! keyCheck())
         return;
@@ -134,8 +134,8 @@ void Property::unset()
 }
 
    
-/// Sets the key value to QVariant \a v.
-void Property::set(const QVariant &v)
+/// Sets the property value to QVariant \a v.
+void Property::setValue(const QVariant &v)
 {
     if (! keyCheck())
         return;
@@ -143,9 +143,9 @@ void Property::set(const QVariant &v)
     manager->setKeyValue(key, v);
 }
 
-/// Returns the current value of the key. The returned QVariant is invalid 
+/// Returns the current value of the property. The returned QVariant is invalid 
 /// if the key value is undetermined or the Property is invalid.
-QVariant Property::get()
+QVariant Property::getValue()
 {
     if (! keyCheck())
         return QVariant();

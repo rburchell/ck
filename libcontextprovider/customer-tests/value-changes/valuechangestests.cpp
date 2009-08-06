@@ -86,7 +86,7 @@ void ValueChangesTests::subscribedPropertyChanges()
     writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
 
     // Test: Change the value of the property
-    test_double.set(51.987);
+    test_double.setValue(51.987);
     // and tell the client to wait for the Changed signal
     QString actual = writeToClient("waitforchanged 3000\n");
 
@@ -99,7 +99,7 @@ void ValueChangesTests::subscribedPropertyChanges()
     writeToClient("resetsignalstatus\n");
 
     // Test: Change a property to unknown
-    test_double.unset();
+    test_double.unsetValue();
     // and tell the client to wait for the Changed signal
     actual = writeToClient("waitforchanged 3000\n");
 
@@ -122,7 +122,7 @@ void ValueChangesTests::nonsubscribedPropertyChanges()
     writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
 
     // Test: Change the value of the property
-    test_int.set(100);
+    test_int.setValue(100);
     // and tell the client to wait for the Changed signal
     QString actual = writeToClient("waitforchanged 3000\n");
 
@@ -135,7 +135,7 @@ void ValueChangesTests::nonsubscribedPropertyChanges()
     writeToClient("resetsignalstatus\n");
 
     // Test: Change a property to unknown
-    test_int.unset();
+    test_int.unsetValue();
     // and tell the client to wait for the Changed signal
     actual = writeToClient("waitforchanged 3000\n");
 
@@ -161,7 +161,7 @@ void ValueChangesTests::unsubscribedPropertyChanges()
     writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
 
     // Test: Change the value of the property
-    test_int.set(100);
+    test_int.setValue(100);
     // and tell the client to wait for the Changed signal
     QString actual = writeToClient("waitforchanged 3000\n");
 
@@ -174,7 +174,7 @@ void ValueChangesTests::unsubscribedPropertyChanges()
     writeToClient("resetsignalstatus\n");
 
     // Test: Change a property to unknown
-    test_int.unset();
+    test_int.unsetValue();
     // and tell the client to wait for the Changed signal
     actual = writeToClient("waitforchanged 3000\n");
 
@@ -197,8 +197,8 @@ void ValueChangesTests::twoPropertiesChange()
     writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double\n");
 
     // Test: Change the value of both properties
-    test_int.set(100);
-    test_double.set(4.111);
+    test_int.setValue(100);
+    test_double.setValue(4.111);
     // and tell the client to wait for the Changed signal
     QString actual = writeToClient("waitforchanged 3000\n");
 
@@ -212,8 +212,8 @@ void ValueChangesTests::twoPropertiesChange()
     writeToClient("resetsignalstatus\n");
 
     // Test: Set both properties to unknown
-    test_int.unset();
-    test_double.unset();
+    test_int.unsetValue();
+    test_double.unsetValue();
     // and tell the client to wait for the Changed signal
     actual = writeToClient("waitforchanged 3000\n");
 
@@ -234,13 +234,13 @@ void ValueChangesTests::sameValueSet()
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Set a value to a property
-    test_int.set(555);
+    test_int.setValue(555);
 
     // Subscribe to 2 properties (one is currently unknown, the other has a value)
     writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double\n");
 
     // Test: Set the value of the property to its current value
-    test_int.set(555);
+    test_int.setValue(555);
     // and tell the client to wait for the Changed signal
     QString actual = writeToClient("waitforchanged 3000\n");
 
@@ -253,7 +253,7 @@ void ValueChangesTests::sameValueSet()
     writeToClient("resetsignalstatus\n");
 
     // Test: Unset a property which is already unknown
-    test_double.unset();
+    test_double.unsetValue();
     // and tell the client to wait for the Changed signal
     actual = writeToClient("waitforchanged 3000\n");
 
@@ -273,7 +273,7 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // FIXME: Tests are dependent! This should be removed!
-    test_int.unset();
+    test_int.unsetValue();
 
     // Subscribe to a property (which is currently unknown)
     QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int\n");
@@ -283,7 +283,7 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
     QCOMPARE(actual.simplified(), expected.simplified());
 
     // Test: Change the value of the property to 0
-    test_int.set(0);
+    test_int.setValue(0);
     // and tell the client to wait for the Changed signal
     actual = writeToClient("waitforchanged 3000\n");
 
@@ -296,7 +296,7 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
     writeToClient("resetsignalstatus\n");
 
     // Test: Change the property to unknown again
-    test_int.unset();
+    test_int.unsetValue();
     // and tell the client to wait for the Changed signal
     actual = writeToClient("waitforchanged 3000\n");
 

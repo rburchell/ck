@@ -163,44 +163,44 @@ void ContextUnitTest::checkSignals()
 void ContextUnitTest::setGetBool()
 {
     resetVariants();
-    battery_is_charging.set(true);
+    battery_is_charging.setValue(true);
     QCOMPARE(*lastVariantSet, QVariant(true));
-    QCOMPARE(battery_is_charging.get(), QVariant(true));
+    QCOMPARE(battery_is_charging.getValue(), QVariant(true));
 }
 
 void ContextUnitTest::setGetInt()
 {
     resetVariants();
-    battery_voltage.set(666);
+    battery_voltage.setValue(666);
     QCOMPARE(*lastVariantSet, QVariant(666));
-    QCOMPARE(battery_voltage.get(), QVariant(666));
+    QCOMPARE(battery_voltage.getValue(), QVariant(666));
     QVERIFY(battery_voltage.isSet());
 }
 
 void ContextUnitTest::setGetDouble()
 {
     resetVariants();
-    battery_voltage.set(0.456);
+    battery_voltage.setValue(0.456);
     QCOMPARE(*lastVariantSet, QVariant(0.456));
-    QCOMPARE(battery_voltage.get(), QVariant(0.456));
+    QCOMPARE(battery_voltage.getValue(), QVariant(0.456));
     QVERIFY(battery_voltage.isSet());
 }
 
 void ContextUnitTest::setGetString()
 {
     resetVariants();
-    battery_voltage.set(QString("Hello!"));
+    battery_voltage.setValue(QString("Hello!"));
     QCOMPARE(*lastVariantSet, QVariant(QString("Hello!")));
-    QCOMPARE(battery_voltage.get(), QVariant("Hello!"));
+    QCOMPARE(battery_voltage.getValue(), QVariant("Hello!"));
     QVERIFY(battery_voltage.isSet());
 }
 
 void ContextUnitTest::setGetQVariant()
 {
     resetVariants();
-    battery_voltage.set(QVariant(123));
+    battery_voltage.setValue(QVariant(123));
     QCOMPARE(*lastVariantSet, QVariant(123));
-    QCOMPARE(battery_voltage.get(), QVariant(123));
+    QCOMPARE(battery_voltage.getValue(), QVariant(123));
     QVERIFY(battery_voltage.isSet());
 }
 
@@ -208,11 +208,11 @@ void ContextUnitTest::unset()
 {
     resetVariants();
     QVERIFY(battery_voltage.isSet() == false);
-    battery_voltage.set(QVariant(123));
+    battery_voltage.setValue(QVariant(123));
     QVERIFY(battery_voltage.isSet());
-    QCOMPARE(battery_voltage.get(), QVariant(123));
-    battery_voltage.unset();
-    QCOMPARE(battery_voltage.get(), QVariant());
+    QCOMPARE(battery_voltage.getValue(), QVariant(123));
+    battery_voltage.unsetValue();
+    QCOMPARE(battery_voltage.getValue(), QVariant());
     QVERIFY(!battery_voltage.isSet());
 }
 
