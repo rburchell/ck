@@ -28,8 +28,7 @@ namespace ContextProvider {
     class Service : public QObject
     {
     public:
-        void add(Property* prop);
         static Service* defaultService;
-        Manager *manager;
+        Manager *manager();
     };
 }

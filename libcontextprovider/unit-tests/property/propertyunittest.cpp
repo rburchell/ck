@@ -28,6 +28,7 @@
 
 namespace ContextProvider {
 
+Manager *manager;
 QVariant *lastVariantSet = NULL;
 
 void resetVariants()
@@ -83,16 +84,21 @@ void Manager::fakeLast(const QString &key)
     emit lastSubscriberDisappeared(key);
 }
 
-Manager::Manager(const QStringList &k) : keys(k)
+Manager::Manager()
 {
+}
+
+void Manager::addKey(const QString &key)
+{
+    keys << key;
 }
 
 // Mock implementation of Service
 Service* Service::defaultService = NULL;
 
-void Service::add(Property* prop)
+Manager *Service::manager()
 {
-    qDebug() << "*********Add called";
+    return ContextProvider::manager;
 }
 
 class PropertyUnitTest : public QObject
@@ -124,10 +130,7 @@ void PropertyUnitTest::initTestCase()
 
 void PropertyUnitTest::init()
 {
-    QStringList keys;
-    keys << "Battery.Voltage" << "Battery.IsCharging";
-    service.manager = new Manager(keys);
-
+    manager = new Manager();
     battery_voltage = new Property(service, "Battery.Voltage");
     battery_is_charging = new Property(service, "Battery.IsCharging");
 }
@@ -136,7 +139,7 @@ void PropertyUnitTest::cleanup()
 {
     delete battery_voltage; battery_voltage = NULL;
     delete battery_is_charging; battery_is_charging = NULL;
-    delete service.manager; service.manager = NULL;
+    delete manager; manager = NULL;
 }
 
 void PropertyUnitTest::getProperty()
@@ -151,13 +154,13 @@ void PropertyUnitTest::checkSignals()
     QSignalSpy spy1(battery_voltage, SIGNAL(firstSubscriberAppeared(QString)));
     QSignalSpy spy2(battery_voltage, SIGNAL(lastSubscriberDisappeared(QString)));
 
-    service.manager->fakeFirst("Battery.Voltage");
+    manager->fakeFirst("Battery.Voltage");
 
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> args1 = spy1.takeFirst();
     QCOMPARE(args1.at(0).toString(), QString("Battery.Voltage"));
     
-    service.manager->fakeLast("Battery.Voltage");
+    manager->fakeLast("Battery.Voltage");
 
     QCOMPARE(spy2.count(), 1);
     QList<QVariant> args2 = spy2.takeFirst();

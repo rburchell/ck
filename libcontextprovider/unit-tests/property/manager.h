@@ -38,7 +38,8 @@ class Manager : public QObject
     Q_OBJECT
 
 public:
-    Manager(const QStringList &keys);
+    Manager();
+    void addKey(const QString &key);
     bool keyIsValid(const QString &key) const;
     void increaseSubscriptionCount(const QString &key);
     void decreaseSubscriptionCount(const QString &key);

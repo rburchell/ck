@@ -61,9 +61,9 @@ void Property::init (Service *service)
 {
     contextDebug() << F_PROPERTY << "Creating new Property for key:" << myKey;
     
-    service->add(this);
-    manager = service->manager;
+    manager = service->manager();
 
+    manager->addKey (myKey);
     sconnect(manager, SIGNAL(firstSubscriberAppeared(const QString&)),
              this, SLOT(onManagerFirstSubscriberAppeared(const QString&)));
     sconnect(manager, SIGNAL(lastSubscriberDisappeared(const QString&)),

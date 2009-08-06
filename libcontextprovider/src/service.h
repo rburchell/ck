@@ -33,6 +33,7 @@ namespace ContextProvider {
 
 class Manager;
 class Property;
+class ServicePrivate;
 
 class Service : public QObject
 {
@@ -51,17 +52,14 @@ public:
     void setValue(const QString &key, const QVariant &val);
 
 private:
-    QList<Property *> props;
-    QDBusConnection::BusType busType;
-    const QString busName;
-    Manager *manager;
-    QDBusConnection *connection;
+    class ServicePrivate *priv;
 
-    void add(Property *prop);
+    Manager *manager();
 
     static Service *defaultService;
 
     friend class Property;
+    friend class ServicePrivate;
 };
 
 } // end namespace

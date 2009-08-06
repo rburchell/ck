@@ -126,16 +126,29 @@ namespace ContextProvider {
     will cause the Service to start.
 */
 
+struct ServicePrivate {
+    QDBusConnection::BusType busType;
+    QString busName;
+    Manager *manager;
+    QDBusConnection *connection;
+};
+
 Service *Service::defaultService;
 
 /// Creates a Service object for \a busName on the bus indicated by \a
 /// busType.  The service will be initially stopped and will
 /// automatically start itself when the main loop is entered.
 Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
-    : QObject(parent), busType(busType), busName(busName), connection(NULL)
+    : QObject(parent)
 {
     contextDebug() << F_SERVICE << "Creating new Service for" << busName;
-    manager = new Manager();
+
+    priv = new ServicePrivate;
+    priv->busType = busType;
+    priv->busName = busName;
+    priv->manager = new Manager();
+    priv->connection = NULL;
+
     QTimer::singleShot(0, this, SLOT(start()));
 }
 
@@ -143,12 +156,12 @@ Service::~Service()
 {
     contextDebug() << F_SERVICE << F_DESTROY << "Destroying Service";
     stop();
+    delete priv;
 }
 
-void Service::add(Property *prop)
+Manager *Service::manager()
 {
-    props << prop;
-    manager->addKey(prop->key());
+    return priv->manager;
 }
 
 /// Sets the Service object as the default one to use when
@@ -170,29 +183,29 @@ void Service::setAsDefault()
 /// it.
 void Service::setValue(const QString &key, const QVariant &val)
 {
-    manager->setKeyValue(key, val);
+    priv->manager->setKeyValue(key, val);
 }
 
 /// Start the Service again after it has been stopped.  All clients
 /// will resubscribe to its properties.
 void Service::start()
 {
-    if (connection)
+    if (priv->connection)
         return;
 
-    connection = new QDBusConnection(QDBusConnection::connectToBus(busType, busName));
-    ManagerAdaptor *managerAdaptor = new ManagerAdaptor(manager, connection);
+    priv->connection = new QDBusConnection(QDBusConnection::connectToBus(priv->busType, priv->busName));
+    ManagerAdaptor *managerAdaptor = new ManagerAdaptor(priv->manager, priv->connection);
 
     // Register service
-    if (! connection->registerService(busName)) {
-        contextCritical() << F_SERVICE << "Failed to register service with name" << busName;
+    if (!priv->connection->registerService(priv->busName)) {
+        contextCritical() << F_SERVICE << "Failed to register service with name" << priv->busName;
         stop();
         return;
     }
 
     // Register object
-    if (managerAdaptor && !connection->registerObject("/org/freedesktop/ContextKit/Manager", manager)) {
-        contextCritical() << F_SERVICE << "Failed to register the Manager object for" << busName;
+    if (managerAdaptor && !priv->connection->registerObject("/org/freedesktop/ContextKit/Manager", priv->manager)) {
+        contextCritical() << F_SERVICE << "Failed to register the Manager object for" << priv->busName;
         stop();
         return;
     }
@@ -201,24 +214,24 @@ void Service::start()
 /// Stop the service.  This will cause it to disappear from D-Bus.
 void Service::stop()
 {
-    if (connection == NULL)
+    if (priv->connection == NULL)
         return;
 
-    contextDebug() << F_SERVICE << "Stopping service for bus:" << busName;
+    contextDebug() << F_SERVICE << "Stopping service for bus:" << priv->busName;
 
     // Unregister
-    connection->unregisterObject("/org/freedesktop/ContextKit/Manager");
-    connection->unregisterService(busName);
+    priv->connection->unregisterObject("/org/freedesktop/ContextKit/Manager");
+    priv->connection->unregisterService(priv->busName);
 
     // Dealloc
-    delete connection;
-    connection = NULL;
+    delete priv->connection;
+    priv->connection = NULL;
 }
 
 /// If the service is running, stop and start it.
 void Service::restart()
 {
-    if (connection) {
+    if (priv->connection) {
         stop();
         start();
     }
