@@ -1,25 +1,21 @@
 #include <QString>
 #include <QObject>
 
-#include "service.h"
-#include "property.h"
-
 class QProcess;
 
 namespace ContextProvider {
 
 class Property;
+class Service;
 
 class ValueChangesTests : public QObject
 {
     Q_OBJECT
 
 private:
-    Service service;
-    Property test_int;
-    Property test_double;
-    Property test_string;
-    Property test_bool;
+    Service* service;
+    Property* test_int;
+    Property* test_double;
 
     QProcess *client;
     bool isReadyToRead;
@@ -44,9 +40,6 @@ private slots:
 
 public slots:
     void readStandardOutput();
-
-public:
-    ValueChangesTests();
 };
 
 } // end namespace

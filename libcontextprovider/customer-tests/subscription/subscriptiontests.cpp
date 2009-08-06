@@ -24,23 +24,14 @@
 #include "subscriptiontests.h"
 #include "sconnect.h"
 
+#include "service.h"
+#include "property.h"
+
 #include <QtTest/QtTest>
 #include <QProcess>
 #include <QStringList>
 
 namespace ContextProvider {
-
-SubscriptionTests::SubscriptionTests()
-    : service1 (QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1", this),
-      test_int (service1, "Test.Int", this),
-      test_double (service1, "Test.Double", this),
-      service2 (QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider2", this),
-      test_string (service2, "Test.String", this),
-      test_bool (service2, "Test.Bool", this)
-{
-    service1.start();
-    service2.start();
-}
 
 void SubscriptionTests::initTestCase()
 {
@@ -53,6 +44,17 @@ void SubscriptionTests::cleanupTestCase()
 // Before each test
 void SubscriptionTests::init()
 {
+    // Start the services
+    service1 = new Service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1");
+    test_int = new Property(*service1, "Test.Int");
+    test_double = new Property(*service1, "Test.Double");
+    service1->start();
+
+    service2 = new Service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider2");
+    test_string = new Property (*service2, "Test.String");
+    test_bool = new Property(*service2, "Test.Bool");
+    service2->start();
+
     // Initialize test program state
     isReadyToRead = false;
 
@@ -73,6 +75,18 @@ void SubscriptionTests::cleanup()
         client->waitForFinished();
     }
     delete client; client = NULL;
+
+    // Stop the services
+    service1->stop();
+    service2->stop();
+
+    delete service1; service1 = NULL;
+    delete service2; service2 = NULL;
+
+    delete test_int; test_int = NULL;
+    delete test_double; test_double = NULL;
+    delete test_bool; test_bool = NULL;
+    delete test_string; test_string = NULL;
 }
 
 void SubscriptionTests::testGetSubscriber()
@@ -134,7 +148,7 @@ void SubscriptionTests::subscribeReturnValueForKnownProperty()
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Set a value for a property
-    test_double.setValue(-8.22);
+    test_double->setValue(-8.22);
 
     // Ask the client to call Subscribe with 1 valid key. The property
     // has a value we just set.
@@ -168,14 +182,14 @@ void SubscriptionTests::subscriberNotifications()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
-    QSignalSpy intItemFirst(&test_int, SIGNAL(firstSubscriberAppeared(const QString&)));
-    QSignalSpy intItemLast(&test_int, SIGNAL(lastSubscriberDisappeared(const QString&)));
-    QSignalSpy doubleItemFirst(&test_double, SIGNAL(firstSubscriberAppeared(const QString&)));
-    QSignalSpy doubleItemLast(&test_double, SIGNAL(lastSubscriberDisappeared(const QString&)));
-    QSignalSpy stringItemFirst(&test_string, SIGNAL(firstSubscriberAppeared(const QString&)));
-    QSignalSpy stringItemLast(&test_string, SIGNAL(lastSubscriberDisappeared(const QString&)));
-    QSignalSpy boolItemFirst(&test_bool, SIGNAL(firstSubscriberAppeared(const QString&)));
-    QSignalSpy boolItemLast(&test_bool, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy intItemFirst(test_int, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy intItemLast(test_int, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy doubleItemFirst(test_double, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy doubleItemLast(test_double, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy stringItemFirst(test_string, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy stringItemLast(test_string, SIGNAL(lastSubscriberDisappeared(const QString&)));
+    QSignalSpy boolItemFirst(test_bool, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy boolItemLast(test_bool, SIGNAL(lastSubscriberDisappeared(const QString&)));
 
     // Ask the client to call GetSubscriber (for both provider bus names), ignore the result
     writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
