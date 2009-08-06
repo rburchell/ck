@@ -133,27 +133,27 @@ void HalProvider::updateProperties()
    
     // Calculate and set ChargePercentage
     if (chargePercentageV != QVariant()) 
-        chargePercentage.set(chargePercentageV.toInt());
+        chargePercentage.setValue(chargePercentageV.toInt());
     else
-        chargePercentage.unset();
+        chargePercentage.unsetValue();
 
     // Calculate and set OnBattery
     if (isDischargingV != QVariant()) 
-        onBattery.set(isDischargingV.toBool());
+        onBattery.setValue(isDischargingV.toBool());
     else
-        onBattery.unset();
+        onBattery.unsetValue();
 
     // Calculate the LowBattery
     if (isDischargingV == QVariant()) 
-        lowBattery.unset();
+        lowBattery.unsetValue();
     else if (isDischargingV.toBool() == false) 
-        lowBattery.set(false);
+        lowBattery.setValue(false);
     else if (chargePercentageV == QVariant())
-        lowBattery.unset();
+        lowBattery.unsetValue();
     else if (chargePercentageV.toInt() < BATTERY_LOW_THRESHOLD)
-        lowBattery.set(true);
+        lowBattery.setValue(true);
     else {
-        lowBattery.set(false);
+        lowBattery.setValue(false);
     }
 
     // Calculate the time until low. 
@@ -168,9 +168,9 @@ void HalProvider::updateProperties()
             timeUntilLowV = 0;
 
         timeUntilLowV *= 3600; // Seconds
-        timeUntilLow.set((int) timeUntilLowV);
+        timeUntilLow.setValue((int) timeUntilLowV);
     } else
-        timeUntilLow.unset();
+        timeUntilLow.unsetValue();
 
     // Calculate the time until full.
     if (chargeCurrentV != QVariant() &&
@@ -180,9 +180,9 @@ void HalProvider::updateProperties()
 
         double timeUntilFullV = (lastFullV.toDouble() - chargeCurrentV.toDouble()) / rateV.toDouble();
         timeUntilFullV *= 3600; // Seconds
-        timeUntilFull.set((int) timeUntilFullV);
+        timeUntilFull.setValue((int) timeUntilFullV);
     } else
-        timeUntilFull.unset();
+        timeUntilFull.unsetValue();
 }
 
 }

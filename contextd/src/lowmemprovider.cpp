@@ -105,22 +105,22 @@ void LowMemProvider::onWatermarkStateChanged()
     if (lowWMState == BoolSysFsPooler::TriStateFalse && 
         highWMState == BoolSysFsPooler::TriStateFalse) {
         // normal
-        memoryPressure.set(0);
+        memoryPressure.setValue(0);
     } else if (lowWMState == BoolSysFsPooler::TriStateTrue && 
                highWMState == BoolSysFsPooler::TriStateFalse) {
         // high
-        memoryPressure.set(1);
+        memoryPressure.setValue(1);
     } else if (lowWMState == BoolSysFsPooler::TriStateTrue && 
                highWMState == BoolSysFsPooler::TriStateTrue) {
         // critical
-        memoryPressure.set(2);
+        memoryPressure.setValue(2);
     } else if (lowWMState == BoolSysFsPooler::TriStateFalse && 
                highWMState == BoolSysFsPooler::TriStateTrue) {
         // ignore rogue state
         return;
     } else {
         // undefined */
-        memoryPressure.unset();
+        memoryPressure.unsetValue();
         return;
     }
 }
