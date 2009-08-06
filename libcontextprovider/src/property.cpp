@@ -62,20 +62,20 @@ namespace ContextProvider {
 /// Constructor. This creates a new context property that should
 /// be used to provide/set values and get notified about subscribers appearing.
 Property::Property(Service &service, const QString &k, QObject* parent)
-    : QObject(parent), manager(NULL), key(k)
+    : QObject(parent), manager(NULL), myKey(k)
 {
-    contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
+    contextDebug() << F_PROPERTY << "Creating new Property for key:" << myKey;
 
     service.add(this);
 }
 
 Property::Property(const QString &k, QObject* parent)
-    : QObject(parent), manager(NULL), key(k)
+    : QObject(parent), manager(NULL), myKey(k)
 {
     if (Service::defaultService == NULL)
         contextCritical() << "No default service set.";
     else {
-        contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
+        contextDebug() << F_PROPERTY << "Creating new Property for key:" << myKey;
         Service::defaultService->add(this);
     }
 }
@@ -97,7 +97,7 @@ void Property::setManager(Manager *manager)
 bool Property::keyCheck() const
 {
     if (manager == NULL) {
-        contextWarning() << "Trying to manipulate an invalid key:" << key;
+        contextWarning() << "Trying to manipulate an invalid key:" << myKey;
         return false;
     } else
         return true;
@@ -115,13 +115,13 @@ bool Property::isSet() const
     if (! keyCheck())
         return false;
         
-    return (manager->getKeyValue(key) != QVariant());
+    return (manager->getKeyValue(myKey) != QVariant());
 }
 
 /// Returns the name of the key this Property represents.
-QString Property::getKey() const
+QString Property::key() const
 {
-    return key;
+    return myKey;
 }
 
 /// Unsets the value. The key value becomes undetermined.
@@ -130,7 +130,7 @@ void Property::unsetValue()
     if (! keyCheck())
         return;
 
-    manager->setKeyValue(key, QVariant());
+    manager->setKeyValue(myKey, QVariant());
 }
 
    
@@ -140,24 +140,24 @@ void Property::setValue(const QVariant &v)
     if (! keyCheck())
         return;
         
-    manager->setKeyValue(key, v);
+    manager->setKeyValue(myKey, v);
 }
 
 /// Returns the current value of the property. The returned QVariant is invalid 
 /// if the key value is undetermined or the Property is invalid.
-QVariant Property::getValue()
+QVariant Property::value()
 {
     if (! keyCheck())
         return QVariant();
         
-    return manager->getKeyValue(key);
+    return manager->getKeyValue(myKey);
 }
 
 /// Called by Manager when first subscriber appears. Delegated if 
 /// this concerns us.
 void Property::onManagerFirstSubscriberAppeared(const QString &key)
 {
-    if (key == this->key) {
+    if (key == myKey) {
         contextDebug() << F_SIGNALS << F_PROPERTY << "First subscriber appeared for key:" << key;
         emit firstSubscriberAppeared(key);
     }
@@ -167,7 +167,7 @@ void Property::onManagerFirstSubscriberAppeared(const QString &key)
 /// this concerns us.
 void Property::onManagerLastSubscriberDisappeared(const QString &key)
 {
-    if (key == this->key) {
+    if (key == myKey) {
         contextDebug() << F_SIGNALS << F_PROPERTY << "Last subscriber disappeared for key:" << key;
         emit lastSubscriberDisappeared(key);
     }
@@ -176,7 +176,7 @@ void Property::onManagerLastSubscriberDisappeared(const QString &key)
 /// Destructor.
 Property::~Property()
 {
-    contextDebug() << F_PROPERTY << F_DESTROY << "Destroying Property for key:" << key;
+    contextDebug() << F_PROPERTY << F_DESTROY << "Destroying Property for key:" << myKey;
 }
 
 } // end namespace

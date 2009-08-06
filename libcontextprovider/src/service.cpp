@@ -71,7 +71,7 @@ void Service::start()
 
     QStringList keys;
     foreach (Property *p, props)
-        keys << p->getKey();
+        keys << p->key();
 
     connection = new QDBusConnection(QDBusConnection::connectToBus(busType, busName));
     manager = new Manager(keys);

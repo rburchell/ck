@@ -43,12 +43,12 @@ public:
     explicit Property(const QString &key, QObject *parent = 0);
     virtual ~Property();
 
-    QString getKey() const;
+    QString key() const;
     bool isValid() const;
     bool isSet() const;
     
     void setValue(const QVariant &v);
-    QVariant getValue();
+    QVariant value();
     void unsetValue();
    
 private:
@@ -56,7 +56,7 @@ private:
     bool keyCheck() const;
 
     Manager *manager;
-    QString key;
+    QString myKey;
 
     friend class Service;
 

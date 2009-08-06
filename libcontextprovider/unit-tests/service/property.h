@@ -40,7 +40,7 @@ public:
 
     void setManager(Manager *);
 
-    QString getKey();
+    QString key();
 
 signals:
     void firstSubscriberAppeared(const QString &key);
