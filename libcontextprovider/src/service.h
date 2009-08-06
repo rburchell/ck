@@ -48,6 +48,8 @@ public:
 
     void setAsDefault();
 
+    void setValue(const QString &key, const QVariant &val);
+
 private:
     QList<Property *> props;
     QDBusConnection::BusType busType;

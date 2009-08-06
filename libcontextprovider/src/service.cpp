@@ -165,6 +165,11 @@ void Service::setAsDefault()
     defaultService = this;
 }
 
+void Service::setValue(const QString &key, const QVariant &val)
+{
+    manager->setKeyValue(key, val);
+}
+
 /// Start the Service again after it has been stopped.  All clients
 /// will resubscribe to its properties.
 void Service::start()
