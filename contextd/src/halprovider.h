@@ -38,7 +38,7 @@ class HalProvider : public QObject
     Q_OBJECT
 
 public:
-    HalProvider(Service &service);
+    HalProvider();
 
 private:
     void updateProperties();

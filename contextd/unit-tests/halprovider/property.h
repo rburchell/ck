@@ -1,47 +1,49 @@
 /*
- * Copyright (C) 2008, 2009 Nokia Corporation.
+ * Copyright (C) 2008 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
- * This program is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * version 2.1 as published by the Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
+ * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
  *
  */
 
-#ifndef CONTEXTGROUP_H
-#define CONTEXTGROUP_H
+#ifndef PROPERTY_H
+#define PROPERTY_H
 
 #include <QObject>
-#include <QSet>
+#include <QString>
 #include <QStringList>
+#include <QDBusConnection>
+#include <QHash>
+#include <QVariant>
 
 namespace ContextProvider {
 
-class Property;
-
-class Group : public QObject
+class Property : public QObject
 {
     Q_OBJECT
-    
-public:
-    explicit Group(QStringList propertiesToWatch, QObject* parent = 0);
-    void fakeFirst();
-    void fakeLast();
 
-signals:
-    void firstSubscriberAppeared();
-    void lastSubscriberDisappeared();
+public:
+    explicit Property(const QString &key, QObject *parent = 0);
+        
+    void setValue(const QVariant &v);
+    void unsetValue();
+    QVariant value();
+
+private:
+    QString key;
 };
 
 }

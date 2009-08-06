@@ -55,7 +55,7 @@ namespace ContextD {
     Communication with Hal happens over DBus.
 */
 
-HalProvider::HalProvider(Service &service) 
+HalProvider::HalProvider() 
     : onBattery("Battery.OnBattery"), lowBattery("Battery.LowBattery"), 
       chargePercentage("Battery.ChargePercentage"), timeUntilLow("Battery.TimeUntilLow"), 
       timeUntilFull("Battery.TimeUntilFull")
