@@ -61,14 +61,14 @@ HalProvider::HalProvider(Service &service)
       timeUntilFull("Battery.TimeUntilFull")
 {
     contextDebug() << F_HAL << "Initializing hal provider";
-    QStringList list;
-    list << "Battery.OnBattery";
-    list << "Battery.ChargePercentage";
-    list << "Battery.LowBattery";
-    list << "Battery.TimeUntilLow";
-    list << "Battery.TimeUntilFull";
-
-    group = new Group(service, list, this); // FIXME DEFAULT
+    
+    QSet<Property*> props;
+    props << &onBattery;
+    props << &chargePercentage;
+    props << &lowBattery;
+    props << &timeUntilLow;
+    props << &timeUntilFull;
+    group = new Group(props, this);
 
     sconnect(group, SIGNAL(firstSubscriberAppeared()),
             this, SLOT(onFirstSubscriberAppeared()));

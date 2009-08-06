@@ -25,7 +25,6 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include "manager.h"
 #include "property.h"
 #include "group.h"
 #include "haldeviceinterface.h"
