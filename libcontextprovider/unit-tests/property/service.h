@@ -3,41 +3,31 @@
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
- * This program is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * version 2.1 as published by the Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
+ * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
+ * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
  *
  */
-
-#ifndef MANAGERADAPTOR_H
-#define MANAGERADAPTOR_H
-
 #include <QObject>
-#include <QDBusAbstractAdaptor>
-#include <QDBusConnection>
-#include "manager.h"
 
 namespace ContextProvider {
 
-class ManagerAdaptor: public QDBusAbstractAdaptor
-{
-    Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "org.freedesktop.ContextKit.Manager")
+    class Property;
 
-public:
-    ManagerAdaptor (Manager* manager, QDBusConnection *connection);
-};
-
-} // namespace ContextProvider
-
-#endif
+    class Service : public QObject
+    {
+    public:
+        void add(Property* prop);
+        static Service* defaultService;
+    };
+}

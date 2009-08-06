@@ -23,7 +23,6 @@
 #include "property.h"
 #include "logging.h"
 #include "manager.h"
-#include "manageradaptor.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
 

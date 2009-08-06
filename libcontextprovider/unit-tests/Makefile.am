@@ -1,6 +1,6 @@
 SUBDIRS = manager	\
 	  subscriber	\
-	  context	\
+	  property	\
 	  contextgroup	\
 	  contextc	\
 	  service

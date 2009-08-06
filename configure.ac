@@ -71,7 +71,7 @@ AC_CONFIG_FILES([
         libcontextprovider/unit-tests/manager/Makefile
         libcontextprovider/unit-tests/subscriber/Makefile
         libcontextprovider/unit-tests/contextgroup/Makefile
-        libcontextprovider/unit-tests/context/Makefile
+        libcontextprovider/unit-tests/property/Makefile
         libcontextprovider/unit-tests/service/Makefile
         libcontextprovider/unit-tests/contextc/Makefile
         libcontextprovider/customer-tests/Makefile
