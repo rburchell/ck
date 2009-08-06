@@ -1,12 +1,11 @@
 bin_PROGRAMS = typestests
 
-typestests_SOURCES = typestests.cpp sconnect.h \
-							typestests.h
+typestests_SOURCES = typestests.cpp typestests.h
 
 check-customer:
 	PATH=$$PATH:../client CONTEXT_LOG_VERBOSITY=WARNING ./typestests
 
-AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)  $(QtTest_CFLAGS) -I$(srcdir)/../../src
+AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)  $(QtTest_CFLAGS) -I$(srcdir)/../../src -I$(top_srcdir)/common
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) $(QtTest_LIBS)
 typestests_LDADD = ../../src/libcontextprovider.la
 ../../src/libcontextprovider.la:
