@@ -33,6 +33,8 @@ namespace ContextProvider {
 class Property;
 class Service;
 
+class GroupPrivate;
+
 class Group : public QObject
 {
     Q_OBJECT
@@ -61,8 +63,7 @@ private slots:
     void onLastSubscriberDisappeared();
 
 private:
-    int propertiesSubscribedTo; ///< Number of Context objects currently subscribed to.
-    QSet<Property *> properties;
+    GroupPrivate *priv;
 };
 
 } // end namespace

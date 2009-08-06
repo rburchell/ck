@@ -72,14 +72,22 @@ namespace ContextProvider {
 
 */
 
+struct GroupPrivate {
+    int propertiesSubscribedTo;
+    QSet<Property *> properties;
+};
+
 /// Constructs a Group which watches the given set of Property objects.
 Group::Group(QSet<Property*> propertiesToWatch, QObject* parent)
-    : QObject(parent), propertiesSubscribedTo(0)
+    : QObject(parent)
 {
     contextDebug() << F_GROUP << "Creating new Group with" << propertiesToWatch.size() << "keys";
-    
+
+    priv = new GroupPrivate;
+    priv->propertiesSubscribedTo = 0;
+
     foreach(Property* property, propertiesToWatch) {
-        properties << property;
+        priv->properties << property;
         sconnect(property, SIGNAL(firstSubscriberAppeared(const QString&)),
                  this, SLOT(onFirstSubscriberAppeared()));
         sconnect(property, SIGNAL(lastSubscriberDisappeared(const QString&)),
@@ -89,13 +97,16 @@ Group::Group(QSet<Property*> propertiesToWatch, QObject* parent)
 
 /// Constructs a Group which listens to the given set of context keys
 Group::Group(Service &service, QStringList propertiesToWatch, QObject* parent)
-    : QObject(parent), propertiesSubscribedTo(0)
+    : QObject(parent)
 {
     contextDebug() << F_GROUP << "Creating new Group with" << propertiesToWatch.size() << "keys";
 
+    priv = new GroupPrivate;
+    priv->propertiesSubscribedTo = 0;
+
     foreach(QString key, propertiesToWatch) {
         Property* property = new Property(service, key, this);
-        properties << property;
+        priv->properties << property;
         sconnect(property, SIGNAL(firstSubscriberAppeared(const QString&)),
                  this, SLOT(onFirstSubscriberAppeared()));
         sconnect(property, SIGNAL(lastSubscriberDisappeared(const QString&)),
@@ -105,14 +116,14 @@ Group::Group(Service &service, QStringList propertiesToWatch, QObject* parent)
 
 QSet<Property *> Group::getProperties()
 {
-    return properties;
+    return priv->properties;
 }
 
 /// Called when any of the watched Property objects is subscribed to.
 void Group::onFirstSubscriberAppeared()
 {
-    ++propertiesSubscribedTo;
-    if (propertiesSubscribedTo == 1) {
+    ++priv->propertiesSubscribedTo;
+    if (priv->propertiesSubscribedTo == 1) {
         contextDebug() << F_GROUP << F_SIGNALS << "First subscriber appeared for group";
         emit firstSubscriberAppeared();
     }
@@ -121,8 +132,8 @@ void Group::onFirstSubscriberAppeared()
 /// Called when any of the watched Property objects is unsubscribed from.
 void Group::onLastSubscriberDisappeared()
 {
-    --propertiesSubscribedTo;
-    if (propertiesSubscribedTo == 0) {
+    --priv->propertiesSubscribedTo;
+    if (priv->propertiesSubscribedTo == 0) {
         contextDebug() << F_GROUP << F_SIGNALS << "Last subscriber gone for group";
         emit lastSubscriberDisappeared();
     }
@@ -131,13 +142,14 @@ void Group::onLastSubscriberDisappeared()
 /// Returns true iff any Property objects in the group are subscribed to.
 bool Group::isSubscribedTo() const
 {
-    return (propertiesSubscribedTo > 0);
+    return (priv->propertiesSubscribedTo > 0);
 }
 
 /// Destructor
 Group::~Group()
 {
     contextDebug() << F_GROUP << F_DESTROY << "Destroying Group";
+    delete priv;
 }
 
 } // end namespace
