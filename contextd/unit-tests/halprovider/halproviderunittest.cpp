@@ -126,9 +126,14 @@ QStringList HalManagerInterface::findDeviceByCapability(const QString &capabilit
 
 /* Mocked Group */
 
-Group::Group(QSet<Property*> props, QObject* parent)
+Group::Group(QObject *o)
 {
     lastGroup = this;
+}
+
+Group& Group::operator<<(const Property &prop)
+{
+    return *this;
 }
 
 void Group::fakeFirst()

@@ -35,7 +35,8 @@ class Group : public QObject
     Q_OBJECT
     
 public:
-    explicit Group(QSet<Property*> propertiesToWatch, QObject* parent = 0);
+    explicit Group(QObject* parent = 0);
+    Group& operator<<(const Property &prop);
     void fakeFirst();
     void fakeLast();
 

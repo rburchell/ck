@@ -48,7 +48,7 @@ private:
     Property chargePercentage; ///< Battery.ChargePercentage
     Property timeUntilLow; ///< Battery.TimeUntilLow
     Property timeUntilFull; ///< Battery.TimeUntilFull
-    Group *group; ///< Group with all the context properties
+    Group group; ///< Group with all the context properties
     HalDeviceInterface *batteryDevice; ///< The interface to the battery device
 
 private slots:
