@@ -24,7 +24,8 @@ check-customer:
 	$(MAKE) -C libcontextsubscriber/customer-tests check-customer
 
 coverage: covoptioncheck
-	$(MAKE) -C libcontextsubscriber/unit-tests coverage
+	$(MAKE) -C libcontextsubscriber/unit-tests coverage \
+	&& $(MAKE) -C libcontextprovider/unit-tests coverage
 
 .PHONY: coverage check-customer check-sum
 
