@@ -19,10 +19,8 @@
  *
  */
 
-#ifndef CONTEXTGROUP_H
-#define CONTEXTGROUP_H
-
-// FIXME: Add this class (and others) to a namespace.
+#ifndef GROUP_H
+#define GROUP_H
 
 #include <QObject>
 #include <QSet>

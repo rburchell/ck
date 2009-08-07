@@ -87,7 +87,7 @@ namespace ContextProvider {
   {
       QApplication app (argc, argv);
 
-      Service my_service (Service::session_bus, "com.example.simple");
+      Service my_service (QDBusConnection::SessionBus, "com.example.simple");
       Property my_property (my_service, "Example.Simple");
 
       // set initial value of property
@@ -106,7 +106,7 @@ namespace ContextProvider {
 */
 
 /*!
-    \class Service
+    \class Service ContextKit ContextKit
 
     \brief A Service object represents a service name on D-Bus that
     implements the Context Framework interface.
@@ -117,13 +117,14 @@ namespace ContextProvider {
     visible via D-Bus and clients can subscribe to its properties.
 
     It is undefined what happens when you add a Property object to a
-    running service after a client has already tried to subscribe to
-    it.  The client might be notified about changes to that property,
-    or it might not.  (XXX - we remove this undefinedness.)
+    running service.  Likewise, it is undefined what happens when you
+    add a Property to a Group while the Service of that Property
+    object is running.
 
     Thus, it is best to create a Service object, add all Property
-    objects to it immediately, and then enter the main loop, which
-    will cause the Service to start.
+    objects to it immediately, create the Group objects for them, and
+    then enter the main loop, which will cause the Service to start.
+
 */
 
 struct ServicePrivate {
