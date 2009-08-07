@@ -22,8 +22,6 @@
 #ifndef CONTEXTGROUP_H
 #define CONTEXTGROUP_H
 
-// FIXME: Add this class (and others) to a namespace.
-
 #include <QObject>
 #include <QSet>
 #include <QStringList>
