@@ -1,7 +1,7 @@
 check_PROGRAMS = propertyunittest
 
 # test's sources
-propertyunittest_SOURCES = propertyunittest.cpp manager.h
+propertyunittest_SOURCES = propertyunittest.cpp manager.h service.h
 
 COVERAGE_FILES = property.cpp
 
@@ -11,7 +11,6 @@ AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)
 AM_LDFLAGS = $(QtCore_LIBS) $(QtDBus_LIBS)
 FROM_SOURCE = loggingfeatures.h property.cpp property.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
-EXTRA_DIST=service.h
 LDADD = 
 include $(top_srcdir)/am/tests.am
 
