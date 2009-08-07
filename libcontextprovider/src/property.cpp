@@ -29,7 +29,7 @@
 namespace ContextProvider {
 
 /*!
-    \class Property
+    \class Property ContextProvider ContextProvider
 
     \brief A Property object represents a Context property.
 

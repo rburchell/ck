@@ -28,7 +28,7 @@
 
 namespace ContextProvider {
 
-/*! \class Group
+/*! \class Group ContextProvider ContextProvider
 
     \brief Groups the firstSubscriberAppeared and
     lastSubscriberDisappeared from multiple Property objects together.
