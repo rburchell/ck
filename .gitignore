@@ -31,7 +31,6 @@ missing
 stamp-h1
 _package
 *.libs
-contextprovider-1.0.pc
 *.gcno
 *.gcda
 *.pyc

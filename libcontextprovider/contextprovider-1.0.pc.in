@@ -6,6 +6,6 @@ includedir=@includedir@
 Name: contextprovider
 Description: ContextKit Context Provider library
 Version: @VERSION@
-Requires: QtCore QtDBus
+Requires: QtCore QtDBus dbus-1
 Libs: -L${libdir} -lcontextprovider
 Cflags: -I${includedir}/contextprovider
