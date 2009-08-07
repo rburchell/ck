@@ -3,7 +3,7 @@ check_PROGRAMS = contextgroupunittest
 # test's sources
 contextgroupunittest_SOURCES = contextgroupunittest.cpp service.h property.h
 
-COVERAGE_FILES = contextgroup.cpp 
+COVERAGE_FILES = group.cpp
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
