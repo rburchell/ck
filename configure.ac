@@ -104,6 +104,7 @@ AC_CONFIG_FILES([
 	libcontextsubscriber/multithreading-tests/wait-for-subscription-thread/Makefile
 	libcontextsubscriber/update-contextkit-providers/Makefile
 	contextd/Makefile
+	contextd/org.freedesktop.ContextKit.contextd.service
 	contextd/src/Makefile
 	contextd/unit-tests/Makefile
 	contextd/unit-tests/halprovider/Makefile
