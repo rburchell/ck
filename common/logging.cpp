@@ -369,9 +369,8 @@ bool ContextRealLogger::shouldPrint()
         foreach(QString feature, showFeatures) {
             if (features.contains(feature))
                 return true;
-            else
-                return false;
         }
+        return false;
     }
             
     return true;
