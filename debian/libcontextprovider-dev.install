@@ -1,4 +1,3 @@
 usr/lib/libcontextprovider.so
 usr/lib/pkgconfig/contextprovider-1.0.pc
 usr/include/contextprovider/*
-usr/share/vala/vapi/contextprovider.vapi
