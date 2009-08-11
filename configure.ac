@@ -19,6 +19,10 @@ PKG_CHECK_MODULES_SUBST([QtTest], [QtTest])
 PKG_CHECK_MODULES_SUBST([QtCore], [QtCore])
 PKG_CHECK_MODULES_SUBST([QtDBus], [QtDBus])
 PKG_CHECK_MODULES_SUBST([QtXml], [QtXml])
+# only for compiling c code
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.12.0])
+PKG_CHECK_MODULES([GOBJECT], [gobject-2.0 >= 2.12.0])
+
 AC_PROG_QT_MOC
 AC_PROG_QT_UIC
 AC_PROG_QT_RCC
@@ -76,6 +80,7 @@ AC_CONFIG_FILES([
 	libcontextsubscriber/customer-tests/update-contextkit-providers/Makefile
 	libcontextprovider/customer-tests/value-changes/Makefile
 	libcontextprovider/customer-tests/types/Makefile
+	libcontextprovider/customer-tests/c-api/Makefile
 	libcontextsubscriber/doc/Makefile
 	libcontextsubscriber/man/Makefile
 	libcontextsubscriber/src/Makefile
