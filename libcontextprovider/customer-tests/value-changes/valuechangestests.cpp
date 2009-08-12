@@ -50,6 +50,9 @@ void ValueChangesTests::init()
     test_double = new Property(*service, "Test.Double");
     service->start();
 
+    // Process the events so that the services get started
+    QCoreApplication::processEvents(QEventLoop::AllEvents);
+
     // Initialize test program state
     isReadyToRead = false;
 
@@ -325,7 +328,7 @@ QString ValueChangesTests::writeToClient(const char* input)
     // expects provider to reply to dbus calls
 
     while (!isReadyToRead) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
     // Return the output from the client
     return client->readAll();

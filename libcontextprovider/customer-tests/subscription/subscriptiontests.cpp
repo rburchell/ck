@@ -53,6 +53,9 @@ void SubscriptionTests::init()
     test_string = new Property (*service2, "Test.String");
     test_bool = new Property(*service2, "Test.Bool");
 
+    // Process the events so that the services get started
+    QCoreApplication::processEvents(QEventLoop::AllEvents);
+
     // Initialize test program state
     isReadyToRead = false;
 
@@ -121,7 +124,8 @@ void SubscriptionTests::subscribeReturnValueForUnknownProperty()
     QVERIFY(clientStarted);
 
     // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+    QString temp = writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
+    qWarning() << temp;
 
     // Ask the client to call Subscribe with 1 valid key. The property
     // is currently unknown since we haven't set a value for it.
@@ -284,7 +288,7 @@ QString SubscriptionTests::writeToClient(const char* input)
     // expects provider to reply to dbus calls
 
     while (!isReadyToRead) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
     // Return the output from the client
     return client->readAll();

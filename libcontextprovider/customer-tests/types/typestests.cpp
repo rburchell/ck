@@ -54,6 +54,9 @@ void TypesTests::init()
     timeItem = new Property (*service, "Test.Time");
     service->start();
 
+    // Process the events so that the service gets started
+    QCoreApplication::processEvents(QEventLoop::AllEvents);
+
     // Initialize test program state
     isReadyToRead = false;
 
@@ -211,7 +214,7 @@ QString TypesTests::writeToClient(const char* input)
     // expects provider to reply to dbus calls
 
     while (!isReadyToRead) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+        QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
     // Return the output from the client
     return client->readAll();
