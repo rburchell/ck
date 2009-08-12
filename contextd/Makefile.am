@@ -1,4 +1,4 @@
-SUBDIRS = src doc unit-tests
+SUBDIRS = src doc unit-tests customer-tests
 
 providerdir = $(datadir)/contextkit/providers/
 oldproviderdir = $(datadir)/context-providers/
@@ -14,9 +14,6 @@ check-sum:
 
 coverage: covoptioncheck
 	$(MAKE) -C unit-tests coverage
-
-check-customer:
-	$(MAKE) -C customer-tests check-customer
 
 .PHONY: coverage check-sum
 

@@ -36,7 +36,7 @@ install: build
 
 	# FIXME customer tests for contextd needed...
 	mkdir -p debian/tmp/usr/share/contextd-tests
-
+	cp -f contextd/customer-tests/*.py debian/tmp/usr/share/contextd-tests
 	cp -rf libcontextsubscriber/customer-tests/commander debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/asynchronicity debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/subscription debian/tmp/usr/share/libcontextsubscriber-tests/

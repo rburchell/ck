@@ -111,6 +111,7 @@ AC_CONFIG_FILES([
 	contextd/Makefile
 	contextd/org.freedesktop.ContextKit.contextd.service
 	contextd/src/Makefile
+	contextd/customer-tests/Makefile
 	contextd/unit-tests/Makefile
 	contextd/unit-tests/halprovider/Makefile
 	contextd/unit-tests/boolsysfspooler/Makefile
