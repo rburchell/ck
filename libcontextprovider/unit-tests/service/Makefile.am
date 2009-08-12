@@ -9,7 +9,7 @@ COVERAGE_FILES = service.cpp
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)
 AM_LDFLAGS = $(QtCore_LIBS) $(QtDBus_LIBS)
-FROM_SOURCE = loggingfeatures.h service.cpp service.h
+FROM_SOURCE = loggingfeatures.h service.cpp service.h queuedinvoker.h queuedinvoker.cpp
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am

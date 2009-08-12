@@ -22,6 +22,8 @@
 #ifndef SERVICE_H
 #define SERVICE_H
 
+#include "queuedinvoker.h"
+
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -35,7 +37,7 @@ class Manager;
 class Property;
 class ServicePrivate;
 
-class Service : public QObject
+class Service : public QueuedInvoker
 {
     Q_OBJECT
 
@@ -61,7 +63,7 @@ private:
     friend class Property;
 
 private slots:
-    void startMe();
+    Q_INVOKABLE void startMe();
 };
 
 } // end namespace

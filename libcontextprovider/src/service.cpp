@@ -19,8 +19,6 @@
  *
  */
 
-#include <QTimer>
-
 #include "service.h"
 #include "property.h"
 #include "logging.h"
@@ -140,7 +138,7 @@ Service *Service::defaultService;
 /// busType.  The service will be initially stopped and will
 /// automatically start itself when the main loop is entered.
 Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
-    : QObject(parent)
+    : QueuedInvoker(parent)
 {
     contextDebug() << F_SERVICE << "Creating new Service for" << busName;
 
@@ -150,7 +148,7 @@ Service::Service(QDBusConnection::BusType busType, const QString &busName, QObje
     priv->manager = new Manager();
     priv->connection = NULL;
 
-    QTimer::singleShot(0, this, SLOT(startMe()));
+    queueOnce("startMe");
 }
 
 Service::~Service()
