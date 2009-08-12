@@ -242,7 +242,7 @@ QString CommandWatcher::describeValuesAndUnknowns(const QMap<QString, QVariant>&
         parameterDescription += (key + "(" + value.typeName() + ":" + describeQVariant(value) + ") ");
     }
 
-    parameterDescription +=" Unknown keys: ";
+    parameterDescription +="Unknown keys: ";
     foreach (const QString& key, unknownKeys) {
         parameterDescription += (key + " ");
     }

@@ -60,6 +60,11 @@ int group2_subscribed = 0;
 int single1_subscribed = 0;
 int single2_subscribed = 0;
 
+int group1_cb_callcount = 0;
+int group2_cb_callcount = 0;
+int single1_cb_callcount = 0;
+int single2_cb_callcount = 0;
+
 /*
   This function is called when the subscription status of the
   group group1 changes.
@@ -67,6 +72,7 @@ int single2_subscribed = 0;
 void group1_cb(int subscribed, void* user_data)
 {
     group1_subscribed = subscribed;
+    ++ group1_cb_callcount;
 }
 
 /*
@@ -76,6 +82,7 @@ void group1_cb(int subscribed, void* user_data)
 void group2_cb(int subscribed, void* user_data)
 {
     group2_subscribed = subscribed;
+    ++ group2_cb_callcount;
 }
 
 /*
@@ -85,6 +92,7 @@ void group2_cb(int subscribed, void* user_data)
 void single1_cb(int subscribed, void* user_data)
 {
     single1_subscribed = subscribed;
+    ++ single1_cb_callcount;
 }
 
 /*
@@ -94,6 +102,7 @@ void single1_cb(int subscribed, void* user_data)
 void single2_cb(int subscribed, void* user_data)
 {
     single2_subscribed = subscribed;
+    ++ single2_cb_callcount;
 }
 
 /* Pipes to and from the client program.  The test program commands
@@ -143,7 +152,7 @@ int compare_output(char* expected)
 {
     int i = 0;
     if (strncmp(line_from_client, expected, chars_read - 1)) {
-        fprintf(stderr, "Actual output  : \"%s\"\n", line_from_client);
+        fprintf(stderr, "\nActual output  : \"%s\"\n", line_from_client);
         fprintf(stderr, "Expected output: \"%s\"\n", expected);
         fprintf(stderr, "Characters read: \"");
         for (i=0; i < chars_read; ++i) fprintf(stderr, "*");
@@ -204,31 +213,67 @@ int test_subscription()
                     "Group1.Int\n");
 
     /* Expected result: the client got the key as Unknown */
-    int mismatch = compare_output("Known keys:  Unknown keys: Group1.Int \n");
+    int mismatch = compare_output("Known keys: Unknown keys: Group1.Int \n");
     if (mismatch) return 1;
 
     /* Expected result: we are notified that the client is now subscribed */
     if (!group1_subscribed) return 1;
+    if (group1_cb_callcount != 1) return 1;
 
     /* Test: set a value to a key and command the client to subscribe to it */
     context_provider_set_double("Group1.Double", 55.2);
     write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
                     "Group1.Double\n");
 
-    /* Expected result: the client got the key as Unknown */
-    mismatch = compare_output("Known keys: Group1.Double(double:55.2)  "
+    /* Expected result: the client got the key and the value */
+    mismatch = compare_output("Known keys: Group1.Double(double:55.2) "
                                   "Unknown keys:  \n");
     if (mismatch) return 1;
 
-    /* Expected result: we are still subscribed */
+    /* Expected result: we are still subscribed but not notified again */
     if (!group1_subscribed) return 1;
+    if (group1_cb_callcount != 1) return 1;
 
+    /* Test: set 2 more values and command the client to subscribe to them */
+    context_provider_set_string("Group1.String", "teststring");
+    context_provider_set_boolean("Group1.Bool", 1);
+
+    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
+                    "Group1.String Group1.Bool\n");
+
+    /* Expected result: the client got the keys and the values */
+    mismatch = compare_output("Known keys: Group1.Bool(bool:true) "
+                              "Group1.String(QString:teststring) "
+                              "Unknown keys:  \n");
+    if (mismatch) return 1;
+
+    /* Expected result: we are still subscribed but not notified again */
+    if (!group1_subscribed) return 1;
+    if (group1_cb_callcount != 1) return 1;
+
+    /* Expected result: during the whole test, non-relevant callbacks
+     * are not called */
+    if (group2_cb_callcount != 0) return 1;
+    if (single1_cb_callcount != 0) return 1;
+    if (single2_cb_callcount != 0) return 1;
 
     return 0;
 }
 
 int test_value_changes()
 {
+    /* Test: change a subscribed property and command the client to
+     * wait the Changed signal */
+    context_provider_set_double("Group1.Double", -41.987);
+    write_to_client("waitforchanged 3000\n");
+
+    /* Expected result: the client got the signal */
+    int mismatch = compare_output("Changed signal received, parameters: "
+                              "Known keys: Group1.Double(double:-41.987) "
+                              "Unknown keys:  \n");
+    if (mismatch) return 1;
+
+
     return 0;
 }
 
@@ -268,6 +313,14 @@ int run_tests()
 
     fprintf(stderr, "Running test_subscription... ");
     ret = test_subscription();
+    if (ret) {
+        fprintf(stderr, "FAIL\n");
+        return ret;
+    }
+    fprintf(stderr, "SUCCESS\n");
+
+    fprintf(stderr, "Running test_value_changes... ");
+    ret = test_value_changes();
     if (ret) {
         fprintf(stderr, "FAIL\n");
         return ret;
