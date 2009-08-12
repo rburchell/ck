@@ -109,14 +109,13 @@ char* write_to_client(char* command)
     struct timeval tv;
     int ret = -1;
 
-    int temp;
     /* Write the command to the client */
-    temp = dprintf(tube[1], command);
+    dprintf(tube[1], command);
 
     /* Process the events until we can read from the client */
     do {
         /*fprintf(stderr, "processing\n");*/
-        g_main_context_iteration(NULL, TRUE);
+        g_main_context_iteration(NULL, FALSE);
 
         FD_ZERO(&read_fds);
         FD_SET(tube[1], &read_fds);
@@ -132,8 +131,25 @@ char* write_to_client(char* command)
 
     chars_read = read(tube[1], line_from_client, 1023);
     line_from_client[chars_read] = '\0';
-    /*fprintf(stderr, "%s\n", line_from_client);*/
+    /*fprintf(stderr, "\"%s\"\n", line_from_client);*/
 
+    return 0;
+}
+
+/* A helper function for comparing the actual output (from the client)
+   to expected output.
+ */
+int compare_output(char* expected)
+{
+    int i = 0;
+    if (strncmp(line_from_client, expected, chars_read - 1)) {
+        fprintf(stderr, "Actual output  : \"%s\"\n", line_from_client);
+        fprintf(stderr, "Expected output: \"%s\"\n", expected);
+        fprintf(stderr, "Characters read: \"");
+        for (i=0; i < chars_read; ++i) fprintf(stderr, "*");
+        fprintf(stderr, "\n");
+        return 1;
+    }
     return 0;
 }
 
@@ -141,7 +157,6 @@ char* write_to_client(char* command)
   Test cases. Note that the test cases are *not* independent and
   include only a minimal set of tests for the C api.
 */
-
 int test_init()
 {
     /* Test: initialize using the library */
@@ -161,25 +176,54 @@ int test_init()
     context_provider_install_key(single2_key, FALSE,
                                  single2_cb, NULL);
 
+    /* Process the events, hoping that the DBus objects now get
+     * initialized properly */
+    while (g_main_context_pending(NULL)) {
+        g_main_context_iteration(NULL, FALSE);
+    }
     return 0;
 }
 
 int test_get_subscriber()
 {
     /* Test: Command the client to execute GetSubscriber over DBus. */
-    write_to_client("getsubscriber session org.freedesktop.ContextKit.testProvider\n");
+    write_to_client("getsubscriber "
+                    "session org.freedesktop.ContextKit.testProvider\n");
 
     /* Expected result: the client got a correct subscriber path */
-    int mismatch = strncmp(line_from_client,
-                           "GetSubscriber returned "
-                           "/org/freedesktop/ContextKit/Subscriber/0",
-                           chars_read-1);
+    int mismatch = compare_output("GetSubscriber returned "
+                           "/org/freedesktop/ContextKit/Subscriber/0\n");
     if (mismatch) return 1;
     return 0;
 }
 
 int test_subscription()
 {
+    /* Test: Command the client to execute Subscribe over DBus. */
+    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
+                    "Group1.Int\n");
+
+    /* Expected result: the client got the key as Unknown */
+    int mismatch = compare_output("Known keys:  Unknown keys: Group1.Int \n");
+    if (mismatch) return 1;
+
+    /* Expected result: we are notified that the client is now subscribed */
+    if (!group1_subscribed) return 1;
+
+    /* Test: set a value to a key and command the client to subscribe to it */
+    context_provider_set_double("Group1.Double", 55.2);
+    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
+                    "Group1.Double\n");
+
+    /* Expected result: the client got the key as Unknown */
+    mismatch = compare_output("Known keys: Group1.Double(double:55.2)  "
+                                  "Unknown keys:  \n");
+    if (mismatch) return 1;
+
+    /* Expected result: we are still subscribed */
+    if (!group1_subscribed) return 1;
+
+
     return 0;
 }
 
@@ -210,8 +254,20 @@ int run_tests()
     }
     fprintf(stderr, "SUCCESS\n");
 
+    /* Uncomment this if you want to run the test program as a
+       stand-alone provider:*/
+    /* while (1) g_main_context_iteration(NULL, FALSE);*/
+
     fprintf(stderr, "Running test_get_subscriber... ");
     ret = test_get_subscriber();
+    if (ret) {
+        fprintf(stderr, "FAIL\n");
+        return ret;
+    }
+    fprintf(stderr, "SUCCESS\n");
+
+    fprintf(stderr, "Running test_subscription... ");
+    ret = test_subscription();
     if (ret) {
         fprintf(stderr, "FAIL\n");
         return ret;
@@ -237,10 +293,10 @@ int main(int argc, char **argv)
 
     if (fork() == 0) {
         /* child process */
-
         close(tube[1]);
-        dup2(tube[0], 0);   /* standard input from the stream pipe */
-        dup2(tube[0], 1);   /* standard output to the same descriptor */
+        dup2(tube[0], 0); /* standard input from the stream pipe */
+        dup2(tube[0], 1); /* standard output to the same descriptor */
+        close(2); /* close stderr to reduce output when running the test */
 
         char* arg_list[] = {"client", NULL};
         execvp("client", arg_list);
