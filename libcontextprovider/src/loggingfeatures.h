@@ -30,5 +30,6 @@
 #define F_DESTROY       (ContextFeature("destroy"))
 #define F_SIGNALS       (ContextFeature("signals"))
 #define F_DBUS          (ContextFeature("dbus"))
+#define F_C             (ContextFeature("cbindings"))
 
 #endif

@@ -26,6 +26,9 @@
 #include "logging.h"
 #include "sconnect.h"
 #include "listeners.h"
+#include "loggingfeatures.h"
+
+#include <QCoreApplication>
 
 namespace ContextProvider {
 }
@@ -81,11 +84,24 @@ static Service *cService;
 
 QList<Listener*> *listeners = NULL;
 
+char argv[] = "libcontextprovider";
+char* p= argv;
+int argc = 1;
+QCoreApplication* app = 0;
+
 /// Initializes and starts the service with a given \a bus_type and a \a bus_name.
 /// Te \a bus_type can be DBUS_BUS_SESSION or DBUS_BUS_SYSTEM. This function can be 
 /// called only once till a matching context_provider_stop is called. 
 int context_provider_init (DBusBusType bus_type, const char* bus_name)
 {
+    contextDebug() << F_C << bus_name;
+
+    if (QCoreApplication::instance() == 0) {
+        // No QCoreApplication created, so crate one.
+        // This will also create an event dispatcher (QEventDispatcherGlibPrivate.)
+        app = new QCoreApplication(argc, &p);
+    }
+
     if (cService != NULL) {
         contextCritical() << "Service already initialize. You can only initialize one service with C API";
         return 0;
@@ -104,6 +120,7 @@ int context_provider_init (DBusBusType bus_type, const char* bus_name)
 /// this function a new service can be started by calling context_provider_init. 
 void context_provider_stop (void)
 {
+    contextDebug() << F_C;
     if (cService) {
         contextDebug() << "Stopping service";
 
@@ -117,6 +134,7 @@ void context_provider_stop (void)
         delete cService;
         cService = NULL;
     }
+    // FIXME: Do we need to do something with the QCoreApplication we might have constructed?
 }
 
 /// Installs (adds) a \a key to be provided by the service. The callback function \a 
@@ -129,6 +147,8 @@ void context_provider_install_key (const char* key,
                                    ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
                                    void* subscription_changed_cb_target)
 {
+    contextDebug() << F_C << key;
+
     if (! cService) {
         contextCritical() << "Can't install key:" << key << "because no service started.";
         return;
@@ -150,6 +170,8 @@ void context_provider_install_group (const char** key_group,
                                      ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
                                      void* subscription_changed_cb_target)
 {
+    contextDebug() << F_C;
+
     if (! cService) {
         contextCritical() << "Can't install key group because no service started.";
         return;
@@ -173,6 +195,7 @@ void context_provider_install_group (const char** key_group,
 /// Sets the \a key to a specified integer \a value.
 void context_provider_set_integer (const char* key, int value)
 {
+    contextDebug() << F_C << key << value;
     if (cService)
         cService->setValue(key, value);
 }
@@ -180,6 +203,7 @@ void context_provider_set_integer (const char* key, int value)
 /// Sets the \a key to a specified double \a value.
 void context_provider_set_double (const char* key, double value)
 {
+    contextDebug() << F_C << key << value;
     if (cService)
         cService->setValue(key, value);
 }
@@ -187,6 +211,7 @@ void context_provider_set_double (const char* key, double value)
 /// Sets the \a key to a specified boolean \a value.
 void context_provider_set_boolean (const char* key, int value)
 {
+    contextDebug() << F_C << key << value;
     if (cService)
         cService->setValue(key, value);
 }
@@ -194,6 +219,7 @@ void context_provider_set_boolean (const char* key, int value)
 /// Sets the \a key to a specified string \a value.
 void context_provider_set_string (const char* key, const char* value)
 {
+    contextDebug() << F_C << key << value;
     if (cService)
         cService->setValue(key, value);
 }
@@ -201,6 +227,7 @@ void context_provider_set_string (const char* key, const char* value)
 /// Sets the \a key to NULL. In other words - unsets the key.
 void context_provider_set_null (const char* key)
 {
+    contextDebug() << F_C << key;
     if (cService)
         cService->setValue(key, QVariant());
 }
