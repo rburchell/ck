@@ -213,7 +213,7 @@ void context_provider_set_boolean (const char* key, int value)
 {
     contextDebug() << F_C << key << value;
     if (cService)
-        cService->setValue(key, value);
+        cService->setValue(key, (value != 0));
 }
 
 /// Sets the \a key to a specified string \a value.
