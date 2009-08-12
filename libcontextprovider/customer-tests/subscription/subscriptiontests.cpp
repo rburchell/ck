@@ -124,8 +124,7 @@ void SubscriptionTests::subscribeReturnValueForUnknownProperty()
     QVERIFY(clientStarted);
 
     // Ask the client to call GetSubscriber, ignore the result
-    QString temp = writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-    qWarning() << temp;
+    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Ask the client to call Subscribe with 1 valid key. The property
     // is currently unknown since we haven't set a value for it.
