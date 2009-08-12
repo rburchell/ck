@@ -34,7 +34,7 @@ class QueuedInvoker : public QObject
     Q_OBJECT
 
 public:
-    QueuedInvoker();
+    QueuedInvoker(QObject* parent = 0);
 
 private slots:
     void onQueuedCall(const char *method);

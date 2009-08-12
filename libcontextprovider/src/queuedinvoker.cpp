@@ -40,7 +40,8 @@ namespace ContextProvider {
 
 */
 
-QueuedInvoker::QueuedInvoker()
+QueuedInvoker::QueuedInvoker(QObject* parent)
+    : QObject(parent)
 {
     connect(this, SIGNAL(queuedCall(const char *)),
             this, SLOT(onQueuedCall(const char *)),
