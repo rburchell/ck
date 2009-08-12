@@ -180,7 +180,7 @@ int test_init()
                                    group1_cb, NULL);
     context_provider_install_group(group2_keys, FALSE,
                                    group2_cb, NULL);
-    context_provider_install_key(single1_key, FALSE,
+    context_provider_install_key(single1_key, TRUE,
                                  single1_cb, NULL);
     context_provider_install_key(single2_key, FALSE,
                                  single2_cb, NULL);
@@ -239,7 +239,7 @@ int test_subscription()
     context_provider_set_boolean("Group1.Bool", 1);
 
     write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
-                    "Group1.String Group1.Bool\n");
+                    "Group1.String Group1.Bool Invalid.Key\n");
 
     /* Expected result: the client got the keys and the values */
     mismatch = compare_output("Known keys: Group1.Bool(bool:true) "
@@ -260,6 +260,27 @@ int test_subscription()
     return 0;
 }
 
+int test_callbacks()
+{
+    /* Test: Command the client to subscribe to a property */
+    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
+                    "Single1.Key\n");
+
+    /* Expected result: we are notified that the client is now subscribed */
+    if (!single1_subscribed) return 1;
+    if (single1_cb_callcount != 1) return 1;
+
+    /* Test: Command the client to unsubscribe */
+    write_to_client("unsubscribe org.freedesktop.ContextKit.testProvider "
+                    "Single1.Key\n");
+
+    /* Expected result: we are notified that the client is now unsubscribed */
+    if (single1_subscribed) return 1;
+    if (single1_cb_callcount != 2) return 1;
+
+    return 0;
+}
+
 int test_value_changes()
 {
     /* Test: change a subscribed property and command the client to
@@ -273,17 +294,145 @@ int test_value_changes()
                               "Unknown keys:  \n");
     if (mismatch) return 1;
 
+    write_to_client("resetsignalstatus\n");
+
+    /* Test: value changes to unknown */
+    context_provider_set_null("Group1.String");
+    write_to_client("waitforchanged 3000\n");
+
+    /* Expected result: the client got the signal */
+    mismatch = compare_output("Changed signal received, parameters: "
+                              "Known keys: "
+                              "Unknown keys: Group1.String \n");
+    if (mismatch) return 1;
+
+    write_to_client("resetsignalstatus\n");
+
+    /* Test: non-subscribed property changes */
+    context_provider_set_integer("Group2.Key1", -365);
+    write_to_client("waitforchanged 3000\n");
+
+    /* Expected result: the client doesn't get a signal */
+    mismatch = compare_output("Timeout\n");
+    if (mismatch) return 1;
+
+    /* Test: two properties change at the same time */
+    context_provider_set_integer("Group1.Int", 343);
+    context_provider_set_boolean("Group1.Bool", 0);
+
+    write_to_client("waitforchanged 3000\n");
+
+    /* Expected result: the client gets both in the same signal */
+    mismatch = compare_output("Changed signal received, parameters: "
+                              "Known keys: Group1.Bool(bool:false) "
+                              "Group1.Int(int:343) "
+                              "Unknown keys: \n");
+    if (mismatch) return 1;
+
+    write_to_client("resetsignalstatus\n");
+
+    /* Test: set two properties the same values they already have */
+    context_provider_set_integer("Group1.Int", 343);
+    context_provider_set_boolean("Group1.Bool", 0);
+
+    write_to_client("waitforchanged 3000\n");
+
+    /* Expected result: the client doesn't get a signal */
+    mismatch = compare_output("Timeout\n");
+    if (mismatch) return 1;
 
     return 0;
 }
 
 int test_unsubscription()
 {
+    /* Test: Command the client to unsubscribe from all Group1 keys. */
+    write_to_client("unsubscribe org.freedesktop.ContextKit.testProvider "
+                    "Group1.Int Group1.Bool Group1.Double Group1.String\n");
+    /* Expected result: we are notified that group1 is no longer
+     * subscribed to*/
+    if (group1_subscribed) return 1;
+    if (group1_cb_callcount != 2) return 1;
+
+    /* Expected result: during the whole test, non-relevant callbacks
+     * are not called */
+    if (group2_cb_callcount != 0) return 1;
+    if (single1_cb_callcount != 2) return 1;
+    if (single2_cb_callcount != 0) return 1;
+
+    /* Test: unsubscribed properties change */
+    context_provider_set_integer("Group1.Int", -8);
+    context_provider_set_null("Group1.Bool");
+
+    write_to_client("waitforchanged 3000\n");
+
+    /* Expected result: the client doesn't get a signal */
+    int mismatch = compare_output("Timeout\n");
+    if (mismatch) return 1;
+
+    return 0;
+}
+
+int test_resetting_values()
+{
+    /* Note: group1 and single1 were initialized with
+     * reset-to-null=true, group2 and single2 with reset-to-null=false */
+
+    /* Test: Command the client to subscribe */
+    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
+                    "Group1.Int Group2.Key2 Single1.Key Single2.Key\n");
+    /* Expected result: the key is in the unknown list*/
+    int mismatch = compare_output("Known keys: "
+                                  "Unknown keys: Group1.Int Group2.Key2 "
+                                  "Single1.Key Single2.Key \n");
+    if (mismatch) return 1;
+
+    /* Test: Set a value to the key */
+    context_provider_set_integer("Group1.Int", 44);
+    context_provider_set_integer("Group2.Key2", 100);
+    context_provider_set_string("Single1.Key", "something");
+    context_provider_set_string("Single2.Key", "else");
+    write_to_client("waitforchanged 3000\n");
+
+    /* Expected result: the client got the signal */
+    mismatch = compare_output("Changed signal received, parameters: "
+                              "Known keys: Group1.Int(int:44) "
+                              "Group2.Key2(int:100) "
+                              "Single1.Key(QString:something) "
+                              "Single2.Key(QString:else) Unknown keys:  \n");
+    if (mismatch) return 1;
+
+    /* Test: Unsubscribe from the keys */
+    write_to_client("unsubscribe org.freedesktop.ContextKit.testProvider "
+                    "Group1.Int Group2.Key2 Single1.Key Single2.Key\n");
+
+    /* Test: Subscribe again */
+    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
+                    "Group1.Int Group2.Key2 Single1.Key Single2.Key\n");
+    /* Expected result: the key Group.Int is in the unknown list --
+       even if we previously set a value. But the key Group2.Key2 has
+       kept its value. The same for Single1.Key and Single2.Key.*/
+    mismatch = compare_output("Known keys: Group2.Key2(int:100) "
+                              "Single2.Key(QString:else) "
+                              "Unknown keys: Group1.Int Single1.Key \n");
+    if (mismatch) return 1;
+
     return 0;
 }
 
 int test_stopping()
 {
+    /* Test: Stop the service */
+    context_provider_stop();
+
+    /* Expected result: the client can no longer get a subscriber */
+    write_to_client("getsubscriber "
+                    "session org.freedesktop.ContextKit.testProvider\n");
+
+    /* Expected result: the client got a correct subscriber path */
+    int mismatch = compare_output("GetSubscriber error: invalid reply\n");
+    if (mismatch) return 1;
+
     return 0;
 }
 
@@ -297,7 +446,7 @@ int run_tests()
         fprintf(stderr, "FAIL\n");
         return ret;
     }
-    fprintf(stderr, "SUCCESS\n");
+    fprintf(stderr, "PASS\n");
 
     /* Uncomment this if you want to run the test program as a
        stand-alone provider:*/
@@ -309,7 +458,7 @@ int run_tests()
         fprintf(stderr, "FAIL\n");
         return ret;
     }
-    fprintf(stderr, "SUCCESS\n");
+    fprintf(stderr, "PASS\n");
 
     fprintf(stderr, "Running test_subscription... ");
     ret = test_subscription();
@@ -317,7 +466,15 @@ int run_tests()
         fprintf(stderr, "FAIL\n");
         return ret;
     }
-    fprintf(stderr, "SUCCESS\n");
+    fprintf(stderr, "PASS\n");
+
+    fprintf(stderr, "Running test_callbacks... ");
+    ret = test_callbacks();
+    if (ret) {
+        fprintf(stderr, "FAIL\n");
+        return ret;
+    }
+    fprintf(stderr, "PASS\n");
 
     fprintf(stderr, "Running test_value_changes... ");
     ret = test_value_changes();
@@ -325,7 +482,32 @@ int run_tests()
         fprintf(stderr, "FAIL\n");
         return ret;
     }
-    fprintf(stderr, "SUCCESS\n");
+    fprintf(stderr, "PASS\n");
+
+    fprintf(stderr, "Running test_unsubscription... ");
+    ret = test_unsubscription();
+    if (ret) {
+        fprintf(stderr, "FAIL\n");
+        return ret;
+    }
+    fprintf(stderr, "PASS\n");
+
+    fprintf(stderr, "Running test_resetting_values... ");
+    ret = test_resetting_values();
+    if (ret) {
+        fprintf(stderr, "FAIL\n");
+        return ret;
+    }
+    fprintf(stderr, "PASS\n");
+
+
+    fprintf(stderr, "Running test_stopping... ");
+    ret = test_stopping();
+    if (ret) {
+        fprintf(stderr, "FAIL\n");
+        return ret;
+    }
+    fprintf(stderr, "PASS\n");
 
     /* All tests successful */
     return 0;
