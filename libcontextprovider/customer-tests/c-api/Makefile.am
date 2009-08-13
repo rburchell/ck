@@ -1,9 +1,9 @@
-bin_PROGRAMS = cprovider
+bin_PROGRAMS = cprovidertests
 
-cprovider_SOURCES = cprovider.c
+cprovidertests_SOURCES = cprovidertests.c
 
 check-customer:
-	PATH=$$PATH:../client CONTEXT_LOG_VERBOSITY=WARNING ./cprovider
+	PATH=$$PATH:../client CONTEXT_LOG_VERBOSITY=WARNING ./cprovidertests
 
-cprovider_CFLAGS = -I$(top_srcdir)/libcontextprovider/src $(GLIB_CFLAGS) $(DBUS_CFLAGS) $(GOBJECT_CFLAGS)
-cprovider_LDFLAGS = $(GLIB_LIBS) $(DBUS_LIBS) $(GOBJECT_LIBS) -L$(top_builddir)/libcontextprovider/src/.libs -lcontextprovider
+cprovidertests_CFLAGS = -I$(top_srcdir)/libcontextprovider/src $(GLIB_CFLAGS) $(DBUS_CFLAGS) $(GOBJECT_CFLAGS)
+cprovidertests_LDFLAGS = $(GLIB_LIBS) $(DBUS_LIBS) $(GOBJECT_LIBS) -L$(top_builddir)/libcontextprovider/src/.libs -lcontextprovider
