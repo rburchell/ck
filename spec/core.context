@@ -172,6 +172,18 @@ OnLowBattery becomes true. In seconds.
 Estimates the needed charging time of the device. In seconds.
     </doc>
   </key>
+ <doc>
+System
+------
+
+Information about the current state of the device.
+  </doc>
+  <key name="System.MemoryPressure">
+    <type>int32</type>
+    <doc>
+Current memory load. Possible values: 0 (normal), 1 (high; low watermark exceeded), 2 (critical; high watermark exceeded).
+    </doc>
+  </key>
   <doc>
 Internet connectivity
 ---------------------
@@ -207,7 +219,7 @@ WLAN, etc.  The possible value are TBD.
     </type>
     <doc>
       The state of the Internet connection, values TBD but will include
-      things like "connected, "disconnected", "connecting".
+      things like "connected", "disconnected", "connecting".
     </doc>
   </key>
   
