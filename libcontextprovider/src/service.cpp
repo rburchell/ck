@@ -138,7 +138,7 @@ Service *Service::defaultService;
 /// busType.  The service will be initially stopped and will
 /// automatically start itself when the main loop is entered.
 Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
-    : QueuedInvoker(parent)
+    : QObject(parent)
 {
     contextDebug() << F_SERVICE << "Creating new Service for" << busName;
 
@@ -148,7 +148,13 @@ Service::Service(QDBusConnection::BusType busType, const QString &busName, QObje
     priv->manager = new Manager();
     priv->connection = NULL;
 
-    queueOnce("startMe");
+    // XXX - there has be an easier way to get a idle callback when
+    //       the event loop is entered.
+    //
+    connect(this, SIGNAL(startMe()),
+            this, SLOT(onStartMe()),
+            Qt::QueuedConnection);
+    emit startMe();
 }
 
 Service::~Service()
@@ -227,7 +233,7 @@ void Service::stop()
     priv->connection = NULL;
 }
 
-void Service::startMe()
+void Service::onStartMe()
 {
     start();
 }
