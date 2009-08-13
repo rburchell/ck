@@ -6,7 +6,6 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = \
 	libcontextprovider \
 	libcontextsubscriber \
-	contextd \
 	spec \
 	doc \
 	python \

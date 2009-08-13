@@ -1,4 +1,0 @@
-usr/bin/contextd
-usr/share/context-providers/contextd.xml
-usr/share/contextkit/providers/org.freedesktop.ContextKit.contextd.context
-usr/share/dbus-1/services/org.freedesktop.ContextKit.contextd.service

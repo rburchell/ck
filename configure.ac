@@ -108,15 +108,6 @@ AC_CONFIG_FILES([
 	libcontextsubscriber/multithreading-tests/wait-for-subscription-only-in-thread/Makefile
 	libcontextsubscriber/multithreading-tests/wait-for-subscription-thread/Makefile
 	libcontextsubscriber/update-contextkit-providers/Makefile
-	contextd/Makefile
-	contextd/org.freedesktop.ContextKit.contextd.service
-	contextd/src/Makefile
-	contextd/customer-tests/Makefile
-	contextd/unit-tests/Makefile
-	contextd/unit-tests/halprovider/Makefile
-	contextd/unit-tests/boolsysfspooler/Makefile
-	contextd/unit-tests/lowmemprovider/Makefile
-	contextd/doc/Makefile
 	python/Makefile
 	spec/Makefile
 	tools/Makefile
