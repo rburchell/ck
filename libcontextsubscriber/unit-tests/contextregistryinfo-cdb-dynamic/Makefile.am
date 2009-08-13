@@ -10,7 +10,9 @@ EXTRA_DIST = context-providers1v1.cdb context-providers1v2.cdb
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
-AM_CXXFLAGS = $(QtDBus_CFLAGS) -I$(srcdir)/../util/ '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"'
+AM_CXXFLAGS = $(QtDBus_CFLAGS) -I$(srcdir)/../util/ \
+              '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"' \
+              '-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"'
 AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = contextregistryinfo.cpp infobackend.cpp	\
 	infoxmlbackend.cpp infoxmlkeysfinder.cpp	\

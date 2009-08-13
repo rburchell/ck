@@ -40,7 +40,7 @@ for the +Example.Random+ property looks like this:
 <?xml version="1.0"?>
 <provider bus="session"
           service="com.example.RandomProvider">
-  <key name="Example.Random">
+  <key name="com.example.Random">
     <type>double</type>
     <doc>
       A random number between 0 and 1 that changes every now and then.
@@ -49,9 +49,10 @@ for the +Example.Random+ property looks like this:
 </provider>
 ------------------
 
-This file declares the single property +Example.Random+ and instructs
-the Content Framework to connect to the +com.example.RandomProvider+
-bus name on the session D-Bus.  It would be stored as
+This file declares the single property +com.example.Random+ and
+instructs the Content Framework to connect to the
++com.example.RandomProvider+ bus name on the session D-Bus.  It would
+be stored as
 +/usr/share/contextkit/providers/com.example.RandomProvider.context+
 
 You need to be careful when choosing property name; see the
@@ -65,15 +66,9 @@ fall out of synch.  See the "Providing core properties" section for
 more about them.
 
 After installing a property declaration file into a directory +$dir+,
-you should usually execute +update-contextkit-providers+ like so:
-
-[source,sh]
------------------------
-update-contextkit-providers $dir
------------------------
-
-This will update the various caches that clients like the
-+libcontextsubscriber+ library use.
+you should usually execute +update-contextkit-providers+.  This will
+update the various caches that clients like the +libcontextsubscriber+
+library use.
 
 But, if a property declaration file is installed via a Debian package,
 you should not call +update-contextkit-providers+ in your maintainer
@@ -152,43 +147,23 @@ you must of course make sure that you follow the specification of that
 property.  You can not redefine its type or description in your
 property declaration file, obviously.
 
-But you still need to include a complete property declaration file
-with your provider and install it in +/usr/share/context-providers/+.
-At run-time, all properties are equal and there isn't anything special
-about core properties anymore.
+Thus, for core properties, you should not include any +type+ or +doc+
+elements in your key declarations, just a +name+ element.  The list of
+core properties is also known to context subcribers at run-time and
+will be used to fill in the missing details.
 
-To create a property declaration file that includes core properties,
-you should copy the necesarry fragments out of the core declaration
-file into yours.  The core declaration file can be found in the
-+contextkit-dev+ package and also link:context.xml[here].
+For example, a property declaration file for core properties could
+look like this:
 
-The core properties will not change very often, but there might be
-changes.  When that happens, you need to review the changes and
-maybe--after careful consideration--update your implementation to
-reflect the changes.  You also need to update your property
-declaration file at that time.
+[source,xml]
+------------------
+<?xml version="1.0"?>
+<provider bus="session"
+          service="com.example.RandomProvider">
+  <key name="Example.Random"/>
+</provider>
+------------------
 
-The +contextkit-dev+ package contains the +check-core-properties+ tool
-to help with this.  Running it like this
-
-[source,sh]
-----
-check-contextkit-properties com.example.Random.context
-----
-
-will check every core property declared in the file
-+com.example.Random.context+ against its current official
-declarations.  It will output some diagnosis and fail if there are any
-discrepancies.  You should run it as part of your test-suite.
-
-You can automatically update your property declaration file from the
-current official declarations by using the +--update+ option:
-
-[source,sh]
-----
-check-contextkit-properties --update com.example.Random.context
-----
-
-This will modify +com.example.Random.context+ in place.  You should
-run it manually when adapting your provider to changes in the official
-core property declarations.
+This just declares that the +Example.Random+ property can be
+subscribed to by contacting +com.example.RandomProvider+ on the
+session bus.  It's type and documentation are found elsewhere.

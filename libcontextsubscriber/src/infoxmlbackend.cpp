@@ -155,6 +155,17 @@ QString InfoXmlBackend::registryPath()
     return QString(regpath);
 }
 
+/// Returns the full path to the core property declaration file. Takes
+/// the \c CONTEXT_CORE_DECLARATIONS env variable into account.
+QString InfoXmlBackend::coreDeclPath()
+{
+    const char *corepath = getenv("CONTEXT_CORE_DECLARATIONS");
+    if (! corepath)
+        corepath = DEFAULT_CONTEXT_CORE_DECLARATIONS;
+
+    return QString(corepath);
+}
+
 /* Slots */
 
 /// Called when one of the parsed XML files changed. This
@@ -232,6 +243,10 @@ void InfoXmlBackend::regenerateKeyDataList()
 
     contextDebug() << F_XML << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
 
+    // Read the core property declarations.
+
+    readKeyDataFromXml (InfoXmlBackend::coreDeclPath());
+
     // For each xml file in the registry we parse it and
     // add it to our hash. We did some sanity checks in the constructor
     // so we skip them now.
@@ -243,7 +258,7 @@ void InfoXmlBackend::regenerateKeyDataList()
     QFileInfoList list = dir.entryInfoList();
     for (int i = 0; i < list.size(); ++i) {
         QFileInfo f = list.at(i);
-        readKeyDataFromXml(f);
+        readKeyDataFromXml(f.filePath());
 
         if (! watcher.files().contains(f.filePath()))
             watcher.addPath(f.filePath());
@@ -252,27 +267,36 @@ void InfoXmlBackend::regenerateKeyDataList()
     }
 }
 
-/// Parses a given \a finfo file and adds it's contents to the hash.
+/// Parses a given \a path file and adds it's contents to the hash.
 /// Also adds the file to the watcher (starts observing it).
-void InfoXmlBackend::readKeyDataFromXml(const QFileInfo &finfo)
+void InfoXmlBackend::readKeyDataFromXml(const QString &path)
 {
-    contextDebug() << F_XML << "Reading keys from" << finfo.filePath();
+    contextDebug() << F_XML << "Reading keys from" << path;
 
     InfoXmlKeysFinder handler;
-    QFile f(finfo.filePath());
+    QFile f(path);
     QXmlInputSource source (&f);
     QXmlSimpleReader reader;
 
     reader.setContentHandler(&handler);
     reader.parse(source);
 
-    // Use insert here instead of unite to overwrite keys
     foreach (QString key, handler.keyDataHash.keys()) {
-        if (keyDataHash.contains(key)) 
-            contextWarning() << "Key" << key << "already defined in previous xml file. Overwriting.";
 
-        keyDataHash.insert(key, handler.keyDataHash.value(key));
+        if (keyDataHash.contains(key)) {
+            // Carefully merge new data into old.  We only allow
+            // addition of bus name and bus type.
+
+            InfoKeyData old_data = keyDataHash.value(key);
+            InfoKeyData new_data = handler.keyDataHash.value(key);
+
+            if (old_data.provider == NULL) {
+                old_data.provider = new_data.provider;
+                old_data.bus = new_data.bus;
+                keyDataHash.insert(key, old_data);
+            } else
+                contextWarning() << "Key" << key << "already defined in previous xml file. Ignoring.";
+        } else
+            keyDataHash.insert(key, handler.keyDataHash.value(key));
     }
 }
-
-

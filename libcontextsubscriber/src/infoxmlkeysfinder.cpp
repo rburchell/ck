@@ -54,6 +54,14 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
         return true;
     }
 
+    // <properties> ...
+    if (inProvider == false && name == "properties") {
+        inProvider = true;
+        currentProvider = "";
+        currentBus = "";
+        return true;
+    }
+
     // <key> ...
     if (inKey == false && inProvider == true && name == "key") {
         // Reset all potential key data
@@ -79,6 +87,13 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
         inKeyDoc = true;
         currentKeyDoc = ""; // Reset doc data
         return true;
+    }
+
+    // complex types
+    if (inKeyType == true && complexKeyType == false) {
+        contextWarning() << F_XML << "Key" << currentKeyName << "has a complex type, which is unsupported for now.";
+        complexKeyType = true;
+        currentKeyType = "";
     }
 
     return true;
@@ -110,7 +125,7 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
             data.bus = currentBus;
 
             if (keyDataHash.contains(currentKeyName)) 
-                contextWarning() << "Key" << currentKeyName << "already defined in this xml file. Overwriting.";
+                contextWarning() << F_XML << "Key" << currentKeyName << "already defined in this xml file. Overwriting.";
             
             keyDataHash.insert(currentKeyName, data);
         }
@@ -118,6 +133,7 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
         inKey = false;
         inKeyDoc = false;
         inKeyType = false;
+        complexKeyType = false;
         return true;
     }
 
@@ -140,9 +156,9 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
 bool InfoXmlKeysFinder::characters(const QString &chars)
 {
     // <type> CHARS ...
-    if (inKeyType == true) {
+    if (inKeyType == true && complexKeyType == false) {
         if (currentKeyType != "")
-            contextWarning() << "Key" << currentKeyName << "already has a type. Overwriting.";
+            contextWarning() << F_XML << "Key" << currentKeyName << "already has a type. Overwriting.";
         currentKeyType = canonicalizeType (chars.trimmed());
         return true;
     }

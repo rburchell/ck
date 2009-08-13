@@ -68,6 +68,7 @@ void ContextRegistryInfoUnitTest::initTestCase()
     qInstallMsgHandler(myMessageOutput);
 
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
+    utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     context = ContextRegistryInfo::instance();
     QVERIFY(context != NULL);
 }

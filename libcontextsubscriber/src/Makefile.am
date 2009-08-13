@@ -18,6 +18,7 @@ includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
 	'-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"' \
+	'-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"' \
 	'-DCONTEXT_LOG_MODULE_NAME="libcontextsubscriber"'
 LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
 

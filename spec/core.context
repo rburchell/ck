@@ -1,7 +1,57 @@
 <?xml version="1.0"?>
-<provider
-  xmlns="http://contextkit.freedesktop.org/Provider"
-  bus="session" service="com.nokia.FakeContextProvider">
+<properties xmlns="http://contextkit.freedesktop.org/Provider">
+  <doc>
+Core Context Properties
+=======================
+
+This is the list of the core contextual properties of the Maemo
+platform.
+
+This document is maintained as part of the +contextkit+ package.
+Please report change requests as bugs against the +contextkit+
+package.
+ 
+*NOTE:* Most of these properties are unstable and their definition will
+change for some time still.  Only the ones explicitly marked as stable
+should be used for now.
+
+Display screens
+---------------
+
+These properties talk about the display screens of the device.
+  </doc>
+  <key name="Screen.TopEdge">
+    <type>
+      <string-enum>
+        <top/>
+        <bottom/>
+        <left/>
+        <right/>
+      </string-enum>
+    </type>
+    <doc>
+The edge of the main display screen where the user expects
+the top-most UI elements to be.  Possible values are the
+strings "top", "bottom", "left", and "right", which refer to
+the edges of the screen in its normal orientation as defined
+by the graphics hardware.  _(stable)_
+    </doc>
+  </key>
+  <key name="Screen.IsCovered">
+    <type>bool</type>
+    <doc>
+Whether or not the main display screen is covered and can thus not be
+seen by the user.  This might mean that the device is laying face down
+on a table, or that its lid is closed if it has one.  _(stable)_
+    </doc>
+  </key>
+  <doc>
+Location
+--------
+
+Best effort location information. If any of the keys are not
+appliciable to the current location, they will be unavailable.
+  </doc>
   <key name="Location.Coordinates">
     <type>
       <uniform-list type="double"/>
@@ -56,6 +106,10 @@ neighborhood or campus, as a localized string.
     <type>string</type>
     <doc>The name of the current continent, as a localized string.</doc>
   </key>
+  <key name="Location.Planet">
+    <type>string</type>
+    <doc>The name of the current planet (or dwarf planet), as a localized string.</doc>
+  </key>
   <key name="Location.PointOfInterest">
     <type>string</type>
     <doc>
@@ -71,6 +125,71 @@ a Nepomuk object inside the Content Framework.)
 A list of URIs for contacts that are physically nearby.
     </doc>
   </key>    
+  <doc>
+Battery
+-------
+
+Information about the batteries of the device.
+  </doc>
+  <key name="Battery.ChargePercentage">
+    <type>percentage</type>
+    <doc>
+The average charge level of the currently connected batteries. 
+Expressed as percentage of the maximum charge level.
+    </doc>
+  </key>
+  <key name="Battery.OnBattery">
+    <type>bool</type>
+    <doc>
+Whether or not the device is currently running on battery power,
+i.e., whether at least one of its batteries is currently discharging.
+    </doc>
+  </key>
+  <key name="Battery.LowBattery">
+    <type>bool</type>
+    <doc>
+Whether or not the device is currently running on low battery power.
+True if OnBattery is true and the charge levels of all 
+batteries are below 10%.
+    </doc>
+  </key>
+  <key name="Battery.IsCharging">
+    <type>bool</type>
+    <doc>
+Whether or not the device is currently charging at least one of its batteries.
+    </doc>
+  </key>
+  <key name="Battery.TimeUntilLow">
+    <type>duration</type>
+    <doc>
+Estimates the time that the device can run on battery before the property 
+OnLowBattery becomes true. In seconds.
+    </doc>
+  </key>
+  <key name="Battery.TimeUntilFull">
+    <type>duration</type>
+    <doc>
+Estimates the needed charging time of the device. In seconds.
+    </doc>
+  </key>
+ <doc>
+System
+------
+
+Information about the current state of the device.
+  </doc>
+  <key name="System.MemoryPressure">
+    <type>int32</type>
+    <doc>
+Current memory load. Possible values: 0 (normal), 1 (high; low watermark exceeded), 2 (critical; high watermark exceeded).
+    </doc>
+  </key>
+  <doc>
+Internet connectivity
+---------------------
+
+Information about the connection of the devide to the Internet.
+  </doc>
   <key name="Internet.NetworkType">
     <type>
       <string-enum>
@@ -100,7 +219,7 @@ WLAN, etc.  The possible value are TBD.
     </type>
     <doc>
       The state of the Internet connection, values TBD but will include
-      things like "connected, "disconnected", "connecting".
+      things like "connected", "disconnected", "connecting".
     </doc>
   </key>
   
@@ -148,6 +267,12 @@ A rough indication of the current traffic rate from the Internet, in
 percent of the maximum possible rate.
     </doc>
   </key>
+  <doc>
+Bluetooth
+---------
+
+Information about Bluetooth related things.      
+  </doc>
   <key name="Bluetooth.Enabled">
     <type>bool</type>
     <doc>
@@ -181,6 +306,12 @@ Bluetooth, in percent of the maximum possible rate.
 The strength of the Bluetooth radio connection.
     </doc>
   </key>
+  <doc>
+Environment
+-----------
+
+Information about the environment the device is in.
+  </doc>
   <key name="Environment.SunRise">
     <type>time</type>
     <doc>
@@ -296,6 +427,10 @@ more information about codifying weather conditions.  We should lift
 something from there, if just for extra geek points.
     </doc>
   </key>
+  <key name="Environment.IsDark">
+    <type>bool</type>
+    <doc>Whether or not it is especially dark.</doc>
+  </key>
   <key name="Environment.IsBright">
     <type>bool</type>
     <doc>Whether or not it is especially bright.</doc>
@@ -304,6 +439,21 @@ something from there, if just for extra geek points.
     <type>bool</type>
     <doc>Whether or not it is especially loud.</doc>
   </key>
+  <doc>
+Use
+---
+
+Information about the current usage context of the device.
+
+Situations are a UI concept similar to Profiles that allows the user
+to have different customizations for his/her device and
+automatically/explcicitly switch between them.  Typical Situations are
+"AtHome", "AtWork", "InMeeting" etc.  Some of them are probably
+pre-defined, others can be defined by the user.  Situations might form
+a hierarchy: InMeeting includes AtWork.
+
+Not much is known about all this right now.
+  </doc>
   <key name="Use.Situations">
     <type>string-list</type>
     <doc>
@@ -311,10 +461,78 @@ The symbolic names of the currently active Situations.  Note that more
 than one situation might be active at the same time.
     </doc>
     </key>
-  <key name="Use.Mode" type="string">
+  <key name="Use.Mode">
     <doc>
 The current main usage mode of the device.
     </doc>
+    <type>
+      <string-enum>
+	<editing>
+          <doc>
+The user is interacting closely with the device and is creating new
+content, such as when composing a email message or creating any other
+kind of document.
+          </doc>
+	</editing>
+	<recording>
+          <doc>
+The user is taking pictures, or recording video or audio.
+          </doc>
+	</recording>
+	<browsing>
+          <doc>
+The user is interacting closely with the device without
+creating new content, such as when browsing search results, or
+browsing through his/her music collection.
+          </doc>
+	</browsing>
+	<watching>
+          <doc>
+The user is watching a video, without closely interacting with the
+device.
+          </doc>
+	</watching>
+	<listening>
+          <doc>
+The user is listening to audio, without closely interacting with the
+device.
+          </doc>
+	</listening>
+        <reading>
+          <doc>
+The user is reading a document, such as when reading a article on the
+web or a e-book.
+          </doc>
+        </reading>
+	<chatting>
+          <doc>
+The user is involved in a real-time, text-based dialog with external
+parties.
+          </doc>
+	</chatting>
+	<gaming>
+          <doc>
+The user is interacting closely with the device, for entertainment.
+          </doc>
+	</gaming>
+	<calling>
+          <doc>
+The user is involved in a real-time, audio- or video-based dialog with
+external parties.
+          </doc>
+	</calling>
+	<active>
+          <doc>
+The user interacting closely with the device, for an activity that
+doesn't fit into any of the above categories.
+          </doc>
+	</active>
+	<idle>
+          <doc>
+The device is not being used.
+          </doc>
+	</idle>
+      </string-enum>
     </type>
   </key>
   <key name="Use.ConnectedContacts" type="string-list">
@@ -350,6 +568,12 @@ Whether or not the user is using the device as a telephone handset,
 holding it next to ear and mouth.
     </doc>
   </key>
+  <doc>
+Events
+------
+
+Information about current and upcoming calendar entries.
+  </doc>
   <key name="Event.Current">
     <type>
       <uniform-list type="nepomuk-uri"/>
@@ -395,4 +619,4 @@ The earliest start time of the events in Events.Next.
 The latest end time of the events in Events.Next.
     </doc>
   </key>
-</provider>
+</properties>
