@@ -11,7 +11,7 @@ COVERAGE_FILES = handlesignalrouter.cpp
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtDBus_CFLAGS) '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"'
 AM_LDFLAGS = 
-FROM_SOURCE = handlesignalrouter.cpp handlesignalrouter.h logging.h logging.cpp loggingfeatures.h # copy these files from the real source
+FROM_SOURCE = handlesignalrouter.cpp handlesignalrouter.h loggingfeatures.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am

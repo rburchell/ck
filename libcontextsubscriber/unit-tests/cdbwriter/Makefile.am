@@ -9,7 +9,7 @@ COVERAGE_FILES = cdbwriter.cpp
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = '-I$(srcdir)/../util/'
 AM_LDFLAGS = $(CDB_LIBS)
-FROM_SOURCE = cdbwriter.cpp cdbwriter.h logging.h logging.cpp loggingfeatures.h # copy these files from the real source
+FROM_SOURCE = cdbwriter.cpp cdbwriter.h loggingfeatures.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am

@@ -1,5 +1,5 @@
 bin_PROGRAMS = context-listen
-context_listen_SOURCES = context-listen.cpp sconnect.h			\
+context_listen_SOURCES = context-listen.cpp			        \
 	propertylistener.h propertylistener.cpp commandwatcher.h	\
 	commandwatcher.cpp
 
@@ -8,11 +8,18 @@ AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) \
 LIBS += $(QtCore_LIBS)
 
 # library dependency hack for seamless make in cli/
-AM_CXXFLAGS += -I$(srcdir)/../src
-context_listen_LDADD = ../src/libcontextsubscriber.la
+AM_CXXFLAGS += -I$(srcdir)/../src \
+	       -I$(top_srcdir)/common
+
+context_listen_LDADD = ../src/libcontextsubscriber.la $(top_builddir)/common/libcommon.la
+
 ../src/libcontextsubscriber.la:
 	$(MAKE) -C ../src libcontextsubscriber.la
-.PHONY: ../src/libcontextsubscriber.la
+
+$(top_builddir)/common/libcommon.la:
+	$(MAKE) -C $(top_builddir)/common libcommon.la
+
+.PHONY: ../src/libcontextsubscriber.la $(top_builddir)/common/libcommon.la
 
 # moccing
 nodist_context_listen_SOURCES = mocs.cpp

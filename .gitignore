@@ -24,12 +24,13 @@ missing
 .dirstamp
 .deps
 *.o
+*.a
 *.lo
 *.la
+*.moc
 stamp-h1
 _package
 *.libs
-contextprovider-1.0.pc
 *.gcno
 *.gcda
 *.pyc
@@ -39,3 +40,5 @@ lcov.info
 INSTALL
 build-stamp
 flexi-properties.xml
+mocs.cpp
+moc_*

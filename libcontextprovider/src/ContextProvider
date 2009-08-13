@@ -1,0 +1,8 @@
+#ifndef CONTEXT_PROVIDER_H
+#define CONTEXT_PROVIDER_H
+
+#include "context/service.h"
+#include "context/property.h"
+#include "context/group.h"
+
+#endif

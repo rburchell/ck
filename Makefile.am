@@ -6,18 +6,12 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = \
 	libcontextprovider \
 	libcontextsubscriber \
-	contextd \
 	spec \
-	tests \
 	doc \
 	python \
 	tools \
-	vapi
+	common
 
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = contextprovider-1.0.pc
-
-EXTRA_DIST = contextprovider-1.0-uninstalled.pc
 DISTCLEANFILES = lcov.info lcov.html
 MAINTAINERCLEANFILES = INSTALL
 
@@ -28,7 +22,8 @@ check-customer:
 	$(MAKE) -C libcontextsubscriber/customer-tests check-customer
 
 coverage: covoptioncheck
-	$(MAKE) -C libcontextsubscriber/unit-tests coverage
+	$(MAKE) -C libcontextsubscriber/unit-tests coverage \
+	&& $(MAKE) -C libcontextprovider/unit-tests coverage
 
 .PHONY: coverage check-customer check-sum
 

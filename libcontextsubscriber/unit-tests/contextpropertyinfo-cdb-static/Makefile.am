@@ -21,7 +21,7 @@ FROM_SOURCE = contextregistryinfo.cpp contextpropertyinfo.cpp	\
 	contextpropertyinfo.h infobackend.h			\
 	infoxmlbackend.h infocdbbackend.h			\
 	infoxmlkeysfinder.h cdbreader.h                         \
-	infokeydata.h sconnect.h logging.h logging.cpp		\
+	infokeydata.h 		\
 	loggingfeatures.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src

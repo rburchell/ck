@@ -11,16 +11,25 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  cdbwriter.h cdbwriter.cpp cdbreader.cpp cdbreader.h		\
 	  infocdbbackend.cpp infocdbbackend.h dbusnamelistener.h	\
 	  dbusnamelistener.cpp handlesignalrouter.cpp			\
-	  handlesignalrouter.h sconnect.h queuedinvoker.cpp		\
-	  queuedinvoker.h logging.h logging.cpp loggingfeatures.h
+	  handlesignalrouter.h queuedinvoker.cpp			\
+	  queuedinvoker.h loggingfeatures.h
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h
-AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
-	'-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"' \
-	'-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"' \
-	'-DCONTEXT_LOG_MODULE_NAME="libcontextsubscriber"'
-LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
+
+AM_CXXFLAGS = -I$(top_srcdir)/common \
+	      $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
+	      '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"' \
+	      '-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"' \
+	      '-DCONTEXT_LOG_MODULE_NAME="libcontextsubscriber"'
+
+$(top_builddir)/common/libcommon.a:
+	$(MAKE) -C $(top_builddir)/common libcommon.a
+
+LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS) 
+libcontextsubscriber_la_LIBADD=$(top_builddir)/common/libcommon.la
+
+.PHONY: $(top_builddir)/common/libcommon.la
 
 # moccing
 nodist_libcontextsubscriber_la_SOURCES = mocs.cpp
