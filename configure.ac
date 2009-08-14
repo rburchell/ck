@@ -55,10 +55,8 @@ AM_CONDITIONAL([CONTEXTKIT_COVERAGE], [test "$missing_deps_COVERAGE" = ""])
 
 AC_CONFIG_FILES([
         Makefile
-        contextprovider-1.0.pc
         doc/Makefile
-        doc/reference/Makefile
-        doc/reference/libcontextprovider/Makefile
+	common/Makefile
         libcontextsubscriber/Makefile
         libcontextsubscriber/cli/Makefile
         libcontextsubscriber/reg-cli/Makefile
@@ -106,42 +104,9 @@ AC_CONFIG_FILES([
 	libcontextprovider/customer-tests/Makefile
 	libcontextprovider/customer-tests/subscription/Makefile
 	libcontextprovider/customer-tests/client/Makefile
-	libcontextsubscriber/Makefile
-	libcontextsubscriber/cli/Makefile
-	libcontextsubscriber/reg-cli/Makefile
-	libcontextsubscriber/contextsubscriber-1.0.pc
-	libcontextsubscriber/customer-tests/Makefile
-	libcontextsubscriber/customer-tests/update-contextkit-providers/Makefile
 	libcontextprovider/customer-tests/value-changes/Makefile
 	libcontextprovider/customer-tests/types/Makefile
 	libcontextprovider/customer-tests/c-api/Makefile
-	libcontextsubscriber/doc/Makefile
-	libcontextsubscriber/man/Makefile
-	libcontextsubscriber/src/Makefile
-	libcontextsubscriber/unit-tests/Makefile
-	libcontextsubscriber/unit-tests/cdbreader/Makefile
-	libcontextsubscriber/unit-tests/cdbwriter/Makefile
-	libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
-	libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-static/Makefile
-	libcontextsubscriber/unit-tests/contextpropertyinfo-xml-dynamic/Makefile
-	libcontextsubscriber/unit-tests/contextpropertyinfo-xml-static/Makefile
-	libcontextsubscriber/unit-tests/contextregistryinfo-cdb-dynamic/Makefile
-	libcontextsubscriber/unit-tests/contextregistryinfo-cdb-static/Makefile
-	libcontextsubscriber/unit-tests/contextregistryinfo-xml-dynamic/Makefile
-	libcontextsubscriber/unit-tests/contextregistryinfo-xml-static/Makefile
-	libcontextsubscriber/unit-tests/handlesignalrouter/Makefile
-	libcontextsubscriber/unit-tests/propertyhandle/Makefile
-	libcontextsubscriber/unit-tests/propertyprovider/Makefile
-	libcontextsubscriber/unit-tests/util/Makefile
-	libcontextsubscriber/multithreading-tests/Makefile
-	libcontextsubscriber/multithreading-tests/new-property-in-thread/Makefile
-	libcontextsubscriber/multithreading-tests/old-property-in-thread/Makefile
-	libcontextsubscriber/multithreading-tests/single-thread/Makefile
-	libcontextsubscriber/multithreading-tests/stress-test/Makefile
-	libcontextsubscriber/multithreading-tests/using-backend-from-thread/Makefile
-	libcontextsubscriber/multithreading-tests/wait-for-subscription-only-in-thread/Makefile
-	libcontextsubscriber/multithreading-tests/wait-for-subscription-thread/Makefile
-	libcontextsubscriber/update-contextkit-providers/Makefile
         python/Makefile
         spec/Makefile
         tools/Makefile
