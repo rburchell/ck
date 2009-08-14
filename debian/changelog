@@ -1,6 +1,21 @@
-contextkit (0.2.13~unreleased) unstable; urgency=low
+contextkit (0.3~unreleased) unstable; urgency=low
 
-  * 
+  * Rewrote libcontextprovider in C++ and added C++ API for it.  The old C
+    API is still there and this version is binary and source compatible
+    with previous versions.
+  
+  * The context daemon is in its own source package now.  This makes this
+    source package more platform independent, removing the Maemo specific
+    bits.
+  
+  * Removed the fake-provider.  Instead, the core property declarations
+    are installed by the libcontextsubscriber package and are always
+    available.
+  
+    If you are a provider for core properties, you now no longer need to
+    include type declarations and documentation for them in your property
+    declaration XML file.  Just the names of the properties you provide
+    are enough.
 
  -- Marius Vollmer <marius.vollmer@nokia.com>  Mon, 20 Jul 2009 10:13:29 +0300
 
