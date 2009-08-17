@@ -1,4 +1,4 @@
-contextkit (0.3~unreleased) unstable; urgency=low
+contextkit (0.3) unstable; urgency=low
 
   * Rewrote libcontextprovider in C++ and added C++ API for it.  The old C
     API is still there and this version is binary and source compatible
@@ -17,7 +17,10 @@ contextkit (0.3~unreleased) unstable; urgency=low
     declaration XML file.  Just the names of the properties you provide
     are enough.
 
- -- Marius Vollmer <marius.vollmer@nokia.com>  Mon, 20 Jul 2009 10:13:29 +0300
+  * The default loggin level is now 'WARNING'.  Set CONTEXT_LOG_VERBOSITY
+    to 'DEBUG' if you want to see more.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Mon, 17 Aug 2009 15:35:04 +0300
 
 contextkit (0.2.12) unstable; urgency=low
 
