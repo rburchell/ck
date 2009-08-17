@@ -46,7 +46,7 @@
 
    \section Usage
 
-   The \c update-contextkit-providers binary, when lunched without parameters, will by default regenerate
+   The \c update-contextkit-providers binary, when launched without parameters, will by default regenerate
    the database in the default installation prefix. Most likely: \c "/usr/share/contextkit/providers" .
    Obviously, for this to be successful, it needs to be launched with proper privileges.
 
@@ -64,8 +64,8 @@
 
    \section Implementation
 
-   To ensure the registry consistency the regeneration is happening atomically - the
-   new database is first written to a temp-named file and then moved-over the old one.
+   To ensure the registry consistency the regeneration is done atomically: the
+   new database is first written to a temp-named file and then moved over the old one.
 */
 
 /* Make sure the given directory exists, is readable etc.

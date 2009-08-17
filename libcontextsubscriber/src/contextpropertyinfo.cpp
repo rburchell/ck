@@ -26,22 +26,27 @@
 /*!
     \page Introspection
 
-    \brief The introspection part of the API allows you to inspect the current
-    state of the registry and observe the changes happening to it.
+    \brief The Context Framework maintains a registry defining which
+    context properties are currently provided and by whom. The
+    introspection API of libcontextsubscriber allows you to inspect
+    the current state of the registry and observe its changes.
 
     \section Overview
 
     The introspection is provided via two classes: ContextRegistryInfo and
-    ContextPropertyInfo. The first one is used to access the state of the registry itself.
-    You can use it to obtain info about the list of currently available keys in the registry
-    or ie. get a list of keys for one particular provider. ContextRegistryInfo provides a
-    high-level view to the registry contents.
+    ContextPropertyInfo.
 
-    ContextRegistryInfo is a singleton class that's created on the first access.
+    ContextRegistryInfo provides a high-level view to the registry
+    contents.  You can use it to obtain info about the list of
+    currently available keys or e.g. get a list of keys for one
+    particular provider.  ContextRegistryInfo is a singleton instance
+    which is created on the first access.
 
-    The ContextPropertyInfo is used to obtain metadata about one particular key. Once created,
-    it can be used to get the type, provider and bus type of the introspected key. It also
-    provides a couple of useful signals for watching changes happening to a key.
+    ContextPropertyInfo is used to obtain metadata about one
+    particular key. Once created, it can be used to retrieve the type
+    and provider information (DBus bus type and name) of the
+    introspected key. It also provides a couple of useful signals for
+    watching changes happening to a key.
 
     \section Usage
 
@@ -66,10 +71,10 @@
     ContextPropertyInfo propInfo("Something.That.Doesnt.Exist");
     propInfo.type();     //  ...returns empty string
     propInfo.doc();      //  ...returns empty string
-    propInfo.provder();  //  ...returns empty string
+    propInfo.provider();  //  ...returns empty string
     \endcode
 
-    You can use this functionality to wait for keys to become availible in the registry.
+    You can use this functionality to wait for keys to become available in the registry.
     Just create a ContextPropertyInfo for a key that you're expecting to become present
     and connect to the /c existsChanged signal.
 
@@ -106,9 +111,9 @@
     is a replacement for it, providing better API and better implementation while maintaining the
     same core ideas and structure.
 
-    \section Quicklook
+    \section quicklook A quick look
 
-    A quick introduction to major changes:
+    The following code for creating a handle for a context property:
 
     \code
     DuiValueSpaceItem topEdge("Context.Screen.TopEdge");
@@ -124,7 +129,7 @@
                      this, SLOT(topEdgeChanged()));
     \endcode
 
-    to list keys:
+    The following code for listing the available context keys:
 
     \code
     DuiValueSpaceItem::listKeys();
@@ -136,10 +141,10 @@
     ContextRegistryInfo::instance()->listKeys();
     \endcode
 
-    \section prefix Context. prefix
+    \section prefix The Context. prefix
 
     In \b DuiValueSpace and accompanying packages, the properties used to
-    have a "Contex." prefix. In example:
+    have a "Context." prefix. For example:
 
     \code
     Context.Screen.TopEdge
@@ -147,7 +152,7 @@
     \endcode
 
     This 'Context.' has been dropped now from \b libcontextsubscriber and
-    all the provider packages. Providers now explicitely provide properties
+    all the provider packages. Providers now explicitly provide properties
     with keys like:
 
     \code
@@ -157,7 +162,7 @@
 
     For compatibility reasons the 'Context.' prefix is still supported in
     newer releases of \b DuiValueSpace. The \b DuiValueSpace library transparently
-    adds the 'Contex.' prefix to all access functions.
+    adds the 'Context.' prefix to all access functions.
 
     A call to:
 

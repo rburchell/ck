@@ -43,17 +43,17 @@
     \endcode
 
     Although the key names can be considered to form a tree (with
-    "Screen" at the root in the preceeding example, etc.) there is no
-    semantic relationship between parent and child nodes in that tree:
-    the key "Screen" is unrelated to "Screen.TopEdge".  In particular,
-    change notifications do not travel up the tree.
+    "Screen" at the root) there is no semantic relationship between
+    parent and child nodes in the tree: the key "Screen" is unrelated
+    to "Screen.TopEdge".  In particular, change notifications do not
+    travel up the tree.
 
     The \ref Introspection section describes in detail how to get a list of
     existing keys and examine their capabilities.
 
     Programmers access the key/value pairs through instances of the
-    ContextProperty class.  These instances allow applications to read
-    item values and receive change notifications.
+    ContextProperty class.  These instances allow applications to
+    access the values and receive change notifications.
 
     Example:
     \code
@@ -62,7 +62,7 @@
                      this, SLOT(topEdgeChanged()));
     \endcode
 
-    In your edgeUpChanged method you are able to get the data:
+    In your edgeUpChanged method you are able to retrieve the value of the property:
     \code
     qWarning() << "The edge " << topEdge->value() << " is up";
     \endcode
@@ -72,8 +72,8 @@
     expensive to determine, so you should only subscribe to those keys
     that you are currently interested in.  You can temporarily
     unsubscribe from a key without destroying the ContextProperty
-    instance for it by using the unsubscribe() member function. Later,
-    you can resume the subscription by calling the subscribe() member
+    instance by using the unsubscribe() member function. Later, you
+    can resume the subscription by calling the subscribe() member
     function.
 
     \code
@@ -88,13 +88,12 @@
     }
     \endcode
 
-    All of the context properties can be used anytime, it doesn't
-    matter if the provider of the property is running or not,
-    installed or not.  If the system/provider can't provide you with a
-    value, the value of the context property will be null.  If for
-    some reason you are interested in property metadata (such as a
-    key's current provider, availability, etc.) you should consult the
-    \ref Introspection API.
+    All the context properties can be used anytime, not depending on
+    whether the provider of the property is installed or running.  If
+    the system/provider cannot provide you with a value, the value of
+    the context property will be null.  If for some reason you are
+    interested in property metadata (such as a key's current provider,
+    availability, etc.) you should consult the \ref Introspection API.
 */
 
 #include "contextproperty.h"
