@@ -34,7 +34,7 @@
     The Context Properties are key/value pairs. The keys are
     strings and the values are QVariants.
 
-    Key are arranged in a hierarchical name space like in this example
+    Key are arranged in a hierarchical namespace like in this example
     of two contextual properties
 
     \code
@@ -141,7 +141,7 @@ struct ContextPropertyPrivate
    property is unsubscribed.
 
    A ContextProperty is generally asynchronous and relies on a running
-   event loop.  Subscritions and unsubcriptions are only handled and
+   event loop.  Subscriptions and unsubcriptions are only handled and
    new values are only received when your program enters the event
    loop.
 
@@ -172,7 +172,7 @@ struct ContextPropertyPrivate
    before calling waitForSubscription() on any of them.  Subscriptions
    are usually bundled together behind the scenes so that they can all
    be done with a single round trip to the provider.  Interleaving
-   creation of ContextPropertys with calls to waitForSubscription()
+   creation of ContextProperties with calls to waitForSubscription()
    would prevent this optimization.
 
    \note The \c ContextProperty class follows the usual QObject rules
