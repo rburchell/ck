@@ -46,7 +46,7 @@ Description: Helper library for providers of context properties
 Package: libcontextprovider-dev
 Section: libdevel
 Architecture: any
-Depends: libcontextprovider0 (= ${binary:Version}), libdbus-1-dev, libdbus-glib-1-dev, libglib2.0-dev, libgee-dev
+Depends: libcontextprovider0 (= ${binary:Version}), libdbus-1-dev, libqt4-dev
 Description: Helper library for providers of context properties
  The libcontextprovider library implements the provider side of the
  org.freedesktop.ContextKit D-Bus interface.
