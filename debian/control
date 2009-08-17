@@ -6,10 +6,12 @@ Build-Depends: debhelper (>= 5),
                automake1.9,
                python,
                python-central,
-               xsltproc,
                libqt4-dev,
-               doxygen,
-               libcdb-dev
+               libcdb-dev,
+               libglib2.0-dev (>= 2.12.0),
+               libdbus-1-dev,
+               xsltproc,
+               doxygen
 XS-Python-Version: all
 Standards-Version: 3.8.0
 

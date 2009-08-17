@@ -24,7 +24,6 @@
 #include <stdio.h>
 #include <glib.h>
 #include <dbus/dbus.h>
-#include <glib-object.h>
 #include <assert.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -519,7 +518,6 @@ int main(int argc, char **argv)
     int ret;
 
     /* Initialization */
-    g_type_init ();
     loop = g_main_loop_new (NULL, FALSE);
 
     /* Start the client program */
