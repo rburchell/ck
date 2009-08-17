@@ -67,6 +67,7 @@ struct GroupPrivate {
     QSet<const Property *> properties;
 };
 
+/// Contructs an empty Group object with the given parent.
 Group::Group(QObject* parent)
     : QObject(parent)
 {
@@ -76,6 +77,8 @@ Group::Group(QObject* parent)
     priv->propertiesSubscribedTo = 0;
 }
 
+/// Adds a Property object to the Group. The Property object needs to
+/// exist as long as the Group object is in use.
 void Group::add(const Property &property)
 {
     contextDebug() << F_GROUP << "Adding property" << property.key();
@@ -87,12 +90,13 @@ void Group::add(const Property &property)
              this, SLOT(onLastSubscriberDisappeared()));
 }
 
+/// Returns the set of properties currently belonging to the Group.
 QSet<const Property *> Group::getProperties()
 {
     return priv->properties;
 }
 
-/// Called when any of the watched Property objects is subscribed to.
+/// Called when some of the watched Property objects are subscribed to.
 void Group::onFirstSubscriberAppeared()
 {
     ++(priv->propertiesSubscribedTo);
@@ -102,7 +106,7 @@ void Group::onFirstSubscriberAppeared()
     }
 }
 
-/// Called when any of the watched Property objects is unsubscribed from.
+/// Called when all of the watched Property objects are unsubscribed from.
 void Group::onLastSubscriberDisappeared()
 {
     --(priv->propertiesSubscribedTo);

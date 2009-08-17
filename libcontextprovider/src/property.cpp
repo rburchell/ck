@@ -31,7 +31,8 @@ namespace ContextProvider {
 /*!
     \class Property ContextProvider ContextProvider
 
-    \brief A Property object represents a Context property.
+    \brief A Property object represents a context property, i.e., a
+    key-value pair.
 
     Each Property object is associated with a Service object at
     construction time.

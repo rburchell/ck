@@ -58,7 +58,7 @@ signals:
     /// them were subscribed to.
     void firstSubscriberAppeared();
     
-    /// Emitted when the group of Context objects is subscribed
+    /// Emitted when the group of Context objects is unsubscribed
     /// from. I.e., when some of them were subscribed to and now all of
     /// them were unsubscribed from.
     void lastSubscriberDisappeared();

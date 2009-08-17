@@ -61,14 +61,15 @@ private slots:
     void onManagerLastSubscriberDisappeared(const QString &key);
 
 signals:
-    /// This is emitted when the first subscriber appears for this Property.
-    /// It can be used ie. to start the actual process of harvesting the 
-    /// data needed for this Property.
+    /// This is emitted when the first subscriber appears for this
+    /// Property.  It can be used e.g. to start the actual process of
+    /// harvesting the data needed for this Property.
     void firstSubscriberAppeared(const QString &key); 
     
-    /// This is emitted when the last subscriber disappears for this Property.
-    /// It can be used ie. to stop the process of harvesting the 
-    /// data needed for this Property (and save resources).
+    /// This is emitted when the last subscriber disappears for this
+    /// Property.  It can be used e.g. to stop the process of
+    /// harvesting the data needed for this Property (and save
+    /// resources).
     void lastSubscriberDisappeared(const QString &key);
 };
 
