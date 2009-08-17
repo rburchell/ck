@@ -1,3 +1,9 @@
+contextkit (0.3.2) unstable; urgency=low
+
+  * Fixed dependencies of libcontextprovider-dev.
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Mon, 17 Aug 2009 18:58:06 +0300
+
 contextkit (0.3.1) unstable; urgency=low
 
   * Fixed Build-Dependencies.
