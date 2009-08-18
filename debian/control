@@ -99,7 +99,7 @@ Description: Helper library for subscribers of context properties
 Package: libcontextsubscriber0-dbg
 Priority: extra
 Architecture: any
-Depends: libcontextsubscriber0 (= ${binary:Version}), contextkit-dbg (= ${binary:Version})
+Depends: libcontextsubscriber0 (= ${binary:Version})
 Description: Helper library for subscribers of context properties
  The libcontextsubscriber library implements the subscribers side of the
  org.freedesktop.ContextKit D-Bus interface.
