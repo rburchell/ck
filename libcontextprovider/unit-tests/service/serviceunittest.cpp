@@ -74,9 +74,13 @@ class ServiceUnitTest : public QObject
 private slots:
     void init();
     void cleanup();
+    void sanityCheck();
+    void defaults();
 
 private:
     Service *service;
+
+    friend class ContextProvider::Service;
 };
 
 // Before each test
@@ -89,6 +93,23 @@ void ServiceUnitTest::init()
 void ServiceUnitTest::cleanup()
 {
     delete service;
+}
+
+void ServiceUnitTest::sanityCheck()
+{
+    QVERIFY(service->manager() != NULL);
+}
+
+void ServiceUnitTest::defaults()
+{
+    QVERIFY(service->defaultService == NULL);
+    service->setAsDefault();
+    QVERIFY(service->defaultService == service);
+
+    Service *otherService = new Service(QDBusConnection::SessionBus, "test2");
+    otherService->setAsDefault();
+    QVERIFY(service->defaultService == service);
+    delete otherService;
 }
 
 #include "serviceunittest.moc"

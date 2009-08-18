@@ -29,6 +29,8 @@
 #include <QHash>
 #include <QVariant>
 
+class ServiceUnitTest;
+
 namespace ContextProvider {
 
 class Manager;
@@ -59,6 +61,7 @@ private:
     static Service *defaultService;
 
     friend class Property;
+    friend class ::ServiceUnitTest;
 
 private slots:
     void onStartMe();
