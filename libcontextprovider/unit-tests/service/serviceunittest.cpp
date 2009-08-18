@@ -29,6 +29,9 @@
 
 using namespace ContextProvider;
 
+QString *lastKey = NULL;
+QVariant *lastValue = NULL;
+
 /* Mocked Manager */
 
 Manager::Manager()
@@ -41,6 +44,8 @@ void Manager::addKey(const QString &key)
 
 void Manager::setKeyValue(const QString &key, const QVariant &v)
 {
+    lastValue = new QVariant(v);
+    lastKey = new QString(key);
 }
 
 QVariant Manager::getKeyValue(const QString &key)
@@ -76,6 +81,7 @@ private slots:
     void cleanup();
     void sanityCheck();
     void defaults();
+    void setValue();
 
 private:
     Service *service;
@@ -110,6 +116,13 @@ void ServiceUnitTest::defaults()
     otherService->setAsDefault();
     QVERIFY(service->defaultService == service);
     delete otherService;
+}
+
+void ServiceUnitTest::setValue()
+{
+    service->setValue("Battery.ChargeLevel", 99);
+    QCOMPARE(*lastKey, QString("Battery.ChargeLevel"));
+    QCOMPARE(lastValue->toInt(), 99);
 }
 
 #include "serviceunittest.moc"
