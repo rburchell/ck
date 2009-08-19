@@ -159,18 +159,25 @@ void SubscriberInterface::resetLogs()
 
 // Mock implementation of the DBusNameListener
 
-DBusNameListener::DBusNameListener(const QDBusConnection connection, const QString &busName,
-                                   bool initialCheck, QObject* parent)
-    : initialCheck(initialCheck)
+DBusNameListener::DBusNameListener(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
 {
     // qDebug() << "Returning a mock dbus name listener";
     // Store the mock implementation (created by the tested class)
     mockDBusNameListener = this;
 }
 
-bool DBusNameListener::isServicePresent() const
+DBusNameListener::~DBusNameListener()
 {
-    return true;
+}
+
+DBusNameListener::ServicePresence DBusNameListener::isServicePresent() const
+{
+    return Present;
+}
+
+void DBusNameListener::startListening(bool nameHasOwnerCheck)
+{
+    this->nameHasOwnerCheck = nameHasOwnerCheck;
 }
 
 // Mock implementation of HandleSignalRouter
@@ -841,7 +848,7 @@ void PropertyProviderUnitTests::providerPresentAtStartup()
 
     // Test: make the DBusNameListener notify the PropertyProvider
     // that the real provider is present
-    if (mockDBusNameListener->initialCheck) {
+    if (mockDBusNameListener->nameHasOwnerCheck) {
         emit mockDBusNameListener->nameAppeared();
     }
 

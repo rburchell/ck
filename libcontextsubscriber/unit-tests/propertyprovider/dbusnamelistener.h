@@ -34,16 +34,20 @@ class DBusNameListener : public QObject
 {
     Q_OBJECT
 public:
-    DBusNameListener(const QDBusConnection connection, const QString &busName,
-                     bool initialCheck = true, QObject* parent = 0);
-    bool isServicePresent() const;
+    enum ServicePresence {NotPresent = 0, Present, Unknown};
+
+    explicit DBusNameListener(QDBusConnection::BusType busType, const QString &busName, QObject* parent = 0);
+    virtual ~DBusNameListener();
+    ServicePresence isServicePresent() const;
+
+    void startListening(bool nameHasOwnerCheck);
 
 signals:
     void nameAppeared();
     void nameDisappeared();
 
 public: // for tests
-    bool initialCheck;
+    bool nameHasOwnerCheck;
 
     friend class PropertyProviderUnitTests;
 };
