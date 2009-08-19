@@ -160,17 +160,25 @@ void PropertyProvider::resetLogs()
 
 // Mock implementation of the DBusNameListener
 
-DBusNameListener::DBusNameListener(const QDBusConnection busType,
-                                   const QString &busName, bool initialCheck, QObject* parent)
- : servicePresent(false)
+DBusNameListener::DBusNameListener(QDBusConnection::BusType busType,
+                                   const QString &busName, QObject* parent)
+ : servicePresent(NotPresent)
 {
     // Store the object created by the class to be tested
     mockDBusNameListener = this;
 }
 
-bool DBusNameListener::isServicePresent() const
+DBusNameListener::~DBusNameListener()
+{
+}
+
+DBusNameListener::ServicePresence DBusNameListener::isServicePresent() const
 {
     return servicePresent;
+}
+
+void DBusNameListener::startListening(bool nameHasOwnerCheck)
+{
 }
 
 //
@@ -199,7 +207,7 @@ void PropertyHandleUnitTests::init()
     // Reset the logs
     PropertyProvider::resetLogs();
     // Reset the DBusNameListener (it is created only once, by the class to be tested)
-    mockDBusNameListener->servicePresent = false;
+    mockDBusNameListener->servicePresent = DBusNameListener::NotPresent;
 }
 
 // After each test
@@ -799,7 +807,7 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
 
     // Test:
     // Command the DBusNameListener to tell that the Commander has appeared
-    mockDBusNameListener->servicePresent = true;
+    mockDBusNameListener->servicePresent = DBusNameListener::Present;
     emit mockDBusNameListener->nameAppeared();
 
     // Expected results:
@@ -818,7 +826,7 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
 
     // Test:
     // Command the DBusNameListener to tell that the Commander has disappeared
-    mockDBusNameListener->servicePresent = false;
+    mockDBusNameListener->servicePresent = DBusNameListener::NotPresent;
     emit mockDBusNameListener->nameDisappeared();
 
     // Expected results:
@@ -852,7 +860,7 @@ void PropertyHandleUnitTests::commandingDisabled()
     propertyHandle->ignoreCommander();
 
     // Command the DBusNameListener to tell that the Commander has appeared
-    mockDBusNameListener->servicePresent = true;
+    mockDBusNameListener->servicePresent = DBusNameListener::Present;
     emit mockDBusNameListener->nameAppeared();
 
     // Expected results:
@@ -866,7 +874,7 @@ void PropertyHandleUnitTests::commandingDisabled()
 
     // Test:
     // Command the DBusNameListener to tell that the Commander has disappeared
-    mockDBusNameListener->servicePresent = false;
+    mockDBusNameListener->servicePresent = DBusNameListener::NotPresent;
     emit mockDBusNameListener->nameDisappeared();
 
     // Expected results:
