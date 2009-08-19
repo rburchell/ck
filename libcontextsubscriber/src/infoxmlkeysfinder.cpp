@@ -40,6 +40,7 @@ bool InfoXmlKeysFinder::startDocument()
     inKey = false;
     inKeyType = false;
     inKeyDoc = false;
+    complexKeyType = false;
     return true;
 }
 
