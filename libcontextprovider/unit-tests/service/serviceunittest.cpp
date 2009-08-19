@@ -82,6 +82,7 @@ private slots:
     void sanityCheck();
     void defaults();
     void setValue();
+    void start();
 
 private:
     Service *service;
@@ -92,7 +93,7 @@ private:
 // Before each test
 void ServiceUnitTest::init()
 {
-    service = new Service(QDBusConnection::SessionBus, "test");
+    service = new Service(QDBusConnection::SessionBus, "test.com");
 }
 
 // After each test
@@ -123,6 +124,12 @@ void ServiceUnitTest::setValue()
     service->setValue("Battery.ChargeLevel", 99);
     QCOMPARE(*lastKey, QString("Battery.ChargeLevel"));
     QCOMPARE(lastValue->toInt(), 99);
+}
+
+void ServiceUnitTest::start()
+{
+    QCOMPARE(service->start(), true);
+    QCOMPARE(service->start(), false);
 }
 
 #include "serviceunittest.moc"
