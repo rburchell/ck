@@ -83,6 +83,7 @@ private slots:
     void defaults();
     void setValue();
     void start();
+    void restart();
 
 private:
     Service *service;
@@ -130,6 +131,15 @@ void ServiceUnitTest::start()
 {
     QCOMPARE(service->start(), true);
     QCOMPARE(service->start(), false);
+}
+
+void ServiceUnitTest::restart()
+{
+    QCOMPARE(service->start(), true);
+    QCOMPARE(service->start(), false);
+    service->restart();
+
+    // Hmm... would be nice to actually check something here... ;)
 }
 
 #include "serviceunittest.moc"
