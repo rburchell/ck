@@ -31,6 +31,8 @@ using namespace ContextProvider;
 
 QString *lastKey = NULL;
 QVariant *lastValue = NULL;
+Manager *lastManager = NULL;
+QDBusConnection *lastConnection = NULL;
 
 /* Mocked Manager */
 
@@ -57,6 +59,8 @@ QVariant Manager::getKeyValue(const QString &key)
 
 ManagerAdaptor::ManagerAdaptor(Manager *m, QDBusConnection *c) 
 {
+    lastManager = m;
+    lastConnection = c;
 }
 
 /* Mocked Property */
@@ -101,6 +105,11 @@ void ServiceUnitTest::init()
 void ServiceUnitTest::cleanup()
 {
     delete service;
+
+    lastKey = NULL;
+    lastValue = NULL;
+    lastManager = NULL;
+    lastConnection = NULL;
 }
 
 void ServiceUnitTest::sanityCheck()
@@ -129,17 +138,35 @@ void ServiceUnitTest::setValue()
 
 void ServiceUnitTest::start()
 {
+    QVERIFY(lastManager == NULL);
+    QVERIFY(lastConnection == NULL);
+
     QCOMPARE(service->start(), true);
+    QVERIFY(lastManager);
+    QVERIFY(lastConnection);
+
     QCOMPARE(service->start(), false);
+    QVERIFY(lastManager);
+    QVERIFY(lastConnection);
 }
 
 void ServiceUnitTest::restart()
 {
-    QCOMPARE(service->start(), true);
-    QCOMPARE(service->start(), false);
-    service->restart();
+    QVERIFY(lastManager == NULL);
+    QVERIFY(lastConnection == NULL);
 
-    // Hmm... would be nice to actually check something here... ;)
+    QCOMPARE(service->start(), true);
+    QVERIFY(lastManager);
+    QVERIFY(lastConnection);
+
+    Manager *cachedManager;
+    QDBusConnection *cachedConnection;
+
+    service->restart();
+    QVERIFY(lastManager);
+    QVERIFY(lastConnection);
+    QVERIFY(lastManager != cachedManager);
+    QVERIFY(lastConnection != cachedConnection);
 }
 
 #include "serviceunittest.moc"
