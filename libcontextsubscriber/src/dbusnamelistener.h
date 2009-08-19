@@ -24,27 +24,36 @@
 
 #include <QObject>
 #include <QString>
+#include <QDBusConnection>
 
 class QDBusPendingCallWatcher;
-class QDBusConnection;
 
 namespace ContextSubscriber {
+
 
 class DBusNameListener : public QObject
 {
     Q_OBJECT
 public:
-    DBusNameListener(const QDBusConnection connection, const QString &busName,
-                     bool initialCheck = true, QObject *parent = 0);
-    bool isServicePresent() const;
+    enum ServicePresence {NotPresent = 0, Present, Unknown};
+
+    explicit DBusNameListener(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    virtual ~DBusNameListener();
+
+    void startListening(bool nameHasOwnerCheck);
+
+    ServicePresence isServicePresent() const;
 
 private slots:
     void onServiceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
     void onNameHasOwnerFinished(QDBusPendingCallWatcher* watcher);
 
 private:
-    bool servicePresent; ///< Our current understanding about the service name's state
+    ServicePresence servicePresent; ///< Our current understanding about the service name's state
+    QDBusConnection::BusType busType; ///< The service bus type we are interested in
     QString busName; ///< The service name we are interested in
+    bool listeningStarted;
+    QDBusConnection* connection;
 
     void setServicePresent();
     void setServiceGone();

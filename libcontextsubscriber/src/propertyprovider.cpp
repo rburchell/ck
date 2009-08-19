@@ -55,11 +55,15 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
     sconnect(managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
 
     // Notice if the provider on the dbus comes and goes
-    providerListener = new DBusNameListener(*connection, busName, false, this);
+    providerListener = new DBusNameListener(busType, busName, this);
     sconnect(providerListener, SIGNAL(nameAppeared()),
              this, SLOT(onProviderAppeared()));
     sconnect(providerListener, SIGNAL(nameDisappeared()),
              this, SLOT(onProviderDisappeared()));
+    // Listen to the provider appearing and disappearing, but don't
+    // perform the initial NameHasOwner check.  We will try to connect
+    // to the provider at startup, whether it's present or not.
+    providerListener->startListening(false);
 
     // Connect the signal of changing values to the class who handles it
     HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();

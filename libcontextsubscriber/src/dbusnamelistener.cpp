@@ -33,12 +33,16 @@ namespace ContextSubscriber {
 
 /*! \class DBusNameListener
 
-  \brief Listens for changes in a specific service name on a DBus bus,
+  \brief Listens for changes in a specific service name on a D-Bus bus,
   optionally gets the initial state of the service name.
 
-  When you create an instance of this class, it will open a connection
-  to DBus bus \c connection, and will start to listen to name changes of
-  service name \c busName.  If a service appears, it will emit the \c
+  When you create an instance of this class, it won't open any D-Bus
+  connections. When startListening is called, the instance connects to
+  the NameOwnerChanged D-Bus signal.  It can also check the current
+  status of the service by executing an asynchronous NameHasOwner
+  call.
+
+  If the specified service appears on D-Bus, it will emit the \c
   nameAppeared() signal, if disappears, then the nameDisappeared()
   signal.  An initial query and signal emission will be done if \c
   initialCheck is true, which is the default.
@@ -49,18 +53,44 @@ namespace ContextSubscriber {
   <tt>isServicePresent()</tt> can return false, even though the service
   is present.
 */
-DBusNameListener::DBusNameListener(QDBusConnection connection, const QString &busName,
-                                   bool initialCheck, QObject *parent) :
-    QObject(parent), servicePresent(false), busName(busName)
+DBusNameListener::DBusNameListener(QDBusConnection::BusType busType, const QString &busName, QObject *parent) :
+QObject(parent), servicePresent(Unknown), busType(busType), busName(busName), listeningStarted(false), connection(0)
 {
-    sconnect(connection.interface(),
+    // Don't do anything, until the user initiates the listening by calling startListening.
+}
+
+DBusNameListener::~DBusNameListener()
+{
+    delete connection;
+    connection = 0;
+}
+
+/// Start listening to the NameOwnerChanged signal over D-Bus. If \a
+/// nameHasOwnerCheck is true, also send a NameHasOwner query to D-Bus
+/// (asyncronously).
+void DBusNameListener::startListening(bool nameHasOwnerCheck)
+{
+    if (listeningStarted) return;
+
+    listeningStarted = true;
+    if (busType == QDBusConnection::SystemBus) {
+        connection = new QDBusConnection(QDBusConnection::systemBus());
+    }
+    else if (busType == QDBusConnection::SessionBus) {
+        connection = new QDBusConnection(QDBusConnection::sessionBus());
+    }
+    else {
+        return;
+    }
+
+    sconnect(connection->interface(),
              SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
              this,
              SLOT(onServiceOwnerChanged(const QString&, const QString&, const QString&)));
 
     // Check if the service is already there
-    if (initialCheck) {
-        QDBusPendingCall nameHasOwnerCall = connection.interface()->asyncCall("NameHasOwner", busName);
+    if (nameHasOwnerCheck) {
+        QDBusPendingCall nameHasOwnerCall = connection->interface()->asyncCall("NameHasOwner", busName);
         SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(nameHasOwnerCall, this);
         sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
                  this, SLOT(onNameHasOwnerFinished(QDBusPendingCallWatcher *)));
@@ -84,16 +114,16 @@ void DBusNameListener::onServiceOwnerChanged(const QString &name, const QString 
 
 void DBusNameListener::setServicePresent()
 {
-    if (servicePresent == false) {
-        servicePresent = true;
+    if (servicePresent != Present) {
+        servicePresent = Present;
         emit nameAppeared();
     }
 }
 
 void DBusNameListener::setServiceGone()
 {
-    if (servicePresent == true) {
-        servicePresent = false;
+    if (servicePresent != NotPresent) {
+        servicePresent = NotPresent;
         emit nameDisappeared();
     }
 }
@@ -106,9 +136,16 @@ void DBusNameListener::onNameHasOwnerFinished(QDBusPendingCallWatcher* watcher)
         // The name has an owner
         setServicePresent();
     }
+    else {
+        // PropertyHandle's are waiting for any signal if they have initiated the
+        // "is commander there" check. So notify also the opposite case.
+        setServiceGone();
+    }
 }
 
-bool DBusNameListener::isServicePresent() const
+/// Return our current understanding (not present, present, unknown)
+/// of the presence of the watched service.
+DBusNameListener::ServicePresence DBusNameListener::isServicePresent() const
 {
     return servicePresent;
 }

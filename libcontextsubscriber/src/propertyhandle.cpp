@@ -39,10 +39,9 @@
 namespace ContextSubscriber {
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
-static const QDBusConnection commanderDBusConnection = QDBusConnection::sessionBus();
 static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
 
-DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusConnection, commanderDBusName);
+DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusType, commanderDBusName);
 bool PropertyHandle::commandingEnabled = true;
 bool PropertyHandle::typeCheckEnabled = false;
 
@@ -77,14 +76,29 @@ PropertyHandle::PropertyHandle(const QString& key)
     // intention of the upper layer is to subscribe construction time.
     // If this intention is changed, changes are needed here as well.
 
-    // Start listening for the beloved commander
+    // Read the information about the provider. This needs to be
+    // done before calling updateProvider.
+    myInfo = new ContextPropertyInfo(myKey, this);
+
+    // Start listening for the context commander, and also initiate a
+    // NameHasOwner check.
+
     sconnect(commanderListener, SIGNAL(nameAppeared()),
              this, SLOT(updateProvider()));
     sconnect(commanderListener, SIGNAL(nameDisappeared()),
              this, SLOT(updateProvider()));
 
-    myInfo = new ContextPropertyInfo(myKey, this);
-    updateProvider();
+    commanderListener->startListening(true);
+
+    // Check if commander is already there:
+    DBusNameListener::ServicePresence commanderPresence = commanderListener->isServicePresent();
+    if (commanderPresence != DBusNameListener::Unknown) {
+        // The status of the commander is known, so we can connect to
+        // the provider (or commander) immediately.
+        updateProvider();
+    }
+    // Otherwise, delay connecting to the provider until we know
+    // whether commander is present.
 
     // Start listening to changes in property registry (e.g., new keys, keys removed)
     sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(const QStringList&)),
@@ -111,7 +125,7 @@ void PropertyHandle::updateProvider()
 {
     PropertyProvider *newProvider;
 
-    if (commandingEnabled && commanderListener->isServicePresent()) {
+    if (commandingEnabled && commanderListener->isServicePresent() == DBusNameListener::Present) {
         // If commander is present it should be able to override the
         // property, so connect to it.
         newProvider = PropertyProvider::instance(commanderDBusType,
