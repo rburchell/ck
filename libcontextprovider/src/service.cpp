@@ -192,11 +192,12 @@ void Service::setValue(const QString &key, const QVariant &val)
 }
 
 /// Start the Service again after it has been stopped.  All clients
-/// will resubscribe to its properties.
-void Service::start()
+/// will resubscribe to its properties. Returns true on success, 
+/// false otherwise.
+bool Service::start()
 {
     if (priv->connection)
-        return;
+        return false;
 
     priv->connection = new QDBusConnection(QDBusConnection::connectToBus(priv->busType, priv->busName));
     ManagerAdaptor *managerAdaptor = new ManagerAdaptor(priv->manager, priv->connection);
@@ -205,15 +206,17 @@ void Service::start()
     if (!priv->connection->registerService(priv->busName)) {
         contextCritical() << F_SERVICE << "Failed to register service with name" << priv->busName;
         stop();
-        return;
+        return false;
     }
 
     // Register object
     if (managerAdaptor && !priv->connection->registerObject("/org/freedesktop/ContextKit/Manager", priv->manager)) {
         contextCritical() << F_SERVICE << "Failed to register the Manager object for" << priv->busName;
         stop();
-        return;
+        return false;
     }
+
+    return true;
 }
 
 /// Stop the service.  This will cause it to disappear from D-Bus.

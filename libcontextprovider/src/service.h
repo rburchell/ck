@@ -45,7 +45,7 @@ public:
     explicit Service(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
     virtual ~Service();
 
-    void start();
+    bool start();
     void stop();
     void restart();
 
