@@ -1,0 +1,6 @@
+coverage
+loggingfeatures.h
+queuedinvoker.cpp
+queuedinvoker.h
+service.cpp
+service.h

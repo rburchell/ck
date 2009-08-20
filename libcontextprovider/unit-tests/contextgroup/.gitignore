@@ -5,3 +5,5 @@ contextgroupunittest
 logging.h
 logging.cpp
 loggingfeatures.h
+group.cpp
+group.h
