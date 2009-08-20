@@ -2,10 +2,10 @@
 
 DIRS="commander subscription asynchronicity registry"
 
-if pkg-config contextprovider-1.0 || [ -e ../../libcontextprovider/.libs/libcontextprovider.so ]
+if pkg-config contextprovider-1.0 || [ -e ../../libcontextprovider/src/.libs/libcontextprovider.so ]
 then
 	export CONTEXT_PROVIDERS=.
-	export LD_LIBRARY_PATH=../../src/.libs:../../../libcontextprovider/.libs
+	export LD_LIBRARY_PATH=../../src/.libs:../../../libcontextprovider/src/.libs
 	export PATH=$PATH:../../../python:../../cli:../../reg-cli
 
 	for dir in $DIRS; do
