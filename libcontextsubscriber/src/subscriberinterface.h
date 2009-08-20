@@ -58,6 +58,10 @@ private:
     SubscriberInterface& operator=(const SubscriberInterface& other);
     QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
 
+protected:
+    void connectNotify(const char *signal);
+    void disconnectNotify(const char *signal);
+
     static const char* interfaceName;
 };
 } // end namespace

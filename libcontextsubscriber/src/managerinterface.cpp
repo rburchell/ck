@@ -83,4 +83,16 @@ bool ManagerInterface::isGetSubscriberFailed() const
     return getSubscriberFailed;
 }
 
+void ManagerInterface::connectNotify(const char *signal)
+{
+    // we don't want to AddMatch any signals on the DBus side
+    QObject::connectNotify(signal);
+}
+
+void ManagerInterface::disconnectNotify(const char *signal)
+{
+    // we don't want to AddMatch any signals on the DBus side
+    QObject::disconnectNotify(signal);
+}
+
 } // end namespace

@@ -52,6 +52,10 @@ private slots:
 
 private:
     bool getSubscriberFailed; ///< Previous async GetSubscriber call failed
+
+protected:
+    void connectNotify(const char *signal);
+    void disconnectNotify(const char *signal);
 };
 
 } // end namespace

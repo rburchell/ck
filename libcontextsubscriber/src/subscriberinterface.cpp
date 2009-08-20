@@ -143,4 +143,23 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
     QStringList keys = watcher->property("keysToSubscribe").toStringList();
     emit subscribeFinished(keys.toSet());
 }
+
+void SubscriberInterface::connectNotify(const char *signal)
+{
+    // only Changed signal should be AddMatch'd on the DBus side
+    if (qstrcmp(signal, SIGNAL(Changed(QMap<QString,QVariant>,QStringList))) == 0)
+        QDBusAbstractInterface::connectNotify(signal);
+    else
+        QObject::connectNotify(signal);
+}
+
+void SubscriberInterface::disconnectNotify(const char *signal)
+{
+    // only Changed signal should be AddMatch'd on the DBus side
+    if (qstrcmp(signal, SIGNAL(Changed(QMap<QString,QVariant>,QStringList))) == 0)
+        QDBusAbstractInterface::disconnectNotify(signal);
+    else
+        QObject::disconnectNotify(signal);
+}
+
 } // end namespace
