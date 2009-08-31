@@ -47,6 +47,7 @@ def stdoutRead (object,lines):
 class Subscription(unittest.TestCase):
 
 	def setUp(self):
+		os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide.context"
 		self.flexiprovider = Popen(["context-provide","session:com.nokia.test",
 			   "int","test.int","1",
 			   "string","test.string","foobar",
@@ -276,6 +277,7 @@ class MultipleSubscribers(unittest.TestCase):
 		pass
 
 	def setUp(self):
+		os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide.context"
 		self.flexiprovider = Popen(["context-provide","session:com.nokia.test",
 			   "int","test.int","1",
 			   "string","test.string","foobar",
