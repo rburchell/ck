@@ -59,6 +59,8 @@ void CommandWatcher::help()
         qDebug() << "  ikey KEY                        - get the info()->key for a key (rather useless)";
         qDebug() << "  man KEY                         - get the info()->doc for a key";
         qDebug() << "  type KEY                        - get the info()->type for a key";
+        qDebug() << "  plugin KEY                      - get the info()->plugin for a key";
+        qDebug() << "  constructionstring KEY          - get the info()->constructionstring for a key";
         qDebug() << "Any prefix of a command can be used as an abbreviation";
 }
 
@@ -147,6 +149,18 @@ void CommandWatcher::interpret(const QString& command) const
             QString key = args[0];
             if (properties->contains(key))
                 out << "type: " << properties->value(key)->info()->type() << endl;
+            else
+                qDebug() << "no such key:" << key;
+        } else if (QString("plugin").startsWith(commandName)) {
+            QString key = args[0];
+            if (properties->contains(key))
+                out << "plugin: " << properties->value(key)->info()->plugin() << endl;
+            else
+                qDebug() << "no such key:" << key;
+        } else if (QString("constructionstring").startsWith(commandName)) {
+            QString key = args[0];
+            if (properties->contains(key))
+                out << "constructionstring: " << properties->value(key)->info()->constructionString() << endl;
             else
                 qDebug() << "no such key:" << key;
         } else
