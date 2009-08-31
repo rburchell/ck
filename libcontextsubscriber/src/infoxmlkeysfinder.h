@@ -44,11 +44,12 @@ private:
     bool inKeyType; ///< Are we in the <key><type>...
     bool complexKeyType; ///< Are we in a sub-element of <type>...
     bool inKeyDoc; ///< Are we in the <key><doc>...
-    QString currentProvider; ///< For our current parse position, the <provider service=?>.
+    QString currentPlugin; ///< For our current parse position, the <provider plugin=?>.
+    QString currentConstructionString; ///< For our current parse position, the <provider constructionString=?>.
+
     QString currentKeyName; ///< For our current parse position, the <key>? name.
     QString currentKeyType; ///< For our current parse position, the <key><type>? type.
     QString currentKeyDoc; ///< For our current parse position, the <key><doc>? documentation.
-    QString currentBus; ///< For our current parse position, the <provider bus=?>.
 
     QString getAttrValue(const QXmlAttributes &attrs, const QString &attrName);
 

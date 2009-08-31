@@ -123,7 +123,7 @@ int main(int argc, char **argv)
         exit(128);
     }
 
-    foreach(QString key, context->listKeys()) {
+    foreach(const QString& key, context->listKeys()) {
         ContextPropertyInfo keyInfo(key);
 
         // Write value to list key
@@ -135,23 +135,20 @@ int main(int argc, char **argv)
         // Write doc
         writer.replace(key + ":KEYDOC", keyInfo.doc());
 
-        // Write provider
-        writer.replace(key + ":KEYPROVIDER", keyInfo.providerDBusName());
+        // Write the name of the plugin constructing the PropertyProvider instance
+        writer.replace(key + ":KEYPLUGIN", keyInfo.plugin());
 
-        // Write bus
-        QDBusConnection::BusType t = keyInfo.providerDBusType();
-        if (t == QDBusConnection::SessionBus)
-            writer.replace(key + ":KEYBUS", "session");
-        else if (t == QDBusConnection::SystemBus)
-            writer.replace(key + ":KEYBUS", "system");
+        // Write the construction parameter for the plugin
+        writer.replace(key + ":KEYCONSTRUCTIONSTRING", keyInfo.constructionString());
+
     }
 
-    foreach(QString provider, context->listProviders()) {
+    foreach(const QString& plugin, context->listPlugins()) {
         // Write provider itself
-        writer.add("PROVIDERS", provider);
+        writer.add("PLUGINS", plugin);
 
-        foreach(QString key, context->listKeys(provider)) {
-            writer.add(provider + ":KEYS", key);
+        foreach(QString key, context->listKeysForPlugin(plugin)) {
+            writer.add(plugin + ":KEYS", key);
         }
     }
 

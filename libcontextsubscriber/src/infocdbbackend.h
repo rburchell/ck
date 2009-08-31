@@ -39,11 +39,15 @@ public:
     virtual QString name() const;
     virtual QStringList listKeys() const;
     virtual QStringList listKeys(QString providername) const;
+    virtual QStringList listKeysForPlugin(QString plugin) const;
     virtual QStringList listProviders() const;
+    virtual QStringList listPlugins() const;
     virtual QString typeForKey(QString key) const;
     virtual QString docForKey(QString key) const;
     virtual QString providerForKey(QString key) const;
     virtual QString providerDBusTypeForKey(QString key) const;
+    virtual QString pluginForKey(QString key) const;
+    virtual QString constructionStringForKey(QString key) const;
 
     static QString databaseDirectory();
     static QString databasePath();

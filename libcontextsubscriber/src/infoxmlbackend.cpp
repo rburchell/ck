@@ -91,8 +91,25 @@ QStringList InfoXmlBackend::listKeys(QString providername) const
     QStringList list;
 
     foreach (QString key, keyDataHash.keys()) {
-        if (keyDataHash.value(key).provider == providername)
+        InfoKeyData data = keyDataHash.value(key);
+        if (data.plugin == "contextkit-dbus" && data.constructionString.endsWith(providername))
             list << keyDataHash.value(key).name;
+    }
+
+    return list;
+}
+
+QStringList InfoXmlBackend::listKeysForPlugin(QString plugin) const
+{
+    // This is slow and not nice, but we're an xml backend and
+    // we can afford to not be the first in the run
+    QStringList list;
+
+    foreach (QString key, keyDataHash.keys()) {
+        InfoKeyData data = keyDataHash.value(key);
+        if (data.plugin == plugin) {
+            list << data.name;
+        }
     }
 
     return list;
@@ -100,13 +117,29 @@ QStringList InfoXmlBackend::listKeys(QString providername) const
 
 QStringList InfoXmlBackend::listProviders() const
 {
+    // TBD: obsolete this?
     // Again -- slow.
     QStringList list;
 
     foreach (QString key, keyDataHash.keys()) {
-        QString provider = keyDataHash.value(key).provider;
+        InfoKeyData data = keyDataHash.value(key);
+        QString provider = data.plugin + ":" + data.constructionString;
         if (! list.contains(provider))
             list << provider;
+    }
+
+    return list;
+}
+
+QStringList InfoXmlBackend::listPlugins() const
+{
+    // Again -- slow.
+    QStringList list;
+
+    foreach (QString key, keyDataHash.keys()) {
+        InfoKeyData data = keyDataHash.value(key);
+        if (! list.contains(data.plugin))
+            list << data.plugin;
     }
 
     return list;
@@ -128,12 +161,32 @@ QString InfoXmlBackend::docForKey(QString key) const
     return keyDataHash.value(key).doc;
 }
 
+QString InfoXmlBackend::pluginForKey(QString key) const
+{
+    if (! keyDataHash.contains(key))
+        return "";
+
+    return keyDataHash.value(key).plugin;
+}
+
+QString InfoXmlBackend::constructionStringForKey(QString key) const
+{
+    if (! keyDataHash.contains(key))
+        return "";
+
+    return keyDataHash.value(key).constructionString;
+}
+
 QString InfoXmlBackend::providerForKey(QString key) const
 {
     if (! keyDataHash.contains(key))
         return "";
 
-    return keyDataHash.value(key).provider;
+    InfoKeyData data = keyDataHash.value(key);
+    if (data.plugin == "contextkit-dbus") {
+        return data.constructionString.split(":").last();
+    }
+    return "";
 }
 
 QString InfoXmlBackend::providerDBusTypeForKey(QString key) const
@@ -141,8 +194,13 @@ QString InfoXmlBackend::providerDBusTypeForKey(QString key) const
     if (! keyDataHash.contains(key))
         return "";
 
-    return keyDataHash.value(key).bus;
+    InfoKeyData data = keyDataHash.value(key);
+    if (data.plugin == "contextkit-dbus") {
+        return data.constructionString.split(":").first();
+    }
+    return "";
 }
+
 
 /// Returns the full path to the registry directory. Takes the
 /// \c CONTEXT_PROVIDERS env variable into account.
@@ -285,14 +343,14 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
 
         if (keyDataHash.contains(key)) {
             // Carefully merge new data into old.  We only allow
-            // addition of bus name and bus type.
+            // addition of plugin name / construction string.
 
             InfoKeyData old_data = keyDataHash.value(key);
             InfoKeyData new_data = handler.keyDataHash.value(key);
 
-            if (old_data.provider == NULL) {
-                old_data.provider = new_data.provider;
-                old_data.bus = new_data.bus;
+            if (old_data.plugin == NULL) {
+                old_data.plugin = new_data.plugin;
+                old_data.constructionString = new_data.constructionString;
                 keyDataHash.insert(key, old_data);
             } else
                 contextWarning() << "Key" << key << "already defined in previous xml file. Ignoring.";

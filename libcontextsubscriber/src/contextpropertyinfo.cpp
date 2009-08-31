@@ -206,8 +206,8 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
                  this, SLOT(onKeyDataChanged(QString)));
 
         cachedType = infoBackend->typeForKey(keyName);
-        cachedProvider = infoBackend->providerForKey(keyName);
-        cachedProviderDBusType = infoBackend->providerDBusTypeForKey(keyName);
+        cachedPlugin = infoBackend->pluginForKey(keyName);
+        cachedConstructionString = infoBackend->constructionStringForKey(keyName);
     }
 }
 
@@ -239,19 +239,40 @@ bool ContextPropertyInfo::exists() const
         return false;
 }
 
+/// Returns the name of the plugin supplying this property
+QString ContextPropertyInfo::plugin() const
+{
+    return cachedPlugin;
+}
+
+/// Returns the construction parameter for the Provider supplying this property
+QString ContextPropertyInfo::constructionString() const
+{
+    return cachedConstructionString;
+}
+
 /// Returns the dbus name of the provider supplying this property/key.
 QString ContextPropertyInfo::providerDBusName() const
 {
-    return cachedProvider;
+    // TBD: obsolete this function?
+    if (cachedPlugin == "contextkit-dbus") {
+        return cachedConstructionString.split(":").last();
+    }
+    return "";
 }
 
 /// Returns the bus type of the provider supplying this property/key.
 /// Ie. if it's a session bus or a system bus.
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
-    if (cachedProviderDBusType == "system")
+    // TBD: obsolete this function?
+    QString busType = "";
+    if (cachedPlugin == "contextkit-dbus") {
+        busType = cachedConstructionString.split(":").first();
+    }
+    if (busType == "system")
         return QDBusConnection::SystemBus;
-    else /* if (cachedProviderDBusType == "session") */
+    else /* if (busType == "session") */
         return QDBusConnection::SessionBus;
 }
 
@@ -278,16 +299,17 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
         emit typeChanged(cachedType);
     }
 
-    QString newProvider = InfoBackend::instance()->providerForKey(keyName);
-    if (cachedProvider != newProvider) {
-        cachedProvider = newProvider;
-        emit providerChanged(cachedProvider);
+    QString newPlugin = InfoBackend::instance()->pluginForKey(keyName);
+    if (cachedPlugin != newPlugin) {
+        cachedPlugin = newPlugin;
+        cachedConstructionString = InfoBackend::instance()->constructionStringForKey(keyName);
+        // TBD: obsolete the providerChanged signal and add pluginChanged or sth?
+        QString newProvider = "";
+        if (newPlugin == "contextkit-dbus") {
+            newProvider = cachedConstructionString.split(":").last();
+        }
+        emit providerChanged(newProvider);
     }
 
-    QString newProviderDBusType = InfoBackend::instance()->providerDBusTypeForKey(keyName);
-    if (cachedProviderDBusType != newProviderDBusType) {
-        cachedProviderDBusType = newProviderDBusType;
-        emit providerDBusTypeChanged(providerDBusType());
-    }
 }
 
