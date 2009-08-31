@@ -34,14 +34,14 @@
 namespace ContextSubscriber {
 
 /*!
-   \class PropertyProvider
+   \class ContextKitProvider
 
    \brief Keeps the DBUS connection with a specific provider and
    handles subscriptions and value changes with the properties of that
    provider.
 */
 
-PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QString& busName)
+ContextKitProvider::ContextKitProvider(QDBusConnection::BusType busType, const QString& busName)
     : subscriberInterface(0), managerInterface(0), connection(0),
       busType(busType), busName(busName)
 {
@@ -81,7 +81,7 @@ PropertyProvider::PropertyProvider(QDBusConnection::BusType busType, const QStri
 }
 
 /// Provider reappeared on the DBus, so get a new subscriber interface from it
-void PropertyProvider::onProviderAppeared()
+void ContextKitProvider::onProviderAppeared()
 {
     delete subscriberInterface;
     subscriberInterface = 0;
@@ -89,7 +89,7 @@ void PropertyProvider::onProviderAppeared()
 }
 
 /// Delete our subscriber interface when the provider went away
-void PropertyProvider::onProviderDisappeared()
+void ContextKitProvider::onProviderDisappeared()
 {
     delete subscriberInterface;
     subscriberInterface = 0;
@@ -98,10 +98,10 @@ void PropertyProvider::onProviderDisappeared()
 /// Called when the manager interface is ready with the asynchronous
 /// GetSubscriber call.  We use the new subscriber interface to
 /// subscribe to the currently subscribed keys.
-void PropertyProvider::onGetSubscriberFinished(QString objectPath)
+void ContextKitProvider::onGetSubscriberFinished(QString objectPath)
 {
     QMutexLocker lock(&subscriptionLock);
-    contextDebug() << "PropertyProvider::onGetSubscriberFinished" << objectPath;
+    contextDebug() << "ContextKitProvider::onGetSubscriberFinished" << objectPath;
 
     if (objectPath != "") {
         // GetSubscriber was successful
@@ -139,11 +139,10 @@ void PropertyProvider::onGetSubscriberFinished(QString objectPath)
 /// which will be caught by the \c PropertyHandle objects to set the
 /// \c subscribePending boolean which is used by the not so busy
 /// busyloop in <tt>waitForSubscription()</tt>.
-void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
+void ContextKitProvider::onSubscribeFinished(QSet<QString> keys)
 {
     QMutexLocker lock(&subscriptionLock);
-    contextDebug() << "PropertyProvider::onSubscribeFinished";
-    // FIXME: contextDebug() << "PropertyProvider::onSubscribeFinished " << keys;
+    contextDebug() << "ContextKitProvider::onSubscribeFinished" << keys;
 
     // Drop keys which were not supposed to be subscribed to (by this provider)
     emit subscribeFinished(keys.intersect(subscribedKeys));
@@ -152,10 +151,10 @@ void PropertyProvider::onSubscribeFinished(QSet<QString> keys)
 /// Schedules a property to be subscribed to.  Returns true if and
 /// only if the main loop has to run for the subscription to be
 /// finalized.
-bool PropertyProvider::subscribe(const QString &key)
+bool ContextKitProvider::subscribe(const QString &key)
 {
     QMutexLocker lock(&subscriptionLock);
-    contextDebug() << "PropertyProvider::subscribe, provider" << busName << key;
+    contextDebug() << "ContextKitProvider::subscribe, provider" << busName << key;
 
     // Note: the intention is saved in all cases; whether we can really subscribe or not.
     subscribedKeys.insert(key);
@@ -180,10 +179,10 @@ bool PropertyProvider::subscribe(const QString &key)
 
 /// Schedules a property to be unsubscribed from when the main loop is
 /// entered the next time.
-void PropertyProvider::unsubscribe(const QString &key)
+void ContextKitProvider::unsubscribe(const QString &key)
 {
     QMutexLocker lock(&subscriptionLock);
-    contextDebug() << "PropertyProvider::unsubscribe, provider" << busName << key;
+    contextDebug() << "ContextKitProvider::unsubscribe, provider" << busName << key;
 
     // Save the intention of the higher level
     subscribedKeys.remove(key);
@@ -204,10 +203,10 @@ void PropertyProvider::unsubscribe(const QString &key)
 
 /// Is executed when the main loop is entered and we have previously
 /// scheduled subscriptions / unsubscriptions.
-void PropertyProvider::handleSubscriptions()
+void ContextKitProvider::handleSubscriptions()
 {
     QMutexLocker lock(&subscriptionLock);
-    qDebug() << "PropertyProvider::handleSubscriptions in thread" << QThread::currentThread();
+    qDebug() << "ContextKitProvider::handleSubscriptions in thread" << QThread::currentThread();
     if (subscriberInterface != 0) {
         if (toSubscribe.size() > 0) subscriberInterface->subscribe(toSubscribe);
         if (toUnsubscribe.size() > 0) subscriberInterface->unsubscribe(toUnsubscribe);
@@ -227,11 +226,11 @@ void PropertyProvider::handleSubscriptions()
             toUnsubscribe.clear();
         }
     }
-    qDebug() << "PropertyProvider::handleSubscriptions processed";
+    qDebug() << "ContextKitProvider::handleSubscriptions processed";
 }
 
 /// Slot, handling changed values coming from the provider over DBUS.
-void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription)
+void ContextKitProvider::onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription)
 {
     QMutexLocker lock(&subscriptionLock);
     for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
@@ -245,19 +244,43 @@ void PropertyProvider::onValuesChanged(QMap<QString, QVariant> values, bool proc
     }
 }
 
-PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busType, const QString& busName)
+IProvider* ContextKitProviderFactory(const QString &constructionString)
+{
+    QStringList constr = constructionString.split(":");
+    if (constr[0] == "session")
+        return new ContextKitProvider(QDBusConnection::SessionBus, constr[1]);
+    else if (constr[0] == "system") {
+        ContextKitProvider* ret = new ContextKitProvider(QDBusConnection::SystemBus, constr[1]);
+        contextDebug() << "POINTER ADDRESS: " << ret;
+        return ret;
+    }
+
+    contextCritical() << "Unknown bus type: " << constructionString;
+    return 0;
+}
+
+IProvider* providerFactory(const QString& plugin, const QString& constructionString)
 {
     // Singleton instance container
-    static QMap<QPair<QDBusConnection::BusType, QString>, PropertyProvider*> providerInstances;
-    QPair<QDBusConnection::BusType, QString> lookupValue(busType, busName);
+    // plugin path, constructionstring -> IProvider
+    static QMap<QPair<QString, QString>, IProvider*> providerInstances;
+    QPair<QString, QString> lookupValue(plugin, constructionString);
 
     static QMutex providerInstancesLock;
     QMutexLocker locker(&providerInstancesLock);
     if (!providerInstances.contains(lookupValue)) {
-        providerInstances.insert(lookupValue, new PropertyProvider(busType, busName));
+        IProvider* newProvider = 0;
+        if (plugin == "contextkit-dbus")
+            newProvider = ContextKitProviderFactory(constructionString);
+        else if (plugin == "bluez")
+            newProvider = ContextKitProviderFactory(constructionString);
+        else // implement plugin system in the else branch
+            ;
+
+        providerInstances.insert(lookupValue, newProvider);
     }
 
-    contextDebug() << "Returning provider instance for" << busType << ":" << busName;
+    contextDebug() << "Returning provider instance for" << plugin << ":" << constructionString;
 
     return providerInstances[lookupValue];
 }

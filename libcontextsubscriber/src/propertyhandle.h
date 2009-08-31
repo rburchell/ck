@@ -33,7 +33,7 @@ class ContextPropertyInfo;
 
 namespace ContextSubscriber {
 
-class PropertyProvider;
+class IProvider;
 class DBusNameListener;
 
 class PropertyHandle : public QObject
@@ -65,7 +65,7 @@ private slots:
 private:
     PropertyHandle(const QString& key);
 
-    PropertyProvider *myProvider; ///< Provider of this property
+    IProvider *myProvider; ///< Provider of this property
     ContextPropertyInfo *myInfo; ///< Metadata for this property
     unsigned int subscribeCount; ///< Number of subscribed ContextProperty objects subscribed to this property
     QMutex subscribeCountLock;

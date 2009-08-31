@@ -40,6 +40,8 @@ namespace ContextSubscriber {
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
 static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
+static const QString commanderPluginName = "contextkit-dbus";
+static const QString commanderPluginString = "session:org.freedesktop.ContextKit.Commander";
 
 DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusType, commanderDBusName);
 bool PropertyHandle::commandingEnabled = true;
@@ -54,13 +56,14 @@ bool PropertyHandle::typeCheckEnabled = false;
   how much ContextProperty objects are created for it.
 
   Communication with the provider is done through the \c myProvider \c
-  PropertyProvider instance, which is updated when needed because of
-  registry changes.  Handling of disappearance from the DBus and then
-  reappearance on the DBus of the same provider is handled privately
-  by \c PropertyProvider.  If we don't know the current provider for
-  this handle, then the \c myProvider pointer is 0.
+  IProvider instance, which is updated when needed
+  because of registry changes.  Handling of disappearance from the
+  DBus and then reappearance on the DBus of the same provider is
+  handled privately by \c IProvider.  If we don't know
+  the current provider for this handle, then the \c myProvider pointer
+  is 0.
 
-  PropertyHandle and PropertyProvider instances are never deleted;
+  PropertyHandle and IProvider instances are never deleted;
   they stick around until the process is terminated.
 
   All of the PropertyHandle instances and Property provider instances
@@ -123,23 +126,24 @@ void PropertyHandle::setTypeCheck(bool typeCheck)
 /// renews the subscriptions.
 void PropertyHandle::updateProvider()
 {
-    PropertyProvider *newProvider;
+    IProvider *newProvider;
 
     if (commandingEnabled && commanderListener->isServicePresent() == DBusNameListener::Present) {
         // If commander is present it should be able to override the
         // property, so connect to it.
-        newProvider = PropertyProvider::instance(commanderDBusType,
-                                                 commanderDBusName);
+        newProvider = providerFactory(commanderPluginName, commanderPluginString);
     } else {
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
         QString dbusName = myInfo->providerDBusName();
 
-        if (dbusName != "") {
+        if (myInfo->exists()) {
             // If myInfo knows the current provider which should be
             // connected to, connect to it.
-            newProvider = PropertyProvider::instance(myInfo->providerDBusType(),
-                                                     dbusName);
+            newProvider = providerFactory("contextkit-dbus",
+                                          (myInfo->providerDBusType() == QDBusConnection::SessionBus ?
+                                           QString("session") : QString("system")) +
+                                          ":" + myInfo->providerDBusName());
         } else {
             // Otherwise we keep the pointer to the old provider.
             // This way, we can still continue communicating with the
@@ -157,11 +161,11 @@ void PropertyHandle::updateProvider()
     }
 
     if (myProvider) {
-        disconnect(myProvider, SIGNAL(subscribeFinished(QSet<QString>)),
+        disconnect(dynamic_cast<QObject*>(myProvider), SIGNAL(subscribeFinished(QSet<QString>)),
                    this, SLOT(onSubscribeFinished(QSet<QString>)));
     }
     if (newProvider) {
-        sconnect(newProvider, SIGNAL(subscribeFinished(QSet<QString>)),
+        sconnect(dynamic_cast<QObject*>(newProvider), SIGNAL(subscribeFinished(QSet<QString>)),
                  this, SLOT(onSubscribeFinished(QSet<QString>)));
     }
 

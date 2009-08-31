@@ -29,6 +29,8 @@
 #include <QSet>
 #include <QMutex>
 
+class ContextPropertyInfo;
+
 namespace ContextSubscriber {
 
 class PropertyHandle;
@@ -36,14 +38,25 @@ class SubscriberInterface;
 class DBusNameListener;
 class ManagerInterface;
 
-class PropertyProvider : public QueuedInvoker
+// TODO: document that subscribeFinished and valueChanged signals has to be defined and has to inherit from QObject
+class IProvider
+{
+public:
+    virtual bool subscribe(const QString &key) = 0;
+    virtual void unsubscribe(const QString &key) = 0;
+};
+
+IProvider* providerFactory(const QString& plugin, const QString& constructionString);
+typedef IProvider* (*ProviderFactoryPrototype)(const QString &constructionString);
+IProvider* ContextKitProviderFactory(const QString &constructionString);
+
+class ContextKitProvider : public QueuedInvoker, public IProvider
 {
     Q_OBJECT
 
 public:
     bool subscribe(const QString &key);
     void unsubscribe(const QString &key);
-    static PropertyProvider* instance(const QDBusConnection::BusType busType, const QString& busName);
 
 signals:
     void subscribeFinished(QSet<QString> keys);
@@ -57,7 +70,7 @@ private slots:
     void onProviderDisappeared();
 
 private:
-    PropertyProvider(QDBusConnection::BusType busType, const QString& busName);
+    ContextKitProvider(QDBusConnection::BusType busType, const QString& busName);
     Q_INVOKABLE void handleSubscriptions();
 
     DBusNameListener *providerListener; ///< Listens to provider's (dis)appearance over DBus
@@ -73,6 +86,8 @@ private:
     QSet<QString> toSubscribe; ///< Keys pending for subscription
     QSet<QString> toUnsubscribe; ///< Keys pending for unsubscription
     QSet<QString> subscribedKeys; ///< The keys that should be currently subscribed to
+
+    friend IProvider* ContextKitProviderFactory(const QString &constructionString);
 };
 
 } // end namespace
