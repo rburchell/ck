@@ -80,7 +80,14 @@ QStringList ContextRegistryInfo::listKeys() const
 /// Returns the list of all the keys associated with the given provider.
 QStringList ContextRegistryInfo::listKeys(QString providername) const
 {
+    // TBD: obsolete this?
     return InfoBackend::instance()->listKeys(providername);
+}
+
+/// Returns the list of all the keys associated with the given plugin
+QStringList ContextRegistryInfo::listKeysForPlugin(QString plugin) const
+{
+    return InfoBackend::instance()->listKeysForPlugin(plugin);
 }
 
 /// Returns the list of all unique providers in the registry.
@@ -88,6 +95,12 @@ QStringList ContextRegistryInfo::listKeys(QString providername) const
 QStringList ContextRegistryInfo::listProviders() const
 {
     return InfoBackend::instance()->listProviders();
+}
+
+/// Returns the list of all unique plugins in the registry.
+QStringList ContextRegistryInfo::listPlugins() const
+{
+    return InfoBackend::instance()->listPlugins();
 }
 
 /// Returns the name of the currently used registry backend. Ie. "cdb" or "xml".

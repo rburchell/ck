@@ -36,7 +36,9 @@ public:
 
     QStringList listKeys() const;
     QStringList listKeys(QString providername) const;
+    QStringList listKeysForPlugin(QString plugin) const;
     QStringList listProviders() const;
+    QStringList listPlugins() const;
     QString backendName() const;
 
 private:

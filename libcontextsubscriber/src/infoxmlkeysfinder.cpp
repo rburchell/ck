@@ -50,16 +50,26 @@ bool InfoXmlKeysFinder::startElement(const QString&, const QString&, const QStri
     // <provider> ...
     if (inProvider == false && name == "provider") {
         inProvider = true;
-        currentProvider = getAttrValue(attrs, "service");
-        currentBus = getAttrValue(attrs, "bus");
+
+        currentPlugin = getAttrValue(attrs, "plugin");
+        currentConstructionString = getAttrValue(attrs, "constructionString");
+        if (currentPlugin == "") {
+            // old style xml with <provider bus="..." service="...">
+            QString currentProvider = getAttrValue(attrs, "service");
+            QString currentBus = getAttrValue(attrs, "bus");
+            currentPlugin = "contextkit-dbus";
+            currentConstructionString = currentBus + ":" + currentProvider;
+        }
+        // else, new style xml with <provider plugin="..." constructionString="...">
+
         return true;
     }
 
     // <properties> ...
     if (inProvider == false && name == "properties") {
         inProvider = true;
-        currentProvider = "";
-        currentBus = "";
+        currentPlugin = "";
+        currentConstructionString = "";
         return true;
     }
 
@@ -122,8 +132,8 @@ bool InfoXmlKeysFinder::endElement(const QString&, const QString&, const QString
             data.name = currentKeyName;
             data.type = currentKeyType;
             data.doc = currentKeyDoc;
-            data.provider = currentProvider;
-            data.bus = currentBus;
+            data.plugin = currentPlugin;
+            data.constructionString = currentConstructionString;
 
             if (keyDataHash.contains(currentKeyName)) 
                 contextWarning() << F_XML << "Key" << currentKeyName << "already defined in this xml file. Overwriting.";

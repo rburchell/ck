@@ -66,12 +66,26 @@ QStringList InfoCdbBackend::listKeys() const
 
 QStringList InfoCdbBackend::listKeys(QString providername) const
 {
-    return reader.valuesForKey(providername + ":KEYS");
+    // TBD: obsolete this?
+    // FIXME: the current impl doesn't work
+    return QStringList();
+}
+
+QStringList InfoCdbBackend::listKeysForPlugin(QString plugin) const
+{
+    return reader.valuesForKey(plugin + ":" + ":KEYS");
 }
 
 QStringList InfoCdbBackend::listProviders() const
 {
-    return reader.valuesForKey("PROVIDERS");
+    // TBD: obsolete this?
+    // FIXME: the current impl doesn't work
+    return QStringList();
+}
+
+QStringList InfoCdbBackend::listPlugins() const
+{
+    return reader.valuesForKey("PLUGINS");
 }
 
 QString InfoCdbBackend::typeForKey(QString key) const
@@ -86,12 +100,42 @@ QString InfoCdbBackend::docForKey(QString key) const
 
 QString InfoCdbBackend::providerForKey(QString key) const
 {
-    return reader.valueForKey(key + ":KEYPROVIDER");
+    // TBD: obsolete this?
+    QString plugin = reader.valueForKey(key + ":PLUGIN");
+    if (plugin == "") {
+        // cdb might be in the old format, try it
+        return reader.valueForKey(key + ":KEYPROVIDER");
+    }
+    if (plugin == "contextkit-dbus") {
+        return reader.valueForKey(key + ":CONSTRUCTIONSTRING").split(":").last();
+    }
+    return "";
 }
 
 QString InfoCdbBackend::providerDBusTypeForKey(QString key) const
 {
-    return reader.valueForKey(key + ":KEYBUS");
+    // TBD: obsolete this?
+    QString plugin = reader.valueForKey(key + ":PLUGIN");
+    if (plugin == "") {
+        // cdb might be in the old format, try it
+        return reader.valueForKey(key + ":KEYBUS");
+    }
+    if (plugin == "contextkit-dbus") {
+        return reader.valueForKey(key + ":CONSTRUCTIONSTRING").split(":").first();
+    }
+    return "";
+}
+
+QString InfoCdbBackend::pluginForKey(QString key) const
+{
+    // FIXME: support the old format
+    return reader.valueForKey(key + ":PLUGIN");
+}
+
+QString InfoCdbBackend::constructionStringForKey(QString key) const
+{
+    // FIXME: support the old format
+    return reader.valueForKey(key + ":CONSTRUCTIONSTRING");
 }
 
 /// Returns true if the database file is present.
