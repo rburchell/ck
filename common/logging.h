@@ -27,6 +27,8 @@
 #include <QStringList>
 #include <QTextStream>
 #include <QBuffer>
+#include <QSet>
+#include <QDebug>
 
 #define CONTEXT_LOG_MSG_TYPE_TEST       1
 #define CONTEXT_LOG_MSG_TYPE_DEBUG      2
@@ -42,7 +44,7 @@ class ContextFeature
 public:
     ContextFeature(QString name);
     QString getName() const;
-    
+
 private:
     QString featureName;
 };
@@ -52,7 +54,7 @@ class ContextRealLogger : public QTextStream
 public:
     ContextRealLogger(int msgType, const char *module, const char *func, const char *file, int line);
     ~ContextRealLogger();
-    
+
     static bool showTest; ///< Test messages enabled at runtime
     static bool showDebug; ///< Debug messages enabled at runtime
     static bool showWarning; ///< Warning messages enabled at runtime
@@ -65,9 +67,9 @@ public:
     static QStringList showFeatures; ///< Show messages with \b only the specified features
     static QStringList hideFeatures; ///< Hide messages with the specified features
     static bool vanilla; ///< Use vanilla (stripped-down) logging
-    
+
     static void initialize();
-    
+
     ContextRealLogger &operator<< (const ContextFeature&);
 
     virtual ContextRealLogger &operator<< (QChar);
@@ -83,9 +85,16 @@ public:
     virtual ContextRealLogger &operator<< (const QString&);
     virtual ContextRealLogger &operator<< (const char *);
     virtual ContextRealLogger &operator<< (char);
- 
+    template <typename T> ContextRealLogger &operator<< (const QSet<T>& set)
+        {
+            QString out;
+            QDebug(&out) << set;
+            QTextStream::operator<<(out);
+            return *this;
+        }
+
 private:
-    
+
     bool shouldPrint();
     void appendFeatures();
 
@@ -100,7 +109,7 @@ private:
 
     \brief A fake logging class.
 
-    When a certain debug message is disabled at a compile-time the debug macros expand to 
+    When a certain debug message is disabled at a compile-time the debug macros expand to
     this class. It has all functions declared as \b inline and fundamentally kills all input
     targeted at it. The compiler optimizes the \b inline by not calling the functions at all and
     not storing the strings at all.
@@ -111,7 +120,7 @@ class ContextZeroLogger
 public:
     /// Constructor. Does nothing.
     inline ContextZeroLogger() {}
-    
+
     /* Stubby ops */
     inline ContextZeroLogger &operator<< (QChar) { return *this;} ///< Does nothing.
     inline ContextZeroLogger &operator<< (char) { return *this;} ///< Does nothing.
@@ -127,6 +136,7 @@ public:
     inline ContextZeroLogger &operator<< (const QString&) { return *this;} ///< Does nothing.
     inline ContextZeroLogger &operator<< (void *) { return *this;} ///< Does nothing.
     inline ContextZeroLogger &operator<< (const ContextFeature&) { return *this;} ///< Does nothing.
+    template <typename T> inline ContextZeroLogger &operator<< (const QSet<T>&) { return *this;} ///< Does nothing.
 };
 
 /* Macro defs */
