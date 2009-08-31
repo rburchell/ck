@@ -15,6 +15,11 @@ package.
 change for some time still.  Only the ones explicitly marked as stable
 should be used for now.
 
+*TODO*
+
+- Rename Internet.SignalStrength to Wifi.SignalStrength, maybe.
+  Same for Internet.NetworkName.
+
 Display screens
 ---------------
 
@@ -304,6 +309,24 @@ Bluetooth, in percent of the maximum possible rate.
     <type>percentage</type>
     <doc>
 The strength of the Bluetooth radio connection.
+    </doc>
+  </key>
+  <doc>
+Cellular
+--------
+
+Information about the cellular radio.
+  </doc>
+  <key name="Cellular.NetworkName"
+       type="string">
+    <doc>
+The name of the cellular network, as a localized string.
+    </doc>
+  </key>
+  <key name="Cellular.SignalStrength"
+       type="percentage">
+    <doc>
+The signal strength at the cellular radio, in percent of the maximum.
     </doc>
   </key>
   <doc>
@@ -617,6 +640,20 @@ The earliest start time of the events in Events.Next.
     <type>time</type>
     <doc>
 The latest end time of the events in Events.Next.
+    </doc>
+  </key>
+  <doc>
+Profiles
+--------
+
+Information about the expected behavior of the device.
+  </doc>
+  <key name="Profile.Name"
+       type="string">
+    <doc>
+The name of the currently active profile as a localized string.  You
+should not try to interpret this string, it is only meant to be
+displayed as a reminder to the user.
     </doc>
   </key>
 </properties>
