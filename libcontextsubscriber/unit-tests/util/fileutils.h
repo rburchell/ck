@@ -21,6 +21,8 @@
 
 #include <QDir>
 #include <QFile>
+#include <QTest>
+#include <stdlib.h>
 
 #define LOCAL_DIR (utilPathForLocalDir())
 #define LOCAL_FILE(f) (utilPathForLocalFile(f))
