@@ -292,7 +292,7 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
             InfoKeyData old_data = keyDataHash.value(key);
             InfoKeyData new_data = handler.keyDataHash.value(key);
 
-            if (old_data.plugin == NULL) {
+            if (old_data.plugin == "") {
                 old_data.plugin = new_data.plugin;
                 old_data.constructionString = new_data.constructionString;
                 keyDataHash.insert(key, old_data);
