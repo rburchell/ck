@@ -140,10 +140,8 @@ void PropertyHandle::updateProvider()
         if (myInfo->exists()) {
             // If myInfo knows the current provider which should be
             // connected to, connect to it.
-            newProvider = providerFactory("contextkit-dbus",
-                                          (myInfo->providerDBusType() == QDBusConnection::SessionBus ?
-                                           QString("session") : QString("system")) +
-                                          ":" + myInfo->providerDBusName());
+            newProvider = providerFactory(myInfo->plugin(),
+                                          myInfo->constructionString());
         } else {
             // Otherwise we keep the pointer to the old provider.
             // This way, we can still continue communicating with the

@@ -249,11 +249,8 @@ IProvider* ContextKitProviderFactory(const QString &constructionString)
     QStringList constr = constructionString.split(":");
     if (constr[0] == "session")
         return new ContextKitProvider(QDBusConnection::SessionBus, constr[1]);
-    else if (constr[0] == "system") {
-        ContextKitProvider* ret = new ContextKitProvider(QDBusConnection::SystemBus, constr[1]);
-        contextDebug() << "POINTER ADDRESS: " << ret;
-        return ret;
-    }
+    else if (constr[0] == "system")
+        return new ContextKitProvider(QDBusConnection::SystemBus, constr[1]);
 
     contextCritical() << "Unknown bus type: " << constructionString;
     return 0;
