@@ -256,7 +256,6 @@ QString ContextPropertyInfo::constructionString() const
 /// compatibility.
 QString ContextPropertyInfo::providerDBusName() const
 {
-    qDebug() << "****Computing provider dbus name" << cachedPlugin << cachedConstructionString;
     // TBD: obsolete this function?
     if (cachedPlugin == "contextkit-dbus") {
         return cachedConstructionString.split(":").last();
