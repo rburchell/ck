@@ -251,7 +251,9 @@ QString ContextPropertyInfo::constructionString() const
     return cachedConstructionString;
 }
 
-/// Returns the dbus name of the provider supplying this property/key.
+/// Returns the dbus name of the provider supplying this
+/// property/key. This function is maintained for backwards
+/// compatibility.
 QString ContextPropertyInfo::providerDBusName() const
 {
     // TBD: obsolete this function?
@@ -262,7 +264,8 @@ QString ContextPropertyInfo::providerDBusName() const
 }
 
 /// Returns the bus type of the provider supplying this property/key.
-/// Ie. if it's a session bus or a system bus.
+/// Ie. if it's a session bus or a system bus. This function is
+/// maintained for backwards compatibility.
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
     // TBD: obsolete this function?

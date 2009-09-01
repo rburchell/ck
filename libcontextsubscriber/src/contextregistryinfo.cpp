@@ -78,10 +78,18 @@ QStringList ContextRegistryInfo::listKeys() const
 }
 
 /// Returns the list of all the keys associated with the given provider.
-QStringList ContextRegistryInfo::listKeys(QString providername) const
+QStringList ContextRegistryInfo::listKeys(QString providerName) const
 {
     // TBD: obsolete this?
-    return InfoBackend::instance()->listKeys(providername);
+    QStringList keys = InfoBackend::instance()->listKeysForPlugin("contextkit-dbus");
+    QStringList toReturn;
+    foreach (const QString& key, keys) {
+        QString constructionString = InfoBackend::instance()->constructionStringForKey(key);
+        if (constructionString.split(":").last() == providerName) {
+            toReturn << key;
+        }
+    }
+    return toReturn;
 }
 
 /// Returns the list of all the keys associated with the given plugin
@@ -91,10 +99,18 @@ QStringList ContextRegistryInfo::listKeysForPlugin(QString plugin) const
 }
 
 /// Returns the list of all unique providers in the registry.
-/// The lists consists of strings with dbus names of the providers.
+/// The lists consist of strings with dbus names of the providers.
 QStringList ContextRegistryInfo::listProviders() const
 {
-    return InfoBackend::instance()->listProviders();
+    // TBD: obsolete this?
+    QStringList keys = InfoBackend::instance()->listKeysForPlugin("contextkit-dbus");
+    QSet<QString> foundProviders;
+    foreach (const QString& key, keys) {
+        QString constructionString = InfoBackend::instance()->constructionStringForKey(key);
+        foundProviders.insert(constructionString.split(":").last());
+    }
+    QStringList toReturn(foundProviders.toList());
+    return toReturn;
 }
 
 /// Returns the list of all unique plugins in the registry.

@@ -64,23 +64,9 @@ QStringList InfoCdbBackend::listKeys() const
     return reader.valuesForKey("KEYS");
 }
 
-QStringList InfoCdbBackend::listKeys(QString providername) const
-{
-    // TBD: obsolete this?
-    // FIXME: the current impl doesn't work
-    return QStringList();
-}
-
 QStringList InfoCdbBackend::listKeysForPlugin(QString plugin) const
 {
     return reader.valuesForKey(plugin + ":" + ":KEYS");
-}
-
-QStringList InfoCdbBackend::listProviders() const
-{
-    // TBD: obsolete this?
-    // FIXME: the current impl doesn't work
-    return QStringList();
 }
 
 QStringList InfoCdbBackend::listPlugins() const
@@ -96,34 +82,6 @@ QString InfoCdbBackend::typeForKey(QString key) const
 QString InfoCdbBackend::docForKey(QString key) const
 {
     return reader.valueForKey(key + ":KEYDOC");
-}
-
-QString InfoCdbBackend::providerForKey(QString key) const
-{
-    // TBD: obsolete this?
-    QString plugin = reader.valueForKey(key + ":PLUGIN");
-    if (plugin == "") {
-        // cdb might be in the old format, try it
-        return reader.valueForKey(key + ":KEYPROVIDER");
-    }
-    if (plugin == "contextkit-dbus") {
-        return reader.valueForKey(key + ":CONSTRUCTIONSTRING").split(":").last();
-    }
-    return "";
-}
-
-QString InfoCdbBackend::providerDBusTypeForKey(QString key) const
-{
-    // TBD: obsolete this?
-    QString plugin = reader.valueForKey(key + ":PLUGIN");
-    if (plugin == "") {
-        // cdb might be in the old format, try it
-        return reader.valueForKey(key + ":KEYBUS");
-    }
-    if (plugin == "contextkit-dbus") {
-        return reader.valueForKey(key + ":CONSTRUCTIONSTRING").split(":").first();
-    }
-    return "";
 }
 
 QString InfoCdbBackend::pluginForKey(QString key) const

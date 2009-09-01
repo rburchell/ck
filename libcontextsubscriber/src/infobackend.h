@@ -40,17 +40,9 @@ public:
     /// Returns the list of all the keys in the registry.
     virtual QStringList listKeys() const = 0;
 
-    /// Returns the list of all the keys in the registry with given D-Bus \a providername.
-    /// TBD: obsolete this?
-    virtual QStringList listKeys(QString providername) const = 0;
-
     /// Returns the list of all the keys in the registry provided
     /// by the given \a plugin.
     virtual QStringList listKeysForPlugin(QString plugin) const = 0;
-
-    /// Returns a list of all the unique providers in the database.
-    /// TBD: obsolete this?
-    virtual QStringList listProviders() const = 0;
 
     /// Returns a list of all the unique plugins in the database.
     virtual QStringList listPlugins() const = 0;
@@ -60,12 +52,6 @@ public:
 
     /// Returns the documentation for the given \a key name.
     virtual QString docForKey(QString key) const = 0;
-
-    /// Returns the provider D-Bus name for the given \a key name.
-    virtual QString providerForKey(QString key) const = 0;
-
-    /// Returns the D-Bus type for the given \a key name.
-    virtual QString providerDBusTypeForKey(QString key) const = 0;
 
     /// Returns the constructor plugin name for the given \a key name.
     virtual QString pluginForKey(QString key) const = 0;

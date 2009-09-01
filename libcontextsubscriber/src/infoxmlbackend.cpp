@@ -84,21 +84,6 @@ QStringList InfoXmlBackend::listKeys() const
     return list;
 }
 
-QStringList InfoXmlBackend::listKeys(QString providername) const
-{
-    // This is slow and not nice, but we're an xml backend and
-    // we can afford to not be the first in the run
-    QStringList list;
-
-    foreach (QString key, keyDataHash.keys()) {
-        InfoKeyData data = keyDataHash.value(key);
-        if (data.plugin == "contextkit-dbus" && data.constructionString.endsWith(providername))
-            list << keyDataHash.value(key).name;
-    }
-
-    return list;
-}
-
 QStringList InfoXmlBackend::listKeysForPlugin(QString plugin) const
 {
     // This is slow and not nice, but we're an xml backend and
@@ -110,22 +95,6 @@ QStringList InfoXmlBackend::listKeysForPlugin(QString plugin) const
         if (data.plugin == plugin) {
             list << data.name;
         }
-    }
-
-    return list;
-}
-
-QStringList InfoXmlBackend::listProviders() const
-{
-    // TBD: obsolete this?
-    // Again -- slow.
-    QStringList list;
-
-    foreach (QString key, keyDataHash.keys()) {
-        InfoKeyData data = keyDataHash.value(key);
-        QString provider = data.plugin + ":" + data.constructionString;
-        if (! list.contains(provider))
-            list << provider;
     }
 
     return list;
@@ -176,31 +145,6 @@ QString InfoXmlBackend::constructionStringForKey(QString key) const
 
     return keyDataHash.value(key).constructionString;
 }
-
-QString InfoXmlBackend::providerForKey(QString key) const
-{
-    if (! keyDataHash.contains(key))
-        return "";
-
-    InfoKeyData data = keyDataHash.value(key);
-    if (data.plugin == "contextkit-dbus") {
-        return data.constructionString.split(":").last();
-    }
-    return "";
-}
-
-QString InfoXmlBackend::providerDBusTypeForKey(QString key) const
-{
-    if (! keyDataHash.contains(key))
-        return "";
-
-    InfoKeyData data = keyDataHash.value(key);
-    if (data.plugin == "contextkit-dbus") {
-        return data.constructionString.split(":").first();
-    }
-    return "";
-}
-
 
 /// Returns the full path to the registry directory. Takes the
 /// \c CONTEXT_PROVIDERS env variable into account.
