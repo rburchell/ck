@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<provider bus="system" service="org.freedesktop.test">
+  <key name="Test.One"><type>int32</type><doc>An integer.</doc></key>
+  <key name="Test.Two"><type>string</type><doc>A string.</doc></key>
+</provider>

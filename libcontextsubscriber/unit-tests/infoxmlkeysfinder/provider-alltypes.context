@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<provider plugin="testplugin.so" constructionString="factoryParameter">
+  <key name="Test.Int1"><type>int32</type></key>
+  <key name="Test.Int2"><type>INT</type></key>
+  <key name="Test.String1"><type>string</type></key>
+  <key name="Test.String2"><type>STRING</type></key>
+  <key name="Test.Bool1"><type>bool</type></key>
+  <key name="Test.Bool2"><type>TRUTH</type></key>
+  <key name="Test.Double1"><type>double</type></key>
+  <key name="Test.Double2"><type>DOUBLE</type></key>
+</provider>

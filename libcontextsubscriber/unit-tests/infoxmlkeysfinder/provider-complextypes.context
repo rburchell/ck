@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<provider plugin="testplugin.so" constructionString="factoryParameter">
+  <key name="Test.Complex"><type><complex><sub>something</sub></complex></type></key>
+</provider>
