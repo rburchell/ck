@@ -66,7 +66,7 @@ QStringList InfoCdbBackend::listKeys() const
 
 QStringList InfoCdbBackend::listKeysForPlugin(QString plugin) const
 {
-    return reader.valuesForKey(plugin + ":" + ":KEYS");
+    return reader.valuesForKey(plugin + ":KEYS");
 }
 
 QStringList InfoCdbBackend::listPlugins() const
