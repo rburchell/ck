@@ -80,7 +80,7 @@ void ContextRegistryInfoUnitTest::checkProperBackend()
 void ContextRegistryInfoUnitTest::listKeys()
 {
     QStringList list = context->listKeys();
-    QCOMPARE(list.size(), 3);
+    QCOMPARE(list.size(), 5);
 
     QStringList expectedKeys;
     expectedKeys << "Battery.ChargePercentage";
