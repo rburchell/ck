@@ -256,6 +256,7 @@ QString ContextPropertyInfo::constructionString() const
 /// compatibility.
 QString ContextPropertyInfo::providerDBusName() const
 {
+    qDebug() << "****Computing provider dbus name" << cachedPlugin << cachedConstructionString;
     // TBD: obsolete this function?
     if (cachedPlugin == "contextkit-dbus") {
         return cachedConstructionString.split(":").last();
@@ -302,11 +303,11 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
         emit typeChanged(cachedType);
     }
 
+    // TBD: obsolete the providerChanged signal and add pluginChanged or sth?
     QString newPlugin = InfoBackend::instance()->pluginForKey(keyName);
-    if (cachedPlugin != newPlugin) {
+    if (cachedPlugin == "contextkit-dbus" || newPlugin == "contextkit-dbus") {
         cachedPlugin = newPlugin;
         cachedConstructionString = InfoBackend::instance()->constructionStringForKey(keyName);
-        // TBD: obsolete the providerChanged signal and add pluginChanged or sth?
         QString newProvider = "";
         if (newPlugin == "contextkit-dbus") {
             newProvider = cachedConstructionString.split(":").last();

@@ -87,13 +87,13 @@ QString InfoCdbBackend::docForKey(QString key) const
 QString InfoCdbBackend::pluginForKey(QString key) const
 {
     // FIXME: support the old format
-    return reader.valueForKey(key + ":PLUGIN");
+    return reader.valueForKey(key + ":KEYPLUGIN");
 }
 
 QString InfoCdbBackend::constructionStringForKey(QString key) const
 {
     // FIXME: support the old format
-    return reader.valueForKey(key + ":CONSTRUCTIONSTRING");
+    return reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING");
 }
 
 /// Returns true if the database file is present.
