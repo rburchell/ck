@@ -11,8 +11,8 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  cdbwriter.h cdbwriter.cpp cdbreader.cpp cdbreader.h		\
 	  infocdbbackend.cpp infocdbbackend.h dbusnamelistener.h	\
 	  dbusnamelistener.cpp handlesignalrouter.cpp			\
-	  handlesignalrouter.h queuedinvoker.cpp			\
-	  queuedinvoker.h loggingfeatures.h
+	  handlesignalrouter.h queuedinvoker.cpp queuedinvoker.h	\
+	  loggingfeatures.h bluezinterface.h bluezinterface.cpp
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h

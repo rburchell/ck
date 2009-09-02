@@ -256,6 +256,16 @@ IProvider* ContextKitProviderFactory(const QString &constructionString)
     return 0;
 }
 
+// TODO
+/*IProvider* BluezProviderFactory(const QString &constructionString)
+{
+    if (constructionString != "")
+        return 0;
+
+    return new BluezInterface();
+    }*/
+
+
 IProvider* providerFactory(const QString& plugin, const QString& constructionString)
 {
     // Singleton instance container
@@ -269,8 +279,8 @@ IProvider* providerFactory(const QString& plugin, const QString& constructionStr
         IProvider* newProvider = 0;
         if (plugin == "contextkit-dbus")
             newProvider = ContextKitProviderFactory(constructionString);
-        else if (plugin == "bluez")
-            newProvider = ContextKitProviderFactory(constructionString);
+        else if (plugin == "bluez");
+//            newProvider = BluezProviderFactory(constructionString);
         else // implement plugin system in the else branch
             ;
 
