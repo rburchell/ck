@@ -20,11 +20,13 @@
  */
 
 #include "service.h"
+#include "servicebackend.h"
 #include "property.h"
 #include "logging.h"
 #include "manager.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
+
 
 namespace ContextProvider {
 
@@ -47,7 +49,7 @@ struct PropertyPrivate {
 Property::Property(Service &service, const QString &k, QObject* parent)
     : QObject(parent)
 {
-    init (&service, k);
+    init (service.backend()->manager(), k);
 }
 
 /// Create a Property object on the default service for the key \a k.
@@ -55,22 +57,22 @@ Property::Property(Service &service, const QString &k, QObject* parent)
 Property::Property(const QString &k, QObject* parent)
     : QObject(parent)
 {
-    if (Service::defaultService == NULL) {
+    if (ServiceBackend::defaultService == NULL) {
         contextCritical() << "No default service set.";
         abort();
     }
 
-    init (Service::defaultService, k);
+    init (ServiceBackend::defaultService->manager(), k);
 }
 
-void Property::init (Service *service, const QString &key)
+void Property::init (Manager *manager, const QString &key)
 {
     contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
 
     priv = new PropertyPrivate;
     priv->myKey = key;
-    priv->manager = service->manager();
-    
+    priv->manager = manager;
+
     priv->manager->addKey (priv->myKey);
     sconnect(priv->manager, SIGNAL(firstSubscriberAppeared(const QString&)),
              this, SLOT(onManagerFirstSubscriberAppeared(const QString&)));
@@ -103,14 +105,14 @@ void Property::setValue(const QVariant &v)
     priv->manager->setKeyValue(priv->myKey, v);
 }
 
-/// Returns the current value of the property. The returned QVariant is invalid 
+/// Returns the current value of the property. The returned QVariant is invalid
 /// if the key value is undetermined or the Property is invalid.
 QVariant Property::value()
 {
     return priv->manager->getKeyValue(priv->myKey);
 }
 
-/// Called by Manager when first subscriber appears. Delegated if 
+/// Called by Manager when first subscriber appears. Delegated if
 /// this concerns us.
 void Property::onManagerFirstSubscriberAppeared(const QString &key)
 {

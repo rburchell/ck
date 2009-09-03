@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef SERVICE_H
-#define SERVICE_H
+#ifndef SERVICEBACKEND_H
+#define SERVICEBACKEND_H
 
 #include <QObject>
 #include <QString>
@@ -29,46 +29,32 @@
 #include <QHash>
 #include <QVariant>
 
-class ServiceUnitTest;
-
 namespace ContextProvider {
 
 class Manager;
 class Property;
-class ServicePrivate;
-class ServiceBackend;
+class ServiceBackendPrivate;
 
-class Service : QObject
+class ServiceBackend : QObject
 {
     Q_OBJECT
 
 public:
-    explicit Service(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
-    virtual ~Service();
+    explicit ServiceBackend(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    virtual ~ServiceBackend();
 
     bool start();
     void stop();
     void restart();
 
     void setAsDefault();
-
     void setValue(const QString &key, const QVariant &val);
+    Manager *manager();
+
+    static ServiceBackend *defaultService;
 
 private:
-    class ServicePrivate *priv;
-
-    ServiceBackend *backend();
-
-    static QHash <QString, ServiceBackend*> backends;
-
-    friend class Property;
-    friend class ::ServiceUnitTest;
-
-private slots:
-    void onStartMe();
-
-signals:
-    void startMe();
+    class ServiceBackendPrivate *priv;
 };
 
 } // end namespace

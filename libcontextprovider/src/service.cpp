@@ -20,6 +20,7 @@
  */
 
 #include "service.h"
+#include "servicebackend.h"
 #include "property.h"
 #include "logging.h"
 #include "manager.h"
@@ -42,7 +43,7 @@ namespace ContextProvider {
   declared in the ContextProvider header file.
 
   Thus, you would typically gain access to the classes like this
-  
+
   \code
   #include <ContextProvider>
 
@@ -63,8 +64,8 @@ namespace ContextProvider {
 
   CP::Service my_service (...);
   \endcode
-  
-  
+
+
   The basic pattern to use this library is to create a Service
   instance to represent you on D-Bus and then to add Property
   instances to it for the keys that you want to provide.  Once this is
@@ -106,8 +107,11 @@ namespace ContextProvider {
 /*!
     \class Service ContextKit ContextKit
 
-    \brief A Service object represents a service name on D-Bus that
-    implements the Context Framework interface.
+    \brief A Service object is a proxy representing a service on D-Bus that
+    implements the Context Framework interface. The lifespan of the
+    Service class is not tied to the real service lifespan. This way
+    a service can be accessed and controled from different parts of
+    the code.
 
     Every Property object must be associated with a Service object.
 
@@ -125,28 +129,32 @@ namespace ContextProvider {
 
 */
 
+QHash <QString, ServiceBackend*> Service::backends;
+
 struct ServicePrivate {
-    QDBusConnection::BusType busType;
-    QString busName;
-    Manager *manager;
-    QDBusConnection *connection;
+    ServiceBackend *backend;
 };
 
-Service *Service::defaultService;
-
-/// Creates a Service object for \a busName on the bus indicated by \a
-/// busType.  The service will be initially stopped and will
-/// automatically start itself when the main loop is entered.
+/// Creates a Service proxy object for \a busName on the bus indicated by \a
+/// busType. If the service is accessed for the first time it'll be created and
+/// set up. If the service with the given parameters already exists, the created
+/// object represents a controller to a previously-created service.
+/// A new Service is initially stopped and will automatically start itself
+/// when the main loop is entered.
 Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
     : QObject(parent)
 {
     contextDebug() << F_SERVICE << "Creating new Service for" << busName;
 
+    QString keystring = busName + ":" + ((busType == QDBusConnection::SessionBus) ? "Session" : "System");
+
     priv = new ServicePrivate;
-    priv->busType = busType;
-    priv->busName = busName;
-    priv->manager = new Manager();
-    priv->connection = NULL;
+    if (backends.contains(keystring)) {
+        priv->backend = backends.value(keystring);
+    } else {
+        priv->backend = new ServiceBackend(busType, busName);
+        backends.insert(keystring, priv->backend);
+    }
 
     // XXX - there has be an easier way to get a idle callback when
     //       the event loop is entered.
@@ -157,16 +165,18 @@ Service::Service(QDBusConnection::BusType busType, const QString &busName, QObje
     emit startMe();
 }
 
+/// Destroys this Service class. The actual service on dbus is not destroyed nor stopped.
 Service::~Service()
 {
     contextDebug() << F_SERVICE << F_DESTROY << "Destroying Service";
-    stop();
     delete priv;
 }
 
-Manager *Service::manager()
+/// Returns the backend controller for this Service. Multiple Service classes
+/// share one backend instance.
+ServiceBackend *Service::backend()
 {
-    return priv->manager;
+    return priv->backend;
 }
 
 /// Sets the Service object as the default one to use when
@@ -175,12 +185,7 @@ Manager *Service::manager()
 /// be deallocated.
 void Service::setAsDefault()
 {
-    if (defaultService) {
-        contextCritical() << F_SERVICE << "Default service already set.";
-        return;
-    }
-
-    defaultService = this;
+    priv->backend->setAsDefault();
 }
 
 /// Set the value of \a key to \a val.  A property named \a key must
@@ -188,66 +193,33 @@ void Service::setAsDefault()
 /// it.
 void Service::setValue(const QString &key, const QVariant &val)
 {
-    priv->manager->setKeyValue(key, val);
+    priv->backend->manager()->setKeyValue(key, val);
 }
 
 /// Start the Service again after it has been stopped.  All clients
-/// will resubscribe to its properties. Returns true on success, 
+/// will resubscribe to its properties. Returns true on success,
 /// false otherwise.
 bool Service::start()
 {
-    if (priv->connection)
-        return false;
-
-    priv->connection = new QDBusConnection(QDBusConnection::connectToBus(priv->busType, priv->busName));
-    ManagerAdaptor *managerAdaptor = new ManagerAdaptor(priv->manager, priv->connection);
-
-    // Register service
-    if (!priv->connection->registerService(priv->busName)) {
-        contextCritical() << F_SERVICE << "Failed to register service with name" << priv->busName;
-        stop();
-        return false;
-    }
-
-    // Register object
-    if (managerAdaptor && !priv->connection->registerObject("/org/freedesktop/ContextKit/Manager", priv->manager)) {
-        contextCritical() << F_SERVICE << "Failed to register the Manager object for" << priv->busName;
-        stop();
-        return false;
-    }
-
-    return true;
+    return priv->backend->start();
 }
 
 /// Stop the service.  This will cause it to disappear from D-Bus.
 void Service::stop()
 {
-    if (priv->connection == NULL)
-        return;
-
-    contextDebug() << F_SERVICE << "Stopping service for bus:" << priv->busName;
-
-    // Unregister
-    priv->connection->unregisterObject("/org/freedesktop/ContextKit/Manager");
-    priv->connection->unregisterService(priv->busName);
-
-    // Dealloc
-    delete priv->connection;
-    priv->connection = NULL;
-}
-
-void Service::onStartMe()
-{
-    start();
+    priv->backend->stop();
 }
 
 /// If the service is running, stop and start it.
 void Service::restart()
 {
-    if (priv->connection) {
-        stop();
-        start();
-    }
+    priv->backend->restart();
+}
+
+/// Automatic startup when entering the run loop.
+void Service::onStartMe()
+{
+    start();
 }
 
 } // end namespace
