@@ -54,9 +54,16 @@ namespace ContextSubscriber {
   is present.
 */
 DBusNameListener::DBusNameListener(QDBusConnection::BusType busType, const QString &busName, QObject *parent) :
-QObject(parent), servicePresent(Unknown), busType(busType), busName(busName), listeningStarted(false), connection(0)
+    QObject(parent), servicePresent(Unknown), busType(busType), busName(busName), listeningStarted(false), connection(0)
 {
     // Don't do anything, until the user initiates the listening by calling startListening.
+}
+
+DBusNameListener::DBusNameListener(const QDBusConnection bus, const QString &busName, QObject *parent) :
+    QObject(parent), servicePresent(Unknown), busName(busName), listeningStarted(false), connection(0)
+{
+    // we copy the connection so we can safely delete it in the destructor
+    connection = new QDBusConnection(bus);
 }
 
 DBusNameListener::~DBusNameListener()
@@ -73,14 +80,17 @@ void DBusNameListener::startListening(bool nameHasOwnerCheck)
     if (listeningStarted) return;
 
     listeningStarted = true;
-    if (busType == QDBusConnection::SystemBus) {
-        connection = new QDBusConnection(QDBusConnection::systemBus());
-    }
-    else if (busType == QDBusConnection::SessionBus) {
-        connection = new QDBusConnection(QDBusConnection::sessionBus());
-    }
-    else {
-        return;
+    // if we were initialized without a connection, we have to create our own
+    if (connection == 0) {
+        if (busType == QDBusConnection::SystemBus) {
+            connection = new QDBusConnection(QDBusConnection::systemBus());
+        }
+        else if (busType == QDBusConnection::SessionBus) {
+            connection = new QDBusConnection(QDBusConnection::sessionBus());
+        }
+        else {
+            return;
+        }
     }
 
     sconnect(connection->interface(),
@@ -103,6 +113,7 @@ void DBusNameListener::startListening(bool nameHasOwnerCheck)
 /// signal.
 void DBusNameListener::onServiceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
 {
+    contextDebug() << "name owner change" << name << oldOwner << newOwner;
     if (name == busName) {
         if (oldOwner == "") {
             setServicePresent();

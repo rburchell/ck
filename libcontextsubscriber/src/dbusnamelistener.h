@@ -38,6 +38,7 @@ public:
     enum ServicePresence {NotPresent = 0, Present, Unknown};
 
     explicit DBusNameListener(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    explicit DBusNameListener(const QDBusConnection bus, const QString &busName, QObject *parent = 0);
     virtual ~DBusNameListener();
 
     void startListening(bool nameHasOwnerCheck);

@@ -56,14 +56,14 @@ bool PropertyHandle::typeCheckEnabled = false;
   how much ContextProperty objects are created for it.
 
   Communication with the provider is done through the \c myProvider \c
-  IProvider instance, which is updated when needed
+  Provider instance, which is updated when needed
   because of registry changes.  Handling of disappearance from the
   DBus and then reappearance on the DBus of the same provider is
-  handled privately by \c IProvider.  If we don't know
+  handled privately by \c Provider.  If we don't know
   the current provider for this handle, then the \c myProvider pointer
   is 0.
 
-  PropertyHandle and IProvider instances are never deleted;
+  PropertyHandle and Provider instances are never deleted;
   they stick around until the process is terminated.
 
   All of the PropertyHandle instances and Property provider instances
@@ -126,12 +126,12 @@ void PropertyHandle::setTypeCheck(bool typeCheck)
 /// renews the subscriptions.
 void PropertyHandle::updateProvider()
 {
-    IProvider *newProvider;
+    Provider *newProvider;
 
     if (commandingEnabled && commanderListener->isServicePresent() == DBusNameListener::Present) {
         // If commander is present it should be able to override the
         // property, so connect to it.
-        newProvider = providerFactory(commanderPluginName, commanderPluginString);
+        newProvider = Provider::instance(commanderPluginName, commanderPluginString);
     } else {
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
@@ -140,8 +140,8 @@ void PropertyHandle::updateProvider()
         if (myInfo->exists()) {
             // If myInfo knows the current provider which should be
             // connected to, connect to it.
-            newProvider = providerFactory(myInfo->plugin(),
-                                          myInfo->constructionString());
+            newProvider = Provider::instance(myInfo->plugin(),
+                                             myInfo->constructionString());
         } else {
             // Otherwise we keep the pointer to the old provider.
             // This way, we can still continue communicating with the
@@ -231,11 +231,10 @@ bool PropertyHandle::isSubscribePending() const
 
 /// Used by the \c HandleSignalRouter to change the value of the
 /// property.  Before changing the value it checks the type if type
-/// checks are enabled.  It also verifies that the new value is
-/// different from the old one if \c allowSameValue is false.  These
-/// verification errors are signalled on the stderr.  After the checks
-/// it updates the value and emits the valueChanged() signal.
-void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
+/// checks are enabled.  The verification errors are signalled on the
+/// stderr.  After the check it updates the value and emits the
+/// valueChanged() signal.
+void PropertyHandle::setValue(QVariant newValue)
 {
     if (typeCheckEnabled // type checks enabled
         && !newValue.isNull() // variable is non-null
@@ -261,18 +260,7 @@ void PropertyHandle::setValue(QVariant newValue, bool allowSameValue)
     }
 
     QWriteLocker lock(&valueLock);
-    if (myValue == newValue && myValue.isNull() == newValue.isNull()) {
-        // The property already has the value we received.
-        // If we're processing the return values of Subscribe, this is normal,
-        // since the return message contains values for the keys subscribed to.
-
-        // If we're not processing the return values of Subscribe, it is an error.
-        // Print out a message of provider error.
-        // In either case, don't emit valueChanged.
-        if (!allowSameValue) {
-            contextWarning() << "Provider error, received unnecessary DBUS signal for property" << myKey;
-        }
-    } else {
+    if (myValue != newValue || myValue.isNull() != newValue.isNull()) {
         // The value was new
         myValue = newValue;
         emit valueChanged();

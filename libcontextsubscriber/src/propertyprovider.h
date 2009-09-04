@@ -38,56 +38,61 @@ class SubscriberInterface;
 class DBusNameListener;
 class ManagerInterface;
 
-// TODO: document that subscribeFinished and valueChanged signals has to be defined and has to inherit from QObject
-class IProvider
+class IProviderPlugin : public QObject
 {
+    Q_OBJECT
 public:
-    virtual bool subscribe(const QString &key) = 0;
-    virtual void unsubscribe(const QString &key) = 0;
+    virtual void subscribe(QSet<QString> keys) = 0;
+    virtual void unsubscribe(QSet<QString> keys) = 0;
+
+signals:
+    void ready();
+    void failed(QString error);
+    void subscribeFinished(QString key);
+    void subscribeFailed(QString failedKey, QString error);
+    // FIXME: document that duplicate suppression is done by the
+    // "framework", so plugin doesn't have to guarantee that value is
+    // new
+    void valueChanged(QString key, QVariant value);
 };
 
-IProvider* providerFactory(const QString& plugin, const QString& constructionString);
-typedef IProvider* (*ProviderFactoryPrototype)(const QString &constructionString);
-IProvider* ContextKitProviderFactory(const QString &constructionString);
+typedef IProviderPlugin* (*ProviderPluginFactoryPrototype)(const QString &constructionString);
 
-class ContextKitProvider : public QueuedInvoker, public IProvider
+class Provider : public QueuedInvoker
 {
     Q_OBJECT
 
 public:
+    static Provider* instance(const QString& plugin, const QString& constructionString);
     bool subscribe(const QString &key);
     void unsubscribe(const QString &key);
 
 signals:
     void subscribeFinished(QSet<QString> keys);
-    void valueChanged(QString key, QVariant value, bool processingSubscription);
 
 private slots:
-    void onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
-    void onGetSubscriberFinished(QString objectPath);
-    void onSubscribeFinished(QSet<QString> keys);
-    void onProviderAppeared();
-    void onProviderDisappeared();
+    void onPluginReady();
+    void onPluginFailed(QString error);
+    void onPluginSubscribeFinished(QString key);
+    void onPluginSubscribeFailed(QString failedKey, QString error);
+    void onPluginValueChanged(QString key, QVariant newValue);
 
 private:
-    ContextKitProvider(QDBusConnection::BusType busType, const QString& busName);
-    Q_INVOKABLE void handleSubscriptions();
+    enum PluginState { INITIALIZING, READY, FAILED };
+    Provider(const QString &plugin, const QString &constructionString);
+    Q_INVOKABLE void handleSubscribes();
+    Q_INVOKABLE void constructPlugin();
+    IProviderPlugin* plugin;
+    PluginState pluginState;
+    QString pluginName;
+    QString constructionString;
 
-    DBusNameListener *providerListener; ///< Listens to provider's (dis)appearance over DBus
-    SubscriberInterface *subscriberInterface; ///< The DBus interface for the Subscriber object
-    ManagerInterface *managerInterface; ///< The DBus interface for the Manager object
-    bool getSubscriberFailed; ///< Whether the GetSubscriber dbus call failed on the manager interface
-
-    QDBusConnection *connection; ///< The connection to DBus, generated from busType
-    QDBusConnection::BusType busType; ///< The bus type of the DBus provider connected to
-    QString busName; ///< The bus name of the DBus provider connected to
-
-    QMutex subscriptionLock;
+    QMutex subscribeLock;
     QSet<QString> toSubscribe; ///< Keys pending for subscription
     QSet<QString> toUnsubscribe; ///< Keys pending for unsubscription
-    QSet<QString> subscribedKeys; ///< The keys that should be currently subscribed to
 
-    friend IProvider* ContextKitProviderFactory(const QString &constructionString);
+    // FIXME: rename this to something which contains the word intention in it
+    QSet<QString> subscribedKeys; ///< The keys that should be currently subscribed to
 };
 
 } // end namespace

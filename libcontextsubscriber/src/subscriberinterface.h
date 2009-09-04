@@ -45,8 +45,9 @@ public:
     void unsubscribe(QSet<QString> keys);
 
 signals:
-    void valuesChanged(QMap<QString, QVariant> values, bool processingSubscription);
-    void subscribeFinished(QSet<QString> keys);
+    void valuesChanged(QMap<QString, QVariant> values);
+    void subscribeFinished(QList<QString> keys);
+    void subscribeFailed(QList<QString> keys, QString error);
     void Changed(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);
 
 private slots:

@@ -33,7 +33,7 @@ class ContextPropertyInfo;
 
 namespace ContextSubscriber {
 
-class IProvider;
+class Provider;
 class DBusNameListener;
 
 class PropertyHandle : public QObject
@@ -51,7 +51,7 @@ public:
 
     static PropertyHandle* instance(const QString& key);
 
-    void setValue(QVariant newValue, bool allowSameValue);
+    void setValue(QVariant newValue);
     static void ignoreCommander();
     static void setTypeCheck(bool typeCheck);
 
@@ -65,7 +65,7 @@ private slots:
 private:
     PropertyHandle(const QString& key);
 
-    IProvider *myProvider; ///< Provider of this property
+    Provider *myProvider; ///< Provider of this property
     ContextPropertyInfo *myInfo; ///< Metadata for this property
     unsigned int subscribeCount; ///< Number of subscribed ContextProperty objects subscribed to this property
     QMutex subscribeCountLock;

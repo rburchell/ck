@@ -74,7 +74,7 @@ void SubscriberInterface::subscribe(QSet<QString> keys)
     // FIXME contextDebug() << "SubscriberInterface::subscribe " << keys;
     if (isValid() == false || keys.size() == 0) {
         contextDebug() << "Subscriber cannot subscribe -> emitting subscribeFinished()";
-        emit subscribeFinished(keys);
+        emit subscribeFinished(keys.toList());
         return;
     }
 
@@ -107,7 +107,7 @@ void SubscriberInterface::unsubscribe(QSet<QString> keys)
 void SubscriberInterface::onChanged(const QMap<QString, QVariant> &values, const QStringList& unknownKeys)
 {
     QMap<QString, QVariant> copy = values;
-    emit valuesChanged(mergeNullsWithMap(copy, unknownKeys), false);
+    emit valuesChanged(mergeNullsWithMap(copy, unknownKeys));
 }
 
 /// A helper function. Sets the values of given keys to a null QVariant in a QMap.
@@ -127,21 +127,26 @@ QMap<QString, QVariant>& SubscriberInterface::mergeNullsWithMap(QMap<QString, QV
 void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
 {
     QDBusPendingReply<QMap<QString, QVariant>, QStringList> reply = *watcher;
+
+    QList<QString> requestedKeys = watcher->property("keysToSubscribe").toStringList();
+
     if (reply.isError()) {
         // Possible causes of the error:
         // The provider is not running
         // The provider didn't implement the needed interface + function
         // The function resulted in an error
         contextWarning() << "Provider error while subscribing:" << reply.error().message();
+        emit subscribeFailed(requestedKeys, "Provider error");
     } else {
         QMap<QString, QVariant> subscribeTimeValues = reply.argumentAt<0>();
         QStringList unknowns = reply.argumentAt<1>();
 
         // TODO: the protocol should be better, this is just a workaround
-        emit valuesChanged(mergeNullsWithMap(subscribeTimeValues, unknowns), true);
+        QMap<QString, QVariant> okMap = mergeNullsWithMap(subscribeTimeValues, unknowns);
+        emit subscribeFinished(okMap.keys());
+        emit valuesChanged(okMap);
+        emit subscribeFailed((requestedKeys.toSet() - okMap.keys().toSet()).toList(), "Not provided");
     }
-    QStringList keys = watcher->property("keysToSubscribe").toStringList();
-    emit subscribeFinished(keys.toSet());
 }
 
 void SubscriberInterface::connectNotify(const char *signal)

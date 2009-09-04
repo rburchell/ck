@@ -45,10 +45,10 @@ HandleSignalRouter* HandleSignalRouter::instance()
     return &myInstance;
 }
 
-void HandleSignalRouter::onValueChanged(QString key, QVariant value, bool processingSubscription)
+void HandleSignalRouter::onValueChanged(QString key, QVariant value)
 {
     PropertyHandle* handle = PropertyHandle::instance(key);
-    handle->setValue(value, processingSubscription);
+    handle->setValue(value);
 }
 
 } // end namespace

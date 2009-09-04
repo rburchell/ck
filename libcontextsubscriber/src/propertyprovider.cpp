@@ -22,9 +22,7 @@
 #include "propertyprovider.h"
 #include "handlesignalrouter.h"
 #include "sconnect.h"
-#include "subscriberinterface.h"
-#include "managerinterface.h"
-#include "dbusnamelistener.h"
+#include "contextkitplugin.h"
 #include "logging.h"
 #include <QTimer>
 #include <QMutexLocker>
@@ -34,104 +32,72 @@
 namespace ContextSubscriber {
 
 /*!
-   \class ContextKitProvider
+   \class Provider
 
    \brief Keeps the DBUS connection with a specific provider and
    handles subscriptions and value changes with the properties of that
    provider.
 */
 
-ContextKitProvider::ContextKitProvider(QDBusConnection::BusType busType, const QString& busName)
-    : subscriberInterface(0), managerInterface(0), connection(0),
-      busType(busType), busName(busName)
+Provider::Provider(const QString &plugin, const QString &constructionString)
+    : plugin(0), pluginState(INITIALIZING), pluginName(plugin), constructionString(constructionString)
 {
-    if (busType == QDBusConnection::SystemBus)
-        connection = new QDBusConnection(QDBusConnection::systemBus());
-    else
-        connection = new QDBusConnection(QDBusConnection::sessionBus());
+    queueOnce("constructPlugin");
+}
 
-    // Call GetSubscriber asynchronously
-    managerInterface = new ManagerInterface(*connection, busName, this);
-    sconnect(managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onGetSubscriberFinished(QString)));
+void Provider::constructPlugin()
+{
+    if (pluginName == "contextkit-dbus") {
+        plugin = contextKitPluginFactory(constructionString);
+    } else ; // FIXME: implement plugin system in the else branch
 
-    // Notice if the provider on the dbus comes and goes
-    providerListener = new DBusNameListener(busType, busName, this);
-    sconnect(providerListener, SIGNAL(nameAppeared()),
-             this, SLOT(onProviderAppeared()));
-    sconnect(providerListener, SIGNAL(nameDisappeared()),
-             this, SLOT(onProviderDisappeared()));
-    // Listen to the provider appearing and disappearing, but don't
-    // perform the initial NameHasOwner check.  We will try to connect
-    // to the provider at startup, whether it's present or not.
-    providerListener->startListening(false);
+    if (plugin == 0) {
+        pluginState = FAILED;
+        handleSubscribes();
+        return;
+    }
 
     // Connect the signal of changing values to the class who handles it
     HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
-    sconnect(this, SIGNAL(valueChanged(QString, QVariant, bool)),
-             handleSignalRouter, SLOT(onValueChanged(QString, QVariant, bool)));
+    sconnect(plugin, SIGNAL(valueChanged(QString, QVariant)),
+             handleSignalRouter, SLOT(onValueChanged(QString, QVariant)));
 
-    // Move the object (and all children) to the main thread
-    moveToThread(QCoreApplication::instance()->thread());
+    sconnect(plugin, SIGNAL(ready()),
+             this, SLOT(onPluginReady()));
+    sconnect(plugin, SIGNAL(failed(QString)),
+             this, SLOT(onPluginFailed(QString)));
 
-    // At startup we don't know if the provider is present or not, so
-    // we just try to get the subscriber through the managerinterface
-    // and it will turn out.  We have to use the queueOnce feature,
-    // because we are not necessarily in the main event loop's thread.
-    queueOnce("onProviderAppeared");
+    // FIXME: signal these things through the handlesignalrouter
+    sconnect(plugin, SIGNAL(subscribeFinished(QString)),
+             this, SLOT(onPluginSubscribeFinished(QString)));
+    sconnect(plugin, SIGNAL(subscribeFailed(QString, QString)),
+             this, SLOT(onPluginSubscribeFailed(QString, QString)));
 }
 
-/// Provider reappeared on the DBus, so get a new subscriber interface from it
-void ContextKitProvider::onProviderAppeared()
+void Provider::onPluginReady()
 {
-    delete subscriberInterface;
-    subscriberInterface = 0;
-    managerInterface->getSubscriber();
+    // FIXME: try this out :)
+    contextDebug();
+
+    QMutexLocker lock(&subscribeLock);
+    // Renew the subscriptions (if any).
+    // Renewing happens when a provider has disappeared and now it appeared again.
+    toUnsubscribe.clear();
+    toSubscribe.clear();
+    toSubscribe += subscribedKeys;
+    pluginState = READY;
+    lock.unlock();
+    handleSubscribes();
 }
 
-/// Delete our subscriber interface when the provider went away
-void ContextKitProvider::onProviderDisappeared()
+void Provider::onPluginFailed(QString error)
 {
-    delete subscriberInterface;
-    subscriberInterface = 0;
-}
+    contextWarning() << error;
 
-/// Called when the manager interface is ready with the asynchronous
-/// GetSubscriber call.  We use the new subscriber interface to
-/// subscribe to the currently subscribed keys.
-void ContextKitProvider::onGetSubscriberFinished(QString objectPath)
-{
-    QMutexLocker lock(&subscriptionLock);
-    contextDebug() << "ContextKitProvider::onGetSubscriberFinished" << objectPath;
-
-    if (objectPath != "") {
-        // GetSubscriber was successful
-        delete subscriberInterface;
-        subscriberInterface = new SubscriberInterface(*connection, busName, objectPath, this);
-
-        sconnect(subscriberInterface,
-                 SIGNAL(valuesChanged(QMap<QString, QVariant>, bool)),
-                 this,
-                 SLOT(onValuesChanged(QMap<QString, QVariant>, bool)));
-        sconnect(subscriberInterface,
-                 SIGNAL(subscribeFinished(QSet<QString>)),
-                 this,
-                 SLOT(onSubscribeFinished(QSet<QString>)));
-
-        // Renew the subscriptions (if any).
-        // Renewing happens when a provider has disappeared and now it appeared again.
-
-        toUnsubscribe.clear();
-        toSubscribe.clear();
-        toSubscribe += subscribedKeys;
-
-        queueOnce("handleSubscriptions");
-    }
-    else {
-        // GetSubscriber failed
-        emit subscribeFinished(toSubscribe);
-        toSubscribe.clear();
-        toUnsubscribe.clear();
-    }
+    QMutexLocker lock(&subscribeLock);
+    pluginState = FAILED;
+    lock.unlock();
+    handleSubscribes();
 }
 
 /// Called when the subscriber interface is ready with the
@@ -139,23 +105,33 @@ void ContextKitProvider::onGetSubscriberFinished(QString objectPath)
 /// which will be caught by the \c PropertyHandle objects to set the
 /// \c subscribePending boolean which is used by the not so busy
 /// busyloop in <tt>waitForSubscription()</tt>.
-void ContextKitProvider::onSubscribeFinished(QSet<QString> keys)
+void Provider::onPluginSubscribeFinished(QString key)
 {
-    QMutexLocker lock(&subscriptionLock);
-    contextDebug() << "ContextKitProvider::onSubscribeFinished" << keys;
+    contextDebug() << key;
 
-    // Drop keys which were not supposed to be subscribed to (by this provider)
-    emit subscribeFinished(keys.intersect(subscribedKeys));
+    QMutexLocker lock(&subscribeLock);
+    if (subscribedKeys.contains(key))
+        // FIXME: get rid of QSet, go through signalhandlerouter
+        emit subscribeFinished(QSet<QString>() << key);
+}
+
+void Provider::onPluginSubscribeFailed(QString key, QString error)
+{
+    contextDebug() << "Provider::onPluginSubscribeFailed" << key << error;
+
+    QMutexLocker lock(&subscribeLock);
+    if (subscribedKeys.contains(key))
+        emit subscribeFinished(QSet<QString>() << key);
 }
 
 /// Schedules a property to be subscribed to.  Returns true if and
 /// only if the main loop has to run for the subscription to be
 /// finalized.
-bool ContextKitProvider::subscribe(const QString &key)
+bool Provider::subscribe(const QString &key)
 {
-    QMutexLocker lock(&subscriptionLock);
-    contextDebug() << "ContextKitProvider::subscribe, provider" << busName << key;
+    contextDebug() << "plugin" << pluginName << constructionString;
 
+    QMutexLocker lock(&subscribeLock);
     // Note: the intention is saved in all cases; whether we can really subscribe or not.
     subscribedKeys.insert(key);
 
@@ -167,23 +143,23 @@ bool ContextKitProvider::subscribe(const QString &key)
     }
 
     // Schedule the key to be subscribed to and return true
-    qDebug() << "Inserting the key to toSubscribe" << QThread::currentThread();
+    contextDebug() << "Inserting the key to toSubscribe" << QThread::currentThread();
 
     // Really schedule the key to be subscribed to
     toSubscribe.insert(key);
 
-    queueOnce("handleSubscriptions");
+    queueOnce("handleSubscribes");
 
     return true;
 }
 
 /// Schedules a property to be unsubscribed from when the main loop is
 /// entered the next time.
-void ContextKitProvider::unsubscribe(const QString &key)
+void Provider::unsubscribe(const QString &key)
 {
-    QMutexLocker lock(&subscriptionLock);
-    contextDebug() << "ContextKitProvider::unsubscribe, provider" << busName << key;
+    contextDebug() << "Provider::unsubscribe, plugin" << pluginName << constructionString;
 
+    QMutexLocker lock(&subscribeLock);
     // Save the intention of the higher level
     subscribedKeys.remove(key);
 
@@ -197,95 +173,60 @@ void ContextKitProvider::unsubscribe(const QString &key)
         // Really schedule the key to be unsubscribed from
         toUnsubscribe.insert(key);
 
-        queueOnce("handleSubscriptions");
+        queueOnce("handleSubscribes");
     }
 }
 
 /// Is executed when the main loop is entered and we have previously
 /// scheduled subscriptions / unsubscriptions.
-void ContextKitProvider::handleSubscriptions()
+void Provider::handleSubscribes()
 {
-    QMutexLocker lock(&subscriptionLock);
-    qDebug() << "ContextKitProvider::handleSubscriptions in thread" << QThread::currentThread();
-    if (subscriberInterface != 0) {
-        if (toSubscribe.size() > 0) subscriberInterface->subscribe(toSubscribe);
-        if (toUnsubscribe.size() > 0) subscriberInterface->unsubscribe(toUnsubscribe);
+    contextDebug() << "Provider::handleSubscribes in thread" << QThread::currentThread();
+
+    QMutexLocker lock(&subscribeLock);
+
+    switch (pluginState) {
+    case READY:
+        if (toSubscribe.size() > 0) plugin->subscribe(toSubscribe);
+        if (toUnsubscribe.size() > 0) plugin->unsubscribe(toUnsubscribe);
         toSubscribe.clear();
         toUnsubscribe.clear();
-    } else {
-        // subscriberInterface can be zero because we are still waiting
-        // GetSubscriber to finish, then just wait
-
-        // Or the subscription will not be successful, emit the
-        // subscribeFinished signal so that the handles will stop
-        // waiting.
-        if (managerInterface->isGetSubscriberFailed()) {
-            qDebug() << "GetSubscriber has failed previously";
-            if (toSubscribe.size() > 0) emit subscribeFinished(toSubscribe);
-            toSubscribe.clear();
-            toUnsubscribe.clear();
-        }
+        break;
+    case FAILED:
+        // it failed for good.
+        contextDebug() << "Plugin init has failed previously";
+        if (toSubscribe.size() > 0) emit subscribeFinished(toSubscribe);
+        toSubscribe.clear();
+        toUnsubscribe.clear();
+        break;
+    case INITIALIZING:
+        // we just have to wait,
+        break;
     }
-    qDebug() << "ContextKitProvider::handleSubscriptions processed";
+
+    contextDebug() << "Provider::handleSubscribes processed";
 }
 
-/// Slot, handling changed values coming from the provider over DBUS.
-void ContextKitProvider::onValuesChanged(QMap<QString, QVariant> values, bool processingSubscription)
+void Provider::onPluginValueChanged(QString key, QVariant newValue)
 {
-    QMutexLocker lock(&subscriptionLock);
-    for (QMap<QString, QVariant>::const_iterator i = values.constBegin(); i != values.constEnd(); ++i) {
-        if (subscribedKeys.contains(i.key()) == false) {
-            contextWarning() << "Received a property not subscribed to:" << i.key();
-        } else {
-            // Note: HandleSignalRouter will catch this signal and set the value of the
-            // corresponding PropertyHandle.
-            emit valueChanged(i.key(), i.value(), processingSubscription);
-        }
-    }
+    QMutexLocker lock(&subscribeLock);
+    if (subscribedKeys.contains(key))
+        HandleSignalRouter::instance()->onValueChanged(key, newValue);
+    else
+        contextWarning() << "Received a property not subscribed to:" << key;
 }
 
-IProvider* ContextKitProviderFactory(const QString &constructionString)
-{
-    QStringList constr = constructionString.split(":");
-    if (constr[0] == "session")
-        return new ContextKitProvider(QDBusConnection::SessionBus, constr[1]);
-    else if (constr[0] == "system")
-        return new ContextKitProvider(QDBusConnection::SystemBus, constr[1]);
-
-    contextCritical() << "Unknown bus type: " << constructionString;
-    return 0;
-}
-
-// TODO
-/*IProvider* BluezProviderFactory(const QString &constructionString)
-{
-    if (constructionString != "")
-        return 0;
-
-    return new BluezInterface();
-    }*/
-
-
-IProvider* providerFactory(const QString& plugin, const QString& constructionString)
+Provider* Provider::instance(const QString& plugin, const QString& constructionString)
 {
     // Singleton instance container
-    // plugin path, constructionstring -> IProvider
-    static QMap<QPair<QString, QString>, IProvider*> providerInstances;
+    // plugin path, constructionstring -> Provider
+    static QMap<QPair<QString, QString>, Provider*> providerInstances;
     QPair<QString, QString> lookupValue(plugin, constructionString);
 
     static QMutex providerInstancesLock;
     QMutexLocker locker(&providerInstancesLock);
-    if (!providerInstances.contains(lookupValue)) {
-        IProvider* newProvider = 0;
-        if (plugin == "contextkit-dbus")
-            newProvider = ContextKitProviderFactory(constructionString);
-        else if (plugin == "bluez");
-//            newProvider = BluezProviderFactory(constructionString);
-        else // implement plugin system in the else branch
-            ;
-
-        providerInstances.insert(lookupValue, newProvider);
-    }
+    if (!providerInstances.contains(lookupValue))
+        providerInstances.insert(lookupValue, new Provider(plugin, constructionString));
 
     contextDebug() << "Returning provider instance for" << plugin << ":" << constructionString;
 
