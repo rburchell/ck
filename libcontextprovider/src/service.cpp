@@ -133,6 +133,7 @@ QHash <QString, ServiceBackend*> Service::backends;
 
 struct ServicePrivate {
     ServiceBackend *backend;
+    QString keystring;
 };
 
 /// Creates a Service proxy object for \a busName on the bus indicated by \a
@@ -146,15 +147,17 @@ Service::Service(QDBusConnection::BusType busType, const QString &busName, QObje
 {
     contextDebug() << F_SERVICE << "Creating new Service for" << busName;
 
-    QString keystring = busName + ":" + ((busType == QDBusConnection::SessionBus) ? "Session" : "System");
-
     priv = new ServicePrivate;
-    if (backends.contains(keystring)) {
-        priv->backend = backends.value(keystring);
+    priv->keystring =  busName + ":" + ((busType == QDBusConnection::SessionBus) ? "Session" : "System");
+
+    if (backends.contains(priv->keystring)) {
+        priv->backend = backends.value(priv->keystring);
     } else {
         priv->backend = new ServiceBackend(busType, busName);
-        backends.insert(keystring, priv->backend);
+        backends.insert(priv->keystring, priv->backend);
     }
+
+    priv->backend->ref();
 
     // XXX - there has be an easier way to get a idle callback when
     //       the event loop is entered.
@@ -169,6 +172,13 @@ Service::Service(QDBusConnection::BusType busType, const QString &busName, QObje
 Service::~Service()
 {
     contextDebug() << F_SERVICE << F_DESTROY << "Destroying Service";
+    priv->backend->unref();
+
+    if (priv->backend->refCount() == 0) {
+        backends.remove(priv->keystring);
+        delete priv->backend;
+    }
+
     delete priv;
 }
 

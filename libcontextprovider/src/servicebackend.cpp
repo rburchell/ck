@@ -46,6 +46,7 @@ struct ServiceBackendPrivate {
     QString busName;
     Manager *manager;
     QDBusConnection *connection;
+    int refCount;
 };
 
 /// Creates new ServiceBackend. The backend automatically creates it's Manager.
@@ -60,12 +61,14 @@ ServiceBackend::ServiceBackend(QDBusConnection::BusType busType, const QString &
     priv->busName = busName;
     priv->manager = new Manager();
     priv->connection = NULL;
+    priv->refCount = 0;
 }
 
 /// Destroys the ServiceBackend. The backend is not stopped.
 ServiceBackend::~ServiceBackend()
 {
     contextDebug() << F_SERVICE_BACKEND << F_DESTROY << "Destroying Service";
+    stop();
     delete priv;
 }
 
@@ -149,6 +152,24 @@ void ServiceBackend::setAsDefault()
     }
 
     defaultService = this;
+}
+
+/// Increase the reference count by one. Service calls that.
+void ServiceBackend::ref()
+{
+    priv->refCount++;
+}
+
+/// Decrease the reference count by one. Service calls that.
+void ServiceBackend::unref()
+{
+    priv->refCount--;
+}
+
+/// Return the current reference count. Service manages that.
+int ServiceBackend::refCount()
+{
+    return priv->refCount;
 }
 
 } // end namespace

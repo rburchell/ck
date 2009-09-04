@@ -51,6 +51,10 @@ public:
     void setValue(const QString &key, const QVariant &val);
     Manager *manager();
 
+    void ref();
+    void unref();
+    int refCount();
+
     static ServiceBackend *defaultService;
 
 private:
