@@ -12,3 +12,8 @@ cp dynamic/providers3v2/cache.cdb ../contextpropertyinfo-cdb-dynamic/context-pro
 cp dynamic/providers2v1/cache.cdb ../contextpropertyinfo-cdb-dynamic/context-providers4v1.cdb
 cp dynamic/providers4v2/cache.cdb ../contextpropertyinfo-cdb-dynamic/context-providers4v2.cdb
 
+
+
+cp dynamic/providers2v1/cache.cdb ../contextregistryinfo-cdb-dynamic/context-providers1v1.cdb
+cp dynamic/providers1v2/cache.cdb ../contextregistryinfo-cdb-dynamic/context-providers1v2.cdb
+
