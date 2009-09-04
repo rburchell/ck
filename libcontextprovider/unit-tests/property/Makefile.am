@@ -1,7 +1,7 @@
 check_PROGRAMS = propertyunittest
 
 # test's sources
-propertyunittest_SOURCES = propertyunittest.cpp manager.h service.h
+propertyunittest_SOURCES = propertyunittest.cpp manager.h service.h servicebackend.h
 
 COVERAGE_FILES = property.cpp
 
