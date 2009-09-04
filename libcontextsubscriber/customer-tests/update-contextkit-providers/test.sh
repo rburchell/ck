@@ -27,14 +27,11 @@ function dotest {
     querydb "KEYS" "KEYS"
     compare "KEYS.expected" "KEYS.actual"
 
-    querydb "PROVIDERS" "PROVIDERS"
-    compare "PROVIDERS.expected" "PROVIDERS.actual"
+    querydb "PLUGINS" "PLUGINS"
+    compare "PLUGINS.expected" "PLUGINS.actual"
 
-    querydb "org.freedesktop.ContextKit.contextd1:KEYS" "org.freedesktop.ContextKit.contextd1_KEYS"
-    compare "org.freedesktop.ContextKit.contextd1_KEYS.expected" "org.freedesktop.ContextKit.contextd1_KEYS.actual"
-
-    querydb "org.freedesktop.ContextKit.contextd2:KEYS" "org.freedesktop.ContextKit.contextd2_KEYS"
-    compare "org.freedesktop.ContextKit.contextd2_KEYS.expected" "org.freedesktop.ContextKit.contextd2_KEYS.actual"
+    querydb "contextkit-dbus:KEYS" "contextkit-dbus_KEYS"
+    compare "contextkit-dbus_KEYS.expected" "contextkit-dbus_KEYS.actual"
 
     querydb "Battery.Charging:KEYTYPE" "Battery.Charging_KEYTYPE"
     compare "Battery.Charging_KEYTYPE.expected" "Battery.Charging_KEYTYPE.actual"
@@ -42,11 +39,11 @@ function dotest {
     querydb "Battery.Charging:KEYDOC" "Battery.Charging_KEYDOC"
     compare "Battery.Charging_KEYDOC.expected" "Battery.Charging_KEYDOC.actual"
 
-    querydb "Battery.Charging:KEYPROVIDER" "Battery.Charging_KEYPROVIDER"
-    compare "Battery.Charging_KEYPROVIDER.expected" "Battery.Charging_KEYPROVIDER.actual"
+    querydb "Battery.Charging:KEYPLUGIN" "Battery.Charging_KEYPLUGIN"
+    compare "Battery.Charging_KEYPLUGIN.expected" "Battery.Charging_KEYPLUGIN.actual"
 
-    querydb "Battery.Charging:KEYBUS" "Battery.Charging_KEYBUS"
-    compare "Battery.Charging_KEYBUS.expected" "Battery.Charging_KEYBUS.actual"
+    querydb "Battery.Charging:KEYCONSTRUCTIONSTRING" "Battery.Charging_KEYCONSTRUCTIONSTRING"
+    compare "Battery.Charging_KEYCONSTRUCTIONSTRING.expected" "Battery.Charging_KEYCONSTRUCTIONSTRING.actual"
 }
 
 # Ensure that the cache file permissions are ok
