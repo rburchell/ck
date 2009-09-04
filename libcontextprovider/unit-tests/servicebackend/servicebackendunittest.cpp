@@ -62,14 +62,15 @@ QVariant Manager::getKeyValue(const QString &key)
     return QVariant();
 }
 
-
-
 class ServiceBackendUnitTest : public QObject
 {
     Q_OBJECT
 
 private slots:
     void init();
+    void defaults();
+    void setValue();
+    void refCouting();
 
 private:
     ServiceBackend *serviceBackend;
@@ -82,6 +83,28 @@ void ServiceBackendUnitTest::init()
 {
     serviceBackend = new ServiceBackend(QDBusConnection::SessionBus, "test.com");
 }
+
+void ServiceBackendUnitTest::defaults()
+{
+    QVERIFY(ServiceBackend::defaultService == NULL);
+}
+
+void ServiceBackendUnitTest::refCouting()
+{
+    QCOMPARE(serviceBackend->refCount(), 0);
+    serviceBackend->ref();
+    QCOMPARE(serviceBackend->refCount(), 1);
+    serviceBackend->unref();
+    QCOMPARE(serviceBackend->refCount(), 0);
+}
+
+void ServiceBackendUnitTest::setValue()
+{
+    serviceBackend->setValue("Battery.ChargeLevel", 99);
+    QCOMPARE(*lastKey, QString("Battery.ChargeLevel"));
+    QCOMPARE(lastValue->toInt(), 99);
+}
+
 
 #include "servicebackendunittest.moc"
 QTEST_MAIN(ServiceBackendUnitTest);
