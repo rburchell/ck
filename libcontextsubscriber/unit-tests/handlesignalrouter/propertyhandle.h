@@ -37,11 +37,11 @@ class PropertyHandle : public QObject
 
 public:
     static PropertyHandle* instance(const QString& key);
-    void setValue(QVariant newValue, bool allowSameValue);
+    void setValue(QVariant newValue);
 
     // For tests
 signals:
-    void setValueCalled(QString, QVariant, bool);
+    void setValueCalled(QString, QVariant);
 
 public:
     PropertyHandle(const QString& key);

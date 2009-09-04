@@ -73,9 +73,9 @@ PropertyHandle::PropertyHandle(const QString& key)
 {
 }
 
-void PropertyHandle::setValue(QVariant value, bool allowSame)
+void PropertyHandle::setValue(QVariant value)
 {
-    emit setValueCalled(myKey, value, allowSame);
+    emit setValueCalled(myKey, value);
 }
 
 PropertyHandle* PropertyHandle::instance(const QString& key)
@@ -137,13 +137,13 @@ void HandleSignalRouterUnitTests::routingSignals()
     // Get the object to be tested
     handleSignalRouter = HandleSignalRouter::instance();
     // Start spying the mock handles
-    QSignalSpy spy1(mockHandleOne, SIGNAL(setValueCalled(QString, QVariant, bool)));
-    QSignalSpy spy2(mockHandleTwo, SIGNAL(setValueCalled(QString, QVariant, bool)));
-    QSignalSpy spy3(mockHandleThree, SIGNAL(setValueCalled(QString, QVariant, bool)));
+    QSignalSpy spy1(mockHandleOne, SIGNAL(setValueCalled(QString, QVariant)));
+    QSignalSpy spy2(mockHandleTwo, SIGNAL(setValueCalled(QString, QVariant)));
+    QSignalSpy spy3(mockHandleThree, SIGNAL(setValueCalled(QString, QVariant)));
 
     // Test:
     // Send a signal to the HandleSignalRouter
-    handleSignalRouter->onValueChanged("Property.One", QVariant(4.3), true);
+    handleSignalRouter->onValueChanged("Property.One", QVariant(4.3));
 
     // Expected results:
     // The mockHandleOne.setValue was called
@@ -151,14 +151,13 @@ void HandleSignalRouterUnitTests::routingSignals()
     QList<QVariant> parameters = spy1.takeFirst();
     QCOMPARE(parameters.at(0), QVariant("Property.One"));
     QCOMPARE(parameters.at(1).value<QVariant >(), QVariant(4.3));
-    QCOMPARE(parameters.at(2), QVariant(true));
     // The setValue of other mock handles were not called
     QCOMPARE(spy2.count(), 0);
     QCOMPARE(spy3.count(), 0);
 
     // Test:
     // Send a signal to the HandleSignalRouter
-    handleSignalRouter->onValueChanged("Property.Two", QVariant("value"), false);
+    handleSignalRouter->onValueChanged("Property.Two", QVariant("value"));
 
     // Expected results:
     // The mockHandleTwo.setValue was called
@@ -166,7 +165,6 @@ void HandleSignalRouterUnitTests::routingSignals()
     parameters = spy2.takeFirst();
     QCOMPARE(parameters.at(0), QVariant("Property.Two"));
     QCOMPARE(parameters.at(1).value<QVariant >(), QVariant("value"));
-    QCOMPARE(parameters.at(2), QVariant(false));
     // The setValue of other mock handles were not called
     QCOMPARE(spy1.count(), 0);
     QCOMPARE(spy3.count(), 0);
