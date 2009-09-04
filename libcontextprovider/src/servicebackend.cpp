@@ -20,7 +20,6 @@
  */
 
 #include "servicebackend.h"
-#include "property.h"
 #include "logging.h"
 #include "manager.h"
 #include "manageradaptor.h"
