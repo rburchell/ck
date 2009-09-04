@@ -100,6 +100,7 @@ AC_CONFIG_FILES([
 	libcontextprovider/unit-tests/property/Makefile
 	libcontextprovider/unit-tests/contextc/Makefile
 	libcontextprovider/unit-tests/service/Makefile
+	libcontextprovider/unit-tests/servicebackend/Makefile
 	libcontextprovider/customer-tests/Makefile
 	libcontextprovider/customer-tests/subscription/Makefile
 	libcontextprovider/customer-tests/client/Makefile
