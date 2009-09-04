@@ -555,6 +555,12 @@ doesn't fit into any of the above categories.
 The device is not being used.
           </doc>
 	</idle>
+        <maintenance>
+          <doc>
+The user is doing system-wide maintenance work such as restoring a
+backup or upgrading the OS software.
+          </doc>
+        </maintenance>
       </string-enum>
     </type>
   </key>

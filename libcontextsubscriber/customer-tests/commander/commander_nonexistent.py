@@ -22,13 +22,13 @@
 ##
 ##
 ## This test:
-##   - starts up a client and a provider
-##   - starts a commander with a different value and type for a provider provided property
-##                    and with a new string non-provided property
-##   - checks that the client gets an error for the provider provided property
-##   - checks that the client gets the new string non-provided property
-##   - changes the non-provided property's type to int and checks it
-##     (so this proves that type checks are always off for commander added properties)
+##	 - starts up a client and a provider
+##	 - starts a commander with a different value and type for a provider
+##	   provided property and with a new string non-provided property
+##	 - checks that the client gets an error for the provider provided property
+##	 - checks that the client gets the new string non-provided property
+##	 - changes the non-provided property's type to int and checks it
+##	   (so this proves that type checks are always off for commander properties)
 
 import sys
 import os
@@ -39,70 +39,78 @@ import unittest
 from subprocess import Popen, PIPE
 
 def timeoutHandler(signum, frame):
-    raise Exception('tests has been running for too long')
+	raise Exception('tests has been running for too long')
 
 class Callable:
-    def __init__(self, anycallable):
-        self.__call__ = anycallable
+	def __init__(self, anycallable):
+		self.__call__ = anycallable
 
 class CommanderNonExistent(unittest.TestCase):
-    def startProvider(busname, args):
-        ret = Popen(["context-provide", busname] + args,
-              stdin=PIPE,stderr=PIPE,stdout=PIPE)
-        # wait for it
-        print >>ret.stdin, "info()"
-        ret.stdout.readline().rstrip()
-        return ret
-    startProvider = Callable(startProvider)
+	def startProvider(busname, args):
+		ret = Popen(["context-provide", busname] + args,
+			  stdin=PIPE,stderr=PIPE,stdout=PIPE)
+		# wait for it
+		print >>ret.stdin, "info()"
+		ret.stdout.readline().rstrip()
+		return ret
+	startProvider = Callable(startProvider)
 
-    def wanted(name, type, value):
-        return "%s = %s:%s" % (name, type, value)
-    wanted = Callable(wanted)
+	def wanted(name, type, value):
+		return "%s = %s:%s" % (name, type, value)
+	wanted = Callable(wanted)
 
-    def wantedUnknown(name):
-        return "%s is Unknown" % (name)
-    wantedUnknown = Callable(wantedUnknown)
+	def wantedUnknown(name):
+		return "%s is Unknown" % (name)
+	wantedUnknown = Callable(wantedUnknown)
 
-    def setUp(self):
-        self.flexiprovider = self.startProvider("com.nokia.test",
-                                           ["int","test.int","42"])
-        self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
-                                                    ["string", "test.int", "foobar",
-                                                     "string", "test.string", "barfoo"])
-        self.context_client = Popen(["context-listen","test.int", "test.string"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+	def setUp(self):
+		os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide.context"
+		self.flexiprovider = self.startProvider("com.nokia.test",
+										   ["int","test.int","42"])
 
-    def tearDown(self):
-        os.kill(self.flexiprovider.pid, 9)
-        if (self.context_commander != 0): os.kill(self.context_commander.pid, 9)
-        os.kill(self.context_client.pid, 9)
-        os.unlink('context-provide.context')
 
-    def testCommanderFunctionality(self):
-        line = self.context_client.stderr.readline().rstrip()
-        while not line.startswith('(PROVIDER) ERROR: bad type for "test.int" wanted: "INT" got: QString'):
-            line = self.context_client.stderr.readline().rstrip()
-        # if we are here, then the type check worked
 
-        # check the non-existent property
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.string", "QString", "barfoo"),
-                         "Non-existent property couldn't be commanded")
+		os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./commander.context"
+		self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
+													["string", "test.int", "foobar",
+													 "string", "test.string", "barfoo"])
+		self.context_client = Popen(["context-listen","test.int", "test.string"],
+									stdin=PIPE, stdout=PIPE, stderr=PIPE)
 
-        # change the type of the non-existent property
-        print >>self.context_commander.stdin, "add(INT('test.string', 42))"
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.string", "int", "42"),
-                         "Non-existent property's type couldn't be overwritten")
+	def tearDown(self):
+		os.kill(self.flexiprovider.pid, 9)
+		if (self.context_commander != 0): os.kill(self.context_commander.pid, 9)
+		os.kill(self.context_client.pid, 9)
+		os.unlink('context-provide.context')
+		#os.unlink('../commander.context')
+
+	def testCommanderFunctionality(self):
+		line = self.context_client.stderr.readline().rstrip()
+		while not 'Provider error, bad type for  test.int wanted: INT got: QString' in line:
+			line = self.context_client.stderr.readline().rstrip()
+
+		# if we are here, then the type check worked
+
+		# check the non-existent property
+		got = self.context_client.stdout.readline().rstrip()
+		self.assertEqual(got,
+						 self.wanted("test.string", "QString", "barfoo"),
+						 "Non-existent property couldn't be commanded")
+
+		# change the type of the non-existent property
+		print >>self.context_commander.stdin, "add(INT('test.string', 42))"
+		got = self.context_client.stdout.readline().rstrip()
+		self.assertEqual(got,
+						  self.wanted("test.string", "int", "42"),
+						  "Non-existent property's type couldn't be overwritten")
 
 def runTests():
-    suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderNonExistent)
-    result = unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
-    return len(result.errors + result.failures)
+	suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderNonExistent)
+	result = unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
+	return len(result.errors + result.failures)
 
 if __name__ == "__main__":
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
-    signal.signal(signal.SIGALRM, timeoutHandler)
-    signal.alarm(10)
-    sys.exit(runTests())
+	sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+	signal.signal(signal.SIGALRM, timeoutHandler)
+	signal.alarm(10)
+	sys.exit(runTests())
