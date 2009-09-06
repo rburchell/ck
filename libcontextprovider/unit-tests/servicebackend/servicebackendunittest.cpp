@@ -45,6 +45,7 @@ ManagerAdaptor::ManagerAdaptor(Manager *m, QDBusConnection *c)
 
 Manager::Manager()
 {
+    lastManager = this;
 }
 
 void Manager::addKey(const QString &key)
@@ -71,6 +72,7 @@ private slots:
     void defaults();
     void setValue();
     void refCouting();
+    void manager();
 
 private:
     ServiceBackend *serviceBackend;
@@ -82,6 +84,12 @@ private:
 void ServiceBackendUnitTest::init()
 {
     serviceBackend = new ServiceBackend(QDBusConnection::SessionBus, "test.com");
+}
+
+void ServiceBackendUnitTest::manager()
+{
+    QVERIFY(lastManager != NULL);
+    QVERIFY(serviceBackend->manager() == lastManager);
 }
 
 void ServiceBackendUnitTest::defaults()
