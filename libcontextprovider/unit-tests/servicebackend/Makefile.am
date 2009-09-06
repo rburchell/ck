@@ -3,7 +3,7 @@ check_PROGRAMS = servicebackendunittest
 # test's sources
 servicebackendunittest_SOURCES = servicebackendunittest.cpp manager.h manageradaptor.h
 
-COVERAGE_FILES = service.cpp 
+COVERAGE_FILES = servicebackend.cpp 
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
