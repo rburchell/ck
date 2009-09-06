@@ -39,7 +39,7 @@ class ServiceBackend : QObject
 
 public:
     Manager *manager();
-    static ServiceBackend *defaultService;
+    static ServiceBackend *defaultServiceBackend;
 };
 
 } // end namespace

@@ -57,12 +57,12 @@ Property::Property(Service &service, const QString &k, QObject* parent)
 Property::Property(const QString &k, QObject* parent)
     : QObject(parent)
 {
-    if (ServiceBackend::defaultService == NULL) {
+    if (ServiceBackend::defaultServiceBackend == NULL) {
         contextCritical() << "No default service set.";
         abort();
     }
 
-    init (ServiceBackend::defaultService->manager(), k);
+    init (ServiceBackend::defaultServiceBackend->manager(), k);
 }
 
 void Property::init (Manager *manager, const QString &key)

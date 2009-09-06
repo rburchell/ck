@@ -55,7 +55,7 @@ public:
     void unref();
     int refCount();
 
-    static ServiceBackend *defaultService;
+    static ServiceBackend *defaultServiceBackend;
 
 private:
     class ServiceBackendPrivate *priv;

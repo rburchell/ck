@@ -38,7 +38,7 @@ namespace ContextProvider {
     has a Manager and registers properties.
 */
 
-ServiceBackend *ServiceBackend::defaultService;
+ServiceBackend *ServiceBackend::defaultServiceBackend;
 
 struct ServiceBackendPrivate {
     QDBusConnection::BusType busType;
@@ -145,12 +145,12 @@ void ServiceBackend::restart()
 /// be deallocated.
 void ServiceBackend::setAsDefault()
 {
-    if (defaultService) {
+    if (defaultServiceBackend) {
         contextCritical() << F_SERVICE_BACKEND << "Default service already set.";
         return;
     }
 
-    defaultService = this;
+    defaultServiceBackend = this;
 }
 
 /// Increase the reference count by one. Service calls that.

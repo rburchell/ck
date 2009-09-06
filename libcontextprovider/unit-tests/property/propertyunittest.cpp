@@ -102,7 +102,7 @@ ServiceBackend* Service::backend()
 }
 
 // Mock implementation of ServiceBackend
-ServiceBackend* ServiceBackend::defaultService = NULL;
+ServiceBackend* ServiceBackend::defaultServiceBackend = NULL;
 
 Manager *ServiceBackend::manager()
 {
