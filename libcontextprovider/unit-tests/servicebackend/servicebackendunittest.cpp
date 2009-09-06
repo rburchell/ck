@@ -28,6 +28,14 @@
 
 using namespace ContextProvider;
 
+struct ContextProvider::ServiceBackendPrivate {
+    QDBusConnection::BusType busType;
+    QString busName;
+    Manager *manager;
+    QDBusConnection *connection;
+    int refCount;
+};
+
 QString *lastKey = NULL;
 QVariant *lastValue = NULL;
 Manager *lastManager = NULL;
@@ -69,10 +77,12 @@ class ServiceBackendUnitTest : public QObject
 
 private slots:
     void init();
+    void sanity();
     void defaults();
     void setValue();
     void refCouting();
     void manager();
+    void startAndStop();
 
 private:
     ServiceBackend *serviceBackend;
@@ -90,6 +100,12 @@ void ServiceBackendUnitTest::manager()
 {
     QVERIFY(lastManager != NULL);
     QVERIFY(serviceBackend->manager() == lastManager);
+}
+
+void ServiceBackendUnitTest::sanity()
+{
+    QVERIFY(serviceBackend->priv != NULL);
+    QVERIFY(serviceBackend->priv->connection == NULL);
 }
 
 void ServiceBackendUnitTest::defaults()
@@ -114,6 +130,27 @@ void ServiceBackendUnitTest::refCouting()
     QCOMPARE(serviceBackend->refCount(), 1);
     serviceBackend->unref();
     QCOMPARE(serviceBackend->refCount(), 0);
+}
+
+void ServiceBackendUnitTest::startAndStop()
+{
+    QVERIFY(serviceBackend->priv->connection == NULL);
+    serviceBackend->start();
+
+    QTest::qWait(100);
+    QVERIFY(serviceBackend->priv->connection != NULL);
+
+    serviceBackend->restart();
+    QTest::qWait(100);
+    QVERIFY(serviceBackend->priv->connection != NULL);
+
+    QTest::qWait(100);
+    serviceBackend->stop();
+    QVERIFY(serviceBackend->priv->connection == NULL);
+
+    serviceBackend->restart();
+    QTest::qWait(100);
+    QVERIFY(serviceBackend->priv->connection == NULL);
 }
 
 void ServiceBackendUnitTest::setValue()

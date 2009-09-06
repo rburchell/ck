@@ -29,6 +29,8 @@
 #include <QHash>
 #include <QVariant>
 
+class ServiceBackendUnitTest;
+
 namespace ContextProvider {
 
 class Manager;
@@ -56,6 +58,7 @@ public:
     int refCount();
 
     static ServiceBackend *defaultServiceBackend;
+    friend class ::ServiceBackendUnitTest;
 
 private:
     class ServiceBackendPrivate *priv;
