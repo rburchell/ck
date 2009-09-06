@@ -63,12 +63,14 @@ ServiceBackend::ServiceBackend(QDBusConnection::BusType busType, const QString &
     priv->refCount = 0;
 }
 
-/// Destroys the ServiceBackend. The backend is not stopped.
+/// Destroys the ServiceBackend. The backend is stopped.
 ServiceBackend::~ServiceBackend()
 {
     contextDebug() << F_SERVICE_BACKEND << F_DESTROY << "Destroying Service";
     stop();
     delete priv;
+    if (ServiceBackend::defaultServiceBackend == this)
+        ServiceBackend::defaultServiceBackend = NULL;
 }
 
 /// Returns the Manager associated with this backend.

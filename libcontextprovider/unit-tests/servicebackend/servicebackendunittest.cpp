@@ -89,6 +89,8 @@ void ServiceBackendUnitTest::defaults()
     QVERIFY(ServiceBackend::defaultServiceBackend == NULL);
     serviceBackend->setAsDefault();
     QVERIFY(ServiceBackend::defaultServiceBackend == serviceBackend);
+    delete serviceBackend;
+    QVERIFY(ServiceBackend::defaultServiceBackend == NULL);
 }
 
 void ServiceBackendUnitTest::refCouting()
