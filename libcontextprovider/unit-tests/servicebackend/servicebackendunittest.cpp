@@ -97,6 +97,12 @@ void ServiceBackendUnitTest::defaults()
     QVERIFY(ServiceBackend::defaultServiceBackend == NULL);
     serviceBackend->setAsDefault();
     QVERIFY(ServiceBackend::defaultServiceBackend == serviceBackend);
+
+    // Set another
+    ServiceBackend *anotherOne = new ServiceBackend(QDBusConnection::SessionBus, "another.com");
+    anotherOne->setAsDefault();
+    QVERIFY(ServiceBackend::defaultServiceBackend == serviceBackend);
+
     delete serviceBackend;
     QVERIFY(ServiceBackend::defaultServiceBackend == NULL);
 }
