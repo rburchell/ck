@@ -61,15 +61,25 @@
   <complexType name="providerDefn">
     <complexContent>
       <extension base="provider:propertyList">
-	<attribute name="bus" use="required" type="provider:dbusBusType">
+	<attribute name="plugin" type="string">
 	  <annotation><documentation>
-	      Which standard D-Bus bus this service can be activated on
+	      Which libcontextsubscriber plugin can communicate with the provider. For the ContextKit D-Bus protocol, use contextkit-dbus.
 	  </documentation></annotation>
 	</attribute>
-	<attribute name="service" use="required" type="NCName">
+	<attribute name="constructionString" type="string">
+	  <annotation><documentation>
+              The parameter given to the plugin communicating with the provider. For the ContextKit D-Bus protocol, use dbustype:dbusservicename.
+	  </documentation></annotation>
+	</attribute>
+	<attribute name="bus" type="provider:dbusBusType">
+	  <annotation><documentation>
+	      Which standard D-Bus bus this service can be activated on (To be deprecated: use the plugin and constructionString attributes instead.)
+	  </documentation></annotation>
+	</attribute>
+	<attribute name="service" type="NCName">
 	  <annotation><documentation>
 	    The bus name of the service that will provide these keys.
-	    This service must be activatable on the bus specified in "bus".
+	    This service must be activatable on the bus specified in "bus". (To be deprecated: use the plugin and constructionString attributes instead.)
 	  </documentation></annotation>
 	</attribute>
       </extension>
