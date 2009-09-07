@@ -46,6 +46,7 @@ namespace ContextProvider {
 Manager::Manager() : subscriberCounter(0)
 {
     contextDebug() << F_MANAGER << "Creating new Manager";
+    qRegisterMetaType<QVariant>("QVariant");
 }
 
 /// Add a key to this Manager.  Duplicate keys will be ignored with a
