@@ -48,6 +48,7 @@ struct ServiceBackendPrivate {
     Manager *manager;
     QDBusConnection *connection;
     int refCount;
+    bool registerService;
 };
 
 /// Creates new ServiceBackend. The backend automatically creates it's Manager.
@@ -63,6 +64,7 @@ ServiceBackend::ServiceBackend(QDBusConnection::BusType busType, const QString &
     priv->manager = new Manager();
     priv->connection = NULL;
     priv->refCount = 0;
+    priv->registerService = true;
 }
 
 /// Destroys the ServiceBackend. The backend is stopped.
@@ -91,6 +93,19 @@ void ServiceBackend::setValue(const QString &key, const QVariant &val)
     priv->manager->setKeyValue(key, val);
 }
 
+/// Controls te service registration on dbus. If register service is set to
+/// true (by default) the service while be registered on dbus. Set to false
+//  if you want to reuse an existing service (ie. provided by piece of code).
+void ServiceBackend::setRegisterService(bool r)
+{
+    if (priv->connection) {
+        contextWarning() << F_SERVICE_BACKEND << "Trying to set service registration while service running";
+        return;
+    }
+
+    priv->registerService = r;
+}
+
 /// Start the ServiceBackend again after it has been stopped.  All clients
 /// will resubscribe to its properties. Returns true on success,
 /// false otherwise.
@@ -103,7 +118,7 @@ bool ServiceBackend::start()
     ManagerAdaptor *managerAdaptor = new ManagerAdaptor(priv->manager, priv->connection);
 
     // Register service
-    if (!priv->connection->registerService(priv->busName)) {
+    if (priv->registerService && !priv->connection->registerService(priv->busName)) {
         contextCritical() << F_SERVICE_BACKEND << "Failed to register service with name" << priv->busName;
         stop();
         return false;

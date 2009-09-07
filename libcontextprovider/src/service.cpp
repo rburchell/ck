@@ -233,6 +233,14 @@ void Service::setValue(const QString &key, const QVariant &val)
     priv->backend->manager()->setKeyValue(key, val);
 }
 
+/// Controls te service registration on dbus. If register service is set to
+/// true (by default) the service while be registered on dbus. Set to false
+//  if you want to reuse an existing service (ie. provided by piece of code).
+void Service::setRegisterService(bool r)
+{
+    priv->backend->setRegisterService(r);
+}
+
 /// Start the Service again after it has been stopped.  All clients
 /// will resubscribe to its properties. Returns true on success,
 /// false otherwise.
