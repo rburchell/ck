@@ -36,6 +36,8 @@ namespace ContextProvider {
     Multiple Service instances can share same ServiceBackend.
     The backend is the actual worker that operates on dbus,
     has a Manager and registers properties.
+
+    The Service class actually proxies all methods to the ServiceBackend.
 */
 
 ServiceBackend *ServiceBackend::defaultServiceBackend;
@@ -64,6 +66,8 @@ ServiceBackend::ServiceBackend(QDBusConnection::BusType busType, const QString &
 }
 
 /// Destroys the ServiceBackend. The backend is stopped.
+/// If this backend is the defaultServiceBackend, the defaultServiceBackend is
+/// set back to NULL.
 ServiceBackend::~ServiceBackend()
 {
     contextDebug() << F_SERVICE_BACKEND << F_DESTROY << "Destroying Service";
@@ -132,7 +136,7 @@ void ServiceBackend::stop()
     priv->connection = NULL;
 }
 
-/// If the service is running, stop and start it.
+/// If the service is running, stop and start it again.
 void ServiceBackend::restart()
 {
     if (priv->connection) {
@@ -142,9 +146,7 @@ void ServiceBackend::restart()
 }
 
 /// Sets the ServiceBackend object as the default one to use when
-/// constructing Property objects.  You can only set the default
-/// Service once and the Service object that is the default must never
-/// be deallocated.
+/// constructing Property objects.
 void ServiceBackend::setAsDefault()
 {
     if (defaultServiceBackend) {

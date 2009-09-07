@@ -65,7 +65,6 @@ namespace ContextProvider {
   CP::Service my_service (...);
   \endcode
 
-
   The basic pattern to use this library is to create a Service
   instance to represent you on D-Bus and then to add Property
   instances to it for the keys that you want to provide.  Once this is
@@ -113,6 +112,34 @@ namespace ContextProvider {
     a service can be accessed and controled from different parts of
     the code.
 
+    When you first create a Service class with given session/name params
+    the real dbus service instance is actually created and started.
+    Future references to this session/name will give you a Service instance
+    that points to the very same service as the first Service initialization
+    that started it. In other words, we can say that the Service class represents
+    a proxy interface to the real dbus service.
+
+    When the last instance of Service is destroyed, the real service is automatically
+    terminated and destroyed (there is a simple ref counting mechanism involved to
+    guarantee that).
+
+    Consider the following examples:
+
+    \code
+    Service *s1 = new Service("QDBusConnection::SessionBus, "com.example.simple");
+    Service *s2 = new Service("QDBusConnection::SessionBus, "com.example.simple");
+    // s1 and s2 represent same service
+
+    s1->start();
+    // Bots s1 and s2 are now started
+
+    s2->start();
+    // Bots s1 and s2 are now stopped
+
+    delete s1; // s2 is still valid, service is present
+    delete s2; // the "com.example.simple" just disappeared from
+    \endcode
+
     Every Property object must be associated with a Service object.
 
     A Service can be running or stopped.  When it is running, it is
@@ -138,7 +165,7 @@ struct ServicePrivate {
 
 /// Creates a Service proxy object for \a busName on the bus indicated by \a
 /// busType. If the service is accessed for the first time it'll be created and
-/// set up. If the service with the given parameters already exists, the created
+/// set up. If the service with the given parameters already exists the created
 /// object represents a controller to a previously-created service.
 /// A new Service is initially stopped and will automatically start itself
 /// when the main loop is entered.
@@ -168,7 +195,9 @@ Service::Service(QDBusConnection::BusType busType, const QString &busName, QObje
     emit startMe();
 }
 
-/// Destroys this Service class. The actual service on dbus is not destroyed nor stopped.
+/// Destroys this Service class. The actual service on dbus is destroyed and stopped
+/// if this object is a last instance pointing at the actual service with the given
+/// name and session params.
 Service::~Service()
 {
     contextDebug() << F_SERVICE << F_DESTROY << "Destroying Service";
@@ -190,9 +219,7 @@ ServiceBackend *Service::backend()
 }
 
 /// Sets the Service object as the default one to use when
-/// constructing Property objects.  You can only set the default
-/// Service once and the Service object that is the default must never
-/// be deallocated.
+/// constructing Property objects.
 void Service::setAsDefault()
 {
     priv->backend->setAsDefault();
