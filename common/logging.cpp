@@ -22,6 +22,7 @@
 #include "logging.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #include <QDateTime>
 #include <QFile>
 
@@ -405,6 +406,12 @@ ContextRealLogger& ContextRealLogger::operator<< (const ContextFeature &f)
 ContextRealLogger::~ContextRealLogger()
 {
     if (shouldPrint()) {
+        // The Trolls set STDERR to O_NONBLOCK, but ignores the EAGAIN
+        // from write, so if your machine is heavily loaded and the
+        // terminal can't keep up with our log messages you start to
+        // lose them.  Hack: just set STDERR to block before every
+        // debug message.
+        fcntl(STDERR_FILENO, F_SETFL, O_WRONLY);
         appendFeatures();
         QTextStream::operator<<('\n');
         QTextStream(stderr) << data;
