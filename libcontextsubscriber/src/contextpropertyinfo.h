@@ -26,6 +26,7 @@
 #include <QStringList>
 #include <QObject>
 #include <QDBusConnection>
+#include <QMutex>
 
 class ContextPropertyInfo : public QObject
 {
@@ -47,9 +48,11 @@ public:
 
 private:
     QString keyName; ///< The name of the key his ContextPropertyInfo represents.
+    QString cachedDoc; ///< The documentation of the key.
     QString cachedType; ///< Cached (stored) type of the key.
     QString cachedProvider; ///< Cached (stored) provider of the key.
     QString cachedProviderDBusType; ///< Cached (stored) provider dbus type of the key.
+    mutable QMutex cacheLock; ///< Lock for the cache.
 
 private slots:
     void onKeyDataChanged(const QString& key);

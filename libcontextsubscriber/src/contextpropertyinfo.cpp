@@ -22,6 +22,8 @@
 #include "contextpropertyinfo.h"
 #include "infobackend.h"
 #include "sconnect.h"
+#include <QMutex>
+#include <QMutexLocker>
 
 /*!
     \page Introspection
@@ -206,6 +208,7 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
                  this, SLOT(onKeyDataChanged(QString)));
 
         cachedType = infoBackend->typeForKey(keyName);
+        cachedDoc = infoBackend->docForKey(keyName);
         cachedProvider = infoBackend->providerForKey(keyName);
         cachedProviderDBusType = infoBackend->providerDBusTypeForKey(keyName);
     }
@@ -214,24 +217,28 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
 /// Returns the full name of the introspected key.
 QString ContextPropertyInfo::key() const
 {
+    QMutexLocker lock(&cacheLock);
     return keyName;
 }
 
 /// Returns the doc (documentation) for the introspected key.
 QString ContextPropertyInfo::doc() const
 {
-    return InfoBackend::instance()->docForKey(keyName);
+    QMutexLocker lock(&cacheLock);
+    return cachedDoc;
 }
 
 /// Returns the type name for the introspected key.
 QString ContextPropertyInfo::type() const
 {
+    QMutexLocker lock(&cacheLock);
     return cachedType;
 }
 
 /// Returns true if the key exists in the registry.
 bool ContextPropertyInfo::exists() const
 {
+    QMutexLocker lock(&cacheLock);
     // A key is assumed to exist if it's type != "".
     if (cachedType != "")
         return true;
@@ -242,6 +249,7 @@ bool ContextPropertyInfo::exists() const
 /// Returns the dbus name of the provider supplying this property/key.
 QString ContextPropertyInfo::providerDBusName() const
 {
+    QMutexLocker lock(&cacheLock);
     return cachedProvider;
 }
 
@@ -249,6 +257,7 @@ QString ContextPropertyInfo::providerDBusName() const
 /// Ie. if it's a session bus or a system bus.
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
+    QMutexLocker lock(&cacheLock);
     if (cachedProviderDBusType == "system")
         return QDBusConnection::SystemBus;
     else /* if (cachedProviderDBusType == "session") */
@@ -263,6 +272,8 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 /// update the cached values and fire the actual signals.
 void ContextPropertyInfo::onKeyDataChanged(const QString& key)
 {
+    QMutexLocker lock(&cacheLock);
+
     if (key != keyName)
         return;
 
@@ -289,5 +300,7 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
         cachedProviderDBusType = newProviderDBusType;
         emit providerDBusTypeChanged(providerDBusType());
     }
-}
 
+    QString newDoc = InfoBackend::instance()->docForKey(keyName);
+    cachedDoc = newDoc;
+}
