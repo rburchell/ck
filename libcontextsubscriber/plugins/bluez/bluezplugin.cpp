@@ -35,7 +35,7 @@ BluezPlugin::BluezPlugin()
     // Connect signals from the Bluez interface. The events we listen to are:
     // - interface getting connected to Bluez
     // - interface failing to connect to Bluez
-    // - interface losing connection to Bluez         TODO: implement
+    // - interface losing connection to Bluez
     // - Bluez property changing
     sconnect(&bluezInterface, SIGNAL(ready()),
              this, SIGNAL(ready()));

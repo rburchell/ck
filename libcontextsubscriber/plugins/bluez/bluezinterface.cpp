@@ -42,8 +42,16 @@ BluezInterface::BluezInterface() : manager(0), adapter(0)
 
 void BluezInterface::onNameOwnerChanged(QString name, QString /*oldOwner*/, QString newOwner)
 {
-    if (name == serviceName && newOwner != "") {
-        connectToBluez();
+    if (name == serviceName) {
+        if (newOwner != "") {
+            // BlueZ appeared -> connect to it. If successful, ready()
+            // will be emitted when the connection is established.
+            connectToBluez();
+        }
+        else {
+            // BlueZ disappeared
+            emit failed("BlueZ left D-Bus");
+        }
     }
 }
 
