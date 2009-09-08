@@ -20,6 +20,34 @@
  */
 
 #include "bluezplugin.h"
+#include "sconnect.h"
+#include "logging.h"
+
+IProviderPlugin* bluezPluginFactory(const QString& /*constructionString*/)
+{
+    // Note: it's the caller's responsibility to delete the plugin if
+    // needed.
+    return new BluezPlugin();
+}
+
+BluezPlugin::BluezPlugin()
+{
+    // Connect signals from the Bluez interface. The events we listen to are:
+    // - interface getting connected to Bluez
+    // - interface failing to connect to Bluez
+    // - interface losing connection to Bluez         TODO: implement
+    // - Bluez property changing
+    sconnect(&bluezInterface, SIGNAL(ready()),
+             this, SIGNAL(ready()));
+    sconnect(&bluezInterface, SIGNAL(failed()),
+             this, SIGNAL(failed()));
+    sconnect(&bluezInterface, SIGNAL(propertyChanged(QString, QVariant)),
+             this, SLOT(onPropertyChanged(QString, QVariant)));
+
+    // Create a mapping from Bluez properties to Context Properties
+    properties["Powered"] = "Bluetooth.Enabled";
+    properties["Discoverable"] = "Bluetooth.Visible";
+}
 
 void BluezPlugin::subscribe(QSet<QString> keys)
 {
@@ -29,4 +57,16 @@ void BluezPlugin::unsubscribe(QSet<QString> keys)
 {
 }
 
+/// Called when a Bluez property changes. Check if the change is
+/// relevant, and if so, signal the value change of the corresponding
+/// context property.
+void BluezPlugin::onPropertyChanged(QString key, QVariant value)
+{
+    if (properties.contains(key)) {
+        contextDebug() << "Prop changed:" << properties[key] << value.toString();
+        emit valueChanged(properties[key], value);
+        // Note: the upper layer is responsible for checking if the
+        // value was a different one.
+    }
+}
 

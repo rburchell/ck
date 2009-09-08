@@ -22,21 +22,34 @@
 #ifndef BLUEZPLUGIN_H
 #define BLUEZPLUGIN_H
 
-#include "propertyprovider.h"
+#include "bluezinterface.h"
+#include "propertyprovider.h" // For IProviderPlugin definition
 
 using ContextSubscriber::IProviderPlugin;
 
 extern "C" {
-    IProviderPlugin* contextKitPluginFactory(const QString& constructionString);
+    IProviderPlugin* bluezPluginFactory(const QString& constructionString);
 }
+
+// FIXME: doxygen
 
 
 class BluezPlugin : public IProviderPlugin
 {
     Q_OBJECT
+
 public:
+    explicit BluezPlugin();
     virtual void subscribe(QSet<QString> keys);
     virtual void unsubscribe(QSet<QString> keys);
+
+private slots:
+    void onPropertyChanged(QString key, QVariant variant);
+
+private:
+    BluezInterface bluezInterface;
+    QMap<QString, QString> properties; ///< Mapping of Bluez properties to Context FW properties
+
 };
 
 #endif

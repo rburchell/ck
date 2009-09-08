@@ -32,12 +32,24 @@
 #include <QDBusError>
 #include <QDBusVariant>
 
-// FIXME: Doxygen
+/*!
+
+  \class BluezInterface
+
+  \brief Communicates with bluetoothd over D-Bus and signals the
+  changes in Bluez properties.
+
+ */
 class BluezInterface : public QObject
 {
     Q_OBJECT
 public:
     BluezInterface();
+signals:
+    void propertyChanged(QString key, QVariant value);
+    void ready();
+    void failed();
+
 private slots:
     void replyDBusError(QDBusError err);
     void replyDefaultAdapter(QDBusObjectPath path);
@@ -51,8 +63,6 @@ private:
     QDBusInterface* manager;
     QDBusInterface* adapter;
     QString adapterPath;
-    QMap<QString, QVariant> values;
-    QMap<QString, QVariant> properties;
     static const QString serviceName;
     static const QString managerPath;
     static const QString managerInterface;

@@ -38,8 +38,6 @@ BluezInterface::BluezInterface() : manager(0), adapter(0)
     busConnection.connect("org.freedesktop.DBus", "/org/freedesktop/DBus",
                           "org.freedesktop.DBus", "NameOwnerChanged",
                           this, SLOT(onNameOwnerChanged(QString, QString, QString)));
-    properties["Powered"] = "Bluetooth.Enabled";
-    properties["Discoverable"] = "Bluetooth.Visible";
     connectToBluez();
 }
 
@@ -75,6 +73,7 @@ void BluezInterface::connectToBluez()
 void BluezInterface::replyDBusError(QDBusError err)
 {
     contextWarning() << "DBus error occured:" << err.message();
+    emit failed();
 }
 
 void BluezInterface::replyDefaultAdapter(QDBusObjectPath path)
@@ -89,24 +88,16 @@ void BluezInterface::replyDefaultAdapter(QDBusObjectPath path)
     adapter->callWithCallback("GetProperties", QList<QVariant>(), this,
                               SLOT(replyGetProperties(QMap<QString, QVariant>)),
                               SLOT(replyDBusError(QDBusError)));
+    emit ready();
 }
 
 void BluezInterface::onPropertyChanged(QString key, QDBusVariant value)
 {
-    onPropertyChanged(key, value.variant());
-}
-
-void BluezInterface::onPropertyChanged(QString key, QVariant value)
-{
-    if (properties.contains(key) && values[key] != value) {
-        values[key] = value;
-        // TODO: emit here
-        contextDebug() << "Prop changed:" << key << value.toString();
-    }
+    emit propertyChanged(key, value.variant());
 }
 
 void BluezInterface::replyGetProperties(QMap<QString, QVariant> map)
 {
     foreach(QString key, map.keys())
-        onPropertyChanged(key, map[key]);
+        emit propertyChanged(key, map[key]);
 }
