@@ -303,8 +303,6 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
     if (key != keyName)
         return;
 
-    QWriteLocker lock(&cacheLock);
-
     QString newType = InfoBackend::instance()->typeForKey(keyName);
     if (cachedType != newType) {
 
