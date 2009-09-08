@@ -20,7 +20,7 @@
  */
 
 #include "propertyhandle.h"
-#include "propertyprovider.h"
+#include "provider.h"
 #include "sconnect.h"
 #include "contextpropertyinfo.h"
 #include "contextregistryinfo.h"

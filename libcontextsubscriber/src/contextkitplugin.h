@@ -28,7 +28,7 @@
 #include <QVariant>
 #include <QMap>
 #include "dbusnamelistener.h"
-#include "propertyprovider.h"
+#include "provider.h"
 
 extern "C" {
     ContextSubscriber::IProviderPlugin* contextKitPluginFactory(QString constructionString);

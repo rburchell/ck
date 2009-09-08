@@ -19,7 +19,7 @@
  *
  */
 
-#include "propertyprovider.h"
+#include "provider.h"
 #include "handlesignalrouter.h"
 #include "sconnect.h"
 #include "contextkitplugin.h"
