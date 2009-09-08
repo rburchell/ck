@@ -54,7 +54,7 @@ private slots:
     void onPropertyChanged(QString key, QVariant variant);
 
 private:
-    BluezInterface* bluezInterface;
+    BluezInterface bluezInterface;
     QMap<QString, QString> properties; ///< Mapping of Bluez properties to Context FW properties
 
 };
