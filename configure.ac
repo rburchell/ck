@@ -65,6 +65,8 @@ AC_CONFIG_FILES([
         libcontextsubscriber/doc/Makefile
         libcontextsubscriber/man/Makefile
         libcontextsubscriber/src/Makefile
+        libcontextsubscriber/plugins/Makefile
+        libcontextsubscriber/plugins/bluez/Makefile
         libcontextsubscriber/unit-tests/Makefile
         libcontextsubscriber/unit-tests/cdbreader/Makefile
         libcontextsubscriber/unit-tests/cdbwriter/Makefile

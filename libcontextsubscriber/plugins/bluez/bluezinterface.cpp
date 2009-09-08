@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -20,11 +20,12 @@
  */
 
 #include "bluezinterface.h"
+#include "logging.h"
+
 #include <QDBusObjectPath>
 #include <QDBusInterface>
 #include <QDBusError>
 #include <QDBusVariant>
-#include "logging.h"
 
 const QString BluezInterface::serviceName = "org.bluez";
 const QString BluezInterface::managerPath = "/";
@@ -100,6 +101,7 @@ void BluezInterface::onPropertyChanged(QString key, QVariant value)
     if (properties.contains(key) && values[key] != value) {
         values[key] = value;
         // TODO: emit here
+        contextDebug() << "Prop changed:" << key << value.toString();
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -27,12 +27,12 @@
 #include <QMap>
 #include <QDBusConnection>
 #include <QVariant>
+#include <QDBusObjectPath>
+#include <QDBusInterface>
+#include <QDBusError>
+#include <QDBusVariant>
 
-class QDBusError;
-class QDBusInterface;
-class QDBusObjectPath;
-class QDBusVariant;
-
+// FIXME: Doxygen
 class BluezInterface : public QObject
 {
     Q_OBJECT
