@@ -38,7 +38,6 @@ BluezInterface::BluezInterface() : manager(0), adapter(0)
     busConnection.connect("org.freedesktop.DBus", "/org/freedesktop/DBus",
                           "org.freedesktop.DBus", "NameOwnerChanged",
                           this, SLOT(onNameOwnerChanged(QString, QString, QString)));
-    //connectToBluez();
 }
 
 void BluezInterface::onNameOwnerChanged(QString name, QString /*oldOwner*/, QString newOwner)
@@ -89,7 +88,7 @@ void BluezInterface::replyDefaultAdapter(QDBusObjectPath path)
     adapter->callWithCallback("GetProperties", QList<QVariant>(), this,
                               SLOT(replyGetProperties(QMap<QString, QVariant>)),
                               SLOT(replyDBusError(QDBusError)));
-    //emit ready(); // FIXME: this seems to break the plugin!
+    emit ready();
 }
 
 void BluezInterface::onPropertyChanged(QString key, QDBusVariant value)
