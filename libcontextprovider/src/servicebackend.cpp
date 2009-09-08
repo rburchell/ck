@@ -95,15 +95,24 @@ void ServiceBackend::setValue(const QString &key, const QVariant &val)
 
 /// Controls te service registration on dbus. If register service is set to
 /// true (by default) the service while be registered on dbus. Set to false
-//  if you want to reuse an existing service (ie. provided by piece of code).
+/// if you want to reuse an existing service (ie. provided by piece of code).
+/// This function will fail if requested behavior is different from the current
+/// behavior and the service is already running.
 void ServiceBackend::setRegisterService(bool r)
 {
+    if (priv->registerService == r)
+        return;
+
+    // Complain ONLY when actually trying to change value. This is important
+    // for some black-box operation when you have no clue whetver you're starting
+    // the service or just reusing it (ie. plugins).
+
     if (priv->connection) {
         contextWarning() << F_SERVICE_BACKEND << "Trying to set service registration while service running";
         return;
+    } else {
+        priv->registerService = r;
     }
-
-    priv->registerService = r;
 }
 
 /// Start the ServiceBackend again after it has been stopped.  All clients
