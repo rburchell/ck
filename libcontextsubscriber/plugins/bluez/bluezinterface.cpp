@@ -89,7 +89,7 @@ void BluezInterface::replyDefaultAdapter(QDBusObjectPath path)
     adapter->callWithCallback("GetProperties", QList<QVariant>(), this,
                               SLOT(replyGetProperties(QMap<QString, QVariant>)),
                               SLOT(replyDBusError(QDBusError)));
-    emit ready();
+    //emit ready(); // FIXME: this seems to break the plugin!
 }
 
 void BluezInterface::onPropertyChanged(QString key, QDBusVariant value)
