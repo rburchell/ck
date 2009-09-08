@@ -23,13 +23,18 @@
 #include "sconnect.h"
 #include "logging.h"
 
+/// The factory method for constructing the IPropertyProvider instance.
 IProviderPlugin* bluezPluginFactory(const QString& /*constructionString*/)
 {
     // Note: it's the caller's responsibility to delete the plugin if
     // needed.
-    return new BluezPlugin();
+    return new ContextSubscriberBluez::BluezPlugin();
 }
 
+namespace ContextSubscriberBluez {
+
+/// Constructor. Construct the BluezInterface which handles the D-Bus
+/// connection, and tell it to try to connect to Bluez right away.
 BluezPlugin::BluezPlugin()
 {
     // Connect signals from the Bluez interface. The events we listen to are:
@@ -50,6 +55,9 @@ BluezPlugin::BluezPlugin()
     properties["Discoverable"] = "Bluetooth.Visible";
 }
 
+/// Implementation of the IPropertyProvider::subscribe. We don't need
+/// any extra work for subscribing to keys, thus subscribe is finished
+/// right away.
 void BluezPlugin::subscribe(QSet<QString> keys)
 {
     contextDebug() << keys;
@@ -58,6 +66,8 @@ void BluezPlugin::subscribe(QSet<QString> keys)
     }
 }
 
+/// Implementation of the IPropertyProvider::unsubscribe. We're not
+/// keeping track on subscriptions, so we don't need to do anything.
 void BluezPlugin::unsubscribe(QSet<QString> keys)
 {
 }
@@ -75,4 +85,6 @@ void BluezPlugin::onPropertyChanged(QString key, QVariant value)
         // value was a different one.
     }
 }
+
+} // end namespace
 

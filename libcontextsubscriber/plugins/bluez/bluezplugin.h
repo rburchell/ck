@@ -31,7 +31,17 @@ extern "C" {
     IProviderPlugin* bluezPluginFactory(const QString& constructionString);
 }
 
-// FIXME: doxygen
+namespace ContextSubscriberBluez
+{
+
+/*!
+  \class BluezPlugin
+
+  \brief A libcontextsubscriber plugin for communicating with Bluez
+  over D-Bus. Provides context properties Bluetooth.Enabled and
+  Bluetooth.Visible.
+
+ */
 
 
 class BluezPlugin : public IProviderPlugin
@@ -58,5 +68,6 @@ private:
     QMap<QString, QString> properties; ///< Mapping of Bluez properties to Context FW properties
 
 };
+}
 
 #endif

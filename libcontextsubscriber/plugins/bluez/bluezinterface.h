@@ -32,6 +32,9 @@
 #include <QDBusError>
 #include <QDBusVariant>
 
+namespace ContextSubscriberBluez
+{
+
 /*!
 
   \class BluezInterface
@@ -71,4 +74,5 @@ private:
     static QDBusConnection busConnection;
 };
 
+}
 #endif

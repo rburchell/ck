@@ -27,6 +27,8 @@
 #include <QDBusError>
 #include <QDBusVariant>
 
+namespace ContextSubscriberBluez {
+
 const QString BluezInterface::serviceName = "org.bluez";
 const QString BluezInterface::managerPath = "/";
 const QString BluezInterface::managerInterface = "org.bluez.Manager";
@@ -40,6 +42,7 @@ BluezInterface::BluezInterface() : manager(0), adapter(0)
                           this, SLOT(onNameOwnerChanged(QString, QString, QString)));
 }
 
+/// Called when the nameOwnerChanged signal is received over D-Bus.
 void BluezInterface::onNameOwnerChanged(QString name, QString /*oldOwner*/, QString newOwner)
 {
     if (name == serviceName) {
@@ -55,6 +58,7 @@ void BluezInterface::onNameOwnerChanged(QString name, QString /*oldOwner*/, QStr
     }
 }
 
+/// Try to establish the connection to BlueZ.
 void BluezInterface::connectToBluez()
 {
     if (adapter) {
@@ -77,12 +81,15 @@ void BluezInterface::connectToBluez()
                               SLOT(replyDBusError(QDBusError)));
 }
 
+/// Called when a D-Bus error occurs when processing our
+/// callWithCallback.
 void BluezInterface::replyDBusError(QDBusError err)
 {
     contextWarning() << "DBus error occured:" << err.message();
     emit failed("Cannot connect to BlueZ:" + err.message());
 }
 
+/// Called when the DefaultAdapter D-Bus call is done.
 void BluezInterface::replyDefaultAdapter(QDBusObjectPath path)
 {
     contextDebug();
@@ -99,15 +106,20 @@ void BluezInterface::replyDefaultAdapter(QDBusObjectPath path)
     emit ready();
 }
 
+/// Connected to the D-Bus signal PropertyChanged from BlueZ / adaptor.
 void BluezInterface::onPropertyChanged(QString key, QDBusVariant value)
 {
     contextDebug() << key << value.variant().toString();
     emit propertyChanged(key, value.variant());
 }
 
+/// Called when the GetProperties D-Bus call is done.
 void BluezInterface::replyGetProperties(QMap<QString, QVariant> map)
 {
     contextDebug();
     foreach(const QString& key, map.keys())
         emit propertyChanged(key, map[key]);
 }
+
+} // end namespace
+
