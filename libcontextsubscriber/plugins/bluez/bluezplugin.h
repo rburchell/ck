@@ -53,13 +53,6 @@ public:
     virtual void subscribe(QSet<QString> keys);
     virtual void unsubscribe(QSet<QString> keys);
 
-signals:
-    void ready();
-    void failed(QString error);
-    void subscribeFinished(QString key);
-    void subscribeFailed(QString failedKey, QString error);
-    void valueChanged(QString key, QVariant value);
-
 private slots:
     void onPropertyChanged(QString key, QVariant variant);
 
