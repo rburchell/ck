@@ -63,15 +63,15 @@ void Provider::constructPlugin()
              handleSignalRouter, SLOT(onValueChanged(QString, QVariant)));
 
     sconnect(plugin, SIGNAL(ready()),
-             this, SLOT(onPluginReady()));
+             this, SLOT(onPluginReady()), Qt::QueuedConnection);
     sconnect(plugin, SIGNAL(failed(QString)),
-             this, SLOT(onPluginFailed(QString)));
+             this, SLOT(onPluginFailed(QString)), Qt::QueuedConnection);
 
     // FIXME: signal these things through the handlesignalrouter
     sconnect(plugin, SIGNAL(subscribeFinished(QString)),
-             this, SLOT(onPluginSubscribeFinished(QString)));
+             this, SLOT(onPluginSubscribeFinished(QString)), Qt::QueuedConnection);
     sconnect(plugin, SIGNAL(subscribeFailed(QString, QString)),
-             this, SLOT(onPluginSubscribeFailed(QString, QString)));
+             this, SLOT(onPluginSubscribeFailed(QString, QString)), Qt::QueuedConnection);
 }
 
 void Provider::onPluginReady()
