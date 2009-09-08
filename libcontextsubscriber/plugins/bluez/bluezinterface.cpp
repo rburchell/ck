@@ -38,7 +38,7 @@ BluezInterface::BluezInterface() : manager(0), adapter(0)
     busConnection.connect("org.freedesktop.DBus", "/org/freedesktop/DBus",
                           "org.freedesktop.DBus", "NameOwnerChanged",
                           this, SLOT(onNameOwnerChanged(QString, QString, QString)));
-    connectToBluez();
+    //connectToBluez();
 }
 
 void BluezInterface::onNameOwnerChanged(QString name, QString /*oldOwner*/, QString newOwner)
@@ -73,11 +73,12 @@ void BluezInterface::connectToBluez()
 void BluezInterface::replyDBusError(QDBusError err)
 {
     contextWarning() << "DBus error occured:" << err.message();
-    emit failed();
+    emit failed("Cannot connect to BlueZ:" + err.message());
 }
 
 void BluezInterface::replyDefaultAdapter(QDBusObjectPath path)
 {
+    contextDebug();
     adapterPath = path.path();
     adapter = new QDBusInterface(serviceName, adapterPath, adapterInterface, busConnection, this);
     busConnection.connect(serviceName,
@@ -93,11 +94,13 @@ void BluezInterface::replyDefaultAdapter(QDBusObjectPath path)
 
 void BluezInterface::onPropertyChanged(QString key, QDBusVariant value)
 {
+    contextDebug() << key << value.variant().toString();
     emit propertyChanged(key, value.variant());
 }
 
 void BluezInterface::replyGetProperties(QMap<QString, QVariant> map)
 {
-    foreach(QString key, map.keys())
+    contextDebug();
+    foreach(const QString& key, map.keys())
         emit propertyChanged(key, map[key]);
 }

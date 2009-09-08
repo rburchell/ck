@@ -45,10 +45,12 @@ class BluezInterface : public QObject
     Q_OBJECT
 public:
     BluezInterface();
+    void connectToBluez();
+
 signals:
     void propertyChanged(QString key, QVariant value);
     void ready();
-    void failed();
+    void failed(QString error);
 
 private slots:
     void replyDBusError(QDBusError err);
@@ -58,7 +60,6 @@ private slots:
     void onNameOwnerChanged(QString name, QString oldOwner, QString newOwner);
 private:
     void onPropertyChanged(QString key, QVariant value);
-    void connectToBluez();
 
     QDBusInterface* manager;
     QDBusInterface* adapter;

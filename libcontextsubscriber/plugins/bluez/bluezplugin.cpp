@@ -37,12 +37,14 @@ BluezPlugin::BluezPlugin()
     // - interface failing to connect to Bluez
     // - interface losing connection to Bluez         TODO: implement
     // - Bluez property changing
-    sconnect(&bluezInterface, SIGNAL(ready()),
+    bluezInterface = new BluezInterface();
+    sconnect(bluezInterface, SIGNAL(ready()),
              this, SIGNAL(ready()));
-    sconnect(&bluezInterface, SIGNAL(failed()),
-             this, SIGNAL(failed()));
-    sconnect(&bluezInterface, SIGNAL(propertyChanged(QString, QVariant)),
+    sconnect(bluezInterface, SIGNAL(failed(QString)),
+             this, SIGNAL(failed(QString)));
+    sconnect(bluezInterface, SIGNAL(propertyChanged(QString, QVariant)),
              this, SLOT(onPropertyChanged(QString, QVariant)));
+    bluezInterface->connectToBluez();
 
     // Create a mapping from Bluez properties to Context Properties
     properties["Powered"] = "Bluetooth.Enabled";
@@ -51,6 +53,10 @@ BluezPlugin::BluezPlugin()
 
 void BluezPlugin::subscribe(QSet<QString> keys)
 {
+    contextDebug() << keys;
+    foreach(const QString& key, keys) {
+        emit subscribeFinished(key);
+    }
 }
 
 void BluezPlugin::unsubscribe(QSet<QString> keys)
