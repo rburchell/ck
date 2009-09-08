@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Nokia Corporation.
+ * Copyright (C) 2008 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -18,17 +18,30 @@
  * 02110-1301 USA
  *
  */
+
+#ifndef SERVICEBACKEND_H
+#define SERVICEBACKEND_H
+
 #include <QObject>
-#include "servicebackend.h"
+#include <QString>
+#include <QStringList>
+#include <QDBusConnection>
+#include <QHash>
+#include <QVariant>
 
 namespace ContextProvider {
 
-class Property;
 class Manager;
 
-class Service : public QObject
+class ServiceBackend : QObject
 {
+    Q_OBJECT
+
 public:
-    ServiceBackend *backend();
+    Manager *manager();
+    static ServiceBackend *defaultServiceBackend;
 };
-}
+
+} // end namespace
+
+#endif

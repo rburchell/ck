@@ -1,0 +1,5 @@
+coverage
+loggingfeatures.h
+servicebackend.cpp
+servicebackend.h
+servicebackendunittest

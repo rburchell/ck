@@ -29,6 +29,7 @@
 namespace ContextProvider {
 
 Manager *manager;
+ServiceBackend *serviceBackend;
 QVariant *lastVariantSet = NULL;
 
 void resetVariants()
@@ -94,9 +95,16 @@ void Manager::addKey(const QString &key)
 }
 
 // Mock implementation of Service
-Service* Service::defaultService = NULL;
 
-Manager *Service::manager()
+ServiceBackend* Service::backend()
+{
+    return ContextProvider::serviceBackend;
+}
+
+// Mock implementation of ServiceBackend
+ServiceBackend* ServiceBackend::defaultServiceBackend = NULL;
+
+Manager *ServiceBackend::manager()
 {
     return ContextProvider::manager;
 }
@@ -146,11 +154,11 @@ void PropertyUnitTest::getProperty()
 {
     QCOMPARE(battery_voltage->key(), QString("Battery.Voltage"));
 }
-    
+
 void PropertyUnitTest::checkSignals()
 {
     resetVariants();
-   
+
     QSignalSpy spy1(battery_voltage, SIGNAL(firstSubscriberAppeared(QString)));
     QSignalSpy spy2(battery_voltage, SIGNAL(lastSubscriberDisappeared(QString)));
 
@@ -159,7 +167,7 @@ void PropertyUnitTest::checkSignals()
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> args1 = spy1.takeFirst();
     QCOMPARE(args1.at(0).toString(), QString("Battery.Voltage"));
-    
+
     manager->fakeLast("Battery.Voltage");
 
     QCOMPARE(spy2.count(), 1);
