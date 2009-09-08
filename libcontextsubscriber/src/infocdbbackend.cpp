@@ -46,7 +46,7 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
 {
     contextDebug() << F_CDB << "Initializing cdb backend with database:" << InfoCdbBackend::databasePath();
-
+    
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
 
@@ -61,57 +61,39 @@ QString InfoCdbBackend::name() const
 
 QStringList InfoCdbBackend::listKeys() const
 {
-    if (databaseCompatible)
-        return reader.valuesForKey("KEYS");
-    else
-        return QStringList();
+    return reader.valuesForKey("KEYS");
 }
 
 QStringList InfoCdbBackend::listKeysForPlugin(QString plugin) const
 {
-    if (databaseCompatible)
-        return reader.valuesForKey(plugin + ":KEYS");
-    else
-        return QStringList();
+    return reader.valuesForKey(plugin + ":KEYS");
 }
 
 QStringList InfoCdbBackend::listPlugins() const
 {
-    if (databaseCompatible)
-        return reader.valuesForKey("PLUGINS");
-    else
-        return QStringList();
+    return reader.valuesForKey("PLUGINS");
 }
 
 QString InfoCdbBackend::typeForKey(QString key) const
 {
-    if (databaseCompatible)
-        return reader.valueForKey(key + ":KEYTYPE");
-    else
-        return "";
+    return reader.valueForKey(key + ":KEYTYPE");
 }
 
 QString InfoCdbBackend::docForKey(QString key) const
 {
-    if (databaseCompatible)
-        return reader.valueForKey(key + ":KEYDOC");
-    else
-        return "";
+    return reader.valueForKey(key + ":KEYDOC");
 }
 
 QString InfoCdbBackend::pluginForKey(QString key) const
 {
-    if (databaseCompatible)
-        return reader.valueForKey(key + ":KEYPLUGIN");
-    else
-        return "";
+    // FIXME: support the old format
+    return reader.valueForKey(key + ":KEYPLUGIN");
 }
 
 QString InfoCdbBackend::constructionStringForKey(QString key) const
 {
-    if (databaseCompatible)
-        return reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING");
-    return "";
+    // FIXME: support the old format
+    return reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING");
 }
 
 /// Returns true if the database file is present.
@@ -183,12 +165,6 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
 
     reader.reopen();
     watchPathOrDirectory();
-
-    // Check the database version
-    if (reader.valueForKey("VERSION") == CDB_COMPATIBILITY_VERSION_STRING)
-        databaseCompatible = true;
-    else
-        databaseCompatible = false;
 
     // If nobody is watching us anyways, drop out now and skip
     // the further processing. This could be made more granular

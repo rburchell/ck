@@ -29,8 +29,6 @@
 #include "cdbreader.h"
 #include "infobackend.h"
 
-#define CDB_COMPATIBILITY_VERSION_STRING "CDB1"
-
 class InfoCdbBackend : public InfoBackend
 {
     Q_OBJECT
@@ -57,7 +55,6 @@ private:
     void watchPathOrDirectory();
     void watchDirectory();
     void watchPath();
-    bool databaseCompatible;
 
 private slots:
     void onDatabaseFileChanged(const QString &path);

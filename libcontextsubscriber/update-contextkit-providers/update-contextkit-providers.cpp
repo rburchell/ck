@@ -26,7 +26,6 @@
 #include "contextpropertyinfo.h"
 #include "cdbwriter.h"
 #include "fcntl.h"
-#include "infocdbbackend.h"
 
 /*!
    \page UpdatingContextProviders
@@ -113,7 +112,7 @@ int main(int argc, char **argv)
     QDir dir(path);
     checkDirectory(dir);
     QString tmpDbPath = dir.absoluteFilePath("cache-XXXXXX");
-    QString finalDbPath = dir.absoluteFilePath("cache.cdb");
+    QString finalDbPath = dir.absoluteFilePath("cache.cdb"); 
     QByteArray templ = tmpDbPath.toUtf8();
 
     char *tempPath = templ.data();
@@ -123,9 +122,6 @@ int main(int argc, char **argv)
         printf("ERROR: %s is not writable. No permissions?\n", templ.constData());
         exit(128);
     }
-
-    // Write the compatibility string
-    writer.add("VERSION", CDB_COMPATIBILITY_VERSION_STRING);
 
     foreach(const QString& key, context->listKeys()) {
         ContextPropertyInfo keyInfo(key);
