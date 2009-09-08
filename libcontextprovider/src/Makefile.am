@@ -21,7 +21,9 @@ libcontextprovider_la_SOURCES = loggingfeatures.h       \
                                 contextc.cpp            \
                                 listeners.h             \
                                 listeners.cpp		\
-				context_provider.h
+				context_provider.h	\
+				servicebackend.h	\
+				servicebackend.cpp
 
 includecontextproviderdir=$(includedir)/contextprovider
 includecontextprovider_HEADERS = ContextProvider contextc.h context_provider.h

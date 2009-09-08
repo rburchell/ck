@@ -4,3 +4,4 @@ queuedinvoker.cpp
 queuedinvoker.h
 service.cpp
 service.h
+serviceunittest

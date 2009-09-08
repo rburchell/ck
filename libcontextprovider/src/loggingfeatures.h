@@ -22,14 +22,15 @@
 #ifndef FEATURES_H
 #define FEATURES_H
 
-#define F_SERVICE       (ContextFeature("service"))
-#define F_PROPERTY      (ContextFeature("property"))
-#define F_MANAGER       (ContextFeature("manager"))
-#define F_SUBSCRIBER    (ContextFeature("subscriber"))
-#define F_GROUP         (ContextFeature("group"))
-#define F_DESTROY       (ContextFeature("destroy"))
-#define F_SIGNALS       (ContextFeature("signals"))
-#define F_DBUS          (ContextFeature("dbus"))
-#define F_C             (ContextFeature("cbindings"))
+#define F_SERVICE           (ContextFeature("service"))
+#define F_SERVICE_BACKEND   (ContextFeature("servicebackend"))
+#define F_PROPERTY          (ContextFeature("property"))
+#define F_MANAGER           (ContextFeature("manager"))
+#define F_SUBSCRIBER        (ContextFeature("subscriber"))
+#define F_GROUP             (ContextFeature("group"))
+#define F_DESTROY           (ContextFeature("destroy"))
+#define F_SIGNALS           (ContextFeature("signals"))
+#define F_DBUS              (ContextFeature("dbus"))
+#define F_C                 (ContextFeature("cbindings"))
 
 #endif

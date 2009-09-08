@@ -26,7 +26,7 @@
 #include <QStringList>
 #include <QObject>
 #include <QDBusConnection>
-#include <QReadWriteLock>
+#include <QMutex>
 
 class ContextPropertyInfo : public QObject
 {
@@ -55,7 +55,7 @@ private:
     QString cachedType; ///< Cached (stored) type of the key.
     QString cachedPlugin; ///< Cached name of the plugin providing the key
     QString cachedConstructionString; ///< Cached construction string for the Provider
-    mutable QReadWriteLock cacheLock;
+    mutable QMutex cacheLock; ///< Lock for the cache.
 
 private slots:
     void onKeyDataChanged(const QString& key);

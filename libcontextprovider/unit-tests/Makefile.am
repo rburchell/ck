@@ -3,7 +3,8 @@ SUBDIRS = manager	\
 	  property	\
 	  contextgroup	\
 	  contextc	\
-	  service
+	  service       \
+          servicebackend
 
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
