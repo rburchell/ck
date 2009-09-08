@@ -29,12 +29,12 @@
 #include <QMap>
 #include "dbusnamelistener.h"
 #include "propertyprovider.h"
-namespace ContextSubscriber {
 
 extern "C" {
-    IProviderPlugin* contextKitPluginFactory(const QString& constructionString);
+    ContextSubscriber::IProviderPlugin* contextKitPluginFactory(QString constructionString);
 }
 
+namespace ContextSubscriber {
 class ContextKitPlugin : public IProviderPlugin
 {
     Q_OBJECT
@@ -45,11 +45,11 @@ public:
     void unsubscribe(QSet<QString> keys);
 
 signals:
-    void ready();
-    void failed(QString error);
-    void subscribeFinished(QString key);
-    void subscribeFailed(QString failedKey, QString error);
-    void valueChanged(QString key, QVariant value);
+    void ready(); ///< Emitted when the GetSubscriber call returns successfully.
+    void failed(QString error); ///< Emitted when the GetSubscriber call fails or provider not on D-Bus at all.
+    void subscribeFinished(QString key); ///< Emitted when Subscribe call succeeds on D-Bus.
+    void subscribeFailed(QString failedKey, QString error); ///< Emitted when Subscribe call fails on D-Bus.
+    void valueChanged(QString key, QVariant value); ///< Emitted when ValueChanged signal comes on D-Bus
 
 private slots:
     void onDBusValuesChanged(QMap<QString, QVariant> values);
@@ -61,11 +61,11 @@ private slots:
 
 private:
     DBusNameListener *providerListener; ///< Listens to provider's (dis)appearance over DBus
-    SubscriberInterface *subscriberInterface; ///< The DBus interface for the Subscriber object
-    ManagerInterface *managerInterface; ///< The DBus interface for the Manager object
+    SubscriberInterface *subscriberInterface; ///< The D-Bus interface for the Subscriber object
+    ManagerInterface *managerInterface; ///< The D-Bus interface for the Manager object
 
     QDBusConnection *connection; ///< The connection to DBus
-    QString busName; ///< The bus name of the DBus provider connected to
+    QString busName; ///< The D-Bus service name of the ContextKit provider connected to
 };
 
 

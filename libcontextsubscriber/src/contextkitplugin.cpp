@@ -26,9 +26,9 @@
 #include "sconnect.h"
 #include <QStringList>
 
-namespace ContextSubscriber {
-
-IProviderPlugin* contextKitPluginFactory(const QString& constructionString)
+/// Creates a new instance, the service to connect to has to be passed
+/// in \c constructionString in the format <tt>[session|dbus]:servicename</tt>.
+ContextSubscriber::IProviderPlugin* contextKitPluginFactory(QString constructionString)
 {
     QStringList constr = constructionString.split(":");
     if (constr.size() != 2) {
@@ -36,14 +36,24 @@ IProviderPlugin* contextKitPluginFactory(const QString& constructionString)
         return 0;
     }
     if (constr[0] == "session")
-        return new ContextKitPlugin(QDBusConnection::sessionBus(), constr[1]);
+        return new ContextSubscriber::ContextKitPlugin(QDBusConnection::sessionBus(), constr[1]);
     else if (constr[0] == "system")
-        return new ContextKitPlugin(QDBusConnection::systemBus(), constr[1]);
+        return new ContextSubscriber::ContextKitPlugin(QDBusConnection::systemBus(), constr[1]);
 
     contextCritical() << "Unknown bus type: " << constructionString;
     return 0;
 }
 
+namespace ContextSubscriber {
+
+/*!
+  \class ContextKitPlugin
+  \brief Implementation of the ContextKit D-Bus protocol.
+*/
+
+/// Creates subscriber and manager interface, tries to get a
+/// subscriber instance from the manager and starts listening for
+/// provider appearing and disappearing on D-Bus.
 ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& busName)
     : subscriberInterface(0), managerInterface(0), connection(new QDBusConnection(bus)),
       busName(busName)
@@ -67,7 +77,8 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
     onProviderAppeared();
 }
 
-/// Provider reappeared on the DBus, so get a new subscriber interface from it
+/// Gets a new subscriber interface from manager when the provider
+/// appears.
 void ContextKitPlugin::onProviderAppeared()
 {
     contextDebug() << "ContextKitPlugin::onProviderAppeared";
@@ -76,7 +87,7 @@ void ContextKitPlugin::onProviderAppeared()
     managerInterface->getSubscriber();
 }
 
-/// Delete our subscriber interface when the provider went away
+/// Delete our subscriber interface when the provider goes away.
 void ContextKitPlugin::onProviderDisappeared()
 {
     contextDebug() << "ContextKitPlugin::onProviderDisappeared";
@@ -85,8 +96,8 @@ void ContextKitPlugin::onProviderDisappeared()
     emit failed("Provider went away");
 }
 
-/// Called when the manager interface is ready with the asynchronous
-/// GetSubscriber call.
+/// Starts using the fresh subscriber interface when it is returned by
+/// the manager in response to the GetSubscriber call.
 void ContextKitPlugin::onDBusGetSubscriberFinished(QString objectPath)
 {
     if (objectPath != "") {
@@ -110,29 +121,33 @@ void ContextKitPlugin::onDBusGetSubscriberFinished(QString objectPath)
         emit failed("Was unable to get subscriber object on dbus");
 }
 
+/// Signals the Provider that the subscribe is finished.
 void ContextKitPlugin::onDBusSubscribeFinished(QList<QString> keys)
 {
     foreach (const QString& key, keys)
         emit subscribeFinished(key);
 }
 
+/// Signals the Provider that the subscribe is failed.
 void ContextKitPlugin::onDBusSubscribeFailed(QList<QString> keys, QString error)
 {
     foreach (const QString& key, keys)
         emit subscribeFailed(key, error);
 }
 
+/// Forwards the subscribe request to the wire.
 void ContextKitPlugin::subscribe(QSet<QString> keys)
 {
     subscriberInterface->subscribe(keys);
 }
 
+/// Forwards the unsubscribe request to the wire.
 void ContextKitPlugin::unsubscribe(QSet<QString> keys)
 {
     subscriberInterface->unsubscribe(keys);
 }
 
-/// Slot, handling changed values coming from the provider over DBUS.
+/// Forwards value changes from the wire to the upper layer (Provider).
 void ContextKitPlugin::onDBusValuesChanged(QMap<QString, QVariant> values)
 {
     foreach (const QString& key, values.keys())

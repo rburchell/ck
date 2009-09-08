@@ -119,20 +119,23 @@ void Provider::constructPlugin()
     }
 
     // Connect the signal of changing values to the class who handles it
-//    HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
+    HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
     sconnect(plugin, SIGNAL(valueChanged(QString, QVariant)),
              this, SLOT(onPluginValueChanged(QString, QVariant)));
+    sconnect(this, SIGNAL(valueChanged(QString, QVariant)),
+             handleSignalRouter, SLOT(onValueChanged(QString, QVariant)));
 
     sconnect(plugin, SIGNAL(ready()),
              this, SLOT(onPluginReady()));
     sconnect(plugin, SIGNAL(failed(QString)),
              this, SLOT(onPluginFailed(QString)));
 
-    // FIXME: signal these things through the handlesignalrouter
     sconnect(plugin, SIGNAL(subscribeFinished(QString)),
              this, SLOT(onPluginSubscribeFinished(QString)));
     sconnect(plugin, SIGNAL(subscribeFailed(QString, QString)),
              this, SLOT(onPluginSubscribeFailed(QString, QString)));
+    sconnect(this, SIGNAL(subscribeFinished(QString)),
+             handleSignalRouter, SLOT(onSubscribeFinished(QString)));
 }
 
 /// Updates \c pluginState to \c READY and requests subscription for
@@ -172,8 +175,7 @@ void Provider::signalSubscribeFinished(QString key)
 {
     QMutexLocker lock(&subscribeLock);
     if (subscribedKeys.contains(key))
-        // FIXME: get rid of QSet, go through signalhandlerouter
-        emit subscribeFinished(QSet<QString>() << key);
+        emit subscribeFinished(key);
 }
 
 /// Forwards the call to \c signalSubscribeFinished.
@@ -264,7 +266,9 @@ void Provider::handleSubscribes()
     case FAILED:
         // it failed for good.
         contextDebug() << "Plugin init has failed";
-        if (toSubscribe.size() > 0) emit subscribeFinished(toSubscribe);
+        if (toSubscribe.size() > 0)
+            foreach (QString key, toSubscribe)
+                emit subscribeFinished(key);
         toSubscribe.clear();
         toUnsubscribe.clear();
         break;
@@ -282,7 +286,7 @@ void Provider::onPluginValueChanged(QString key, QVariant newValue)
 {
     QMutexLocker lock(&subscribeLock);
     if (subscribedKeys.contains(key))
-        HandleSignalRouter::instance()->onValueChanged(key, newValue);
+        emit valueChanged(key, newValue);
     else
         contextWarning() << "Received a property not subscribed to:" << key;
 }

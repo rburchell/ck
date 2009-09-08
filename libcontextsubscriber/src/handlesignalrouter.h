@@ -36,6 +36,7 @@ public:
 
 public slots:
     void onValueChanged(QString key, QVariant value);
+    void onSubscribeFinished(QString key);
 
 private:
     HandleSignalRouter();

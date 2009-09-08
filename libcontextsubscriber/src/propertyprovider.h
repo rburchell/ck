@@ -53,9 +53,6 @@ signals:
     void valueChanged(QString key, QVariant value);
 };
 
-/// Prototype for IProviderPlugin factory functions.
-typedef IProviderPlugin* (*ProviderPluginFactoryPrototype)(const QString &constructionString);
-
 class Provider : public QueuedInvoker
 {
     Q_OBJECT
@@ -66,7 +63,8 @@ public:
     void unsubscribe(const QString &key);
 
 signals:
-    void subscribeFinished(QSet<QString> keys);
+    void subscribeFinished(QString key);
+    void valueChanged(QString key, QVariant value);
 
 private slots:
     void onPluginReady();

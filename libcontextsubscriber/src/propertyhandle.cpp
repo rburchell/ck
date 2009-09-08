@@ -158,15 +158,6 @@ void PropertyHandle::updateProvider()
         }
     }
 
-    if (myProvider) {
-        disconnect(dynamic_cast<QObject*>(myProvider), SIGNAL(subscribeFinished(QSet<QString>)),
-                   this, SLOT(onSubscribeFinished(QSet<QString>)));
-    }
-    if (newProvider) {
-        sconnect(dynamic_cast<QObject*>(newProvider), SIGNAL(subscribeFinished(QSet<QString>)),
-                 this, SLOT(onSubscribeFinished(QSet<QString>)));
-    }
-
     if (newProvider != myProvider && subscribeCount > 0) {
         // The provider has changed and ContextProperty classes are subscribed to this handle.
         // Unsubscribe from the old provider
@@ -204,13 +195,10 @@ void PropertyHandle::unsubscribe()
     }
 }
 
-/// Sets \c subscribePending to false if this property is contained in
-/// the \c keys set.
-void PropertyHandle::onSubscribeFinished(QSet<QString> keys)
+/// Sets \c subscribePending to false.
+void PropertyHandle::setSubscribeFinished()
 {
-    if (keys.contains(myKey)) {
-        subscribePending = false;
-    }
+    subscribePending = false;
 }
 
 QString PropertyHandle::key() const
