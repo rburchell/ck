@@ -36,6 +36,7 @@ namespace ContextProvider {
 class Manager;
 class Property;
 class ServicePrivate;
+class ServiceBackend;
 
 class Service : QObject
 {
@@ -52,13 +53,14 @@ public:
     void setAsDefault();
 
     void setValue(const QString &key, const QVariant &val);
+    void setRegisterService(bool reg);
 
 private:
     class ServicePrivate *priv;
 
-    Manager *manager();
+    ServiceBackend *backend();
 
-    static Service *defaultService;
+    static QHash <QString, ServiceBackend*> backends;
 
     friend class Property;
     friend class ::ServiceUnitTest;

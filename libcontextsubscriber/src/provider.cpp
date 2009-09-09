@@ -19,7 +19,7 @@
  *
  */
 
-#include "propertyprovider.h"
+#include "provider.h"
 #include "handlesignalrouter.h"
 #include "sconnect.h"
 #include "contextkitplugin.h"
@@ -32,19 +32,80 @@
 namespace ContextSubscriber {
 
 /*!
-   \class Provider
+  \class IProviderPlugin
+  \brief Interface for provider plugins.
 
-   \brief Keeps the DBUS connection with a specific provider and
-   handles subscriptions and value changes with the properties of that
-   provider.
-*/
+  Every Provider instance contains exactly one plugin (pointer) with
+  this interface which is constructed on initialization time and never
+  change after that.  This way the concrete protocol (dbus, shared
+  memory, etc.) between the library and the provider is abstracted.
 
+  The Provider instance communicates need for subscribe and
+  unsubscribe calls (on the wire) using the \c subscribe and \c
+  unsubscribe methods.
+
+  The plugin can fail or became ready anytime because of things
+  happening on the wire inside the plugin (socket closed, dbus service
+  appears/disappears).  Whenever the plugin has new information about
+  this it should emit the signal \c ready or \c failed accordingly.
+
+  When the plugin is ready, it has to be able to handle \c subscribe
+  and \c unsubscribe function calls.  Also, after emitting \c ready it
+  should be in a state where it is not subscribed to anything on the
+  wire, since immediately after \c ready is emitted, the provider will
+  place a subscribe call with all of the properties that should be
+  subscribed.
+
+  Subscription failures or successes can be signaled with emitting \c
+  subscribeFailed and \c subscribeFinished.
+
+  At last, but not least, the plugin can emit \c valueChanged, when it
+  has a new value for any property.  It is not required to only signal
+  new values, the library takes care of keeping the old value and only
+  emit change signals to the upper layers if the new value is really
+  new.
+
+  An implementation of this interface doesn't have to care about
+  threads at all, all of the methods, starting from the constructor
+  will be only called from inside the Qt event loop of the main
+  thread.  This means that neither the constructor nor the \c
+  subscribe, \c unsubscribe calls should block.  They have to finish
+  as soon as possible and signal the results later via signals.
+
+  \class Provider
+  \brief Connects to a group of properties via the help of a plugin.
+
+  Each instance of this class keeps a plugin dependent communication
+  channel (DBus, shared memory, etc.) open and handles subscriptions,
+  value changes of the properties belonging to the provider on the
+  other end of the channel.
+
+  This class is thread safe, the \c instance, \c subscribe and \c
+  unsubscribe methods can be called from any threads.  However this
+  class also guarantees that the signal \c subscribeFinished and \c
+  valueChanged will be always emitted from inside the main thread's
+  main loop.
+
+  \fn void Provider::subscribeFinished(QSet<QString> keys)
+  \brief Emitted when the subscription procedure for \c keys finished
+  (either succeeded, either failed) */
+
+/// Stores the passed plugin name and construction paramater, then
+/// moves into the main thread and queues a constructPlugin call.
 Provider::Provider(const QString &plugin, const QString &constructionString)
     : plugin(0), pluginState(INITIALIZING), pluginName(plugin), constructionString(constructionString)
 {
+    // Move the PropertyHandle (and all children) to main thread.
+    moveToThread(QCoreApplication::instance()->thread());
+
     queueOnce("constructPlugin");
 }
 
+/// Decides which plugin to instantiate based on the \c plugin passed
+/// to the constructor.  Always called in the main loop after the
+/// constructor is finished.  Each plugin library implements a
+/// function which can create new instances of that plugin (TODO: come
+/// up with the name of the function).
 void Provider::constructPlugin()
 {
     if (pluginName == "contextkit-dbus") {
@@ -60,6 +121,8 @@ void Provider::constructPlugin()
     // Connect the signal of changing values to the class who handles it
     HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
     sconnect(plugin, SIGNAL(valueChanged(QString, QVariant)),
+             this, SLOT(onPluginValueChanged(QString, QVariant)));
+    sconnect(this, SIGNAL(valueChanged(QString, QVariant)),
              handleSignalRouter, SLOT(onValueChanged(QString, QVariant)));
 
     sconnect(plugin, SIGNAL(ready()),
@@ -67,13 +130,16 @@ void Provider::constructPlugin()
     sconnect(plugin, SIGNAL(failed(QString)),
              this, SLOT(onPluginFailed(QString)), Qt::QueuedConnection);
 
-    // FIXME: signal these things through the handlesignalrouter
     sconnect(plugin, SIGNAL(subscribeFinished(QString)),
              this, SLOT(onPluginSubscribeFinished(QString)), Qt::QueuedConnection);
     sconnect(plugin, SIGNAL(subscribeFailed(QString, QString)),
              this, SLOT(onPluginSubscribeFailed(QString, QString)), Qt::QueuedConnection);
+    sconnect(this, SIGNAL(subscribeFinished(QString)),
+             handleSignalRouter, SLOT(onSubscribeFinished(QString)));
 }
 
+/// Updates \c pluginState to \c READY and requests subscription for
+/// the keys that should be subscribed.
 void Provider::onPluginReady()
 {
     // FIXME: try this out :)
@@ -90,6 +156,8 @@ void Provider::onPluginReady()
     handleSubscribes();
 }
 
+/// Updates \c pluginState to \c FAILED and signals subscribeFinished
+/// for keys we are trying to subscribe to.
 void Provider::onPluginFailed(QString error)
 {
     contextWarning() << error;
@@ -100,28 +168,31 @@ void Provider::onPluginFailed(QString error)
     handleSubscribes();
 }
 
-/// Called when the subscriber interface is ready with the
-/// asynchronous Subscribe call. Emit the \c subscribeFinished signal
-/// which will be caught by the \c PropertyHandle objects to set the
-/// \c subscribePending boolean which is used by the not so busy
-/// busyloop in <tt>waitForSubscription()</tt>.
+/// The plugin has finished subscribing to a key, signals this fact to
+/// the upper layer.  The final API for this is the
+/// <tt>waitForSubscription()</tt> method in \c ContextProperty.
+void Provider::signalSubscribeFinished(QString key)
+{
+    QMutexLocker lock(&subscribeLock);
+    if (subscribedKeys.contains(key))
+        emit subscribeFinished(key);
+}
+
+/// Forwards the call to \c signalSubscribeFinished.
 void Provider::onPluginSubscribeFinished(QString key)
 {
     contextDebug() << key;
 
-    QMutexLocker lock(&subscribeLock);
-    if (subscribedKeys.contains(key))
-        // FIXME: get rid of QSet, go through signalhandlerouter
-        emit subscribeFinished(QSet<QString>() << key);
+    signalSubscribeFinished(key);
 }
 
+/// Forwards the call to \c signalSubscribeFinished, after logging a
+/// warning.
 void Provider::onPluginSubscribeFailed(QString key, QString error)
 {
-    contextDebug() << "Provider::onPluginSubscribeFailed" << key << error;
+    contextWarning() << key << error;
 
-    QMutexLocker lock(&subscribeLock);
-    if (subscribedKeys.contains(key))
-        emit subscribeFinished(QSet<QString>() << key);
+    signalSubscribeFinished(key);
 }
 
 /// Schedules a property to be subscribed to.  Returns true if and
@@ -177,7 +248,7 @@ void Provider::unsubscribe(const QString &key)
     }
 }
 
-/// Is executed when the main loop is entered and we have previously
+/// Executed when the main loop is entered and we have previously
 /// scheduled subscriptions / unsubscriptions.
 void Provider::handleSubscribes()
 {
@@ -194,8 +265,10 @@ void Provider::handleSubscribes()
         break;
     case FAILED:
         // it failed for good.
-        contextDebug() << "Plugin init has failed previously";
-        if (toSubscribe.size() > 0) emit subscribeFinished(toSubscribe);
+        contextDebug() << "Plugin init has failed";
+        if (toSubscribe.size() > 0)
+            foreach (QString key, toSubscribe)
+                emit subscribeFinished(key);
         toSubscribe.clear();
         toUnsubscribe.clear();
         break;
@@ -207,15 +280,18 @@ void Provider::handleSubscribes()
     contextDebug() << "Provider::handleSubscribes processed";
 }
 
+/// Forwards the \c newValue for \c key received from the plugin to
+/// the upper layers via \c HandleSignalRouter.
 void Provider::onPluginValueChanged(QString key, QVariant newValue)
 {
     QMutexLocker lock(&subscribeLock);
     if (subscribedKeys.contains(key))
-        HandleSignalRouter::instance()->onValueChanged(key, newValue);
+        emit valueChanged(key, newValue);
     else
         contextWarning() << "Received a property not subscribed to:" << key;
 }
 
+/// Returns a singleton for the named \c plugin with the \c constructionString.
 Provider* Provider::instance(const QString& plugin, const QString& constructionString)
 {
     // Singleton instance container
@@ -233,7 +309,4 @@ Provider* Provider::instance(const QString& plugin, const QString& constructionS
     return providerInstances[lookupValue];
 }
 
-
 } // end namespace
-
-

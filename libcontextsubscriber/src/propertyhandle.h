@@ -52,6 +52,7 @@ public:
     static PropertyHandle* instance(const QString& key);
 
     void setValue(QVariant newValue);
+    void setSubscribeFinished();
     static void ignoreCommander();
     static void setTypeCheck(bool typeCheck);
 
@@ -59,7 +60,6 @@ signals:
     void valueChanged();
 
 private slots:
-    void onSubscribeFinished(QSet<QString> keys);
     void updateProvider();
 
 private:

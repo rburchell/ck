@@ -19,28 +19,50 @@
  *
  */
 
-#ifndef HANDLESIGNALROUTER_H
-#define HANDLESIGNALROUTER_H
+#ifndef SERVICEBACKEND_H
+#define SERVICEBACKEND_H
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
+#include <QDBusConnection>
+#include <QHash>
 #include <QVariant>
 
-namespace ContextSubscriber {
+class ServiceBackendUnitTest;
 
-class HandleSignalRouter : public QObject
+namespace ContextProvider {
+
+class Manager;
+class Property;
+class ServiceBackendPrivate;
+
+class ServiceBackend : QObject
 {
     Q_OBJECT
-public:
-    static HandleSignalRouter* instance();
 
-public slots:
-    void onValueChanged(QString key, QVariant value);
-    void onSubscribeFinished(QString key);
+public:
+    explicit ServiceBackend(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    virtual ~ServiceBackend();
+
+    bool start();
+    void stop();
+    void restart();
+
+    void setRegisterService(bool reg);
+    void setAsDefault();
+    void setValue(const QString &key, const QVariant &val);
+    Manager *manager();
+
+    void ref();
+    void unref();
+    int refCount();
+
+    static ServiceBackend *defaultServiceBackend;
+    friend class ::ServiceBackendUnitTest;
 
 private:
-    HandleSignalRouter();
-    static HandleSignalRouter myInstance; ///< Singleton instance
+    class ServiceBackendPrivate *priv;
 };
 
 } // end namespace

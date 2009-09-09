@@ -22,9 +22,8 @@
 #include "contextpropertyinfo.h"
 #include "infobackend.h"
 #include "sconnect.h"
-
-#include <QReadLocker>
-#include <QWriteLocker>
+#include <QMutex>
+#include <QMutexLocker>
 
 /*!
     \page Introspection
@@ -209,7 +208,7 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
                  this, SLOT(onKeyDataChanged(QString)));
 
         cachedType = infoBackend->typeForKey(keyName);
-        cachedDoc = InfoBackend::instance()->docForKey(keyName);
+        cachedDoc = infoBackend->docForKey(keyName);
         cachedPlugin = infoBackend->pluginForKey(keyName);
         cachedConstructionString = infoBackend->constructionStringForKey(keyName);
     }
@@ -218,27 +217,28 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
 /// Returns the full name of the introspected key.
 QString ContextPropertyInfo::key() const
 {
+    QMutexLocker lock(&cacheLock);
     return keyName;
 }
 
 /// Returns the doc (documentation) for the introspected key.
 QString ContextPropertyInfo::doc() const
 {
-    QReadLocker lock(&cacheLock);
+    QMutexLocker lock(&cacheLock);
     return cachedDoc;
 }
 
 /// Returns the type name for the introspected key.
 QString ContextPropertyInfo::type() const
 {
-    QReadLocker lock(&cacheLock);
+    QMutexLocker lock(&cacheLock);
     return cachedType;
 }
 
 /// Returns true if the key exists in the registry.
 bool ContextPropertyInfo::exists() const
 {
-    QReadLocker lock(&cacheLock);
+    QMutexLocker lock(&cacheLock);
     // A key is assumed to exist if it's type != "".
     if (cachedType != "")
         return true;
@@ -249,14 +249,14 @@ bool ContextPropertyInfo::exists() const
 /// Returns the name of the plugin supplying this property
 QString ContextPropertyInfo::plugin() const
 {
-    QReadLocker lock(&cacheLock);
+    QMutexLocker lock(&cacheLock);
     return cachedPlugin;
 }
 
 /// Returns the construction parameter for the Provider supplying this property
 QString ContextPropertyInfo::constructionString() const
 {
-    QReadLocker lock(&cacheLock);
+    QMutexLocker lock(&cacheLock);
     return cachedConstructionString;
 }
 
@@ -265,7 +265,7 @@ QString ContextPropertyInfo::constructionString() const
 /// compatibility.
 QString ContextPropertyInfo::providerDBusName() const
 {
-    QReadLocker lock(&cacheLock);
+    QMutexLocker lock(&cacheLock);
     // TBD: obsolete this function?
     if (cachedPlugin == "contextkit-dbus") {
         return cachedConstructionString.split(":").last();
@@ -278,7 +278,7 @@ QString ContextPropertyInfo::providerDBusName() const
 /// maintained for backwards compatibility.
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
-    QReadLocker lock(&cacheLock);
+    QMutexLocker lock(&cacheLock);
     // TBD: obsolete this function?
     QString busType = "";
     if (cachedPlugin == "contextkit-dbus") {
@@ -298,10 +298,10 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 /// update the cached values and fire the actual signals.
 void ContextPropertyInfo::onKeyDataChanged(const QString& key)
 {
+    QMutexLocker lock(&cacheLock);
+
     if (key != keyName)
         return;
-
-    QWriteLocker lock(&cacheLock);
 
     QString newType = InfoBackend::instance()->typeForKey(keyName);
     if (cachedType != newType) {
@@ -328,6 +328,4 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
         }
         emit providerChanged(newProvider);
     }
-
 }
-

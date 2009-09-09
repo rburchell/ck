@@ -1,22 +1,22 @@
-check_PROGRAMS = propertyunittest
+check_PROGRAMS = servicebackendunittest
 
 # test's sources
-propertyunittest_SOURCES = propertyunittest.cpp manager.h service.h servicebackend.h
+servicebackendunittest_SOURCES = servicebackendunittest.cpp manager.h manageradaptor.h
 
-COVERAGE_FILES = property.cpp
+COVERAGE_FILES = servicebackend.cpp 
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)
 AM_LDFLAGS = $(QtCore_LIBS) $(QtDBus_LIBS)
-FROM_SOURCE = loggingfeatures.h property.cpp property.h # copy these files from the real source
+FROM_SOURCE = loggingfeatures.h servicebackend.cpp servicebackend.h
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am
 
-nodist_propertyunittest_SOURCES = mocs.cpp
-QT_TOMOC = $(filter %.h, $(propertyunittest_SOURCES) $(FROM_SOURCE))
+nodist_servicebackendunittest_SOURCES = mocs.cpp
+QT_TOMOC = $(filter %.h, $(servicebackendunittest_SOURCES) $(FROM_SOURCE))
 include $(top_srcdir)/am/qt.am
 
 # when MOCing from .cpp file, you also has to help the dependency tracker
-propertyunittest.o: propertyunittest.moc
+servicebackendunittest.o: servicebackendunittest.moc

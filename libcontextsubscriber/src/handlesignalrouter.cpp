@@ -19,20 +19,22 @@
  *
  */
 
-/*! \class HandleSignalRouter
-
-  \brief Routes the <tt>valueChanged()</tt> signal to the correct \c
-  PropertyHandle object.
-
-  This is an optimization, so we don't have to connect all of the
-  value changes from the same provider to all of the
-  <tt>PropertyHandle</tt>s of that provider.
-*/
-
 #include "handlesignalrouter.h"
 #include "propertyhandle.h"
 
 namespace ContextSubscriber {
+
+/*!
+  \class HandleSignalRouter
+
+  \brief Routes the <tt>valueChanged()</tt> and the
+  <tt>subscribeFinished()</tt> signals to the correct \c
+  PropertyHandle object.
+
+  This is an optimization, so we don't have to connect all of the
+  providers to all of the <tt>PropertyHandle</tt>s of that provider.
+*/
+
 
 HandleSignalRouter HandleSignalRouter::myInstance;
 
@@ -49,6 +51,12 @@ void HandleSignalRouter::onValueChanged(QString key, QVariant value)
 {
     PropertyHandle* handle = PropertyHandle::instance(key);
     handle->setValue(value);
+}
+
+void HandleSignalRouter::onSubscribeFinished(QString key)
+{
+    PropertyHandle* handle = PropertyHandle::instance(key);
+    handle->setSubscribeFinished();
 }
 
 } // end namespace

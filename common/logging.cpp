@@ -309,11 +309,11 @@ ContextRealLogger::ContextRealLogger(int type, const char *module, const char *f
 
     // Add timestamp
     if (! hideTimestamps && ! vanilla)
-        *this << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+        *this << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss").toLocal8Bit().data();
 
     // Module name
     if (! vanilla)
-        *this << QString("[" + QString(module) + "]");
+        *this << QString("[" + QString(module) + "]").toLocal8Bit().data();
 
     // Message name
     switch(type) {
@@ -338,7 +338,7 @@ ContextRealLogger::ContextRealLogger(int type, const char *module, const char *f
     // File, line and function...
 
     if (! vanilla)
-        *this << QString("[" + QString(file) + ":" + QString::number(line) + ":" + QString(func) + "]");
+        *this << QString("[" + QString(file) + ":" + QString::number(line) + ":" + QString(func) + "]").toLocal8Bit().data();
 }
 
 bool ContextRealLogger::shouldPrint()
@@ -418,108 +418,4 @@ ContextRealLogger::~ContextRealLogger()
     }
 
     setDevice(NULL);
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (QChar v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (signed short v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (unsigned short v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (signed int v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (unsigned int v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (signed long v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (unsigned long v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (float v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (double v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (void *v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (const QString &v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (const char *v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
-}
-
-/// Standard QTextStream operators. Automatically adds whitespace.
-ContextRealLogger& ContextRealLogger::operator<< (char v)
-{
-    QTextStream::operator<<(v);
-    QTextStream::operator<<(' ');
-    return *this;
 }

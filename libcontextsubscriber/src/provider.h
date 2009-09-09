@@ -50,13 +50,8 @@ signals:
     void failed(QString error);
     void subscribeFinished(QString key);
     void subscribeFailed(QString failedKey, QString error);
-    // FIXME: document that duplicate suppression is done by the
-    // "framework", so plugin doesn't have to guarantee that value is
-    // new
     void valueChanged(QString key, QVariant value);
 };
-
-typedef IProviderPlugin* (*ProviderPluginFactoryPrototype)(const QString &constructionString);
 
 class Provider : public QueuedInvoker
 {
@@ -68,7 +63,8 @@ public:
     void unsubscribe(const QString &key);
 
 signals:
-    void subscribeFinished(QSet<QString> keys);
+    void subscribeFinished(QString key);
+    void valueChanged(QString key, QVariant value);
 
 private slots:
     void onPluginReady();
@@ -82,10 +78,12 @@ private:
     Provider(const QString &plugin, const QString &constructionString);
     Q_INVOKABLE void handleSubscribes();
     Q_INVOKABLE void constructPlugin();
-    IProviderPlugin* plugin;
+    void signalSubscribeFinished(QString key);
+
+    IProviderPlugin* plugin; ///< Plugin instance communicating with the concrete provider.
     PluginState pluginState;
     QString pluginName;
-    QString constructionString;
+    QString constructionString; ///< Parameter used for initialize the plugin.
 
     QMutex subscribeLock;
     QSet<QString> toSubscribe; ///< Keys pending for subscription
