@@ -12,7 +12,8 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  infocdbbackend.cpp infocdbbackend.h dbusnamelistener.h	\
 	  dbusnamelistener.cpp handlesignalrouter.cpp			\
 	  handlesignalrouter.h queuedinvoker.cpp queuedinvoker.h	\
-	  loggingfeatures.h contextkitplugin.h contextkitplugin.cpp
+	  loggingfeatures.h contextkitplugin.h contextkitplugin.cpp \
+	  iproviderplugin.h
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h
@@ -26,7 +27,7 @@ AM_CXXFLAGS = -I$(top_srcdir)/common \
 $(top_builddir)/common/libcommon.la:
 	$(MAKE) -C $(top_builddir)/common libcommon.la
 
-LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS) 
+LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
 libcontextsubscriber_la_LIBADD=$(top_builddir)/common/libcommon.la
 
 .PHONY: $(top_builddir)/common/libcommon.la

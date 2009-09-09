@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef PROPERTYPROVIDER_H
-#define PROPERTYPROVIDER_H
+#ifndef PROVIDER_H
+#define PROVIDER_H
 
 #include "queuedinvoker.h"
 
@@ -37,21 +37,7 @@ class PropertyHandle;
 class SubscriberInterface;
 class DBusNameListener;
 class ManagerInterface;
-
-class IProviderPlugin : public QObject
-{
-    Q_OBJECT
-public:
-    virtual void subscribe(QSet<QString> keys) = 0;
-    virtual void unsubscribe(QSet<QString> keys) = 0;
-
-signals:
-    void ready();
-    void failed(QString error);
-    void subscribeFinished(QString key);
-    void subscribeFailed(QString failedKey, QString error);
-    void valueChanged(QString key, QVariant value);
-};
+class IProviderPlugin;
 
 class Provider : public QueuedInvoker
 {

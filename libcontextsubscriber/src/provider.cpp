@@ -20,6 +20,7 @@
  */
 
 #include "provider.h"
+#include "iproviderplugin.h"
 #include "handlesignalrouter.h"
 #include "sconnect.h"
 #include "contextkitplugin.h"
@@ -142,7 +143,6 @@ void Provider::constructPlugin()
 /// the keys that should be subscribed.
 void Provider::onPluginReady()
 {
-    // FIXME: try this out :)
     contextDebug();
 
     QMutexLocker lock(&subscribeLock);

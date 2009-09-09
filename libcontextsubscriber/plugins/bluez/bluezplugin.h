@@ -23,7 +23,7 @@
 #define BLUEZPLUGIN_H
 
 #include "bluezinterface.h"
-#include "provider.h" // For IProviderPlugin definition
+#include "iproviderplugin.h" // For IProviderPlugin definition
 
 using ContextSubscriber::IProviderPlugin;
 

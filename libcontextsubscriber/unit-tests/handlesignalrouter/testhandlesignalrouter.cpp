@@ -78,6 +78,11 @@ void PropertyHandle::setValue(QVariant value)
     emit setValueCalled(myKey, value);
 }
 
+void PropertyHandle::setSubscribeFinished()
+{
+    emit setSubscribeFinishedCalled(myKey);
+}
+
 PropertyHandle* PropertyHandle::instance(const QString& key)
 {
     if (key == "Property.One") {
@@ -140,10 +145,14 @@ void HandleSignalRouterUnitTests::routingSignals()
     QSignalSpy spy1(mockHandleOne, SIGNAL(setValueCalled(QString, QVariant)));
     QSignalSpy spy2(mockHandleTwo, SIGNAL(setValueCalled(QString, QVariant)));
     QSignalSpy spy3(mockHandleThree, SIGNAL(setValueCalled(QString, QVariant)));
+    QSignalSpy sspy1(mockHandleOne, SIGNAL(setSubscribeFinishedCalled(QString)));
+    QSignalSpy sspy2(mockHandleTwo, SIGNAL(setSubscribeFinishedCalled(QString)));
+    QSignalSpy sspy3(mockHandleThree, SIGNAL(setSubscribeFinishedCalled(QString)));
 
     // Test:
     // Send a signal to the HandleSignalRouter
     handleSignalRouter->onValueChanged("Property.One", QVariant(4.3));
+    handleSignalRouter->onSubscribeFinished("Property.One");
 
     // Expected results:
     // The mockHandleOne.setValue was called
@@ -151,23 +160,34 @@ void HandleSignalRouterUnitTests::routingSignals()
     QList<QVariant> parameters = spy1.takeFirst();
     QCOMPARE(parameters.at(0), QVariant("Property.One"));
     QCOMPARE(parameters.at(1).value<QVariant >(), QVariant(4.3));
+    QCOMPARE(sspy1.count(), 1);
+    parameters = sspy1.takeFirst();
+    QCOMPARE(parameters.at(0), QVariant("Property.One"));
     // The setValue of other mock handles were not called
     QCOMPARE(spy2.count(), 0);
     QCOMPARE(spy3.count(), 0);
+    QCOMPARE(sspy2.count(), 0);
+    QCOMPARE(sspy3.count(), 0);
 
     // Test:
     // Send a signal to the HandleSignalRouter
     handleSignalRouter->onValueChanged("Property.Two", QVariant("value"));
+    handleSignalRouter->onSubscribeFinished("Property.Two");
 
     // Expected results:
     // The mockHandleTwo.setValue was called
     QCOMPARE(spy2.count(), 1);
+    QCOMPARE(sspy2.count(), 1);
     parameters = spy2.takeFirst();
     QCOMPARE(parameters.at(0), QVariant("Property.Two"));
     QCOMPARE(parameters.at(1).value<QVariant >(), QVariant("value"));
+    parameters = sspy2.takeFirst();
+    QCOMPARE(parameters.at(0), QVariant("Property.Two"));
     // The setValue of other mock handles were not called
     QCOMPARE(spy1.count(), 0);
     QCOMPARE(spy3.count(), 0);
+    QCOMPARE(sspy1.count(), 0);
+    QCOMPARE(sspy3.count(), 0);
 
 }
 

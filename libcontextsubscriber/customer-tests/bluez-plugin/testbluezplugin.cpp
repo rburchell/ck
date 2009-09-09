@@ -23,7 +23,7 @@
 #include "testbluezplugin.h"
 
 // Plugin interface definition
-#include "provider.h" // FIXME: change header file name
+#include "iproviderplugin.h"
 
 #include <QtTest/QtTest>
 #include <QLibrary>

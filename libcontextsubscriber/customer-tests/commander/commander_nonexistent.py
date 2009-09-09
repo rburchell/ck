@@ -86,7 +86,7 @@ class CommanderNonExistent(unittest.TestCase):
 
 	def testCommanderFunctionality(self):
 		line = self.context_client.stderr.readline().rstrip()
-		while not 'Provider error, bad type for  test.int wanted: INT got: QString' in line:
+		while not 'Provider error, bad type for  "test.int" wanted: "INT" got: QString' in line:
 			line = self.context_client.stderr.readline().rstrip()
 
 		# if we are here, then the type check worked
