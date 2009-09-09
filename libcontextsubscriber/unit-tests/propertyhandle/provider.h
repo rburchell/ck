@@ -21,8 +21,8 @@
 
 // This is a mock implementation
 
-#ifndef PROPERTYPROVIDER_H
-#define PROPERTYPROVIDER_H
+#ifndef PROVIDER_H
+#define PROVIDER_H
 
 #include <QObject>
 #include <QDBusConnection>
@@ -31,23 +31,24 @@
 
 namespace ContextSubscriber {
 
-class PropertyProvider : public QObject
+class Provider : public QObject
 {
     Q_OBJECT
 
 public:
+    static Provider* instance(const QString &plugin, const QString& constructionString);
     bool subscribe(const QString &key);
     void unsubscribe(const QString &key);
-    static PropertyProvider* instance(const QDBusConnection::BusType busType, const QString& busName);
 
 signals:
-    void subscribeFinished(QSet<QString> keys);
-    void valueChanged(QString key, QVariant value, bool processingSubscription);
+    void subscribeFinished(QString key);
+    void valueChanged(QString key, QVariant value);
+
 public:
     // Logging
     static int instanceCount;
-    static QList<QDBusConnection::BusType> instanceDBusTypes;
-    static QStringList instanceDBusNames;
+    static QStringList instancePluginNames;
+    static QStringList instancePluginConstructionStrings;
     // Log the subscribe calls
     static int subscribeCount; // count
     static QStringList subscribeKeys; // parameters
@@ -60,7 +61,7 @@ public:
     // on which it was called
 
     // For tests
-    PropertyProvider(QString name); // public only in tests
+    Provider(QString name); // public only in tests
     static void resetLogs();
     QString myName;
 

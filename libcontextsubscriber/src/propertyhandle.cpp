@@ -135,7 +135,6 @@ void PropertyHandle::updateProvider()
     } else {
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
-        QString dbusName = myInfo->providerDBusName();
 
         if (myInfo->exists()) {
             // If myInfo knows the current provider which should be

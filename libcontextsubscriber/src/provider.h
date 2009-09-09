@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef PROPERTYPROVIDER_H
-#define PROPERTYPROVIDER_H
+#ifndef PROVIDER_H
+#define PROVIDER_H
 
 #include "queuedinvoker.h"
 
