@@ -1,5 +1,5 @@
-propertyprovider.cpp
-propertyprovider.h
+provider.cpp
+provider.h
 sconnect.h
 logging.cpp
 logging.h

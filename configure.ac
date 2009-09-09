@@ -78,7 +78,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/unit-tests/contextregistryinfo-xml-static/Makefile
         libcontextsubscriber/unit-tests/handlesignalrouter/Makefile
         libcontextsubscriber/unit-tests/propertyhandle/Makefile
-        libcontextsubscriber/unit-tests/propertyprovider/Makefile
+        libcontextsubscriber/unit-tests/provider/Makefile
         libcontextsubscriber/unit-tests/infoxmlkeysfinder/Makefile
         libcontextsubscriber/unit-tests/util/Makefile
         libcontextsubscriber/multithreading-tests/Makefile
