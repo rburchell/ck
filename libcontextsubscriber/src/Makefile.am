@@ -13,7 +13,7 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  dbusnamelistener.cpp handlesignalrouter.cpp			\
 	  handlesignalrouter.h queuedinvoker.cpp queuedinvoker.h	\
 	  loggingfeatures.h bluezinterface.h bluezinterface.cpp		\
-	  contextkitplugin.h contextkitplugin.cpp
+	  contextkitplugin.h contextkitplugin.cpp iproviderplugin.h
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h

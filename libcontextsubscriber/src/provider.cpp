@@ -20,6 +20,7 @@
  */
 
 #include "provider.h"
+#include "iproviderplugin.h"
 #include "handlesignalrouter.h"
 #include "sconnect.h"
 #include "contextkitplugin.h"
