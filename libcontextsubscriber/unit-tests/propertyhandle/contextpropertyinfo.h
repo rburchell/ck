@@ -38,6 +38,10 @@ public:
 
     QString type() const;
 
+    bool exists() const;
+    QString plugin() const;
+    QString constructionString() const;
+
     QString providerDBusName() const;
     QDBusConnection::BusType providerDBusType() const;
 

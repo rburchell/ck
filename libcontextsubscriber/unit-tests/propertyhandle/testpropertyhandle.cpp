@@ -23,7 +23,7 @@
 #include "testpropertyhandle.h"
 
 // Mock header files
-#include "propertyprovider.h"
+#include "provider.h"
 #include "dbusnamelistener.h"
 #include "contextpropertyinfo.h"
 #include "contextregistryinfo.h"
@@ -41,7 +41,7 @@ ContextPropertyInfo* mockContextPropertyInfo;
 // Mock implementation of ContextPropertyInfo
 
 ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
-    : myType("")
+    : myType("faketype")
 {
     // Store the object created by the class to be tested
     mockContextPropertyInfo = this;
@@ -50,6 +50,21 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
 QString ContextPropertyInfo::type() const
 {
     return myType;
+}
+
+bool ContextPropertyInfo::exists() const
+{
+    return myType != "";
+}
+
+QString ContextPropertyInfo::plugin() const
+{
+    return "fakeplugin";
+}
+
+QString ContextPropertyInfo::constructionString() const
+{
+    return "fakeconstructionstring";
 }
 
 QString ContextPropertyInfo::providerDBusName() const
@@ -96,39 +111,39 @@ void myMessageOutput(QtMsgType type, const char *msg)
 
 // Mock instances
 // These will be created by the test program
-PropertyProvider* mockPropertyProvider;
-PropertyProvider* mockCommanderProvider;
+Provider* mockProvider;
+Provider* mockCommanderProvider;
 DBusNameListener* mockDBusNameListener;
 
-// Mock implementation of the PropertyProvider
-int PropertyProvider::instanceCount = 0;
-QList<QDBusConnection::BusType> PropertyProvider::instanceDBusTypes;
-QStringList PropertyProvider::instanceDBusNames;
-int PropertyProvider::subscribeCount = 0;
-QStringList PropertyProvider::subscribeKeys;
-QStringList PropertyProvider::subscribeProviderNames;
+// Mock implementation of the Provider
+int Provider::instanceCount = 0;
+QStringList Provider::instancePluginNames;
+QStringList Provider::instancePluginConstructionStrings;
+int Provider::subscribeCount = 0;
+QStringList Provider::subscribeKeys;
+QStringList Provider::subscribeProviderNames;
 
-int PropertyProvider::unsubscribeCount = 0;
-QStringList PropertyProvider::unsubscribeKeys;
-QStringList PropertyProvider::unsubscribeProviderNames;
+int Provider::unsubscribeCount = 0;
+QStringList Provider::unsubscribeKeys;
+QStringList Provider::unsubscribeProviderNames;
 
-PropertyProvider* PropertyProvider::instance(const QDBusConnection::BusType busType, const QString &busName)
+Provider* Provider::instance(const QString &plugin, const QString& constructionString)
 {
     ++ instanceCount;
-    instanceDBusTypes << busType;
-    instanceDBusNames << busName;
-    if (busName.contains("Commander")) {
+    instancePluginNames << plugin;
+    instancePluginConstructionStrings << constructionString;
+    if (constructionString.contains("Commander")) {
         return mockCommanderProvider;
     }
-    return mockPropertyProvider;
+    return mockProvider;
 }
 
-PropertyProvider::PropertyProvider(QString name)
+Provider::Provider(QString name)
     : myName(name)
 {
 }
 
-bool PropertyProvider::subscribe(const QString& key)
+bool Provider::subscribe(const QString& key)
 {
     qDebug() << "subscribe" << key << myName;
     ++subscribeCount;
@@ -137,7 +152,7 @@ bool PropertyProvider::subscribe(const QString& key)
     return true;
 }
 
-void PropertyProvider::unsubscribe(const QString& key)
+void Provider::unsubscribe(const QString& key)
 {
     qDebug() << "unsubscribe" << key << myName;
     ++unsubscribeCount;
@@ -145,11 +160,11 @@ void PropertyProvider::unsubscribe(const QString& key)
     unsubscribeProviderNames << myName;
 }
 
-void PropertyProvider::resetLogs()
+void Provider::resetLogs()
 {
     instanceCount = 0;
-    instanceDBusTypes.clear();
-    instanceDBusNames.clear();
+    instancePluginConstructionStrings.clear();
+    instancePluginNames.clear();
     subscribeCount = 0;
     subscribeKeys.clear();
     subscribeProviderNames.clear();
@@ -201,11 +216,11 @@ void PropertyHandleUnitTests::cleanupTestCase()
 void PropertyHandleUnitTests::init()
 {
     // Create the mock instances
-    mockPropertyProvider = new PropertyProvider("NormalProvider");
-    mockCommanderProvider = new PropertyProvider("Commander");
+    mockProvider = new Provider("NormalProvider");
+    mockCommanderProvider = new Provider("Commander");
     mockContextRegistryInfo = new ContextRegistryInfo();
     // Reset the logs
-    PropertyProvider::resetLogs();
+    Provider::resetLogs();
     // Reset the DBusNameListener (it is created only once, by the class to be tested)
     mockDBusNameListener->servicePresent = DBusNameListener::NotPresent;
 }
@@ -213,8 +228,8 @@ void PropertyHandleUnitTests::init()
 // After each test
 void PropertyHandleUnitTests::cleanup()
 {
-    delete mockPropertyProvider;
-    mockPropertyProvider = 0;
+    delete mockProvider;
+    mockProvider = 0;
     delete mockCommanderProvider;
     mockCommanderProvider = 0;
     delete mockContextRegistryInfo;
@@ -237,10 +252,10 @@ void PropertyHandleUnitTests::initializing()
     propertyHandle = PropertyHandle::instance(key);
 
     // Expected results:
-    // The PropertyProvider with the correct DBusName and DBusType was created.
-    QCOMPARE(PropertyProvider::instanceCount, 1);
-    QCOMPARE(PropertyProvider::instanceDBusTypes.at(0), QDBusConnection::SessionBus);
-    QCOMPARE(PropertyProvider::instanceDBusNames.at(0), QString("Fake.Provider"));
+    // The Provider with the correct DBusName and DBusType was created.
+    QCOMPARE(Provider::instanceCount, 1);
+    QCOMPARE(Provider::instancePluginNames.at(0), QString("fakeplugin"));
+    QCOMPARE(Provider::instancePluginConstructionStrings.at(0), QString("fakeconstructionstring"));
 }
 
 void PropertyHandleUnitTests::key()
@@ -285,10 +300,10 @@ void PropertyHandleUnitTests::subscribe()
     propertyHandle->subscribe();
 
     // Expected results:
-    // The PropertyHandle calls the PropertyProvider::subscribe
-    QCOMPARE(PropertyProvider::subscribeCount, 1);
-    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
-    QCOMPARE(PropertyProvider::unsubscribeCount, 0);
+    // The PropertyHandle calls the Provider::subscribe
+    QCOMPARE(Provider::subscribeCount, 1);
+    QCOMPARE(Provider::subscribeKeys.at(0), key);
+    QCOMPARE(Provider::unsubscribeCount, 0);
 }
 
 void PropertyHandleUnitTests::subscribeAndUnsubscribe()
@@ -307,11 +322,11 @@ void PropertyHandleUnitTests::subscribeAndUnsubscribe()
     propertyHandle->unsubscribe();
 
     // Expected results:
-    // The PropertyHandle calls the PropertyProvider::unsubscribe
-    QCOMPARE(PropertyProvider::subscribeCount, 1);
-    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
-    QCOMPARE(PropertyProvider::unsubscribeCount, 1);
-    QCOMPARE(PropertyProvider::unsubscribeKeys.at(0), key);
+    // The PropertyHandle calls the Provider::unsubscribe
+    QCOMPARE(Provider::subscribeCount, 1);
+    QCOMPARE(Provider::subscribeKeys.at(0), key);
+    QCOMPARE(Provider::unsubscribeCount, 1);
+    QCOMPARE(Provider::unsubscribeKeys.at(0), key);
 }
 
 void PropertyHandleUnitTests::subscribeTwice()
@@ -330,11 +345,11 @@ void PropertyHandleUnitTests::subscribeTwice()
     propertyHandle->subscribe();
 
     // Expected results:
-    // The PropertyHandle calls the PropertyProvider::subscribe
+    // The PropertyHandle calls the Provider::subscribe
     // but only once.
-    QCOMPARE(PropertyProvider::subscribeCount, 1);
-    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
-    QCOMPARE(PropertyProvider::unsubscribeCount, 0);
+    QCOMPARE(Provider::subscribeCount, 1);
+    QCOMPARE(Provider::subscribeKeys.at(0), key);
+    QCOMPARE(Provider::unsubscribeCount, 0);
 }
 
 void PropertyHandleUnitTests::subscriptionPendingAndFinished()
@@ -354,23 +369,8 @@ void PropertyHandleUnitTests::subscriptionPendingAndFinished()
     // The subscription is marked as pending
     QVERIFY(propertyHandle->isSubscribePending());
 
-    // Test:
-    // Command the PropertyProvider to emit the subscriptionFinished signal
-    // without the relevant key
-    QSet<QString> toEmit1;
-    toEmit1.insert("Non.Relevant.Key");
-    emit mockPropertyProvider->subscribeFinished(toEmit1);
-
-    // Expected results:
-    // The subscription is still marked as pending
-    QVERIFY(propertyHandle->isSubscribePending());
-
-    // Test:
-    // Command the PropertyProvider to emit the subscriptionFinished signal
-    // with the relevant key
-    QSet<QString> toEmit2;
-    toEmit2.insert(key);
-    emit mockPropertyProvider->subscribeFinished(toEmit2);
+    // finished
+    propertyHandle->setSubscribeFinished();
 
     // Expected results:
     // The subscription is no longer marked as pending
@@ -395,12 +395,12 @@ void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribe()
     propertyHandle->unsubscribe();
 
     // Expected results:
-    // The PropertyHandle calls the PropertyProvider::subscribe
+    // The PropertyHandle calls the Provider::subscribe
     // but only once. The unsubscribe is not called, since one of the
     // subscriptions is still valid.
-    QCOMPARE(PropertyProvider::subscribeCount, 1);
-    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
-    QCOMPARE(PropertyProvider::unsubscribeCount, 0);
+    QCOMPARE(Provider::subscribeCount, 1);
+    QCOMPARE(Provider::subscribeKeys.at(0), key);
+    QCOMPARE(Provider::unsubscribeCount, 0);
 }
 
 void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribeTwice()
@@ -423,12 +423,12 @@ void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribeTwice()
     propertyHandle->unsubscribe();
 
     // Expected results:
-    // The PropertyHandle calls the PropertyProvider::subscribe
+    // The PropertyHandle calls the Provider::subscribe
     // but only once. Also the unsubscription is called once.
-    QCOMPARE(PropertyProvider::subscribeCount, 1);
-    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
-    QCOMPARE(PropertyProvider::unsubscribeCount, 1);
-    QCOMPARE(PropertyProvider::unsubscribeKeys.at(0), key);
+    QCOMPARE(Provider::subscribeCount, 1);
+    QCOMPARE(Provider::subscribeKeys.at(0), key);
+    QCOMPARE(Provider::unsubscribeCount, 1);
+    QCOMPARE(Provider::unsubscribeKeys.at(0), key);
 }
 
 void PropertyHandleUnitTests::setValueWithoutTypeCheck()
@@ -447,7 +447,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a double
-    propertyHandle->setValue(QVariant(1.4), true);
+    propertyHandle->setValue(QVariant(1.4));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -458,7 +458,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     // Test:
     spy.clear();
     // Command the PropertyHandle to set its value to the same value it already has
-    propertyHandle->setValue(QVariant(1.4), true);
+    propertyHandle->setValue(QVariant(1.4));
 
     // Expected results:
     // The valueChanged signal is not emitted
@@ -468,7 +468,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is an integer
-    propertyHandle->setValue(QVariant(-8), true);
+    propertyHandle->setValue(QVariant(-8));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -480,7 +480,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     // Test:
     spy.clear();
     // Command the PropertyHandle to set its value to the same value it already has
-    propertyHandle->setValue(QVariant(-8), true);
+    propertyHandle->setValue(QVariant(-8));
 
     // Expected results:
     // The valueChanged signal is not emitted
@@ -490,7 +490,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a string
-    propertyHandle->setValue(QVariant("myValue"), true);
+    propertyHandle->setValue(QVariant("myValue"));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -502,7 +502,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     // Test:
     spy.clear();
     // Command the PropertyHandle to set its value to the same value it already has
-    propertyHandle->setValue(QVariant("myValue"), true);
+    propertyHandle->setValue(QVariant("myValue"));
 
     // Expected results:
     // The valueChanged signal is not emitted
@@ -512,7 +512,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a boolean
-    propertyHandle->setValue(QVariant(true), true);
+    propertyHandle->setValue(QVariant(true));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -524,7 +524,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     // Test:
     spy.clear();
     // Command the PropertyHandle to set its value to the same value it already has
-    propertyHandle->setValue(QVariant(true), true);
+    propertyHandle->setValue(QVariant(true));
 
     // Expected results:
     // The valueChanged signal is not emitted
@@ -534,7 +534,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a null
-    propertyHandle->setValue(QVariant(), true);
+    propertyHandle->setValue(QVariant());
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -546,7 +546,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     // Test:
     spy.clear();
     // Command the PropertyHandle to set its value to the same value it already has
-    propertyHandle->setValue(QVariant(), true);
+    propertyHandle->setValue(QVariant());
 
     // Expected results:
     // The valueChanged signal is not emitted
@@ -577,7 +577,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     // Test:
     // Command the PropertyHandle to change its value
     // The new value is a double
-    propertyHandle->setValue(QVariant(1.4), true);
+    propertyHandle->setValue(QVariant(1.4));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -589,7 +589,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a null
-    propertyHandle->setValue(QVariant(), true);
+    propertyHandle->setValue(QVariant());
 
     // Expected results:
     // The NULL value is always accepcted (not depending on the type)
@@ -607,7 +607,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     // Test:
     // Command the PropertyHandle to change its value
     // The new value is an integer
-    propertyHandle->setValue(QVariant(-8), true);
+    propertyHandle->setValue(QVariant(-8));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -620,7 +620,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a null
-    propertyHandle->setValue(QVariant(), true);
+    propertyHandle->setValue(QVariant());
 
     // Expected results:
     // The NULL value is always accepcted (not depending on the type)
@@ -638,7 +638,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     // Test:
     // Command the PropertyHandle to change its value
     // The new value is a string
-    propertyHandle->setValue(QVariant("myValue"), true);
+    propertyHandle->setValue(QVariant("myValue"));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -651,7 +651,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a null
-    propertyHandle->setValue(QVariant(), true);
+    propertyHandle->setValue(QVariant());
 
     // Expected results:
     // The NULL value is always accepcted (not depending on the type)
@@ -669,7 +669,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     // Test:
     // Command the PropertyHandle to change its value
     // The new value is a boolean
-    propertyHandle->setValue(QVariant(true), true);
+    propertyHandle->setValue(QVariant(true));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -682,7 +682,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a null
-    propertyHandle->setValue(QVariant(), true);
+    propertyHandle->setValue(QVariant());
 
     // Expected results:
     // The NULL value is always accepcted (not depending on the type)
@@ -713,15 +713,15 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
     // Set the type to DOUBLE
     mockContextPropertyInfo->myType = "DOUBLE";
     // Set an initial value
-    propertyHandle->setValue(QVariant(4.2), true);
+    propertyHandle->setValue(QVariant(4.2));
     spy.clear();
 
     // Test:
     // Command the PropertyHandle to change its value multiple times but with
     // incorrect types.
-    propertyHandle->setValue(QVariant(5), true);
-    propertyHandle->setValue(QVariant("string"), true);
-    propertyHandle->setValue(QVariant(false), true);
+    propertyHandle->setValue(QVariant(5));
+    propertyHandle->setValue(QVariant("string"));
+    propertyHandle->setValue(QVariant(false));
 
     // Expected results:
     // The valueChanged signal was not emitted
@@ -733,15 +733,15 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
     // Set the type to INT
     mockContextPropertyInfo->myType = "INT";
     // Set an initial value
-    propertyHandle->setValue(QVariant(22), true);
+    propertyHandle->setValue(QVariant(22));
     spy.clear();
 
     // Test:
     // Command the PropertyHandle to change its value multiple times but with
     // incorrect types.
-    propertyHandle->setValue(QVariant(5.6), true);
-    propertyHandle->setValue(QVariant("string"), true);
-    propertyHandle->setValue(QVariant(false), true);
+    propertyHandle->setValue(QVariant(5.6));
+    propertyHandle->setValue(QVariant("string"));
+    propertyHandle->setValue(QVariant(false));
 
     // Expected results:
     // The valueChanged signal was not emitted
@@ -753,15 +753,15 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
     // Set the type to STRING
     mockContextPropertyInfo->myType = "STRING";
     // Set an initial value
-    propertyHandle->setValue(QVariant("myString"), true);
+    propertyHandle->setValue(QVariant("myString"));
     spy.clear();
 
     // Test:
     // Command the PropertyHandle to change its value multiple times but with
     // incorrect types.
-    propertyHandle->setValue(QVariant(5.4), true);
-    propertyHandle->setValue(QVariant(-8), true);
-    propertyHandle->setValue(QVariant(false), true);
+    propertyHandle->setValue(QVariant(5.4));
+    propertyHandle->setValue(QVariant(-8));
+    propertyHandle->setValue(QVariant(false));
 
     // Expected results:
     // The valueChanged signal was not emitted
@@ -773,15 +773,15 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
     // Set the type to TRUTH
     mockContextPropertyInfo->myType = "TRUTH";
     // Set an initial value
-    propertyHandle->setValue(QVariant(false), true);
+    propertyHandle->setValue(QVariant(false));
     spy.clear();
 
     // Test:
     // Command the PropertyHandle to change its value multiple times but with
     // incorrect types.
-    propertyHandle->setValue(QVariant(5.4), true);
-    propertyHandle->setValue(QVariant(-8), true);
-    propertyHandle->setValue(QVariant("string"), true);
+    propertyHandle->setValue(QVariant(5.4));
+    propertyHandle->setValue(QVariant(-8));
+    propertyHandle->setValue(QVariant("string"));
 
     // Expected results:
     // The valueChanged signal was not emitted
@@ -803,7 +803,7 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
     propertyHandle->subscribe();
 
     // Clear the logs from the subscription
-    PropertyProvider::resetLogs();
+    Provider::resetLogs();
 
     // Test:
     // Command the DBusNameListener to tell that the Commander has appeared
@@ -812,17 +812,17 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
 
     // Expected results:
     // The handle unsubscribes from the real provider
-    QCOMPARE(PropertyProvider::unsubscribeCount, 1);
-    QCOMPARE(PropertyProvider::unsubscribeKeys.at(0), key);
-    QCOMPARE(PropertyProvider::unsubscribeProviderNames.at(0), QString("NormalProvider"));
+    QCOMPARE(Provider::unsubscribeCount, 1);
+    QCOMPARE(Provider::unsubscribeKeys.at(0), key);
+    QCOMPARE(Provider::unsubscribeProviderNames.at(0), QString("NormalProvider"));
     // And subscribes to Commander
-    QCOMPARE(PropertyProvider::subscribeCount, 1);
-    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
-    QCOMPARE(PropertyProvider::subscribeProviderNames.at(0), QString("Commander"));
+    QCOMPARE(Provider::subscribeCount, 1);
+    QCOMPARE(Provider::subscribeKeys.at(0), key);
+    QCOMPARE(Provider::subscribeProviderNames.at(0), QString("Commander"));
 
     // Setup:
     // Clear the logs from the subscription
-    PropertyProvider::resetLogs();
+    Provider::resetLogs();
 
     // Test:
     // Command the DBusNameListener to tell that the Commander has disappeared
@@ -831,13 +831,13 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
 
     // Expected results:
     // The PropertyHandle unsubscribes from the commander
-    QCOMPARE(PropertyProvider::unsubscribeCount, 1);
-    QCOMPARE(PropertyProvider::unsubscribeKeys.at(0), key);
-    QCOMPARE(PropertyProvider::unsubscribeProviderNames.at(0), QString("Commander"));
+    QCOMPARE(Provider::unsubscribeCount, 1);
+    QCOMPARE(Provider::unsubscribeKeys.at(0), key);
+    QCOMPARE(Provider::unsubscribeProviderNames.at(0), QString("Commander"));
     // And subscribes to the real provider
-    QCOMPARE(PropertyProvider::subscribeCount, 1);
-    QCOMPARE(PropertyProvider::subscribeKeys.at(0), key);
-    QCOMPARE(PropertyProvider::subscribeProviderNames.at(0), QString("NormalProvider"));
+    QCOMPARE(Provider::subscribeCount, 1);
+    QCOMPARE(Provider::subscribeKeys.at(0), key);
+    QCOMPARE(Provider::subscribeProviderNames.at(0), QString("NormalProvider"));
 }
 
 void PropertyHandleUnitTests::commandingDisabled()
@@ -853,7 +853,7 @@ void PropertyHandleUnitTests::commandingDisabled()
     propertyHandle->subscribe();
 
     // Clear the logs from the subscription
-    PropertyProvider::resetLogs();
+    Provider::resetLogs();
 
     // Test:
     // Disable commanding
@@ -865,12 +865,12 @@ void PropertyHandleUnitTests::commandingDisabled()
 
     // Expected results:
     // The PropertyHandle ignores the Commander
-    QCOMPARE(PropertyProvider::unsubscribeCount, 0);
-    QCOMPARE(PropertyProvider::subscribeCount, 0);
+    QCOMPARE(Provider::unsubscribeCount, 0);
+    QCOMPARE(Provider::subscribeCount, 0);
 
     // Setup:
     // Clear the logs from the subscription
-    PropertyProvider::resetLogs();
+    Provider::resetLogs();
 
     // Test:
     // Command the DBusNameListener to tell that the Commander has disappeared
@@ -879,8 +879,8 @@ void PropertyHandleUnitTests::commandingDisabled()
 
     // Expected results:
     // The PropertyHandle ignores the Commander
-    QCOMPARE(PropertyProvider::unsubscribeCount, 0);
-    QCOMPARE(PropertyProvider::subscribeCount, 0);
+    QCOMPARE(Provider::unsubscribeCount, 0);
+    QCOMPARE(Provider::subscribeCount, 0);
 }
 
 } // end namespace

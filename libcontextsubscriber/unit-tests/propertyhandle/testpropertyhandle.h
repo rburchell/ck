@@ -61,7 +61,6 @@ private slots:
 
     void commanderAppearsAndDisappears();
     void commandingDisabled();
-
 };
 
 } // end namespace
