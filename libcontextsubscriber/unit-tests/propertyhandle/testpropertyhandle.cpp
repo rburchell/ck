@@ -67,16 +67,6 @@ QString ContextPropertyInfo::constructionString() const
     return "fakeconstructionstring";
 }
 
-QString ContextPropertyInfo::providerDBusName() const
-{
-    return "Fake.Provider";
-}
-
-QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
-{
-    return QDBusConnection::SessionBus;
-}
-
 // Mock implementation of the ContextRegistryInfo
 
 ContextRegistryInfo* ContextRegistryInfo::instance(const QString& backendName)
