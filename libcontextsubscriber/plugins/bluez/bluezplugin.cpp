@@ -21,10 +21,11 @@
 
 #include "bluezplugin.h"
 #include "sconnect.h"
+
 #include "logging.h"
 
 /// The factory method for constructing the IPropertyProvider instance.
-IProviderPlugin* bluezPluginFactory(const QString& /*constructionString*/)
+IProviderPlugin* pluginFactory(const QString& /*constructionString*/)
 {
     // Note: it's the caller's responsibility to delete the plugin if
     // needed.

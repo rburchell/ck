@@ -28,7 +28,7 @@
 using ContextSubscriber::IProviderPlugin;
 
 extern "C" {
-    IProviderPlugin* bluezPluginFactory(const QString& constructionString);
+    IProviderPlugin* pluginFactory(const QString& constructionString);
 }
 
 namespace ContextSubscriberBluez
