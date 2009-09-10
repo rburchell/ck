@@ -22,6 +22,7 @@
 #include <QObject>
 
 class QLibrary;
+class QProcess;
 
 class BluezPluginTests : public QObject
 {
@@ -37,9 +38,11 @@ private slots:
 
     // Test cases
     void loading();
-    //void normalOperation();
+    void normalOperation();
     //void bluezNotPresent();
     //void bluezDisappearsAndAppears();
 private:
+    bool startBluez();
     QLibrary* library;
+    QProcess* bluezProcess;
 };
