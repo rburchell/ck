@@ -43,6 +43,8 @@ public:
     static ServiceBackend *defaultService;
 
     void setAsDefault();
+    void setRegisterService(bool reg);
+
     void ref();
     void unref();
     int refCount();
