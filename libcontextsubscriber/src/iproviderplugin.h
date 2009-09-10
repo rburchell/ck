@@ -23,6 +23,7 @@
 #define IPROVIDERPLUGIN_H
 
 #include <QObject>
+#include <QVariant>
 
 namespace ContextSubscriber {
 
