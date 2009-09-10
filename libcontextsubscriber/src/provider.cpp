@@ -127,9 +127,9 @@ void Provider::constructPlugin()
              handleSignalRouter, SLOT(onValueChanged(QString, QVariant)));
 
     sconnect(plugin, SIGNAL(ready()),
-             this, SLOT(onPluginReady()), Qt::QueuedConnection);
+             this, SLOT(onPluginReady()));
     sconnect(plugin, SIGNAL(failed(QString)),
-             this, SLOT(onPluginFailed(QString)), Qt::QueuedConnection);
+             this, SLOT(onPluginFailed(QString)));
 
     sconnect(plugin, SIGNAL(subscribeFinished(QString)),
              this, SLOT(onPluginSubscribeFinished(QString)), Qt::QueuedConnection);
