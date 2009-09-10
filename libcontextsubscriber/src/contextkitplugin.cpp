@@ -21,7 +21,6 @@
 
 #include "contextkitplugin.h"
 #include "logging.h"
-#include "managerinterface.h"
 #include "subscriberinterface.h"
 #include "sconnect.h"
 #include <QStringList>
@@ -51,29 +50,29 @@ namespace ContextSubscriber {
   \brief Implementation of the ContextKit D-Bus protocol.
 */
 
+const QString ContextKitPlugin::managerPath = "/org/freedesktop/ContextKit/Manager";
+const QString ContextKitPlugin::managerIName = "org.freedesktop.ContextKit.Manager";
+
 /// Creates subscriber and manager interface, tries to get a
 /// subscriber instance from the manager and starts listening for
 /// provider appearing and disappearing on D-Bus.
 ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& busName)
-    : subscriberInterface(0), managerInterface(0), connection(new QDBusConnection(bus)),
+    : providerListener(new DBusNameListener(bus, busName, this)),
+      subscriberInterface(0),
+      managerInterface(new QDBusInterface(busName, managerPath, managerIName, bus, this)),
+      connection(new QDBusConnection(bus)),
       busName(busName)
 {
-    // Call GetSubscriber asynchronously
-    managerInterface = new ManagerInterface(*connection, busName, this);
-    sconnect(managerInterface, SIGNAL(getSubscriberFinished(QString)), this, SLOT(onDBusGetSubscriberFinished(QString)));
-
     // Notice if the provider on the dbus comes and goes
-    providerListener = new DBusNameListener(bus, busName, this);
     sconnect(providerListener, SIGNAL(nameAppeared()),
              this, SLOT(onProviderAppeared()));
     sconnect(providerListener, SIGNAL(nameDisappeared()),
              this, SLOT(onProviderDisappeared()));
-    // Listen to the provider appearing and disappearing, but don't
-    // perform the initial NameHasOwner check.  We will try to connect
-    // to the provider at startup, whether it's present or not.
-    providerListener->startListening(false);
 
-    // Just try to connect to the provider.
+    // Listen to the provider appearing and disappearing, but don't
+    // perform the initial NameHasOwner check.  We try to connect to
+    // the provider at startup, whether it's present or not.
+    providerListener->startListening(false);
     onProviderAppeared();
 }
 
@@ -84,7 +83,11 @@ void ContextKitPlugin::onProviderAppeared()
     contextDebug() << "ContextKitPlugin::onProviderAppeared";
     delete subscriberInterface;
     subscriberInterface = 0;
-    managerInterface->getSubscriber();
+    managerInterface->callWithCallback("GetSubscriber",
+                                       QList<QVariant>(),
+                                       this,
+                                       SLOT(onDBusGetSubscriberFinished(QDBusObjectPath)),
+                                       SLOT(onDBusGetSubscriberFailed(QDBusError)));
 }
 
 /// Delete our subscriber interface when the provider goes away.
@@ -98,27 +101,29 @@ void ContextKitPlugin::onProviderDisappeared()
 
 /// Starts using the fresh subscriber interface when it is returned by
 /// the manager in response to the GetSubscriber call.
-void ContextKitPlugin::onDBusGetSubscriberFinished(QString objectPath)
+void ContextKitPlugin::onDBusGetSubscriberFinished(QDBusObjectPath objectPath)
 {
-    if (objectPath != "") {
-        delete subscriberInterface;
-        subscriberInterface = new SubscriberInterface(*connection, busName, objectPath, this);
-        sconnect(subscriberInterface,
-                 SIGNAL(valuesChanged(QMap<QString, QVariant>)),
-                 this,
-                 SLOT(onDBusValuesChanged(QMap<QString, QVariant>)));
-        sconnect(subscriberInterface,
-                 SIGNAL(subscribeFinished(QList<QString>)),
-                 this,
-                 SLOT(onDBusSubscribeFinished(QList<QString>)));
-        sconnect(subscriberInterface,
-                 SIGNAL(subscribeFailed(QList<QString>, QString)),
-                 this,
-                 SLOT(onDBusSubscribeFailed(QList<QString>, QString)));
+    delete subscriberInterface;
+    subscriberInterface = new SubscriberInterface(*connection, busName, objectPath.path(), this);
+    sconnect(subscriberInterface,
+             SIGNAL(valuesChanged(QMap<QString, QVariant>)),
+             this,
+             SLOT(onDBusValuesChanged(QMap<QString, QVariant>)));
+    sconnect(subscriberInterface,
+             SIGNAL(subscribeFinished(QList<QString>)),
+             this,
+             SLOT(onDBusSubscribeFinished(QList<QString>)));
+    sconnect(subscriberInterface,
+             SIGNAL(subscribeFailed(QList<QString>, QString)),
+             this,
+             SLOT(onDBusSubscribeFailed(QList<QString>, QString)));
 
-        emit ready();
-    } else
-        emit failed("Was unable to get subscriber object on dbus");
+    emit ready();
+}
+
+void ContextKitPlugin::onDBusGetSubscriberFailed(QDBusError err)
+{
+    emit failed("Was unable to get subscriber object on dbus: " + err.message());
 }
 
 /// Signals the Provider that the subscribe is finished.

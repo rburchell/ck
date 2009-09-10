@@ -1,8 +1,7 @@
 lib_LTLIBRARIES = libcontextsubscriber.la
 libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	  contextproperty.h propertyhandle.cpp propertyhandle.h		\
-	  provider.cpp provider.h managerinterface.h	                \
-	  managerinterface.cpp safedbuspendingcallwatcher.h		\
+	  provider.cpp provider.h safedbuspendingcallwatcher.h		\
 	  subscriberinterface.h subscriberinterface.cpp			\
 	  contextpropertyinfo.cpp contextpropertyinfo.h			\
 	  contextregistryinfo.cpp contextregistryinfo.h infobackend.h	\
