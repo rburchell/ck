@@ -25,15 +25,13 @@
 
 namespace ContextSubscriber {
 
-class PropertyProvider;
+class Provider;
 
-class PropertyProviderUnitTests : public QObject
+class ProviderUnitTests : public QObject
 {
     Q_OBJECT
 
 private:
-    PropertyProvider *propertyProvider;
-
     // Tests
 private slots:
     // Init and cleanup helper functions
@@ -44,30 +42,12 @@ private slots:
 
     // Test cases
     void initializing();
-
-    void getSubscriberSucceeds();
-    void getSubscriberFails();
-
-    void subscription();
-    void subscriptionOfTwoProperties();
-    void unsubscription();
-    void unsubscriptionOfTwoProperties();
-
-    void immediateUnsubscription();
-    void immediateResubscription();
-
-    void subscriptionFinished();
-
-    void subscriptionAfterGetSubscriberFailed();
-
-    void valuesChanged();
-    void valuesChangedWithUnnecessaryProperties();
-
-    void providerDisappearsAndAppears();
-
-    // Tests for bug fixes
-    void providerPresentAtStartup();
-
+    void pluginReadyHandled();
+    void pluginFailedHandled();
+    void badPluginName();
+    void unsubscribe();
+    void pluginSubscriptionFinishes();
+    void pluginValueChanges();
 };
 
 } // end namespace

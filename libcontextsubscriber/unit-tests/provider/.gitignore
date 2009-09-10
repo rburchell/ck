@@ -1,3 +1,4 @@
+iproviderplugin.h
 provider.cpp
 provider.h
 sconnect.h

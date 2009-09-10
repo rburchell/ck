@@ -9,7 +9,7 @@ SUBDIRS = $(SUBDIRSTESTS) util
 
 check-sum: all
 	@list='$(SUBDIRSTESTS)'; for subdir in $$list; do \
-          (cd $$subdir && tput bold && echo $$subdir:\  && tput sgr0 && ( $(MAKE) $(AM_MAKEFLAGS) check | grep '^Total' | grep -v '^make' ) ) \
+          (cd $$subdir && tput bold && echo $$subdir:\  && tput sgr0 && ( $(MAKE) $(AM_MAKEFLAGS) check 2>/dev/null | grep '^Total' | grep -v '^make' ) ) \
         done
 
 coverage: covoptioncheck

@@ -37,8 +37,8 @@ public:
     static HandleSignalRouter* instance();
 
 public slots:
-    void onValueChanged(QString key, QVariant value, bool processingSubscription);
-
+    void onValueChanged(QString key, QVariant value);
+    void onSubscribeFinished(QString key);
 };
 
 } // end namespace

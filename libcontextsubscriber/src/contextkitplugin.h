@@ -22,14 +22,17 @@
 #ifndef CONTEXTKITPLUGIN_H
 #define CONTEXTKITPLUGIN_H
 
+#include "dbusnamelistener.h"
+#include "subscriberinterface.h"
+#include "provider.h"
+#include "iproviderplugin.h"
 #include <QString>
 #include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusObjectPath>
 #include <QSet>
 #include <QVariant>
 #include <QMap>
-#include "dbusnamelistener.h"
-#include "provider.h"
-#include "iproviderplugin.h"
 
 extern "C" {
     ContextSubscriber::IProviderPlugin* contextKitPluginFactory(QString constructionString);
@@ -54,19 +57,26 @@ signals:
 
 private slots:
     void onDBusValuesChanged(QMap<QString, QVariant> values);
-    void onDBusGetSubscriberFinished(QString objectPath);
+    void onDBusGetSubscriberFinished(QDBusObjectPath objectPath);
+    void onDBusGetSubscriberFailed(QDBusError err);
     void onDBusSubscribeFinished(QList<QString> keys);
     void onDBusSubscribeFailed(QList<QString> keys, QString error);
     void onProviderAppeared();
     void onProviderDisappeared();
 
 private:
+    QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
+
     DBusNameListener *providerListener; ///< Listens to provider's (dis)appearance over DBus
     SubscriberInterface *subscriberInterface; ///< The D-Bus interface for the Subscriber object
-    ManagerInterface *managerInterface; ///< The D-Bus interface for the Manager object
+    QDBusInterface *managerInterface; ///< The D-Bus interface for the Manager object
 
     QDBusConnection *connection; ///< The connection to DBus
     QString busName; ///< The D-Bus service name of the ContextKit provider connected to
+
+    static const QString managerIName; ///< org.freedesktop.ContextKit.Manager
+    static const QString subscriberIName; ///< org.freedesktop.ContextKit.Subscriber
+    static const QString managerPath; ///< /org/freedesktop/ContextKit/Manager
 };
 
 

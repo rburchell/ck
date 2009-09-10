@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2008, 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,44 +19,45 @@
  *
  */
 
-#ifndef MANAGERINTERFACE_H
-#define MANAGERINTERFACE_H
+// mock implementation
 
-// This is a mock implementation
+#ifndef CONTEXTKITPLUGIN_H
+#define CONTEXTKITPLUGIN_H
 
-#include <QObject>
+#include <QString>
 #include <QDBusConnection>
+#include <QSet>
+#include <QVariant>
+#include "iproviderplugin.h"
+
+extern "C" {
+    ContextSubscriber::IProviderPlugin* contextKitPluginFactory(QString constructionString);
+}
 
 namespace ContextSubscriber {
-
-class ManagerInterface : public QObject
+class ContextKitPlugin : public IProviderPlugin
 {
     Q_OBJECT
 
-
 public:
-    ManagerInterface(const QDBusConnection connection, const QString &busName, QObject *parent = 0);
-
-    void getSubscriber();
-    bool isGetSubscriberFailed() const;
+    void subscribe(QSet<QString> keys);
+    void unsubscribe(QSet<QString> keys);
 
 signals:
-    void getSubscriberFinished(QString objectPath);
+    void ready();
+    void failed(QString error);
+    void subscribeFinished(QString key);
+    void subscribeFailed(QString failedKey, QString error);
+    void valueChanged(QString key, QVariant value);
 
-public:
-    // Logging
-    static int getSubscriberCount;
-    static int creationCount;
-    static QStringList creationBusNames;
+private:
+    QSet<QString> subscribeRequested;
+    QSet<QString> unsubscribeRequested;
 
-    // For tests
-    static void resetLogs();
-    bool getSubscriberFailed;
-
-    friend class PropertyProviderUnitTests;
-
+    friend class ProviderUnitTests;
 };
 
-} // end namespace
+
+}
 
 #endif
