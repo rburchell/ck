@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIRS="commander subscription asynchronicity registry"
+DIRS="commander subscription asynchronicity registry bluez-plugin2"
 
 if pkg-config contextprovider-1.0 || [ -e ../../libcontextprovider/src/.libs/libcontextprovider.so ]
 then
