@@ -20,7 +20,7 @@
  */
 
 // Header file of the tests
-#include "testpropertyprovider.h"
+#include "testprovider.h"
 
 // Mock header files
 #include "dbusnamelistener.h"
@@ -29,7 +29,7 @@
 #include "managerinterface.h"
 
 // Header file of the class to be tested
-#include "propertyprovider.h"
+#include "provider.h"
 
 #include <QtTest/QtTest>
 #include <QDebug>
