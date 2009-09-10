@@ -17,7 +17,6 @@
 CommandWatcher::CommandWatcher(int commandfd, QMap<QString, ContextProperty*> *properties, QObject *parent) :
     QObject(parent), commandfd(commandfd), properties(properties)
 {
-    fcntl(commandfd, F_SETFL, O_NONBLOCK);
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
     sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
     help();
@@ -29,6 +28,7 @@ void CommandWatcher::onActivated()
     static QByteArray commandBuffer = "";
     static char buf[1024];
     int readSize;
+    fcntl(commandfd, F_SETFL, O_NONBLOCK);
     while ((readSize = read(commandfd, &buf, 1024)) > 0)
         commandBuffer += QByteArray(buf, readSize);
 
@@ -61,12 +61,14 @@ void CommandWatcher::help()
         qDebug() << "  type KEY                        - get the info()->type for a key";
         qDebug() << "  plugin KEY                      - get the info()->plugin for a key";
         qDebug() << "  constructionstring KEY          - get the info()->constructionstring for a key";
+        qDebug() << "  flush                           - write FLUSHED to stderr and stdout";
         qDebug() << "Any prefix of a command can be used as an abbreviation";
 }
 
 void CommandWatcher::interpret(const QString& command) const
 {
     QTextStream out(stdout);
+    QTextStream err(stderr);
     if (command == "") {
         help();
     } else {
@@ -74,7 +76,7 @@ void CommandWatcher::interpret(const QString& command) const
         QString commandName = args[0];
         args.pop_front();
 
-        if (args.size() == 0) {
+        if (args.size() == 0 && !QString("flush").startsWith(commandName)) {
             help();
             return;
         }
@@ -163,6 +165,11 @@ void CommandWatcher::interpret(const QString& command) const
                 out << "constructionstring: " << properties->value(key)->info()->constructionString() << endl;
             else
                 qDebug() << "no such key:" << key;
+        } else if (QString("flush").startsWith(commandName)) {
+            out << "FLUSHED" << endl;
+            out.flush();
+            err << "FLUSHED" << endl;
+            err.flush();
         } else
             help();
     }
