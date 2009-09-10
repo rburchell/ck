@@ -29,6 +29,7 @@
 #include <QMutexLocker>
 #include <QCoreApplication>
 #include <QThread>
+#include <QLibrary>
 
 namespace ContextSubscriber {
 
@@ -91,6 +92,8 @@ namespace ContextSubscriber {
   \brief Emitted when the subscription procedure for \c keys finished
   (either succeeded, either failed) */
 
+typedef IProviderPlugin* (*PluginFactoryFunc)(const QString& constructionString);
+
 /// Stores the passed plugin name and construction paramater, then
 /// moves into the main thread and queues a constructPlugin call.
 Provider::Provider(const QString &plugin, const QString &constructionString)
@@ -111,7 +114,23 @@ void Provider::constructPlugin()
 {
     if (pluginName == "contextkit-dbus") {
         plugin = contextKitPluginFactory(constructionString);
-    } else ; // FIXME: implement plugin system in the else branch
+    }
+    else {
+        QLibrary library(pluginName);
+        library.load();
+        if (library.isLoaded() == false) {
+            contextCritical() << "Error loading library:" << library.errorString();
+        }
+        else {
+            PluginFactoryFunc factory = (PluginFactoryFunc) library.resolve("pluginFactory");
+            if (factory) {
+                contextDebug() << "Resolved factory function";
+                plugin = factory(constructionString);
+            } else {
+                contextCritical() << "Cannot resolve factory function pluginFactory";
+            }
+        }
+    }
 
     if (plugin == 0) {
         pluginState = FAILED;
