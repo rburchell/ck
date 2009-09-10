@@ -32,16 +32,9 @@ import os
 import signal
 import re
 import time
-
 import unittest
 from subprocess import Popen, PIPE
-
-def timeoutHandler(signum, frame):
-    raise Exception('tests has been running for too long')
-
-class Callable:
-    def __init__(self, anycallable):
-        self.__call__ = anycallable
+from cltool import CLTool
 
 class Asynchronous(unittest.TestCase):
     def startProvider(busname, args):
@@ -51,15 +44,7 @@ class Asynchronous(unittest.TestCase):
         print >>ret.stdin, "info()"
         ret.stdout.readline().rstrip()
         return ret
-    startProvider = Callable(startProvider)
-
-    def wanted(name, type, value):
-        return "%s = %s:%s" % (name, type, value)
-    wanted = Callable(wanted)
-
-    def wantedUnknown(name):
-        return "%s is Unknown" % (name)
-    wantedUnknown = Callable(wantedUnknown)
+    startProvider = staticmethod(startProvider)
 
     #SetUp
     def setUp(self):
@@ -97,20 +82,19 @@ class Asynchronous(unittest.TestCase):
         """
 
         # check the fast property
-        self.context_client = Popen(["context-listen", "test.fast", "test.slow"],
-                                    stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        self.context_client = CLTool("context-listen", "test.fast", "test.slow")
 
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.fast", "int", "42"),
-                         "Bad value for the fast property")
+        self.assert_(self.context_client.expect(CLTool.STDOUT,
+                                                CLTool.wanted("test.fast", "int", "42"),
+                                                1), # timeout == 1 second
+                     "Bad value for the fast property, wanted 42, communication:")
         fast_time = time.time()
 
         # check the slow property
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.slow", "int", "42"),
-                         "Bad value for the slow property")
+        self.assert_(self.context_client.expect(CLTool.STDOUT,
+                                                CLTool.wanted("test.slow", "int", "42"),
+                                                10), # timeout == 10 second max, but 3 is enough usually
+                     "Bad value for the slow property, wanted 42, communication:")
         slow_time = time.time()
 
         self.assert_(slow_time - fast_time > 2.0,
@@ -129,9 +113,6 @@ def runTests():
     result = unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
     return len(result.errors + result.failures)
 
-
 if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
-    signal.signal(signal.SIGALRM, timeoutHandler)
-    signal.alarm(10)
     sys.exit(runTests())
