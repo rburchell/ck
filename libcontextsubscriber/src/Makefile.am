@@ -1,21 +1,22 @@
 lib_LTLIBRARIES = libcontextsubscriber.la
 libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
-	  contextproperty.h propertyhandle.cpp propertyhandle.h		\
-	  provider.cpp provider.h safedbuspendingcallwatcher.h		\
-	  subscriberinterface.h subscriberinterface.cpp			\
-	  contextpropertyinfo.cpp contextpropertyinfo.h			\
-	  contextregistryinfo.cpp contextregistryinfo.h infobackend.h	\
-	  infobackend.cpp infoxmlbackend.h infoxmlbackend.cpp		\
-	  infoxmlkeysfinder.h infoxmlkeysfinder.cpp infokeydata.h	\
-	  cdbwriter.h cdbwriter.cpp cdbreader.cpp cdbreader.h		\
-	  infocdbbackend.cpp infocdbbackend.h dbusnamelistener.h	\
-	  dbusnamelistener.cpp handlesignalrouter.cpp			\
-	  handlesignalrouter.h queuedinvoker.cpp queuedinvoker.h	\
-	  loggingfeatures.h bluezinterface.h bluezinterface.cpp		\
-	  contextkitplugin.h contextkitplugin.cpp iproviderplugin.h
+	contextproperty.h propertyhandle.cpp propertyhandle.h		\
+	provider.cpp provider.h safedbuspendingcallwatcher.h		\
+	subscriberinterface.h subscriberinterface.cpp			\
+	contextpropertyinfo.cpp contextpropertyinfo.h			\
+	contextregistryinfo.cpp contextregistryinfo.h infobackend.h	\
+	infobackend.cpp infoxmlbackend.h infoxmlbackend.cpp		\
+	infoxmlkeysfinder.h infoxmlkeysfinder.cpp infokeydata.h		\
+	cdbwriter.h cdbwriter.cpp cdbreader.cpp cdbreader.h		\
+	infocdbbackend.cpp infocdbbackend.h dbusnamelistener.h		\
+	dbusnamelistener.cpp handlesignalrouter.cpp			\
+	handlesignalrouter.h queuedinvoker.cpp queuedinvoker.h		\
+	loggingfeatures.h bluezinterface.h bluezinterface.cpp		\
+	contextkitplugin.h contextkitplugin.cpp iproviderplugin.h
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
-includecontextsubscriber_HEADERS = contextproperty.h contextpropertyinfo.h contextregistryinfo.h
+includecontextsubscriber_HEADERS = contextproperty.h			\
+	contextpropertyinfo.h contextregistryinfo.h iproviderplugin.h
 
 AM_CXXFLAGS = -I$(top_srcdir)/common \
 	      $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
