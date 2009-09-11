@@ -25,6 +25,7 @@
 #include "sconnect.h"
 #include "contextkitplugin.h"
 #include "logging.h"
+#include "loggingfeatures.h"
 #include <QTimer>
 #include <QMutexLocker>
 #include <QCoreApplication>
@@ -110,23 +111,45 @@ Provider::Provider(const QString &plugin, const QString &constructionString)
 /// up with the name of the function).
 void Provider::constructPlugin()
 {
+    contextDebug() << F_PLUGINS;
     if (pluginName == "contextkit-dbus") {
         plugin = contextKitPluginFactory(constructionString);
     }
     else {
-        QLibrary library(pluginName);
-        library.load();
-        if (library.isLoaded() == false) {
-            contextCritical() << "Error loading library:" << library.errorString();
+        // Require the plugin name to start with /
+        if (pluginName.startsWith("/")) {
+
+            // Enable overriding the plugin location with an environment variable
+            const char *pluginPath = getenv("CONTEXT_SUBSCRIBER_PLUGINS");
+            if (! pluginPath)
+                pluginPath = DEFAULT_CONTEXT_SUBSCRIBER_PLUGINS;
+
+            QString pluginFilename(pluginPath);
+            // Allow pluginPath to have a trailing / or not
+            if (pluginFilename.endsWith("/")) {
+                pluginFilename.chop(1);
+            }
+
+            pluginFilename.append(pluginName);
+
+            QLibrary library(pluginFilename);
+            library.load();
+
+            if (library.isLoaded()) {
+                PluginFactoryFunc factory = (PluginFactoryFunc) library.resolve("pluginFactory");
+                if (factory) {
+                    contextDebug() << "Resolved factory function";
+                    plugin = factory(constructionString);
+                } else {
+                    contextCritical() << "Error resolving function pluginFactory from plugin" << pluginFilename;
+                }
+            }
+            else {
+                contextCritical() << "Error loading plugin" << pluginFilename << ":" << library.errorString();
+            }
         }
         else {
-            PluginFactoryFunc factory = (PluginFactoryFunc) library.resolve("pluginFactory");
-            if (factory) {
-                contextDebug() << "Resolved factory function";
-                plugin = factory(constructionString);
-            } else {
-                contextCritical() << "Cannot resolve factory function pluginFactory";
-            }
+            contextCritical() << "Illegal plugin name" << pluginName << ", doesn't start with /";
         }
     }
 
