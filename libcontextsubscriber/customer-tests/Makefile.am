@@ -1,4 +1,5 @@
 SUBDIRS = update-contextkit-providers testplugins
+CHECKSUBDIRS = update-contextkit-providers
 
 libcontextsubscribertestsdir = $(datadir)/libcontextsubscriber-tests
 libcontextsubscribertests_DATA = tests.xml
@@ -6,7 +7,7 @@ libcontextsubscribertests_DATA = tests.xml
 check-customer:
 	$(MAKE) -C $(top_srcdir) all
 	./runTests.sh
-	for i in $(SUBDIRS); do	$(MAKE) -C $$i $@; done
+	for i in $(CHECKSUBDIRS); do	$(MAKE) -C $$i $@; done
 
 CLEANFILES = *.pyc
 
