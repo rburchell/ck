@@ -50,6 +50,7 @@ signals:
     void providerDBusTypeChanged(QDBusConnection::BusType newBusType);
     void typeChanged(QString newType);
     void existsChanged(bool exists);
+    void pluginChanged(QString, QString);
 
 public:
     // For the test program
