@@ -83,6 +83,12 @@ PropertyHandle::PropertyHandle(const QString& key)
     // done before calling updateProvider.
     myInfo = new ContextPropertyInfo(myKey, this);
 
+    // Start listening to changes in property introspection (e.g., added to registry, plugin changes)
+    sconnect(myInfo, SIGNAL(existsChanged(bool)),
+             this, SLOT(updateProvider()));
+    sconnect(myInfo, SIGNAL(pluginChanged(QString, QString)),
+             this, SLOT(updateProvider()));
+
     // Start listening for the context commander, and also initiate a
     // NameHasOwner check.
 
@@ -103,9 +109,6 @@ PropertyHandle::PropertyHandle(const QString& key)
     // Otherwise, delay connecting to the provider until we know
     // whether commander is present.
 
-    // Start listening to changes in property registry (e.g., new keys, keys removed)
-    sconnect(ContextRegistryInfo::instance(), SIGNAL(keysChanged(const QStringList&)),
-             this, SLOT(updateProvider()));
 
     // Move the PropertyHandle (and all children) to main thread.
     moveToThread(QCoreApplication::instance()->thread());
@@ -127,6 +130,7 @@ void PropertyHandle::setTypeCheck(bool typeCheck)
 void PropertyHandle::updateProvider()
 {
     Provider *newProvider;
+    contextDebug() << F_PLUGINS;
 
     if (commandingEnabled && commanderListener->isServicePresent() == DBusNameListener::Present) {
         // If commander is present it should be able to override the
@@ -139,6 +143,7 @@ void PropertyHandle::updateProvider()
         if (myInfo->exists()) {
             // If myInfo knows the current provider which should be
             // connected to, connect to it.
+            contextDebug() << F_PLUGINS << "Key exists";
             newProvider = Provider::instance(myInfo->plugin(),
                                              myInfo->constructionString());
         } else {
@@ -146,6 +151,8 @@ void PropertyHandle::updateProvider()
             // This way, we can still continue communicating with the
             // provider even though the key is no longer in the
             // registry.
+            contextDebug() << F_PLUGINS << "Key doesn't exist -> keep old provider info";
+
             newProvider = myProvider;
 
             if (newProvider == 0) {
