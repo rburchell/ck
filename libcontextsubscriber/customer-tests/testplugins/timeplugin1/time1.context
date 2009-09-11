@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<provider xmlns="http://contextkit.freedesktop.org/Provider" plugin="libcontextsubscribertime1" constructionString="time">
+  <key name="Test.Time"><type>STRING</type></key> 
+</provider>
