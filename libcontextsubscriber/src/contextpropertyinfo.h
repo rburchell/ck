@@ -85,6 +85,14 @@ signals:
     /// signal you can wait (watch) for various keys to become available.
     /// \param exists The new state of the key.
     void existsChanged(bool exists);
+
+    /// Emitted when the libcontextsubscriber plugin providing the key
+    /// changes, or the construction parameter to give to the plugin
+    /// changes.. The \a plugin is the name of the new plugin
+    /// providing the key and the \a constructionString is the new
+    /// construction parameter to give to the plugin.
+    void pluginChanged(QString plugin, QString constructionString);
+
 };
 
 #endif // CONTEXTPROPERTYINFO_H
