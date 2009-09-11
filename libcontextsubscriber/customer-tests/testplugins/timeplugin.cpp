@@ -27,7 +27,7 @@
 #include <QDateTime>
 
 /// The factory method for constructing the IPropertyProvider instance.
-IProviderPlugin* pluginFactory(const QString& /*constructionString*/)
+IProviderPlugin* pluginFactory(QString /*constructionString*/)
 {
     // Note: it's the caller's responsibility to delete the plugin if
     // needed.
@@ -42,8 +42,10 @@ TimePlugin::TimePlugin()
     prefix = TIME_PLUGIN_PREFIX;
     timer.setInterval(2000);
     sconnect(&timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
-    sconnect(this, SIGNAL(emitReady()), this, SLOT(onEmitReady()), Qt::QueuedConnection);
-    emit emitReady();
+    QTimer *t = new QTimer(this);
+    sconnect(t, SIGNAL(timeout()), this, SLOT(emitReady()), Qt::QueuedConnection);
+    t.setSingleShot(true);
+    t.setInterval(0);
 }
 
 void TimePlugin::subscribe(QSet<QString> keys)
@@ -60,7 +62,7 @@ void TimePlugin::unsubscribe(QSet<QString> keys)
     timer.stop();
 }
 
-void TimePlugin::onEmitReady()
+void TimePlugin::emitReady()
 {
     contextDebug();
     emit ready();
@@ -73,4 +75,3 @@ void TimePlugin::onTimeout()
 }
 
 } // end namespace
-

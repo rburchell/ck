@@ -32,7 +32,7 @@ This is a test plugin for customer tests.
 using ContextSubscriber::IProviderPlugin;
 
 extern "C" {
-    IProviderPlugin* pluginFactory(const QString& constructionString);
+    IProviderPlugin* pluginFactory(QString constructionString);
 }
 
 namespace ContextSubscriberTime
@@ -47,11 +47,8 @@ public:
     virtual void subscribe(QSet<QString> keys);
     virtual void unsubscribe(QSet<QString> keys);
 
-signals:
-    void emitReady();
-
 private slots:
-    void onEmitReady();
+    void emitReady();
     void onTimeout();
 
 private:

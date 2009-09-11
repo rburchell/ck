@@ -42,6 +42,8 @@ signals:
     void valueChanged(QString key, QVariant value);
 };
 
+typedef IProviderPlugin* (*PluginFactoryFunc)(QString constructionString);
+
 }
 
 #endif

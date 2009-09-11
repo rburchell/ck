@@ -92,8 +92,6 @@ namespace ContextSubscriber {
   \brief Emitted when the subscription procedure for \c keys finished
   (either succeeded, either failed) */
 
-typedef IProviderPlugin* (*PluginFactoryFunc)(const QString& constructionString);
-
 /// Stores the passed plugin name and construction paramater, then
 /// moves into the main thread and queues a constructPlugin call.
 Provider::Provider(const QString &plugin, const QString &constructionString)

@@ -62,6 +62,10 @@ AC_CONFIG_FILES([
         libcontextsubscriber/contextsubscriber-1.0.pc
         libcontextsubscriber/customer-tests/Makefile
         libcontextsubscriber/customer-tests/update-contextkit-providers/Makefile
+        libcontextsubscriber/customer-tests/bluez-plugin/Makefile
+        libcontextsubscriber/customer-tests/testplugins/Makefile
+        libcontextsubscriber/customer-tests/testplugins/timeplugin1/Makefile
+        libcontextsubscriber/customer-tests/testplugins/timeplugin2/Makefile
         libcontextsubscriber/doc/Makefile
         libcontextsubscriber/man/Makefile
         libcontextsubscriber/src/Makefile
@@ -83,10 +87,6 @@ AC_CONFIG_FILES([
         libcontextsubscriber/unit-tests/provider/Makefile
         libcontextsubscriber/unit-tests/infoxmlkeysfinder/Makefile
         libcontextsubscriber/unit-tests/util/Makefile
-        libcontextsubscriber/customer-tests/bluez-plugin/Makefile
-        libcontextsubscriber/customer-tests/testplugins/Makefile
-        libcontextsubscriber/customer-tests/testplugins/timeplugin1/Makefile
-        libcontextsubscriber/customer-tests/testplugins/timeplugin2/Makefile
         libcontextsubscriber/multithreading-tests/Makefile
         libcontextsubscriber/multithreading-tests/new-property-in-thread/Makefile
         libcontextsubscriber/multithreading-tests/old-property-in-thread/Makefile
