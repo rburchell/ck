@@ -4,7 +4,7 @@
 #export DH_VERBOSE=1
 
 Makefile:
-	./configure --prefix /usr --sysconfdir=/etc --disable-vala --disable-doc --disable-coverage
+	./configure --prefix /usr --sysconfdir=/etc --disable-doc --disable-coverage \
 
 build: build-stamp
 build-stamp: Makefile
