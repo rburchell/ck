@@ -44,8 +44,9 @@ TimePlugin::TimePlugin()
     sconnect(&timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
     QTimer *t = new QTimer(this);
     sconnect(t, SIGNAL(timeout()), this, SLOT(emitReady()), Qt::QueuedConnection);
-    t.setSingleShot(true);
-    t.setInterval(0);
+    t->setSingleShot(true);
+    t->setInterval(0);
+    t->start();
 }
 
 void TimePlugin::subscribe(QSet<QString> keys)
