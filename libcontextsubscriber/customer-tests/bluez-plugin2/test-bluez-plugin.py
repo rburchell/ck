@@ -53,6 +53,8 @@ class BluezPlugin(unittest.TestCase):
 
         def setUp(self):
                 os.environ["CONTEXT_PROVIDERS"] = "."
+                os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] = "../../plugins/bluez/.libs/"
+                # FIXME: this won't work in the test package...
 
                 # Make Bluetooth invisible and un-enabled
                 # Note: This test will alter the bluetooth settings of the system!

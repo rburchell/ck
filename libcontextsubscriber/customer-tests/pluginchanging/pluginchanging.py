@@ -46,13 +46,22 @@ def stdoutRead (object,lines):
 class Subscription(unittest.TestCase):
 
 	def setUp(self):
+		print "set up"
 		os.environ["CONTEXT_PROVIDERS"] = "."
+		# We need 2 plugins which are in separate directories.
+		os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] = "."
+		os.system('cp ../testplugins/timeplugin1/.libs/libcontextsubscribertime1.so.* .')
+		os.system('cp ../testplugins/timeplugin2/.libs/libcontextsubscribertime2.so.* .')
+
 
 		self.context_client = Popen(["context-listen","Test.Time"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
 	def tearDown(self):
+		print "tear down"
+
 		proc_kill(self.context_client.pid)
 		os.remove('time.context')
+		os.remove('libcontextsubscribertime*.so.*')
 
 	def testChangingPlugin(self):
 

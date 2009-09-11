@@ -7,9 +7,8 @@ export PYTHONPATH="`pwd`/common/"
 if pkg-config contextprovider-1.0 || [ -e ../../libcontextprovider/src/.libs/libcontextprovider.so ]
 then
 	export CONTEXT_PROVIDERS=.
-	export LD_LIBRARY_PATH=../../src/.libs:../../../libcontextprovider/src/.libs:../testplugins/timeplugin1/.libs:../testplugins/timeplugin2/.libs
+	export LD_LIBRARY_PATH=../../src/.libs:../../../libcontextprovider/src/.libs
 	export PATH=$PATH:../../../python:../../cli:../../reg-cli
-	export CONTEXT_SUBSCRIBER_PLUGINS=../../plugins/bluez/.libs/
 
 	for dir in $DIRS; do
 		cd $dir
