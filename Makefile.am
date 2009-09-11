@@ -1,4 +1,4 @@
-DISTCHECK_CONFIGURE_FLAGS = --disable-doc --disable-vala --disable-coverage
+DISTCHECK_CONFIGURE_FLAGS = --disable-doc --disable-coverage
 
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4
@@ -16,9 +16,11 @@ DISTCLEANFILES = lcov.info lcov.html
 MAINTAINERCLEANFILES = INSTALL
 
 check-sum:
+	$(MAKE) -C libcontextprovider/unit-tests check-sum
 	$(MAKE) -C libcontextsubscriber/unit-tests check-sum
 
 check-customer:
+	$(MAKE) -C libcontextprovider/customer-tests check-customer
 	$(MAKE) -C libcontextsubscriber/customer-tests check-customer
 
 coverage: covoptioncheck

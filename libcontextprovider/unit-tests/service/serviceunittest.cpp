@@ -61,6 +61,10 @@ void ServiceBackend::setAsDefault()
     defaultService = this;
 }
 
+void ServiceBackend::setRegisterService(bool reg)
+{
+}
+
 void ServiceBackend::ref()
 {
 }
