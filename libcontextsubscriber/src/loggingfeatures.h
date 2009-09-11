@@ -26,5 +26,6 @@
 #define F_XML       (ContextFeature("xml"))
 #define F_CDB       (ContextFeature("cdb"))
 #define F_DESTROY   (ContextFeature("destroy"))
+#define F_PLUGINS   (ContextFeature("plugins"))
 
 #endif
