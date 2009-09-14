@@ -642,4 +642,47 @@ should not try to interpret this string, it is only meant to be
 displayed as a reminder to the user.
     </doc>
   </key>
+  <doc>
+Session
+-------
+
+Information about the current user session.  If there is no current
+session, all values are null.
+  </doc>
+  <key name="Session.State">
+    <type>
+      <string-enum>
+        <starting/>
+        <running/>
+        <suspended/>
+        <eclipsed/>
+        <terminating/>
+      </string-enum>
+    </type>
+    <doc>
+The state of the current session, as string valued enumeration.  When
+a session is started, it remains in the "starting" state until it is
+fully ready and the system is idle again.  It then changes between
+"running", "suspended", and "eclipsed" as explained below until it
+shuts down and is in the "terminating" state.
+
+The session is in the "running" state when the normal desktop UI
+components such as the panel, desktop icons, taskbars, notification
+areas and status menus are available to the user.
+
+The session goes to the "suspended" state when the user stops
+interacting with it.  The screen is typically blanked when the session
+is suspended.  In general, there is no point in trying to interact
+with the user when the session is suspended.
+
+The session is in the "eclipsed" state when the complete screen has
+been given to some other application, such as full-screen video
+playback.  In that state, the notification areas and status menus, etc
+of the desktop aren't visible to the user, of course, and
+notifications should be unintrusive and important.
+
+Applications should be prepared to see all states in any kind of order
+without getting confused.
+    </doc>
+  </key>
 </properties>

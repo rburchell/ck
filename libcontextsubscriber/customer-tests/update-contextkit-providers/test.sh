@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+export CONTEXT_CORE_DECLARATIONS=.
+export CONTEXT_PROVIDERS=.
+
 # Remove all temp files
 function clean {
     `rm -f *.actual`
