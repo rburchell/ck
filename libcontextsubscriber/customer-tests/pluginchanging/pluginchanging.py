@@ -35,7 +35,7 @@ def proc_kill(pid):
 	os.system('../common/rec-kill.sh %d' % pid)
 
 def timeoutHandler(signum, frame):
-	raise Exception('tests has been running for too long')
+	raise Exception('tests have been running for too long')
 
 def stdoutRead (object,lines):
 	list = []
@@ -46,12 +46,11 @@ def stdoutRead (object,lines):
 class Subscription(unittest.TestCase):
 
 	def setUp(self):
-		print "set up"
 		os.environ["CONTEXT_PROVIDERS"] = "."
 		# We need 2 plugins which are in separate directories.
 		os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] = "."
-		os.system('cp ../testplugins/timeplugin1/.libs/libcontextsubscribertime1.so.* .')
-		os.system('cp ../testplugins/timeplugin2/.libs/libcontextsubscribertime2.so.* .')
+		os.system('cp ../testplugins/timeplugin1/.libs/libcontextsubscribertime1.so* .')
+		os.system('cp ../testplugins/timeplugin2/.libs/libcontextsubscribertime2.so* .')
 
 
 		self.context_client = Popen(["context-listen","Test.Time"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
@@ -61,14 +60,16 @@ class Subscription(unittest.TestCase):
 
 		proc_kill(self.context_client.pid)
 		os.remove('time.context')
-		os.remove('libcontextsubscribertime*.so.*')
+		os.system('rm libcontextsubscribertime*.so*')
 
 	def testChangingPlugin(self):
 
 		# Copy the declaration file, declaring libcontextsubscribertime1 plugin.
 		os.system('cp time1.context.temp time.context.temp')
 		os.system('mv time.context.temp time.context')
+		#print "now reading"
 		actual = self.context_client.stdout.readline().rstrip()
+		#print actual
 
 		# The client got a value provided by the libcontextsubscribertime1
 		self.assertEqual(actual.startswith("Test.Time = QString:Time1: "), True, "Got: %s" % actual)
