@@ -1,4 +1,4 @@
-SUBDIRS = src plugins unit-tests customer-tests multithreading-tests cli reg-cli update-contextkit-providers doc man
+SUBDIRS = src unit-tests customer-tests multithreading-tests cli reg-cli update-contextkit-providers doc man
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextsubscriber-1.0.pc

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd $(dirname $0)
-DIRS="commander subscription asynchronicity registry bluez-plugin2 pluginchanging"
+DIRS="commander subscription asynchronicity registry pluginchanging"
 export PYTHONPATH="`pwd`/common/"
 
 if pkg-config contextprovider-1.0 || [ -e ../../libcontextprovider/src/.libs/libcontextprovider.so ]

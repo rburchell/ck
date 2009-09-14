@@ -62,15 +62,12 @@ AC_CONFIG_FILES([
         libcontextsubscriber/contextsubscriber-1.0.pc
         libcontextsubscriber/customer-tests/Makefile
         libcontextsubscriber/customer-tests/update-contextkit-providers/Makefile
-        libcontextsubscriber/customer-tests/bluez-plugin/Makefile
         libcontextsubscriber/customer-tests/testplugins/Makefile
         libcontextsubscriber/customer-tests/testplugins/timeplugin1/Makefile
         libcontextsubscriber/customer-tests/testplugins/timeplugin2/Makefile
         libcontextsubscriber/doc/Makefile
         libcontextsubscriber/man/Makefile
         libcontextsubscriber/src/Makefile
-        libcontextsubscriber/plugins/Makefile
-        libcontextsubscriber/plugins/bluez/Makefile
         libcontextsubscriber/unit-tests/Makefile
         libcontextsubscriber/unit-tests/cdbreader/Makefile
         libcontextsubscriber/unit-tests/cdbwriter/Makefile
