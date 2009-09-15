@@ -49,7 +49,7 @@ public:
     void stop();
     void restart();
 
-    void setRegisterService(bool reg);
+    void setConnection(const QDBusConnection &connection);
     void setAsDefault();
     void setValue(const QString &key, const QVariant &val);
     Manager *manager();
