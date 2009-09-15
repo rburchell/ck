@@ -233,6 +233,12 @@ void Service::setValue(const QString &key, const QVariant &val)
     priv->backend->manager()->setKeyValue(key, val);
 }
 
+/// Set (override) the dbus \a connection to use by the Service. When the
+/// dbus connection is specified using this function the service is NOT
+/// automatically registered on the bus. It's ok to call this function many times
+/// as long as the connection name is the same all the time. It's NOT
+/// okay to call this function more than one time with connections with
+/// different names.
 void Service::setConnection(const QDBusConnection &connection)
 {
     priv->backend->setConnection(connection);
