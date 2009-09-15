@@ -43,7 +43,7 @@ public:
     static ServiceBackend *defaultService;
 
     void setAsDefault();
-    void setRegisterService(bool reg);
+    void setConnection(const QDBusConnection &connection);
 
     void ref();
     void unref();
