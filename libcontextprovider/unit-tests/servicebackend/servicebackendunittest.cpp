@@ -33,7 +33,9 @@ struct ContextProvider::ServiceBackendPrivate {
     QString busName;
     Manager *manager;
     QDBusConnection *connection;
+    QDBusConnection *implicitConnection;
     int refCount;
+    bool registeredService;
 };
 
 QString *lastKey = NULL;
@@ -83,6 +85,7 @@ private slots:
     void refCouting();
     void manager();
     void startAndStop();
+    void setConnection();
 
 private:
     ServiceBackend *serviceBackend;
@@ -160,6 +163,11 @@ void ServiceBackendUnitTest::setValue()
     QCOMPARE(lastValue->toInt(), 99);
 }
 
+void ServiceBackendUnitTest::setConnection()
+{
+    serviceBackend->setConnection(QDBusConnection::sessionBus());
+    QCOMPARE(serviceBackend->priv->implicitConnection->name(), QDBusConnection::sessionBus().name());
+}
 
 #include "servicebackendunittest.moc"
 QTEST_MAIN(ServiceBackendUnitTest);
