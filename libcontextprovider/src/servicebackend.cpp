@@ -104,8 +104,13 @@ void ServiceBackend::setValue(const QString &key, const QVariant &val)
 /// different names.
 void ServiceBackend::setConnection(const QDBusConnection &connection)
 {
+    if (priv->connection && priv->connection->name() == connection.name()) {
+        // Silently exit
+        return;
+    }
+
     if (priv->connection) {
-        contextWarning() << F_SERVICE_BACKEND << "Can't set connection while service running!";
+        contextWarning() << F_SERVICE_BACKEND << "Trying to change connection while service backed running!";
         return;
     }
 
