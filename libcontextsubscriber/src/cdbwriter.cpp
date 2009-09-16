@@ -31,10 +31,11 @@
 
     \brief A wrapper class to write data (create) tiny-cdb databases.
 
-    This class is not a part of the public API.
-    The writer operates only on strings. String values can be associated with string keys.
-    Several operations are supported - ading, replacing and inserting. Those operations differ
-    in how they handle existing keys with same name.
+    This class is not a part of the public API.  The writer operates
+    on string-qvariant pairs. QVariant values can be associated with
+    string keys.  Several operations are supported - adding, replacing
+    and inserting. Those operations differ in how they handle existing
+    keys with same name.
 
     The writer automatically cloes the filesystem resource on destruction but
     can be also closed manually. Writing to a closed writer has no effect.
@@ -87,7 +88,7 @@ CDBWriter::~CDBWriter()
 /// for this key already exists, another one is added.
 /// \param key Key name as string.
 /// \param val Value as string.
-void CDBWriter::add(const QString &key, const QString &val)
+void CDBWriter::add(const QString &key, const QVariant &val)
 {
     put(key, val, CDB_PUT_ADD);
 }
@@ -96,7 +97,7 @@ void CDBWriter::add(const QString &key, const QString &val)
 /// for this key already exists, nothing is done.
 /// \param key Key name as string.
 /// \param val Value as string.
-void CDBWriter::insert(const QString &key, const QString &val)
+void CDBWriter::insert(const QString &key, const QVariant &val)
 {
     put(key, val, CDB_PUT_INSERT);
 }
@@ -106,7 +107,7 @@ void CDBWriter::insert(const QString &key, const QString &val)
 /// new one.
 /// \param key Key name as string.
 /// \param val Value as string.
-void CDBWriter::replace(const QString &key, const QString &val)
+void CDBWriter::replace(const QString &key, const QVariant &val)
 {
     put(key, val, CDB_PUT_REPLACE);
 }
@@ -145,22 +146,23 @@ bool CDBWriter::isWritable()
 /// Puts a new \a key with value \a val into the database. Depending
 /// on the \a flag the key is added, inserted or replaced. The public
 /// methods of this class are wrapperes of this method with proper flags.
-void CDBWriter::put(const QString &key, const QString &val, int flag)
+void CDBWriter::put(const QString &key, const QVariant &val, int flag)
 {
     if (! cdbm)
         return;
 
     QByteArray keyUtf8Data = key.toUtf8();
-    QByteArray valUtf8Data = val.toUtf8();
-
     int klen = keyUtf8Data.size();
     const char *kval = keyUtf8Data.constData();
-    int vlen = valUtf8Data.size();
-    const char *vval = valUtf8Data.constData();
+
+    QByteArray valArray;
+    QDataStream ds(&valArray, QIODevice::Truncate | QIODevice::WriteOnly);
+    ds << val;
+    int vlen = valArray.size();
+    const char *vval = valArray.constData();
 
     cdb_make_put((struct cdb_make *) cdbm,
                  kval, klen,
                  vval, vlen,
                  (cdb_put_mode) flag);
 }
-

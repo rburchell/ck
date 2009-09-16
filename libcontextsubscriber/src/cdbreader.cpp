@@ -23,7 +23,9 @@
 #include <cdb.h>
 #include <fcntl.h>
 #include <QDebug>
+#include <QByteArray>
 #include <QFile>
+#include <QDataStream>
 #include "cdbreader.h"
 #include "logging.h"
 #include "loggingfeatures.h"
@@ -34,12 +36,13 @@
 
     \brief A wrapper class to read data from a tiny-cdb database.
 
-    This class is not a part of the public API.
-    The reader operates only on strings and can read a string value for a string key
-    or a list of string values for a string key. The reader automatically closes the
-    underlying filesystem resource on destruction but can be also closed manually.
+    This class is not a part of the public API.  The reader operates
+    on string-qvariant pairs: can read a qvariant value for a string
+    key or a list of qvariant values for a string key. The reader
+    automatically closes the underlying filesystem resource on
+    destruction but can be also closed manually.
 
-    Reading from a closed reader with return empty strings.
+    Reading from a closed reader will return empty strings.
 */
 
 /// Constructs a new CDBReader reading from cdb database at \a dbpath
@@ -84,7 +87,7 @@ void CDBReader::reopen()
     if (! QFile::exists(path))
         return;
 
-    fd = open(path.toUtf8().constData(), O_RDONLY);
+    fd = open(path.toLocal8Bit().constData(), O_RDONLY);
 
     if (fd > 0) {
         cdb = calloc(1, sizeof(struct cdb));
@@ -95,45 +98,16 @@ void CDBReader::reopen()
     }
 }
 
-/// Returns a string value for the given \a key.
-/// First value is returned if there are many values for one key.
-/// \param key The key name in the database.
-QString CDBReader::valueForKey(const QString &key) const
-{
-    if (! cdb) {
-        contextDebug() << F_CDB << "Trying to read value key:" << key << "from database that is closed!";
-        return "";
-    }
-
-    QByteArray utf8Data = key.toUtf8();
-    unsigned int klen = utf8Data.size();
-    const char *kval = utf8Data.constData();
-
-    if (cdb_find((struct cdb*) cdb, kval, klen)) {
-        unsigned int vpos = cdb_datapos((struct cdb*) cdb);
-        unsigned int vlen = cdb_datalen((struct cdb*) cdb);
-        char *val = (char *) malloc(vlen + 1);
-        cdb_read((struct cdb*) cdb, val, vlen, vpos);
-        val[vlen] = 0;
-
-        QString str(val);
-        free(val);
-        return str;
-    } else
-        return "";
-}
-
 /// Returns all values associated with the given key from the database.
 /// \param key The key name in the database.
-QStringList CDBReader::valuesForKey(const QString &key) const
+QVariantList CDBReader::valuesForKey(const QString &key) const
 {
-    QStringList list;
-
     if (! cdb) {
         contextDebug() << F_CDB << "Trying to read values for key:" << key << "from database that is closed!";
-        return list;
+        return QVariantList();
     }
 
+    QVariantList list;
     QByteArray utf8Data = key.toUtf8();
     unsigned int klen = utf8Data.size();
     const char *kval = utf8Data.constData();
@@ -144,16 +118,27 @@ QStringList CDBReader::valuesForKey(const QString &key) const
     while(cdb_findnext(&cdbf) > 0) {
         unsigned int vpos = cdb_datapos((struct cdb*) cdb);
         unsigned int vlen = cdb_datalen((struct cdb*) cdb);
-        char *val = (char *) malloc(vlen + 1);
+        char *val = (char *) malloc(vlen);
         cdb_read((struct cdb*) cdb, val, vlen, vpos);
-        val[vlen] = 0;
-
-        QString str(val);
+        QByteArray valArray(val, vlen);
+        QDataStream ds(&valArray, QIODevice::ReadOnly);
+        QVariant valVariant;
+        ds >> valVariant;
+        list << valVariant;
         free(val);
-        list << str;
     }
 
     return list;
+}
+
+/// Returns a value for the given \a key.
+/// First value is returned if there are many values for one key.
+/// \param key The key name in the database.
+QVariant CDBReader::valueForKey(const QString &key) const
+{
+    QVariantList ret = valuesForKey(key);
+    if (ret.size() == 0) return QVariant();
+    return ret[0];
 }
 
 /// Returns the current state of the reader. Reader is not readable if

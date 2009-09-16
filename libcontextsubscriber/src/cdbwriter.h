@@ -23,6 +23,8 @@
 #define CDBWRITER_H
 
 #include <QObject>
+#include <QString>
+#include <QVariant>
 
 class CDBWriter : public QObject
 {
@@ -33,9 +35,9 @@ public:
     explicit CDBWriter(int fd, QObject *parent = 0);
     virtual ~CDBWriter();
 
-    void add(const QString &key, const QString &val);
-    void insert(const QString &key, const QString &val);
-    void replace(const QString &key, const QString &val);
+    void add(const QString &key, const QVariant &val);
+    void insert(const QString &key, const QVariant &val);
+    void replace(const QString &key, const QVariant &val);
     void close();
     bool isWritable();
     int fileDescriptor() const;
@@ -44,7 +46,7 @@ private:
     void *cdbm; ///< A cdb library structure used to read data.
     int fd; ///< A file descriptor pointing to the database.
 
-    void put(const QString &key, const QString &val, int flag);
+    void put(const QString &key, const QVariant &val, int flag);
 };
 
 #endif

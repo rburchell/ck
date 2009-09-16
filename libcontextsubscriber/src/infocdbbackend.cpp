@@ -46,7 +46,7 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
 {
     contextDebug() << F_CDB << "Initializing cdb backend with database:" << InfoCdbBackend::databasePath();
-    
+
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
 
@@ -59,41 +59,49 @@ QString InfoCdbBackend::name() const
     return QString("cdb");
 }
 
+QStringList InfoCdbBackend::variantListToStringList(const QVariantList &l)
+{
+    QStringList ret;
+    foreach (QVariant v, l)
+        ret << v.toString();
+
+    return ret;
+}
+
+
 QStringList InfoCdbBackend::listKeys() const
 {
-    return reader.valuesForKey("KEYS");
+    return variantListToStringList(reader.valuesForKey("KEYS"));
 }
 
 QStringList InfoCdbBackend::listKeysForPlugin(QString plugin) const
 {
-    return reader.valuesForKey(plugin + ":KEYS");
+    return variantListToStringList(reader.valuesForKey(plugin + ":KEYS"));
 }
 
 QStringList InfoCdbBackend::listPlugins() const
 {
-    return reader.valuesForKey("PLUGINS");
+    return variantListToStringList(reader.valuesForKey("PLUGINS"));
 }
 
 QString InfoCdbBackend::typeForKey(QString key) const
 {
-    return reader.valueForKey(key + ":KEYTYPE");
+    return reader.valueForKey(key + ":KEYTYPE").toString();
 }
 
 QString InfoCdbBackend::docForKey(QString key) const
 {
-    return reader.valueForKey(key + ":KEYDOC");
+    return reader.valueForKey(key + ":KEYDOC").toString();
 }
 
 QString InfoCdbBackend::pluginForKey(QString key) const
 {
-    // FIXME: support the old format
-    return reader.valueForKey(key + ":KEYPLUGIN");
+    return reader.valueForKey(key + ":KEYPLUGIN").toString();
 }
 
 QString InfoCdbBackend::constructionStringForKey(QString key) const
 {
-    // FIXME: support the old format
-    return reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING");
+    return reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING").toString();
 }
 
 /// Returns true if the database file is present.

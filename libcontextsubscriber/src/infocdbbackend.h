@@ -55,6 +55,7 @@ private:
     void watchPathOrDirectory();
     void watchDirectory();
     void watchPath();
+    static QStringList variantListToStringList(const QVariantList &l);
 
 private slots:
     void onDatabaseFileChanged(const QString &path);
