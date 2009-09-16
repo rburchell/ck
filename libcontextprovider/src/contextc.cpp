@@ -57,6 +57,10 @@ using namespace ContextProvider;
     keys ("Battery.OnBattery", "Battery.ChargePercentage") and sets their
     respective values.
 
+    Note: If the provider used other D-Bus bindings than QDBus, the
+    service name ("org.test.provider") needs to be unique, i.e., the
+    provider process should not register it itself.
+
     \section Callbacks
 
     The context_provider_install_key function and context_provider_install_group function

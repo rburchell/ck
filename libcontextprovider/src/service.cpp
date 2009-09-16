@@ -36,7 +36,7 @@ namespace ContextProvider {
 
   This library implements the provider side of the Context Framework.
   It has both a C++ and a C interface, so you can choose which you
-  prefer.
+  prefer. For the documentation of the C API, see \ref CApi.
 
   The C++ interface consists mainly of the three classes Service,
   Property, and Group in the namespace ContextProvider.  They are
