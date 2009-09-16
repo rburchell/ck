@@ -53,7 +53,7 @@ public:
     void setAsDefault();
 
     void setValue(const QString &key, const QVariant &val);
-    void setRegisterService(bool reg);
+    void setConnection(const QDBusConnection &connection);
 
 private:
     class ServicePrivate *priv;

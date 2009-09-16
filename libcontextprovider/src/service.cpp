@@ -233,12 +233,15 @@ void Service::setValue(const QString &key, const QVariant &val)
     priv->backend->manager()->setKeyValue(key, val);
 }
 
-/// Controls te service registration on dbus. If register service is set to
-/// true (by default) the service while be registered on dbus. Set to false
-//  if you want to reuse an existing service (ie. provided by piece of code).
-void Service::setRegisterService(bool r)
+/// Set (override) the dbus \a connection to use by the Service. When the
+/// dbus connection is specified using this function the service is NOT
+/// automatically registered on the bus. It's ok to call this function many times
+/// as long as the connection name is the same all the time. It's NOT
+/// okay to call this function more than one time with connections with
+/// different names.
+void Service::setConnection(const QDBusConnection &connection)
 {
-    priv->backend->setRegisterService(r);
+    priv->backend->setConnection(connection);
 }
 
 /// Start the Service again after it has been stopped.  All clients
