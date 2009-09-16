@@ -47,8 +47,9 @@ struct ServiceBackendPrivate {
     QString busName;
     Manager *manager;
     QDBusConnection *connection;
+    QDBusConnection *implicitConnection;
     int refCount;
-    bool registerService;
+    bool registeredService;
 };
 
 /// Creates new ServiceBackend. The backend automatically creates it's Manager.
@@ -63,8 +64,9 @@ ServiceBackend::ServiceBackend(QDBusConnection::BusType busType, const QString &
     priv->busName = busName;
     priv->manager = new Manager();
     priv->connection = NULL;
+    priv->implicitConnection = NULL;
     priv->refCount = 0;
-    priv->registerService = true;
+    priv->registeredService = false;
 }
 
 /// Destroys the ServiceBackend. The backend is stopped.
@@ -74,6 +76,7 @@ ServiceBackend::~ServiceBackend()
 {
     contextDebug() << F_SERVICE_BACKEND << F_DESTROY << "Destroying Service";
     stop();
+    delete priv->implicitConnection;
     delete priv;
     if (ServiceBackend::defaultServiceBackend == this)
         ServiceBackend::defaultServiceBackend = NULL;
@@ -93,26 +96,29 @@ void ServiceBackend::setValue(const QString &key, const QVariant &val)
     priv->manager->setKeyValue(key, val);
 }
 
-/// Controls te service registration on dbus. If register service is set to
-/// true (by default) the service while be registered on dbus. Set to false
-/// if you want to reuse an existing service (ie. provided by piece of code).
-/// This function will fail if requested behavior is different from the current
-/// behavior and the service is already running.
-void ServiceBackend::setRegisterService(bool r)
+/// Set (override) the dbus \a connection to use by the ServiceBackend. When the
+/// dbus connection is specified using this function the service is NOT
+/// automatically registered on the bus. It's ok to call this function many times
+/// as long as the connection name is the same all the time. It's NOT
+/// okay to call this function more than one time with connections with
+/// different names.
+void ServiceBackend::setConnection(const QDBusConnection &connection)
 {
-    if (priv->registerService == r)
+    if (priv->connection && priv->connection->name() == connection.name()) {
+        // Silently exit
         return;
-
-    // Complain ONLY when actually trying to change value. This is important
-    // for some black-box operation when you have no clue whetver you're starting
-    // the service or just reusing it (ie. plugins).
+    }
 
     if (priv->connection) {
-        contextWarning() << F_SERVICE_BACKEND << "Trying to set service registration while service running";
+        contextWarning() << F_SERVICE_BACKEND << "Trying to change connection while service backed running!";
         return;
-    } else {
-        priv->registerService = r;
     }
+
+    if (priv->implicitConnection && connection.name() != priv->implicitConnection->name()) {
+        contextWarning() << F_SERVICE_BACKEND << "Connection was already set/forced with different name!";
+        return;
+    } else
+        priv->implicitConnection = new QDBusConnection(connection);
 }
 
 /// Start the ServiceBackend again after it has been stopped.  All clients
@@ -123,15 +129,21 @@ bool ServiceBackend::start()
     if (priv->connection)
         return false;
 
-    priv->connection = new QDBusConnection(QDBusConnection::connectToBus(priv->busType, priv->busName));
-    ManagerAdaptor *managerAdaptor = new ManagerAdaptor(priv->manager, priv->connection);
+    if (priv->implicitConnection == NULL) {
+        priv->connection = new QDBusConnection(QDBusConnection::connectToBus(priv->busType, priv->busName));
 
-    // Register service
-    if (priv->registerService && !priv->connection->registerService(priv->busName)) {
-        contextCritical() << F_SERVICE_BACKEND << "Failed to register service with name" << priv->busName;
-        stop();
-        return false;
-    }
+        // Register service
+        if (!priv->connection->registerService(priv->busName)) {
+            contextCritical() << F_SERVICE_BACKEND << "Failed to register service with name" << priv->busName;
+            stop();
+            return false;
+        }
+
+        priv->registeredService = true;
+    } else
+        priv->connection = new QDBusConnection(*priv->implicitConnection);
+
+    ManagerAdaptor *managerAdaptor = new ManagerAdaptor(priv->manager, priv->connection);
 
     // Register object
     if (managerAdaptor && !priv->connection->registerObject("/org/freedesktop/ContextKit/Manager", priv->manager)) {
@@ -153,11 +165,13 @@ void ServiceBackend::stop()
 
     // Unregister
     priv->connection->unregisterObject("/org/freedesktop/ContextKit/Manager");
-    priv->connection->unregisterService(priv->busName);
+    if (priv->registeredService)
+        priv->connection->unregisterService(priv->busName);
 
     // Dealloc
     delete priv->connection;
     priv->connection = NULL;
+    priv->registeredService = false;
 }
 
 /// If the service is running, stop and start it again.

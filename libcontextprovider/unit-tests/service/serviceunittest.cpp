@@ -61,7 +61,7 @@ void ServiceBackend::setAsDefault()
     defaultService = this;
 }
 
-void ServiceBackend::setRegisterService(bool reg)
+void ServiceBackend::setConnection(const QDBusConnection &connection)
 {
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Nokia Corporation.
+ * Copyright (C) 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -18,14 +18,42 @@
  * 02110-1301 USA
  *
  */
- 
-#ifndef LOGGINGFEATURES_H
-#define LOGGINGFEATURES_H
 
-#define F_THREADS   (ContextFeature("threads"))
-#define F_XML       (ContextFeature("xml"))
-#define F_CDB       (ContextFeature("cdb"))
-#define F_DESTROY   (ContextFeature("destroy"))
-#define F_PLUGINS   (ContextFeature("plugins"))
+/*
+This is a test plugin for customer tests.
+*/
+
+#ifndef TIMEPLUGIN_H
+#define TIMEPLUGIN_H
+
+#include "iproviderplugin.h" // For IProviderPlugin definition
+#include <QTimer>
+
+using ContextSubscriber::IProviderPlugin;
+
+extern "C" {
+    IProviderPlugin* pluginFactory(QString constructionString);
+}
+
+namespace ContextSubscriberTime
+{
+
+class TimePlugin : public IProviderPlugin
+{
+    Q_OBJECT
+
+public:
+    explicit TimePlugin();
+    virtual void subscribe(QSet<QString> keys);
+    virtual void unsubscribe(QSet<QString> keys);
+
+private slots:
+    void onTimeout();
+
+private:
+    QTimer timer;
+    QString prefix;
+};
+}
 
 #endif

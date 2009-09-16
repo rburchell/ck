@@ -303,29 +303,48 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
     if (key != keyName)
         return;
 
+    // Update caches and store old values
+    QString oldType = cachedType;
     QString newType = InfoBackend::instance()->typeForKey(keyName);
-    if (cachedType != newType) {
+    cachedType = newType;
 
-        if (cachedType == "")
+    cachedDoc = InfoBackend::instance()->docForKey(keyName);
+
+    QString oldPlugin = cachedPlugin;
+    QString oldConstructionString = cachedConstructionString;
+    QString newPlugin = InfoBackend::instance()->pluginForKey(keyName);
+    QString newConstructionString = InfoBackend::instance()->constructionStringForKey(keyName);
+    cachedPlugin = newPlugin;
+    cachedConstructionString = newConstructionString;
+
+    // Release the lock before emitting the signals; otherwise
+    // listeners trying to access cached values would create a
+    // deadlock.
+    lock.unlock();
+
+    // Emit the needed signals
+    if (oldType != newType) {
+
+        if (oldType == "")
             emit existsChanged(true);
         if (newType == "")
             emit existsChanged(false);
 
-        cachedType = newType;
         emit typeChanged(cachedType);
     }
 
-    cachedDoc = InfoBackend::instance()->docForKey(keyName);
-
-    // TBD: obsolete the providerChanged signal and add pluginChanged or sth?
-    QString newPlugin = InfoBackend::instance()->pluginForKey(keyName);
-    if (cachedPlugin == "contextkit-dbus" || newPlugin == "contextkit-dbus") {
-        cachedPlugin = newPlugin;
-        cachedConstructionString = InfoBackend::instance()->constructionStringForKey(keyName);
-        QString newProvider = "";
-        if (newPlugin == "contextkit-dbus") {
-            newProvider = cachedConstructionString.split(":").last();
+    // TBD: obsolete the providerChanged & providerDBusTypeChanged signals?
+    if (oldPlugin != newPlugin || oldConstructionString != newConstructionString) {
+        if (oldPlugin == "contextkit-dbus" || newPlugin == "contextkit-dbus") {
+            QString newProvider = "";
+            if (newPlugin == "contextkit-dbus") {
+                newProvider = cachedConstructionString.split(":").last();
+            }
+            emit providerChanged(newProvider);
+            // Note: we don't emit providerDBusTypeChanged any
+            // more. It would be cumbersome, and there's no real use
+            // case for listening to it.
         }
-        emit providerChanged(newProvider);
+        emit pluginChanged(newPlugin, newConstructionString);
     }
 }

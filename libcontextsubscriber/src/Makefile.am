@@ -20,6 +20,7 @@ includecontextsubscriber_HEADERS = contextproperty.h			\
 
 AM_CXXFLAGS = -I$(top_srcdir)/common \
 	      $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
+	      '-DDEFAULT_CONTEXT_SUBSCRIBER_PLUGINS="@libdir@/contextkit/subscriber-plugins"' \
 	      '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"' \
 	      '-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"' \
 	      '-DCONTEXT_LOG_MODULE_NAME="libcontextsubscriber"'
@@ -27,7 +28,7 @@ AM_CXXFLAGS = -I$(top_srcdir)/common \
 $(top_builddir)/common/libcommon.la:
 	$(MAKE) -C $(top_builddir)/common libcommon.la
 
-LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS) 
+LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
 libcontextsubscriber_la_LIBADD=$(top_builddir)/common/libcommon.la
 
 .PHONY: $(top_builddir)/common/libcommon.la
@@ -40,3 +41,6 @@ include $(top_srcdir)/am/qt.am
 # because if you change configure parameter DEFAULT_CONTEXT_PROVIDERS,
 # you should do a recompile
 infocdbbackend.lo infoxmlbackend.lo: Makefile
+
+# and the same for DEFAULT_CONTEXT_SUBSCRIBER_PLUGINS
+provider.lo: Makefile

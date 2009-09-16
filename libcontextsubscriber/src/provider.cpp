@@ -25,16 +25,23 @@
 #include "sconnect.h"
 #include "contextkitplugin.h"
 #include "logging.h"
+#include "loggingfeatures.h"
 #include <QTimer>
 #include <QMutexLocker>
 #include <QCoreApplication>
 #include <QThread>
+#include <QLibrary>
 
 namespace ContextSubscriber {
 
 /*!
   \class IProviderPlugin
   \brief Interface for provider plugins.
+
+  Note: this interface is private, currently it is not advised to use
+  it and create ContextKit subscriber plugins on your own, we can and
+  will change this interface anytime in the future even between small
+  bugfix releases.
 
   Every Provider instance contains exactly one plugin (pointer) with
   this interface which is constructed on initialization time and never
@@ -45,7 +52,14 @@ namespace ContextSubscriber {
   unsubscribe calls (on the wire) using the \c subscribe and \c
   unsubscribe methods.
 
-  The plugin can fail or became ready anytime because of things
+  When the plugin is constructed, it should emit the signal ready()
+  when it is ready to take in subscriptions. However, the signal
+  ready() should not be emitted in the plugin constructor. If the
+  plugin is able to take in subscriptions immediately, you can use
+  QMetaObject::invokeMethod with QueuedConnection to emit the signal
+  when the main loop is entered the next time.
+
+  The plugin can fail or became ready again anytime because of things
   happening on the wire inside the plugin (socket closed, dbus service
   appears/disappears).  Whenever the plugin has new information about
   this it should emit the signal \c ready or \c failed accordingly.
@@ -109,9 +123,43 @@ Provider::Provider(const QString &plugin, const QString &constructionString)
 /// up with the name of the function).
 void Provider::constructPlugin()
 {
+    contextDebug() << F_PLUGINS;
     if (pluginName == "contextkit-dbus") {
         plugin = contextKitPluginFactory(constructionString);
-    } else ; // FIXME: implement plugin system in the else branch
+    }
+    else if (pluginName.startsWith("/")) { // Require the plugin name to start with /
+        // Enable overriding the plugin location with an environment variable
+        const char *pluginPath = getenv("CONTEXT_SUBSCRIBER_PLUGINS");
+        if (! pluginPath)
+            pluginPath = DEFAULT_CONTEXT_SUBSCRIBER_PLUGINS;
+
+        QString pluginFilename(pluginPath);
+        // Allow pluginPath to have a trailing / or not
+        if (pluginFilename.endsWith("/")) {
+            pluginFilename.chop(1);
+        }
+
+        pluginFilename.append(pluginName);
+
+        QLibrary library(pluginFilename);
+        library.load();
+
+        if (library.isLoaded()) {
+            PluginFactoryFunc factory = (PluginFactoryFunc) library.resolve("pluginFactory");
+            if (factory) {
+                contextDebug() << "Resolved factory function";
+                plugin = factory(constructionString);
+            } else {
+                contextCritical() << "Error resolving function pluginFactory from plugin" << pluginFilename;
+            }
+        }
+        else {
+            contextCritical() << "Error loading plugin" << pluginFilename << ":" << library.errorString();
+        }
+    }
+    else {
+        contextCritical() << "Illegal plugin name" << pluginName << ", doesn't start with /";
+    }
 
     if (plugin == 0) {
         pluginState = FAILED;

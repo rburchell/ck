@@ -1,12 +1,11 @@
 #!/bin/bash
 
-DIRS="commander subscription asynchronicity registry"
+cd $(dirname $0)
+DIRS="commander subscription asynchronicity registry pluginchanging"
+. ./env.sh
 
 if pkg-config contextprovider-1.0 || [ -e ../../libcontextprovider/src/.libs/libcontextprovider.so ]
 then
-	export CONTEXT_PROVIDERS=.
-	export LD_LIBRARY_PATH=../../src/.libs:../../../libcontextprovider/src/.libs
-	export PATH=$PATH:../../../python:../../cli:../../reg-cli
 
 	for dir in $DIRS; do
 		cd $dir

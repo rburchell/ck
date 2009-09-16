@@ -291,26 +291,6 @@ A boolean indicating whether or not the device is visible to other
 Bluetooth devices when they search for others.
     </doc>
   </key>
-  <key name="Bluetooth.TrafficOut">
-    <type>percentage</type>
-    <doc>
-A rough indication of the current outgoing traffic rate over
-Bluetooth, in percent of the maximum possible rate.
-    </doc>
-  </key>
-  <key name="Bluetooth.TrafficIn">
-    <type>percentage</type>
-    <doc>
-A rough indication of the current incoming traffic rate over
-Bluetooth, in percent of the maximum possible rate.
-    </doc>
-  </key>
-  <key name="Bluetooth.SignalStrength">
-    <type>percentage</type>
-    <doc>
-The strength of the Bluetooth radio connection.
-    </doc>
-  </key>
   <doc>
 Cellular
 --------

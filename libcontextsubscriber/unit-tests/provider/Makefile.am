@@ -9,7 +9,9 @@ COVERAGE_FILES = provider.cpp
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
-AM_CXXFLAGS = $(QtDBus_CFLAGS)
+AM_CXXFLAGS = $(QtDBus_CFLAGS) \
+	      '-DDEFAULT_CONTEXT_SUBSCRIBER_PLUGINS="@libdir@/contextkit/subscriber-plugins"'
+
 AM_LDFLAGS = $(QtDBus_LIBS)
 # copy these files from the real source
 FROM_SOURCE = provider.cpp provider.h iproviderplugin.h	\
