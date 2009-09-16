@@ -42,11 +42,7 @@ TimePlugin::TimePlugin()
     prefix = TIME_PLUGIN_PREFIX;
     timer.setInterval(2000);
     sconnect(&timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
-    QTimer *t = new QTimer(this);
-    sconnect(t, SIGNAL(timeout()), this, SLOT(emitReady()), Qt::QueuedConnection);
-    t->setSingleShot(true);
-    t->setInterval(0);
-    t->start();
+    QMetaObject::invokeMethod(this, "ready", Qt::QueuedConnection);
 }
 
 void TimePlugin::subscribe(QSet<QString> keys)
@@ -61,12 +57,6 @@ void TimePlugin::subscribe(QSet<QString> keys)
 void TimePlugin::unsubscribe(QSet<QString> keys)
 {
     timer.stop();
-}
-
-void TimePlugin::emitReady()
-{
-    contextDebug();
-    emit ready();
 }
 
 void TimePlugin::onTimeout()
