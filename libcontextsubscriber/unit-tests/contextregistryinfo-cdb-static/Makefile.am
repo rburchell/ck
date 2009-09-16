@@ -6,7 +6,6 @@ contextregistryinfounittest_cdb_static_SOURCES = contextregistryinfounittest.cpp
 COVERAGE_FILES = contextregistryinfo.cpp 	\
 		 infobackend.cpp		\
 		 infocdbbackend.cpp
-EXTRA_DIST = cache.cdb
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always

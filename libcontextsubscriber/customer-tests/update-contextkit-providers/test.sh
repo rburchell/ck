@@ -62,6 +62,7 @@ function checkperm {
 BASEDIR=`dirname $0`
 
 # Test using command line param
+export CONTEXT_PROVIDERS="/tmp/wrong/path"
 ../../update-contextkit-providers/update-contextkit-providers "./"
 dotest
 checkperm

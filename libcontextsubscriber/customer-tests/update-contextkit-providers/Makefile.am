@@ -2,6 +2,9 @@ check-customer:
 	$(MAKE) -C @abs_top_srcdir@ all
 	./test.sh
 
+clean-local:
+	rm -f *.actual *.cdb
+
 EXTRA_DIST = test.sh Battery.Charging_KEYCONSTRUCTIONSTRING.expected	\
 	Battery.Charging_KEYDOC.expected				\
 	Battery.Charging_KEYPLUGIN.expected				\
