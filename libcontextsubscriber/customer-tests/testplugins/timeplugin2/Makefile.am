@@ -1,5 +1,5 @@
-lib_LTLIBRARIES = libcontextsubscribertime2.la 
-libcontextsubscribertime2_la_SOURCES = timeplugin.cpp timeplugin.h 
+lib_LTLIBRARIES = libcontextsubscribertime2.la
+libcontextsubscribertime2_la_SOURCES = timeplugin.cpp timeplugin.h
 
 BUILT_SOURCES = $(libcontextsubscribertime2_la_SOURCES)
 timeplugin.cpp: ../timeplugin.cpp
@@ -19,7 +19,7 @@ AM_CXXFLAGS = -I$(top_srcdir)/common	\
 $(top_builddir)/common/libcommon.a:
 	$(MAKE) -C $(top_builddir)/common libcommon.a
 
-LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtDBus_LIBS) 
+LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtDBus_LIBS)
 libcontextsubscribertime2_la_LIBADD=$(top_builddir)/common/libcommon.la
 
 .PHONY: $(top_builddir)/common/libcommon.la
