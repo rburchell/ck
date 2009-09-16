@@ -52,7 +52,14 @@ namespace ContextSubscriber {
   unsubscribe calls (on the wire) using the \c subscribe and \c
   unsubscribe methods.
 
-  The plugin can fail or became ready anytime because of things
+  When the plugin is constructed, it should emit the signal ready()
+  when it is ready to take in subscriptions. However, the signal
+  ready() should not be emitted in the plugin constructor. If the
+  plugin is able to take in subscriptions immediately, you can use
+  QMetaObject::invokeMethod with QueuedConnection to emit the signal
+  when the main loop is entered the next time.
+
+  The plugin can fail or became ready again anytime because of things
   happening on the wire inside the plugin (socket closed, dbus service
   appears/disappears).  Whenever the plugin has new information about
   this it should emit the signal \c ready or \c failed accordingly.
