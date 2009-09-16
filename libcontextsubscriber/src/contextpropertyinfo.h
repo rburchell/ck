@@ -55,6 +55,7 @@ private:
     QString cachedType; ///< Cached (stored) type of the key.
     QString cachedPlugin; ///< Cached name of the plugin providing the key
     QString cachedConstructionString; ///< Cached construction string for the Provider
+    bool cachedExists; ///< Cached state of the key (existance).
     mutable QMutex cacheLock; ///< Lock for the cache.
 
 private slots:
