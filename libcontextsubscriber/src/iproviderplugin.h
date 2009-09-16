@@ -27,6 +27,11 @@
 
 namespace ContextSubscriber {
 
+/* This is not a public API of ContextKit, please do not write third
+ * party plugins for the ContextKit client library without first
+ * contacting us.
+ */
+
 class IProviderPlugin : public QObject
 {
     Q_OBJECT

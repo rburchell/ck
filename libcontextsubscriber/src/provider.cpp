@@ -38,6 +38,11 @@ namespace ContextSubscriber {
   \class IProviderPlugin
   \brief Interface for provider plugins.
 
+  Note: this interface is private, currently it is not advised to use
+  it and create ContextKit subscriber plugins on your own, we can and
+  will change this interface anytime in the future even between small
+  bugfix releases.
+
   Every Provider instance contains exactly one plugin (pointer) with
   this interface which is constructed on initialization time and never
   change after that.  This way the concrete protocol (dbus, shared
