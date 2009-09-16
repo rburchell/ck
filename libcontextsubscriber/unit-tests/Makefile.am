@@ -1,5 +1,5 @@
 SUBDIRSTESTS = provider propertyhandle handlesignalrouter               \
-	cdbwriter contextregistryinfo-xml-static			\
+	cdb contextregistryinfo-xml-static				\
 	contextpropertyinfo-xml-static contextregistryinfo-cdb-static	\
 	contextpropertyinfo-cdb-static contextregistryinfo-cdb-dynamic	\
 	contextpropertyinfo-cdb-dynamic					\

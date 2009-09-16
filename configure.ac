@@ -66,8 +66,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/man/Makefile
         libcontextsubscriber/src/Makefile
         libcontextsubscriber/unit-tests/Makefile
-        libcontextsubscriber/unit-tests/cdbreader/Makefile
-        libcontextsubscriber/unit-tests/cdbwriter/Makefile
+        libcontextsubscriber/unit-tests/cdb/Makefile
         libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
         libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-static/Makefile
         libcontextsubscriber/unit-tests/contextpropertyinfo-xml-dynamic/Makefile

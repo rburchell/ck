@@ -137,5 +137,5 @@ void CDBUnitTest::cleanupTestCase()
     QFile::remove("test-fdo.cdb");
 }
 
-#include "cdbwriterunittest.moc"
+#include "cdbunittest.moc"
 QTEST_MAIN(CDBUnitTest);

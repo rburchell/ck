@@ -1,7 +1,7 @@
-check_PROGRAMS = cdbwriterunittest
+check_PROGRAMS = cdbunittest
 
 # test's sources
-cdbwriterunittest_SOURCES = cdbwriterunittest.cpp
+cdbunittest_SOURCES = cdbunittest.cpp
 
 COVERAGE_FILES = cdbwriter.cpp cdbreader.cpp
 
@@ -11,12 +11,12 @@ AM_CXXFLAGS = '-I$(srcdir)/../util/'
 AM_LDFLAGS = $(CDB_LIBS)
 FROM_SOURCE = cdbreader.h cdbreader.cpp cdbwriter.cpp cdbwriter.h loggingfeatures.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
-LDADD = 
+LDADD =
 include $(top_srcdir)/am/tests.am
 
-nodist_cdbwriterunittest_SOURCES = mocs.cpp
-QT_TOMOC = $(filter %.h, $(cdbwriterunittest_SOURCES) $(FROM_SOURCE))
+nodist_cdbunittest_SOURCES = mocs.cpp
+QT_TOMOC = $(filter %.h, $(cdbunittest_SOURCES) $(FROM_SOURCE))
 include $(top_srcdir)/am/qt.am
 
 # when MOCing from .cpp file, you also has to help the dependency tracker
-cdbwriterunittest.o: cdbwriterunittest.moc
+cdbunittest.o: cdbunittest.moc

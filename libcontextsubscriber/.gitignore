@@ -28,8 +28,7 @@ contextsubscriber-1.0.pc
 /unit-tests/contextpropertyinfo-cdb-static/contextpropertyinfounittest-cdb-static
 /unit-tests/contextpropertyinfo-xml-dynamic/contextpropertyinfounittest-xml-dynamic
 /unit-tests/contextpropertyinfo-cdb-dynamic/contextpropertyinfounittest-cdb-dynamic
-/unit-tests/cdbreader/cdbreaderunittest
-/unit-tests/cdbwriter/cdbwriterunittest
+/unit-tests/cdb/cdbunittest
 /unit-tests/provider/provider-unit-tests
 /unit-tests/propertyhandle/propertyhandle-unit-tests
 /unit-tests/handlesignalrouter/handlesignalrouter-unit-tests
