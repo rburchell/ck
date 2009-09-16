@@ -54,7 +54,7 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
 
     QDir dir = QDir(InfoXmlBackend::registryPath());
     if (! dir.exists() || ! dir.isReadable()) {
-        contextWarning() << "Registry path" << InfoXmlBackend::registryPath() 
+        contextWarning() << "Registry path" << InfoXmlBackend::registryPath()
                          << "is not a directory or is not readable!";
         return;
     }
@@ -146,6 +146,14 @@ QString InfoXmlBackend::constructionStringForKey(QString key) const
     return keyDataHash.value(key).constructionString;
 }
 
+bool InfoXmlBackend::keyExists(QString key) const
+{
+    if (keyDataHash.contains(key))
+        return true;
+    else
+        return false;
+}
+
 /// Returns the full path to the registry directory. Takes the
 /// \c CONTEXT_PROVIDERS env variable into account.
 QString InfoXmlBackend::registryPath()
@@ -178,7 +186,7 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     // an unconditional reload message for us.
 
     contextDebug() << F_XML << path << "changed.";
-    
+
     QStringList oldKeys = listKeys();
     regenerateKeyDataList();
     QStringList currentKeys = listKeys();
@@ -213,7 +221,7 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
         return;
 
     contextDebug() << F_XML << registryPath() << "directory changed.";
-    
+
     QStringList oldKeys = listKeys();
     regenerateKeyDataList();
     QStringList currentKeys = listKeys();

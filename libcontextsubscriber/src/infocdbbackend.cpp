@@ -46,7 +46,7 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
 {
     contextDebug() << F_CDB << "Initializing cdb backend with database:" << InfoCdbBackend::databasePath();
-    
+
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
 
@@ -94,6 +94,14 @@ QString InfoCdbBackend::constructionStringForKey(QString key) const
 {
     // FIXME: support the old format
     return reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING");
+}
+
+bool InfoCdbBackend::keyExists(QString key) const
+{
+    if (reader.valuesForKey("KEYS").contains(key))
+        return true;
+    else
+        return false;
 }
 
 /// Returns true if the database file is present.

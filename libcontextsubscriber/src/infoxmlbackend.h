@@ -46,6 +46,7 @@ public:
     virtual QString docForKey(QString key) const;
     virtual QString pluginForKey(QString key) const;
     virtual QString constructionStringForKey(QString key) const;
+    virtual bool keyExists(QString key) const;
 
     static QString registryPath();
     static QString coreDeclPath();
