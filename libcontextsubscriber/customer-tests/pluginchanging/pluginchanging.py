@@ -56,8 +56,6 @@ class Subscription(unittest.TestCase):
 		self.context_client = Popen(["context-listen","Test.Time"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
 	def tearDown(self):
-		print "tear down"
-
 		proc_kill(self.context_client.pid)
 		os.remove('time.context')
 		os.system('rm libcontextsubscribertime*.so*')
