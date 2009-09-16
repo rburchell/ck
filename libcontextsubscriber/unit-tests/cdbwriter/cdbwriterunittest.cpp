@@ -23,22 +23,24 @@
 #include <QtCore>
 #include <fcntl.h>
 #include "cdbwriter.h"
+#include "cdbreader.h"
 #include "fileutils.h"
 
-class CDBWriterUnitTest : public QObject
+class CDBUnitTest : public QObject
 {
     Q_OBJECT
 
 private slots:
-    void basicCreation();
-    void noPermissions();
+    void creation();
     void cleanupTestCase();
     void writingToBad();
     void createWithFileDescriptor();
     void createWithBadFileDescriptor();
+    void reading();
+    void readingFromBad();
 };
 
-void CDBWriterUnitTest::basicCreation()
+void CDBUnitTest::creation()
 {
     CDBWriter writer("test.cdb");
     QCOMPARE(writer.isWritable(), true);
@@ -47,21 +49,27 @@ void CDBWriterUnitTest::basicCreation()
     writer.add("KEYS", "KEYSValue1");
     writer.add("KEYS", "KEYSValue2");
     writer.add("KEYS", "KEYSValue3");
+    writer.insert("KEYS", "doesn't get into");
 
-    writer.add("KEY1", "KEY1Value");
+    writer.add("KEY1", "KEY1Value wrong");
+    writer.replace("KEY1", "KEY1Value");
+
+    QVariantList complex;
+    QMap<QString, QVariant> map;
+    map["fortytwo"] = 42;
+    map["fortytwo two times"] = 4242;
+    QList<QVariant> list;
+    list << 24.24;
+    list << 42.42;
+    complex << QVariant("test") << QVariant(map) << QVariant(list);
+
+    writer.add("COMPLEX", complex);
     writer.close();
 }
 
-void CDBWriterUnitTest::noPermissions()
+void CDBUnitTest::writingToBad()
 {
-    CDBWriter writer("/usr/test.cdb");
-    QCOMPARE(writer.isWritable(), false);
-    writer.close();
-}
-
-void CDBWriterUnitTest::writingToBad()
-{
-    CDBWriter writer("/usr/test.cdb");
+    CDBWriter writer("/proc/test.cdb");
     QCOMPARE(writer.isWritable(), false);
     QVERIFY(writer.fileDescriptor() <= 0);
 
@@ -69,28 +77,65 @@ void CDBWriterUnitTest::writingToBad()
     writer.close();
 }
 
-void CDBWriterUnitTest::createWithFileDescriptor()
+void CDBUnitTest::createWithFileDescriptor()
 {
     int fd = open("test-fdo.cdb", O_RDWR | O_CREAT, 0644);
     CDBWriter writer(fd);
-    
+
     QCOMPARE(writer.isWritable(), true);
 }
 
-void CDBWriterUnitTest::createWithBadFileDescriptor()
+void CDBUnitTest::createWithBadFileDescriptor()
 {
     int fd = open("/usr/test/something/database.cdb", O_RDWR | O_CREAT, 0644);
     CDBWriter writer(fd);
-    
+
     QCOMPARE(writer.isWritable(), false);
 }
 
-void CDBWriterUnitTest::cleanupTestCase()
+void CDBUnitTest::readingFromBad()
+{
+    CDBReader reader("/proc/test.cdb");
+    QCOMPARE(reader.isReadable(), false);
+    QVERIFY(reader.fileDescriptor() <= 0);
+    QVariant v = reader.valueForKey("SOMETHING");
+    QCOMPARE(v, QVariant());
+}
+
+void CDBUnitTest::reading()
+{
+    CDBReader reader("test.cdb");
+    QCOMPARE(reader.isReadable(), true);
+    QVERIFY(reader.fileDescriptor() > 0);
+
+    QCOMPARE(reader.valueForKey("KEY1"), QVariant("KEY1Value"));
+
+    QVariantList reslist = reader.valuesForKey("KEYS");
+    QCOMPARE(reslist.size(), 3);
+
+    QCOMPARE(reslist.at(0), QVariant("KEYSValue1"));
+    QCOMPARE(reslist.at(1), QVariant("KEYSValue2"));
+    QCOMPARE(reslist.at(2), QVariant("KEYSValue3"));
+
+    QCOMPARE(QVariantList() << "KEY1Value", reader.valuesForKey("KEY1"));
+
+    QVariantList complex;
+    QMap<QString, QVariant> map;
+    map["fortytwo"] = 42;
+    map["fortytwo two times"] = 4242;
+    QList<QVariant> list;
+    list << 24.24;
+    list << 42.42;
+    complex << QVariant("test") << QVariant(map) << QVariant(list);
+
+    QCOMPARE(QVariant(complex), reader.valuesForKey("COMPLEX")[0]);
+}
+
+void CDBUnitTest::cleanupTestCase()
 {
     QFile::remove("test.cdb");
     QFile::remove("test-fdo.cdb");
 }
 
-
 #include "cdbwriterunittest.moc"
-QTEST_MAIN(CDBWriterUnitTest);
+QTEST_MAIN(CDBUnitTest);

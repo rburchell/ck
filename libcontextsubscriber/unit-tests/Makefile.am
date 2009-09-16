@@ -1,4 +1,4 @@
-SUBDIRSTESTS = provider propertyhandle handlesignalrouter cdbreader	\
+SUBDIRSTESTS = provider propertyhandle handlesignalrouter               \
 	cdbwriter contextregistryinfo-xml-static			\
 	contextpropertyinfo-xml-static contextregistryinfo-cdb-static	\
 	contextpropertyinfo-cdb-static contextregistryinfo-cdb-dynamic	\

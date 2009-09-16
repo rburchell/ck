@@ -1,3 +1,5 @@
+cdbreader.cpp
+cdbreader.h
 cdbwriter.cpp
 cdbwriter.h
 logging.cpp

@@ -3,13 +3,13 @@ check_PROGRAMS = cdbwriterunittest
 # test's sources
 cdbwriterunittest_SOURCES = cdbwriterunittest.cpp
 
-COVERAGE_FILES = cdbwriter.cpp 
+COVERAGE_FILES = cdbwriter.cpp cdbreader.cpp
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = '-I$(srcdir)/../util/'
 AM_LDFLAGS = $(CDB_LIBS)
-FROM_SOURCE = cdbwriter.cpp cdbwriter.h loggingfeatures.h # copy these files from the real source
+FROM_SOURCE = cdbreader.h cdbreader.cpp cdbwriter.cpp cdbwriter.h loggingfeatures.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am
