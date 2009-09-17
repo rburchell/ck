@@ -57,6 +57,11 @@ bool ContextPropertyInfo::exists() const
     return myType != "";
 }
 
+bool ContextPropertyInfo::provided() const
+{
+    return true;
+}
+
 QString ContextPropertyInfo::plugin() const
 {
     return "fakeplugin";

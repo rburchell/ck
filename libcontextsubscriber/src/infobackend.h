@@ -62,6 +62,10 @@ public:
     /// Returns true if the given key exists.
     virtual bool keyExists(QString key) const = 0;
 
+    /// Returns true if the given key is provided (i.e., not a core
+    /// property which nobody provides currently)
+    virtual bool keyProvided(QString key) const = 0;
+
 signals:
     /// Emitted when key list changes. ContextRegistryInfo listens on that.
     void keysChanged(const QStringList& currentKeys);

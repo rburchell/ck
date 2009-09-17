@@ -42,6 +42,7 @@ public:
     QString doc() const;
     QString type() const;
     bool exists() const;
+    bool provided() const;
 
     QString providerDBusName() const;
     QDBusConnection::BusType providerDBusType() const;
@@ -56,6 +57,7 @@ private:
     QString cachedPlugin; ///< Cached name of the plugin providing the key
     QString cachedConstructionString; ///< Cached construction string for the Provider
     bool cachedExists; ///< Cached state of the key (existance).
+    bool cachedProvided; ///< Cached state of the key (whether someone provides it).
     mutable QMutex cacheLock; ///< Lock for the cache.
 
 private slots:
@@ -86,6 +88,13 @@ signals:
     /// signal you can wait (watch) for various keys to become available.
     /// \param exists The new state of the key.
     void existsChanged(bool exists);
+
+    /// Emitted when the key gets a provider or loses a provider. The \a provided
+    /// is the new state of the introspected key. This is a strict signal - it's
+    /// emitted only when there was an actual change in the state. Using this
+    /// signal you can wait (watch) for various keys to become available.
+    /// \param provided The new state of the key.
+    void providedChanged(bool provided);
 
     /// Emitted when the libcontextsubscriber plugin providing the key
     /// changes, or the construction parameter to give to the plugin

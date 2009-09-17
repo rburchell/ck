@@ -212,6 +212,7 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
         cachedPlugin = infoBackend->pluginForKey(keyName);
         cachedConstructionString = infoBackend->constructionStringForKey(keyName);
         cachedExists = infoBackend->keyExists(keyName);
+        cachedProvided = infoBackend->keyProvided(keyName);
     }
 }
 
@@ -241,6 +242,13 @@ bool ContextPropertyInfo::exists() const
 {
     QMutexLocker lock(&cacheLock);
     return cachedExists;
+}
+
+/// Returns true if the key is provided by someone.
+bool ContextPropertyInfo::provided() const
+{
+    QMutexLocker lock(&cacheLock);
+    return cachedProvided;
 }
 
 /// Returns the name of the plugin supplying this property
@@ -310,12 +318,14 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
     QString oldPlugin = cachedPlugin;
     QString oldConstructionString = cachedConstructionString;
     bool oldExists = cachedExists;
+    bool oldProvided = cachedProvided;
 
     QString newPlugin = InfoBackend::instance()->pluginForKey(keyName);
     QString newConstructionString = InfoBackend::instance()->constructionStringForKey(keyName);
     cachedPlugin = newPlugin;
     cachedConstructionString = newConstructionString;
     cachedExists = InfoBackend::instance()->keyExists(keyName);
+    cachedProvided = InfoBackend::instance()->keyProvided(keyName);
 
     // Release the lock before emitting the signals; otherwise
     // listeners trying to access cached values would create a
@@ -327,6 +337,8 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
         emit typeChanged(cachedType);
     if (oldExists != cachedExists)
         emit existsChanged(cachedExists);
+    if (oldProvided != cachedProvided)
+        emit existsChanged(cachedProvided);
 
     // TBD: obsolete the providerChanged & providerDBusTypeChanged signals?
     if (oldPlugin != newPlugin || oldConstructionString != newConstructionString) {

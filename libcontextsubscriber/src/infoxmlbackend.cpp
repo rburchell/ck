@@ -154,6 +154,17 @@ bool InfoXmlBackend::keyExists(QString key) const
         return false;
 }
 
+bool InfoXmlBackend::keyProvided(QString key) const
+{
+    if (keyDataHash.contains(key) == false)
+        return false;
+
+    if (keyDataHash.value(key).plugin != "")
+        return true;
+
+    return false;
+}
+
 /// Returns the full path to the registry directory. Takes the
 /// \c CONTEXT_PROVIDERS env variable into account.
 QString InfoXmlBackend::registryPath()

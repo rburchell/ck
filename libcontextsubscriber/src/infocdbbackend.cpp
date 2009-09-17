@@ -104,6 +104,15 @@ bool InfoCdbBackend::keyExists(QString key) const
         return false;
 }
 
+bool InfoCdbBackend::keyProvided(QString key) const
+{
+    QString plugin = reader.valueForKey(key + ":KEYPLUGIN");
+    if (plugin == "")
+        return false;
+
+    return true;
+}
+
 /// Returns true if the database file is present.
 bool InfoCdbBackend::databaseExists()
 {
