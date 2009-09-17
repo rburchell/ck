@@ -17,3 +17,5 @@ sconnect.h
 logging.cpp
 logging.h
 loggingfeatures.h
+nanoxml.cpp
+nanoxml.h
