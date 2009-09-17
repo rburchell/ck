@@ -22,7 +22,7 @@ FROM_SOURCE = contextregistryinfo.cpp contextpropertyinfo.cpp	\
 	infoxmlbackend.h infocdbbackend.h			\
 	infoxmlkeysfinder.h cdbreader.h                         \
 	infokeydata.h 		\
-	loggingfeatures.h
+	loggingfeatures.h nanoxml.cpp nanoxml.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =

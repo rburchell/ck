@@ -16,7 +16,7 @@ AM_CXXFLAGS = $(QtDBus_CFLAGS) -I$(srcdir)/../util/ \
               '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"' \
               '-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"'
 AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
-FROM_SOURCE = contextregistryinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp cdbreader.cpp contextregistryinfo.h infobackend.h infoxmlbackend.h infocdbbackend.h infoxmlkeysfinder.h cdbreader.h infokeydata.h loggingfeatures.h # copy these files from the real source
+FROM_SOURCE = contextregistryinfo.cpp infobackend.cpp infoxmlbackend.cpp infoxmlkeysfinder.cpp infocdbbackend.cpp cdbreader.cpp contextregistryinfo.h infobackend.h infoxmlbackend.h infocdbbackend.h infoxmlkeysfinder.h cdbreader.h infokeydata.h loggingfeatures.h nanoxml.cpp nanoxml.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
 include $(top_srcdir)/am/tests.am
