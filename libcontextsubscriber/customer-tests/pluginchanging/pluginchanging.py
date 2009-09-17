@@ -49,9 +49,8 @@ class Subscription(unittest.TestCase):
 		os.environ["CONTEXT_PROVIDERS"] = "."
 		# We need 2 plugins which are in separate directories.
 		os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] = "."
-		os.system('cp ../testplugins/timeplugin1/.libs/libcontextsubscribertime1.so* .')
-		os.system('cp ../testplugins/timeplugin2/.libs/libcontextsubscribertime2.so* .')
-
+		os.system('cp ../testplugins/libcontextsubscribertime1.so* .')
+		os.system('cp ../testplugins/libcontextsubscribertime2.so* .')
 
 		self.context_client = Popen(["context-listen","Test.Time"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
 
