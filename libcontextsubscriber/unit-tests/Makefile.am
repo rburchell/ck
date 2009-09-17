@@ -4,7 +4,7 @@ SUBDIRSTESTS = provider propertyhandle handlesignalrouter cdbreader	\
 	contextpropertyinfo-cdb-static contextregistryinfo-cdb-dynamic	\
 	contextpropertyinfo-cdb-dynamic					\
 	contextregistryinfo-xml-dynamic					\
-	contextpropertyinfo-xml-dynamic infoxmlkeysfinder               \
+	contextpropertyinfo-xml-dynamic					\
         nanoxml
 SUBDIRS = $(SUBDIRSTESTS) util
 

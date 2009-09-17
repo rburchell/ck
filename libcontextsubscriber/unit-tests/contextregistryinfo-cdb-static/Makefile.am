@@ -15,12 +15,12 @@ AM_CXXFLAGS = $(QtDBus_CFLAGS) -I$(srcdir)/../util/ \
               '-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"'
 AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = contextregistryinfo.cpp infobackend.cpp	\
-	infoxmlbackend.cpp infoxmlkeysfinder.cpp	\
+	infoxmlbackend.cpp	                        \
 	infocdbbackend.cpp cdbreader.cpp		\
 	contextregistryinfo.h infobackend.h		\
 	infoxmlbackend.h infocdbbackend.h		\
-	infoxmlkeysfinder.h cdbreader.h                 \
-	infokeydata.h \
+	cdbreader.h                                     \
+	infokeydata.h                                   \
 	loggingfeatures.h nanoxml.cpp nanoxml.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src

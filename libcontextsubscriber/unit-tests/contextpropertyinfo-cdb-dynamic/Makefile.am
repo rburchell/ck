@@ -18,10 +18,10 @@ AM_CXXFLAGS = $(QtDBus_CFLAGS) -I$(srcdir)/../util/ \
 AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = contextregistryinfo.cpp contextpropertyinfo.cpp	\
 	infobackend.cpp infoxmlbackend.cpp			\
-	infoxmlkeysfinder.cpp infocdbbackend.cpp		\
+	infocdbbackend.cpp		                        \
 	cdbreader.cpp contextregistryinfo.h			\
 	contextpropertyinfo.h infobackend.h infoxmlbackend.h	\
-	infocdbbackend.h infoxmlkeysfinder.h cdbreader.h        \
+	infocdbbackend.h cdbreader.h                            \
         infokeydata.h loggingfeatures.h nanoxml.cpp nanoxml.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src

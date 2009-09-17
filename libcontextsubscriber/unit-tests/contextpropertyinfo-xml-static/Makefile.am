@@ -5,8 +5,7 @@ contextpropertyinfounittest_xml_static_SOURCES = contextpropertyinfounittest.cpp
 
 COVERAGE_FILES = contextpropertyinfo.cpp	\
 		 infobackend.cpp 		\
-		 infoxmlbackend.cpp 		\
-		 infoxmlkeysfinder.cpp
+		 infoxmlbackend.cpp
 EXTRA_DIST = providers1.context providers2.context
 
 # do the testing, coverage, etc. stuff
@@ -17,12 +16,12 @@ AM_CXXFLAGS = $(QtDBus_CFLAGS) -I$(srcdir)/../util/ \
 AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = contextregistryinfo.cpp contextpropertyinfo.cpp	\
 	infobackend.cpp infoxmlbackend.cpp			\
-	infoxmlkeysfinder.cpp infocdbbackend.cpp		\
+	infocdbbackend.cpp		                        \
 	cdbreader.cpp contextregistryinfo.h			\
 	contextpropertyinfo.h infobackend.h			\
 	infoxmlbackend.h infocdbbackend.h			\
-	infoxmlkeysfinder.h cdbreader.h				\
-	infokeydata.h \
+	cdbreader.h				                \
+	infokeydata.h                                           \
 	loggingfeatures.h nanoxml.h nanoxml.cpp
 
 FROM_SOURCE_DIR = $(srcdir)/../../src

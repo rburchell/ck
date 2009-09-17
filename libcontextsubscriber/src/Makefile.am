@@ -6,7 +6,7 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	contextpropertyinfo.cpp contextpropertyinfo.h			\
 	contextregistryinfo.cpp contextregistryinfo.h infobackend.h	\
 	infobackend.cpp infoxmlbackend.h infoxmlbackend.cpp		\
-	infoxmlkeysfinder.h infoxmlkeysfinder.cpp infokeydata.h		\
+	infokeydata.h		                                        \
 	cdbwriter.h cdbwriter.cpp cdbreader.cpp cdbreader.h		\
 	infocdbbackend.cpp infocdbbackend.h dbusnamelistener.h		\
 	dbusnamelistener.cpp handlesignalrouter.cpp			\

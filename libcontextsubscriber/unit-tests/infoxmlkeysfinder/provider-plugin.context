@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<provider plugin="testplugin.so" constructionString="factoryParameter">
-  <key name="Test.Something"><type>bool</type><doc>Something</doc></key>
-  <key name="Test.SomethingElse"><type>double</type><doc>Something else</doc></key>
-</provider>

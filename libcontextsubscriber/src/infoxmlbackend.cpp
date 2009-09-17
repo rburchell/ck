@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include "sconnect.h"
 #include "infoxmlbackend.h"
-#include "infoxmlkeysfinder.h"
 #include "logging.h"
 #include "loggingfeatures.h"
 #include "nanoxml.h"
