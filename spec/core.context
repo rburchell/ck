@@ -27,12 +27,13 @@ These properties talk about the display screens of the device.
   </doc>
   <key name="Screen.TopEdge">
     <type>
-      <string-enum>
+      string
+      <!-- string-enum>
         <top/>
         <bottom/>
         <left/>
         <right/>
-      </string-enum>
+      </string-enum !-->
     </type>
     <doc>
 The edge of the main display screen where the user expects
