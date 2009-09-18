@@ -1,12 +1,14 @@
-contextkit (0.3.3~unreleased) unstable; urgency=low
+contextkit (0.3.3) unstable; urgency=low
   
   * Fixed dependencies of libcontextsubscriber0-dbg.
   * Fixes: NB#133849 -libcontextsubscriber0 fails to upgrade in sb2.
   * Refactored libcontextsubscriber for future possibility to handle
     different protocols towards providers than the ContextKit
     D-Bus protocol.
+  * Refactored libcontextprovider services to support reuse
+    of the same dbus connection
 
- -- Gergely Risko <risko@debian.org>  Thu, 10 Sep 2009 14:53:09 +0300
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 17 Sep 2009 15:44:10 +0300
 
 contextkit (0.3.2) unstable; urgency=low
 
