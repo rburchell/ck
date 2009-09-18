@@ -47,8 +47,8 @@ class Subscription(unittest.TestCase):
 		os.environ["CONTEXT_PROVIDERS"] = "."
 		# We need 2 plugins which are in separate directories.
 		os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] = "."
-		os.system('cp ../testplugins/libcontextsubscribertime1.so* .')
-		os.system('cp ../testplugins/libcontextsubscribertime2.so* .')
+		os.system('cp ../testplugins/libcontextsubscribertime1.so.0.0.0 ./libcontextsubscribertime1.so')
+		os.system('cp ../testplugins/libcontextsubscribertime2.so.0.0.0 ./libcontextsubscribertime2.so')
 
 		self.context_client = CLTool("context-listen", "Test.Time")
 
