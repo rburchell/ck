@@ -39,6 +39,7 @@ public:
     QString type() const;
 
     bool exists() const;
+    bool provided() const;
     QString plugin() const;
     QString constructionString() const;
 
@@ -50,6 +51,7 @@ signals:
     void providerDBusTypeChanged(QDBusConnection::BusType newBusType);
     void typeChanged(QString newType);
     void existsChanged(bool exists);
+    void providedChanged(bool provided);
     void pluginChanged(QString, QString);
 
 public:

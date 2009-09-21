@@ -27,12 +27,13 @@ These properties talk about the display screens of the device.
   </doc>
   <key name="Screen.TopEdge">
     <type>
-      <string-enum>
+      string
+      <!-- string-enum>
         <top/>
         <bottom/>
         <left/>
         <right/>
-      </string-enum>
+      </string-enum !-->
     </type>
     <doc>
 The edge of the main display screen where the user expects
@@ -300,13 +301,51 @@ Information about the cellular radio.
   <key name="Cellular.NetworkName"
        type="string">
     <doc>
-The name of the cellular network, as a localized string.
+The name of the cellular network.
     </doc>
   </key>
   <key name="Cellular.SignalStrength"
        type="percentage">
     <doc>
 The signal strength at the cellular radio, in percent of the maximum.
+    </doc>
+  </key>
+  <key name="Cellular.Technology">
+    <type>
+      <string-enum>
+        <gsm/>
+        <umts/>
+      </string-enum>
+    </type>
+    <doc>
+The currently used Radio Access Technology.
+    </doc>
+  </key>
+  <key name="Cellular.DataTechnology">
+    <type>
+      <string-enum>
+        <gprs/>
+        <egprs/>
+        <umts/>
+        <hspa/>
+      </string-enum>
+    </type>
+    <doc>
+The currently used Radio Access Technology for data transfer.
+    </doc>
+  </key>
+  <key name="Cellular.RegistrationStatus">
+    <type>
+      <string-enum>
+        <home doc="Registered with the home network"/>
+        <roam doc="Roaming"/>
+        <no-sim doc="No SIM card is present"/>
+        <offline doc="Cellular radio is powered off"/>
+        <forbidden doc="Cellular access is denied, e.g., because of invalid SIM"/>
+      </string-enum>
+    </type>
+    <doc>
+The current cellular network registration status.
     </doc>
   </key>
   <doc>

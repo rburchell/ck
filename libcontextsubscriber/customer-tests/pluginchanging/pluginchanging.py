@@ -30,9 +30,7 @@ import string
 from subprocess import Popen, PIPE
 import time
 import signal
-
-def proc_kill(pid):
-	os.system('../common/rec-kill.sh %d' % pid)
+from cltool import CLTool
 
 def timeoutHandler(signum, frame):
 	raise Exception('tests have been running for too long')
@@ -49,14 +47,12 @@ class Subscription(unittest.TestCase):
 		os.environ["CONTEXT_PROVIDERS"] = "."
 		# We need 2 plugins which are in separate directories.
 		os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] = "."
-		os.system('cp ../testplugins/timeplugin1/.libs/libcontextsubscribertime1.so* .')
-		os.system('cp ../testplugins/timeplugin2/.libs/libcontextsubscribertime2.so* .')
+		os.system('cp ../testplugins/libcontextsubscribertime1.so.0.0.0 ./libcontextsubscribertime1.so')
+		os.system('cp ../testplugins/libcontextsubscribertime2.so.0.0.0 ./libcontextsubscribertime2.so')
 
-
-		self.context_client = Popen(["context-listen","Test.Time"],stdin=PIPE,stdout=PIPE,stderr=PIPE)
+		self.context_client = CLTool("context-listen", "Test.Time")
 
 	def tearDown(self):
-		proc_kill(self.context_client.pid)
 		os.remove('time.context')
 		os.system('rm libcontextsubscribertime*.so*')
 
@@ -66,22 +62,16 @@ class Subscription(unittest.TestCase):
 		os.system('cp time1.context.temp time.context.temp')
 		os.system('mv time.context.temp time.context')
 		#print "now reading"
-		actual = self.context_client.stdout.readline().rstrip()
-		#print actual
 
-		# The client got a value provided by the libcontextsubscribertime1
-		self.assertEqual(actual.startswith("Test.Time = QString:Time1: "), True, "Got: %s" % actual)
+		# Expect value coming from plugin libcontextsubscribertime1
+		self.assert_(self.context_client.expect(CLTool.STDOUT, "Test.Time = QString:Time1:", 3))
 
 		# Modify the registry so that the key is now provided by libcontextsubscribertime2
 		os.system('cp time2.context.temp time.context.temp')
 		os.system('mv time.context.temp time.context')
 
-		# Assert that the client starts getting the value from the correct plugin
-		# (not necessarily the first one)
-		actual = self.context_client.stdout.readline().rstrip()
-		actual = self.context_client.stdout.readline().rstrip()
-
-		self.assertEqual(actual.startswith("Test.Time = QString:Time2: "), True, "Got: %s" % actual)
+		# Expect value coming from plugin libcontextsubscribertime2
+		self.assert_(self.context_client.expect(CLTool.STDOUT, "Test.Time = QString:Time2:", 3))
 
 if __name__ == "__main__":
 	sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)

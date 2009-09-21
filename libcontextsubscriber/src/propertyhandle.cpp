@@ -84,7 +84,7 @@ PropertyHandle::PropertyHandle(const QString& key)
     myInfo = new ContextPropertyInfo(myKey, this);
 
     // Start listening to changes in property introspection (e.g., added to registry, plugin changes)
-    sconnect(myInfo, SIGNAL(existsChanged(bool)),
+    sconnect(myInfo, SIGNAL(providedChanged(bool)),
              this, SLOT(updateProvider()));
     sconnect(myInfo, SIGNAL(pluginChanged(QString, QString)),
              this, SLOT(updateProvider()));
@@ -140,7 +140,7 @@ void PropertyHandle::updateProvider()
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
 
-        if (myInfo->exists()) {
+        if (myInfo->provided()) {
             // If myInfo knows the current provider which should be
             // connected to, connect to it.
             contextDebug() << F_PLUGINS << "Key exists";
