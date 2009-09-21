@@ -114,7 +114,7 @@ bool InfoCdbBackend::keyExists(QString key) const
 
 bool InfoCdbBackend::keyProvided(QString key) const
 {
-    QString plugin = reader.valueForKey(key + ":KEYPLUGIN");
+    QString plugin = reader.valueForKey(key + ":KEYPLUGIN").toString();
     if (plugin == "")
         return false;
 
