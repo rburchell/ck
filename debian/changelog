@@ -1,3 +1,9 @@
+contextkit (0.3.6~unreleased) unstable; urgency=low
+
+  *
+
+ -- Gergely Risko <risko@debian.org>  Tue, 22 Sep 2009 11:42:40 +0300
+
 contextkit (0.3.5) unstable; urgency=low
 
   * Internal change: in the cdb we store serialized QVariants from now on.
