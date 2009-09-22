@@ -78,6 +78,12 @@ NanoXml::NanoXml(const QString& path)
     failed = ! reader.parse(source);
 }
 
+/// Destructor.
+NanoXml::~NanoXml()
+{
+    delete current;
+}
+
 /// Parser internal. Add a value (item) \a v to the current list on the stack.
 void NanoXml::addValue(const QString& v)
 {

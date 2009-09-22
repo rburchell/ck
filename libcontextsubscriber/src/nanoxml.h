@@ -34,6 +34,7 @@ class NanoXml : public QObject, QXmlDefaultHandler
 
 public:
     NanoXml(const QString& path);
+    ~NanoXml();
     const QVariant& root();
     const QString namespaceUri();
     bool didFail();
