@@ -1,6 +1,8 @@
 contextkit (0.3.5~unreleased) unstable; urgency=low
 
-  *
+  * Fixes: NB#119638 - debug + critical + error messages should go to
+	stderr from the libcontextprovider library
+  * Fixes: NB#121556 - C API of libcontextprovider uses Glib types
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 18 Sep 2009 16:17:07 +0300
 
