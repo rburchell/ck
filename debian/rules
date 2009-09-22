@@ -40,6 +40,12 @@ install: build
 	cp -rf libcontextsubscriber/customer-tests/asynchronicity debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/subscription debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/registry debian/tmp/usr/share/libcontextsubscriber-tests/
+	cp -r libcontextsubscriber/customer-tests/pluginchanging debian/tmp/usr/share/libcontextsubscriber-tests/
+
+	mkdir debian/tmp/usr/share/libcontextsubscriber-tests/testplugins
+	cp libcontextsubscriber/customer-tests/testplugins/timeplugin1/.libs/libcontextsubscribertime1.so.0.0.0 debian/tmp/usr/share/libcontextsubscriber-tests/testplugins
+	cp libcontextsubscriber/customer-tests/testplugins/timeplugin2/.libs/libcontextsubscribertime2.so.0.0.0 debian/tmp/usr/share/libcontextsubscriber-tests/testplugins
+
 	cp -rf libcontextsubscriber/customer-tests/common debian/tmp/usr/share/libcontextsubscriber-tests/
 
 	chown -R root:root debian/tmp/usr/share/libcontextsubscriber-tests

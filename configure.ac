@@ -1,5 +1,5 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.3.3~unreleased], [marius.vollmer@nokia.com], ContextKit)
+AC_INIT([ContextKit], [0.3.6~unreleased], [marius.vollmer@nokia.com], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign dist-bzip2 tar-ustar 1.9])
@@ -69,8 +69,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/man/Makefile
         libcontextsubscriber/src/Makefile
         libcontextsubscriber/unit-tests/Makefile
-        libcontextsubscriber/unit-tests/cdbreader/Makefile
-        libcontextsubscriber/unit-tests/cdbwriter/Makefile
+        libcontextsubscriber/unit-tests/cdb/Makefile
         libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
         libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-static/Makefile
         libcontextsubscriber/unit-tests/contextpropertyinfo-xml-dynamic/Makefile

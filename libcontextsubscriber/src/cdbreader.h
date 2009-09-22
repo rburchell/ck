@@ -24,6 +24,9 @@
 
 #include <QStringList>
 #include <QObject>
+#include <QVariant>
+#include <QVariantList>
+#include <QByteArray>
 
 class CDBReader : public QObject
 {
@@ -35,8 +38,8 @@ public:
 
     void close();
     void reopen();
-    QString valueForKey(const QString &key) const;
-    QStringList valuesForKey(const QString &key) const;
+    QVariantList valuesForKey(const QString &key) const;
+    QVariant valueForKey(const QString &key) const;
     bool isReadable();
     int fileDescriptor() const;
 
