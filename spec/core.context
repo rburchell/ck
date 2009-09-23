@@ -352,7 +352,9 @@ The current cellular network registration status.
 User alarms
 -----------
 
-Information about the alams set by the user.
+Information about the alams set by the user. We assume, that the user
+can disable or enable all the alarms. In addition, the user can enable
+or disable each alarm individually.
   </doc>
   <key name="UserAlarm.Present">
     <type>bool</type>
@@ -369,27 +371,25 @@ there are no alarms, UserAlarm.Enabled is true.
     </doc>
   </key>
   <key name="UserAlarm.NextTime">
-    <type>int</type>
+    <type>int32</type>
     <doc>
-The time of the next alarm, in Unix time (the number of seconds since
-January 1.1.1970 00:00 UTC). If no alarms are present, the value is
-Unknown.
+The time of the next (enabled) alarm, in Unix time (the number of
+seconds since January 1.1.1970 00:00 UTC). If no alarms are present,
+the value is Unknown.
     </doc>
   </key>
   <key name="UserAlarm.NextDescription">
     <type>string</type>
     <doc>
-The description of the next alarm. If no alarms are present, the value is Unknown.
+The description of the next (enabled) alarm. If no alarms are present,
+the value is Unknown.
     </doc>
   </key>
-  <key name="UserAlarm.Cookies">
-    <type><uniform-list type="int"/></type>
+  <key name="UserAlarm.NextCookie">
+    <type>int32</type>
     <doc>
-The array of cookies, used for referring to the upcoming alarms when
-communicating with alarmd. If no alarms are present, the list is
-empty. The list contains only the alarms to occur in the future, and
-it is ordered by the time of the alarm. The first element of the list
-is the cookie of the next alarm.
+The cookie of the next (enabled) alarm. The cookie can be used for
+referring to the alarm when communicating with timed.
     </doc>
   </key>
   <doc>
