@@ -96,6 +96,7 @@ AC_CONFIG_FILES([
 	libcontextprovider/Makefile
 	libcontextprovider/doc/Makefile
 	libcontextprovider/src/Makefile
+	libcontextprovider/context-provide/Makefile
 	libcontextprovider/unit-tests/Makefile
 	libcontextprovider/unit-tests/manager/Makefile
 	libcontextprovider/unit-tests/subscriber/Makefile
