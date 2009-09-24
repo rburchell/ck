@@ -69,6 +69,7 @@ void CommandWatcher::help()
     qDebug() << "Available commands:";
     qDebug() << "  add KEY TYPE                    - create new key with the given type";
     qDebug() << "  KEY=VALUE                       - set KEY to the given VALUE";
+    qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
     qDebug() << "  flush                           - write FLUSHED to stderr and stdout";
     qDebug() << "Any prefix of a command can be used as an abbreviation";
 }
@@ -91,7 +92,10 @@ void CommandWatcher::interpret(const QString& command)
         // Interpret commands
         if (QString("add").startsWith(commandName)) {
             addCommand(args);
-        }
+        } else if (QString("sleep").startsWith(commandName)) {
+            sleepCommand(args);
+        } else
+            help();
    }
 }
 
@@ -113,6 +117,18 @@ void CommandWatcher::addCommand(const QStringList& args)
 
     properties.insert(keyName, keyType);
     qDebug() << "Added key:" << keyName << "with type:" << keyType;
+}
+
+void CommandWatcher::sleepCommand(const QStringList& args)
+{
+    if (args.count() < 1) {
+        qDebug() << "ERROR: need to specify sleep INTERVAL";
+        return;
+    }
+
+    int interval = args.at(0).toInt();
+    qDebug() << "Sleeping" << interval;
+    sleep(interval);
 }
 
 void CommandWatcher::setCommand(const QString& command)

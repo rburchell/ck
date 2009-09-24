@@ -46,6 +46,7 @@ private:
     static void help();
     void addCommand(const QStringList& args);
     void setCommand(const QString& command);
+    void sleepCommand(const QStringList& args);
 
 private slots:
     void onActivated();
