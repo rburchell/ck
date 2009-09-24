@@ -42,7 +42,8 @@ private:
     int commandfd;
     QSocketNotifier *commandNotifier;
     void interpret(const QString& command);
-    QMap <QString, QString> properties; // key -> type
+    QMap <QString, QString> types; // key -> type
+    QMap <QString, Property*> properties;
     static void help();
     void addCommand(const QStringList& args);
     void setCommand(const QString& command);

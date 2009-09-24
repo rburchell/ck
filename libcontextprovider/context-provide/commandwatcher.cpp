@@ -115,7 +115,9 @@ void CommandWatcher::addCommand(const QStringList& args)
         return;
     }
 
-    properties.insert(keyName, keyType);
+    types.insert(keyName, keyType);
+    properties.insert(keyName, new Property(keyName));
+
     qDebug() << "Added key:" << keyName << "with type:" << keyType;
 }
 
@@ -138,12 +140,13 @@ void CommandWatcher::setCommand(const QString& command)
     const QString keyName = parts.at(0).trimmed();
     const QString value = parts.at(1).trimmed();
 
-    if (! properties.contains(keyName)) {
+    if (! types.contains(keyName)) {
         qDebug() << "ERROR: key" << keyName << "not known/added";
         return;
     }
 
-    const QString keyType = properties.value(keyName);
+    Property *prop = properties.value(keyName);
+    const QString keyType = types.value(keyName);
     QVariant v;
 
     if (keyType == "integer")
@@ -153,6 +156,6 @@ void CommandWatcher::setCommand(const QString& command)
     else if (keyType == "double")
         v = QVariant(value.toDouble());
 
-    qDebug() << "Setting key:" << keyName << "to value:" << value << QString("(" + keyType + ")");
-    Property(keyName).setValue(v);
+    qDebug() << "Setting key:" << keyName << "to value:" << v << QString("(" + keyType + ")");
+    prop->setValue(v);
 }
