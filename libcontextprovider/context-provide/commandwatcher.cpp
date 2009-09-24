@@ -40,6 +40,13 @@ CommandWatcher::CommandWatcher(int commandfd, QObject *parent) :
     help();
 }
 
+CommandWatcher::~CommandWatcher()
+{
+    foreach(Property* p, properties) {
+        delete p;
+    }
+}
+
 void CommandWatcher::onActivated()
 {
     // read all available input to commandBuffer

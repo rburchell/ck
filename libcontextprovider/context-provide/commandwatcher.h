@@ -36,14 +36,17 @@ template <typename K, typename V> class QMap;
 class CommandWatcher : public QObject
 {
     Q_OBJECT
+    
 public:
     CommandWatcher(int commandfd, QObject *parent = 0);
+    ~CommandWatcher();
+    
 private:
     int commandfd;
     QSocketNotifier *commandNotifier;
     void interpret(const QString& command);
-    QMap <QString, QString> types; // key -> type
-    QMap <QString, Property*> properties;
+    QMap <QString, QString> types;          // key -> type
+    QMap <QString, Property*> properties;   // property index
     static void help();
     void addCommand(const QStringList& args);
     void setCommand(const QString& command);

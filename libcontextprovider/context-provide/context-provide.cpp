@@ -38,7 +38,6 @@ int main(int argc, char **argv)
     service.setAsDefault();
     service.start();
 
-
     CommandWatcher commandWatcher(STDIN_FILENO, QCoreApplication::instance());
 
     return app.exec();
