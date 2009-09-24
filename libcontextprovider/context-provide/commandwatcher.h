@@ -19,15 +19,31 @@
  *
  */
 
-#include <QCoreApplication>
-#include <QString>
-#include <QStringList>
-#include <QMap>
-#include <QDebug>
-#include <stdlib.h>
+#ifndef COMMANDWATCHER_H
+#define COMMANDWATCHER_H
 
-int main(int argc, char **argv)
+#include <QObject>
+class QFile;
+class QTextStream;
+class QSocketNotifier;
+class ContextProperty;
+class QString;
+template <typename K, typename V> class QMap;
+
+class CommandWatcher : public QObject
 {
-    QCoreApplication app(argc, argv);
-    return app.exec();
-}
+    Q_OBJECT
+public:
+    CommandWatcher(int commandfd, QMap<QString, ContextProperty*> *properties, QObject *parent = 0);
+private:
+    int commandfd;
+    QSocketNotifier *commandNotifier;
+    void interpret(const QString& command) const;
+    QMap<QString, ContextProperty*> *properties;
+    static void help();
+
+private slots:
+    void onActivated();
+};
+
+#endif
