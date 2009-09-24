@@ -23,10 +23,13 @@
 #define COMMANDWATCHER_H
 
 #include <QObject>
+#include "property.h"
+
+using namespace ContextProvider;
+
 class QFile;
 class QTextStream;
 class QSocketNotifier;
-class ContextProperty;
 class QString;
 template <typename K, typename V> class QMap;
 
@@ -34,13 +37,15 @@ class CommandWatcher : public QObject
 {
     Q_OBJECT
 public:
-    CommandWatcher(int commandfd, QMap<QString, ContextProperty*> *properties, QObject *parent = 0);
+    CommandWatcher(int commandfd, QObject *parent = 0);
 private:
     int commandfd;
     QSocketNotifier *commandNotifier;
-    void interpret(const QString& command) const;
-    QMap<QString, ContextProperty*> *properties;
+    void interpret(const QString& command);
+    QMap <QString, QString> properties; // key -> type
     static void help();
+    void addCommand(const QStringList& args);
+    void setCommand(const QString& command);
 
 private slots:
     void onActivated();

@@ -26,6 +26,7 @@
 #include <QDebug>
 #include <stdlib.h>
 #include <service.h>
+#include "commandwatcher.h"
 
 using namespace ContextProvider;
 
@@ -34,5 +35,11 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
 
     Service service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.Commander");
+    service.setAsDefault();
+    service.start();
+
+
+    CommandWatcher commandWatcher(STDIN_FILENO, QCoreApplication::instance());
+
     return app.exec();
 }

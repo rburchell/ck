@@ -32,8 +32,8 @@
 #include <errno.h>
 #include <QMap>
 
-CommandWatcher::CommandWatcher(int commandfd, QMap<QString, ContextProperty*> *properties, QObject *parent) :
-    QObject(parent), commandfd(commandfd), properties(properties)
+CommandWatcher::CommandWatcher(int commandfd, QObject *parent) :
+    QObject(parent), commandfd(commandfd)
 {
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
     sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
@@ -73,17 +73,49 @@ void CommandWatcher::help()
     qDebug() << "Any prefix of a command can be used as an abbreviation";
 }
 
-void CommandWatcher::interpret(const QString& command) const
+void CommandWatcher::interpret(const QString& command)
 {
     QTextStream out(stdout);
     QTextStream err(stderr);
     if (command == "") {
+        // Show help
         help();
+    } else if (command.contains('=')) {
+        // Setter command
+        setCommand(command);
     } else {
         QStringList args = command.split(" ");
         QString commandName = args[0];
         args.pop_front();
 
         // Interpret commands
+        if (QString("add").startsWith(commandName)) {
+            addCommand(args);
+        }
+   }
+}
+
+void CommandWatcher::addCommand(const QStringList& args)
+{
+    if (args.count() < 2) {
+        qDebug() << "ERROR: need to specify both KEY and TYPE";
+        return;
     }
+
+    const QString keyName = args.at(0);
+    const QString keyType = args.at(1);
+
+    properties.insert(keyName, keyType);
+    qDebug() << "Added key:" << keyName << "with type:" << keyType;
+}
+
+void CommandWatcher::setCommand(const QString& command)
+{
+    QStringList parts = command.split("=");
+
+    const QString keyName = parts.at(0).trimmed();
+    const QString value = parts.at(1).trimmed();
+
+    qDebug() << "Setting key:" << keyName << "to value:" << value;
+    Property(keyName).setValue(value);
 }
