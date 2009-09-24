@@ -25,9 +25,14 @@
 #include <QMap>
 #include <QDebug>
 #include <stdlib.h>
+#include <service.h>
+
+using namespace ContextProvider;
 
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
+
+    Service service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.Commander");
     return app.exec();
 }
