@@ -109,7 +109,7 @@ void CommandWatcher::interpret(const QString& command)
 void CommandWatcher::addCommand(const QStringList& args)
 {
     if (args.count() < 2) {
-        qDebug() << "ERROR: need to specify both KEY and TYPE";
+        qDebug() << "> ERROR: need to specify both KEY and TYPE";
         return;
     }
 
@@ -118,25 +118,25 @@ void CommandWatcher::addCommand(const QStringList& args)
 
     if (keyType != "integer" && keyType != "string" &&
         keyType != "double") {
-        qDebug() << "Unknown type";
+        qDebug() << "> ERROR: Unknown type";
         return;
     }
 
     types.insert(keyName, keyType);
     properties.insert(keyName, new Property(keyName));
 
-    qDebug() << "Added key:" << keyName << "with type:" << keyType;
+    qDebug() << "> Added key:" << keyName << "with type:" << keyType;
 }
 
 void CommandWatcher::sleepCommand(const QStringList& args)
 {
     if (args.count() < 1) {
-        qDebug() << "ERROR: need to specify sleep INTERVAL";
+        qDebug() << "> ERROR: need to specify sleep INTERVAL";
         return;
     }
 
     int interval = args.at(0).toInt();
-    qDebug() << "Sleeping" << interval;
+    qDebug() << "> Sleeping" << interval << "seconds";
     sleep(interval);
 }
 
@@ -148,14 +148,14 @@ void CommandWatcher::setCommand(const QString& command)
     const QString value = parts.at(1).trimmed();
 
     if (! types.contains(keyName)) {
-        qDebug() << "ERROR: key" << keyName << "not known/added";
+        qDebug() << "> ERROR: key" << keyName << "not known/added";
         return;
     }
 
     Property *prop = properties.value(keyName);
     const QString keyType = types.value(keyName);
     QVariant v;
-
+    
     if (keyType == "integer")
         v = QVariant(value.toInt());
     else if (keyType == "string")
@@ -163,6 +163,6 @@ void CommandWatcher::setCommand(const QString& command)
     else if (keyType == "double")
         v = QVariant(value.toDouble());
 
-    qDebug() << "Setting key:" << keyName << "to value:" << v << QString("(" + keyType + ")");
+    qDebug() << "> Setting key:" << keyName << "to value:" << v;
     prop->setValue(v);
 }
