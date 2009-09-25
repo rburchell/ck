@@ -38,7 +38,11 @@ int main(int argc, char **argv)
     QString busName;
     QDBusConnection::BusType busType;
     
-    if (args.count() <= 1) {
+    // First, try silently dropping --v2
+    if (args.count() > 1 && args.at(1) == "--v2")
+        args.pop_front();
+    
+    if (args.count() < 2) {
         // No arguments at all? Use commander session bus.
         busName = "org.freedesktop.ContextKit.Commander";
         busType = QDBusConnection::SessionBus;
