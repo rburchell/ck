@@ -33,8 +33,19 @@ using namespace ContextProvider;
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
+    
+    QStringList args = app.arguments();
+    QString busName;
+    
+    if (args.count() <= 1) {
+        busName = "org.freedesktop.ContextKit.Commander";
+    } else {
+        busName = args.at(1);
+    }
+        
+    qDebug() << "Using bus:" << busName;
 
-    Service service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.Commander");
+    Service service(QDBusConnection::SessionBus, busName);
     service.setAsDefault();
     service.start();
 
