@@ -120,7 +120,7 @@ void CommandWatcher::addCommand(const QStringList& args)
     const QString keyType = args.at(1);
 
     if (keyType != "integer" && keyType != "string" &&
-        keyType != "double") {
+        keyType != "double" && keyType != "truth") {
         qDebug() << "> ERROR: Unknown type";
         return;
     }
@@ -165,6 +165,12 @@ void CommandWatcher::setCommand(const QString& command)
         v = QVariant(value);
     else if (keyType == "double")
         v = QVariant(value.toDouble());
+    else if (keyType == "truth") {
+        if (value == "True" || value == "true" || value == "1")
+            v = QVariant(true);
+        else
+            v = QVariant(false);
+    }
 
     qDebug() << "> Setting key:" << keyName << "to value:" << v;
     prop->setValue(v);
