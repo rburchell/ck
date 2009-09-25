@@ -36,16 +36,34 @@ int main(int argc, char **argv)
     
     QStringList args = app.arguments();
     QString busName;
+    QDBusConnection::BusType busType;
     
     if (args.count() <= 1) {
+        // No arguments at all? Use commander session bus.
         busName = "org.freedesktop.ContextKit.Commander";
+        busType = QDBusConnection::SessionBus;
     } else {
-        busName = args.at(1);
+        args.pop_front();
+        if (args.at(0) == "--help" || args.at(0) == "-h") {
+            // Help? Show it and be gone.
+            qDebug() << "Usage: context-provide [BUSNAME][:BUSTYPE]";
+            qDebug() << "BUSTYPE is 'session' or 'system'. Session if not specified.";
+            return 0;
+        } else {
+            // Parameter? Extract the session bus and type from it.
+            QStringList parts = args.at(0).split(':');
+            busName = parts.at(0);
+            
+            if (parts.count() > 1) 
+                busType = (parts.at(1) == "system") ? QDBusConnection::SystemBus : QDBusConnection::SessionBus;
+            else
+                busType = QDBusConnection::SessionBus;
+        }
     }
         
-    qDebug() << "Using bus:" << busName;
+    qDebug() << "Using bus:" << busName << ((busType == QDBusConnection::SessionBus) ? "session bus" : "system bus");
 
-    Service service(QDBusConnection::SessionBus, busName);
+    Service service(busType, busName);
     service.setAsDefault();
     service.start();
 
