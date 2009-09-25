@@ -28,6 +28,14 @@ if len(sys.argv) < 2:
     print __doc__
     sys.exit(1)
 sys.argv.pop(0)
+
+if sys.argv[0] == "--v2":
+    sys.argv.pop(0)
+    cmd = "./new-context-provide"
+    while len(sys.argv):
+        cmd = cmd + " " + sys.argv.pop(0)
+    exit(os.system(cmd))
+
 busaddress = sys.argv.pop(0).split(':')
 if len(busaddress) == 1:
     busaddress.insert(0, 'session')
