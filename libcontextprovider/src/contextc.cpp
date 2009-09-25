@@ -169,7 +169,7 @@ void context_provider_install_key (const char* key,
 /// passed user data \a subscription_changed_cb_target when the status of the subscription changes -- 
 /// when the first subscriber appears or the last subscriber disappears. The \a clear_values_on_subscribe 
 /// when enabled will automatically clear (set to null/undetermined) the group keys on first subscribe.
-void context_provider_install_group (const char** key_group, 
+void context_provider_install_group (char** key_group, 
                                      int clear_values_on_subscribe, 
                                      ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
                                      void* subscription_changed_cb_target)
