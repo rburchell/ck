@@ -78,6 +78,7 @@ void CommandWatcher::help()
     qDebug() << "  KEY=VALUE                       - set KEY to the given VALUE";
     qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
     qDebug() << "  flush                           - write FLUSHED to stderr and stdout";
+    qDebug() << "  exit                            - quit this program";
     qDebug() << "Any prefix of a command can be used as an abbreviation";
 }
 
@@ -101,6 +102,8 @@ void CommandWatcher::interpret(const QString& command)
             addCommand(args);
         } else if (QString("sleep").startsWith(commandName)) {
             sleepCommand(args);
+        } else if (QString("exit").startsWith(commandName)) {
+            exit(0);
         } else
             help();
    }
