@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<provider bus="session" service="com.nokia.non.existent">
+  <key name="test.nonexistent">
+    <type>INT</type>
+    <doc>A property for a non-existent provider.</doc>
+  </key>
+</provider>
