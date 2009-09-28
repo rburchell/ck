@@ -35,15 +35,15 @@ namespace ContextProvider {
 
 class Manager;
 class Property;
-class ServicePrivate;
 class ServiceBackend;
 
-class Service : QObject
+class Service : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Service(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    explicit Service(QDBusConnection connection, QObject *parent = 0);
+    Service(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
     virtual ~Service();
 
     bool start();
@@ -56,20 +56,10 @@ public:
     void setConnection(const QDBusConnection &connection);
 
 private:
-    class ServicePrivate *priv;
-
-    ServiceBackend *backend();
-
-    static QHash <QString, ServiceBackend*> backends;
+    ServiceBackend *backend;
 
     friend class Property;
     friend class ::ServiceUnitTest;
-
-private slots:
-    void onStartMe();
-
-signals:
-    void startMe();
 };
 
 } // end namespace

@@ -34,7 +34,7 @@ namespace ContextProvider {
     subscriber.
 */
 
-/// Constructor. Creates new adaptor for the given manager with the given 
+/// Constructor. Creates new adaptor for the given manager with the given
 /// dbus connection. The connection \a conn is not retained.
 ManagerAdaptor::ManagerAdaptor(Manager* manager, QDBusConnection *conn)
     : QDBusAbstractAdaptor(manager), manager(manager), connection(conn)
@@ -48,15 +48,16 @@ QDBusObjectPath ManagerAdaptor::GetSubscriber(const QDBusMessage &msg)
 {
     Subscriber *subscriber = manager->getSubscriber(msg.service());
 
+    // FIXME: probably it is easier to do this in manager
     if (!connection->objectRegisteredAt(subscriber->dbusPath())) {
         new SubscriberAdaptor(subscriber);
         connection->registerObject(subscriber->dbusPath(), subscriber);
     }
-    
+
     return QDBusObjectPath(subscriber->dbusPath());
 }
 
-/// Dbus interface slot. The ManagerAdaptor listens for dbus bus names changing 
+/// Dbus interface slot. The ManagerAdaptor listens for dbus bus names changing
 /// to notify the managed Manager that a bus name is gone. It does it through
 /// Manager::busNameIsGone function.
 void ManagerAdaptor::OnServiceOwnerChanged(const QString &name, const QString &oldName, const QString &newName)

@@ -22,6 +22,7 @@
 #ifndef SERVICEBACKEND_H
 #define SERVICEBACKEND_H
 
+#include "manager.h"
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -33,18 +34,19 @@ class ServiceBackendUnitTest;
 
 namespace ContextProvider {
 
-class Manager;
 class Property;
 class ServiceBackendPrivate;
 
-class ServiceBackend : QObject
+class ServiceBackend : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ServiceBackend(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    explicit ServiceBackend(QDBusConnection connection);
+    ServiceBackend(QDBusConnection connection, const QString &busName);
     virtual ~ServiceBackend();
 
+    bool sharedConnection();
     bool start();
     void stop();
     void restart();
@@ -56,13 +58,20 @@ public:
 
     void ref();
     void unref();
-    int refCount();
 
+    static ServiceBackend* instance(QDBusConnection connection);
+    static ServiceBackend* instance(QDBusConnection::BusType busType,
+                                    const QString &busName);
     static ServiceBackend *defaultServiceBackend;
     friend class ::ServiceBackendUnitTest;
 
 private:
-    class ServiceBackendPrivate *priv;
+    Manager myManager;
+    QDBusConnection connection;
+    int refCount;
+    QString busName;
+
+    static QHash <QString, ServiceBackend*> instances;
 };
 
 } // end namespace
