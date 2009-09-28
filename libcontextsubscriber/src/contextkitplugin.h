@@ -49,11 +49,13 @@ public:
     void unsubscribe(QSet<QString> keys);
 
 signals:
+#ifdef DOXYGEN_ONLY
     void ready(); ///< Emitted when the GetSubscriber call returns successfully.
     void failed(QString error); ///< Emitted when the GetSubscriber call fails or provider not on D-Bus at all.
     void subscribeFinished(QString key); ///< Emitted when Subscribe call succeeds on D-Bus.
     void subscribeFailed(QString failedKey, QString error); ///< Emitted when Subscribe call fails on D-Bus.
     void valueChanged(QString key, QVariant value); ///< Emitted when ValueChanged signal comes on D-Bus
+#endif
 
 private slots:
     void onDBusValuesChanged(QMap<QString, QVariant> values);
