@@ -24,6 +24,7 @@
 #include "subscriberinterface.h"
 #include "sconnect.h"
 #include <QStringList>
+#include <QTimer>
 
 /// Creates a new instance, the service to connect to has to be passed
 /// in \c constructionString in the format <tt>[session|dbus]:servicename</tt>.
@@ -59,13 +60,14 @@ const QString ContextKitPlugin::managerIName = "org.freedesktop.ContextKit.Manag
 ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& busName)
     : providerListener(new DBusNameListener(bus, busName, this)),
       subscriberInterface(0),
-      managerInterface(new QDBusInterface(busName, managerPath, managerIName, bus, this)),
+//      managerInterface(new QDBusInterface(busName, managerPath, managerIName, bus, this)),
+      managerInterface(0),
       connection(new QDBusConnection(bus)),
       busName(busName)
 {
     // Notice if the provider on the dbus comes and goes
     sconnect(providerListener, SIGNAL(nameAppeared()),
-             this, SLOT(onProviderAppeared()));
+             this, SLOT(onProviderAppearedReal()));
     sconnect(providerListener, SIGNAL(nameDisappeared()),
              this, SLOT(onProviderDisappeared()));
 
@@ -73,7 +75,7 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
     // perform the initial NameHasOwner check.  We try to connect to
     // the provider at startup, whether it's present or not.
     providerListener->startListening(false);
-    QMetaObject::invokeMethod(this, "onProviderAppeared", Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, "onProviderAppearedReal", Qt::QueuedConnection);
 }
 
 /// Gets a new subscriber interface from manager when the provider
@@ -81,14 +83,28 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
 void ContextKitPlugin::onProviderAppeared()
 {
     contextDebug() << "ContextKitPlugin::onProviderAppeared";
+
+    QTimer* t = new QTimer(this);
+
+    t->setSingleShot(true);
+    t->setInterval(0);
+    t->start();
+    sconnect(t, SIGNAL(timeout()), this, SLOT(onProviderAppearedReal()));
+}
+
+void ContextKitPlugin::onProviderAppearedReal()
+{
     delete subscriberInterface;
     subscriberInterface = 0;
+    delete managerInterface;
+    managerInterface = new QDBusInterface(busName, managerPath, managerIName, *connection, this);
     if (!managerInterface->callWithCallback("GetSubscriber",
                                             QList<QVariant>(),
                                             this,
                                             SLOT(onDBusGetSubscriberFinished(QDBusObjectPath)),
                                             SLOT(onDBusGetSubscriberFailed(QDBusError)))) {
-        emit failed("Wasn't able to call GetSubscriber on the managerinterface");
+        emit failed(QString("Wasn't able to call GetSubscriber on the managerinterface: ") +
+                    managerInterface->lastError().message());
     }
 }
 
