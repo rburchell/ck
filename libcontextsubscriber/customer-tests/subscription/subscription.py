@@ -31,7 +31,7 @@ import string
 from subprocess import Popen, PIPE
 import time
 import signal
-from cltool import CLTool
+from ContextKit.cltool import CLTool
 
 def proc_kill(pid):
         os.system('../common/rec-kill.sh %d' % pid)
