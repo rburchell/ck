@@ -3,7 +3,7 @@
 new-context-provide
 - A tool to debug and inspect applictions using the context framework.
 .SH SYNOPSIS
-.B new-context-provide [busname][:bustype]
+.B new-context-provide [--silent] [busname][:bustype]
 .SH DESCRIPTION
 new-context-provide is an interactive tool to set (provide) properties of the context framework. It can be used to simulate an actual provider or debug applications built with the context framework. When launched, the tool presents a simple console where commands can be issued to provide new keys and set their values.
 .SH COMMANDS
@@ -17,6 +17,9 @@ sets a given KEY value to the new VALUE. This is a standard setter. Example: "Ba
 sleep INTERVAL
 sleeps and blocks the main loop for the given amount of seconds. Example: "sleep 10".
 .SH OPTIONS
+.TP 13
+--silent
+Do not print anything when launched.
 .TP 13
 busname
 the bus name to use. Properties set inside the program will be set as propeties of a service registered on the given busname. If no busname is specified, a commande busname is used by default: org.freedesktop.ContextKit.Commander .
