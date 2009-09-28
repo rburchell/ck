@@ -153,11 +153,11 @@ bool NanoXml::endElement(const QString&, const QString&, const QString &name)
 
 /// Called by the XML parser when parsing starts.
 bool NanoXml::characters(const QString &chars)
-{
+{    
     QString trimmed = chars.trimmed();
 
-    if (trimmed != "")
-        addValue(chars.trimmed());
+    if (trimmed != "") 
+        addValue(trimmed);
 
     return true;
 }

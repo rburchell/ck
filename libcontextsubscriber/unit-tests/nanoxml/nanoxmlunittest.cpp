@@ -33,6 +33,7 @@ private slots:
     void test1();
     void test2();
     void test3();
+    void test4Comments();
     void firstLevelAccessor();
     void secondLevelAccessor();
     void thirdLevelAccessor();
@@ -110,6 +111,39 @@ void NanoXmlUnitTest::test2()
     /* Accessor testing */
     QCOMPARE(nano.keyValue("name"), QVariant("Example.Random"));
     QCOMPARE(nano.keyValue(QString("type"), QString("uniform-list"), QString("type")), QVariant("number"));
+}
+
+void NanoXmlUnitTest::test4Comments()
+{
+    NanoXml nano("test4.xml");
+    QCOMPARE(nano.didFail(), false);
+    
+    QCOMPARE(nano.didFail(), false);
+    QVERIFY(nano.root().type() == QVariant::List);
+    QCOMPARE(nano.root().toList().count(), 4);
+    QVERIFY(nano.root().toList().at(0).type() == QVariant::String);
+    QCOMPARE(nano.root().toList().at(0).toString(), QString("key"));
+    
+    QVERIFY(nano.root().toList().at(1).type() == QVariant::List);
+    QCOMPARE(nano.root().toList().at(1).toList().count(), 2);
+    QVERIFY(nano.root().toList().at(1).toList().at(0).type() == QVariant::String);
+    QCOMPARE(nano.root().toList().at(1).toList().at(0).toString(), QString("name"));
+    QVERIFY(nano.root().toList().at(1).toList().at(1).type() == QVariant::String);
+    QCOMPARE(nano.root().toList().at(1).toList().at(1).toString(), QString("Example.Key"));
+    
+    QVERIFY(nano.root().toList().at(2).type() == QVariant::List);
+    QCOMPARE(nano.root().toList().at(2).toList().count(), 2);
+    QVERIFY(nano.root().toList().at(2).toList().at(0).type() == QVariant::String);
+    QCOMPARE(nano.root().toList().at(2).toList().at(0).toString(), QString("type"));
+    QVERIFY(nano.root().toList().at(2).toList().at(1).type() == QVariant::String);
+    QCOMPARE(nano.root().toList().at(2).toList().at(1).toString(), QString("string"));
+
+    QVERIFY(nano.root().toList().at(3).type() == QVariant::List);
+    QCOMPARE(nano.root().toList().at(3).toList().count(), 2);
+    QVERIFY(nano.root().toList().at(3).toList().at(0).type() == QVariant::String);
+    QCOMPARE(nano.root().toList().at(3).toList().at(0).toString(), QString("doc"));
+    QVERIFY(nano.root().toList().at(3).toList().at(1).type() == QVariant::String);
+    QCOMPARE(nano.root().toList().at(3).toList().at(1).toString(), QString("A random property."));
 }
 
 void NanoXmlUnitTest::test3()
