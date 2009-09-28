@@ -7,6 +7,7 @@ Name: contextsubscriber
 Description: ContextKit Context Subscriber library
 Version: @VERSION@
 Requires: QtCore
+Requires.private: QtDBus QtXml
 Libs: -L${libdir} -lcontextsubscriber
-Libs.private: QtDBus QtXml
+Libs.private: @CDB_LIBS@
 Cflags: -I${includedir}/contextsubscriber
