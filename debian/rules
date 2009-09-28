@@ -87,7 +87,6 @@ binary-arch: build install
 	dh_strip -p libcontextprovider0 --dbg-package="libcontextprovider0-dbg"
 	dh_strip -p libcontextsubscriber0 --dbg-package="libcontextsubscriber0-dbg"
 	dh_pycentral -ppython-contextkit
-	dh_pycentral -pcontextkit-utils
 	dh_link -a
 	dh_compress -a
 	dh_fixperms -a
