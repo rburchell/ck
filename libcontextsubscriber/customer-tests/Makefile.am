@@ -1,4 +1,4 @@
-SUBDIRS = update-contextkit-providers testplugins common
+SUBDIRS = update-contextkit-providers testplugins
 CHECKSUBDIRS = update-contextkit-providers
 
 libcontextsubscribertestsdir = $(datadir)/libcontextsubscriber-tests
