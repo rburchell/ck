@@ -48,6 +48,7 @@ private:
     QMap <QString, QString> types;          // key -> type
     QMap <QString, Property*> properties;   // property index
     static void help();
+    QString unquote(const QString& str);
     void addCommand(const QStringList& args);
     void setCommand(const QString& command);
     void sleepCommand(const QStringList& args);

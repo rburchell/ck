@@ -109,6 +109,18 @@ void CommandWatcher::interpret(const QString& command)
    }
 }
 
+QString CommandWatcher::unquote(const QString& str)
+{
+    QString m = str;
+    if (m.startsWith('"'))
+        m = m.right(m.length() - 1);
+
+    if (m.endsWith('"'))
+        m = m.left(m.length() - 1);
+        
+    return m;
+}
+
 void CommandWatcher::addCommand(const QStringList& args)
 {
     if (args.count() < 2) {
@@ -116,8 +128,8 @@ void CommandWatcher::addCommand(const QStringList& args)
         return;
     }
 
-    const QString keyName = args.at(0);
-    const QString keyType = args.at(1);
+    const QString keyName = unquote(args.at(0));
+    const QString keyType = unquote(args.at(1));
 
     if (keyType != "integer" && keyType != "string" &&
         keyType != "double" && keyType != "truth") {
@@ -138,7 +150,7 @@ void CommandWatcher::sleepCommand(const QStringList& args)
         return;
     }
 
-    int interval = args.at(0).toInt();
+    int interval = unquote(args.at(0)).toInt();
     qDebug() << "> Sleeping" << interval << "seconds";
     sleep(interval);
 }
@@ -147,8 +159,8 @@ void CommandWatcher::setCommand(const QString& command)
 {
     QStringList parts = command.split("=");
 
-    const QString keyName = parts.at(0).trimmed();
-    const QString value = parts.at(1).trimmed();
+    const QString keyName = unquote(parts.at(0).trimmed());
+    const QString value = unquote(parts.at(1).trimmed());
 
     if (! types.contains(keyName)) {
         qDebug() << "> ERROR: key" << keyName << "not known/added";
