@@ -32,12 +32,13 @@
 #include <errno.h>
 #include <QMap>
 
-CommandWatcher::CommandWatcher(int commandfd, QObject *parent) :
-    QObject(parent), commandfd(commandfd)
+CommandWatcher::CommandWatcher(int commandfd, bool s, QObject *parent) :
+    QObject(parent), commandfd(commandfd), out(stdout), err(stderr), silent(s)
 {
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
     sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
-    help();
+    if (!silent)
+        help();
 }
 
 CommandWatcher::~CommandWatcher()
@@ -73,19 +74,18 @@ void CommandWatcher::onActivated()
 
 void CommandWatcher::help()
 {
-    qDebug() << "Available commands:";
-    qDebug() << "  add KEY TYPE                    - create new key with the given type";
-    qDebug() << "  KEY=VALUE                       - set KEY to the given VALUE";
-    qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
-    qDebug() << "  flush                           - write FLUSHED to stderr and stdout";
-    qDebug() << "  exit                            - quit this program";
-    qDebug() << "Any prefix of a command can be used as an abbreviation";
+    out << "Available commands:\n";
+    out << "  add KEY TYPE                    - create new key with the given type\n";
+    out << "  KEY=VALUE                       - set KEY to the given VALUE\n";
+    out << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds\n";
+    out << "  flush                           - write FLUSHED to stderr and stdout\n";
+    out << "  exit                            - quit this program\n";
+    out << "Any prefix of a command can be used as an abbreviation\n";
+    out.flush();
 }
 
 void CommandWatcher::interpret(const QString& command)
 {
-    QTextStream out(stdout);
-    QTextStream err(stderr);
     if (command == "") {
         // Show help
         help();
@@ -104,9 +104,16 @@ void CommandWatcher::interpret(const QString& command)
             sleepCommand(args);
         } else if (QString("exit").startsWith(commandName)) {
             exit(0);
+        } else if (QString("flush").startsWith(commandName)) {
+            out << "FLUSHED" << endl;
+            out.flush();
+            err << "FLUSHED" << endl;
+            err.flush();
         } else
             help();
-   }
+    }
+
+    out.flush();
 }
 
 QString CommandWatcher::unquote(const QString& str)
@@ -117,14 +124,14 @@ QString CommandWatcher::unquote(const QString& str)
 
     if (m.endsWith('"'))
         m = m.left(m.length() - 1);
-        
+
     return m;
 }
 
 void CommandWatcher::addCommand(const QStringList& args)
 {
     if (args.count() < 2) {
-        qDebug() << "> ERROR: need to specify both KEY and TYPE";
+        out << "> ERROR: need to specify both KEY and TYPE\n";
         return;
     }
 
@@ -132,26 +139,26 @@ void CommandWatcher::addCommand(const QStringList& args)
     const QString keyType = unquote(args.at(1));
 
     if (keyType != "integer" && keyType != "string" &&
-        keyType != "double" && keyType != "truth") {
-        qDebug() << "> ERROR: Unknown type";
+        keyType != "double" && keyType != "truth" && keyType != "int") {
+        out << "> ERROR: Unknown type\n";
         return;
     }
 
     types.insert(keyName, keyType);
     properties.insert(keyName, new Property(keyName));
 
-    qDebug() << "> Added key:" << keyName << "with type:" << keyType;
+    out << "> Added key: " << keyName << " with type: " << keyType << "\n";
 }
 
 void CommandWatcher::sleepCommand(const QStringList& args)
 {
     if (args.count() < 1) {
-        qDebug() << "> ERROR: need to specify sleep INTERVAL";
+        out << "> ERROR: need to specify sleep INTERVAL\n";
         return;
     }
 
     int interval = unquote(args.at(0)).toInt();
-    qDebug() << "> Sleeping" << interval << "seconds";
+    out << "> Sleeping " << interval << " seconds" << "\n";
     sleep(interval);
 }
 
@@ -163,15 +170,15 @@ void CommandWatcher::setCommand(const QString& command)
     const QString value = unquote(parts.at(1).trimmed());
 
     if (! types.contains(keyName)) {
-        qDebug() << "> ERROR: key" << keyName << "not known/added";
+        out << "> ERROR: key " << keyName << " not known/added\n";
         return;
     }
 
     Property *prop = properties.value(keyName);
     const QString keyType = types.value(keyName);
     QVariant v;
-    
-    if (keyType == "integer")
+
+    if (keyType == "integer" || keyType == "int")
         v = QVariant(value.toInt());
     else if (keyType == "string")
         v = QVariant(value);
@@ -184,6 +191,6 @@ void CommandWatcher::setCommand(const QString& command)
             v = QVariant(false);
     }
 
-    qDebug() << "> Setting key:" << keyName << "to value:" << v;
+    out << "> Setting key: " << keyName << " to value:" << v.toString() << "\n";
     prop->setValue(v);
 }

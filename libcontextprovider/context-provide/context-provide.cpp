@@ -33,15 +33,27 @@ using namespace ContextProvider;
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
-    
+
     QStringList args = app.arguments();
     QString busName;
     QDBusConnection::BusType busType;
-    
+    QTextStream out(stdout);
+    bool silent = false;
+
     // First, try silently dropping --v2
+    if (args.contains("--v2")) {
+        args.removeAll("--v2");
+    }
+
+    // Silent?
+    if (args.contains("--silent")) {
+        silent = true;
+        args.removeAll("--silent");
+    }
+
     if (args.count() > 1 && args.at(1) == "--v2")
         args.pop_front();
-    
+
     if (args.count() < 2) {
         // No arguments at all? Use commander session bus.
         busName = "org.freedesktop.ContextKit.Commander";
@@ -50,28 +62,30 @@ int main(int argc, char **argv)
         args.pop_front();
         if (args.at(0) == "--help" || args.at(0) == "-h") {
             // Help? Show it and be gone.
-            qDebug() << "Usage: context-provide [BUSNAME][:BUSTYPE]";
-            qDebug() << "BUSTYPE is 'session' or 'system'. Session if not specified.";
+            out << "Usage: context-provide [BUSNAME][:BUSTYPE]\n";
+            out << "BUSTYPE is 'session' or 'system'. Session if not specified.\n";
             return 0;
         } else {
             // Parameter? Extract the session bus and type from it.
             QStringList parts = args.at(0).split(':');
             busName = parts.at(0);
-            
-            if (parts.count() > 1) 
+
+            if (parts.count() > 1)
                 busType = (parts.at(1) == "system") ? QDBusConnection::SystemBus : QDBusConnection::SessionBus;
             else
                 busType = QDBusConnection::SessionBus;
         }
     }
-        
-    qDebug() << "Using bus:" << busName << ((busType == QDBusConnection::SessionBus) ? "session bus" : "system bus");
+
+    if (!silent)
+        out << "Using bus:" << busName << ((busType == QDBusConnection::SessionBus) ? "session bus" : "system bus") << "\n";
 
     Service service(busType, busName);
     service.setAsDefault();
     service.start();
 
-    CommandWatcher commandWatcher(STDIN_FILENO, QCoreApplication::instance());
+    out.flush();
+    CommandWatcher commandWatcher(STDIN_FILENO, silent, QCoreApplication::instance());
 
     return app.exec();
 }
