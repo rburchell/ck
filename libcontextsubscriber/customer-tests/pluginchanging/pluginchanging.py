@@ -30,7 +30,7 @@ import string
 from subprocess import Popen, PIPE
 import time
 import signal
-from cltool import CLTool
+from ContextKit.cltool import CLTool
 
 def timeoutHandler(signum, frame):
 	raise Exception('tests have been running for too long')
