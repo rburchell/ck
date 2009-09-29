@@ -146,6 +146,7 @@ void ServiceBackend::unref()
     refCount--;
 
     if (refCount == 0) {
+        stop();
         QString key = instances.key(this);
         if (key != "")
             instances.remove(key);
