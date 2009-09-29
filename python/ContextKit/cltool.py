@@ -21,6 +21,8 @@
 import re
 import time
 from subprocess import Popen, PIPE
+from fcntl import fcntl, F_GETFL, F_SETFL
+from os import O_NONBLOCK
 
 class CLTool:
     STDOUT = 1
@@ -32,6 +34,7 @@ class CLTool:
     def send(self, string):
         self.__io.append((0, string))
         print >>self.__process.stdin, string
+        self.__process.stdin.flush()
 
     def expect(self, fileno, exp_str, timeout):
         stream = 0
@@ -39,25 +42,38 @@ class CLTool:
         if fileno == self.STDERR: stream = self.__process.stderr
         if stream == 0: return False
 
-        print >>self.__process.stdin, "flush"
+        # set the stream to nonblocking
+        fd = stream.fileno()
+        flags = fcntl(fd, F_GETFL)
+        fcntl(fd, F_SETFL, flags | O_NONBLOCK)
+
         cur_str = ""
         start_time = time.time()
         while True:
-            line = stream.readline().rstrip()
-            if line == "FLUSHED":
-                if re.match(exp_str, cur_str):
-                    return True
-                else:
-                    time.sleep(0.1)
-                    if time.time() - start_time > timeout:
-                        self.printio()
-                        print "Expected:", exp_str
-                        print "Received before the timeout:\n", cur_str
-                        return False
-                    print >>self.__process.stdin, "flush"
-            else:
+            try:
+                line = stream.readline()
+                if not line: # eof
+                    self.__io.append((fileno, "--------- STREAM UNEXPECTEDLY CLOSED -----------"))
+                    self.printio()
+                    print "Expected:", exp_str
+                    print "Received before the stream got closed:\n", cur_str
+                    return False
+                line = line.rstrip()
                 cur_str += line + "\n"
                 self.__io.append((fileno, line))
+            except:
+                time.sleep(0.1) # no data were available
+            if re.match(exp_str, cur_str):
+                return True
+            else:
+                if time.time() - start_time > timeout: # timeout
+                    self.printio()
+                    print "Expected:", exp_str
+                    print "Received before the timeout:\n", cur_str
+                    return False
+
+    def comment(self, st):
+        self.__io.append((-1, st))
 
     def printio(self):
         print
@@ -69,10 +85,12 @@ class CLTool:
                 print "[OU] >>>", line[1]
             if line[0] == 2:
                 print "[ER] >>>", line[1]
+            if line[0] == -1:
+                print "[CM] ===", line[1]
         print '----------------------------------------------------'
 
     def wanted(name, type, value):
-        return "%s = %s:%s$" % (name, type, value)
+        return "^%s = %s:%s$" % (name, type, value)
     wanted = staticmethod(wanted)
 
     def wantedUnknown(name):
