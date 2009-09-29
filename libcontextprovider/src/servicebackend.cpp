@@ -106,7 +106,6 @@ bool ServiceBackend::start()
             return false;
         }
     }
-
     return true;
 }
 

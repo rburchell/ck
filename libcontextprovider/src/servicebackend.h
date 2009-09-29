@@ -49,9 +49,7 @@ public:
     bool sharedConnection();
     bool start();
     void stop();
-    void restart();
 
-    void setConnection(const QDBusConnection &connection);
     void setAsDefault();
     void setValue(const QString &key, const QVariant &val);
     Manager *manager();
@@ -64,6 +62,7 @@ public:
                                     const QString &busName);
     static ServiceBackend *defaultServiceBackend;
     friend class ::ServiceBackendUnitTest;
+    friend class Service;
 
 private:
     Manager myManager;

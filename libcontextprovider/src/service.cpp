@@ -211,7 +211,10 @@ void Service::setValue(const QString &key, const QVariant &val)
 /// different names.
 void Service::setConnection(const QDBusConnection &connection)
 {
-    qFatal("[ContextProvider] Service::setConnection() is deprecated, sorry");
+    qCritical("[ContextProvider] Service::setConnection() is deprecated; use Service(QDBusConnection).");
+    backend->stop();
+    backend->connection = connection;
+    backend->start();
 }
 
 /// Start the Service again after it has been stopped.  All clients
