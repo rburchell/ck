@@ -65,7 +65,6 @@ private slots:
     void onDBusSubscribeFailed(QList<QString> keys, QString error);
     void onProviderAppeared();
     void onProviderDisappeared();
-    void onProviderAppearedReal();
 
 private:
     QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
