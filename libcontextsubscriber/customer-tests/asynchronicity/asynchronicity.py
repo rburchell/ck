@@ -57,8 +57,7 @@ class Asynchronous(unittest.TestCase):
                                                      ["int","test.fast","42"])
         print >>self.flexiprovider_slow.stdin, "import time ; time.sleep(3)"
 
-
-    def testCommanderFunctionality(self):
+    def testAsynchronicity(self):
         """
         Description
             This test verifies that the asynchronicity of the subscriber
@@ -82,23 +81,26 @@ class Asynchronous(unittest.TestCase):
         """
 
         # check the fast property
-        self.context_client = CLTool("context-listen", "test.fast", "test.slow")
+        context_client = CLTool("context-listen", "test.fast", "test.slow")
 
-        self.assert_(self.context_client.expect(CLTool.STDOUT,
+        self.assert_(context_client.expect(CLTool.STDOUT,
                                                 CLTool.wanted("test.fast", "int", "42"),
                                                 1), # timeout == 1 second
-                     "Bad value for the fast property, wanted 42, communication:")
+                     "Bad value for the fast property, wanted 42")
         fast_time = time.time()
+        context_client.comment("Fast property arrived with good value at: " + str(fast_time))
 
         # check the slow property
-        self.assert_(self.context_client.expect(CLTool.STDOUT,
+        self.assert_(context_client.expect(CLTool.STDOUT,
                                                 CLTool.wanted("test.slow", "int", "42"),
                                                 10), # timeout == 10 second max, but 3 is enough usually
-                     "Bad value for the slow property, wanted 42, communication:")
+                     "Bad value for the slow property, wanted 42")
         slow_time = time.time()
+        context_client.comment("Slow property arrived with good value at: " + str(slow_time))
 
         self.assert_(slow_time - fast_time > 2.0,
                      "The arrival time of the fast and slow property is not far enough from each other")
+        #context_client.printio()
 
     #TearDown
     def tearDown(self):
