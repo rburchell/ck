@@ -9,13 +9,16 @@ new-context-provide is an interactive tool to set (provide) properties of the co
 .SH COMMANDS
 .TP 13
 add KEY TYPE
-adds a key named KEY with the given TYPE to the list of provided properties. This has to be called before an attempt is made to set a key value. TYPE can be: "string", "integer", "truth", "double". Example: "add Battery.Status integer".
+adds a key named KEY with the given TYPE to the list of provided properties. This has to be called before an attempt is made to set a key value. TYPE can be: STRING, INTEGER, TRUTH, DOUBLE. Example: "add Battery.Status INTEGER".
 .TP 13
 KEY=VALUE
 sets a given KEY value to the new VALUE. This is a standard setter. Example: "Battery.Status=99". 
 .TP 13
 sleep INTERVAL
 sleeps and blocks the main loop for the given amount of seconds. Example: "sleep 10".
+.TP 13
+dump
+dumps the currently added properties to a xml .context file defined by the CONTEXT_PROVIDE_REGISTRY_FILE environment variable. If the variable is not defined, it creates 'context-provide.context' file in the current directory.
 .SH OPTIONS
 .TP 13
 --silent
