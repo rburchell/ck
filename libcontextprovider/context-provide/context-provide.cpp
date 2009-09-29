@@ -85,7 +85,7 @@ int main(int argc, char **argv)
     service.start();
 
     out.flush();
-    CommandWatcher commandWatcher(STDIN_FILENO, silent, QCoreApplication::instance());
+    CommandWatcher commandWatcher(busName, busType, STDIN_FILENO, silent, QCoreApplication::instance());
 
     return app.exec();
 }

@@ -38,7 +38,7 @@ class CommandWatcher : public QObject
     Q_OBJECT
 
 public:
-    CommandWatcher(int commandfd, bool silent, QObject *parent = 0);
+    CommandWatcher(QString busName, QDBusConnection::BusType busType, int commandfd, bool silent, QObject *parent = 0);
     ~CommandWatcher();
 
 private:
@@ -52,9 +52,13 @@ private:
     void addCommand(const QStringList& args);
     void setCommand(const QString& command);
     void sleepCommand(const QStringList& args);
+    void flushCommand();
+    void dumpCommand();
     QTextStream out;
     QTextStream err;
     bool silent;
+    QString busName;
+    QDBusConnection::BusType busType;
 
 private slots:
     void onActivated();

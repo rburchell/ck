@@ -31,9 +31,10 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <QMap>
+#include <QDir>
 
-CommandWatcher::CommandWatcher(int commandfd, bool s, QObject *parent) :
-    QObject(parent), commandfd(commandfd), out(stdout), err(stderr), silent(s)
+CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int commandfd, bool s, QObject *parent) :
+    QObject(parent), commandfd(commandfd), out(stdout), err(stderr), silent(s), busName(bn), busType(bt)
 {
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
     sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
@@ -79,6 +80,7 @@ void CommandWatcher::help()
     out << "  KEY=VALUE                       - set KEY to the given VALUE\n";
     out << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds\n";
     out << "  flush                           - write FLUSHED to stderr and stdout\n";
+    out << "  dump                            - dump the xml content of the defined props\n";
     out << "  exit                            - quit this program\n";
     out << "Any prefix of a command can be used as an abbreviation\n";
     out.flush();
@@ -104,11 +106,10 @@ void CommandWatcher::interpret(const QString& command)
             sleepCommand(args);
         } else if (QString("exit").startsWith(commandName)) {
             exit(0);
+        } else if (QString("dump").startsWith(commandName)) {
+            dumpCommand();
         } else if (QString("flush").startsWith(commandName)) {
-            out << "FLUSHED" << endl;
-            out.flush();
-            err << "FLUSHED" << endl;
-            err.flush();
+            flushCommand();
         } else
             help();
     }
@@ -128,6 +129,14 @@ QString CommandWatcher::unquote(const QString& str)
     return m;
 }
 
+void CommandWatcher::flushCommand()
+{
+    out << "FLUSHED" << endl;
+    out.flush();
+    err << "FLUSHED" << endl;
+    err.flush();
+}
+
 void CommandWatcher::addCommand(const QStringList& args)
 {
     if (args.count() < 2) {
@@ -138,9 +147,9 @@ void CommandWatcher::addCommand(const QStringList& args)
     const QString keyName = unquote(args.at(0));
     const QString keyType = unquote(args.at(1));
 
-    if (keyType != "integer" && keyType != "string" &&
-        keyType != "double" && keyType != "truth" && keyType != "int") {
-        out << "> ERROR: Unknown type\n";
+    if (keyType != "INT" && keyType != "STRING" &&
+        keyType != "DOUBLE" && keyType != "TRUTH") {
+        out << "> ERROR: Unknown type (has to be: INT, STRING, DOUBLE or TRUTH)\n";
         return;
     }
 
@@ -162,6 +171,46 @@ void CommandWatcher::sleepCommand(const QStringList& args)
     sleep(interval);
 }
 
+void CommandWatcher::dumpCommand()
+{
+    QString fileName;
+    QString dirName = "./";
+
+    if (getenv("CONTEXT_PROVIDE_REGISTRY_FILE"))
+        fileName = QString(getenv("CONTEXT_PROVIDE_REGISTRY_FILE"));
+    else
+        fileName = QString("./context-provide.context");
+
+    if (fileName.indexOf('/') != -1)
+        dirName = QString(fileName.left(fileName.lastIndexOf('/'))) + "/";
+
+    QDir dir(dirName);
+    QString tmpPath = dir.absoluteFilePath("cache-XXXXXX");
+    QByteArray templ = tmpPath.toUtf8();
+    char *tmpPathChars = templ.data();
+    tmpPathChars = mktemp(tmpPathChars);
+    QFile f(tmpPathChars);
+    f.open(QIODevice::WriteOnly);
+    QTextStream xml(&f);
+
+    QString bType = (busType == QDBusConnection::SystemBus) ? "system" : "session";
+    xml << "<?xml version=\"1.0\"?>\n";
+    xml << QString("<provider bus=\"%1\" service=\"%2\">\n").arg(bType).arg(busName);
+
+    foreach(QString key, properties.keys()) {
+        xml << QString("  <key name=\"%1\">\n").arg(key);
+        xml << QString("    <type>%1</type>\n").arg(types.value(key));
+        xml << QString("    <doc>A phony but very flexible property.</doc>\n");
+        xml << QString("  </key>\n");
+    }
+    xml << "</provider>\n";
+
+    f.close();
+
+    // Atomically rename
+    rename(tmpPathChars, fileName.toUtf8().constData());
+}
+
 void CommandWatcher::setCommand(const QString& command)
 {
     QStringList parts = command.split("=");
@@ -178,13 +227,13 @@ void CommandWatcher::setCommand(const QString& command)
     const QString keyType = types.value(keyName);
     QVariant v;
 
-    if (keyType == "integer" || keyType == "int")
+    if (keyType == "INT")
         v = QVariant(value.toInt());
-    else if (keyType == "string")
+    else if (keyType == "STRING")
         v = QVariant(value);
-    else if (keyType == "double")
+    else if (keyType == "DOUBLE")
         v = QVariant(value.toDouble());
-    else if (keyType == "truth") {
+    else if (keyType == "TRUTH") {
         if (value == "True" || value == "true" || value == "1")
             v = QVariant(true);
         else
