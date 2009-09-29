@@ -34,7 +34,7 @@ namespace ContextProvider {
     \brief A ServiceBackend is the real worker behind Service.
 
     Multiple Service instances can share same ServiceBackend.
-    The backend is the actual worker that operates on dbus,
+    The backend is the actual worker that operates on D-Bus,
     has a Manager and registers properties.
 
     The Service class actually proxies all methods to the ServiceBackend.
@@ -43,6 +43,10 @@ namespace ContextProvider {
 QHash<QString, ServiceBackend*> ServiceBackend::instances;
 ServiceBackend *ServiceBackend::defaultServiceBackend;
 
+/// Creates new ServiceBackend with the given QDBusConnection. The
+/// backend automatically creates it's Manager. The connection will be
+/// shared between Service and the provider program, and the
+/// ServiceBackend will not register any service names.
 ServiceBackend::ServiceBackend(QDBusConnection connection) :
     connection(connection),
     refCount(0),
@@ -51,8 +55,10 @@ ServiceBackend::ServiceBackend(QDBusConnection connection) :
     contextDebug() << F_SERVICE_BACKEND << "Creating new ServiceBackend for" << busName;
 }
 
-/// Creates new ServiceBackend. The backend automatically creates it's Manager.
-/// Connection is created on ServiceBackend::start().
+/// Creates new ServiceBackend with the given QDBusConnection and a
+/// service name to register. The backend automatically creates it's
+/// Manager. The connection will not be shared between the Service and
+/// the provider program.
 ServiceBackend::ServiceBackend(QDBusConnection connection, const QString &busName) :
     connection(connection),
     refCount(0),
@@ -61,8 +67,8 @@ ServiceBackend::ServiceBackend(QDBusConnection connection, const QString &busNam
     contextDebug() << F_SERVICE_BACKEND << "Creating new ServiceBackend for" << busName;
 }
 
-/// Destroys the ServiceBackend. The backend is stopped.
-/// If this backend is the defaultServiceBackend, the defaultServiceBackend is
+/// Destroys the ServiceBackend. The backend is stopped.  If this
+/// backend is the defaultServiceBackend, the defaultServiceBackend is
 /// set back to NULL.
 ServiceBackend::~ServiceBackend()
 {
@@ -86,9 +92,10 @@ void ServiceBackend::setValue(const QString &key, const QVariant &val)
     myManager.setKeyValue(key, val);
 }
 
-/// Start the ServiceBackend again after it has been stopped.  All clients
-/// will resubscribe to its properties. Returns true on success,
-/// false otherwise.
+/// Start the Service again after it has been stopped. In the case of
+/// shared connection, the objects will be registered to D-Bus. In the
+/// case of non-shared connection, also the service name will be
+/// registered on D-Bus. Returns true on success, false otherwise.
 bool ServiceBackend::start()
 {
     ManagerAdaptor *managerAdaptor = new ManagerAdaptor(&myManager, &connection);
@@ -109,7 +116,10 @@ bool ServiceBackend::start()
     return true;
 }
 
-/// Stop the service.  This will cause it to disappear from D-Bus.
+/// Stop the service. In the case of shared connection, this will
+/// cause the related objects to be unregistered, but the bus name
+/// will still be on D-Bus. In the case of non-shared connection, this
+/// will cause the service to disappear from D-Bus completely.
 void ServiceBackend::stop()
 {
     contextDebug() << F_SERVICE_BACKEND << "Stopping service for bus:" << busName;
@@ -134,13 +144,15 @@ void ServiceBackend::setAsDefault()
     defaultServiceBackend = this;
 }
 
-/// Increase the reference count by one. Service calls that.
+/// Increase the reference count by one. Service calls this.
 void ServiceBackend::ref()
 {
     refCount++;
 }
 
-/// Decrease the reference count by one. Service calls that.
+/// Decrease the reference count by one. Service calls this. If the
+/// reference count goes to zero, stop the ServiceBackend instance,
+/// remove it from the instance store and schedule it to be deleted.
 void ServiceBackend::unref()
 {
     refCount--;
@@ -156,6 +168,8 @@ void ServiceBackend::unref()
     }
 }
 
+/// Returns a ServiceBackend instance for a given \a
+/// connection. Creates the instance if it does not exist yet.
 ServiceBackend* ServiceBackend::instance(QDBusConnection connection)
 {
     QString lookup = connection.name();
@@ -168,6 +182,8 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection connection)
     return instances[lookup];
 }
 
+/// Returns a ServiceBackend instance for a given \a busType and \a
+/// busName. Creates the instance if it does not exist yet.
 ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
                          const QString &busName)
 {
@@ -185,6 +201,8 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
     return instances[lookup];
 }
 
+/// Returns true iff the ServiceBackend shares its QDBusConnection
+/// with the provider program.
 bool ServiceBackend::sharedConnection()
 {
     return busName == "";
