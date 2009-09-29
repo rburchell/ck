@@ -38,19 +38,21 @@ class ServiceBackend : QObject
     Q_OBJECT
 
 public:
-    explicit ServiceBackend(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    explicit ServiceBackend(QDBusConnection connection, const QString &busName = "");
     Manager *manager();
-    static ServiceBackend *defaultService;
+    static ServiceBackend *defaultServiceBackend;
 
     void setAsDefault();
-    void setConnection(const QDBusConnection &connection);
 
     void ref();
     void unref();
-    int refCount();
+    bool sharedConnection();
     bool start();
     void stop();
-    void restart();
+    static ServiceBackend* instance(QDBusConnection connection);
+    static ServiceBackend* instance(QDBusConnection::BusType busType,
+                                    const QString &busName);
+    QDBusConnection connection;
 };
 
 } // end namespace

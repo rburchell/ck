@@ -44,9 +44,10 @@ QDBusConnection *lastConnection = NULL;
 
 /* Mocked ServiceBackend */
 
-ServiceBackend* ServiceBackend::defaultService = NULL;
+ServiceBackend* ServiceBackend::defaultServiceBackend = NULL;
 
-ServiceBackend::ServiceBackend(QDBusConnection::BusType busType, const QString &busName, QObject *parent)
+ServiceBackend::ServiceBackend(QDBusConnection connection, const QString &busName) :
+    connection(connection)
 {
     lastState = STATE_UNDEFINED;
 }
@@ -58,11 +59,7 @@ Manager* ServiceBackend::manager()
 
 void ServiceBackend::setAsDefault()
 {
-    defaultService = this;
-}
-
-void ServiceBackend::setConnection(const QDBusConnection &connection)
-{
+    defaultServiceBackend = this;
 }
 
 void ServiceBackend::ref()
@@ -71,11 +68,6 @@ void ServiceBackend::ref()
 
 void ServiceBackend::unref()
 {
-}
-
-int ServiceBackend::refCount()
-{
-    return 0;
 }
 
 bool ServiceBackend::start()
@@ -92,9 +84,20 @@ void ServiceBackend::stop()
     lastState = STATE_STOPPED;
 }
 
-void ServiceBackend::restart()
+bool ServiceBackend::sharedConnection()
 {
-    lastState = STATE_RESTARTED;
+    return false;
+}
+
+ServiceBackend* ServiceBackend::instance(QDBusConnection connection)
+{
+    return new ServiceBackend(connection);
+}
+
+ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
+                                         const QString &busName)
+{
+    return new ServiceBackend(QDBusConnection::sessionBus(), busName);
 }
 
 /* Mocked Manager */
@@ -150,7 +153,7 @@ private slots:
     void defaults();
     void setValue();
     void start();
-    void restart();
+    void setConnection();
 
 private:
     Service *service;
@@ -177,21 +180,19 @@ void ServiceUnitTest::cleanup()
 
 void ServiceUnitTest::sanityCheck()
 {
-    QVERIFY(service->backend() != NULL);
+    QVERIFY(service->backend != NULL);
 }
 
 void ServiceUnitTest::defaults()
 {
-    /*
-    QVERIFY(service->defaultService == NULL);
+    QVERIFY(service->backend->defaultServiceBackend == NULL);
     service->setAsDefault();
-    QVERIFY(service->defaultService == service);
+    QVERIFY(service->backend->defaultServiceBackend == service->backend);
 
     Service *otherService = new Service(QDBusConnection::SessionBus, "test2");
     otherService->setAsDefault();
-    QVERIFY(service->defaultService == service);
+    QVERIFY(service->backend->defaultServiceBackend == otherService->backend);
     delete otherService;
-    */
 }
 
 void ServiceUnitTest::setValue()
@@ -203,25 +204,29 @@ void ServiceUnitTest::setValue()
 
 void ServiceUnitTest::start()
 {
-    QVERIFY(lastState == STATE_UNDEFINED);
+    QVERIFY(lastState == STATE_STARTED);
+
+    service->stop();
+    QCOMPARE(lastState, STATE_STOPPED);
 
     QCOMPARE(service->start(), true);
     QCOMPARE(lastState, STATE_STARTED);
 
     QCOMPARE(service->start(), false);
     QCOMPARE(lastState, STATE_STARTED);
-}
-
-void ServiceUnitTest::restart()
-{
-    QVERIFY(lastState == STATE_UNDEFINED);
-
-    QCOMPARE(service->start(), true);
-    QCOMPARE(lastState, STATE_STARTED);
 
     service->restart();
-    QCOMPARE(lastState, STATE_RESTARTED);
+    QCOMPARE(lastState, STATE_STARTED);
 }
+
+void ServiceUnitTest::setConnection()
+{
+    QCOMPARE(service->backend->connection.name(), QString("qt_default_session_bus"));
+    QDBusConnection conn = QDBusConnection::connectToBus(QDBusConnection::SessionBus, "test_bus_name");
+    service->setConnection(conn);
+    QCOMPARE(service->backend->connection.name(), QString("test_bus_name"));
+}
+
 
 #include "serviceunittest.moc"
 QTEST_MAIN(ServiceUnitTest);
