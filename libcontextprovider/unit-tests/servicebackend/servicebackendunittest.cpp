@@ -85,7 +85,6 @@ private slots:
     void refCouting();
     void manager();
     void startAndStop();
-    void setConnection();
 
 private:
     ServiceBackend *serviceBackend;
@@ -96,7 +95,7 @@ private:
 // Before each test
 void ServiceBackendUnitTest::init()
 {
-    serviceBackend = new ServiceBackend(QDBusConnection::SessionBus, "test.com");
+    serviceBackend = new ServiceBackend(QDBusConnection::sessionBus(), "test.com");
 }
 
 void ServiceBackendUnitTest::manager()
@@ -107,8 +106,7 @@ void ServiceBackendUnitTest::manager()
 
 void ServiceBackendUnitTest::sanity()
 {
-    QVERIFY(serviceBackend->priv != NULL);
-    QVERIFY(serviceBackend->priv->connection == NULL);
+    QVERIFY(serviceBackend != NULL);
 }
 
 void ServiceBackendUnitTest::defaults()
@@ -118,7 +116,7 @@ void ServiceBackendUnitTest::defaults()
     QVERIFY(ServiceBackend::defaultServiceBackend == serviceBackend);
 
     // Set another
-    ServiceBackend *anotherOne = new ServiceBackend(QDBusConnection::SessionBus, "another.com");
+    ServiceBackend *anotherOne = new ServiceBackend(QDBusConnection::sessionBus(), "another.com");
     anotherOne->setAsDefault();
     QVERIFY(ServiceBackend::defaultServiceBackend == serviceBackend);
 
@@ -128,32 +126,32 @@ void ServiceBackendUnitTest::defaults()
 
 void ServiceBackendUnitTest::refCouting()
 {
-    QCOMPARE(serviceBackend->refCount(), 0);
+    QCOMPARE(serviceBackend->refCount, 0);
     serviceBackend->ref();
-    QCOMPARE(serviceBackend->refCount(), 1);
+    QCOMPARE(serviceBackend->refCount, 1);
     serviceBackend->unref();
-    QCOMPARE(serviceBackend->refCount(), 0);
+    QCOMPARE(serviceBackend->refCount, 0);
 }
 
 void ServiceBackendUnitTest::startAndStop()
 {
-    QVERIFY(serviceBackend->priv->connection == NULL);
+    QVERIFY(serviceBackend->connection.objectRegisteredAt("/org/freedesktop/ContextKit/Manager") == 0);
     serviceBackend->start();
 
     QTest::qWait(100);
-    QVERIFY(serviceBackend->priv->connection != NULL);
-
-    serviceBackend->restart();
+    QVERIFY(serviceBackend->connection.objectRegisteredAt("/org/freedesktop/ContextKit/Manager") != 0);
+    serviceBackend->stop();
+    serviceBackend->start();
     QTest::qWait(100);
-    QVERIFY(serviceBackend->priv->connection != NULL);
+    QVERIFY(serviceBackend->connection.objectRegisteredAt("/org/freedesktop/ContextKit/Manager") != 0);
 
     QTest::qWait(100);
     serviceBackend->stop();
-    QVERIFY(serviceBackend->priv->connection == NULL);
+    QVERIFY(serviceBackend->connection.objectRegisteredAt("/org/freedesktop/ContextKit/Manager") == 0);
 
-    serviceBackend->restart();
+    serviceBackend->stop();
     QTest::qWait(100);
-    QVERIFY(serviceBackend->priv->connection == NULL);
+    QVERIFY(serviceBackend->connection.objectRegisteredAt("/org/freedesktop/ContextKit/Manager") == 0);
 }
 
 void ServiceBackendUnitTest::setValue()
@@ -161,12 +159,6 @@ void ServiceBackendUnitTest::setValue()
     serviceBackend->setValue("Battery.ChargeLevel", 99);
     QCOMPARE(*lastKey, QString("Battery.ChargeLevel"));
     QCOMPARE(lastValue->toInt(), 99);
-}
-
-void ServiceBackendUnitTest::setConnection()
-{
-    serviceBackend->setConnection(QDBusConnection::sessionBus());
-    QCOMPARE(serviceBackend->priv->implicitConnection->name(), QDBusConnection::sessionBus().name());
 }
 
 #include "servicebackendunittest.moc"
