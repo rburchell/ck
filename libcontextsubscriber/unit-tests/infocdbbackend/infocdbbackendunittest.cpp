@@ -32,6 +32,7 @@ class InfoCdbBackendUnitTest : public QObject
 
 private slots:
     void initTestCase();
+    void databaseExists();
     void listKeys();
     void listPlugins();
     void listKeysForPlugin();
@@ -64,6 +65,11 @@ void InfoCdbBackendUnitTest::initTestCase()
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoCdbBackend();
+}
+
+void InfoCdbBackendUnitTest::databaseExists()
+{
+    QCOMPARE(backend->databaseExists(), true);
 }
 
 void InfoCdbBackendUnitTest::listKeys()
