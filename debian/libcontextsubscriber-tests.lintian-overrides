@@ -1,0 +1,5 @@
+libcontextsubscriber-tests: arch-dependent-file-in-usr-share ./usr/share/libcontextsubscriber-tests/testplugins/libcontextsubscribertime2.so.0.0.0
+libcontextsubscriber-tests: unstripped-binary-or-object ./usr/share/libcontextsubscriber-tests/testplugins/libcontextsubscribertime2.so.0.0.0
+libcontextsubscriber-tests: missing-dependency-on-libc needed by ./usr/share/libcontextsubscriber-tests/testplugins/libcontextsubscribertime1.so.0.0.0 and 1 others
+libcontextsubscriber-tests: unstripped-binary-or-object ./usr/share/libcontextsubscriber-tests/testplugins/libcontextsubscribertime1.so.0.0.0
+libcontextsubscriber-tests: arch-dependent-file-in-usr-share ./usr/share/libcontextsubscriber-tests/testplugins/libcontextsubscribertime1.so.0.0.0
