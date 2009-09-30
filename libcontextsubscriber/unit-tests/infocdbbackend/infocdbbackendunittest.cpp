@@ -38,6 +38,7 @@ private slots:
     void typeForKey();
     void docForKey();
     void pluginForKey();
+    void keyExists();
 };
 
 void InfoCdbBackendUnitTest::initTestCase()
@@ -108,6 +109,16 @@ void InfoCdbBackendUnitTest::pluginForKey()
 
     QCOMPARE(backend->pluginForKey("Does.Not.Exist"), QString());
 }
+
+void InfoCdbBackendUnitTest::keyExists()
+{
+    foreach (QString key, backend->listKeys())
+        QCOMPARE(backend->keyExists(key), true);
+
+    QCOMPARE(backend->keyExists("Does.Not.Exist"), false);
+    QCOMPARE(backend->keyExists("Battery.Charging"), true);
+}
+
 
 #include "infocdbbackendunittest.moc"
 QTEST_MAIN(InfoCdbBackendUnitTest);
