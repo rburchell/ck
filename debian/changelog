@@ -1,8 +1,16 @@
-contextkit (0.3.7~unreleased) unstable; urgency=low
+contextkit (0.3.7) unstable; urgency=low
 
-  *
+  * Added a const promise to context_provider_install_group's first
+    parameter in libcontextprovider C API.
+  * Added cltool.py to python-contextkit, this is a tool for test writers,
+    to make it easier to communicate with context-listen from python
+    scripts.
+  * Refactorings in libcontextprovider Qt API, should get rid of some race
+    conditions; setConnection in Service is deprecated.
+  * libcontextsubscriber's pkg-config file has been fixed, private
+    libraries are in Requires.private now.
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 25 Sep 2009 15:57:15 +0300
+ -- Gergely Risko <gergely+context@risko.hu>  Wed, 30 Sep 2009 08:52:41 +0300
 
 contextkit (0.3.6) unstable; urgency=low
 
