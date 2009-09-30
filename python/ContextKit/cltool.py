@@ -77,6 +77,9 @@ class CLTool:
     def comment(self, st):
         self.__io.append((-1, st))
 
+    def kill(self):
+        self.__process.kill()
+
     def printio(self):
         print
         print '----------------------------------------------------'
@@ -96,5 +99,5 @@ class CLTool:
     wanted = staticmethod(wanted)
 
     def wantedUnknown(name):
-        return "%s is Unknown" % (name)
+        return "\n%s is Unknown\n" % (name)
     wantedUnknown = staticmethod(wantedUnknown)
