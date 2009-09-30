@@ -84,6 +84,10 @@ void SubscriptionTests::cleanup()
     delete test_double; test_double = NULL;
     delete test_bool; test_bool = NULL;
     delete test_string; test_string = NULL;
+
+    // ServiceBackedns are deleted in a deferred way, thus we need to
+    // get them deleted
+    QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
 }
 
 void SubscriptionTests::testGetSubscriber()

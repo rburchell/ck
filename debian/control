@@ -128,10 +128,13 @@ Description: Helper library for subscribers of context properties
 Package: libcontextsubscriber-tests
 Section: devel
 Architecture: any
-Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit
+Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit, ${shlibs:Depends}
 Recommends: python2.5, python (>= 2.5)
-X-Maemo-CI-Packages: libcontextsubscriber0, libcontextprovider0
-X-Maemo-CI-Stage: staging, acceptance
+XB-Maemo-CI-Packages: libcontextsubscriber0, libcontextprovider0
+XB-Maemo-CI-Stage: staging, acceptance
 Description: libcontextsubscriber automated customer tests
+ The libcontextsubscriber library implements the subscriber side of the
+ org.freedesktop.ContextKit D-Bus interface.
  .
- This package contains an automated customer testsuite of the libcontextsubscriber library.
+ This package contains an automated customer testsuite of the
+ libcontextsubscriber library.

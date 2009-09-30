@@ -24,6 +24,7 @@
 #include "subscriberinterface.h"
 #include "sconnect.h"
 #include <QStringList>
+#include <QTimer>
 
 /// Creates a new instance, the service to connect to has to be passed
 /// in \c constructionString in the format <tt>[session|dbus]:servicename</tt>.
@@ -59,7 +60,8 @@ const QString ContextKitPlugin::managerIName = "org.freedesktop.ContextKit.Manag
 ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& busName)
     : providerListener(new DBusNameListener(bus, busName, this)),
       subscriberInterface(0),
-      managerInterface(new QDBusInterface(busName, managerPath, managerIName, bus, this)),
+//      managerInterface(new QDBusInterface(busName, managerPath, managerIName, bus, this)),
+      managerInterface(0),
       connection(new QDBusConnection(bus)),
       busName(busName)
 {
@@ -81,14 +83,18 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
 void ContextKitPlugin::onProviderAppeared()
 {
     contextDebug() << "ContextKitPlugin::onProviderAppeared";
+
     delete subscriberInterface;
     subscriberInterface = 0;
+    delete managerInterface;
+    managerInterface = new QDBusInterface(busName, managerPath, managerIName, *connection, this);
     if (!managerInterface->callWithCallback("GetSubscriber",
                                             QList<QVariant>(),
                                             this,
                                             SLOT(onDBusGetSubscriberFinished(QDBusObjectPath)),
                                             SLOT(onDBusGetSubscriberFailed(QDBusError)))) {
-        emit failed("Wasn't able to call GetSubscriber on the managerinterface");
+        emit failed(QString("Wasn't able to call GetSubscriber on the managerinterface: ") +
+                    managerInterface->lastError().message());
     }
 }
 

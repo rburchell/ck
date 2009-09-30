@@ -52,7 +52,6 @@ void TypesTests::init()
     charItem = new Property(*service, "Test.Char");
     dateItem = new Property(*service, "Test.Date");
     timeItem = new Property (*service, "Test.Time");
-    service->start();
 
     // Process the events so that the service gets started
     QCoreApplication::processEvents(QEventLoop::AllEvents);
@@ -91,6 +90,10 @@ void TypesTests::cleanup()
     delete charItem; charItem = NULL;
     delete timeItem; timeItem = NULL;
     delete dateItem; dateItem = NULL;
+
+    // ServiceBackedns are deleted in a deferred way, thus we need to
+    // get them deleted
+    QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
 }
 
 void TypesTests::typesInReturnValueOfSubscribe()
