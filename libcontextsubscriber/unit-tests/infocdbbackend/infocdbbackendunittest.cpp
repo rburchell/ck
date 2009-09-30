@@ -35,6 +35,7 @@ private slots:
     void listKeys();
     void listPlugins();
     void listKeysForPlugin();
+    void typeForKey();
 };
 
 void InfoCdbBackendUnitTest::initTestCase()
@@ -45,7 +46,9 @@ void InfoCdbBackendUnitTest::initTestCase()
     writer.add("KEYS", "Internet.BytesOut");
     writer.add("PLUGINS", "contextkit-dbus");
     writer.add("contextkit-dbus:KEYS", "Battery.Charging");
-    writer.add("contextkit-dbus:KEYS", "Battery.BytesOut");
+    writer.add("contextkit-dbus:KEYS", "Internet.BytesOut");
+    writer.add("Battery.Charging:TYPE", "TRUTH");
+    writer.add("Internet.BytesOut:TYPE", "INTEGER");
     writer.close();
 
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
@@ -77,6 +80,13 @@ void InfoCdbBackendUnitTest::listKeysForPlugin()
 
     QStringList keys2 = backend->listKeysForPlugin("non-existant");
     QCOMPARE(keys2.count(), 1);
+}
+
+void InfoCdbBackendUnitTest::typeForKey()
+{
+    QCOMPARE(backend->typeForKey("Internet.BytesOut"), QString("INTEGER"));
+    QCOMPARE(backend->typeForKey("Battery.Charging"), QString("TRUTH"));
+    QCOMPARE(backend->typeForKey("Does.Not.Exist"), QString());
 }
 
 #include "infocdbbackendunittest.moc"
