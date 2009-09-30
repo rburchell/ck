@@ -34,6 +34,7 @@ private slots:
     void listKeys();
     void listPlugins();
     void listKeysForPlugin();
+    void typeForKey();
 };
 
 void InfoXmlBackendUnitTest::initTestCase()
@@ -77,7 +78,19 @@ void InfoXmlBackendUnitTest::listKeysForPlugin()
     QVERIFY(keys.contains("Key.With.double"));
     QVERIFY(keys.contains("Key.With.complex"));
     QVERIFY(keys.contains("Battery.Charging"));
-    QVERIFY(keys.contains("Battery.ChargePercentage"));
+}
+
+void InfoXmlBackendUnitTest::typeForKey()
+{
+    QCOMPARE(backend->typeForKey("Battery.ChargePercentage"), QString());
+    QCOMPARE(backend->typeForKey("Key.With.Attribute"), QString("TRUTH"));
+    QCOMPARE(backend->typeForKey("Battery.LowBattery"), QString("TRUTH"));
+    QCOMPARE(backend->typeForKey("Key.With.bool"), QString("TRUTH"));
+    QCOMPARE(backend->typeForKey("Key.With.int32"), QString("INT"));
+    QCOMPARE(backend->typeForKey("Key.With.string"), QString("STRING"));
+    QCOMPARE(backend->typeForKey("Key.With.double"), QString("DOUBLE"));
+    QCOMPARE(backend->typeForKey("Key.With.complex"), QString());
+    QCOMPARE(backend->typeForKey("Battery.Charging"), QString("TRUTH"));
 }
 
 #include "infoxmlbackendunittest.moc"
