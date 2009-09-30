@@ -36,6 +36,8 @@ private slots:
     void listKeysForPlugin();
     void typeForKey();
     void docForKey();
+    void pluginForKey();
+    void keyExists();
 };
 
 void InfoXmlBackendUnitTest::initTestCase()
@@ -104,6 +106,21 @@ void InfoXmlBackendUnitTest::docForKey()
     QCOMPARE(backend->docForKey("Key.With.double"), QString());
     QCOMPARE(backend->docForKey("Key.With.complex"), QString());
     QCOMPARE(backend->docForKey("Battery.Charging"), QString("This is true when battery is charging"));
+}
+
+void InfoXmlBackendUnitTest::pluginForKey()
+{
+    foreach (QString key, backend->listKeys())
+        QCOMPARE(backend->pluginForKey(key), QString("contextkit-dbus"));
+}
+
+void InfoXmlBackendUnitTest::keyExists()
+{
+    foreach (QString key, backend->listKeys())
+        QCOMPARE(backend->keyExists(key), true);
+
+    QCOMPARE(backend->keyExists("Does.Not.Exist"), false);
+    QCOMPARE(backend->keyExists("Battery.Charging"), true);
 }
 
 #include "infoxmlbackendunittest.moc"
