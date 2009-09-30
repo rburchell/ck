@@ -40,8 +40,6 @@ int main(int argc, char **argv)
     QString busName;
     QDBusConnection::BusType busType = QDBusConnection::SessionBus;
     QTextStream out(stdout);
-    QTextStream err(stderr);
-    bool silent = false;
 
     // First, try silently dropping --v2
     if (args.contains("--v2")) {
@@ -50,15 +48,9 @@ int main(int argc, char **argv)
 
     if (args.contains("--help") || args.contains("-h")) {
         // Help? Show it and be gone.
-        out << "Usage: context-provide [--silent] [--session | --system] [BUSNAME]\n";
+        out << "Usage: context-provide [--session | --system] [BUSNAME]\n";
         out << "BUSNAME is " COMMANDER " by default, and bus is session.\n";
         return 0;
-    }
-
-    // Silent?
-    if (args.contains("--silent") || args.contains("-q")) { // quiet
-        silent = true;
-        args.removeAll("--silent");
     }
 
     // session/system
@@ -80,16 +72,8 @@ int main(int argc, char **argv)
     // Parameter? Extract the session bus and type from it.
     busName = args.at(1);
 
-    Service service(busType, busName);
+    Service service(busType, busName, false);
     service.setAsDefault();
-
-    // FIXME: check the error status of service and exit here, if the
-    // registration was unsuccessful
-    if (!silent) {
-        out << "Service: " << busName << " on " <<
-            ((busType == QDBusConnection::SessionBus) ? "session" : "system") << "\n";
-    }
-    out.flush();
 
     // 0 -> prog name
     // 1 -> busname
@@ -101,14 +85,29 @@ int main(int argc, char **argv)
     // 7 -> value of prop2
     // ...
     if (args.count() % 3 != 2) {
-        err << "Wrong number of properties\n";
+        qDebug() << "Wrong number of properties\n";
         return 1;
     }
 
-    CommandWatcher commandWatcher(busName, busType, STDIN_FILENO, silent, QCoreApplication::instance());
+    qDebug() << "Service:" << busName.toLocal8Bit().data() << "on" <<
+        ((busType == QDBusConnection::SessionBus) ? "session" : "system");
+
+
+    CommandWatcher commandWatcher(busName, busType, STDIN_FILENO, QCoreApplication::instance());
 
     for (int i=2; i < args.count(); i+=3)
         commandWatcher.addCommand(args.mid(i, 3));
+
+    if (args.count() > 2) {
+        qDebug() << "Autostarting the service, since you have had properties on the command line";
+        if (!service.start()) {
+            qDebug() << "Starting service failed";
+            return 2;
+        }
+    } else {
+        qDebug() << "SERVICE NOT STARTED, since you haven't had parameters on the command line";
+        qDebug() << "Use the start command when you are ready to be registered on D-Bus";
+    }
 
     return app.exec();
 }
