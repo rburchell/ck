@@ -40,11 +40,7 @@ install: build
 	cp -rf libcontextsubscriber/customer-tests/asynchronicity debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/subscription debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/registry debian/tmp/usr/share/libcontextsubscriber-tests/
-	cp -r libcontextsubscriber/customer-tests/pluginchanging debian/tmp/usr/share/libcontextsubscriber-tests/
-
-	mkdir debian/tmp/usr/share/libcontextsubscriber-tests/testplugins
-	cp libcontextsubscriber/customer-tests/testplugins/timeplugin1/.libs/libcontextsubscribertime1.so.0.0.0 debian/tmp/usr/share/libcontextsubscriber-tests/testplugins
-	cp libcontextsubscriber/customer-tests/testplugins/timeplugin2/.libs/libcontextsubscribertime2.so.0.0.0 debian/tmp/usr/share/libcontextsubscriber-tests/testplugins
+	cp -rf libcontextsubscriber/customer-tests/pluginchanging debian/tmp/usr/share/libcontextsubscriber-tests/
 
 	mkdir debian/tmp/usr/share/libcontextsubscriber-tests/common
 	cp libcontextsubscriber/customer-tests/common/*.sh debian/tmp/usr/share/libcontextsubscriber-tests/common
@@ -68,7 +64,6 @@ binary-indep: build install
 	dh_installexamples -i
 	dh_installman -i
 	dh_link -i
-	dh_lintian -i
 	dh_compress -i
 	dh_fixperms -i
 	dh_installdeb -i
@@ -89,14 +84,13 @@ binary-arch: build install
 	dh_strip -p libcontextsubscriber0 --dbg-package="libcontextsubscriber0-dbg"
 	dh_pycentral -ppython-contextkit
 	dh_link -a
-	dh_lintian -a
 	dh_compress -a
 	dh_fixperms -a
-	dh_makeshlibs -a -V -Xtestplugins  # do not add ldconfig calls because of testplugins
+	dh_makeshlibs -a -V -Xcontextsubscribertime  # do not add ldconfig calls because of testplugins
 	dh_installdeb -a
 	cp `pwd`/debian/libcontextsubscriber0.triggers `pwd`/debian/libcontextsubscriber0/DEBIAN/triggers
 	chmod 0644 `pwd`/debian/libcontextsubscriber0/DEBIAN/triggers
-	dh_shlibdeps -a -Xtestplugins
+	dh_shlibdeps -a
 	dh_gencontrol -a
 	dh_md5sums -a
 	dh_builddeb -a

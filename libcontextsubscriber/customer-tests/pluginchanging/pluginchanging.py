@@ -33,48 +33,53 @@ import signal
 from ContextKit.cltool import CLTool
 
 def timeoutHandler(signum, frame):
-	raise Exception('tests have been running for too long')
+        raise Exception('tests have been running for too long')
 
 def stdoutRead (object,lines):
-	list = []
-	for i in range(lines):
-		list.append(object.stdout.readline().rstrip())
-	return list
+        list = []
+        for i in range(lines):
+                list.append(object.stdout.readline().rstrip())
+        return list
 
 class Subscription(unittest.TestCase):
 
-	def setUp(self):
-		os.environ["CONTEXT_PROVIDERS"] = "."
-		# We need 2 plugins which are in separate directories.
-		os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] = "."
-		os.system('cp ../testplugins/libcontextsubscribertime1.so.0.0.0 ./libcontextsubscribertime1.so')
-		os.system('cp ../testplugins/libcontextsubscribertime2.so.0.0.0 ./libcontextsubscribertime2.so')
+        def setUp(self):
+                os.environ["CONTEXT_PROVIDERS"] = "."
+                if os.path.isdir("../testplugins"):
+                        # for your local machine
+                        os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] = "../testplugins"
+                else:
+                        # if libcontextsubscriber-tests is installed
+                        os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] = "/usr/lib/contextkit/subscriber-test-plugins"
 
-		self.context_client = CLTool("context-listen", "Test.Time")
+                if not os.path.exists(os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] + "/" + "contextsubscribertime1.so") \
+                            or not os.path.exists(os.environ["CONTEXT_SUBSCRIBER_PLUGINS"] + "/" + "contextsubscribertime2.so"):
+                        self.assert_(False, "Couldn't find the test time plugins")
 
-	def tearDown(self):
-		os.remove('time.context')
-		os.system('rm libcontextsubscribertime*.so*')
+                self.context_client = CLTool("context-listen", "Test.Time")
 
-	def testChangingPlugin(self):
+        def tearDown(self):
+                os.remove('time.context')
 
-		# Copy the declaration file, declaring libcontextsubscribertime1 plugin.
-		os.system('cp time1.context.temp time.context.temp')
-		os.system('mv time.context.temp time.context')
-		#print "now reading"
+        def testChangingPlugin(self):
 
-		# Expect value coming from plugin libcontextsubscribertime1
-		self.assert_(self.context_client.expect(CLTool.STDOUT, "Test.Time = QString:Time1:", 3))
+                # Copy the declaration file, declaring libcontextsubscribertime1 plugin.
+                os.system('cp time1.context.temp time.context.temp')
+                os.system('mv time.context.temp time.context')
+                #print "now reading"
 
-		# Modify the registry so that the key is now provided by libcontextsubscribertime2
-		os.system('cp time2.context.temp time.context.temp')
-		os.system('mv time.context.temp time.context')
+                # Expect value coming from plugin libcontextsubscribertime1
+                self.assert_(self.context_client.expect(CLTool.STDOUT, "Test.Time = QString:Time1:", 3))
 
-		# Expect value coming from plugin libcontextsubscribertime2
-		self.assert_(self.context_client.expect(CLTool.STDOUT, "Test.Time = QString:Time2:", 3))
+                # Modify the registry so that the key is now provided by libcontextsubscribertime2
+                os.system('cp time2.context.temp time.context.temp')
+                os.system('mv time.context.temp time.context')
+
+                # Expect value coming from plugin libcontextsubscribertime2
+                self.assert_(self.context_client.expect(CLTool.STDOUT, "Test.Time = QString:Time2:", 3))
 
 if __name__ == "__main__":
-	sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
-	signal.signal(signal.SIGALRM, timeoutHandler)
-	signal.alarm(30)
-	unittest.main()
+        sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
+        signal.signal(signal.SIGALRM, timeoutHandler)
+        signal.alarm(30)
+        unittest.main()
