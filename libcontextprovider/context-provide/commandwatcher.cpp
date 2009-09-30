@@ -207,6 +207,9 @@ void CommandWatcher::dumpCommand()
     // Atomically rename
     rename(tmpPathChars, fileName.toUtf8().constData());
     free(tmpPathChars);
+
+    out << "> Wrote " << fileName << "\n";
+
 }
 
 void CommandWatcher::setCommand(const QString& command)
