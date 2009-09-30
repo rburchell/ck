@@ -75,13 +75,14 @@ void CommandWatcher::onActivated()
 void CommandWatcher::help()
 {
     qDebug() << "Available commands:\n";
-    qDebug() << "  add TYPE KEY VALUE              - create new key with the given type\n";
-    qDebug() << "  KEY=VALUE                       - set KEY to the given VALUE\n";
-    qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds\n";
-    qDebug() << "  dump                            - dump the xml content of the defined props\n";
-    qDebug() << "  start                           - (re)register everything on D-Bus\n";
-    qDebug() << "  exit                            - quit this program\n";
-    qDebug() << "Any prefix of a command can be used as an abbreviation\n";
+    qDebug() << "  add TYPE KEY VALUE              - create new key with the given type";
+    qDebug() << "  KEY=VALUE                       - set KEY to the given VALUE";
+    qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
+    qDebug() << "  dump                            - dump the xml content of the defined props";
+    qDebug() << "  start                           - (re)register everything on D-Bus";
+    qDebug() << "  unset KEY                       - sets KEY to unknown";
+    qDebug() << "  exit                            - quit this program";
+    qDebug() << "Any unique prefix of a command can be used as an abbreviation";
 }
 
 void CommandWatcher::interpret(const QString& command)
