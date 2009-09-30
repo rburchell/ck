@@ -30,14 +30,17 @@
 
 using namespace ContextProvider;
 
+#define COMMANDER "org.freedesktop.ContextKit.Commander"
+
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
 
     QStringList args = app.arguments();
     QString busName;
-    QDBusConnection::BusType busType;
+    QDBusConnection::BusType busType = QDBusConnection::SessionBus;
     QTextStream out(stdout);
+    QTextStream err(stderr);
     bool silent = false;
 
     // First, try silently dropping --v2
@@ -45,47 +48,67 @@ int main(int argc, char **argv)
         args.removeAll("--v2");
     }
 
+    if (args.contains("--help") || args.contains("-h")) {
+        // Help? Show it and be gone.
+        out << "Usage: context-provide [--silent] [--session | --system] [BUSNAME]\n";
+        out << "BUSNAME is " COMMANDER " by default, and bus is session.\n";
+        return 0;
+    }
+
     // Silent?
-    if (args.contains("--silent")) {
+    if (args.contains("--silent") || args.contains("-q")) { // quiet
         silent = true;
         args.removeAll("--silent");
     }
 
-    if (args.count() > 1 && args.at(1) == "--v2")
-        args.pop_front();
-
-    if (args.count() < 2) {
-        // No arguments at all? Use commander session bus.
-        busName = "org.freedesktop.ContextKit.Commander";
+    // session/system
+    if (args.contains("--session")) {
         busType = QDBusConnection::SessionBus;
-    } else {
-        args.pop_front();
-        if (args.at(0) == "--help" || args.at(0) == "-h") {
-            // Help? Show it and be gone.
-            out << "Usage: context-provide [BUSNAME][:BUSTYPE]\n";
-            out << "BUSTYPE is 'session' or 'system'. Session if not specified.\n";
-            return 0;
-        } else {
-            // Parameter? Extract the session bus and type from it.
-            QStringList parts = args.at(0).split(':');
-            busName = parts.at(0);
-
-            if (parts.count() > 1)
-                busType = (parts.at(1) == "system") ? QDBusConnection::SystemBus : QDBusConnection::SessionBus;
-            else
-                busType = QDBusConnection::SessionBus;
-        }
+        args.removeAll("--session");
     }
 
-    if (!silent)
-        out << "Using bus:" << busName << ((busType == QDBusConnection::SessionBus) ? "session bus" : "system bus") << "\n";
+    if (args.contains("--system")) {
+        busType = QDBusConnection::SystemBus;
+        args.removeAll("--system");
+    }
+
+    if (args.count() < 2) {
+        // No arguments at all? Use commander by default.
+        args.push_back(COMMANDER);
+    }
+
+    // Parameter? Extract the session bus and type from it.
+    busName = args.at(1);
 
     Service service(busType, busName);
     service.setAsDefault();
-    service.start();
 
+    // FIXME: check the error status of service and exit here, if the
+    // registration was unsuccessful
+    if (!silent) {
+        out << "Service: " << busName << " on " <<
+            ((busType == QDBusConnection::SessionBus) ? "session" : "system") << "\n";
+    }
     out.flush();
+
+    // 0 -> prog name
+    // 1 -> busname
+    // 2 -> type of prop1
+    // 3 -> name of prop1
+    // 4 -> value of prop1
+    // 5 -> type of prop2
+    // 6 -> name of prop2
+    // 7 -> value of prop2
+    // ...
+    if (args.count() % 3 != 2) {
+        err << "Wrong number of properties\n";
+        return 1;
+    }
+
     CommandWatcher commandWatcher(busName, busType, STDIN_FILENO, silent, QCoreApplication::instance());
+
+    for (int i=2; i < args.count(); i+=3)
+        commandWatcher.addCommand(args.mid(i, 3));
 
     return app.exec();
 }

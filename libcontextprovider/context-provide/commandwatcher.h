@@ -40,6 +40,7 @@ class CommandWatcher : public QObject
 public:
     CommandWatcher(QString busName, QDBusConnection::BusType busType, int commandfd, bool silent, QObject *parent = 0);
     ~CommandWatcher();
+    void addCommand(const QStringList& args);
 
 private:
     int commandfd;
@@ -49,11 +50,11 @@ private:
     QMap <QString, Property*> properties;   // property index
     void help();
     QString unquote(const QString& str);
-    void addCommand(const QStringList& args);
     void setCommand(const QString& command);
     void sleepCommand(const QStringList& args);
     void flushCommand();
     void dumpCommand();
+    void startCommand();
     QTextStream out;
     QTextStream err;
     bool silent;

@@ -21,6 +21,7 @@
 
 #include "commandwatcher.h"
 #include "sconnect.h"
+#include <service.h>
 #include <QTextStream>
 #include <QFile>
 #include <QSocketNotifier>
@@ -76,11 +77,12 @@ void CommandWatcher::onActivated()
 void CommandWatcher::help()
 {
     out << "Available commands:\n";
-    out << "  add KEY TYPE                    - create new key with the given type\n";
+    out << "  add TYPE KEY VALUE              - create new key with the given type\n";
     out << "  KEY=VALUE                       - set KEY to the given VALUE\n";
     out << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds\n";
     out << "  flush                           - write FLUSHED to stderr and stdout\n";
     out << "  dump                            - dump the xml content of the defined props\n";
+    out << "  start                           - (re)register everything on D-Bus\n";
     out << "  exit                            - quit this program\n";
     out << "Any prefix of a command can be used as an abbreviation\n";
     out.flush();
@@ -110,6 +112,8 @@ void CommandWatcher::interpret(const QString& command)
             dumpCommand();
         } else if (QString("flush").startsWith(commandName)) {
             flushCommand();
+        } else if (QString("start").startsWith(commandName)) {
+            startCommand();
         } else
             help();
     }
@@ -144,8 +148,8 @@ void CommandWatcher::addCommand(const QStringList& args)
         return;
     }
 
-    const QString keyName = unquote(args.at(0));
-    const QString keyType = unquote(args.at(1));
+    const QString keyType = unquote(args.at(0)).toUpper();
+    const QString keyName = unquote(args.at(1));
 
     if (keyType != "INT" && keyType != "STRING" &&
         keyType != "DOUBLE" && keyType != "TRUTH") {
@@ -157,6 +161,10 @@ void CommandWatcher::addCommand(const QStringList& args)
     properties.insert(keyName, new Property(keyName));
 
     out << "> Added key: " << keyName << " with type: " << keyType << "\n";
+
+    // handle default value
+    if (args.count() > 2)
+        setCommand(keyName + "=\"" + QStringList(args.mid(2)).join(" ") + "\"");
 }
 
 void CommandWatcher::sleepCommand(const QStringList& args)
@@ -185,12 +193,15 @@ void CommandWatcher::dumpCommand()
         dirName = QString(fileName.left(fileName.lastIndexOf('/'))) + "/";
 
     QDir dir(dirName);
-    QString tmpPath = dir.absoluteFilePath("cache-XXXXXX");
+    QString tmpPath = dir.absoluteFilePath("temp-XXXXXX");
     QByteArray templ = tmpPath.toUtf8();
-    char *tmpPathChars = templ.data();
-    tmpPathChars = mktemp(tmpPathChars);
-    QFile f(tmpPathChars);
-    f.open(QIODevice::WriteOnly);
+    char *tmpPathChars = (char*) malloc(strlen(templ.data())+1);
+    if (tmpPathChars  == NULL)
+        qFatal("Not enough memory");
+    strcpy(tmpPathChars, templ.data());
+    int fd = mkstemp(tmpPathChars);
+    QFile f;
+    f.open(fd, QIODevice::WriteOnly);
     QTextStream xml(&f);
 
     QString bType = (busType == QDBusConnection::SystemBus) ? "system" : "session";
@@ -206,17 +217,17 @@ void CommandWatcher::dumpCommand()
     xml << "</provider>\n";
 
     f.close();
+    close(fd);
 
     // Atomically rename
     rename(tmpPathChars, fileName.toUtf8().constData());
+    free(tmpPathChars);
 }
 
 void CommandWatcher::setCommand(const QString& command)
 {
-    QStringList parts = command.split("=");
-
-    const QString keyName = unquote(parts.at(0).trimmed());
-    const QString value = unquote(parts.at(1).trimmed());
+    const QString keyName = unquote(command.left(command.indexOf('=')).trimmed());
+    const QString value = unquote(command.mid(command.indexOf('=')+1).trimmed());
 
     if (! types.contains(keyName)) {
         out << "> ERROR: key " << keyName << " not known/added\n";
@@ -240,6 +251,14 @@ void CommandWatcher::setCommand(const QString& command)
             v = QVariant(false);
     }
 
-    out << "> Setting key: " << keyName << " to value:" << v.toString() << "\n";
+    out << "> Setting key: " << keyName << " to value: " << v.toString() << "\n";
     prop->setValue(v);
+}
+
+void CommandWatcher::startCommand()
+{
+    Service service(busType, busName);
+    service.start();
+    // FIXME: exit here if the registration is unsuccessful
+    out << "> Service started\n";
 }
