@@ -37,6 +37,7 @@ private slots:
     void listKeysForPlugin();
     void typeForKey();
     void docForKey();
+    void constructionStringForKey();
     void pluginForKey();
     void keyExists();
 };
@@ -51,6 +52,7 @@ void InfoXmlBackendUnitTest::initTestCase()
 void InfoXmlBackendUnitTest::listKeys()
 {
     QStringList keys = backend->listKeys();
+    QCOMPARE(keys.count(), 9);
     QVERIFY(keys.contains("Battery.ChargePercentage"));
     QVERIFY(keys.contains("Battery.LowBattery"));
     QVERIFY(keys.contains("Key.With.Attribute"));
@@ -60,7 +62,6 @@ void InfoXmlBackendUnitTest::listKeys()
     QVERIFY(keys.contains("Key.With.double"));
     QVERIFY(keys.contains("Key.With.complex"));
     QVERIFY(keys.contains("Battery.Charging"));
-    QVERIFY(keys.contains("Battery.ChargePercentage"));
 }
 
 void InfoXmlBackendUnitTest::listPlugins()
@@ -82,6 +83,7 @@ void InfoXmlBackendUnitTest::listKeysForPlugin()
     QVERIFY(keys.contains("Key.With.double"));
     QVERIFY(keys.contains("Key.With.complex"));
     QVERIFY(keys.contains("Battery.Charging"));
+    QVERIFY(backend->listKeysForPlugin("does-not-exist").count() == 0);
 }
 
 void InfoXmlBackendUnitTest::typeForKey()
@@ -95,6 +97,7 @@ void InfoXmlBackendUnitTest::typeForKey()
     QCOMPARE(backend->typeForKey("Key.With.double"), QString("DOUBLE"));
     QCOMPARE(backend->typeForKey("Key.With.complex"), QString());
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("TRUTH"));
+    QCOMPARE(backend->typeForKey("Does.Not.Exist"), QString());
 }
 
 void InfoXmlBackendUnitTest::docForKey()
@@ -107,12 +110,15 @@ void InfoXmlBackendUnitTest::docForKey()
     QCOMPARE(backend->docForKey("Key.With.double"), QString());
     QCOMPARE(backend->docForKey("Key.With.complex"), QString());
     QCOMPARE(backend->docForKey("Battery.Charging"), QString("This is true when battery is charging"));
+    QCOMPARE(backend->docForKey("Does.Not.Exist"), QString());
 }
 
 void InfoXmlBackendUnitTest::pluginForKey()
 {
     foreach (QString key, backend->listKeys())
         QCOMPARE(backend->pluginForKey(key), QString("contextkit-dbus"));
+
+    QCOMPARE(backend->pluginForKey("Does.Not.Exist"), QString());
 }
 
 void InfoXmlBackendUnitTest::keyExists()
@@ -128,6 +134,16 @@ void InfoXmlBackendUnitTest::paths()
 {
     QCOMPARE(InfoXmlBackend::registryPath(), QString(LOCAL_DIR));
     QCOMPARE(InfoXmlBackend::coreDeclPath(), QString("/dev/null"));
+}
+
+void InfoXmlBackendUnitTest::constructionStringForKey()
+{
+    foreach (QString key, backend->listKeys())
+        QVERIFY(backend->constructionStringForKey(key) != QString());
+
+    QCOMPARE(backend->constructionStringForKey("Battery.Charging"), QString("system:org.freedesktop.ContextKit.contextd2"));
+    QCOMPARE(backend->constructionStringForKey("Key.With.bool"), QString("session:org.freedesktop.ContextKit.contextd1"));
+    QCOMPARE(backend->constructionStringForKey("Does.Not.Exist"), QString());
 }
 
 #include "infoxmlbackendunittest.moc"
