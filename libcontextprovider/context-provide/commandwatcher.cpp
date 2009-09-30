@@ -109,6 +109,8 @@ void CommandWatcher::interpret(const QString& command)
             dumpCommand();
         } else if (QString("start").startsWith(commandName)) {
             startCommand();
+        } else if (QString("unset").startsWith(commandName)) {
+            unsetCommand(args);
         } else
             help();
     }
@@ -239,6 +241,25 @@ void CommandWatcher::setCommand(const QString& command)
 
     out << "> Setting key: " << keyName << " to value: " << v.toString() << "\n";
     prop->setValue(v);
+}
+
+void CommandWatcher::unsetCommand(const QStringList& args)
+{
+    if (args.count() < 1) {
+        out << "> ERROR: need to specify key to unset\n";
+        return;
+    }
+
+    QString keyName = unquote(args[0].trimmed());
+
+    if (! types.contains(keyName)) {
+        out << "> ERROR: key " << keyName << " not known/added\n";
+        return;
+    }
+
+    Property *prop = properties.value(keyName);
+    out << "> Setting key: " << keyName << " to unknown\n";
+    prop->unsetValue();
 }
 
 void CommandWatcher::startCommand()

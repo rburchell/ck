@@ -50,6 +50,7 @@ private:
     QMap <QString, Property*> properties;   // property index
     void help();
     QString unquote(const QString& str);
+    void unsetCommand(const QStringList& args);
     void setCommand(const QString& command);
     void sleepCommand(const QStringList& args);
     void flushCommand();
