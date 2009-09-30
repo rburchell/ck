@@ -150,6 +150,7 @@ void CommandWatcher::addCommand(const QStringList& args)
     properties.insert(keyName, new Property(keyName));
 
     out << "> Added key: " << keyName << " with type: " << keyType << "\n";
+    out.flush();
 
     // handle default value
     if (args.count() > 2)
@@ -164,7 +165,8 @@ void CommandWatcher::sleepCommand(const QStringList& args)
     }
 
     int interval = unquote(args.at(0)).toInt();
-    out << "> Sleeping " << interval << " seconds" << "\n";
+    out << "> Sleeping " << interval << " seconds" << endl;
+    out.flush();
     sleep(interval);
 }
 
@@ -212,7 +214,8 @@ void CommandWatcher::dumpCommand()
     rename(tmpPathChars, fileName.toUtf8().constData());
     free(tmpPathChars);
 
-    out << "> Wrote " << fileName << "\n";
+    out << "> Wrote " << fileName << endl;
+    out.flush();
 
 }
 
@@ -222,7 +225,7 @@ void CommandWatcher::setCommand(const QString& command)
     const QString value = unquote(command.mid(command.indexOf('=')+1).trimmed());
 
     if (! types.contains(keyName)) {
-        qDebug() << "ERROR: key " << keyName << " not known/added";
+        qDebug() << "ERROR: key" << keyName << "not known/added";
         return;
     }
 
@@ -243,26 +246,28 @@ void CommandWatcher::setCommand(const QString& command)
             v = QVariant(false);
     }
 
-    out << "> Setting key: " << keyName << " to value: " << v.toString() << "\n";
+    out << "> Setting key: " << keyName << " to value: " << v.toString() << endl;
+    out.flush();
     prop->setValue(v);
 }
 
 void CommandWatcher::unsetCommand(const QStringList& args)
 {
     if (args.count() < 1) {
-        out << "> ERROR: need to specify key to unset\n";
+        qDebug() << "ERROR: need to specify key to unset";
         return;
     }
 
     QString keyName = unquote(args[0].trimmed());
 
     if (! types.contains(keyName)) {
-        out << "> ERROR: key " << keyName << " not known/added\n";
+        qDebug() << "ERROR: key" << keyName << "not known/added";
         return;
     }
 
     Property *prop = properties.value(keyName);
-    out << "> Setting key: " << keyName << " to unknown\n";
+    out << "> Setting key: " << keyName << " to unknown" << endl;
+    out.flush();
     prop->unsetValue();
 }
 
@@ -271,5 +276,6 @@ void CommandWatcher::startCommand()
     Service service(busType, busName);
     service.start();
     // FIXME: exit here if the registration is unsuccessful
-    out << "> Service started\n";
+    out << "> Service started" << endl;
+    out.flush();
 }
