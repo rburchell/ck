@@ -129,7 +129,7 @@ QString CommandWatcher::unquote(const QString& str)
 void CommandWatcher::addCommand(const QStringList& args)
 {
     if (args.count() < 2) {
-        out << "> ERROR: need to specify both KEY and TYPE\n";
+        qDebug() << "ERROR: need to specify both KEY and TYPE";
         return;
     }
 
@@ -138,7 +138,7 @@ void CommandWatcher::addCommand(const QStringList& args)
 
     if (keyType != "INT" && keyType != "STRING" &&
         keyType != "DOUBLE" && keyType != "TRUTH" && keyType != "BOOL") {
-        out << "> ERROR: Unknown type (has to be: INT, STRING, DOUBLE or TRUTH)\n";
+        qDebug() << "ERROR: Unknown type (has to be: INT, STRING, DOUBLE, BOOL or TRUTH)";
         return;
     }
     if (keyType == "BOOL") keyType = "TRUTH";
@@ -156,7 +156,7 @@ void CommandWatcher::addCommand(const QStringList& args)
 void CommandWatcher::sleepCommand(const QStringList& args)
 {
     if (args.count() < 1) {
-        out << "> ERROR: need to specify sleep INTERVAL\n";
+        qDebug() << "ERROR: need to specify sleep INTERVAL";
         return;
     }
 
@@ -219,7 +219,7 @@ void CommandWatcher::setCommand(const QString& command)
     const QString value = unquote(command.mid(command.indexOf('=')+1).trimmed());
 
     if (! types.contains(keyName)) {
-        out << "> ERROR: key " << keyName << " not known/added\n";
+        qDebug() << "ERROR: key " << keyName << " not known/added";
         return;
     }
 
