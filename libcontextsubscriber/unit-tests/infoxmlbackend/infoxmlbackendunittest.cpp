@@ -40,6 +40,7 @@ private slots:
     void constructionStringForKey();
     void pluginForKey();
     void keyExists();
+    void keyProvided();
 };
 
 void InfoXmlBackendUnitTest::initTestCase()
@@ -144,6 +145,14 @@ void InfoXmlBackendUnitTest::constructionStringForKey()
     QCOMPARE(backend->constructionStringForKey("Battery.Charging"), QString("system:org.freedesktop.ContextKit.contextd2"));
     QCOMPARE(backend->constructionStringForKey("Key.With.bool"), QString("session:org.freedesktop.ContextKit.contextd1"));
     QCOMPARE(backend->constructionStringForKey("Does.Not.Exist"), QString());
+}
+
+void InfoXmlBackendUnitTest::keyProvided()
+{
+    foreach (QString key, backend->listKeys())
+        QVERIFY(backend->keyProvided(key) == true);
+
+    QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
 }
 
 #include "infoxmlbackendunittest.moc"
