@@ -136,14 +136,15 @@ void CommandWatcher::addCommand(const QStringList& args)
         return;
     }
 
-    const QString keyType = unquote(args.at(0)).toUpper();
+    QString keyType = unquote(args.at(0)).toUpper();
     const QString keyName = unquote(args.at(1));
 
     if (keyType != "INT" && keyType != "STRING" &&
-        keyType != "DOUBLE" && keyType != "TRUTH") {
+        keyType != "DOUBLE" && keyType != "TRUTH" && keyType != "BOOL") {
         out << "> ERROR: Unknown type (has to be: INT, STRING, DOUBLE or TRUTH)\n";
         return;
     }
+    if (keyType == "BOOL") keyType = "TRUTH";
 
     types.insert(keyName, keyType);
     properties.insert(keyName, new Property(keyName));
@@ -210,6 +211,9 @@ void CommandWatcher::dumpCommand()
     // Atomically rename
     rename(tmpPathChars, fileName.toUtf8().constData());
     free(tmpPathChars);
+
+    out << "> Wrote " << fileName << "\n";
+
 }
 
 void CommandWatcher::setCommand(const QString& command)
