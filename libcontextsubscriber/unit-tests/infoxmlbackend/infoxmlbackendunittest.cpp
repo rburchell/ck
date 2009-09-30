@@ -31,6 +31,7 @@ class InfoXmlBackendUnitTest : public QObject
 
 private slots:
     void initTestCase();
+    void paths();
     void listKeys();
     void listPlugins();
     void listKeysForPlugin();
@@ -121,6 +122,12 @@ void InfoXmlBackendUnitTest::keyExists()
 
     QCOMPARE(backend->keyExists("Does.Not.Exist"), false);
     QCOMPARE(backend->keyExists("Battery.Charging"), true);
+}
+
+void InfoXmlBackendUnitTest::paths()
+{
+    QCOMPARE(InfoXmlBackend::registryPath(), QString(LOCAL_DIR));
+    QCOMPARE(InfoXmlBackend::coreDeclPath(), QString("/dev/null"));
 }
 
 #include "infoxmlbackendunittest.moc"
