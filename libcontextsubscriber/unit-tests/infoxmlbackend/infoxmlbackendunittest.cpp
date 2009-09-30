@@ -27,15 +27,41 @@
 class InfoXmlBackendUnitTest : public QObject
 {
     Q_OBJECT
+    InfoXmlBackend *backend;
 
 private slots:
     void initTestCase();
+    void listKeys();
+    void listPlugins();
 };
 
 void InfoXmlBackendUnitTest::initTestCase()
 {
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
+    backend = new InfoXmlBackend();
+}
+
+void InfoXmlBackendUnitTest::listKeys()
+{
+    QStringList keys = backend->listKeys();
+    QVERIFY(keys.contains("Battery.ChargePercentage"));
+    QVERIFY(keys.contains("Battery.LowBattery"));
+    QVERIFY(keys.contains("Key.With.Attribute"));
+    QVERIFY(keys.contains("Key.With.bool"));
+    QVERIFY(keys.contains("Key.With.int32"));
+    QVERIFY(keys.contains("Key.With.string"));
+    QVERIFY(keys.contains("Key.With.double"));
+    QVERIFY(keys.contains("Key.With.complex"));
+    QVERIFY(keys.contains("Battery.Charging"));
+    QVERIFY(keys.contains("Battery.ChargePercentage"));
+}
+
+void InfoXmlBackendUnitTest::listPlugins()
+{
+    QStringList plugins = backend->listPlugins();
+    QCOMPARE(plugins.count(), 1);
+    QVERIFY(plugins.contains("contextkit-dbus"));
 }
 
 #include "infoxmlbackendunittest.moc"
