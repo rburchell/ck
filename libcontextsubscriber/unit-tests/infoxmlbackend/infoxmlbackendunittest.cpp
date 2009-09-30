@@ -33,6 +33,7 @@ private slots:
     void initTestCase();
     void listKeys();
     void listPlugins();
+    void listKeysForPlugin();
 };
 
 void InfoXmlBackendUnitTest::initTestCase()
@@ -62,6 +63,21 @@ void InfoXmlBackendUnitTest::listPlugins()
     QStringList plugins = backend->listPlugins();
     QCOMPARE(plugins.count(), 1);
     QVERIFY(plugins.contains("contextkit-dbus"));
+}
+
+void InfoXmlBackendUnitTest::listKeysForPlugin()
+{
+    QStringList keys = backend->listKeysForPlugin("contextkit-dbus");
+    QVERIFY(keys.contains("Battery.ChargePercentage"));
+    QVERIFY(keys.contains("Battery.LowBattery"));
+    QVERIFY(keys.contains("Key.With.Attribute"));
+    QVERIFY(keys.contains("Key.With.bool"));
+    QVERIFY(keys.contains("Key.With.int32"));
+    QVERIFY(keys.contains("Key.With.string"));
+    QVERIFY(keys.contains("Key.With.double"));
+    QVERIFY(keys.contains("Key.With.complex"));
+    QVERIFY(keys.contains("Battery.Charging"));
+    QVERIFY(keys.contains("Battery.ChargePercentage"));
 }
 
 #include "infoxmlbackendunittest.moc"
