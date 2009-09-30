@@ -128,7 +128,7 @@ Description: Helper library for subscribers of context properties
 Package: libcontextsubscriber-tests
 Section: devel
 Architecture: any
-Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit
+Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit, ${shlibs:Depends}
 Recommends: python2.5, python (>= 2.5)
 XB-Maemo-CI-Packages: libcontextsubscriber0, libcontextprovider0
 XB-Maemo-CI-Stage: staging, acceptance
