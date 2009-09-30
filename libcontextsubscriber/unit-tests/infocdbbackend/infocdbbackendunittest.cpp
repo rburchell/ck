@@ -36,6 +36,7 @@ private slots:
     void listPlugins();
     void listKeysForPlugin();
     void typeForKey();
+    void docForKey();
 };
 
 void InfoCdbBackendUnitTest::initTestCase()
@@ -47,8 +48,9 @@ void InfoCdbBackendUnitTest::initTestCase()
     writer.add("PLUGINS", "contextkit-dbus");
     writer.add("contextkit-dbus:KEYS", "Battery.Charging");
     writer.add("contextkit-dbus:KEYS", "Internet.BytesOut");
-    writer.add("Battery.Charging:TYPE", "TRUTH");
-    writer.add("Internet.BytesOut:TYPE", "INTEGER");
+    writer.add("Battery.Charging:KEYTYPE", "TRUTH");
+    writer.add("Internet.BytesOut:KEYTYPE", "INTEGER");
+    writer.add("Battery.Charging:KEYDOC", "doc1");
     writer.close();
 
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
@@ -79,7 +81,7 @@ void InfoCdbBackendUnitTest::listKeysForPlugin()
     QVERIFY(keys1.contains("Internet.BytesOut"));
 
     QStringList keys2 = backend->listKeysForPlugin("non-existant");
-    QCOMPARE(keys2.count(), 1);
+    QCOMPARE(keys2.count(), 0);
 }
 
 void InfoCdbBackendUnitTest::typeForKey()
@@ -88,6 +90,14 @@ void InfoCdbBackendUnitTest::typeForKey()
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("TRUTH"));
     QCOMPARE(backend->typeForKey("Does.Not.Exist"), QString());
 }
+
+void InfoCdbBackendUnitTest::docForKey()
+{
+    QCOMPARE(backend->docForKey("Internet.BytesOut"), QString());
+    QCOMPARE(backend->docForKey("Battery.Charging"), QString("doc1"));
+    QCOMPARE(backend->docForKey("Does.Not.Exist"), QString());
+}
+
 
 #include "infocdbbackendunittest.moc"
 QTEST_MAIN(InfoCdbBackendUnitTest);
