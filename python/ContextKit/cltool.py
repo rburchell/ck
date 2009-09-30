@@ -63,7 +63,9 @@ class CLTool:
                 self.__io.append((fileno, line))
             except:
                 time.sleep(0.1) # no data were available
-            if re.match(exp_str, cur_str):
+            # this is hack, so you can have expressions like "\nwhole line\n"
+            # and they will match even for the first line
+            if re.search(exp_str, "\n" + cur_str):
                 return True
             else:
                 if time.time() - start_time > timeout: # timeout
@@ -90,7 +92,7 @@ class CLTool:
         print '----------------------------------------------------'
 
     def wanted(name, type, value):
-        return "^%s = %s:%s$" % (name, type, value)
+        return "\n%s = %s:%s\n" % (name, type, value)
     wanted = staticmethod(wanted)
 
     def wantedUnknown(name):
