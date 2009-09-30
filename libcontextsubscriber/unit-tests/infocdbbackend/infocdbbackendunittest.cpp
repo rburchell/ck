@@ -39,6 +39,8 @@ private slots:
     void docForKey();
     void pluginForKey();
     void keyExists();
+    void constructionStringForKey();
+    void keyProvided();
 };
 
 void InfoCdbBackendUnitTest::initTestCase()
@@ -55,6 +57,8 @@ void InfoCdbBackendUnitTest::initTestCase()
     writer.add("Battery.Charging:KEYDOC", "doc1");
     writer.add("Internet.BytesOut:KEYPLUGIN", "contextkit-dbus");
     writer.add("Battery.Charging:KEYPLUGIN", "contextkit-dbus");
+    writer.add("Battery.Charging:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
+    writer.add("Internet.BytesOut:KEYCONSTRUCTIONSTRING", "session:org.freedesktop.ContextKit.contextd2");
     writer.close();
 
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
@@ -118,6 +122,24 @@ void InfoCdbBackendUnitTest::keyExists()
     QCOMPARE(backend->keyExists("Does.Not.Exist"), false);
     QCOMPARE(backend->keyExists("Battery.Charging"), true);
 }
+
+void InfoCdbBackendUnitTest::constructionStringForKey()
+{
+    foreach (QString key, backend->listKeys())
+        QVERIFY(backend->constructionStringForKey(key) != QString());
+
+    QCOMPARE(backend->constructionStringForKey("Battery.Charging"), QString("system:org.freedesktop.ContextKit.contextd1"));
+    QCOMPARE(backend->constructionStringForKey("Does.Not.Exist"), QString());
+}
+
+void InfoCdbBackendUnitTest::keyProvided()
+{
+    foreach (QString key, backend->listKeys())
+        QVERIFY(backend->keyProvided(key) == true);
+
+    QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
+}
+
 
 
 #include "infocdbbackendunittest.moc"
