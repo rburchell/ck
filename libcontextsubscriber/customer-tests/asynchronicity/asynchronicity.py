@@ -37,26 +37,6 @@ from subprocess import Popen, PIPE
 from ContextKit.cltool import CLTool
 
 class Asynchronous(unittest.TestCase):
-    def startProvider(busname, args):
-        ret = Popen(["context-provide", busname] + args,
-              stdin=PIPE,stdout=PIPE)
-        # wait for it
-        print >>ret.stdin, "info()"
-        ret.stdout.readline().rstrip()
-        return ret
-    startProvider = staticmethod(startProvider)
-
-    #SetUp
-    def setUp(self):
-
-        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide-slow.context"
-        self.flexiprovider_slow = self.startProvider("com.nokia.slow",
-                                                     ["int","test.slow","42"])
-        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide-fast.context"
-        self.flexiprovider_fast = self.startProvider("com.nokia.fast",
-                                                     ["int","test.fast","42"])
-        print >>self.flexiprovider_slow.stdin, "import time ; time.sleep(3)"
-
     def testAsynchronicity(self):
         """
         Description
@@ -80,11 +60,18 @@ class Asynchronous(unittest.TestCase):
             None
         """
 
-        # check the fast property
+        provider_slow = CLTool("new-context-provide", "com.nokia.slow",
+                                                     "int","test.slow","42")
+        provider_fast = CLTool("new-context-provide", "com.nokia.fast",
+                                                     "int","test.fast","44")
+        provider_slow.send("sleep 3")
+
+        # start the client
         context_client = CLTool("context-listen", "test.fast", "test.slow")
 
+        # check the fast property
         self.assert_(context_client.expect(CLTool.STDOUT,
-                                                CLTool.wanted("test.fast", "int", "42"),
+                                                CLTool.wanted("test.fast", "int", "44"),
                                                 1), # timeout == 1 second
                      "Bad value for the fast property, wanted 42")
         fast_time = time.time()
@@ -93,7 +80,7 @@ class Asynchronous(unittest.TestCase):
         # check the slow property
         self.assert_(context_client.expect(CLTool.STDOUT,
                                                 CLTool.wanted("test.slow", "int", "42"),
-                                                10), # timeout == 10 second max, but 3 is enough usually
+                                                5), # timeout == 5 second max, but 3 is enough usually
                      "Bad value for the slow property, wanted 42")
         slow_time = time.time()
         context_client.comment("Slow property arrived with good value at: " + str(slow_time))
@@ -101,13 +88,6 @@ class Asynchronous(unittest.TestCase):
         self.assert_(slow_time - fast_time > 2.0,
                      "The arrival time of the fast and slow property is not far enough from each other")
         #context_client.printio()
-
-    #TearDown
-    def tearDown(self):
-        os.kill(self.flexiprovider_fast.pid, 9)
-        os.kill(self.flexiprovider_slow.pid, 9)
-        os.unlink('context-provide-fast.context')
-        os.unlink('context-provide-slow.context')
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(Asynchronous)
