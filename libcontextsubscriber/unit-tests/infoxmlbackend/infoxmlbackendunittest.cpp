@@ -35,6 +35,7 @@ private slots:
     void listPlugins();
     void listKeysForPlugin();
     void typeForKey();
+    void docForKey();
 };
 
 void InfoXmlBackendUnitTest::initTestCase()
@@ -91,6 +92,18 @@ void InfoXmlBackendUnitTest::typeForKey()
     QCOMPARE(backend->typeForKey("Key.With.double"), QString("DOUBLE"));
     QCOMPARE(backend->typeForKey("Key.With.complex"), QString());
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("TRUTH"));
+}
+
+void InfoXmlBackendUnitTest::docForKey()
+{
+    QCOMPARE(backend->docForKey("Battery.ChargePercentage"), QString());
+    QCOMPARE(backend->docForKey("Battery.LowBattery"), QString("This is true when battery is low"));
+    QCOMPARE(backend->docForKey("Key.With.bool"), QString());
+    QCOMPARE(backend->docForKey("Key.With.int32"), QString());
+    QCOMPARE(backend->docForKey("Key.With.string"), QString());
+    QCOMPARE(backend->docForKey("Key.With.double"), QString());
+    QCOMPARE(backend->docForKey("Key.With.complex"), QString());
+    QCOMPARE(backend->docForKey("Battery.Charging"), QString("This is true when battery is charging"));
 }
 
 #include "infoxmlbackendunittest.moc"
