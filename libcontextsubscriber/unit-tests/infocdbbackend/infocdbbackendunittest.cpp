@@ -23,6 +23,7 @@
 #include <QtCore>
 #include "fileutils.h"
 #include "infocdbbackend.h"
+#include "cdbwriter.h"
 
 class InfoCdbBackendUnitTest : public QObject
 {
@@ -31,13 +32,37 @@ class InfoCdbBackendUnitTest : public QObject
 
 private slots:
     void initTestCase();
+    void listKeys();
+    void listPlugins();
 };
 
 void InfoCdbBackendUnitTest::initTestCase()
 {
+    // FIXME: LOCAL_DIR
+    CDBWriter writer("cache.cdb");
+    writer.add("KEYS", "Battery.Charging");
+    writer.add("KEYS", "Internet.BytesOut");
+    writer.add("PLUGINS", "contextkit-dbus");
+    writer.close();
+
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoCdbBackend();
+}
+
+void InfoCdbBackendUnitTest::listKeys()
+{
+    QStringList keys = backend->listKeys();
+    QCOMPARE(keys.count(), 2);
+    QVERIFY(keys.contains("Battery.Charging"));
+    QVERIFY(keys.contains("Internet.BytesOut"));
+}
+
+void InfoCdbBackendUnitTest::listPlugins()
+{
+    QStringList plugins = backend->listPlugins();
+    QCOMPARE(plugins.count(), 1);
+    QVERIFY(plugins.contains("contextkit-dbus"));
 }
 
 #include "infocdbbackendunittest.moc"

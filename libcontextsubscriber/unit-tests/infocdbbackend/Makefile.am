@@ -5,7 +5,7 @@ infocdbbackendunittest_SOURCES = infocdbbackendunittest.cpp
 
 COVERAGE_FILES = infobackend.cpp 		\
 	         infocdbbackend.cpp
-EXTRA_DIST = 
+EXTRA_DIST = cache.src
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
@@ -16,6 +16,7 @@ AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = 							\
 	infobackend.cpp infoxmlbackend.cpp			\
 	cdbreader.h cdbreader.cpp				\
+        cdbwriter.h cdbwriter.cpp                               \
 	infoxmlkeysfinder.cpp 					\
 	infobackend.h						\
 	infoxmlbackend.h 					\
