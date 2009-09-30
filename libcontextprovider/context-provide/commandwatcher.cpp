@@ -34,13 +34,11 @@
 #include <QMap>
 #include <QDir>
 
-CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int commandfd, bool s, QObject *parent) :
-    QObject(parent), commandfd(commandfd), out(stdout), err(stderr), silent(s), busName(bn), busType(bt)
+CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int commandfd, QObject *parent) :
+    QObject(parent), commandfd(commandfd), out(stdout), busName(bn), busType(bt)
 {
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
     sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
-    if (!silent)
-        help();
 }
 
 CommandWatcher::~CommandWatcher()
@@ -76,16 +74,14 @@ void CommandWatcher::onActivated()
 
 void CommandWatcher::help()
 {
-    out << "Available commands:\n";
-    out << "  add TYPE KEY VALUE              - create new key with the given type\n";
-    out << "  KEY=VALUE                       - set KEY to the given VALUE\n";
-    out << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds\n";
-    out << "  flush                           - write FLUSHED to stderr and stdout\n";
-    out << "  dump                            - dump the xml content of the defined props\n";
-    out << "  start                           - (re)register everything on D-Bus\n";
-    out << "  exit                            - quit this program\n";
-    out << "Any prefix of a command can be used as an abbreviation\n";
-    out.flush();
+    qDebug() << "Available commands:\n";
+    qDebug() << "  add TYPE KEY VALUE              - create new key with the given type\n";
+    qDebug() << "  KEY=VALUE                       - set KEY to the given VALUE\n";
+    qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds\n";
+    qDebug() << "  dump                            - dump the xml content of the defined props\n";
+    qDebug() << "  start                           - (re)register everything on D-Bus\n";
+    qDebug() << "  exit                            - quit this program\n";
+    qDebug() << "Any prefix of a command can be used as an abbreviation\n";
 }
 
 void CommandWatcher::interpret(const QString& command)
@@ -110,14 +106,11 @@ void CommandWatcher::interpret(const QString& command)
             exit(0);
         } else if (QString("dump").startsWith(commandName)) {
             dumpCommand();
-        } else if (QString("flush").startsWith(commandName)) {
-            flushCommand();
         } else if (QString("start").startsWith(commandName)) {
             startCommand();
         } else
             help();
     }
-
     out.flush();
 }
 
@@ -131,14 +124,6 @@ QString CommandWatcher::unquote(const QString& str)
         m = m.left(m.length() - 1);
 
     return m;
-}
-
-void CommandWatcher::flushCommand()
-{
-    out << "FLUSHED" << endl;
-    out.flush();
-    err << "FLUSHED" << endl;
-    err.flush();
 }
 
 void CommandWatcher::addCommand(const QStringList& args)
