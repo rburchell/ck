@@ -35,6 +35,7 @@ install: build
 
 	# install testsets under /usr/share
 	mkdir -p debian/tmp/usr/share
+	dh_lintian
 
 	cp -rf libcontextsubscriber/customer-tests/commander debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/asynchronicity debian/tmp/usr/share/libcontextsubscriber-tests/
