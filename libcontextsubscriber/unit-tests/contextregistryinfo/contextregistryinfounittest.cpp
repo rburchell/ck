@@ -87,6 +87,7 @@ private slots:
     void listKeys();
     void listKeysForPlugin();
     void listProviders();
+    void listPlugins();
 };
 
 void ContextRegistryInfoUnitTest::initTestCase()
@@ -130,6 +131,13 @@ void ContextRegistryInfoUnitTest::listProviders()
     QCOMPARE(providers.count(), 2);
     QVERIFY(providers.contains("com.nokia.musicplayer"));
     QVERIFY(providers.contains("org.freedesktop.ContextKit.contextd"));
+}
+
+void ContextRegistryInfoUnitTest::listPlugins()
+{
+    QStringList plugins = registry->listPlugins();
+    QCOMPARE(plugins.count(), 1);
+    QVERIFY(plugins.contains("contextkit-dbus"));
 }
 
 #include "contextregistryinfounittest.moc"
