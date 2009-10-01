@@ -14,7 +14,7 @@
         <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/bin/libcontextprovider-tests/;./typestests</step>
       </case>
       <case name="libprov004" description="Clients getting value change notifications" requirement="" timeout="20">
-        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/bin/libcontextprovider-tests/;./valuechangetests</step>
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/bin/libcontextprovider-tests/;./valuechangestests</step>
       </case>
 
       <environments>
