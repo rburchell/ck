@@ -86,6 +86,7 @@ private slots:
     void initTestCase();
     void listKeys();
     void listKeysForPlugin();
+    void listProviders();
 };
 
 void ContextRegistryInfoUnitTest::initTestCase()
@@ -114,10 +115,21 @@ void ContextRegistryInfoUnitTest::listKeys()
 
 void ContextRegistryInfoUnitTest::listKeysForPlugin()
 {
-    QStringList keys = registry->listKeysForPlugin("contextkit-dbus");
-    QCOMPARE(keys.count(), 2);
-    QVERIFY(keys.contains("Battery.Charging"));
-    QVERIFY(keys.contains("Media.NowPlaying"));
+    QStringList keys1 = registry->listKeysForPlugin("contextkit-dbus");
+    QCOMPARE(keys1.count(), 2);
+    QVERIFY(keys1.contains("Battery.Charging"));
+    QVERIFY(keys1.contains("Media.NowPlaying"));
+
+    QStringList keys2 = registry->listKeysForPlugin("does-not-exist");
+    QCOMPARE(keys2.count(), 0);
+}
+
+void ContextRegistryInfoUnitTest::listProviders()
+{
+    QStringList providers = registry->listProviders();
+    QCOMPARE(providers.count(), 2);
+    QVERIFY(providers.contains("com.nokia.musicplayer"));
+    QVERIFY(providers.contains("org.freedesktop.ContextKit.contextd"));
 }
 
 #include "contextregistryinfounittest.moc"
