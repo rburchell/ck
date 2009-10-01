@@ -62,6 +62,19 @@ Description: Helper library for providers of context properties
  .
  This package contains the documentation.
 
+Package: libcontextprovider-tests
+Section: devel
+Architecture: any
+Depends: libcontextprovider0, ${shlibs:Depends}
+XB-Maemo-CI-Packages: libcontextprovider0
+XB-Maemo-CI-Stage: staging, acceptance
+Description: libcontextprovider automated customer tests
+ The libcontextprovider library implements the provider side of the
+ org.freedesktop.ContextKit D-Bus interface.
+ .
+ This package contains an automated customer testsuite of the
+ libcontextprovider library.
+
 Package: python-contextkit
 Section: python
 Architecture: any
