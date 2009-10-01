@@ -69,7 +69,7 @@ QString InfoBackend::constructionStringForKey(QString key) const
     if (key == "Battery.Charging")
         return "system:org.freedesktop.ContextKit.contextd";
     else if (key == "Media.NowPlaying")
-        return "system:com.nokia.musicplayer";
+        return "session:com.nokia.musicplayer";
     return QString();
 }
 
@@ -162,6 +162,7 @@ private slots:
     void exists();
     void provided();
     void providerDBusName();
+    void providerDBusType();
 };
 
 void ContextPropertyInfoUnitTest::initTestCase()
@@ -223,6 +224,17 @@ void ContextPropertyInfoUnitTest::providerDBusName()
     QCOMPARE(p2.providerDBusName(), QString("com.nokia.musicplayer"));
     QCOMPARE(p3.providerDBusName(), QString());
 }
+
+void ContextPropertyInfoUnitTest::providerDBusType()
+{
+    ContextPropertyInfo p1("Battery.Charging");
+    ContextPropertyInfo p2("Media.NowPlaying");
+    ContextPropertyInfo p3("Does.Not.Exist");
+    QCOMPARE(p1.providerDBusType(), QDBusConnection::SystemBus);
+    QCOMPARE(p2.providerDBusType(), QDBusConnection::SessionBus);
+    QCOMPARE(p3.providerDBusType(), QDBusConnection::SessionBus);
+}
+
 
 #include "contextpropertyinfounittest.moc"
 QTEST_MAIN(ContextPropertyInfoUnitTest);
