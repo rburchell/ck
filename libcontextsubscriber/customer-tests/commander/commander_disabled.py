@@ -29,56 +29,25 @@
 
 import sys
 import os
-import signal
-
 import unittest
-from subprocess import Popen, PIPE
-
-def timeoutHandler(signum, frame):
-    raise Exception('tests has been running for too long')
-
-class Callable:
-    def __init__(self, anycallable):
-        self.__call__ = anycallable
+from ContextKit.cltool import CLTool
 
 class CommanderDisabled(unittest.TestCase):
-    def startProvider(busname, args):
-        ret = Popen(["context-provide", busname] + args,
-              stdin=PIPE,stderr=PIPE,stdout=PIPE)
-        # wait for it
-        print >>ret.stdin, "info()"
-        ret.stdout.readline().rstrip()
-        return ret
-    startProvider = Callable(startProvider)
-
-    def wanted(name, type, value):
-        return "%s = %s:%s" % (name, type, value)
-    wanted = Callable(wanted)
-
-    def wantedUnknown(name):
-        return "%s is Unknown" % (name)
-    wantedUnknown = Callable(wantedUnknown)
-
-    def setUp(self):
-        self.flexiprovider = self.startProvider("com.nokia.test",
-                                           ["int","test.int","42"])
-        self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
-                                                    ["int", "test.int", "4242"])
-        os.environ["CONTEXT_CLI_IGNORE_COMMANDER"] = ""
-        self.context_client = Popen(["context-listen","test.int"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-
     def tearDown(self):
-        os.kill(self.flexiprovider.pid, 9)
-        if (self.context_commander != 0): os.kill(self.context_commander.pid, 9)
-        os.kill(self.context_client.pid, 9)
         os.unlink('context-provide.context')
-        pass
 
     def testCommanderFunctionality(self):
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.int", "int", "42"),
-                         "Provider provided value is wrong")
+        provider = CLTool("new-context-provide", "contextkit.test", "int", "test.int", "42")
+        provider.send("dump")
+        commander = CLTool("new-context-provide")
+        commander.send("add int test.int 4242")
+        commander.send("start")
+        os.environ["CONTEXT_CLI_IGNORE_COMMANDER"] = ""
+        listen = CLTool("context-listen", "test.int")
+        self.assert_(listen.expect(CLTool.STDOUT,
+                                   CLTool.wanted("test.int", "int", "42"),
+                                   1),
+                     "Provider provided value is wrong")
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderDisabled)
@@ -86,6 +55,4 @@ def runTests():
     return len(result.errors + result.failures)
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGALRM, timeoutHandler)
-    signal.alarm(10)
     sys.exit(runTests())

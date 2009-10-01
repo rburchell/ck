@@ -34,18 +34,8 @@
 
 import sys
 import os
-import signal
-
 import unittest
-from subprocess import Popen, PIPE
 from ContextKit.cltool import CLTool
-
-def timeoutHandler(signum, frame):
-    raise Exception('tests has been running for too long')
-
-class Callable:
-    def __init__(self, anycallable):
-        self.__call__ = anycallable
 
 class CommanderAppearing(unittest.TestCase):
     def tearDown(self):
@@ -97,6 +87,4 @@ def runTests():
     return len(result.errors + result.failures)
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGALRM, timeoutHandler)
-    signal.alarm(10)
     sys.exit(runTests())
