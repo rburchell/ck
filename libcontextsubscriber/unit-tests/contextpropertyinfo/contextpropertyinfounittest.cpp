@@ -160,6 +160,7 @@ private slots:
     void doc();
     void type();
     void exists();
+    void provided();
 };
 
 void ContextPropertyInfoUnitTest::initTestCase()
@@ -200,6 +201,16 @@ void ContextPropertyInfoUnitTest::exists()
     QCOMPARE(p1.exists(), true);
     QCOMPARE(p2.exists(), true);
     QCOMPARE(p3.exists(), false);
+}
+
+void ContextPropertyInfoUnitTest::provided()
+{
+    ContextPropertyInfo p1("Battery.Charging");
+    ContextPropertyInfo p2("Media.NowPlaying");
+    ContextPropertyInfo p3("Does.Not.Exist");
+    QCOMPARE(p1.provided(), true);
+    QCOMPARE(p2.provided(), false);
+    QCOMPARE(p3.provided(), false);
 }
 
 #include "contextpropertyinfounittest.moc"
