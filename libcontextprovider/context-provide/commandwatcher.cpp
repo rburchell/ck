@@ -132,7 +132,7 @@ QString CommandWatcher::unquote(const QString& str)
 void CommandWatcher::addCommand(const QStringList& args)
 {
     if (args.count() < 2) {
-        out << "> ERROR: need to specify both KEY and TYPE\n";
+        out << "ERROR: need to specify both KEY and TYPE\n";
         return;
     }
 
@@ -141,15 +141,19 @@ void CommandWatcher::addCommand(const QStringList& args)
 
     if (keyType != "INT" && keyType != "STRING" &&
         keyType != "DOUBLE" && keyType != "TRUTH" && keyType != "BOOL") {
-        out << "> ERROR: Unknown type (has to be: INT, STRING, DOUBLE or TRUTH)\n";
+        out << "ERROR: Unknown type (has to be: INT, STRING, DOUBLE or TRUTH)\n";
         return;
     }
     if (keyType == "BOOL") keyType = "TRUTH";
 
-    types.insert(keyName, keyType);
-    properties.insert(keyName, new Property(keyName));
-
-    out << "> Added key: " << keyName << " with type: " << keyType << "\n";
+    if (properties.contains(keyName)) {
+        qDebug() << "Already existing key, changing the type and value of it";
+        types[keyName] = keyType;
+    } else {
+        types.insert(keyName, keyType);
+        properties.insert(keyName, new Property(keyName));
+        qDebug() << "Added key: " << keyName << " with type: " << keyType << "\n";
+    }
 
     // handle default value
     if (args.count() > 2)
@@ -159,12 +163,12 @@ void CommandWatcher::addCommand(const QStringList& args)
 void CommandWatcher::sleepCommand(const QStringList& args)
 {
     if (args.count() < 1) {
-        out << "> ERROR: need to specify sleep INTERVAL\n";
+        out << "ERROR: need to specify sleep INTERVAL\n";
         return;
     }
 
     int interval = unquote(args.at(0)).toInt();
-    out << "> Sleeping " << interval << " seconds" << "\n";
+    out << "Sleeping " << interval << " seconds" << "\n";
     sleep(interval);
 }
 
@@ -212,7 +216,7 @@ void CommandWatcher::dumpCommand()
     rename(tmpPathChars, fileName.toUtf8().constData());
     free(tmpPathChars);
 
-    out << "> Wrote " << fileName << "\n";
+    out << "Wrote " << fileName << "\n";
 
 }
 
@@ -222,7 +226,7 @@ void CommandWatcher::setCommand(const QString& command)
     const QString value = unquote(command.mid(command.indexOf('=')+1).trimmed());
 
     if (! types.contains(keyName)) {
-        out << "> ERROR: key " << keyName << " not known/added\n";
+        out << "ERROR: key " << keyName << " not known/added\n";
         return;
     }
 
@@ -243,26 +247,26 @@ void CommandWatcher::setCommand(const QString& command)
             v = QVariant(false);
     }
 
-    out << "> Setting key: " << keyName << " to value: " << v.toString() << "\n";
+    out << "Setting key: " << keyName << " to value: " << v.toString() << "\n";
     prop->setValue(v);
 }
 
 void CommandWatcher::unsetCommand(const QStringList& args)
 {
     if (args.count() < 1) {
-        out << "> ERROR: need to specify key to unset\n";
+        out << "ERROR: need to specify key to unset\n";
         return;
     }
 
     QString keyName = unquote(args[0].trimmed());
 
     if (! types.contains(keyName)) {
-        out << "> ERROR: key " << keyName << " not known/added\n";
+        out << "ERROR: key " << keyName << " not known/added\n";
         return;
     }
 
     Property *prop = properties.value(keyName);
-    out << "> Setting key: " << keyName << " to unknown\n";
+    out << "Setting key: " << keyName << " to unknown\n";
     prop->unsetValue();
 }
 
@@ -271,5 +275,5 @@ void CommandWatcher::startCommand()
     Service service(busType, busName);
     service.start();
     // FIXME: exit here if the registration is unsuccessful
-    out << "> Service started\n";
+    out << "Service started\n";
 }
