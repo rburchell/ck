@@ -40,11 +40,11 @@ class CommanderNonExistent(unittest.TestCase):
                 os.unlink('context-provide.context')
 
         def testCommanderFunctionality(self):
-                provider = CLTool("new-context-provide", "com.nokia.test", "int", "test.int", "42")
+                provider = CLTool("context-provide-internal", "com.nokia.test", "int", "test.int", "42")
                 provider.send("dump")
                 self.assert_(provider.expect(CLTool.STDOUT, "Wrote", 1)) # wait for it
                 listen = CLTool("context-listen", "test.int", "test.string")
-                commander = CLTool("new-context-provide")
+                commander = CLTool("context-provide-internal")
                 commander.send("add string test.int foobar")
                 commander.send("add string test.string barfoo")
                 commander.send("start")
