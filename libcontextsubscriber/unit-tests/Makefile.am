@@ -5,7 +5,8 @@ SUBDIRSTESTS = provider propertyhandle handlesignalrouter               \
 	contextpropertyinfo-cdb-dynamic					\
 	contextregistryinfo-xml-dynamic					\
 	contextpropertyinfo-xml-dynamic infoxmlkeysfinder		\
-	infoxmlbackend infocdbbackend contextregistryinfo
+	infoxmlbackend infocdbbackend contextregistryinfo               \
+        contextpropertyinfo
 SUBDIRS = $(SUBDIRSTESTS) util
 
 check-sum: all
