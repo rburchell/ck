@@ -80,6 +80,9 @@ class CLTool:
     def kill(self):
         self.__process.kill()
 
+    def wait(self):
+            return self.__process.wait()
+
     def printio(self):
         print
         print '----------------------------------------------------'

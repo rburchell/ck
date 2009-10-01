@@ -218,7 +218,7 @@ void CommandWatcher::dumpCommand()
     rename(tmpPathChars, fileName.toUtf8().constData());
     free(tmpPathChars);
 
-    out << "> Wrote " << fileName << endl;
+    out << "Wrote " << fileName << endl;
     out.flush();
 }
 

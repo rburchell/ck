@@ -22,95 +22,54 @@
 ##
 ##
 ## This test:
-##	 - starts up a client and a provider
-##	 - starts a commander with a different value and type for a provider
-##	   provided property and with a new string non-provided property
-##	 - checks that the client gets an error for the provider provided property
-##	 - checks that the client gets the new string non-provided property
-##	 - changes the non-provided property's type to int and checks it
-##	   (so this proves that type checks are always off for commander properties)
+##       - starts up a client and a provider
+##       - starts a commander with a different value and type for a provider
+##         provided property and with a new string non-provided property
+##       - checks that the client gets an error for the provider provided property
+##       - checks that the client gets the new string non-provided property
+##       - changes the non-provided property's type to int and checks it
+##         (so this proves that type checks are always off for commander properties)
 
 import sys
 import os
-import signal
-import re
-
 import unittest
-from subprocess import Popen, PIPE
-
-def timeoutHandler(signum, frame):
-	raise Exception('tests has been running for too long')
-
-class Callable:
-	def __init__(self, anycallable):
-		self.__call__ = anycallable
+from ContextKit.cltool import CLTool
 
 class CommanderNonExistent(unittest.TestCase):
-	def startProvider(busname, args):
-		ret = Popen(["context-provide", busname] + args,
-			  stdin=PIPE,stderr=PIPE,stdout=PIPE)
-		# wait for it
-		print >>ret.stdin, "info()"
-		ret.stdout.readline().rstrip()
-		return ret
-	startProvider = Callable(startProvider)
+        def tearDown(self):
+                os.unlink('context-provide.context')
 
-	def wanted(name, type, value):
-		return "%s = %s:%s" % (name, type, value)
-	wanted = Callable(wanted)
+        def testCommanderFunctionality(self):
+                provider = CLTool("new-context-provide", "com.nokia.test", "int", "test.int", "42")
+                provider.send("dump")
+                commander = CLTool("new-context-provide")
+                commander.send("add string test.int foobar")
+                commander.send("add string test.string barfoo")
+                commander.send("start")
 
-	def wantedUnknown(name):
-		return "%s is Unknown" % (name)
-	wantedUnknown = Callable(wantedUnknown)
+                listen = CLTool("context-listen", "test.int", "test.string")
+                self.assert_(listen.expect(CLTool.STDERR,
+                                           'Provider error, bad type for  "test.int" wanted: "INT" got: QString',
+                                           1),
+                     "Type check didn't work")
 
-	def setUp(self):
-		os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide.context"
-		self.flexiprovider = self.startProvider("com.nokia.test",
-										   ["int","test.int","42"])
+                # check the non-existent property
+                self.assert_(listen.expect(CLTool.STDOUT,
+                                           CLTool.wanted("test.string", "QString", "barfoo"),
+                                           1),
+                     "Non-existent property couldn't be commanded")
 
-
-
-		os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./commander.context"
-		self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
-													["string", "test.int", "foobar",
-													 "string", "test.string", "barfoo"])
-		self.context_client = Popen(["context-listen","test.int", "test.string"],
-									stdin=PIPE, stdout=PIPE, stderr=PIPE)
-
-	def tearDown(self):
-		os.kill(self.flexiprovider.pid, 9)
-		if (self.context_commander != 0): os.kill(self.context_commander.pid, 9)
-		os.kill(self.context_client.pid, 9)
-		os.unlink('context-provide.context')
-		#os.unlink('../commander.context')
-
-	def testCommanderFunctionality(self):
-		line = self.context_client.stderr.readline().rstrip()
-		while not 'Provider error, bad type for  "test.int" wanted: "INT" got: QString' in line:
-			line = self.context_client.stderr.readline().rstrip()
-
-		# if we are here, then the type check worked
-
-		# check the non-existent property
-		got = self.context_client.stdout.readline().rstrip()
-		self.assertEqual(got,
-						 self.wanted("test.string", "QString", "barfoo"),
-						 "Non-existent property couldn't be commanded")
-
-		# change the type of the non-existent property
-		print >>self.context_commander.stdin, "add(INT('test.string', 42))"
-		got = self.context_client.stdout.readline().rstrip()
-		self.assertEqual(got,
-						  self.wanted("test.string", "int", "42"),
-						  "Non-existent property's type couldn't be overwritten")
+                # change the type of the non-existent property
+                commander.send("add int test.string 42")
+                self.assert_(listen.expect(CLTool.STDOUT,
+                                           CLTool.wanted("test.string", "int", "42"),
+                                           1),
+                             "Non-existent property's type couldn't be overwritten")
 
 def runTests():
-	suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderNonExistent)
-	result = unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
-	return len(result.errors + result.failures)
+        suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderNonExistent)
+        result = unittest.TextTestRunner(verbosity=2).run(suiteInstallation)
+        return len(result.errors + result.failures)
 
 if __name__ == "__main__":
-	sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
-	signal.signal(signal.SIGALRM, timeoutHandler)
-	signal.alarm(10)
-	sys.exit(runTests())
+        sys.exit(runTests())

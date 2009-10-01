@@ -29,11 +29,8 @@
 
 import sys
 import os
-import signal
-import re
 import time
 import unittest
-from subprocess import Popen, PIPE
 from ContextKit.cltool import CLTool
 
 class Asynchronous(unittest.TestCase):
@@ -71,16 +68,16 @@ class Asynchronous(unittest.TestCase):
 
         # check the fast property
         self.assert_(context_client.expect(CLTool.STDOUT,
-                                                CLTool.wanted("test.fast", "int", "44"),
-                                                1), # timeout == 1 second
+                                           CLTool.wanted("test.fast", "int", "44"),
+                                           1), # timeout == 1 second
                      "Bad value for the fast property, wanted 42")
         fast_time = time.time()
         context_client.comment("Fast property arrived with good value at: " + str(fast_time))
 
         # check the slow property
         self.assert_(context_client.expect(CLTool.STDOUT,
-                                                CLTool.wanted("test.slow", "int", "42"),
-                                                5), # timeout == 5 second max, but 3 is enough usually
+                                           CLTool.wanted("test.slow", "int", "42"),
+                                           5), # timeout == 5 second max, but 3 is enough usually
                      "Bad value for the slow property, wanted 42")
         slow_time = time.time()
         context_client.comment("Slow property arrived with good value at: " + str(slow_time))

@@ -26,24 +26,13 @@
 import sys
 import unittest
 import os
-import string
-from subprocess import Popen, PIPE
-import time
-import signal
 from ContextKit.cltool import CLTool
 
-def timeoutHandler(signum, frame):
-        raise Exception('tests have been running for too long')
-
-def stdoutRead (object,lines):
-        list = []
-        for i in range(lines):
-                list.append(object.stdout.readline().rstrip())
-        return list
-
 class Subscription(unittest.TestCase):
+        def tearDown(self):
+                os.remove('time.context')
 
-        def setUp(self):
+        def testChangingPlugin(self):
                 os.environ["CONTEXT_PROVIDERS"] = "."
                 if os.path.isdir("../testplugins"):
                         # for your local machine
@@ -57,11 +46,6 @@ class Subscription(unittest.TestCase):
                         self.assert_(False, "Couldn't find the test time plugins")
 
                 self.context_client = CLTool("context-listen", "Test.Time")
-
-        def tearDown(self):
-                os.remove('time.context')
-
-        def testChangingPlugin(self):
 
                 # Copy the declaration file, declaring libcontextsubscribertime1 plugin.
                 os.system('cp time1.context.temp time.context.temp')
@@ -80,6 +64,4 @@ class Subscription(unittest.TestCase):
 
 if __name__ == "__main__":
         sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
-        signal.signal(signal.SIGALRM, timeoutHandler)
-        signal.alarm(30)
         unittest.main()
