@@ -85,6 +85,7 @@ private:
 private slots:
     void initTestCase();
     void listKeys();
+    void listKeysForPlugin();
 };
 
 void ContextRegistryInfoUnitTest::initTestCase()
@@ -109,6 +110,14 @@ void ContextRegistryInfoUnitTest::listKeys()
 
     QStringList keys4 = registry->listKeys("com.something");
     QCOMPARE(keys4.count(), 0);
+}
+
+void ContextRegistryInfoUnitTest::listKeysForPlugin()
+{
+    QStringList keys = registry->listKeysForPlugin("contextkit-dbus");
+    QCOMPARE(keys.count(), 2);
+    QVERIFY(keys.contains("Battery.Charging"));
+    QVERIFY(keys.contains("Media.NowPlaying"));
 }
 
 #include "contextregistryinfounittest.moc"
