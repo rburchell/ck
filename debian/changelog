@@ -1,4 +1,4 @@
-contextkit (0.3.8~unreleased) unstable; urgency=low
+contextkit (0.3.7.3) unstable; urgency=low
 
   * libcontextsubscriber-tests lintian errors fixed
   * context-provide UI has been changed, see context-provide(1)
