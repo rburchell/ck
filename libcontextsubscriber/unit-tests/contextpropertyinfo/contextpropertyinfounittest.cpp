@@ -164,6 +164,7 @@ private slots:
     void providerDBusName();
     void providerDBusType();
     void plugin();
+    void constructionString();
 };
 
 void ContextPropertyInfoUnitTest::initTestCase()
@@ -244,6 +245,16 @@ void ContextPropertyInfoUnitTest::plugin()
     QCOMPARE(p1.plugin(), QString("contextkit-dbus"));
     QCOMPARE(p2.plugin(), QString("contextkit-dbus"));
     QCOMPARE(p3.plugin(), QString());
+}
+
+void ContextPropertyInfoUnitTest::constructionString()
+{
+    ContextPropertyInfo p1("Battery.Charging");
+    ContextPropertyInfo p2("Media.NowPlaying");
+    ContextPropertyInfo p3("Does.Not.Exist");
+    QCOMPARE(p1.constructionString(), QString("system:org.freedesktop.ContextKit.contextd"));
+    QCOMPARE(p2.constructionString(), QString("session:com.nokia.musicplayer"));
+    QCOMPARE(p3.constructionString(), QString());
 }
 
 #include "contextpropertyinfounittest.moc"
