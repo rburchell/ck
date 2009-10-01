@@ -80,6 +80,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/unit-tests/contextregistryinfo-xml-static/Makefile
         libcontextsubscriber/unit-tests/infoxmlbackend/Makefile
         libcontextsubscriber/unit-tests/infocdbbackend/Makefile
+        libcontextsubscriber/unit-tests/contextregistryinfo/Makefile
         libcontextsubscriber/unit-tests/handlesignalrouter/Makefile
         libcontextsubscriber/unit-tests/propertyhandle/Makefile
         libcontextsubscriber/unit-tests/provider/Makefile
