@@ -41,22 +41,34 @@ QStringList InfoBackend::listKeys() const
 {
     QStringList l;
     l << QString("Battery.Charging");
-    l << QString("Battery.Capacity");
+    l << QString("Media.NowPlaying");
     return l;
 }
 
 QStringList InfoBackend::listKeysForPlugin(QString plugin) const
 {
-    return QStringList();
+    if (plugin == "contextkit-dbus") {
+        QStringList l;
+        l << QString("Battery.Charging");
+        l << QString("Media.NowPlaying");
+        return l;
+    } else
+        return QStringList();
 }
 
 QStringList InfoBackend::listPlugins() const
 {
-    return QStringList();
+    QStringList l;
+    l << QString("contextkit-dbus");
+    return l;
 }
 
 QString InfoBackend::constructionStringForKey(QString key) const
 {
+    if (key == "Battery.Charging")
+        return "system:org.freedesktop.ContextKit.contextd";
+    else if (key == "Media.NowPlaying")
+        return "system:com.nokia.musicplayer";
     return QString();
 }
 
@@ -82,10 +94,21 @@ void ContextRegistryInfoUnitTest::initTestCase()
 
 void ContextRegistryInfoUnitTest::listKeys()
 {
-    QStringList keys = registry->listKeys();
-    QCOMPARE(keys.count(), 2);
-    QVERIFY(keys.contains("Battery.Charging"));
-    QVERIFY(keys.contains("Battery.Capacity"));
+    QStringList keys1 = registry->listKeys();
+    QCOMPARE(keys1.count(), 2);
+    QVERIFY(keys1.contains("Battery.Charging"));
+    QVERIFY(keys1.contains("Media.NowPlaying"));
+
+    QStringList keys2 = registry->listKeys("org.freedesktop.ContextKit.contextd");
+    QCOMPARE(keys2.count(), 1);
+    QVERIFY(keys2.contains("Battery.Charging"));
+
+    QStringList keys3 = registry->listKeys("com.nokia.musicplayer");
+    QCOMPARE(keys3.count(), 1);
+    QVERIFY(keys3.contains("Media.NowPlaying"));
+
+    QStringList keys4 = registry->listKeys("com.something");
+    QCOMPARE(keys4.count(), 0);
 }
 
 #include "contextregistryinfounittest.moc"
