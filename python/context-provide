@@ -32,11 +32,8 @@ sys.argv.pop(0)
 
 # Support for new context-provide
 if sys.argv[0] == "--v2":
-    sys.argv.pop(0)
     cmd = "context-provide-internal"
-    while len(sys.argv):
-        cmd = cmd + " " + sys.argv.pop(0)
-    exit(os.system(cmd))
+    os.execvp(cmd, sys.argv)
 
 busaddress = sys.argv.pop(0).split(':')
 if len(busaddress) == 1:
