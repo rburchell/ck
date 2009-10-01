@@ -29,6 +29,7 @@ class Manager;
 class Service : public QObject
 {
 public:
-    ServiceBackend *backend();
+    Service();
+    ServiceBackend *backend;
 };
 }

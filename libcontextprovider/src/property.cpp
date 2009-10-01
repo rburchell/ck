@@ -49,7 +49,7 @@ struct PropertyPrivate {
 Property::Property(Service &service, const QString &k, QObject* parent)
     : QObject(parent)
 {
-    init (service.backend()->manager(), k);
+    init(service.backend->manager(), k);
 }
 
 /// Create a Property object on the default service for the key \a k.

@@ -100,6 +100,9 @@ void DBusNameListener::startListening(bool nameHasOwnerCheck)
 
     // Check if the service is already there
     if (nameHasOwnerCheck) {
+        if (connection->isConnected() == false) {
+            setServiceGone();
+        }
         QDBusPendingCall nameHasOwnerCall = connection->interface()->asyncCall("NameHasOwner", busName);
         SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(nameHasOwnerCall, this);
         sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),

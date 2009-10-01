@@ -36,6 +36,9 @@ contextsubscriber-1.0.pc
 /unit-tests/*/*.moc
 coverage/
 
+/customer-tests/testplugins/contextsubscribertime1.so
+/customer-tests/testplugins/contextsubscribertime2.so
+
 # Other binaries
 /cli/context-listen
 /update-tool/update-tool

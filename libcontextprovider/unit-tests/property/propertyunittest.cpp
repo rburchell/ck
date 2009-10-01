@@ -96,9 +96,9 @@ void Manager::addKey(const QString &key)
 
 // Mock implementation of Service
 
-ServiceBackend* Service::backend()
+Service::Service()
 {
-    return ContextProvider::serviceBackend;
+    backend = new ContextProvider::ServiceBackend();
 }
 
 // Mock implementation of ServiceBackend

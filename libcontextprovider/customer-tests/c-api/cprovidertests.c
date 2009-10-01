@@ -19,8 +19,10 @@
  *
  */
 
-#include "context_provider.h"
+/* for dprintf */
+#define _GNU_SOURCE
 
+#include "context_provider.h"
 #include <stdio.h>
 #include <glib.h>
 #include <dbus/dbus.h>
@@ -118,7 +120,7 @@ char* write_to_client(char* command)
     int ret = -1;
 
     /* Write the command to the client */
-    dprintf(tube[1], command);
+    dprintf(tube[1], "%s", command);
 
     /* Process the events until we can read from the client */
     do {
@@ -175,9 +177,10 @@ int test_init()
 
     /* Install 2 groups of keys and 2 single keys */
 
-    context_provider_install_group(group1_keys, TRUE,
+    // FIXME: (char **) can be removed if the API got fixed
+    context_provider_install_group((char **)group1_keys, TRUE,
                                    group1_cb, NULL);
-    context_provider_install_group(group2_keys, FALSE,
+    context_provider_install_group((char **)group2_keys, FALSE,
                                    group2_cb, NULL);
     context_provider_install_key(single1_key, TRUE,
                                  single1_cb, NULL);

@@ -37,18 +37,18 @@ using namespace ContextProvider;
 
 /*!
     \page CApi C Api
-    
+
     \brief The libcontextprovider library offers a simple plain-C API to be used
     from any C program.
-    
+
     \section Usage
 
     \code
     context_provider_init(DBUS_BUS_SESSION, "org.test.provider");
-    
+
     context_provider_install_key("Battery.OnBattery", 0, NULL, NULL);
     context_provider_install_key("Battery.ChargePercentage", 0, NULL, NULL);
-    
+
     context_provider_set_boolean("Battery.OnBattery", 1);
     context_provider_set_integer("Battery.ChargePercentage", 55);
     \endcode
@@ -65,9 +65,9 @@ using namespace ContextProvider;
 
     The context_provider_install_key function and context_provider_install_group function
     take arguments specyfying the callback function. The callback is executed when the
-    subscription status changes for the key or the key group (first subscriber 
-    appears or last subscriber goes away). Basing on this info the provider can 
-    manage it's resources. It's okay also to use the callback function to actually 
+    subscription status changes for the key or the key group (first subscriber
+    appears or last subscriber goes away). Basing on this info the provider can
+    manage it's resources. It's okay also to use the callback function to actually
     set the value.
 
     \code
@@ -94,8 +94,8 @@ int argc = 1;
 QCoreApplication* app = 0;
 
 /// Initializes and starts the service with a given \a bus_type and a \a bus_name.
-/// Te \a bus_type can be DBUS_BUS_SESSION or DBUS_BUS_SYSTEM. This function can be 
-/// called only once till a matching context_provider_stop is called. 
+/// The \a bus_type can be DBUS_BUS_SESSION or DBUS_BUS_SYSTEM. This function can be
+/// called only once till a matching context_provider_stop is called.
 int context_provider_init (DBusBusType bus_type, const char* bus_name)
 {
     contextDebug() << F_C << bus_name;
@@ -112,7 +112,7 @@ int context_provider_init (DBusBusType bus_type, const char* bus_name)
     }
 
     cService = new Service(bus_type == DBUS_BUS_SESSION
-                           ? QDBusConnection::SessionBus   
+                           ? QDBusConnection::SessionBus
                            : QDBusConnection::SystemBus,
                            bus_name);
     listeners = new QList<Listener*>;
@@ -121,7 +121,7 @@ int context_provider_init (DBusBusType bus_type, const char* bus_name)
 }
 
 /// Stops the currently started service with context_provider_init. After calling
-/// this function a new service can be started by calling context_provider_init. 
+/// this function a new service can be started by calling context_provider_init.
 void context_provider_stop (void)
 {
     contextDebug() << F_C;
@@ -134,21 +134,21 @@ void context_provider_stop (void)
                 delete listener;
         }
         delete listeners; listeners = NULL;
-        
+
         delete cService;
         cService = NULL;
     }
     // FIXME: Do we need to do something with the QCoreApplication we might have constructed?
 }
 
-/// Installs (adds) a \a key to be provided by the service. The callback function \a 
+/// Installs (adds) a \a key to be provided by the service. The callback function \a
 /// subscription_changed_cb will be called with the passed user data \a subscription_changed_cb_target
 /// when the status of the subscription changes -- when the first subscriber appears or the
-/// last subscriber disappears. The \a clear_values_on_subscribe when enabled will automatically 
+/// last subscriber disappears. The \a clear_values_on_subscribe when enabled will automatically
 /// clear (set to null/undetermined) the group keys on first subscribe.
-void context_provider_install_key (const char* key, 
-                                   int clear_values_on_subscribe, 
-                                   ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
+void context_provider_install_key (const char* key,
+                                   int clear_values_on_subscribe,
+                                   ContextProviderSubscriptionChangedCallback subscription_changed_cb,
                                    void* subscription_changed_cb_target)
 {
     contextDebug() << F_C << key;
@@ -157,21 +157,21 @@ void context_provider_install_key (const char* key,
         contextCritical() << "Can't install key:" << key << "because no service started.";
         return;
     }
-    
+
     listeners->append(new PropertyListener(*cService, key,
                                            clear_values_on_subscribe,
                                            subscription_changed_cb, subscription_changed_cb_target));
     cService->restart();
 }
 
-/// Installs (adds) a \a key_group to be provided by the service. The \a key_group is a NULL-terminated 
-/// array containing the keys. The callback function \a subscription_changed_cb will be called with the 
-/// passed user data \a subscription_changed_cb_target when the status of the subscription changes -- 
-/// when the first subscriber appears or the last subscriber disappears. The \a clear_values_on_subscribe 
+/// Installs (adds) a \a key_group to be provided by the service. The \a key_group is a NULL-terminated
+/// array containing the keys. The callback function \a subscription_changed_cb will be called with the
+/// passed user data \a subscription_changed_cb_target when the status of the subscription changes --
+/// when the first subscriber appears or the last subscriber disappears. The \a clear_values_on_subscribe
 /// when enabled will automatically clear (set to null/undetermined) the group keys on first subscribe.
-void context_provider_install_group (char** key_group, 
-                                     int clear_values_on_subscribe, 
-                                     ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
+void context_provider_install_group (char* const * key_group,
+                                     int clear_values_on_subscribe,
+                                     ContextProviderSubscriptionChangedCallback subscription_changed_cb,
                                      void* subscription_changed_cb_target)
 {
     contextDebug() << F_C;

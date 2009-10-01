@@ -48,7 +48,6 @@ void ValueChangesTests::init()
     service = new Service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1");
     test_int = new Property(*service, "Test.Int");
     test_double = new Property(*service, "Test.Double");
-    service->start();
 
     // Process the events so that the services get started
     QCoreApplication::processEvents(QEventLoop::AllEvents);
@@ -74,13 +73,14 @@ void ValueChangesTests::cleanup()
     }
     delete client; client = NULL;
 
-    // Stop the service
-    service->stop();
-
     delete service; service = NULL;
 
     delete test_int; test_int = NULL;
     delete test_double; test_double = NULL;
+
+    // ServiceBackedns are deleted in a deferred way, thus we need to
+    // get them deleted
+    QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
 }
 
 void ValueChangesTests::subscribedPropertyChanges()
@@ -312,7 +312,6 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
 
     QCOMPARE(actual.simplified(), expected.simplified());
 }
-
 
 void ValueChangesTests::readStandardOutput()
 {
