@@ -31,7 +31,6 @@ class InfoBackend : public QObject
     Q_OBJECT
 
 public:
-
     static InfoBackend* instance(const QString &backendName = "");
 
     QString name() const;
@@ -39,6 +38,10 @@ public:
     QStringList listKeysForPlugin(QString plugin) const;
     QStringList listPlugins() const;
     QString constructionStringForKey(QString key) const;
+
+    void fireKeysChanged(const QStringList& keys);
+    void fireKeysAdded(const QStringList& keys);
+    void fireKeysRemoved(const QStringList& keys);
 
 signals:
     void keysChanged(const QStringList& currentKeys);

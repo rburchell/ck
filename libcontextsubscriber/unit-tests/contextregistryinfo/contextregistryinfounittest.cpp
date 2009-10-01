@@ -27,9 +27,16 @@
 
 /* Mocked infobackend */
 
+InfoBackend* currentBackend = NULL;
+
 InfoBackend* InfoBackend::instance(const QString &backendName)
 {
-    return new InfoBackend();
+    if (currentBackend)
+        return currentBackend;
+    else {
+        currentBackend = new InfoBackend();
+        return currentBackend;
+    }
 }
 
 QString InfoBackend::name() const
@@ -72,6 +79,21 @@ QString InfoBackend::constructionStringForKey(QString key) const
     return QString();
 }
 
+void InfoBackend::fireKeysChanged(const QStringList& keys)
+{
+    emit keysChanged(keys);
+}
+
+void InfoBackend::fireKeysAdded(const QStringList& keys)
+{
+    emit keysAdded(keys);
+}
+
+void InfoBackend::fireKeysRemoved(const QStringList& keys)
+{
+    emit keysRemoved(keys);
+}
+
 /* ContextRegistryInfoUnitTest */
 
 class ContextRegistryInfoUnitTest : public QObject
@@ -89,6 +111,7 @@ private slots:
     void listProviders();
     void listPlugins();
     void backendName();
+    void signalling();
 };
 
 void ContextRegistryInfoUnitTest::initTestCase()
@@ -144,6 +167,32 @@ void ContextRegistryInfoUnitTest::listPlugins()
 void ContextRegistryInfoUnitTest::backendName()
 {
     QCOMPARE(registry->backendName(), QString("test"));
+}
+
+void ContextRegistryInfoUnitTest::signalling()
+{
+    QSignalSpy spy1(registry, SIGNAL(keysChanged(QStringList)));
+    QSignalSpy spy2(registry, SIGNAL(keysAdded(QStringList)));
+    QSignalSpy spy3(registry, SIGNAL(keysRemoved(QStringList)));
+
+    QStringList keys;
+    keys << QString("Battery.Charging");
+    keys << QString("Media.NowPlaying");
+
+    currentBackend->fireKeysChanged(keys);
+    QCOMPARE(spy1.count(), 1);
+    QList<QVariant> args1 = spy1.takeFirst();
+    QCOMPARE(args1.at(0).toStringList(), keys);
+
+    currentBackend->fireKeysAdded(keys);
+    QCOMPARE(spy2.count(), 1);
+    QList<QVariant> args2 = spy2.takeFirst();
+    QCOMPARE(args2.at(0).toStringList(), keys);
+
+    currentBackend->fireKeysRemoved(keys);
+    QCOMPARE(spy3.count(), 1);
+    QList<QVariant> args3 = spy3.takeFirst();
+    QCOMPARE(args3.at(0).toStringList(), keys);
 }
 
 #include "contextregistryinfounittest.moc"
