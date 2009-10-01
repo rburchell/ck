@@ -1,4 +1,5 @@
-noinst_PROGRAMS = client
+testdir = $(bindir)/libcontextprovider-tests
+test_PROGRAMS = client
 
 client_SOURCES = client.cpp commandwatcher.h commandwatcher.cpp
 

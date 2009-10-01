@@ -1,4 +1,5 @@
-bin_PROGRAMS = typestests
+testdir = $(bindir)/libcontextprovider-tests
+test_PROGRAMS = typestests
 
 typestests_SOURCES = typestests.cpp typestests.h
 
