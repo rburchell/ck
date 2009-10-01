@@ -22,6 +22,7 @@
 #include <QtTest/QtTest>
 #include <QtCore>
 #include "nanoxml.h"
+#include "fileutils.h"
 
 class NanoXmlUnitTest : public QObject
 {
@@ -42,7 +43,7 @@ private slots:
 
 void NanoXmlUnitTest::test1()
 {
-    NanoXml nano("test1.xml");
+    NanoXml nano(LOCAL_FILE("test1.xml"));
     QCOMPARE(nano.didFail(), false);
     QVERIFY(nano.root().type() == QVariant::List);
     QCOMPARE(nano.root().toList().count(), 4);
@@ -79,7 +80,7 @@ void NanoXmlUnitTest::test1()
 
 void NanoXmlUnitTest::test2()
 {
-    NanoXml nano("test2.xml");
+    NanoXml nano(LOCAL_FILE("test2.xml"));
     QCOMPARE(nano.didFail(), false);
     QVERIFY(nano.root().type() == QVariant::List);
     QCOMPARE(nano.root().toList().count(), 3);
@@ -115,22 +116,22 @@ void NanoXmlUnitTest::test2()
 
 void NanoXmlUnitTest::test4Comments()
 {
-    NanoXml nano("test4.xml");
+    NanoXml nano(LOCAL_FILE("test4.xml"));
     QCOMPARE(nano.didFail(), false);
-    
+
     QCOMPARE(nano.didFail(), false);
     QVERIFY(nano.root().type() == QVariant::List);
     QCOMPARE(nano.root().toList().count(), 4);
     QVERIFY(nano.root().toList().at(0).type() == QVariant::String);
     QCOMPARE(nano.root().toList().at(0).toString(), QString("key"));
-    
+
     QVERIFY(nano.root().toList().at(1).type() == QVariant::List);
     QCOMPARE(nano.root().toList().at(1).toList().count(), 2);
     QVERIFY(nano.root().toList().at(1).toList().at(0).type() == QVariant::String);
     QCOMPARE(nano.root().toList().at(1).toList().at(0).toString(), QString("name"));
     QVERIFY(nano.root().toList().at(1).toList().at(1).type() == QVariant::String);
     QCOMPARE(nano.root().toList().at(1).toList().at(1).toString(), QString("Example.Key"));
-    
+
     QVERIFY(nano.root().toList().at(2).type() == QVariant::List);
     QCOMPARE(nano.root().toList().at(2).toList().count(), 2);
     QVERIFY(nano.root().toList().at(2).toList().at(0).type() == QVariant::String);
@@ -148,7 +149,7 @@ void NanoXmlUnitTest::test4Comments()
 
 void NanoXmlUnitTest::test3()
 {
-    NanoXml nano("test3.xml");
+    NanoXml nano(LOCAL_FILE("test3.xml"));
     QCOMPARE(nano.didFail(), false);
     QCOMPARE(nano.namespaceUri(), QString("http://www.test.org/document"));
 }
@@ -179,8 +180,6 @@ void NanoXmlUnitTest::secondLevelAccessor()
     list1.append(QVariant(list2));
     QVariant root(list1);
 
-
-
     QCOMPARE(NanoXml::keyValue("object", "key", root), QVariant("value"));
 }
 
@@ -206,7 +205,7 @@ void NanoXmlUnitTest::thirdLevelAccessor()
 
 void NanoXmlUnitTest::broken()
 {
-    NanoXml nano("broken.xml");
+    NanoXml nano(LOCAL_FILE("broken.xml"));
     QCOMPARE(nano.didFail(), true);
     QCOMPARE(nano.root(), QVariant());
 }
