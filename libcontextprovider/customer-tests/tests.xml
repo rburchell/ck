@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<testdefinition version="0.1">
+  <suite name="libcontextprovider-tests">
+    <set name="libcontextprovider suite" description="libcontextprovider tests">
+      <pre_steps>
+      </pre_steps>
+      <case name="libprov001" description="C API of libcontextprovider" requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/bin/libcontextprovider-tests/;./cprovidertests</step>
+      </case>
+      <case name="libprov002" description="Clients subscribing to properties" requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/bin/libcontextprovider-tests/;./subscriptiontests</step>
+      </case>
+      <case name="libprov003" description="Properties of different types" requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/bin/libcontextprovider-tests/;./typestests</step>
+      </case>
+      <case name="libprov004" description="Clients getting value change notifications" requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/bin/libcontextprovider-tests/;./valuechangetests</step>
+      </case>
+
+      <environments>
+        <scratchbox>false</scratchbox>
+        <hardware>true</hardware>
+      </environments>
+    </set>
+  </suite>
+</testdefinition>
