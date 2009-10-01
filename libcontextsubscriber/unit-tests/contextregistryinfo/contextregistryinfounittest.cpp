@@ -88,6 +88,7 @@ private slots:
     void listKeysForPlugin();
     void listProviders();
     void listPlugins();
+    void backendName();
 };
 
 void ContextRegistryInfoUnitTest::initTestCase()
@@ -138,6 +139,11 @@ void ContextRegistryInfoUnitTest::listPlugins()
     QStringList plugins = registry->listPlugins();
     QCOMPARE(plugins.count(), 1);
     QVERIFY(plugins.contains("contextkit-dbus"));
+}
+
+void ContextRegistryInfoUnitTest::backendName()
+{
+    QCOMPARE(registry->backendName(), QString("test"));
 }
 
 #include "contextregistryinfounittest.moc"
