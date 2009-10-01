@@ -73,7 +73,7 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
     // perform the initial NameHasOwner check.  We try to connect to
     // the provider at startup, whether it's present or not.
     providerListener->startListening(false);
-    onProviderAppeared();
+    QMetaObject::invokeMethod(this, "onProviderAppeared", Qt::QueuedConnection);
 }
 
 /// Gets a new subscriber interface from manager when the provider
@@ -83,11 +83,13 @@ void ContextKitPlugin::onProviderAppeared()
     contextDebug() << "ContextKitPlugin::onProviderAppeared";
     delete subscriberInterface;
     subscriberInterface = 0;
-    managerInterface->callWithCallback("GetSubscriber",
-                                       QList<QVariant>(),
-                                       this,
-                                       SLOT(onDBusGetSubscriberFinished(QDBusObjectPath)),
-                                       SLOT(onDBusGetSubscriberFailed(QDBusError)));
+    if (!managerInterface->callWithCallback("GetSubscriber",
+                                            QList<QVariant>(),
+                                            this,
+                                            SLOT(onDBusGetSubscriberFinished(QDBusObjectPath)),
+                                            SLOT(onDBusGetSubscriberFailed(QDBusError)))) {
+        emit failed("Wasn't able to call GetSubscriber on the managerinterface");
+    }
 }
 
 /// Delete our subscriber interface when the provider goes away.

@@ -34,7 +34,7 @@ import re
 import time
 import unittest
 from subprocess import Popen, PIPE
-from cltool import CLTool
+from ContextKit.cltool import CLTool
 
 class Asynchronous(unittest.TestCase):
     def startProvider(busname, args):
