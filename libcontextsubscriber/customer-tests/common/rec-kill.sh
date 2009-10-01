@@ -1,7 +1,7 @@
 #!/bin/sh
 
 dokill() {
-    for cpid in `cat /proc/[0-9]*/stat | cut -d\  -f1,4 | grep " $1" | cut -d' ' -f1`
+    for cpid in `cat /proc/[0-9]*/stat 2>/dev/null | cut -d\  -f1,4 | grep " $1" | cut -d' ' -f1`
     do
         dokill $cpid
     done

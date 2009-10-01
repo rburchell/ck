@@ -37,17 +37,6 @@ import os
 import unittest
 from ContextKit.cltool import CLTool
 
-def timeoutHandler(signum, frame):
-    raise Exception('tests has been running for too long')
-
-def startProvider(busname, args):
-    ret = Popen(["context-provide", busname] + args,
-                stdin=PIPE,stderr=PIPE,stdout=PIPE)
-    # wait for it
-    print >>ret.stdin, "info()"
-    ret.stdout.readline().rstrip()
-    return ret
-
 class PrintInfoRunning(unittest.TestCase):
     def tearDown(self):
         os.unlink('context-provide.context')
@@ -59,6 +48,7 @@ class PrintInfoRunning(unittest.TestCase):
                           "double", "test.double", "4.231",
                           "truth", "test.truth", "False")
         provider.send("dump")
+        self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 1)) # wait for it
         info_client = CLTool("context-print-info", "test.int", "test.string", "test.double", "test.truth", "test.nothing")
 
         returnValue = info_client.wait()

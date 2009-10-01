@@ -42,16 +42,17 @@ class CommanderNonExistent(unittest.TestCase):
         def testCommanderFunctionality(self):
                 provider = CLTool("new-context-provide", "com.nokia.test", "int", "test.int", "42")
                 provider.send("dump")
+                self.assert_(provider.expect(CLTool.STDOUT, "Wrote", 1)) # wait for it
+                listen = CLTool("context-listen", "test.int", "test.string")
                 commander = CLTool("new-context-provide")
                 commander.send("add string test.int foobar")
                 commander.send("add string test.string barfoo")
                 commander.send("start")
 
-                listen = CLTool("context-listen", "test.int", "test.string")
                 self.assert_(listen.expect(CLTool.STDERR,
                                            'Provider error, bad type for  "test.int" wanted: "INT" got: QString',
                                            1),
-                     "Type check didn't work")
+                             "Type check didn't work")
 
                 # check the non-existent property
                 self.assert_(listen.expect(CLTool.STDOUT,
