@@ -58,11 +58,11 @@ class Asynchronous(unittest.TestCase):
         """
 
         # start the client
-        provider_slow = CLTool("context-provide-internal", "com.nokia.slow",
+        provider_slow = CLTool("context-provide", "--v2", "com.nokia.slow",
                                "int","test.slow","42")
         provider_slow.send("sleep 3")
         provider_slow.expect(CLTool.STDOUT, "Sleeping", 1) # wait for it
-        provider_fast = CLTool("context-provide-internal", "com.nokia.fast",
+        provider_fast = CLTool("context-provide", "--v2", "com.nokia.fast",
                                "int","test.fast","44")
         provider_fast.expect(CLTool.STDOUT, "Setting key", 1) # wait for it
 

@@ -42,7 +42,7 @@ class CommanderAppearing(unittest.TestCase):
         os.unlink('context-provide.context')
 
     def testCommanderFunctionality(self):
-        provider = CLTool("context-provide-internal", "com.nokia.test", "int", "test.int", "42")
+        provider = CLTool("context-provide", "--v2", "com.nokia.test", "int", "test.int", "42")
         provider.send("dump")
 
         listen = CLTool("context-listen", "test.int")
@@ -52,7 +52,7 @@ class CommanderAppearing(unittest.TestCase):
                                            1),
                      "Bad value initially from the real provider, wanted 42")
 
-        commander =  CLTool("context-provide-internal")
+        commander =  CLTool("context-provide", "--v2")
         commander.send("add int test.int 4242")
         commander.send("start")
 

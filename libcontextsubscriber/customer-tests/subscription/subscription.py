@@ -58,7 +58,7 @@ class Subscription(unittest.TestCase):
                         None
                 """
 
-                provider = CLTool("context-provide-internal", "com.nokia.test",
+                provider = CLTool("context-provide", "--v2", "com.nokia.test",
                                  "int","test.int","1",
                                  "string","test.string","foobar",
                                  "double","test.double","2.5",
@@ -136,7 +136,7 @@ class Subscription(unittest.TestCase):
                         None
                 """
 
-                provider = CLTool("context-provide-internal", "com.nokia.test",
+                provider = CLTool("context-provide", "--v2", "com.nokia.test",
                                  "int","test.int","1",
                                  "string","test.string","foobar",
                                  "double","test.double","2.5",
@@ -193,7 +193,7 @@ class Subscription(unittest.TestCase):
                         None
                 """
 
-                provider = CLTool("context-provide-internal", "com.nokia.test",
+                provider = CLTool("context-provide", "--v2", "com.nokia.test",
                                  "int","test.int","1",
                                  "string","test.string","foobar",
                                  "double","test.double","2.5",
@@ -231,7 +231,7 @@ class Subscription(unittest.TestCase):
                 References
                         None
                 """
-                provider = CLTool("context-provide-internal", "com.nokia.test", "truth", "test.truth", "False")
+                provider = CLTool("context-provide", "--v2", "com.nokia.test", "truth", "test.truth", "False")
                 provider.send("dump")
                 provider.send("test.truth = False")
                 listen = CLTool("context-listen", "test.truth")
@@ -277,7 +277,7 @@ class Subscription(unittest.TestCase):
                 References
                         None
                 """
-                provider = CLTool("context-provide-internal", "com.nokia.test", "string", "test.string", "something")
+                provider = CLTool("context-provide", "--v2", "com.nokia.test", "string", "test.string", "something")
                 provider.send("dump")
                 listen = CLTool("context-listen", "test.string")
 
@@ -306,7 +306,7 @@ class Subscription(unittest.TestCase):
 
 class MultipleSubscribers(unittest.TestCase):
         def setUp(self):
-                self.flexiprovider = CLTool("context-provide-internal","com.nokia.test",
+                self.flexiprovider = CLTool("context-provide", "--v2","com.nokia.test",
                                             "int","test.int","1",
                                             "string","test.string","foobar",
                                             "double","test.double","2.5",
@@ -429,17 +429,13 @@ class MultipleProviders(unittest.TestCase):
                 os.unlink('./context-provide2.context')
 
         def testTwoProviders(self):
-                os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide1.context"
-                provider1 = CLTool("context-provide-internal","com.nokia.test",
+                provider1 = CLTool("context-provide", "--v2","com.nokia.test",
                                    "truth","test.truth","True")
-                provider1.send("dump")
+                provider1.send("dump context-provide1.context")
 
-                os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide2.context"
-                provider2 = CLTool("context-provide-internal","com.nokia.test2",
+                provider2 = CLTool("context-provide", "--v2","com.nokia.test2",
                                    "int","test.int","24")
-                provider2.send("dump")
-
-                os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide.context"
+                provider2.send("dump context-provide2.context")
 
                 listen = CLTool("context-listen","test.int","test.truth")
 
@@ -490,7 +486,7 @@ class SubscriptionPause (unittest.TestCase):
                         None
                 """
 
-                self.provider = CLTool("context-provide-internal","com.nokia.test",
+                self.provider = CLTool("context-provide", "--v2","com.nokia.test",
                                        "int","test.int","1")
                 self.provider.send("dump")
                 self.listen = CLTool("context-listen","test.int")
@@ -547,7 +543,7 @@ class SubscriptionPause (unittest.TestCase):
                 References
                         None
                 """
-                self.provider = CLTool("context-provide-internal","com.nokia.test",
+                self.provider = CLTool("context-provide", "--v2","com.nokia.test",
                                        "int","test.int","1")
                 self.provider.send("dump")
                 self.provider.send("sleep 3")

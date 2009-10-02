@@ -52,8 +52,8 @@ int main(int argc, char **argv)
     }
 
     if (args.contains("--help") || args.contains("-h") ||
-        args[0].endsWith("context-provide-internal") &&
-        !args[0].endsWith("lt-context-provide-internal")) {
+        (args[0].endsWith("context-provide-internal") &&
+         !args[0].endsWith("lt-context-provide-internal"))) {
         // Help? Show it and be gone.
         // FIXME: has to replace this with argv[0]
         out << "Usage: context-provide --v2 [--session | --system] [BUSNAME]\n";

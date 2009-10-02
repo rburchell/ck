@@ -37,9 +37,9 @@ class CommanderDisabled(unittest.TestCase):
         os.unlink('context-provide.context')
 
     def testCommanderFunctionality(self):
-        provider = CLTool("context-provide-internal", "contextkit.test", "int", "test.int", "42")
+        provider = CLTool("context-provide", "--v2", "contextkit.test", "int", "test.int", "42")
         provider.send("dump")
-        commander = CLTool("context-provide-internal")
+        commander = CLTool("context-provide", "--v2")
         commander.send("add int test.int 4242")
         commander.send("start")
         os.environ["CONTEXT_CLI_IGNORE_COMMANDER"] = ""

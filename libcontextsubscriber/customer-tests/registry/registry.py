@@ -42,7 +42,7 @@ class PrintInfoRunning(unittest.TestCase):
         os.unlink('context-provide.context')
 
     def testReturnValue(self):
-        provider = CLTool("context-provide-internal", "com.nokia.test",
+        provider = CLTool("context-provide", "--v2", "com.nokia.test",
                           "int", "test.int", "-5",
                           "string", "test.string", "something",
                           "double", "test.double", "4.231",
@@ -60,14 +60,14 @@ class PrintingProperties(unittest.TestCase):
         os.unlink('context-provide.context')
 
     def testProperties(self):
-        provider = CLTool("context-provide-internal", "com.nokia.test",
+        provider = CLTool("context-provide", "--v2", "com.nokia.test",
                           "int", "test.int", "-5",
                           "string", "test.string", "something",
                           "double", "test.double", "4.231",
                           "truth", "test.truth", "False")
         provider.send("dump")
         self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 1),
-                     "context-provide.context couldn't been written by context-provide-internal")
+                     "context-provide.context couldn't been written by context-provide")
         info_client = CLTool("context-print-info","test.int", "test.string", "test.double", "test.truth", "test.nothing")
 
         expected_results = ["Key: test.int",
