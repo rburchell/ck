@@ -43,7 +43,8 @@ class Service : public QObject
 
 public:
     explicit Service(QDBusConnection connection, QObject *parent = 0);
-    Service(QDBusConnection::BusType busType, const QString &busName, bool autoStart = true, QObject *parent = 0);
+    Service(QDBusConnection::BusType busType, const QString &busName, QObject *parent = 0);
+    Service(QDBusConnection::BusType busType, const QString &busName, bool autoStart, QObject *parent = 0);
     virtual ~Service();
 
     bool start();

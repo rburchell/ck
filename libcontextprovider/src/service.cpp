@@ -218,6 +218,14 @@ Service::Service(QDBusConnection::BusType busType, const QString &busName, bool 
     backend->ref();
 }
 
+/// A convenient constructor, where autoStart is always true.
+Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
+    : QObject(parent)
+{
+    backend = ServiceBackend::instance(busType, busName, true);
+    backend->ref();
+}
+
 /// Destroys this Service instance. The actual service on D-Bus is
 /// destroyed and stopped if this object is a last instance pointing
 /// at the actual service with the given constructor parameters
