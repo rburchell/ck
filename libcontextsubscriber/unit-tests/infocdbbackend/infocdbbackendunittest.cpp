@@ -29,6 +29,10 @@ class InfoCdbBackendUnitTest : public QObject
 {
     Q_OBJECT
     InfoCdbBackend *backend;
+    
+private:
+    void createBaseDatabase(QString path);
+    void createAlternateDatabase(QString path);
 
 private slots:
     void initTestCase();
@@ -46,10 +50,9 @@ private slots:
     void cleanupTestCase();
 };
 
-void InfoCdbBackendUnitTest::initTestCase()
+void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 {
-    // Create the cdb
-    CDBWriter writer(LOCAL_FILE("cache.cdb"));
+    CDBWriter writer(path);
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Internet.BytesOut");
     writer.add("PLUGINS", "contextkit-dbus");
@@ -63,6 +66,30 @@ void InfoCdbBackendUnitTest::initTestCase()
     writer.add("Battery.Charging:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
     writer.add("Internet.BytesOut:KEYCONSTRUCTIONSTRING", "session:org.freedesktop.ContextKit.contextd2");
     writer.close();
+}
+
+void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
+{
+    CDBWriter writer(path);
+    writer.add("KEYS", "Battery.Charging");
+    writer.add("KEYS", "Battery.Capacity");
+    writer.add("PLUGINS", "contextkit-dbus");
+    writer.add("contextkit-dbus:KEYS", "Battery.Charging");
+    writer.add("contextkit-dbus:KEYS", "Battery.Capacity");
+    writer.add("Battery.Charging:KEYTYPE", "INTEGER");
+    writer.add("Battery.Charging:KEYDOC", "doc1");
+    writer.add("Battery.Charging:KEYPLUGIN", "contextkit-dbus");
+    writer.add("Battery.Charging:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
+    writer.add("Battery.Capacity:KEYTYPE", "INTEGER");
+    writer.add("Battery.Capacity:KEYDOC", "doc3");
+    writer.add("Battery.Capacity:KEYPLUGIN", "contextkit-dbus");
+    writer.add("Battery.Capacity:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
+    writer.close();   
+}
+
+void InfoCdbBackendUnitTest::initTestCase()
+{
+    createBaseDatabase(LOCAL_FILE("cache.cdb"));
 
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
@@ -150,24 +177,6 @@ void InfoCdbBackendUnitTest::keyProvided()
 
 void InfoCdbBackendUnitTest::dynamics()
 {
-    // Write new database
-    CDBWriter writer(LOCAL_FILE("cache-next.cdb"));
-    writer.add("KEYS", "Battery.Charging");
-    writer.add("KEYS", "Battery.Capacity");
-    writer.add("PLUGINS", "contextkit-dbus");
-    writer.add("contextkit-dbus:KEYS", "Battery.Charging");
-    writer.add("contextkit-dbus:KEYS", "Battery.Capacity");
-    writer.add("Battery.Charging:KEYTYPE", "INTEGER");
-    writer.add("Battery.Charging:KEYDOC", "doc1");
-    writer.add("Battery.Charging:KEYPLUGIN", "contextkit-dbus");
-    writer.add("Battery.Charging:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
-    writer.add("Battery.Capacity:KEYTYPE", "INTEGER");
-    writer.add("Battery.Capacity:KEYDOC", "doc3");
-    writer.add("Battery.Capacity:KEYPLUGIN", "contextkit-dbus");
-    writer.add("Battery.Capacity:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
-
-    writer.close();
-    
     backend->connectNotify("-"); // Fake it. Spy does something fishy here.
     
     // Setup the spy observers
@@ -176,6 +185,7 @@ void InfoCdbBackendUnitTest::dynamics()
     QSignalSpy spy3(backend, SIGNAL(keyDataChanged(QString)));
     QSignalSpy spy4(backend, SIGNAL(keysAdded(QStringList)));
 
+    createAlternateDatabase(LOCAL_FILE("cache-next.cdb"));
     utilCopyLocalWithRemove("cache-next.cdb", "cache.cdb");
     
     // Test the new values
