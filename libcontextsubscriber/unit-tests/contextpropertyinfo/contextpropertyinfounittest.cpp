@@ -100,7 +100,6 @@ void InfoBackend::disconnectNotify(const char *signal)
 {
 }
 
-/*
 void InfoBackend::fireKeysChanged(const QStringList& keys)
 {
     emit keysChanged(keys);
@@ -116,12 +115,10 @@ void InfoBackend::fireKeysRemoved(const QStringList& keys)
     emit keysRemoved(keys);
 }
 
-void InfoBackend::fireKeysDataChanged(const QStringList& keys)
+void InfoBackend::fireKeyDataChanged(const QString& key)
 {
-    emit keysChanged(keys);
+    emit keyDataChanged(key);
 }
-*/
-
 
 /* ContextRegistryInfoUnitTest */
 
@@ -140,6 +137,7 @@ private slots:
     void providerDBusType();
     void plugin();
     void constructionString();
+    void typeChanged();
 };
 
 void ContextPropertyInfoUnitTest::initTestCase()
@@ -249,6 +247,23 @@ void ContextPropertyInfoUnitTest::constructionString()
     QCOMPARE(p1.constructionString(), QString("system:org.freedesktop.ContextKit.contextd"));
     QCOMPARE(p2.constructionString(), QString("session:com.nokia.musicplayer"));
     QCOMPARE(p3.constructionString(), QString());
+}
+
+void ContextPropertyInfoUnitTest::typeChanged()
+{
+    ContextPropertyInfo p("Battery.Charging");
+    QSignalSpy spy(&p, SIGNAL(typeChanged(QString)));
+
+    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+
+    QCOMPARE(spy.count(), 0);
+
+    typeMap.insert("Battery.Charging", "INT");
+    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> args = spy.takeFirst();
+    QCOMPARE(args.at(0).toString(), QString("INT"));
 }
 
 #include "contextpropertyinfounittest.moc"

@@ -43,6 +43,11 @@ public:
     void connectNotify(const char *signal);
     void disconnectNotify(const char *signal);
 
+    void fireKeysChanged(const QStringList& keys);
+    void fireKeysAdded(const QStringList& keys);
+    void fireKeysRemoved(const QStringList& keys);
+    void fireKeyDataChanged(const QString& key);
+
 signals:
     void keysChanged(const QStringList& currentKeys);
     void keysAdded(const QStringList& newKeys);
