@@ -42,12 +42,13 @@ private slots:
     void keyExists();
     void constructionStringForKey();
     void keyProvided();
+    void cleanupTestCase();
 };
 
 void InfoCdbBackendUnitTest::initTestCase()
 {
-    // FIXME: LOCAL_DIR
-    CDBWriter writer("cache.cdb");
+    // Create the cdb
+    CDBWriter writer(LOCAL_FILE("cache.cdb"));
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Internet.BytesOut");
     writer.add("PLUGINS", "contextkit-dbus");
@@ -144,6 +145,12 @@ void InfoCdbBackendUnitTest::keyProvided()
         QVERIFY(backend->keyProvided(key) == true);
 
     QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
+}
+
+void InfoCdbBackendUnitTest::cleanupTestCase()
+{
+     QFile::remove("cache.cdb");
+     QFile::remove(LOCAL_FILE("cache.cdb"));
 }
 
 
