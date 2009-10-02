@@ -1,1 +1,1 @@
-dist_man_MANS = new-context-provide.1
+dist_man_MANS = context-provide-v2.1
