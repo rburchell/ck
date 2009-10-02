@@ -141,6 +141,7 @@ private slots:
     void providerChanged();
     void providedChanged();
     void pluginChanged();
+    void dbusTypeChanged();
 };
 
 void ContextPropertyInfoUnitTest::initTestCase()
@@ -325,6 +326,22 @@ void ContextPropertyInfoUnitTest::pluginChanged()
     QCOMPARE(spy2.count(), 1);
     QList<QVariant> args2 = spy2.takeFirst();
     QCOMPARE(args2.at(0).toString(), QString(""));
+}
+
+void ContextPropertyInfoUnitTest::dbusTypeChanged()
+{
+    ContextPropertyInfo p("Battery.Charging");
+    QSignalSpy spy(&p, SIGNAL(providerDBusTypeChanged(QDBusConnection::BusType)));
+
+    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+
+    QCOMPARE(spy.count(), 0);
+
+    constructionStringMap.insert("Battery.Charging", "session:org.freedesktop.ContextKit.contextd");
+    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+
+    // WE DON'T EMIT THE DBUS TYPE CHANGED ANYMORE!
+    QCOMPARE(spy.count(), 0);
 }
 
 #include "contextpropertyinfounittest.moc"
