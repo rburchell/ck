@@ -44,6 +44,7 @@ class CommanderAppearing(unittest.TestCase):
     def testCommanderFunctionality(self):
         provider = CLTool("context-provide", "--v2", "com.nokia.test", "int", "test.int", "42")
         provider.send("dump")
+        provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
         listen = CLTool("context-listen", "test.int")
 
@@ -55,6 +56,7 @@ class CommanderAppearing(unittest.TestCase):
         commander =  CLTool("context-provide", "--v2")
         commander.send("add int test.int 4242")
         commander.send("start")
+        commander.expect(CLTool.STDOUT, "Added", 10) # wait for it
 
         self.assert_(listen.expect(CLTool.STDOUT,
                                            CLTool.wanted("test.int", "int", "4242"),

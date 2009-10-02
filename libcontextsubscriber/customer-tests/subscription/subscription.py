@@ -64,6 +64,7 @@ class Subscription(unittest.TestCase):
                                  "double","test.double","2.5",
                                  "truth","test.truth","True")
                 provider.send("dump")
+                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth")
                 self.assert_(
                         listen.expectAll(CLTool.STDOUT,
@@ -75,7 +76,7 @@ class Subscription(unittest.TestCase):
                         "Actual key values pairs do not match expected")
 
                 provider.send("test.int = 100")
-                listen.expect(CLTool.STDOUT, "int:100", 1) # wait for it
+                listen.expect(CLTool.STDOUT, "int:100", 10) # wait for it
                 listen.send("value test.int")
                 self.assert_(
                         listen.expect(CLTool.STDOUT,
@@ -91,7 +92,7 @@ class Subscription(unittest.TestCase):
                         "Value command returned wrong value")
 
                 provider.send("unset test.int")
-                listen.expect(CLTool.STDOUT, "Unknown", 1) # wait for it
+                listen.expect(CLTool.STDOUT, "Unknown", 10) # wait for it
                 listen.send("value test.int")
                 self.assert_(
                         listen.expect(CLTool.STDOUT,
@@ -141,14 +142,16 @@ class Subscription(unittest.TestCase):
                                  "string","test.string","foobar",
                                  "double","test.double","2.5",
                                  "truth","test.truth","True")
+                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
                 provider.send("dump")
+                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth")
                 listen.expectAll(CLTool.STDOUT,
                                  ["\ntest.double = double:2.5\n",
                                   "\ntest.int = int:1\n",
                                   "\ntest.string = QString:foobar\n",
                                   "\ntest.truth = bool:true\n"],
-                                 1) # wait for it
+                                 10) # wait for it
                 listen.send("ikey test.int")
 
                 self.assert_(
@@ -198,7 +201,9 @@ class Subscription(unittest.TestCase):
                                  "string","test.string","foobar",
                                  "double","test.double","2.5",
                                  "truth","test.truth","True")
+                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
                 provider.send("dump")
+                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth")
                 self.assert_(
                         listen.expectAll(CLTool.STDOUT,
@@ -232,8 +237,11 @@ class Subscription(unittest.TestCase):
                         None
                 """
                 provider = CLTool("context-provide", "--v2", "com.nokia.test", "truth", "test.truth", "False")
+                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
                 provider.send("dump")
+                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 provider.send("test.truth = False")
+                provider.expect(CLTool.STDOUT, "Setting", 10) # wait for it
                 listen = CLTool("context-listen", "test.truth")
                 self.assert_(
                         listen.expect(CLTool.STDOUT,
@@ -278,7 +286,9 @@ class Subscription(unittest.TestCase):
                         None
                 """
                 provider = CLTool("context-provide", "--v2", "com.nokia.test", "string", "test.string", "something")
+                provider.expect(CLTool.STDOUT, "Setting key: test.string", 10) # wait for it
                 provider.send("dump")
+                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 listen = CLTool("context-listen", "test.string")
 
                 self.assert_(
@@ -311,11 +321,17 @@ class MultipleSubscribers(unittest.TestCase):
                                             "string","test.string","foobar",
                                             "double","test.double","2.5",
                                             "truth","test.truth","True")
+                self.flexiprovider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
                 self.flexiprovider.send("dump")
+                self.flexiprovider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 self.context_client1 = CLTool("context-listen","test.int","test.double","test.string","test.truth")
                 self.context_client2 = CLTool("context-listen","test.int","test.double")
                 self.context_client3 = CLTool("context-listen","test.int","test.string","test.truth")
                 self.context_client4 = CLTool("context-listen","test.int","test.double","test.string")
+                self.context_client1.expect(CLTool.STDERR, "Available commands", 10) # wait for it
+                self.context_client2.expect(CLTool.STDERR, "Available commands", 10) # wait for it
+                self.context_client3.expect(CLTool.STDERR, "Available commands", 10) # wait for it
+                self.context_client4.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
         def tearDown(self):
                 self.flexiprovider.kill()
@@ -431,11 +447,15 @@ class MultipleProviders(unittest.TestCase):
         def testTwoProviders(self):
                 provider1 = CLTool("context-provide", "--v2","com.nokia.test",
                                    "truth","test.truth","True")
+                provider1.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
                 provider1.send("dump context-provide1.context")
+                provider1.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
                 provider2 = CLTool("context-provide", "--v2","com.nokia.test2",
                                    "int","test.int","24")
+                provider2.expect(CLTool.STDOUT, "Setting key: test.int", 10) # wait for it
                 provider2.send("dump context-provide2.context")
+                provider2.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
                 listen = CLTool("context-listen","test.int","test.truth")
 
@@ -488,7 +508,9 @@ class SubscriptionPause (unittest.TestCase):
 
                 self.provider = CLTool("context-provide", "--v2","com.nokia.test",
                                        "int","test.int","1")
+                self.provider.expect(CLTool.STDOUT, "Setting key: test.int", 10) # wait for it
                 self.provider.send("dump")
+                self.provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 self.listen = CLTool("context-listen","test.int")
 
                 self.assert_(
@@ -545,9 +567,11 @@ class SubscriptionPause (unittest.TestCase):
                 """
                 self.provider = CLTool("context-provide", "--v2","com.nokia.test",
                                        "int","test.int","1")
+                self.provider.expect(CLTool.STDOUT, "Setting key: test.int", 10) # wait for it
                 self.provider.send("dump")
+                self.provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 self.provider.send("sleep 3")
-                self.provider.expect(CLTool.STDOUT, "Sleep", 1) # wait for it
+                self.provider.expect(CLTool.STDOUT, "Sleep", 10) # wait for it
                 self.listen = CLTool("context-listen")
                 self.listen.send("new test.int")
                 self.listen.send("waitforsubscription test.int")

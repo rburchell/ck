@@ -60,11 +60,13 @@ class Asynchronous(unittest.TestCase):
         # start the client
         provider_slow = CLTool("context-provide", "--v2", "com.nokia.slow",
                                "int","test.slow","42")
-        provider_slow.send("sleep 3")
-        provider_slow.expect(CLTool.STDOUT, "Sleeping", 1) # wait for it
+        provider_slow.expect(CLTool.STDOUT, "Setting key", 10) # wait for it
         provider_fast = CLTool("context-provide", "--v2", "com.nokia.fast",
                                "int","test.fast","44")
-        provider_fast.expect(CLTool.STDOUT, "Setting key", 1) # wait for it
+        provider_fast.expect(CLTool.STDOUT, "Setting key", 10) # wait for it
+
+        provider_slow.send("sleep 3")
+        provider_slow.expect(CLTool.STDOUT, "Sleeping", 3) # wait for it
 
         context_client = CLTool("context-listen", "test.fast", "test.slow")
 
@@ -79,15 +81,17 @@ class Asynchronous(unittest.TestCase):
         # check the slow property
         self.assert_(context_client.expect(CLTool.STDOUT,
                                            CLTool.wanted("test.slow", "int", "42"),
-                                           5), # timeout == 5 seconds max, but 3 is enough usually
+                                           10), # timeout == 10 seconds max, but 5 is enough usually
                      "Bad value for the slow property, wanted 42")
         slow_time = time.time()
         context_client.comment("Slow property arrived with good value at: " + str(slow_time))
 
-        self.assert_(slow_time - fast_time > 2.0,
-                     "The arrival time of the fast and slow property is not far enough from each other")
+        if slow_time - fast_time < 2.0:
+            context_client.printio()
+            self.assert_(False,
+                         "The arrival time of the fast and slow property is not far enough from each other")
 
-        #context_client.printio()
+        # context_client.printio()
 
         provider_slow.kill()
         provider_fast.kill()

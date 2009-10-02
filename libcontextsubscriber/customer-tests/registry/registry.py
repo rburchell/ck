@@ -48,7 +48,7 @@ class PrintInfoRunning(unittest.TestCase):
                           "double", "test.double", "4.231",
                           "truth", "test.truth", "False")
         provider.send("dump")
-        self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 1)) # wait for it
+        self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 10)) # wait for it
         info_client = CLTool("context-print-info", "test.int", "test.string", "test.double", "test.truth", "test.nothing")
 
         returnValue = info_client.wait()
