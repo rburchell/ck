@@ -1,13 +1,23 @@
 .TH context-provide 1 May-28-2009
+
 .SH NAME
 context-provide
 - a simple provider to provide context properties for testing/debugging
+
 .SH SYNOPSIS
 .B context-provide\fR [\fIBUSTYPE\fR:]\fIPROVIDERNAME\fR [\fITYPE\fR \fINAME\fR \fIINITVALUE\fR]...
+
+.SH THIS IS DEPRECATED
+The old synopsis of context-provide is deprecated and shouldn't be
+used in new projects.  In a later version of ContextKit, it won't be
+provided at all.  Please use the new synopsis, which is available by
+using --v2 as the first parameter.  The new synopsis is documented in
+context-provide-v2(1).
+
 .SH DESCRIPTION
-context-provide is a tool for testing/debugging Context Framework
-clients.  It allows you to define properties and change their values
-during runtime.
+context-provide is a tool for testing/debugging ContextKit clients.
+It allows you to define properties and change their values during
+runtime.
 
 .SH PARAMETERS
 .TP 8
@@ -21,6 +31,7 @@ service name of the provider on DBus.
 TYPE NAME INITVALUE
 with these triplets you can define initial properties.  Type can be one of int, string,
 double, truth.
+
 .SH ENVIRONMENT VARIABLES
 .TP 8
 CONTEXT_PROVIDE_REGISTRY_FILE
@@ -70,4 +81,4 @@ context-provide needs 2.5, so you have to run it like this:
 You can check the current python version with python -V
 
 .SH SEE ALSO
-context-listen(1)
+context-listen(1), context-provide-v2(1)
