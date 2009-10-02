@@ -3,10 +3,12 @@ contextkit (0.3.8) unstable; urgency=low
   * libcontextsubscriber-tests lintian errors fixed.
   * Rewrote context-provide in C++, the UI has been changed, see
     context-provide-v2(1).
+  * New package libcontextprovider-tests added, containing customer tests
+    of the libcontextprovider.
 
   Imlemented: CntFr-323
 
- -- Gergely Risko <gergely+context@risko.hu>  Fri, 02 Oct 2009 09:34:50 +0300
+ -- Gergely Risko <gergely+context@risko.hu>  Fri, 02 Oct 2009 16:17:10 +0300
 
 contextkit (0.3.7) unstable; urgency=low
 
