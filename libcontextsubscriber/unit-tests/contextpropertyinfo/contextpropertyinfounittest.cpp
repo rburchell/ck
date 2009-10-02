@@ -139,6 +139,7 @@ private slots:
     void constructionString();
     void typeChanged();
     void providerChanged();
+    void pluginChanged();
 };
 
 void ContextPropertyInfoUnitTest::initTestCase()
@@ -282,6 +283,31 @@ void ContextPropertyInfoUnitTest::providerChanged()
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
     QCOMPARE(args.at(0).toString(), QString("org.freedesktop.ContextKit.robot"));
+}
+
+void ContextPropertyInfoUnitTest::pluginChanged()
+{
+    ContextPropertyInfo p("Battery.Charging");
+    QSignalSpy spy1(&p, SIGNAL(pluginChanged(QString, QString)));
+    QSignalSpy spy2(&p, SIGNAL(providerChanged(QString)));
+
+    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+
+    QCOMPARE(spy1.count(), 0);
+    QCOMPARE(spy2.count(), 0);
+
+    pluginMap.insert("Battery.Charging", "test.so");
+    constructionStringMap.insert("Battery.Charging", "secret:something");
+    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+
+    QCOMPARE(spy1.count(), 1);
+    QList<QVariant> args1 = spy1.takeFirst();
+    QCOMPARE(args1.at(0).toString(), QString("test.so"));
+    QCOMPARE(args1.at(1).toString(), QString("secret:something"));
+
+    QCOMPARE(spy2.count(), 1);
+    QList<QVariant> args2 = spy2.takeFirst();
+    QCOMPARE(args2.at(0).toString(), QString(""));
 }
 
 #include "contextpropertyinfounittest.moc"
