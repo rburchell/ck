@@ -5,5 +5,5 @@ usr/share/libcontextsubscriber-tests/asynchronicity/*.py
 usr/share/libcontextsubscriber-tests/registry/*.py
 usr/share/libcontextsubscriber-tests/pluginchanging/pluginchanging.py
 usr/share/libcontextsubscriber-tests/pluginchanging/time*.context.temp
-usr/share/libcontextsubscriber-tests/testplugins/libcontextsubscribertime*.so.0.0.0
 usr/share/libcontextsubscriber-tests/common/rec-kill.sh
+usr/lib/contextkit/subscriber-test-plugins/contextsubscribertime*.so

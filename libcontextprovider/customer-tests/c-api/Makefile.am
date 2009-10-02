@@ -1,4 +1,5 @@
-bin_PROGRAMS = cprovidertests
+testdir = $(bindir)/libcontextprovider-tests
+test_PROGRAMS = cprovidertests
 
 cprovidertests_SOURCES = cprovidertests.c
 

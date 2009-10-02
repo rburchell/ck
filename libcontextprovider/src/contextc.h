@@ -32,31 +32,31 @@ extern "C" {
 typedef void (*ContextProviderSubscriptionChangedCallback) (int subscribe, void* user_data);
 
 int
-context_provider_init           (DBusBusType bus_type, 
+context_provider_init           (DBusBusType bus_type,
                                  const char* bus_name);
 
-void        
+void
 context_provider_stop           (void);
 
 void
-context_provider_install_key    (const char* key, 
-                                 int clear_values_on_subscribe, 
-                                 ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
+context_provider_install_key    (const char* key,
+                                 int clear_values_on_subscribe,
+                                 ContextProviderSubscriptionChangedCallback subscription_changed_cb,
                                  void* subscription_changed_cb_target);
 
-void 
-context_provider_install_group  (char** key_group, 
-                                 int clear_values_on_subscribe, 
-                                 ContextProviderSubscriptionChangedCallback subscription_changed_cb, 
+void
+context_provider_install_group  (char* const * key_group,
+                                 int clear_values_on_subscribe,
+                                 ContextProviderSubscriptionChangedCallback subscription_changed_cb,
                                  void* subscription_changed_cb_target);
 
-void 
+void
 context_provider_set_integer    (const char* key, int value);
 
-void 
+void
 context_provider_set_double     (const char* key, double value);
 
-void 
+void
 context_provider_set_boolean    (const char* key, int value);
 
 void
@@ -67,6 +67,6 @@ context_provider_set_null       (const char* key);
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif
