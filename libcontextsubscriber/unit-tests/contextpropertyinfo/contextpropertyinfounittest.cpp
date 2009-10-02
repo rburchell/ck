@@ -139,6 +139,7 @@ private slots:
     void constructionString();
     void typeChanged();
     void providerChanged();
+    void providedChanged();
     void pluginChanged();
 };
 
@@ -283,6 +284,22 @@ void ContextPropertyInfoUnitTest::providerChanged()
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
     QCOMPARE(args.at(0).toString(), QString("org.freedesktop.ContextKit.robot"));
+}
+
+void ContextPropertyInfoUnitTest::providedChanged()
+{
+    ContextPropertyInfo p("Battery.Charging");
+    QSignalSpy spy(&p, SIGNAL(providedChanged(bool)));
+
+    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+
+    QCOMPARE(spy.count(), 0);
+
+    providedMap.insert("Battery.Charging", false);
+    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> args = spy.takeFirst();
 }
 
 void ContextPropertyInfoUnitTest::pluginChanged()
