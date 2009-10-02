@@ -41,16 +41,29 @@ int main(int argc, char **argv)
     QDBusConnection::BusType busType = QDBusConnection::SessionBus;
     QTextStream out(stdout);
 
-    // First, try silently dropping --v2
-    if (args.contains("--v2")) {
-        args.removeAll("--v2");
+    qDebug() << args;
+
+    // I hate libtool
+
+    // Check that we are not called with our internal name
+    if (args[0].endsWith("context-provide-internal") &&
+        !args[0].endsWith("lt-context-provide-internal")) {
+        out << "Please don't use this binary directly!\n";
     }
 
-    if (args.contains("--help") || args.contains("-h")) {
+    if (args.contains("--help") || args.contains("-h") ||
+        args[0].endsWith("context-provide-internal") &&
+        !args[0].endsWith("lt-context-provide-internal")) {
         // Help? Show it and be gone.
-        out << "Usage: context-provide [--session | --system] [BUSNAME]\n";
+        // FIXME: has to replace this with argv[0]
+        out << "Usage: context-provide --v2 [--session | --system] [BUSNAME]\n";
         out << "BUSNAME is " COMMANDER " by default, and bus is session.\n";
         return 0;
+    }
+
+    // Silently dropping --v2
+    if (args.contains("--v2")) {
+        args.removeAll("--v2");
     }
 
     // session/system

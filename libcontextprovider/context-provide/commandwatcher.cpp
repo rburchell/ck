@@ -75,12 +75,12 @@ void CommandWatcher::onActivated()
 void CommandWatcher::help()
 {
     qDebug() << "Available commands:\n";
-    qDebug() << "  add TYPE KEY VALUE              - create new key with the given type";
+    qDebug() << "  add TYPE KEY [VALUE]            - create new key with the given type";
     qDebug() << "  KEY=VALUE                       - set KEY to the given VALUE";
-    qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
-    qDebug() << "  dump                            - dump the xml content of the defined props";
-    qDebug() << "  start                           - (re)register everything on D-Bus";
     qDebug() << "  unset KEY                       - sets KEY to unknown";
+    qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
+    qDebug() << "  dump [FILENAME]                 - dump the xml content of the defined props";
+    qDebug() << "  start                           - (re)register everything on D-Bus";
     qDebug() << "  exit                            - quit this program";
     qDebug() << "Any unique prefix of a command can be used as an abbreviation";
 }
@@ -106,7 +106,7 @@ void CommandWatcher::interpret(const QString& command)
         } else if (QString("exit").startsWith(commandName)) {
             exit(0);
         } else if (QString("dump").startsWith(commandName)) {
-            dumpCommand();
+            dumpCommand(args);
         } else if (QString("start").startsWith(commandName)) {
             startCommand();
         } else if (QString("unset").startsWith(commandName)) {
@@ -174,15 +174,17 @@ void CommandWatcher::sleepCommand(const QStringList& args)
     sleep(interval);
 }
 
-void CommandWatcher::dumpCommand()
+void CommandWatcher::dumpCommand(const QStringList &args)
 {
     QString fileName;
-    QString dirName = "./";
+    QString dirName;
 
-    if (getenv("CONTEXT_PROVIDE_REGISTRY_FILE"))
-        fileName = QString(getenv("CONTEXT_PROVIDE_REGISTRY_FILE"));
+    if (args.size() > 0)
+        fileName = args[0];
     else
-        fileName = QString("./context-provide.context");
+        fileName = QString("context-provide.context");
+    if (!fileName.startsWith("/"))
+        fileName = QString("./") + fileName;
 
     if (fileName.indexOf('/') != -1)
         dirName = QString(fileName.left(fileName.lastIndexOf('/'))) + "/";
@@ -277,8 +279,10 @@ void CommandWatcher::unsetCommand(const QStringList& args)
 void CommandWatcher::startCommand()
 {
     Service service(busType, busName);
-    service.start();
-    // FIXME: exit here if the registration is unsuccessful
+    if (!service.start()) {
+        qDebug() << "Starting service failed";
+        exit(2);
+    }
     out << "Service started" << endl;
     out.flush();
 }

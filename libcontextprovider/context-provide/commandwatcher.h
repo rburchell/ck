@@ -54,7 +54,7 @@ private:
     void setCommand(const QString& command);
     void sleepCommand(const QStringList& args);
     void flushCommand();
-    void dumpCommand();
+    void dumpCommand(const QStringList& args);
     void startCommand();
     QTextStream out;
     bool silent;
