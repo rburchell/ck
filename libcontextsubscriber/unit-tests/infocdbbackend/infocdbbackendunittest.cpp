@@ -42,6 +42,7 @@ private slots:
     void keyExists();
     void constructionStringForKey();
     void keyProvided();
+    void dynamics();
     void cleanupTestCase();
 };
 
@@ -147,13 +148,75 @@ void InfoCdbBackendUnitTest::keyProvided()
     QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
 }
 
+void InfoCdbBackendUnitTest::dynamics()
+{
+    // Write new database
+    CDBWriter writer(LOCAL_FILE("cache-next.cdb"));
+    writer.add("KEYS", "Battery.Charging");
+    writer.add("KEYS", "Battery.Capacity");
+    writer.add("PLUGINS", "contextkit-dbus");
+    writer.add("contextkit-dbus:KEYS", "Battery.Charging");
+    writer.add("contextkit-dbus:KEYS", "Battery.Capacity");
+    writer.add("Battery.Charging:KEYTYPE", "INTEGER");
+    writer.add("Battery.Charging:KEYDOC", "doc1");
+    writer.add("Battery.Charging:KEYPLUGIN", "contextkit-dbus");
+    writer.add("Battery.Charging:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
+    writer.add("Battery.Capacity:KEYTYPE", "INTEGER");
+    writer.add("Battery.Capacity:KEYDOC", "doc3");
+    writer.add("Battery.Capacity:KEYPLUGIN", "contextkit-dbus");
+    writer.add("Battery.Capacity:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
+
+    writer.close();
+    
+    backend->connectNotify("-"); // Fake it. Spy does something fishy here.
+    
+    // Setup the spy observers
+    QSignalSpy spy1(backend, SIGNAL(keysRemoved(QStringList)));
+    QSignalSpy spy2(backend, SIGNAL(keysChanged(QStringList)));
+    QSignalSpy spy3(backend, SIGNAL(keyDataChanged(QString)));
+    QSignalSpy spy4(backend, SIGNAL(keysAdded(QStringList)));
+
+    utilCopyLocalWithRemove("cache-next.cdb", "cache.cdb");
+    
+    // Test the new values
+    QCOMPARE(backend->databaseExists(), true);
+    QCOMPARE(backend->listKeys().count(), 2);
+    QVERIFY(backend->listKeys().contains("Battery.Charging"));
+    QVERIFY(backend->listKeys().contains("Battery.Capacity"));
+    QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
+    QCOMPARE(backend->docForKey("Battery.Charging"), QString("doc1"));
+    QVERIFY(backend->keyProvided("Battery.Charging") == true);
+    QVERIFY(backend->keyProvided("Internet.BytesOut") == false);
+    
+    // Test emissions
+    QCOMPARE(spy1.count(), 1);
+    QList<QVariant> args1 = spy1.takeFirst();
+    QCOMPARE(args1.at(0).toList().size(), 1);
+    QCOMPARE(args1.at(0).toStringList().at(0), QString("Internet.BytesOut"));
+    
+    QCOMPARE(spy2.count(), 1);
+    QList<QVariant> args2 = spy2.takeFirst();
+    QCOMPARE(args2.at(0).toList().size(), 2);
+    QCOMPARE(args2.at(0).toStringList().at(0), QString("Battery.Charging"));
+    QCOMPARE(args2.at(0).toStringList().at(1), QString("Battery.Capacity"));
+    
+    QCOMPARE(spy3.count(), 3);
+    
+    QCOMPARE(spy4.count(), 1);
+    QList<QVariant> args4 = spy4.takeFirst();
+    QCOMPARE(args4.at(0).toList().size(), 1);
+    QCOMPARE(args4.at(0).toStringList().at(0), QString("Battery.Capacity"));
+
+    backend->disconnectNotify("-"); // Fake it. Spy does something fishy here.
+}
+
 void InfoCdbBackendUnitTest::cleanupTestCase()
 {
      QFile::remove("cache.cdb");
      QFile::remove(LOCAL_FILE("cache.cdb"));
+     QFile::remove("cache-next.cdb");
+     QFile::remove(LOCAL_FILE("cache-next.cdb"));
 }
-
-
 
 #include "infocdbbackendunittest.moc"
 QTEST_MAIN(InfoCdbBackendUnitTest);
