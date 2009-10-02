@@ -24,6 +24,12 @@
 #include "contextpropertyinfo.h"
 #include "infobackend.h"
 
+QMap <QString, QString> constructionStringMap;
+QMap <QString, QString> typeMap;
+QMap <QString, QString> docMap;
+QMap <QString, QString> pluginMap;
+QMap <QString, bool> providedMap;
+
 /* Mocked infobackend */
 
 InfoBackend* currentBackend = NULL;
@@ -38,76 +44,41 @@ InfoBackend* InfoBackend::instance(const QString &backendName)
     }
 }
 
-QStringList InfoBackend::listKeys() const
-{
-    QStringList l;
-    l << QString("Battery.Charging");
-    l << QString("Media.NowPlaying");
-    return l;
-}
-
-QStringList InfoBackend::listKeysForPlugin(QString plugin) const
-{
-    if (plugin == "contextkit-dbus") {
-        QStringList l;
-        l << QString("Battery.Charging");
-        l << QString("Media.NowPlaying");
-        return l;
-    } else
-        return QStringList();
-}
-
-QStringList InfoBackend::listPlugins() const
-{
-    QStringList l;
-    l << QString("contextkit-dbus");
-    return l;
-}
-
 QString InfoBackend::constructionStringForKey(QString key) const
 {
-    if (key == "Battery.Charging")
-        return "system:org.freedesktop.ContextKit.contextd";
-    else if (key == "Media.NowPlaying")
-        return "session:com.nokia.musicplayer";
-    return QString();
+    if (constructionStringMap.contains(key))
+        return constructionStringMap.value(key);
+    else
+        return QString();
 }
 
 QString InfoBackend::typeForKey(QString key) const
 {
-    if (key == "Battery.Charging")
-        return "TRUTH";
-    else if (key == "Media.NowPlaying")
-        return "STRING";
+     if (typeMap.contains(key))
+        return typeMap.value(key);
     else
-        return "";
+        return QString();
 }
 
 QString InfoBackend::docForKey(QString key) const
 {
-    if (key == "Battery.Charging")
-        return "Battery.Charging doc";
-    else if (key == "Media.NowPlaying")
-        return "Media.NowPlaying doc";
+    if (docMap.contains(key))
+        return docMap.value(key);
     else
-        return "";
+        return QString();
 }
 
 QString InfoBackend::pluginForKey(QString key) const
 {
-    if (key == "Battery.Charging")
-        return "contextkit-dbus";
-    else if (key == "Media.NowPlaying")
-        return "contextkit-dbus";
+    if (pluginMap.contains(key))
+        return pluginMap.value(key);
     else
-        return "";
+        return QString();
 }
 
 bool InfoBackend::keyExists(QString key) const
 {
-    if (key == "Battery.Charging")
-        return true;
-    else if (key == "Media.NowPlaying")
+    if (typeMap.contains(key))
         return true;
     else
         return false;
@@ -115,10 +86,8 @@ bool InfoBackend::keyExists(QString key) const
 
 bool InfoBackend::keyProvided(QString key) const
 {
-    if (key == "Battery.Charging")
-        return true;
-    else if (key == "Media.NowPlaying")
-        return true;
+    if (providedMap.contains(key))
+        return providedMap.value(key);
     else
         return false;
 }
@@ -146,7 +115,13 @@ void InfoBackend::fireKeysRemoved(const QStringList& keys)
 {
     emit keysRemoved(keys);
 }
+
+void InfoBackend::fireKeysDataChanged(const QStringList& keys)
+{
+    emit keysChanged(keys);
+}
 */
+
 
 /* ContextRegistryInfoUnitTest */
 
@@ -169,6 +144,25 @@ private slots:
 
 void ContextPropertyInfoUnitTest::initTestCase()
 {
+    constructionStringMap.clear();
+    constructionStringMap.insert("Battery.Charging", "system:org.freedesktop.ContextKit.contextd");
+    constructionStringMap.insert("Media.NowPlaying", "session:com.nokia.musicplayer");
+
+    typeMap.clear();
+    typeMap.insert("Battery.Charging", "TRUTH");
+    typeMap.insert("Media.NowPlaying", "STRING");
+
+    docMap.clear();
+    docMap.insert("Battery.Charging", "Battery.Charging doc");
+    docMap.insert("Media.NowPlaying", "Media.NowPlaying doc");
+
+    pluginMap.clear();
+    pluginMap.insert("Battery.Charging", "contextkit-dbus");
+    pluginMap.insert("Media.NowPlaying", "contextkit-dbus");
+
+    providedMap.clear();
+    providedMap.insert("Battery.Charging", true);
+    providedMap.insert("Media.NowPlaying", true);
 }
 
 void ContextPropertyInfoUnitTest::key()

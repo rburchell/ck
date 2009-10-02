@@ -33,9 +33,6 @@ class InfoBackend : public QObject
 public:
 
     static InfoBackend* instance(const QString &backendName = "");
-    QStringList listKeys() const;
-    QStringList listKeysForPlugin(QString plugin) const;
-    QStringList listPlugins() const;
     QString typeForKey(QString key) const;
     QString docForKey(QString key) const;
     QString pluginForKey(QString key) const;
