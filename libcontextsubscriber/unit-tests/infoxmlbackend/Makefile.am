@@ -3,8 +3,7 @@ check_PROGRAMS = infoxmlbackendunittest
 # your test's sources
 infoxmlbackendunittest_SOURCES = infoxmlbackendunittest.cpp
 
-COVERAGE_FILES = infobackend.cpp 		\
-		 infoxmlbackend.cpp
+COVERAGE_FILES = infoxmlbackend.cpp
 EXTRA_DIST = 
 
 # do the testing, coverage, etc. stuff

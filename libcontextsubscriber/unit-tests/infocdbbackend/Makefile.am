@@ -3,8 +3,7 @@ check_PROGRAMS = infocdbbackendunittest
 # your test's sources
 infocdbbackendunittest_SOURCES = infocdbbackendunittest.cpp
 
-COVERAGE_FILES = infobackend.cpp 		\
-	         infocdbbackend.cpp
+COVERAGE_FILES = infocdbbackend.cpp
 EXTRA_DIST = cache.src
 
 # do the testing, coverage, etc. stuff
