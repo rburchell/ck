@@ -99,10 +99,9 @@ void InfoBackend::fireKeysRemoved(const QStringList& keys)
 class ContextRegistryInfoUnitTest : public QObject
 {
     Q_OBJECT
-    ContextRegistryInfo *registry;
 
 private:
-    ContextRegistryInfo *context;
+    ContextRegistryInfo *registry;
 
 private slots:
     void initTestCase();
