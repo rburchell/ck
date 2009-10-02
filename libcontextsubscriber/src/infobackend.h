@@ -103,6 +103,9 @@ private:
 
     friend class InfoXmlBackend;
     friend class InfoCdbBackend;
+    friend class InfoXmlBackendUnitTest;
+    friend class InfoCdbBackendUnitTest;
+
 };
 
 #endif // INFOBACKEND_H
