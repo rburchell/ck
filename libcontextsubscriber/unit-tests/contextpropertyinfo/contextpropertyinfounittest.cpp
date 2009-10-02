@@ -138,6 +138,7 @@ private slots:
     void plugin();
     void constructionString();
     void typeChanged();
+    void providerChanged();
 };
 
 void ContextPropertyInfoUnitTest::initTestCase()
@@ -264,6 +265,23 @@ void ContextPropertyInfoUnitTest::typeChanged()
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
     QCOMPARE(args.at(0).toString(), QString("INT"));
+}
+
+void ContextPropertyInfoUnitTest::providerChanged()
+{
+    ContextPropertyInfo p("Battery.Charging");
+    QSignalSpy spy(&p, SIGNAL(providerChanged(QString)));
+
+    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+
+    QCOMPARE(spy.count(), 0);
+
+    constructionStringMap.insert("Battery.Charging", "system:org.freedesktop.ContextKit.robot");
+    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> args = spy.takeFirst();
+    QCOMPARE(args.at(0).toString(), QString("org.freedesktop.ContextKit.robot"));
 }
 
 #include "contextpropertyinfounittest.moc"
