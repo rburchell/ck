@@ -41,8 +41,6 @@ int main(int argc, char **argv)
     QDBusConnection::BusType busType = QDBusConnection::SessionBus;
     QTextStream out(stdout);
 
-    qDebug() << args;
-
     // I hate libtool
 
     // Check that we are not called with our internal name
