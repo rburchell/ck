@@ -338,7 +338,7 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
     if (oldExists != cachedExists)
         emit existsChanged(cachedExists);
     if (oldProvided != cachedProvided)
-        emit existsChanged(cachedProvided);
+        emit providedChanged(cachedProvided);
 
     // TBD: obsolete the providerChanged & providerDBusTypeChanged signals?
     if (oldPlugin != newPlugin || oldConstructionString != newConstructionString) {
