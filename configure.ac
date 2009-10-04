@@ -70,14 +70,6 @@ AC_CONFIG_FILES([
         libcontextsubscriber/src/Makefile
         libcontextsubscriber/unit-tests/Makefile
         libcontextsubscriber/unit-tests/cdb/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-static/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-xml-dynamic/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-xml-static/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-cdb-dynamic/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-cdb-static/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-xml-dynamic/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-xml-static/Makefile
         libcontextsubscriber/unit-tests/infoxmlbackend/Makefile
         libcontextsubscriber/unit-tests/infocdbbackend/Makefile
         libcontextsubscriber/unit-tests/contextregistryinfo/Makefile
