@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<provider bus="session" service="org.freedesktop.ContextKit.contextd1">
-  <key name="Battery.ChargePercentage">
-    <type>INT</type>
-    <doc>This is a charge percentage of the battery</doc>
-  </key>
-</provider>
