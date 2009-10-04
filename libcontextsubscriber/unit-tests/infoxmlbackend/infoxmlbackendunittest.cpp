@@ -28,6 +28,9 @@ class InfoXmlBackendUnitTest : public QObject
 {
     Q_OBJECT
     InfoXmlBackend *backend;
+    
+private:
+    bool inSpyHasOneInList(QSignalSpy &spy, const QString &v);
 
 private slots:
     void initTestCase();
@@ -45,6 +48,22 @@ private slots:
     void cleanupTestCase();
 };
 
+bool InfoXmlBackendUnitTest::inSpyHasOneInList(QSignalSpy &spy, const QString &v)
+{
+    if (spy.count() == 0)
+        return false;
+    
+    while (spy.count() > 0) {
+        QList<QVariant> args = spy.takeFirst();
+        foreach (QString s, args.at(0).toStringList()) {
+            if (s == v)
+                return true;
+        }
+    }
+
+    return false;
+}
+
 void InfoXmlBackendUnitTest::initTestCase()
 {
     utilCopyLocalWithRemove("providers2v1.src", "providers2.context");
@@ -56,7 +75,7 @@ void InfoXmlBackendUnitTest::initTestCase()
 void InfoXmlBackendUnitTest::listKeys()
 {
     QStringList keys = backend->listKeys();
-    QCOMPARE(keys.count(), 9);
+    QCOMPARE(keys.count(), 10);
     QVERIFY(keys.contains("Battery.ChargePercentage"));
     QVERIFY(keys.contains("Battery.LowBattery"));
     QVERIFY(keys.contains("Key.With.Attribute"));
@@ -66,6 +85,7 @@ void InfoXmlBackendUnitTest::listKeys()
     QVERIFY(keys.contains("Key.With.double"));
     QVERIFY(keys.contains("Key.With.complex"));
     QVERIFY(keys.contains("Battery.Charging"));
+    QVERIFY(keys.contains("Battery.Voltage"));
 }
 
 void InfoXmlBackendUnitTest::listPlugins()
@@ -87,6 +107,7 @@ void InfoXmlBackendUnitTest::listKeysForPlugin()
     QVERIFY(keys.contains("Key.With.double"));
     QVERIFY(keys.contains("Key.With.complex"));
     QVERIFY(keys.contains("Battery.Charging"));
+    QVERIFY(keys.contains("Battery.Voltage"));
     QVERIFY(backend->listKeysForPlugin("does-not-exist").count() == 0);
 }
 
@@ -101,6 +122,7 @@ void InfoXmlBackendUnitTest::typeForKey()
     QCOMPARE(backend->typeForKey("Key.With.double"), QString("DOUBLE"));
     QCOMPARE(backend->typeForKey("Key.With.complex"), QString());
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("TRUTH"));
+    QCOMPARE(backend->typeForKey("Battery.Voltage"), QString("INTEGER"));
     QCOMPARE(backend->typeForKey("Does.Not.Exist"), QString());
 }
 
@@ -160,16 +182,30 @@ void InfoXmlBackendUnitTest::keyProvided()
 
 void InfoXmlBackendUnitTest::dynamics()
 {
+    // Sanity check
     QStringList keys = backend->listKeys();
-    QCOMPARE(keys.count(), 9);
+    QCOMPARE(keys.count(), 10);
     QVERIFY(keys.contains("Battery.Charging"));
     QCOMPARE(backend->keyExists("System.Active"), false);
     
+    // Setup the spy observers
+    QSignalSpy spy1(backend, SIGNAL(keysRemoved(QStringList)));
+    QSignalSpy spy2(backend, SIGNAL(keysChanged(QStringList)));
+    QSignalSpy spy3(backend, SIGNAL(keyDataChanged(QString)));
+    QSignalSpy spy4(backend, SIGNAL(keysAdded(QStringList)));
+
     utilCopyLocalWithRemove("providers2v2.src", "providers2.context");
     utilCopyLocalWithRemove("providers3.src", "providers3.context");
-    
+
+    // Again, some basic check
     QCOMPARE(backend->keyExists("System.Active"), true);
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
+    
+    // Test emissions
+    QVERIFY(inSpyHasOneInList(spy1, "Battery.Voltage")); 
+    QVERIFY(inSpyHasOneInList(spy2, "Battery.Charging")); 
+    QVERIFY(inSpyHasOneInList(spy3, "Battery.Charging"));
+    QVERIFY(inSpyHasOneInList(spy4, "System.Active"));
 }
 
 void InfoXmlBackendUnitTest::cleanupTestCase()

@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <xml>
     <provider bus="system" service="org.freedesktop.ContextKit.contextd2">
-        <key name="Battery.Charging">
-            <type>INTEGER</type>
-        </key>
+        <key name="Battery.Charging" type="INTEGER" />
     </provider>
 </xml>

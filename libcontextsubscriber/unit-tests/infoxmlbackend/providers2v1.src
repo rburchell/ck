@@ -7,6 +7,7 @@
                 This is true when battery is charging
             </doc>
         </key>
+  	<key name="Battery.Voltage" type="INTEGER"/>
     </provider>
     <provider bus="system" service="org.freedesktop.ContextKit.contextd1">
         <key name="Battery.ChargePercentage">
