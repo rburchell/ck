@@ -90,6 +90,7 @@ private slots:
     void checkAndEmitKeysRemoved();
     void checkAndEmitKeysChanged();
     void connectNotify();
+    void instance();
 };
 
 void InfoBackendUnitTest::initTestCase()
@@ -160,6 +161,25 @@ void InfoBackendUnitTest::connectNotify()
     QCOMPARE(backend->connectCount, 1);
     backend->disconnectNotify("-");
     QCOMPARE(backend->connectCount, 0);
+}
+
+void InfoBackendUnitTest::instance()
+{
+    InfoBackend *instance;
+    
+    InfoBackend::backendInstance = NULL;
+    instance = InfoBackend::instance("xml");
+    QCOMPARE(instance, InfoBackend::backendInstance);
+    QCOMPARE(instance->name(), QString("xml"));
+    
+    InfoBackend::backendInstance = NULL;
+    instance = InfoBackend::instance("cdb");
+    QCOMPARE(instance, InfoBackend::backendInstance);
+    QCOMPARE(instance->name(), QString("cdb"));
+
+    InfoBackend::backendInstance = new InfoTestBackend();
+    InfoBackend::destroyInstance();
+    QVERIFY(InfoBackend::backendInstance == NULL);
 }
 
 
