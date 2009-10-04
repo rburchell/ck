@@ -103,8 +103,10 @@ private:
 
     friend class InfoXmlBackend;
     friend class InfoCdbBackend;
+    friend class InfoTestBackend;
     friend class InfoXmlBackendUnitTest;
     friend class InfoCdbBackendUnitTest;
+    friend class InfoBackendUnitTest;
 
 };
 

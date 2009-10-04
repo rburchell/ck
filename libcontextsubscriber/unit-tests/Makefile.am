@@ -7,7 +7,8 @@ SUBDIRSTESTS = \
 	infoxmlbackend 							\
 	infocdbbackend 							\
 	contextregistryinfo               				\
-        contextpropertyinfo
+        contextpropertyinfo						\
+	infobackend
 
 SUBDIRS = $(SUBDIRSTESTS) util
 

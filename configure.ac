@@ -74,6 +74,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/unit-tests/infocdbbackend/Makefile
         libcontextsubscriber/unit-tests/contextregistryinfo/Makefile
         libcontextsubscriber/unit-tests/contextpropertyinfo/Makefile
+        libcontextsubscriber/unit-tests/infobackend/Makefile
         libcontextsubscriber/unit-tests/handlesignalrouter/Makefile
         libcontextsubscriber/unit-tests/propertyhandle/Makefile
         libcontextsubscriber/unit-tests/provider/Makefile
