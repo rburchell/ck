@@ -35,6 +35,7 @@ private:
 private slots:
     void initTestCase();
     void paths();
+    void name();
     void listKeys();
     void listPlugins();
     void listKeysForPlugin();
@@ -86,6 +87,11 @@ void InfoXmlBackendUnitTest::listKeys()
     QVERIFY(keys.contains("Key.With.complex"));
     QVERIFY(keys.contains("Battery.Charging"));
     QVERIFY(keys.contains("Battery.Voltage"));
+}
+
+void InfoXmlBackendUnitTest::name()
+{
+    QCOMPARE(backend->name(), QString("xml"));
 }
 
 void InfoXmlBackendUnitTest::listPlugins()
