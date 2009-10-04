@@ -7,7 +7,7 @@ infocdbbackend.h
 infokeydata.h
 infoxmlbackend.cpp
 infoxmlbackend.h
-infoxmlbackendunittest
+infobackendunittest
 infoxmlkeysfinder.cpp
 infoxmlkeysfinder.h
 loggingfeatures.h
