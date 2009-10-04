@@ -47,6 +47,7 @@ private slots:
     void constructionStringForKey();
     void keyProvided();
     void dynamics();
+    void removed();
     void cleanupTestCase();
 };
 
@@ -217,6 +218,23 @@ void InfoCdbBackendUnitTest::dynamics()
     QCOMPARE(args4.at(0).toList().size(), 1);
     QCOMPARE(args4.at(0).toStringList().at(0), QString("Battery.Capacity"));
 
+    backend->disconnectNotify("-"); // Fake it. Spy does something fishy here.
+}
+
+void InfoCdbBackendUnitTest::removed()
+{
+    backend->connectNotify("-"); // Fake it. Spy does something fishy here.
+    QSignalSpy spy(backend, SIGNAL(keysRemoved(QStringList)));
+    
+    QFile::remove("cache.cdb");
+    QFile::remove(LOCAL_FILE("cache.cdb"));
+    
+    QTest::qWait(DEFAULT_WAIT_PERIOD);
+    
+    //QCOMPARE(spy.count(), 1);
+    //QList<QVariant> args = spy.takeFirst();
+    //QCOMPARE(args.at(0).toList().size(), 2);
+    
     backend->disconnectNotify("-"); // Fake it. Spy does something fishy here.
 }
 
