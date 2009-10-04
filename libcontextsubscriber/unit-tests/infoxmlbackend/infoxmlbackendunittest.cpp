@@ -41,10 +41,13 @@ private slots:
     void pluginForKey();
     void keyExists();
     void keyProvided();
+    void dynamics();
+    void cleanupTestCase();
 };
 
 void InfoXmlBackendUnitTest::initTestCase()
 {
+    utilCopyLocalWithRemove("providers2v1.src", "providers2.context");
     utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoXmlBackend();
@@ -153,6 +156,28 @@ void InfoXmlBackendUnitTest::keyProvided()
         QVERIFY(backend->keyProvided(key) == true);
 
     QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
+}
+
+void InfoXmlBackendUnitTest::dynamics()
+{
+    QStringList keys = backend->listKeys();
+    QCOMPARE(keys.count(), 9);
+    QVERIFY(keys.contains("Battery.Charging"));
+    QCOMPARE(backend->keyExists("System.Active"), false);
+    
+    utilCopyLocalWithRemove("providers2v2.src", "providers2.context");
+    utilCopyLocalWithRemove("providers3.src", "providers3.context");
+    
+    QCOMPARE(backend->keyExists("System.Active"), true);
+    QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
+}
+
+void InfoXmlBackendUnitTest::cleanupTestCase()
+{
+     QFile::remove("providers3.context");
+     QFile::remove("providers2.context");
+     QFile::remove(LOCAL_FILE("providers3.context"));
+     QFile::remove(LOCAL_FILE("providers2.context"));
 }
 
 #include "infoxmlbackendunittest.moc"
