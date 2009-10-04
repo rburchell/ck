@@ -4,7 +4,7 @@ check_PROGRAMS = infocdbbackendunittest
 infocdbbackendunittest_SOURCES = infocdbbackendunittest.cpp
 
 COVERAGE_FILES = infocdbbackend.cpp
-EXTRA_DIST = cache.src
+EXTRA_DIST = 
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
