@@ -28,7 +28,7 @@ class InfoXmlBackendUnitTest : public QObject
 {
     Q_OBJECT
     InfoXmlBackend *backend;
-    
+
 private:
     bool inSpyHasOneInList(QSignalSpy &spy, const QString &v);
 
@@ -53,7 +53,7 @@ bool InfoXmlBackendUnitTest::inSpyHasOneInList(QSignalSpy &spy, const QString &v
 {
     if (spy.count() == 0)
         return false;
-    
+
     while (spy.count() > 0) {
         QList<QVariant> args = spy.takeFirst();
         foreach (QString s, args.at(0).toStringList()) {
@@ -68,7 +68,7 @@ bool InfoXmlBackendUnitTest::inSpyHasOneInList(QSignalSpy &spy, const QString &v
 void InfoXmlBackendUnitTest::initTestCase()
 {
     utilCopyLocalWithRemove("providers2v1.src", "providers2.context");
-    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
+    utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoXmlBackend();
 }
@@ -193,7 +193,7 @@ void InfoXmlBackendUnitTest::dynamics()
     QCOMPARE(keys.count(), 10);
     QVERIFY(keys.contains("Battery.Charging"));
     QCOMPARE(backend->keyExists("System.Active"), false);
-    
+
     // Setup the spy observers
     QSignalSpy spy1(backend, SIGNAL(keysRemoved(QStringList)));
     QSignalSpy spy2(backend, SIGNAL(keysChanged(QStringList)));
@@ -206,10 +206,10 @@ void InfoXmlBackendUnitTest::dynamics()
     // Again, some basic check
     QCOMPARE(backend->keyExists("System.Active"), true);
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
-    
+
     // Test emissions
-    QVERIFY(inSpyHasOneInList(spy1, "Battery.Voltage")); 
-    QVERIFY(inSpyHasOneInList(spy2, "Battery.Charging")); 
+    QVERIFY(inSpyHasOneInList(spy1, "Battery.Voltage"));
+    QVERIFY(inSpyHasOneInList(spy2, "Battery.Charging"));
     QVERIFY(inSpyHasOneInList(spy3, "Battery.Charging"));
     QVERIFY(inSpyHasOneInList(spy4, "System.Active"));
 }
@@ -218,8 +218,6 @@ void InfoXmlBackendUnitTest::cleanupTestCase()
 {
      QFile::remove("providers3.context");
      QFile::remove("providers2.context");
-     QFile::remove(LOCAL_FILE("providers3.context"));
-     QFile::remove(LOCAL_FILE("providers2.context"));
 }
 
 #include "infoxmlbackendunittest.moc"
