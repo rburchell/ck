@@ -66,7 +66,7 @@ class PrintingProperties(unittest.TestCase):
                           "double", "test.double", "4.231",
                           "truth", "test.truth", "False")
         provider.send("dump")
-        self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 1),
+        self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 10),
                      "context-provide.context couldn't been written by context-provide")
         info_client = CLTool("context-print-info","test.int", "test.string", "test.double", "test.truth", "test.nothing")
 
