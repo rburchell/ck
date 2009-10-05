@@ -59,7 +59,8 @@ public:
 
     static ServiceBackend* instance(QDBusConnection connection);
     static ServiceBackend* instance(QDBusConnection::BusType busType,
-                                    const QString &busName);
+                                    const QString &busName,
+                                    bool autoStart);
     static ServiceBackend *defaultServiceBackend;
     friend class ::ServiceBackendUnitTest;
     friend class Service;

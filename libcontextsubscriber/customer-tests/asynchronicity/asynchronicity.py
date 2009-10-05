@@ -29,34 +29,11 @@
 
 import sys
 import os
-import signal
-import re
 import time
 import unittest
-from subprocess import Popen, PIPE
 from ContextKit.cltool import CLTool
 
 class Asynchronous(unittest.TestCase):
-    def startProvider(busname, args):
-        ret = Popen(["context-provide", busname] + args,
-              stdin=PIPE,stdout=PIPE)
-        # wait for it
-        print >>ret.stdin, "info()"
-        ret.stdout.readline().rstrip()
-        return ret
-    startProvider = staticmethod(startProvider)
-
-    #SetUp
-    def setUp(self):
-
-        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide-slow.context"
-        self.flexiprovider_slow = self.startProvider("com.nokia.slow",
-                                                     ["int","test.slow","42"])
-        os.environ["CONTEXT_PROVIDE_REGISTRY_FILE"] = "./context-provide-fast.context"
-        self.flexiprovider_fast = self.startProvider("com.nokia.fast",
-                                                     ["int","test.fast","42"])
-        print >>self.flexiprovider_slow.stdin, "import time ; time.sleep(3)"
-
     def testAsynchronicity(self):
         """
         Description
@@ -80,34 +57,44 @@ class Asynchronous(unittest.TestCase):
             None
         """
 
-        # check the fast property
+        # start the client
+        provider_slow = CLTool("context-provide", "--v2", "com.nokia.slow",
+                               "int","test.slow","42")
+        provider_slow.expect(CLTool.STDOUT, "Setting key", 10) # wait for it
+        provider_fast = CLTool("context-provide", "--v2", "com.nokia.fast",
+                               "int","test.fast","44")
+        provider_fast.expect(CLTool.STDOUT, "Setting key", 10) # wait for it
+
+        provider_slow.send("sleep 3")
+        provider_slow.expect(CLTool.STDOUT, "Sleeping", 3) # wait for it
+
         context_client = CLTool("context-listen", "test.fast", "test.slow")
 
+        # check the fast property
         self.assert_(context_client.expect(CLTool.STDOUT,
-                                                CLTool.wanted("test.fast", "int", "42"),
-                                                1), # timeout == 1 second
-                     "Bad value for the fast property, wanted 42")
+                                           CLTool.wanted("test.fast", "int", "44"),
+                                           3), # timeout == 3 seconds
+                     "Bad value for the fast property, wanted 44")
         fast_time = time.time()
         context_client.comment("Fast property arrived with good value at: " + str(fast_time))
 
         # check the slow property
         self.assert_(context_client.expect(CLTool.STDOUT,
-                                                CLTool.wanted("test.slow", "int", "42"),
-                                                10), # timeout == 10 second max, but 3 is enough usually
+                                           CLTool.wanted("test.slow", "int", "42"),
+                                           10), # timeout == 10 seconds max, but 5 is enough usually
                      "Bad value for the slow property, wanted 42")
         slow_time = time.time()
         context_client.comment("Slow property arrived with good value at: " + str(slow_time))
 
-        self.assert_(slow_time - fast_time > 2.0,
-                     "The arrival time of the fast and slow property is not far enough from each other")
-        #context_client.printio()
+        if slow_time - fast_time < 2.0:
+            context_client.printio()
+            self.assert_(False,
+                         "The arrival time of the fast and slow property is not far enough from each other")
 
-    #TearDown
-    def tearDown(self):
-        os.kill(self.flexiprovider_fast.pid, 9)
-        os.kill(self.flexiprovider_slow.pid, 9)
-        os.unlink('context-provide-fast.context')
-        os.unlink('context-provide-slow.context')
+        # context_client.printio()
+
+        provider_slow.kill()
+        provider_fast.kill()
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(Asynchronous)

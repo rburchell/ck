@@ -10,6 +10,7 @@ defaulting to the latter).
 """
 
 import sys
+import os
 from ContextKit.flexiprovider import *
 
 # A custom conversion function since bool('False') == True.
@@ -28,6 +29,11 @@ if len(sys.argv) < 2:
     print __doc__
     sys.exit(1)
 sys.argv.pop(0)
+
+# Support for new context-provide
+if sys.argv[0] == "--v2":
+    os.execvp("context-provide-internal", [ "context-provide" ] + sys.argv)
+
 busaddress = sys.argv.pop(0).split(':')
 if len(busaddress) == 1:
     busaddress.insert(0, 'session')

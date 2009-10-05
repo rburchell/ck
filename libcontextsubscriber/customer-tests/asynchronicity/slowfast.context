@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<xml>
+  <provider bus="session" service="com.nokia.slow">
+    <key name="test.slow">
+      <type>INT</type>
+      <doc>A phony but very flexible property.</doc>
+    </key>
+  </provider>
+  <provider bus="session" service="com.nokia.fast">
+    <key name="test.fast">
+      <type>INT</type>
+      <doc>A phony but very flexible property.</doc>
+    </key>
+  </provider>
+</xml>
