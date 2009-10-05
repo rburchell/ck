@@ -67,6 +67,7 @@ bool InfoXmlBackendUnitTest::inSpyHasOneInList(QSignalSpy &spy, const QString &v
 
 void InfoXmlBackendUnitTest::initTestCase()
 {
+    utilCopyLocalAtomically("providers1.src", "providers1.context");
     utilCopyLocalWithRemove("providers2v1.src", "providers2.context");
     utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
@@ -164,7 +165,7 @@ void InfoXmlBackendUnitTest::keyExists()
 
 void InfoXmlBackendUnitTest::paths()
 {
-    QCOMPARE(InfoXmlBackend::registryPath(), QString(LOCAL_DIR));
+    QCOMPARE(InfoXmlBackend::registryPath(), QString("./"));
     QCOMPARE(InfoXmlBackend::coreDeclPath(), QString("/dev/null"));
 }
 
@@ -216,8 +217,9 @@ void InfoXmlBackendUnitTest::dynamics()
 
 void InfoXmlBackendUnitTest::cleanupTestCase()
 {
-     QFile::remove("providers3.context");
+     QFile::remove("providers1.context");
      QFile::remove("providers2.context");
+     QFile::remove("providers3.context");
 }
 
 #include "infoxmlbackendunittest.moc"

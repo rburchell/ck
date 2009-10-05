@@ -22,6 +22,7 @@
 #include <QDir>
 #include <QFile>
 #include <QTest>
+#include <QDebug>
 #include <stdlib.h>
 
 #define LOCAL_DIR (utilPathForLocalDir())
@@ -58,6 +59,7 @@ void utilCopyLocalWithRemove(QString src, QString dest, int waitPeriod = DEFAULT
 {
     src = LOCAL_FILE(src);
 
+    qDebug() << "REMOVING" << dest << "COPYING" << src << "TO" << dest;
     QFile::remove(dest);
     QFile::copy(src, dest);
 

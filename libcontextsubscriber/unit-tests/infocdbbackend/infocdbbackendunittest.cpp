@@ -29,7 +29,7 @@ class InfoCdbBackendUnitTest : public QObject
 {
     Q_OBJECT
     InfoCdbBackend *backend;
-    
+
 private:
     void createBaseDatabase(QString path);
     void createAlternateDatabase(QString path);
@@ -54,6 +54,7 @@ private slots:
 
 void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 {
+    qDebug() << "WRITING BASE DB TO:" << path;
     CDBWriter writer(path);
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Internet.BytesOut");
@@ -72,6 +73,7 @@ void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 
 void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
 {
+    qDebug() << "WRITING ALTERNATE DB TO:" << path;
     CDBWriter writer(path);
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Battery.Capacity");
@@ -86,21 +88,21 @@ void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
     writer.add("Battery.Capacity:KEYDOC", "doc3");
     writer.add("Battery.Capacity:KEYPLUGIN", "contextkit-dbus");
     writer.add("Battery.Capacity:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
-    writer.close();   
+    writer.close();
 }
 
 void InfoCdbBackendUnitTest::initTestCase()
 {
-    createBaseDatabase(LOCAL_FILE("cache.cdb"));
+    createBaseDatabase("cache.cdb");
 
-    utilSetEnv("CONTEXT_PROVIDERS", LOCAL_DIR);
+    utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoCdbBackend();
 }
 
 void InfoCdbBackendUnitTest::databaseDirectory()
 {
-    QCOMPARE(backend->databaseDirectory(), QString(LOCAL_DIR));
+    QCOMPARE(backend->databaseDirectory(), QString("./"));
 }
 
 void InfoCdbBackendUnitTest::databaseExists()
@@ -185,16 +187,18 @@ void InfoCdbBackendUnitTest::keyProvided()
 void InfoCdbBackendUnitTest::dynamics()
 {
     backend->connectNotify("-"); // Fake it. Spy does something fishy here.
-    
+
     // Setup the spy observers
     QSignalSpy spy1(backend, SIGNAL(keysRemoved(QStringList)));
     QSignalSpy spy2(backend, SIGNAL(keysChanged(QStringList)));
     QSignalSpy spy3(backend, SIGNAL(keyDataChanged(QString)));
     QSignalSpy spy4(backend, SIGNAL(keysAdded(QStringList)));
 
-    createAlternateDatabase(LOCAL_FILE("cache-next.cdb"));
-    utilCopyLocalWithRemove("cache-next.cdb", "cache.cdb");
-    
+    createAlternateDatabase("cache-next.cdb");
+    QFile::remove("cache.cdb");
+    QFile::copy("cache-next.cdb", "cache.cdb");
+    QTest::qWait(DEFAULT_WAIT_PERIOD);
+
     // Test the new values
     QCOMPARE(backend->databaseExists(), true);
     QCOMPARE(backend->listKeys().count(), 2);
@@ -204,21 +208,21 @@ void InfoCdbBackendUnitTest::dynamics()
     QCOMPARE(backend->docForKey("Battery.Charging"), QString("doc1"));
     QVERIFY(backend->keyProvided("Battery.Charging") == true);
     QVERIFY(backend->keyProvided("Internet.BytesOut") == false);
-    
+
     // Test emissions
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> args1 = spy1.takeFirst();
     QCOMPARE(args1.at(0).toList().size(), 1);
     QCOMPARE(args1.at(0).toStringList().at(0), QString("Internet.BytesOut"));
-    
+
     QCOMPARE(spy2.count(), 1);
     QList<QVariant> args2 = spy2.takeFirst();
     QCOMPARE(args2.at(0).toList().size(), 2);
     QCOMPARE(args2.at(0).toStringList().at(0), QString("Battery.Charging"));
     QCOMPARE(args2.at(0).toStringList().at(1), QString("Battery.Capacity"));
-    
+
     QCOMPARE(spy3.count(), 3);
-    
+
     QCOMPARE(spy4.count(), 1);
     QList<QVariant> args4 = spy4.takeFirst();
     QCOMPARE(args4.at(0).toList().size(), 1);
@@ -231,25 +235,22 @@ void InfoCdbBackendUnitTest::removed()
 {
     backend->connectNotify("-"); // Fake it. Spy does something fishy here.
     QSignalSpy spy(backend, SIGNAL(keysRemoved(QStringList)));
-    
+
     QFile::remove("cache.cdb");
-    QFile::remove(LOCAL_FILE("cache.cdb"));
-    
+
     QTest::qWait(DEFAULT_WAIT_PERIOD);
-    
+
     //QCOMPARE(spy.count(), 1);
     //QList<QVariant> args = spy.takeFirst();
     //QCOMPARE(args.at(0).toList().size(), 2);
-    
+
     backend->disconnectNotify("-"); // Fake it. Spy does something fishy here.
 }
 
 void InfoCdbBackendUnitTest::cleanupTestCase()
 {
      QFile::remove("cache.cdb");
-     QFile::remove(LOCAL_FILE("cache.cdb"));
      QFile::remove("cache-next.cdb");
-     QFile::remove(LOCAL_FILE("cache-next.cdb"));
 }
 
 #include "infocdbbackendunittest.moc"
