@@ -325,11 +325,11 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
     if (new_data.plugin == "") {
         QString currentProvider = NanoXml::keyValue("service", providerTree).toString();
         QString currentBus = NanoXml::keyValue("bus", providerTree).toString();
-        new_data.plugin = "contextkit-dbus";
 
-        if (currentBus != "" && currentProvider != "")
+        if (currentBus != "" && currentProvider != "") {
+            new_data.plugin = "contextkit-dbus";
             new_data.constructionString = currentBus + ":" + currentProvider;
-        else
+        } else
             new_data.constructionString = "";
     }
 
