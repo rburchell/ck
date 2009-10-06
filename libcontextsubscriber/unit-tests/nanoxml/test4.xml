@@ -1,0 +1,8 @@
+<key name="Example.Key"
+     type="string">
+<!-- This is a comment -->
+  <doc>
+    A random property.
+  </doc>
+<!-- Another comment -->
+</key>

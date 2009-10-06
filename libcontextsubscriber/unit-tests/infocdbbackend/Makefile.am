@@ -16,14 +16,14 @@ FROM_SOURCE = 							\
 	infobackend.cpp infoxmlbackend.cpp			\
 	cdbreader.h cdbreader.cpp				\
         cdbwriter.h cdbwriter.cpp                               \
-	infoxmlkeysfinder.cpp 					\
 	infobackend.h						\
 	infoxmlbackend.h 					\
 	infocdbbackend.h 					\
 	infocdbbackend.cpp 					\
-	infoxmlkeysfinder.h 					\
 	infokeydata.h 						\
-	loggingfeatures.h
+	loggingfeatures.h                                       \
+        nanoxml.h                                               \
+        nanoxml.cpp
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =

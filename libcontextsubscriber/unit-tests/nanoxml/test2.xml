@@ -1,0 +1,5 @@
+<key name="Example.Random">
+  <type>
+    <uniform-list type="number"/>
+  </type>
+</key>

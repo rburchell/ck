@@ -65,6 +65,8 @@ private:
 
     void regenerateKeyDataList();
     void readKeyDataFromXml(const QString &path);
+    QString canonicalizeType (const QString &type);
+    void parseKey(const QVariant &keyTree, const QVariant &providerTree);
 };
 
 #endif // INFOXMLBACKEND_H
