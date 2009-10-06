@@ -65,7 +65,9 @@ class Asynchronous(unittest.TestCase):
                                "int","test.fast","44")
         provider_fast.expect(CLTool.STDOUT, "Setting key", 10) # wait for it
 
-        provider_slow.send("sleep 3")
+        provider_slow.comment("provider_slow sleep time started at" + str(time.time()))
+
+        provider_slow.send("sleep 6")
         provider_slow.expect(CLTool.STDOUT, "Sleeping", 3) # wait for it
 
         context_client = CLTool("context-listen", "test.fast", "test.slow")
@@ -87,6 +89,7 @@ class Asynchronous(unittest.TestCase):
         context_client.comment("Slow property arrived with good value at: " + str(slow_time))
 
         if slow_time - fast_time < 2.0:
+            provider_slow.printio()
             context_client.printio()
             self.assert_(False,
                          "The arrival time of the fast and slow property is not far enough from each other")
