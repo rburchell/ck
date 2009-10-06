@@ -28,6 +28,7 @@
 #include <QFileSystemWatcher>
 #include "cdbreader.h"
 #include "infobackend.h"
+#include "contextproviderinfo.h"
 
 class InfoCdbBackend : public InfoBackend
 {
@@ -46,6 +47,7 @@ public:
     virtual QString constructionStringForKey(QString key) const;
     virtual bool keyExists(QString key) const;
     virtual bool keyProvided(QString key) const;
+    virtual QList<ContextProviderInfo> listProviders() const;
 
     static QString databaseDirectory();
     static QString databasePath();

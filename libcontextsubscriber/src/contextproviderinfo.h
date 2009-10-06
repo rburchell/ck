@@ -25,13 +25,10 @@
 #include <QObject>
 #include <QString>
 
-class ContextProviderInfo : public QObject
+struct ContextProviderInfo
 {
-    Q_OBJECT
-
-public:
-    virtual QString plugin() const;
-    virtual QString constructionString() const;
+    QString plugin;
+    QString constructionString;
 };
 
 #endif // CONTEXTPROVIDERINFO

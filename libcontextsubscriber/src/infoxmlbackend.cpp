@@ -25,12 +25,14 @@
 #include <QXmlSimpleReader>
 #include <QXmlInputSource>
 #include <QFile>
+#include <QList>
 #include <stdlib.h>
 #include "sconnect.h"
 #include "infoxmlbackend.h"
 #include "infoxmlkeysfinder.h"
 #include "logging.h"
 #include "loggingfeatures.h"
+#include "contextproviderinfo.h"
 
 /*!
     \class InfoXmlBackend
@@ -321,3 +323,9 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
             keyDataHash.insert(key, handler.keyDataHash.value(key));
     }
 }
+
+QList<ContextProviderInfo> InfoXmlBackend::listProviders() const
+{
+    return QList<ContextProviderInfo> ();
+}
+

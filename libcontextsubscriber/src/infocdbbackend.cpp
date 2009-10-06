@@ -29,6 +29,7 @@
 #include "infocdbbackend.h"
 #include "logging.h"
 #include "loggingfeatures.h"
+#include "contextproviderinfo.h"
 
 /*!
     \class InfoCdbBackend
@@ -216,3 +217,9 @@ void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
 
     onDatabaseFileChanged(path);
 }
+
+QList<ContextProviderInfo> InfoCdbBackend::listProviders() const
+{
+     return QList<ContextProviderInfo> ();
+}
+

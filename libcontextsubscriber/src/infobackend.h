@@ -25,6 +25,7 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
+#include "contextproviderinfo.h"
 
 class InfoBackend : public QObject
 {
@@ -65,6 +66,8 @@ public:
     /// Returns true if the given key is provided (i.e., not a core
     /// property which nobody provides currently)
     virtual bool keyProvided(QString key) const = 0;
+
+    virtual QList<ContextProviderInfo> listProviders() const = 0;
 
 signals:
     /// Emitted when key list changes. ContextRegistryInfo listens on that.
