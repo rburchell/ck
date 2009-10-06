@@ -60,7 +60,7 @@ appliciable to the current location, they will be unavailable.
   </doc>
   <key name="Location.Coordinates">
     <type>
-      <uniform-list type="double"/>
+      <!--<uniform-list type="double"/>-->
     </type>
     <doc>
 The coordinates of the current position as a list of two or three
@@ -105,7 +105,10 @@ neighborhood or campus, as a localized string.
     <doc>TBD</doc>
   </key>
   <key name="Location.TimezoneOffset">
-    <type>duration</type>
+    <type>
+      <!--duration-->
+      int32
+    </type>
     <doc>TBD</doc>
   </key>
   <key name="Location.Continent">
@@ -125,7 +128,7 @@ a Nepomuk object inside the Content Framework.)
   </key>
   <key name="Location.NearbyContacts">
     <type>
-      <uniform-list type="nepomuk-uri"/>
+      <!--<uniform-list type="nepomuk-uri"/>-->
     </type>
     <doc>
 A list of URIs for contacts that are physically nearby.
@@ -138,7 +141,10 @@ Battery
 Information about the batteries of the device.
   </doc>
   <key name="Battery.ChargePercentage">
-    <type>percentage</type>
+    <type>
+      <!--percentage-->
+      int32
+    </type>
     <doc>
 The average charge level of the currently connected batteries. 
 Expressed as percentage of the maximum charge level.
@@ -166,14 +172,20 @@ Whether or not the device is currently charging at least one of its batteries.
     </doc>
   </key>
   <key name="Battery.TimeUntilLow">
-    <type>duration</type>
+    <type>
+      <!--duration-->
+      int32
+    </type>
     <doc>
 Estimates the time that the device can run on battery before the property 
 OnLowBattery becomes true. In seconds.
     </doc>
   </key>
   <key name="Battery.TimeUntilFull">
-    <type>duration</type>
+    <type>
+      <!--duration-->
+      int32
+    </type>
     <doc>
 Estimates the needed charging time of the device. In seconds.
     </doc>
@@ -198,10 +210,11 @@ Information about the connection of the devide to the Internet.
   </doc>
   <key name="Internet.NetworkType">
     <type>
-      <string-enum>
+      <!--<string-enum>
         <GPRS/>
         <WLAN/>
-      </string-enum>
+	</string-enum>-->
+      string
     </type>
     <doc>
 The type of the current connection to the Internet, such as GPRS,
@@ -217,11 +230,12 @@ WLAN, etc.  The possible value are TBD.
 
   <key name="Internet.NetworkState">
     <type>
-      <string-enum>
+      <!--<string-enum>
         <disconnected/>
         <connecting/>
         <connected/>
-      </string-enum>
+      </string-enum>-->
+      string
     </type>
     <doc>
       The state of the Internet connection, values TBD but will include
@@ -244,7 +258,10 @@ The unique id of the network.
   </key>
 
   <key name="Internet.SignalStrength">
-    <type>percentage</type>
+    <type>
+      <!--percentage-->
+      int32
+    </type>
     <doc>
 The signal strength of the current connection to the Internet.  This
 will be 100% percent for wired connections, usually.
@@ -260,14 +277,20 @@ Whether or not traffic to/from the Internet is billed per data volume
   </key>
 
   <key name="Internet.TrafficOut">
-    <type>percentage</type>
+    <type>
+      <!--percentage-->
+      int32
+    </type>
     <doc>
 A rough indication of the current traffic rate to the Internet, in
 percent of the maximum possible rate.
     </doc>
   </key>
   <key name="Internet.TrafficIn">
-    <type>percentage</type>
+    <type>
+      <!--percentage-->
+      int32
+    </type>
     <doc>
 A rough indication of the current traffic rate from the Internet, in
 percent of the maximum possible rate.
@@ -304,18 +327,22 @@ Information about the cellular radio.
 The name of the cellular network.
     </doc>
   </key>
-  <key name="Cellular.SignalStrength"
-       type="percentage">
+  <key name="Cellular.SignalStrength">
+    <type>
+      <!--percentage-->
+      int32
+    </type>
     <doc>
 The signal strength at the cellular radio, in percent of the maximum.
     </doc>
   </key>
   <key name="Cellular.Technology">
     <type>
-      <string-enum>
+      <!--<string-enum>
         <gsm/>
         <umts/>
-      </string-enum>
+      </string-enum>-->
+      string
     </type>
     <doc>
 The currently used Radio Access Technology.
@@ -323,12 +350,13 @@ The currently used Radio Access Technology.
   </key>
   <key name="Cellular.DataTechnology">
     <type>
-      <string-enum>
+      <!--<string-enum>
         <gprs/>
         <egprs/>
         <umts/>
         <hspa/>
-      </string-enum>
+      </string-enum>-->
+    string
     </type>
     <doc>
 The currently used Radio Access Technology for data transfer.
@@ -336,16 +364,61 @@ The currently used Radio Access Technology for data transfer.
   </key>
   <key name="Cellular.RegistrationStatus">
     <type>
-      <string-enum>
+      <!--<string-enum>
         <home doc="Registered with the home network"/>
         <roam doc="Roaming"/>
         <no-sim doc="No SIM card is present"/>
         <offline doc="Cellular radio is powered off"/>
         <forbidden doc="Cellular access is denied, e.g., because of invalid SIM"/>
-      </string-enum>
+      </string-enum>-->
+      string
     </type>
     <doc>
 The current cellular network registration status.
+    </doc>
+  </key>
+  <doc>
+User alarms
+-----------
+
+Information about the alams set by the user. We assume, that the user
+can disable or enable all the alarms. In addition, the user can enable
+or disable each alarm individually.
+  </doc>
+  <key name="UserAlarm.Present">
+    <type>bool</type>
+    <doc>
+Indicates whether there is an upcoming alarm set by the user. Can be
+true even if alarms are disabled.
+    </doc>
+  </key>
+  <key name="UserAlarm.Enabled">
+    <type>bool</type>
+    <doc>
+Indicates whether the alarms are enabled or disabled by the user. If
+there are no alarms, UserAlarm.Enabled is true.
+    </doc>
+  </key>
+  <key name="UserAlarm.NextTime">
+    <type>int32</type>
+    <doc>
+The time of the next (enabled) alarm, in Unix time (the number of
+seconds since January 1.1.1970 00:00 UTC). If no alarms are present,
+the value is Unknown.
+    </doc>
+  </key>
+  <key name="UserAlarm.NextDescription">
+    <type>string</type>
+    <doc>
+The description of the next (enabled) alarm. If no alarms are present,
+the value is Unknown.
+    </doc>
+  </key>
+  <key name="UserAlarm.NextCookie">
+    <type>int32</type>
+    <doc>
+The cookie of the next (enabled) alarm. The cookie can be used for
+referring to the alarm when communicating with timed.
     </doc>
   </key>
   <doc>
@@ -355,20 +428,26 @@ Environment
 Information about the environment the device is in.
   </doc>
   <key name="Environment.SunRise">
-    <type>time</type>
+    <type>
+      <!--time-->
+      int32
+    </type>
     <doc>
 The time of sun rise.
     </doc>
   </key>
   <key name="Environment.SunSet">
-    <type>time</type>
+    <type>
+      <!--time-->
+      int32
+    </type>
     <doc>
 The time of sun set.
     </doc>
   </key>
   <key name="Environment.Weather">
     <type>
-       <map>
+       <!--<map>
 	 <allowed-keys>
 	   <Condition>
              <type>string</type>
@@ -461,7 +540,8 @@ The wind direction in degrees.  North is 0, east is 90, etc.
              </doc>
            </WindDirectionD>
 	 </allowed-keys>
-       </map>
+       </map>-->
+       string
     </type>
     <doc>
 The current weather.  See http://www.ominous-valve.com/wx_codes.txt for
@@ -497,7 +577,9 @@ a hierarchy: InMeeting includes AtWork.
 Not much is known about all this right now.
   </doc>
   <key name="Use.Situations">
-    <type>string-list</type>
+    <type>
+      <!--string-list-->
+    </type>
     <doc>
 The symbolic names of the currently active Situations.  Note that more
 than one situation might be active at the same time.
@@ -508,7 +590,7 @@ than one situation might be active at the same time.
 The current main usage mode of the device.
     </doc>
     <type>
-      <string-enum>
+      <!--<string-enum>
 	<editing>
           <doc>
 The user is interacting closely with the device and is creating new
@@ -580,12 +662,13 @@ The user is doing system-wide maintenance work such as restoring a
 backup or upgrading the OS software.
           </doc>
         </maintenance>
-      </string-enum>
+      </string-enum>-->
+      string
     </type>
   </key>
-  <key name="Use.ConnectedContacts" type="string-list">
+  <key name="Use.ConnectedContacts">
     <type>
-      <uniform-list type="nepomuk-uri"/>
+      <!--<uniform-list type="nepomuk-uri"/>-->
     </type>
     <doc>
 A list of URIs for contacts that the user is currently engaged in
@@ -594,7 +677,7 @@ conversations with.  (The URIs point to Nepomuk objects.)
   </key>    
   <key name="Use.RecentDocuments">
     <type>
-      <uniform-list type="nepomuk-uri"/>
+      <!--<uniform-list type="nepomuk-uri"/>-->
     </type>
     <doc>
 A list of URIs for recently used documents, at most ten elements long.
@@ -624,7 +707,7 @@ Information about current and upcoming calendar entries.
   </doc>
   <key name="Event.Current">
     <type>
-      <uniform-list type="nepomuk-uri"/>
+      <!--<uniform-list type="nepomuk-uri"/>-->
     </type>
     <doc>
 The currently active events, as a list of Nepomuk URIs.  The list
@@ -633,20 +716,26 @@ current time, and whose end time is later.
     </doc>
   </key>
   <key name="Event.CurrentStart">
-    <type>time</type>
+    <type>
+      <!--time-->
+      int32
+    </type>
     <doc>
 The earliest start time of the events in Events.Current.
     </doc>
   </key>
   <key name="Event.CurrentEnd">
-    <type>time</type>
+    <type>
+      <!--time-->
+      int32
+    </type>
     <doc>
 The latest end time of the events in Events.Current.
     </doc>
   </key>
   <key name="Event.Next">
     <type>
-      <uniform-list type="nepomuk-uri"/>
+      <!--<uniform-list type="nepomuk-uri"/>-->
     </type>
     <doc>
 The upcoming events, as a list of Nepomuk URIs.  The list contains
@@ -656,13 +745,19 @@ start at exactly the same time.
     </doc>
   </key>
   <key name="Event.NextStart">
-    <type>time</type>
+    <type>
+      <!--time-->
+      int32
+    </type>
     <doc>
 The earliest start time of the events in Events.Next.
     </doc>
   </key>
   <key name="Event.NextEnd">
-    <type>time</type>
+    <type>
+      <!--time-->
+      int32
+    </type>
     <doc>
 The latest end time of the events in Events.Next.
     </doc>
@@ -690,13 +785,14 @@ session, all values are null.
   </doc>
   <key name="Session.State">
     <type>
-      <string-enum>
+      <!--<string-enum>
         <starting/>
         <running/>
         <suspended/>
         <eclipsed/>
         <terminating/>
-      </string-enum>
+      </string-enum>-->
+      string
     </type>
     <doc>
 The state of the current session, as string valued enumeration.  When
