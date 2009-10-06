@@ -22,6 +22,8 @@
 #include "contextpropertyinfo.h"
 #include "infobackend.h"
 #include "sconnect.h"
+#include "logging.h"
+#include "loggingfeatures.h"
 #include <QMutex>
 #include <QMutexLocker>
 
@@ -254,6 +256,8 @@ bool ContextPropertyInfo::provided() const
 /// Returns the name of the plugin supplying this property
 QString ContextPropertyInfo::plugin() const
 {
+    contextWarning() << F_DEPRECATION << "ContextPropertyInfo::plugin() is deprecated.";
+
     QMutexLocker lock(&cacheLock);
     return cachedPlugin;
 }
@@ -261,6 +265,8 @@ QString ContextPropertyInfo::plugin() const
 /// Returns the construction parameter for the Provider supplying this property
 QString ContextPropertyInfo::constructionString() const
 {
+    contextWarning() << F_DEPRECATION << "ContextPropertyInfo::constructionString() is deprecated.";
+
     QMutexLocker lock(&cacheLock);
     return cachedConstructionString;
 }
@@ -270,6 +276,8 @@ QString ContextPropertyInfo::constructionString() const
 /// compatibility.
 QString ContextPropertyInfo::providerDBusName() const
 {
+    contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusName() is deprecated.";
+
     QMutexLocker lock(&cacheLock);
     // TBD: obsolete this function?
     if (cachedPlugin == "contextkit-dbus") {
@@ -283,6 +291,8 @@ QString ContextPropertyInfo::providerDBusName() const
 /// maintained for backwards compatibility.
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
+    contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusType() is deprecated.";
+
     QMutexLocker lock(&cacheLock);
     // TBD: obsolete this function?
     QString busType = "";
