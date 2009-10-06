@@ -365,3 +365,10 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
         emit pluginChanged(newPlugin, newConstructionString);
     }
 }
+
+const QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
+{
+    QMutexLocker lock(&cacheLock);
+    return InfoBackend::instance()->listProviders(keyName);
+}
+

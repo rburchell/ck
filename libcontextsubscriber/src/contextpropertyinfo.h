@@ -27,6 +27,7 @@
 #include <QObject>
 #include <QDBusConnection>
 #include <QMutex>
+#include "contextproviderinfo.h"
 
 class ContextPropertyInfo : public QObject
 {
@@ -49,6 +50,7 @@ public:
 
     QString plugin() const;
     QString constructionString() const;
+    virtual const QList<ContextProviderInfo> listProviders() const;
 
 private:
     QString keyName; ///< The name of the key his ContextPropertyInfo represents.
