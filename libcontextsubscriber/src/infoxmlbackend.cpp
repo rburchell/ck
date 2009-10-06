@@ -335,6 +335,18 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
             new_data.constructionString = "";
     }
 
+    // Add to providers list
+    if (new_data.plugin != "" && new_data.constructionString != "") {
+        ContextProviderInfo providerInfo;
+        providerInfo.plugin = new_data.plugin;
+        providerInfo.constructionString = new_data.constructionString;
+
+        if (! keyProvidersHash.contains(key))
+            keyProvidersHash.insert(key, new QList<ContextProviderInfo>);
+
+        keyProvidersHash.value(key)->append(providerInfo);
+    }
+
     new_data.name = key;
     new_data.doc = NanoXml::keyValue("doc", keyTree).toString();
     new_data.type = canonicalizeType(NanoXml::keyValue("type", keyTree).toString());
@@ -395,8 +407,8 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     }
 }
 
-QList<ContextProviderInfo> InfoXmlBackend::listProviders(QString key) const
+const QList<ContextProviderInfo> InfoXmlBackend::listProviders(QString key) const
 {
-    return QList<ContextProviderInfo> ();
+    return *keyProvidersHash.value(key);
 }
 

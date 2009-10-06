@@ -67,7 +67,7 @@ public:
     /// property which nobody provides currently)
     virtual bool keyProvided(QString key) const = 0;
 
-    virtual QList<ContextProviderInfo> listProviders(QString key) const = 0;
+    virtual const QList<ContextProviderInfo> listProviders(QString key) const = 0;
 
 signals:
     /// Emitted when key list changes. ContextRegistryInfo listens on that.
