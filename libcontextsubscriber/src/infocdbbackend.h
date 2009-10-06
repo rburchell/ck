@@ -47,7 +47,7 @@ public:
     virtual QString constructionStringForKey(QString key) const;
     virtual bool keyExists(QString key) const;
     virtual bool keyProvided(QString key) const;
-    virtual QList<ContextProviderInfo> listProviders() const;
+    virtual QList<ContextProviderInfo> listProviders(QString key) const;
 
     static QString databaseDirectory();
     static QString databasePath();

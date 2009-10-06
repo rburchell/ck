@@ -395,7 +395,7 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     }
 }
 
-QList<ContextProviderInfo> InfoXmlBackend::listProviders() const
+QList<ContextProviderInfo> InfoXmlBackend::listProviders(QString key) const
 {
     return QList<ContextProviderInfo> ();
 }

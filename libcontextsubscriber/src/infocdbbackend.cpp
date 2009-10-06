@@ -218,7 +218,7 @@ void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
     onDatabaseFileChanged(path);
 }
 
-QList<ContextProviderInfo> InfoCdbBackend::listProviders() const
+QList<ContextProviderInfo> InfoCdbBackend::listProviders(QString key) const
 {
      return QList<ContextProviderInfo> ();
 }
