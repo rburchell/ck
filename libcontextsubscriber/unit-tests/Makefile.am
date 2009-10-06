@@ -3,12 +3,11 @@ SUBDIRSTESTS =                                                          \
 	propertyhandle							\
 	handlesignalrouter               				\
 	cdb 								\
-	infoxmlkeysfinder						\
 	infoxmlbackend 							\
 	infocdbbackend 							\
 	contextregistryinfo               				\
         contextpropertyinfo						\
-	infobackend
+	infobackend                                                     \
         nanoxml
 
 SUBDIRS = $(SUBDIRSTESTS) util
