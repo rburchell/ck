@@ -34,78 +34,54 @@
 
 import sys
 import os
-import signal
-
 import unittest
-from subprocess import Popen, PIPE
-
-def timeoutHandler(signum, frame):
-    raise Exception('tests has been running for too long')
-
-class Callable:
-    def __init__(self, anycallable):
-        self.__call__ = anycallable
+from ContextKit.cltool import CLTool
 
 class CommanderAppearing(unittest.TestCase):
-    def startProvider(busname, args):
-        ret = Popen(["context-provide", busname] + args,
-              stdin=PIPE,stderr=PIPE,stdout=PIPE)
-        # wait for it
-        print >>ret.stdin, "info()"
-        ret.stdout.readline().rstrip()
-        return ret
-    startProvider = Callable(startProvider)
-
-    def wanted(name, type, value):
-        return "%s = %s:%s" % (name, type, value)
-    wanted = Callable(wanted)
-
-    def wantedUnknown(name):
-        return "%s is Unknown" % (name)
-    wantedUnknown = Callable(wantedUnknown)
-
-    def setUp(self):
-        self.flexiprovider = self.startProvider("com.nokia.test",
-                                           ["int","test.int","42"])
-        self.context_client = Popen(["context-listen","test.int"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        self.context_commander = 0
-
     def tearDown(self):
-        os.kill(self.flexiprovider.pid, 9)
-        if (self.context_commander != 0): os.kill(self.context_commander.pid, 9)
-        os.kill(self.context_client.pid, 9)
         os.unlink('context-provide.context')
-        pass
 
     def testCommanderFunctionality(self):
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.int", "int", "42"),
-                         "Initial value is bad")
+        provider = CLTool("context-provide", "--v2", "com.nokia.test", "int", "test.int", "42")
+        provider.send("dump")
+        provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
-        self.context_commander = self.startProvider("org.freedesktop.ContextKit.Commander",
-                                                    ["int", "test.int", "4242"])
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.int", "int", "4242"),
-                         "Value after commander has been started is bad")
+        listen = CLTool("context-listen", "test.int")
 
-        print >>self.context_commander.stdin, "set('test.int', None)"
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wantedUnknown("test.int"),
-                         "Value after commander has changed it to unknown is bad")
+        self.assert_(listen.expect(CLTool.STDOUT,
+                                           CLTool.wanted("test.int", "int", "42"),
+                                           1),
+                     "Bad value initially from the real provider, wanted 42")
 
-        print >>self.context_commander.stdin, "set('test.int', 1235)"
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.int", "int", "1235"),
-                         "Value after commander has changed it is bad")
-        os.system('../common/rec-kill.sh %d' % self.context_commander.pid)
-        got = self.context_client.stdout.readline().rstrip()
-        self.assertEqual(got,
-                         self.wanted("test.int", "int", "42"),
-                         "Value after killing the commander is bad")
+        commander =  CLTool("context-provide", "--v2")
+        commander.send("add int test.int 4242")
+        commander.send("start")
+        commander.expect(CLTool.STDOUT, "Added", 10) # wait for it
+
+        self.assert_(listen.expect(CLTool.STDOUT,
+                                           CLTool.wanted("test.int", "int", "4242"),
+                                           1),
+                     "Value after commander has been started is wrong, wanted 4242")
+
+        commander.send("unset test.int")
+        listen.comment("commander commanded test.int to unknown")
+        self.assert_(listen.expect(CLTool.STDOUT,
+                                           CLTool.wantedUnknown("test.int"),
+                                           1),
+                     "Value after commander has changed it to unknown is wrong")
+
+        commander.send("test.int = 1235")
+        self.assert_(listen.expect(CLTool.STDOUT,
+                                           CLTool.wanted("test.int", "int", "1235"),
+                                           1),
+                     "Value after commander has changed it is wrong, wanted 1235")
+
+        commander.kill()
+        listen.comment("Commander killed")
+        self.assert_(listen.expect(CLTool.STDOUT,
+                                           CLTool.wanted("test.int", "int", "42"),
+                                           1),
+                     "Value after killing the commander is wrong, wanted 42")
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderAppearing)
@@ -113,6 +89,4 @@ def runTests():
     return len(result.errors + result.failures)
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGALRM, timeoutHandler)
-    signal.alarm(10)
     sys.exit(runTests())

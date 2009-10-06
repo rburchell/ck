@@ -69,21 +69,21 @@ void CommandWatcher::onActivated()
 
 void CommandWatcher::help()
 {
-        qDebug() << "Available commands:";
-        qDebug() << "  new KEY...                      - create context properties";
-        qDebug() << "  delete KEY...                   - delete context properties";
-        qDebug() << "  subscribe KEY...                - subscribe to keys";
-        qDebug() << "  waitforsubscription KEY...      - subscribe to keys";
-        qDebug() << "  unsubscribe KEY...              - unsubscribe from keys";
-        qDebug() << "  value KEY [DEF]                 - get value for a key";
-        qDebug() << "  key KEY                         - get the key for a key (rather useless)";
-        qDebug() << "  ikey KEY                        - get the info()->key for a key (rather useless)";
-        qDebug() << "  man KEY                         - get the info()->doc for a key";
-        qDebug() << "  type KEY                        - get the info()->type for a key";
-        qDebug() << "  plugin KEY                      - get the info()->plugin for a key";
-        qDebug() << "  constructionstring KEY          - get the info()->constructionstring for a key";
-        qDebug() << "  flush                           - write FLUSHED to stderr and stdout";
-        qDebug() << "Any prefix of a command can be used as an abbreviation";
+    qDebug() << "Available commands:";
+    qDebug() << "  new KEY...                      - create context properties";
+    qDebug() << "  delete KEY...                   - delete context properties";
+    qDebug() << "  subscribe KEY...                - subscribe to keys";
+    qDebug() << "  waitforsubscription KEY...      - subscribe to keys";
+    qDebug() << "  unsubscribe KEY...              - unsubscribe from keys";
+    qDebug() << "  value KEY [DEF]                 - get value for a key";
+    qDebug() << "  key KEY                         - get the key for a key (rather useless)";
+    qDebug() << "  ikey KEY                        - get the info()->key for a key (rather useless)";
+    qDebug() << "  man KEY                         - get the info()->doc for a key";
+    qDebug() << "  type KEY                        - get the info()->type for a key";
+    qDebug() << "  plugin KEY                      - get the info()->plugin for a key";
+    qDebug() << "  constructionstring KEY          - get the info()->constructionstring for a key";
+    qDebug() << "  flush                           - write FLUSHED to stderr and stdout";
+    qDebug() << "Any prefix of a command can be used as an abbreviation";
 }
 
 void CommandWatcher::interpret(const QString& command) const

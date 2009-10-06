@@ -1,4 +1,5 @@
-bin_PROGRAMS = subscriptiontests
+testdir = $(bindir)/libcontextprovider-tests
+test_PROGRAMS = subscriptiontests
 
 subscriptiontests_SOURCES = subscriptiontests.cpp \
 			    subscriptiontests.h

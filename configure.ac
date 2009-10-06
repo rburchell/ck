@@ -1,5 +1,5 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.3.8~unreleased], [marius.vollmer@nokia.com], ContextKit)
+AC_INIT([ContextKit], [0.3.9~unreleased], [marius.vollmer@nokia.com], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign dist-bzip2 tar-ustar 1.9])
@@ -70,14 +70,11 @@ AC_CONFIG_FILES([
         libcontextsubscriber/src/Makefile
         libcontextsubscriber/unit-tests/Makefile
         libcontextsubscriber/unit-tests/cdb/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-dynamic/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-cdb-static/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-xml-dynamic/Makefile
-        libcontextsubscriber/unit-tests/contextpropertyinfo-xml-static/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-cdb-dynamic/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-cdb-static/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-xml-dynamic/Makefile
-        libcontextsubscriber/unit-tests/contextregistryinfo-xml-static/Makefile
+        libcontextsubscriber/unit-tests/infoxmlbackend/Makefile
+        libcontextsubscriber/unit-tests/infocdbbackend/Makefile
+        libcontextsubscriber/unit-tests/contextregistryinfo/Makefile
+        libcontextsubscriber/unit-tests/contextpropertyinfo/Makefile
+        libcontextsubscriber/unit-tests/infobackend/Makefile
         libcontextsubscriber/unit-tests/handlesignalrouter/Makefile
         libcontextsubscriber/unit-tests/propertyhandle/Makefile
         libcontextsubscriber/unit-tests/provider/Makefile
@@ -96,6 +93,8 @@ AC_CONFIG_FILES([
 	libcontextprovider/Makefile
 	libcontextprovider/doc/Makefile
 	libcontextprovider/src/Makefile
+	libcontextprovider/context-provide/Makefile
+	libcontextprovider/man/Makefile
 	libcontextprovider/unit-tests/Makefile
 	libcontextprovider/unit-tests/manager/Makefile
 	libcontextprovider/unit-tests/subscriber/Makefile

@@ -95,9 +95,13 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection connection)
 }
 
 ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
-                                         const QString &busName)
+                                         const QString &busName, bool autoStart)
 {
-    return new ServiceBackend(QDBusConnection::sessionBus(), busName);
+    ServiceBackend *r = new ServiceBackend(QDBusConnection::sessionBus(), busName);
+    if (autoStart)
+        r->start();
+
+    return r;
 }
 
 /* Mocked Manager */

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<xml>
+    <provider bus="system" service="com.nokia.daemon">
+        <key name="System.Active">
+            <type>TRUTH</type>
+            <doc>This is true when system is active</doc>
+        </key>
+    </provider>
+</xml>

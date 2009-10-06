@@ -248,12 +248,12 @@ void ContextCUnitTest::installKey()
 
 void ContextCUnitTest::installGroup()
 {
-    char *keys[] = {
+    const char *keys[] = {
         "Location.Lat",
         "Location.Lon",
         NULL
     };
-    context_provider_install_group(keys, 0, MagicCallback, this);
+    context_provider_install_group((char **)keys, 0, MagicCallback, this);
     QVERIFY(keysList.contains("Location.Lat"));
     QVERIFY(keysList.contains("Location.Lon"));
     QCOMPARE(keysList.length(), 2);
@@ -305,13 +305,13 @@ void ContextCUnitTest::clearKeyOnSubscribeKey()
 
 void ContextCUnitTest::clearKeyOnSubscribeGroup()
 {
-    char *keys[] = {
+    const char *keys[] = {
         "Location.Lat",
         "Location.Lon",
         NULL
     };
 
-    context_provider_install_group(keys, 1, MagicCallback, this);
+    context_provider_install_group((char **)keys, 1, MagicCallback, this);
 
     context_provider_set_integer("Location.Lat", 123);
     context_provider_set_integer("Location.Lat", 456);

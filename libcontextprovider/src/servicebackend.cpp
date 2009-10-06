@@ -103,6 +103,7 @@ bool ServiceBackend::start()
     // Register object
     if (managerAdaptor && !connection.registerObject("/org/freedesktop/ContextKit/Manager", &myManager)) {
         contextCritical() << F_SERVICE_BACKEND << "Failed to register the Manager object for" << busName;
+        contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
         return false;
     }
 
@@ -177,6 +178,7 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection connection)
 
     if (!instances.contains(lookup)) {
         ServiceBackend* backend = new ServiceBackend(connection);
+        backend->start();
         instances.insert(lookup, backend);
     }
     return instances[lookup];
@@ -185,7 +187,7 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection connection)
 /// Returns a ServiceBackend instance for a given \a busType and \a
 /// busName. Creates the instance if it does not exist yet.
 ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
-                         const QString &busName)
+                                         const QString &busName, bool autoStart)
 {
     QString lookup = QString("contextprovider_") +
         ((busType == QDBusConnection::SessionBus) ? "session" : "system") +
@@ -196,6 +198,7 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
         ServiceBackend* backend = new ServiceBackend(
             QDBusConnection::connectToBus(busType, busName),
             busName);
+        if (autoStart) backend->start();
         instances.insert(lookup, backend);
     }
     return instances[lookup];

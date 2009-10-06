@@ -198,9 +198,9 @@ namespace ContextProvider {
 /// started when it is constructed.
 Service::Service(QDBusConnection connection, QObject *parent)
 {
+    // this singleton accessor method always autostart
     backend = ServiceBackend::instance(connection);
     backend->ref();
-    start();
 }
 
 
@@ -210,13 +210,20 @@ Service::Service(QDBusConnection connection, QObject *parent)
 /// created and set up. If the service with the given parameters
 /// already exists the created object represents a controller to a
 /// previously-created service.  A new Service will be started when it
-/// is constructed.
+/// is constructed if \a autoStart is true (which is the default).
+Service::Service(QDBusConnection::BusType busType, const QString &busName, bool autoStart, QObject* parent)
+    : QObject(parent)
+{
+    backend = ServiceBackend::instance(busType, busName, autoStart);
+    backend->ref();
+}
+
+/// A convenient constructor, where autoStart is always true.
 Service::Service(QDBusConnection::BusType busType, const QString &busName, QObject* parent)
     : QObject(parent)
 {
-    backend = ServiceBackend::instance(busType, busName);
+    backend = ServiceBackend::instance(busType, busName, true);
     backend->ref();
-    start();
 }
 
 /// Destroys this Service instance. The actual service on D-Bus is

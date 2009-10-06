@@ -22,6 +22,7 @@
 #include <QDir>
 #include <QFile>
 #include <QTest>
+#include <QDebug>
 #include <stdlib.h>
 
 #define LOCAL_DIR (utilPathForLocalDir())
@@ -59,7 +60,8 @@ void utilCopyLocalWithRemove(QString src, QString dest, int waitPeriod = DEFAULT
     src = LOCAL_FILE(src);
 
     QFile::remove(dest);
-    QFile::copy(src, dest);
+    if (! QFile::copy(src, dest))
+        qFatal("Failed to copy %s to %s!", src.toLocal8Bit().data(), dest.toLocal8Bit().data());
 
     if (waitPeriod > 0)
         QTest::qWait(waitPeriod);
@@ -70,8 +72,13 @@ void utilCopyLocalAtomically(QString src, QString dest, int waitPeriod = DEFAULT
     src = LOCAL_FILE(src);
     QString temp = "temp.file";
 
-    QFile::copy(src, temp);
-    rename(temp.toUtf8().constData(), dest.toUtf8().constData());
+    QFile::remove(temp);
+
+    if (! QFile::copy(src, temp))
+        qFatal("Failed to copy %s to %s!", src.toLocal8Bit().data(), temp.toLocal8Bit().data());
+        
+    if (rename(temp.toUtf8().constData(), dest.toUtf8().constData()) != 0)
+        qFatal("Failed to rename %s to %s!", temp.toLocal8Bit().data(), dest.toLocal8Bit().data());
 
     if (waitPeriod > 0)
         QTest::qWait(waitPeriod);

@@ -34,63 +34,44 @@
 
 import sys
 import os
-import signal
-
 import unittest
-from subprocess import Popen, PIPE
-
-def timeoutHandler(signum, frame):
-    raise Exception('tests has been running for too long')
-
-class Callable:
-    def __init__(self, anycallable):
-        self.__call__ = anycallable
-
-def startProvider(busname, args):
-    ret = Popen(["context-provide", busname] + args,
-                stdin=PIPE,stderr=PIPE,stdout=PIPE)
-    # wait for it
-    print >>ret.stdin, "info()"
-    ret.stdout.readline().rstrip()
-    return ret
-startProvider = Callable(startProvider)
+from ContextKit.cltool import CLTool
 
 class PrintInfoRunning(unittest.TestCase):
-    def setUp(self):
-        pass
     def tearDown(self):
-        os.kill(self.flexiprovider.pid, 9)
         os.unlink('context-provide.context')
 
     def testReturnValue(self):
-        self.flexiprovider = startProvider("com.nokia.test",
-                                           ["int", "test.int", "-5", 
-                                            "string", "test.string", "something",
-                                            "double", "test.double", "4.231",
-                                            "truth", "test.truth", "False"])
-        self.info_client = Popen(["context-print-info","test.int", "test.string", "test.double", "test.truth", "test.nothing"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        provider = CLTool("context-provide", "--v2", "com.nokia.test",
+                          "int", "test.int", "-5",
+                          "string", "test.string", "something",
+                          "double", "test.double", "4.231",
+                          "truth", "test.truth", "False")
+        provider.send("dump")
+        self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 10)) # wait for it
+        info_client = CLTool("context-print-info", "test.int", "test.string", "test.double", "test.truth", "test.nothing")
 
-        returnValue = self.info_client.wait()
+        returnValue = info_client.wait()
         self.assertEqual(returnValue, 0, "context-print-info exited with return value != 0")
+        provider.kill()
 
 class PrintingProperties(unittest.TestCase):
-    def setUp(self):
-        self.flexiprovider = startProvider("com.nokia.test",
-                                           ["int", "test.int", "-5", 
-                                            "string", "test.string", "something",
-                                            "double", "test.double", "4.231",
-                                            "truth", "test.truth", "False"])
-        self.info_client = Popen(["context-print-info","test.int", "test.string", "test.double", "test.truth", "test.nothing"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-
     def tearDown(self):
-        os.kill(self.flexiprovider.pid, 9)
-        os.kill(self.info_client.pid, 9)
         os.unlink('context-provide.context')
-        pass
 
     def testProperties(self):
-        expected_results = ["Key: test.int", 
-                            "Existence: true", 
+        provider = CLTool("context-provide", "--v2", "com.nokia.test",
+                          "int", "test.int", "-5",
+                          "string", "test.string", "something",
+                          "double", "test.double", "4.231",
+                          "truth", "test.truth", "False")
+        provider.send("dump")
+        self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 10),
+                     "context-provide.context couldn't been written by context-provide")
+        info_client = CLTool("context-print-info","test.int", "test.string", "test.double", "test.truth", "test.nothing")
+
+        expected_results = ["Key: test.int",
+                            "Existence: true",
                             "Provider DBus type: session",
                             "Provider DBus name: com.nokia.test",
                             "Documentation: A phony but very flexible property.",
@@ -117,16 +98,17 @@ class PrintingProperties(unittest.TestCase):
                             "Existence: false",
                             "----------"]
 
-        for i in range(len(expected_results)):
-            got = self.info_client.stdout.readline().rstrip()
-            self.assertEqual(got, expected_results[i].rstrip())
+        self.assert_(info_client.expect(CLTool.STDOUT,
+                                        "\n".join(expected_results),
+                                        1),
+                     "Bad introspection result from context-print-info")
 
 def runTests():
     suitePrintInfoRunning = unittest.TestLoader().loadTestsFromTestCase(PrintInfoRunning)
     suiteProperties = unittest.TestLoader().loadTestsFromTestCase(PrintingProperties)
 
     errors = []
-    result = unittest.TextTestRunner(verbosity=2).run(suitePrintInfoRunning) 
+    result = unittest.TextTestRunner(verbosity=2).run(suitePrintInfoRunning)
     errors += result.errors + result.failures
     result = unittest.TextTestRunner(verbosity=2).run(suiteProperties)
     errors += result.errors + result.failures
@@ -134,6 +116,4 @@ def runTests():
     return len(errors)
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGALRM, timeoutHandler)
-    signal.alarm(10)
     sys.exit(runTests())

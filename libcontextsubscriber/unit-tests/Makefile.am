@@ -1,11 +1,16 @@
-SUBDIRSTESTS = provider propertyhandle handlesignalrouter               \
-	cdb contextregistryinfo-xml-static				\
-	contextpropertyinfo-xml-static contextregistryinfo-cdb-static	\
-	contextpropertyinfo-cdb-static contextregistryinfo-cdb-dynamic	\
-	contextpropertyinfo-cdb-dynamic					\
-	contextregistryinfo-xml-dynamic					\
-	contextpropertyinfo-xml-dynamic					\
+SUBDIRSTESTS =                                                          \
+	provider 							\
+	propertyhandle							\
+	handlesignalrouter               				\
+	cdb 								\
+	infoxmlkeysfinder						\
+	infoxmlbackend 							\
+	infocdbbackend 							\
+	contextregistryinfo               				\
+        contextpropertyinfo						\
+	infobackend
         nanoxml
+
 SUBDIRS = $(SUBDIRSTESTS) util
 
 check-sum: all
