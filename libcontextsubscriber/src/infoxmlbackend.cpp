@@ -56,12 +56,11 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
     if (! dir.exists() || ! dir.isReadable()) {
         contextWarning() << "Registry path" << InfoXmlBackend::registryPath()
                          << "is not a directory or is not readable!";
-        return;
+    } else {
+        watcher.addPath(InfoXmlBackend::registryPath());
+        sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
+        sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onFileChanged(QString)));
     }
-
-    watcher.addPath(InfoXmlBackend::registryPath());
-    sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
-    sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onFileChanged(QString)));
 
     regenerateKeyDataList();
 }
@@ -262,17 +261,22 @@ void InfoXmlBackend::regenerateKeyDataList()
     if (watchedFiles.size() > 0)
         watcher.removePaths(watchedFiles);
 
+    contextDebug() << F_XML << "Reading core declarations from:" << InfoXmlBackend::coreDeclPath();
+    readKeyDataFromXml (InfoXmlBackend::coreDeclPath());
+
     contextDebug() << F_XML << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
 
     // Read the core property declarations.
-
-    readKeyDataFromXml (InfoXmlBackend::coreDeclPath());
-
     // For each xml file in the registry we parse it and
     // add it to our hash. We did some sanity checks in the constructor
     // so we skip them now.
 
     QDir dir = QDir(registryPath());
+
+    // Bail out now if no directory
+    if (! dir.exists() || ! dir.isReadable())
+        return;
+
     dir.setFilter(QDir::Files);
     dir.setNameFilters(QStringList("*.context"));
 
@@ -322,7 +326,11 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
         QString currentProvider = NanoXml::keyValue("service", providerTree).toString();
         QString currentBus = NanoXml::keyValue("bus", providerTree).toString();
         new_data.plugin = "contextkit-dbus";
-        new_data.constructionString = currentBus + ":" + currentProvider;
+
+        if (currentBus != "" && currentProvider != "")
+            new_data.constructionString = currentBus + ":" + currentProvider;
+        else
+            new_data.constructionString = "";
     }
 
     new_data.name = key;
@@ -369,7 +377,8 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     }
     */
 
-    if (nano.root().toList().at(0).toString() == "provider") {
+    if (nano.root().toList().at(0).toString() == "provider" ||
+        nano.root().toList().at(0).toString() == "properties") {
         // One provider. Iterate over each key.
         foreach (QVariant keyTree, nano.keyValues("key")) {
             parseKey(keyTree, nano.root());
