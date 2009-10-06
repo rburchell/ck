@@ -45,6 +45,7 @@ private slots:
     void pluginForKey();
     void keyExists();
     void keyProvided();
+    void listProviders();
     void dynamics();
     void cleanupTestCase();
 };
@@ -185,6 +186,14 @@ void InfoXmlBackendUnitTest::keyProvided()
         QVERIFY(backend->keyProvided(key) == true);
 
     QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
+}
+
+void InfoXmlBackendUnitTest::listProviders()
+{
+    QList <ContextProviderInfo> list = backend->listProviders("Battery.Charging");
+    QCOMPARE(list.count(), 1);
+    QCOMPARE(list.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd2"));
 }
 
 void InfoXmlBackendUnitTest::dynamics()
