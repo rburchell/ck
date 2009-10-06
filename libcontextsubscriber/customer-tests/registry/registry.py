@@ -68,40 +68,17 @@ class PrintingProperties(unittest.TestCase):
         provider.send("dump")
         self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 10),
                      "context-provide.context couldn't been written by context-provide")
-        info_client = CLTool("context-print-info","test.int", "test.string", "test.double", "test.truth", "test.nothing")
+        info_client = CLTool("context-ls","-l","test.*")
 
-        expected_results = ["Key: test.int",
-                            "Existence: true",
-                            "Provider DBus type: session",
-                            "Provider DBus name: com.nokia.test",
-                            "Documentation: A phony but very flexible property.",
-                            "----------",
-                            "Key: test.string",
-                            "Existence: true",
-                            "Provider DBus type: session",
-                            "Provider DBus name: com.nokia.test",
-                            "Documentation: A phony but very flexible property.",
-                            "----------",
-                            "Key: test.double",
-                            "Existence: true",
-                            "Provider DBus type: session",
-                            "Provider DBus name: com.nokia.test",
-                            "Documentation: A phony but very flexible property.",
-                            "----------",
-                            "Key: test.truth",
-                            "Existence: true",
-                            "Provider DBus type: session",
-                            "Provider DBus name: com.nokia.test",
-                            "Documentation: A phony but very flexible property.",
-                            "----------",
-                            "Key: test.nothing",
-                            "Existence: false",
-                            "----------"]
+        expected_results = ["test.int\tINT\tcontextkit-dbus\tsession:com.nokia.test\tA phony but very flexible property.",
+                            "test.double\tDOUBLE\tcontextkit-dbus\tsession:com.nokia.test\tA phony but very flexible property.",
+                            "test.truth\tTRUTH\tcontextkit-dbus\tsession:com.nokia.test\tA phony but very flexible property.",
+                            "test.string\tSTRING\tcontextkit-dbus\tsession:com.nokia.test\tA phony but very flexible property."]
 
         self.assert_(info_client.expect(CLTool.STDOUT,
                                         "\n".join(expected_results),
                                         1),
-                     "Bad introspection result from context-print-info")
+                     "Bad introspection result from context-ls")
 
 def runTests():
     suitePrintInfoRunning = unittest.TestLoader().loadTestsFromTestCase(PrintInfoRunning)
