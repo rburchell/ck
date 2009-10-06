@@ -193,10 +193,13 @@ void InfoCdbBackendUnitTest::keyProvided()
 
 void InfoCdbBackendUnitTest::listProviders()
 {
-    QList <ContextProviderInfo> list = backend->listProviders("Battery.Charging");
-    QCOMPARE(list.count(), 1);
-    QCOMPARE(list.at(0).plugin, QString("contextkit-dbus"));
-    QCOMPARE(list.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));
+    QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
+    QCOMPARE(list1.count(), 1);
+    QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));
+
+    QList <ContextProviderInfo> list2 = backend->listProviders("Does.Not.Exist");
+    QCOMPARE(list2.count(), 0);
 }
 
 void InfoCdbBackendUnitTest::dynamics()
