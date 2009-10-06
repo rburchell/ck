@@ -42,7 +42,8 @@ int main(int argc, char **argv)
         if (provided && !backend->keyProvided(key))
             continue;
         if (longListing) {
-            out << key << "\t" << backend->typeForKey(key) << "\t" << backend->docForKey(key) << "\n";
+            out << key << "\t" << backend->typeForKey(key) << "\t" << backend->pluginForKey(key) << "\t"
+                << backend->constructionStringForKey(key) << "\t" << backend->docForKey(key) << "\n";
         } else
             out << key << "\n";
     }
