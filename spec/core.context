@@ -327,8 +327,11 @@ Information about the cellular radio.
 The name of the cellular network.
     </doc>
   </key>
-  <key name="Cellular.SignalStrength"
-       type="percentage">
+  <key name="Cellular.SignalStrength">
+    <type>
+      <!--percentage-->
+      int32
+    </type>
     <doc>
 The signal strength at the cellular radio, in percent of the maximum.
     </doc>
@@ -663,7 +666,7 @@ backup or upgrading the OS software.
       string
     </type>
   </key>
-  <key name="Use.ConnectedContacts" type="string-list">
+  <key name="Use.ConnectedContacts">
     <type>
       <!--<uniform-list type="nepomuk-uri"/>-->
     </type>
