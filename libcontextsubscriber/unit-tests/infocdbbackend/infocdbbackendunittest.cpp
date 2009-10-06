@@ -55,10 +55,10 @@ private slots:
 void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 {
     CDBWriter writer(path);
-    
+
     if (! writer.isWritable())
-        qFatal("Failed to open %s for reading!", path);
-    
+        qFatal("Failed to open %s for reading!", path.toLocal8Bit().data());
+
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Internet.BytesOut");
     writer.add("PLUGINS", "contextkit-dbus");
@@ -77,10 +77,10 @@ void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
 {
     CDBWriter writer(path);
-    
+
     if (! writer.isWritable())
-        qFatal("Failed to open %s for reading!", path);
-    
+        qFatal("Failed to open %s for reading!", path.toLocal8Bit().data());
+
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Battery.Capacity");
     writer.add("PLUGINS", "contextkit-dbus");
