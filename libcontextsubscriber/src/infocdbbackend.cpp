@@ -69,7 +69,6 @@ QStringList InfoCdbBackend::variantListToStringList(const QVariantList &l)
     return ret;
 }
 
-
 QStringList InfoCdbBackend::listKeys() const
 {
     return variantListToStringList(reader.valuesForKey("KEYS"));
@@ -220,6 +219,15 @@ void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
 
 const QList<ContextProviderInfo> InfoCdbBackend::listProviders(QString key) const
 {
-     return QList<ContextProviderInfo> ();
+    ContextProviderInfo info;
+    info.plugin = reader.valueForKey(key + ":KEYPLUGIN").toString();
+    info.constructionString = reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING").toString();
+
+    QList<ContextProviderInfo> lst;
+    if (info.plugin != "") {
+        lst << info;
+    }
+
+    return lst;
 }
 

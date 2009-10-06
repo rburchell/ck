@@ -61,7 +61,6 @@ private slots:
 private:
     QFileSystemWatcher watcher; ///< A watched object obsering the database file. Delivers synced notifications.
     QHash <QString, InfoKeyData> keyDataHash; ///< This hash contains the full state of registry in memory.
-    QHash <QString, QList <ContextProviderInfo>* > keyProvidersHash;
     int countOfFilesInLastParse; ///< The number of xml files we parsed in last registry update.
 
     void regenerateKeyDataList();
