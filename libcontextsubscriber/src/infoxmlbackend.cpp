@@ -28,9 +28,9 @@
 #include <stdlib.h>
 #include "sconnect.h"
 #include "infoxmlbackend.h"
-#include "infoxmlkeysfinder.h"
 #include "logging.h"
 #include "loggingfeatures.h"
+#include "nanoxml.h"
 
 /*!
     \class InfoXmlBackend
@@ -56,12 +56,11 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
     if (! dir.exists() || ! dir.isReadable()) {
         contextWarning() << "Registry path" << InfoXmlBackend::registryPath()
                          << "is not a directory or is not readable!";
-        return;
+    } else {
+        watcher.addPath(InfoXmlBackend::registryPath());
+        sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
+        sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onFileChanged(QString)));
     }
-
-    watcher.addPath(InfoXmlBackend::registryPath());
-    sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
-    sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onFileChanged(QString)));
 
     regenerateKeyDataList();
 }
@@ -262,17 +261,22 @@ void InfoXmlBackend::regenerateKeyDataList()
     if (watchedFiles.size() > 0)
         watcher.removePaths(watchedFiles);
 
+    contextDebug() << F_XML << "Reading core declarations from:" << InfoXmlBackend::coreDeclPath();
+    readKeyDataFromXml (InfoXmlBackend::coreDeclPath());
+
     contextDebug() << F_XML << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
 
     // Read the core property declarations.
-
-    readKeyDataFromXml (InfoXmlBackend::coreDeclPath());
-
     // For each xml file in the registry we parse it and
     // add it to our hash. We did some sanity checks in the constructor
     // so we skip them now.
 
     QDir dir = QDir(registryPath());
+
+    // Bail out now if no directory
+    if (! dir.exists() || ! dir.isReadable())
+        return;
+
     dir.setFilter(QDir::Files);
     dir.setNameFilters(QStringList("*.context"));
 
@@ -288,36 +292,103 @@ void InfoXmlBackend::regenerateKeyDataList()
     }
 }
 
+/// Convert a subset of new-style type names to the currently used
+/// old-style type names.  This way we can slowly fade in new-style
+/// types.
+QString InfoXmlBackend::canonicalizeType (const QString &type)
+{
+    if (type == "bool")
+        return "TRUTH";
+    else if (type == "int32")
+        return "INT";
+    else if (type == "string")
+        return "STRING";
+    else if (type == "double")
+        return "DOUBLE";
+    else
+        return type;
+}
+
+/// Parse the given QVariant tree which is supposed to be a key tree.
+void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerTree)
+{
+    QString key = NanoXml::keyValue("name", keyTree).toString();
+
+    // Build new data
+    InfoKeyData old_data = keyDataHash.value(key);
+
+    InfoKeyData new_data;
+    new_data.plugin = NanoXml::keyValue("plugin", providerTree).toString();
+    new_data.constructionString = NanoXml::keyValue("constructionString", providerTree).toString();;
+
+    // Suport old-style XML...
+    if (new_data.plugin == "") {
+        QString currentProvider = NanoXml::keyValue("service", providerTree).toString();
+        QString currentBus = NanoXml::keyValue("bus", providerTree).toString();
+
+        if (currentBus != "" && currentProvider != "") {
+            new_data.plugin = "contextkit-dbus";
+            new_data.constructionString = currentBus + ":" + currentProvider;
+        } else
+            new_data.constructionString = "";
+    }
+
+    new_data.name = key;
+    new_data.doc = NanoXml::keyValue("doc", keyTree).toString();
+    new_data.type = canonicalizeType(NanoXml::keyValue("type", keyTree).toString());
+
+    if (keyDataHash.contains(key)) {
+
+        // Carefully merge new data into old.  We only allow
+        // addition of plugin name / construction string.
+
+        if (old_data.plugin == "") {
+            old_data.plugin = new_data.plugin;
+            old_data.constructionString = new_data.constructionString;
+            keyDataHash.insert(key, old_data);
+        } else {
+            contextWarning() << "Key" << key << "already defined in previous xml file. Ignoring.";
+        }
+    } else {
+        contextDebug() << "Adding new key" << key << "with type:" << new_data.type;
+        keyDataHash.insert(key, new_data);
+    }
+}
+
 /// Parses a given \a path file and adds it's contents to the hash.
 /// Also adds the file to the watcher (starts observing it).
 void InfoXmlBackend::readKeyDataFromXml(const QString &path)
 {
     contextDebug() << F_XML << "Reading keys from" << path;
 
-    InfoXmlKeysFinder handler;
-    QFile f(path);
-    QXmlInputSource source (&f);
-    QXmlSimpleReader reader;
+    NanoXml nano(path);
 
-    reader.setContentHandler(&handler);
-    reader.parse(source);
+    // Check if format is all ok
+    if (nano.didFail()) {
+        contextWarning() << F_XML << "Reading" << path << "failed, parsing error.";
+        return;
+    }
 
-    foreach (QString key, handler.keyDataHash.keys()) {
+    // FIXME: Check the format, for forward-compatibility branch
+    /*
+    if (nano.namespaceUri() != "" && nano.namespaceUri() != BACKEND_COMPATIBILITY_NAMESPACE) {
+        contextWarning() << F_XML << "Reading" << path << "failed, invalid format";
+        return;
+    }
+    */
 
-        if (keyDataHash.contains(key)) {
-            // Carefully merge new data into old.  We only allow
-            // addition of plugin name / construction string.
-
-            InfoKeyData old_data = keyDataHash.value(key);
-            InfoKeyData new_data = handler.keyDataHash.value(key);
-
-            if (old_data.plugin == "") {
-                old_data.plugin = new_data.plugin;
-                old_data.constructionString = new_data.constructionString;
-                keyDataHash.insert(key, old_data);
-            } else
-                contextWarning() << "Key" << key << "already defined in previous xml file. Ignoring.";
-        } else
-            keyDataHash.insert(key, handler.keyDataHash.value(key));
+    if (nano.root().toList().at(0).toString() == "provider" ||
+        nano.root().toList().at(0).toString() == "properties") {
+        // One provider. Iterate over each key.
+        foreach (QVariant keyTree, nano.keyValues("key")) {
+            parseKey(keyTree, nano.root());
+        }
+    } else {
+        // Multiple providers... iterate over providers and keys
+        foreach (QVariant providerTree, nano.keyValues("provider")) {
+           foreach (QVariant keyTree, NanoXml::keyValues("key", providerTree)) {
+               parseKey(keyTree, providerTree);
+           }
+        }
     }
 }

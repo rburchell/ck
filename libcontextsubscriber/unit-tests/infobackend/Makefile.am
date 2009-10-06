@@ -15,14 +15,14 @@ AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = 							\
 	infobackend.cpp infoxmlbackend.cpp			\
 	cdbreader.h cdbreader.cpp				\
-	infoxmlkeysfinder.cpp 					\
 	infobackend.h						\
 	infoxmlbackend.h 					\
 	infocdbbackend.h 					\
 	infocdbbackend.cpp 					\
-	infoxmlkeysfinder.h 					\
 	infokeydata.h 						\
-	loggingfeatures.h
+	loggingfeatures.h                                       \
+        nanoxml.cpp                                             \
+        nanoxml.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =

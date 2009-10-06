@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<provider xmlns:svg="http://www.test.org/document" bus="session" service="org.maemo.contextd">
+    <key name="Battery.ChargePercentage" type="INT" />
+</provider>
