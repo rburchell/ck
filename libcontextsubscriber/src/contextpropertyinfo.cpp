@@ -260,7 +260,10 @@ QString ContextPropertyInfo::plugin() const
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::plugin() is deprecated.";
 
     QMutexLocker lock(&cacheLock);
-    return cachedPlugin;
+    if (cachedProviders.size() == 0)
+        return "";
+    else
+        return cachedProviders.at(0).plugin;
 }
 
 /// Returns the construction parameter for the Provider supplying this property
@@ -269,7 +272,10 @@ QString ContextPropertyInfo::constructionString() const
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::constructionString() is deprecated.";
 
     QMutexLocker lock(&cacheLock);
-    return cachedConstructionString;
+    if (cachedProviders.size() == 0)
+        return "";
+    else
+        return cachedProviders.at(0).constructionString;
 }
 
 /// Returns the dbus name of the provider supplying this
@@ -280,11 +286,16 @@ QString ContextPropertyInfo::providerDBusName() const
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusName() is deprecated.";
 
     QMutexLocker lock(&cacheLock);
-    // TBD: obsolete this function?
-    if (cachedPlugin == "contextkit-dbus") {
-        return cachedConstructionString.split(":").last();
+    if (cachedProviders.size() == 0)
+        return "";
+    else {
+        QString plg = cachedProviders.at(0).plugin;
+        QString constructionString = cachedProviders.at(0).constructionString;
+        if (plg == "contextkit-dbus")
+            return constructionString.split(":").last();
+        else
+            return "";
     }
-    return "";
 }
 
 /// Returns the bus type of the provider supplying this property/key.
@@ -295,11 +306,15 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusType() is deprecated.";
 
     QMutexLocker lock(&cacheLock);
-    // TBD: obsolete this function?
     QString busType = "";
-    if (cachedPlugin == "contextkit-dbus") {
-        busType = cachedConstructionString.split(":").first();
+
+    if (cachedProviders.size() > 0) {
+        QString plg = cachedProviders.at(0).plugin;
+        QString constructionString = cachedProviders.at(0).constructionString;
+        if (plg == "contextkit-dbus")
+            busType = constructionString.split(":").first();
     }
+
     if (busType == "system")
         return QDBusConnection::SystemBus;
     else /* if (busType == "session") */
