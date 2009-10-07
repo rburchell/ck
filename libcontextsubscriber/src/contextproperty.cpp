@@ -144,6 +144,9 @@ struct ContextPropertyPrivate
    new values are only received when your program enters the event
    loop.
 
+   ContextProperty objects can be created only after the
+   Q(Core)Application is constructed.
+
    When a ContextProperty is first created or goes from the
    unsubcribed to the subscribed state later on, it is temporarily in
    an intermediate 'subscribing' state.  This state lasts until the
