@@ -59,15 +59,13 @@ private:
     QString keyName; ///< The name of the key his ContextPropertyInfo represents.
     QString cachedDoc; ///< The documentation of the key.
     QString cachedType; ///< Cached (stored) type of the key.
-    QString cachedPlugin; ///< Cached name of the plugin providing the key
-    QString cachedConstructionString; ///< Cached construction string for the Provider
     bool cachedExists; ///< Cached state of the key (existance).
     bool cachedProvided; ///< Cached state of the key (whether someone provides it).
     mutable QMutex cacheLock; ///< Lock for the cache.
     QList <ContextProviderInfo> cachedProviders;
 
 private slots:
-    void onKeyDataChanged(const QString& key);
+    void onChanged(const QString& key);
 
 signals:
     /// Emitted when the provider of the key changes. The \a newProvider

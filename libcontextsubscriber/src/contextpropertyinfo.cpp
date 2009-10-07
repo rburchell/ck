@@ -206,13 +206,11 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
 
     if (key != "") {
         InfoBackend* infoBackend = InfoBackend::instance();
-        sconnect(infoBackend, SIGNAL(keyDataChanged(QString)),
-                 this, SLOT(onKeyDataChanged(QString)));
+        sconnect(infoBackend, SIGNAL(changed(QString)),
+                 this, SLOT(onChanged(QString)));
 
         cachedType = infoBackend->typeForKey(keyName);
         cachedDoc = infoBackend->docForKey(keyName);
-        cachedPlugin = infoBackend->pluginForKey(keyName);
-        cachedConstructionString = infoBackend->constructionStringForKey(keyName);
         cachedExists = infoBackend->keyExists(keyName);
         cachedProvided = infoBackend->keyProvided(keyName);
         cachedProviders = infoBackend->listProviders(keyName);
@@ -327,30 +325,16 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 /// actual infobackend instance. It's executed on every change to any
 /// of the keys. We first check if the data concerns us. Next we
 /// update the cached values and fire the actual signals.
-void ContextPropertyInfo::onKeyDataChanged(const QString& key)
+void ContextPropertyInfo::onChanged(const QString& key)
 {
     QMutexLocker lock(&cacheLock);
 
     if (key != keyName)
         return;
 
-    // Update caches and store old values
-    QString oldType = cachedType;
-    QString newType = InfoBackend::instance()->typeForKey(keyName);
-    cachedType = newType;
-
+    // Update caches
+    QString cachedType = InfoBackend::instance()->typeForKey(keyName);
     cachedDoc = InfoBackend::instance()->docForKey(keyName);
-
-    QString oldPlugin = cachedPlugin;
-    QString oldConstructionString = cachedConstructionString;
-    bool oldExists = cachedExists;
-    bool oldProvided = cachedProvided;
-    QList <ContextProviderInfo> oldProviders = cachedProviders;
-
-    QString newPlugin = InfoBackend::instance()->pluginForKey(keyName);
-    QString newConstructionString = InfoBackend::instance()->constructionStringForKey(keyName);
-    cachedPlugin = newPlugin;
-    cachedConstructionString = newConstructionString;
     cachedExists = InfoBackend::instance()->keyExists(keyName);
     cachedProvided = InfoBackend::instance()->keyProvided(keyName);
     cachedProviders = InfoBackend::instance()->listProviders(keyName);
@@ -361,27 +345,13 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
     lock.unlock();
 
     // Emit the needed signals
-    if (oldType != newType)
-        emit typeChanged(cachedType);
-    if (oldExists != cachedExists)
-        emit existsChanged(cachedExists);
-    if (oldProvided != cachedProvided)
-        emit providedChanged(cachedProvided);
+    emit typeChanged(cachedType);
+    emit existsChanged(cachedExists);
+    emit providedChanged(cachedProvided);
 
-    // TBD: obsolete the providerChanged & providerDBusTypeChanged signals?
-    if (oldPlugin != newPlugin || oldConstructionString != newConstructionString) {
-        if (oldPlugin == "contextkit-dbus" || newPlugin == "contextkit-dbus") {
-            QString newProvider = "";
-            if (newPlugin == "contextkit-dbus") {
-                newProvider = cachedConstructionString.split(":").last();
-            }
-            emit providerChanged(newProvider);
-            // Note: we don't emit providerDBusTypeChanged any
-            // more. It would be cumbersome, and there's no real use
-            // case for listening to it.
-        }
-        emit pluginChanged(newPlugin, newConstructionString);
-    }
+    emit providerChanged(providerDBusName());
+    emit providerDBusTypeChanged(providerDBusType());
+    emit pluginChanged(plugin(), constructionString());
 }
 
 const QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const

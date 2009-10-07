@@ -82,6 +82,8 @@ signals:
     /// Emitted when key data changes. ContextPropertyInfo instances listen on that.
     void keyDataChanged(const QString& key);
 
+    void changed(const QString& key);
+
 protected:
     virtual void connectNotify(const char *signal);
     virtual void disconnectNotify(const char *signal);
