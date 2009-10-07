@@ -136,7 +136,17 @@ QStringList ContextRegistryInfo::listProviders() const
 /// Returns the list of all unique plugins in the registry.
 QStringList ContextRegistryInfo::listPlugins() const
 {
-    return InfoBackend::instance()->listPlugins();
+    contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listPlugins() is deprecated.";
+
+    QSet<QString> plugins;
+
+    foreach (QString key, listKeys()) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+            plugins.insert(info.plugin);
+        }
+    }
+
+    return plugins.toList();
 }
 
 /// Returns the name of the currently used registry backend. Ie. "cdb" or "xml".
