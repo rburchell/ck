@@ -52,6 +52,9 @@ public:
     QString constructionString() const;
     virtual const QList<ContextProviderInfo> listProviders() const;
 
+protected:
+    virtual void connectNotify(const char *signal);
+
 private:
     QString keyName; ///< The name of the key his ContextPropertyInfo represents.
     QString cachedDoc; ///< The documentation of the key.

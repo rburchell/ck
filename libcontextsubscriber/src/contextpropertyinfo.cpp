@@ -390,3 +390,22 @@ const QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
     return cachedProviders;
 }
 
+void ContextPropertyInfo::connectNotify(const char *signal)
+{
+    QObject::connectNotify(signal);
+
+    if (signal == SIGNAL(providerChanged(QString)))
+        contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerChanged signal is deprecated.";
+    else if (signal == SIGNAL(providerDBusTypeChanged(QDBusConnection::BusType)))
+        contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusTypeChanged signal is deprecated.";
+    else if (signal == SIGNAL(typeChanged(QString)))
+        contextWarning() << F_DEPRECATION << "ContextPropertyInfo::typeChanged signal is deprecated.";
+    else if (signal == SIGNAL(existsChanged(bool)))
+        contextWarning() << F_DEPRECATION << "ContextPropertyInfo::existsChanged signal is deprecated.";
+    else if (signal == SIGNAL(providedChanged(bool)))
+        contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providedChanged signal is deprecated.";
+    else if (signal == SIGNAL(pluginChanged(QString, QString)))
+        contextWarning() << F_DEPRECATION << "ContextPropertyInfo::pluginChanged signal is deprecated.";
+}
+
+
