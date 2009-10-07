@@ -80,8 +80,6 @@ signals:
     void keysRemoved(const QStringList& removedKeys);
 
     /// Emitted when key data changes. ContextPropertyInfo instances listen on that.
-    void keyDataChanged(const QString& key);
-
     void changed(const QString& key);
 
 protected:
@@ -98,7 +96,7 @@ private:
 
     void checkAndEmitKeysAdded(const QStringList &currentKeys, const QStringList &oldKeys);
     void checkAndEmitKeysRemoved(const QStringList &currentKeys, const QStringList &oldKeys);
-    void checkAndEmitKeysChanged(const QStringList &currentKeys, const QStringList &oldKeys);
+    void checkAndEmitChanged(const QStringList &currentKeys, const QStringList &oldKeys);
 
     /// Private operator. Do not use.
     InfoBackend& operator=(const InfoBackend&);

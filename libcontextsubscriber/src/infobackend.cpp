@@ -112,16 +112,16 @@ void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys,
 
 /// Given the \a currentKeys list of keys and the \a oldKeys list of keys,
 /// emit a signal containing the union of those two lists.
-void InfoBackend::checkAndEmitKeysChanged(const QStringList &currentKeys,
-                                          const QStringList &oldKeys)
+void InfoBackend::checkAndEmitChanged(const QStringList &currentKeys,
+                                      const QStringList &oldKeys)
 {
     foreach(QString key, oldKeys) {
-        emit keyDataChanged(key);
+        emit changed(key);
     }
 
     foreach(QString key, currentKeys) {
         if (! oldKeys.contains(key))
-            emit keyDataChanged(key);
+            emit changed(key);
     }
 }
 

@@ -211,7 +211,7 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     checkAndEmitKeysAdded(currentKeys, oldKeys);
     checkAndEmitKeysRemoved(currentKeys, oldKeys);
     emit keysChanged(listKeys());
-    checkAndEmitKeysChanged(currentKeys, oldKeys);
+    checkAndEmitChanged(currentKeys, oldKeys);
 }
 
 /// Called when the registry directory changed (ie. file removed or added).
@@ -246,7 +246,7 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
     checkAndEmitKeysAdded(currentKeys, oldKeys);
     checkAndEmitKeysRemoved(currentKeys, oldKeys);
     emit keysChanged(listKeys());
-    checkAndEmitKeysChanged(currentKeys, oldKeys);
+    checkAndEmitChanged(currentKeys, oldKeys);
 }
 
 /* Private */

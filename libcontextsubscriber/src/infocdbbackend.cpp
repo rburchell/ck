@@ -204,7 +204,7 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     checkAndEmitKeysAdded(currentKeys, oldKeys);
     checkAndEmitKeysRemoved(currentKeys, oldKeys);
     emit keysChanged(listKeys());
-    checkAndEmitKeysChanged(currentKeys, oldKeys);
+    checkAndEmitChanged(currentKeys, oldKeys);
 }
 
 /// Called when the directory with cache.db chanes. We start to observe this
