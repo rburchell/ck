@@ -61,6 +61,7 @@ private:
     bool cachedExists; ///< Cached state of the key (existance).
     bool cachedProvided; ///< Cached state of the key (whether someone provides it).
     mutable QMutex cacheLock; ///< Lock for the cache.
+    QList <ContextProviderInfo> cachedProviders;
 
 private slots:
     void onKeyDataChanged(const QString& key);

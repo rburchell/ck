@@ -215,6 +215,7 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
         cachedConstructionString = infoBackend->constructionStringForKey(keyName);
         cachedExists = infoBackend->keyExists(keyName);
         cachedProvided = infoBackend->keyProvided(keyName);
+        cachedProviders = infoBackend->listProviders(keyName);
     }
 }
 
@@ -329,6 +330,7 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
     QString oldConstructionString = cachedConstructionString;
     bool oldExists = cachedExists;
     bool oldProvided = cachedProvided;
+    QList <ContextProviderInfo> oldProviders = cachedProviders;
 
     QString newPlugin = InfoBackend::instance()->pluginForKey(keyName);
     QString newConstructionString = InfoBackend::instance()->constructionStringForKey(keyName);
@@ -336,6 +338,7 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
     cachedConstructionString = newConstructionString;
     cachedExists = InfoBackend::instance()->keyExists(keyName);
     cachedProvided = InfoBackend::instance()->keyProvided(keyName);
+    cachedProviders = InfoBackend::instance()->listProviders(keyName);
 
     // Release the lock before emitting the signals; otherwise
     // listeners trying to access cached values would create a
@@ -369,6 +372,6 @@ void ContextPropertyInfo::onKeyDataChanged(const QString& key)
 const QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
 {
     QMutexLocker lock(&cacheLock);
-    return InfoBackend::instance()->listProviders(keyName);
+    return cachedProviders;
 }
 
