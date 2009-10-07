@@ -83,16 +83,20 @@ QStringList ContextRegistryInfo::listKeys() const
 /// Returns the list of all the keys associated with the given provider.
 QStringList ContextRegistryInfo::listKeys(QString providerName) const
 {
-    // TBD: obsolete this?
-    QStringList keys = InfoBackend::instance()->listKeysForPlugin("contextkit-dbus");
-    QStringList toReturn;
-    foreach (const QString& key, keys) {
-        QString constructionString = InfoBackend::instance()->constructionStringForKey(key);
-        if (constructionString.split(":").last() == providerName) {
-            toReturn << key;
+    contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listKeys(QString provider) is deprecated.";
+
+    QSet<QString> keys;
+
+    foreach (QString key, listKeys()) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+            if (info.plugin == "contextkit-dbus" &&
+                info.constructionString.split(":").last() == providerName) {
+                keys.insert(key);
+            }
         }
     }
-    return toReturn;
+
+    return keys.toList();
 }
 
 /// Returns the list of all the keys associated with the given plugin
