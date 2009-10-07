@@ -22,6 +22,9 @@
 #include "contextregistryinfo.h"
 #include "infobackend.h"
 #include "sconnect.h"
+#include "logging.h"
+#include "loggingfeatures.h"
+#include "contextproviderinfo.h"
 #include <QMutex>
 #include <QMutexLocker>
 #include <QCoreApplication>
@@ -95,7 +98,22 @@ QStringList ContextRegistryInfo::listKeys(QString providerName) const
 /// Returns the list of all the keys associated with the given plugin
 QStringList ContextRegistryInfo::listKeysForPlugin(QString plugin) const
 {
-    return InfoBackend::instance()->listKeysForPlugin(plugin);
+    contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listKeysForPlugin() is deprecated.";
+
+    QStringList keys;
+
+    foreach (QString key, listKeys()) {
+        QList <ContextProviderInfo> providers = InfoBackend::instance()->listProviders(key);
+        foreach (ContextProviderInfo info, providers) {
+            if (info.plugin == plugin) {
+                keys << key;
+                break;
+            }
+        }
+
+    }
+
+    return keys;
 }
 
 /// Returns the list of all unique providers in the registry.
