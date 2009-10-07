@@ -120,15 +120,19 @@ QStringList ContextRegistryInfo::listKeysForPlugin(QString plugin) const
 /// The lists consist of strings with dbus names of the providers.
 QStringList ContextRegistryInfo::listProviders() const
 {
-    // TBD: obsolete this?
-    QStringList keys = InfoBackend::instance()->listKeysForPlugin("contextkit-dbus");
-    QSet<QString> foundProviders;
-    foreach (const QString& key, keys) {
-        QString constructionString = InfoBackend::instance()->constructionStringForKey(key);
-        foundProviders.insert(constructionString.split(":").last());
+    contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listProviders() is deprecated.";
+
+    QSet<QString> providers;
+
+    foreach (QString key, listKeys()) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+            if (info.plugin == "contextkit-dbus") {
+                providers.insert(info.constructionString.split(":").last());
+            }
+        }
     }
-    QStringList toReturn(foundProviders.toList());
-    return toReturn;
+
+    return providers.toList();
 }
 
 /// Returns the list of all unique plugins in the registry.
