@@ -85,36 +85,6 @@ QStringList InfoXmlBackend::listKeys() const
     return list;
 }
 
-QStringList InfoXmlBackend::listKeysForPlugin(QString plugin) const
-{
-    // This is slow and not nice, but we're an xml backend and
-    // we can afford to not be the first in the run
-    QStringList list;
-
-    foreach (QString key, keyDataHash.keys()) {
-        InfoKeyData data = keyDataHash.value(key);
-        if (data.plugin == plugin) {
-            list << data.name;
-        }
-    }
-
-    return list;
-}
-
-QStringList InfoXmlBackend::listPlugins() const
-{
-    // Again -- slow.
-    QStringList list;
-
-    foreach (QString key, keyDataHash.keys()) {
-        InfoKeyData data = keyDataHash.value(key);
-        if (! list.contains(data.plugin))
-            list << data.plugin;
-    }
-
-    return list;
-}
-
 QString InfoXmlBackend::typeForKey(QString key) const
 {
     if (! keyDataHash.contains(key))
@@ -129,22 +99,6 @@ QString InfoXmlBackend::docForKey(QString key) const
         return "";
 
     return keyDataHash.value(key).doc;
-}
-
-QString InfoXmlBackend::pluginForKey(QString key) const
-{
-    if (! keyDataHash.contains(key))
-        return "";
-
-    return keyDataHash.value(key).plugin;
-}
-
-QString InfoXmlBackend::constructionStringForKey(QString key) const
-{
-    if (! keyDataHash.contains(key))
-        return "";
-
-    return keyDataHash.value(key).constructionString;
 }
 
 bool InfoXmlBackend::keyDeclared(QString key) const

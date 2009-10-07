@@ -41,24 +41,11 @@ public:
     /// Returns the list of all the keys in the registry.
     virtual QStringList listKeys() const = 0;
 
-    /// Returns the list of all the keys in the registry provided
-    /// by the given \a plugin.
-    virtual QStringList listKeysForPlugin(QString plugin) const = 0;
-
-    /// Returns a list of all the unique plugins in the database.
-    virtual QStringList listPlugins() const = 0;
-
     /// Returns a type for the given \a key.
     virtual QString typeForKey(QString key) const = 0;
 
     /// Returns the documentation for the given \a key name.
     virtual QString docForKey(QString key) const = 0;
-
-    /// Returns the constructor plugin name for the given \a key name.
-    virtual QString pluginForKey(QString key) const = 0;
-
-    /// Returns the constructor plugin parameter for the given \a key name.
-    virtual QString constructionStringForKey(QString key) const = 0;
 
     /// Returns true if the given key exists.
     virtual bool keyDeclared(QString key) const = 0;

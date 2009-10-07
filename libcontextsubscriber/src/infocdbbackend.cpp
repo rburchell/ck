@@ -74,16 +74,6 @@ QStringList InfoCdbBackend::listKeys() const
     return variantListToStringList(reader.valuesForKey("KEYS"));
 }
 
-QStringList InfoCdbBackend::listKeysForPlugin(QString plugin) const
-{
-    return variantListToStringList(reader.valuesForKey(plugin + ":KEYS"));
-}
-
-QStringList InfoCdbBackend::listPlugins() const
-{
-    return variantListToStringList(reader.valuesForKey("PLUGINS"));
-}
-
 QString InfoCdbBackend::typeForKey(QString key) const
 {
     return reader.valueForKey(key + ":KEYTYPE").toString();
@@ -92,16 +82,6 @@ QString InfoCdbBackend::typeForKey(QString key) const
 QString InfoCdbBackend::docForKey(QString key) const
 {
     return reader.valueForKey(key + ":KEYDOC").toString();
-}
-
-QString InfoCdbBackend::pluginForKey(QString key) const
-{
-    return reader.valueForKey(key + ":KEYPLUGIN").toString();
-}
-
-QString InfoCdbBackend::constructionStringForKey(QString key) const
-{
-    return reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING").toString();
 }
 
 bool InfoCdbBackend::keyDeclared(QString key) const
