@@ -100,20 +100,18 @@ QStringList ContextRegistryInfo::listKeysForPlugin(QString plugin) const
 {
     contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listKeysForPlugin() is deprecated.";
 
-    QStringList keys;
+    QSet<QString> keys;
 
     foreach (QString key, listKeys()) {
-        QList <ContextProviderInfo> providers = InfoBackend::instance()->listProviders(key);
-        foreach (ContextProviderInfo info, providers) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
             if (info.plugin == plugin) {
-                keys << key;
-                break;
+                keys.insert(key);
             }
         }
 
     }
 
-    return keys;
+    return keys.toList();
 }
 
 /// Returns the list of all unique providers in the registry.
