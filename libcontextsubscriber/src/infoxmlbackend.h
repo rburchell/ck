@@ -47,7 +47,7 @@ public:
     virtual QString docForKey(QString key) const;
     virtual QString pluginForKey(QString key) const;
     virtual QString constructionStringForKey(QString key) const;
-    virtual bool keyExists(QString key) const;
+    virtual bool keyDeclared(QString key) const;
     virtual bool keyProvided(QString key) const;
     virtual const QList<ContextProviderInfo> listProviders(QString key) const;
 

@@ -104,7 +104,7 @@ QString InfoCdbBackend::constructionStringForKey(QString key) const
     return reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING").toString();
 }
 
-bool InfoCdbBackend::keyExists(QString key) const
+bool InfoCdbBackend::keyDeclared(QString key) const
 {
     if (reader.valuesForKey("KEYS").contains(key))
         return true;

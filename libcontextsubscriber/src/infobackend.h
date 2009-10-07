@@ -61,7 +61,7 @@ public:
     virtual QString constructionStringForKey(QString key) const = 0;
 
     /// Returns true if the given key exists.
-    virtual bool keyExists(QString key) const = 0;
+    virtual bool keyDeclared(QString key) const = 0;
 
     /// Returns true if the given key is provided (i.e., not a core
     /// property which nobody provides currently)

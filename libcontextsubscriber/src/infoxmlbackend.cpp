@@ -147,7 +147,7 @@ QString InfoXmlBackend::constructionStringForKey(QString key) const
     return keyDataHash.value(key).constructionString;
 }
 
-bool InfoXmlBackend::keyExists(QString key) const
+bool InfoXmlBackend::keyDeclared(QString key) const
 {
     if (keyDataHash.contains(key))
         return true;

@@ -43,6 +43,7 @@ public:
     QString doc() const;
     QString type() const;
     bool exists() const;
+    bool declared() const;
     bool provided() const;
 
     QString providerDBusName() const;
@@ -59,7 +60,7 @@ private:
     QString keyName; ///< The name of the key his ContextPropertyInfo represents.
     QString cachedDoc; ///< The documentation of the key.
     QString cachedType; ///< Cached (stored) type of the key.
-    bool cachedExists; ///< Cached state of the key (existance).
+    bool cachedDeclared; ///< Cached state of the key (existance).
     bool cachedProvided; ///< Cached state of the key (whether someone provides it).
     mutable QMutex cacheLock; ///< Lock for the cache.
     QList <ContextProviderInfo> cachedProviders;
