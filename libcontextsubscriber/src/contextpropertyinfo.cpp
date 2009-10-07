@@ -345,6 +345,7 @@ void ContextPropertyInfo::onChanged(const QString& key)
     lock.unlock();
 
     // Emit the needed signals
+    emit changed(keyName);
     emit typeChanged(cachedType);
     emit existsChanged(cachedExists);
     emit providedChanged(cachedProvided);

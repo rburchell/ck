@@ -107,6 +107,7 @@ signals:
     /// construction parameter to give to the plugin.
     void pluginChanged(QString plugin, QString constructionString);
 
+    void changed(QString key);
 };
 
 #endif // CONTEXTPROPERTYINFO_H
