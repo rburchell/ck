@@ -66,8 +66,11 @@ signals:
     /// Emitted when keys are removed. ContextRegistryInfo listens on that.
     void keysRemoved(const QStringList& removedKeys);
 
-    /// Emitted when key data changes. ContextPropertyInfo instances listen on that.
-    void changed(const QString& key);
+    /// Emitted when key data/info changes. ContextPropertyInfo instances listen on that.
+    void keyChanged(const QString& key);
+
+    /// Emitted when the key list changes. ContextRegistryInfo listens on that.
+    void listChanged();
 
 protected:
     virtual void connectNotify(const char *signal);
@@ -83,7 +86,7 @@ private:
 
     void checkAndEmitKeysAdded(const QStringList &currentKeys, const QStringList &oldKeys);
     void checkAndEmitKeysRemoved(const QStringList &currentKeys, const QStringList &oldKeys);
-    void checkAndEmitChanged(const QStringList &currentKeys, const QStringList &oldKeys);
+    void checkAndEmitKeyChanged(const QStringList &currentKeys, const QStringList &oldKeys);
 
     /// Private operator. Do not use.
     InfoBackend& operator=(const InfoBackend&);

@@ -162,10 +162,12 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     // is not an issue.
 
     // Emissions
-    checkAndEmitKeysAdded(currentKeys, oldKeys);
-    checkAndEmitKeysRemoved(currentKeys, oldKeys);
-    emit keysChanged(listKeys());
-    checkAndEmitChanged(currentKeys, oldKeys);
+    checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
+    checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
+    emit keysChanged(listKeys()); // DEPRECATED emission
+
+    emit listChanged();
+    checkAndEmitKeyChanged(currentKeys, oldKeys);
 }
 
 /// Called when the registry directory changed (ie. file removed or added).
@@ -197,10 +199,12 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
     // is not an issue.
 
     // Emissions
-    checkAndEmitKeysAdded(currentKeys, oldKeys);
-    checkAndEmitKeysRemoved(currentKeys, oldKeys);
-    emit keysChanged(listKeys());
-    checkAndEmitChanged(currentKeys, oldKeys);
+    checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
+    checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
+    emit keysChanged(listKeys()); // DEPRECATED emission
+
+    emit listChanged();
+    checkAndEmitKeyChanged(currentKeys, oldKeys);
 }
 
 /* Private */

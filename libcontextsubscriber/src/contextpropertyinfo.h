@@ -66,7 +66,7 @@ private:
     QList <ContextProviderInfo> cachedProviders;
 
 private slots:
-    void onChanged(const QString& key);
+    void onKeyChanged(const QString& key);
 
 signals:
     /// Emitted when the provider of the key changes. The \a newProvider

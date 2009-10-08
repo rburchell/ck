@@ -206,8 +206,8 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
 
     if (key != "") {
         InfoBackend* infoBackend = InfoBackend::instance();
-        sconnect(infoBackend, SIGNAL(changed(QString)),
-                 this, SLOT(onChanged(QString)));
+        sconnect(infoBackend, SIGNAL(keyChanged(QString)),
+                 this, SLOT(onKeyChanged(QString)));
 
         cachedType = infoBackend->typeForKey(keyName);
         cachedDoc = infoBackend->docForKey(keyName);
@@ -332,7 +332,7 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 /// actual infobackend instance. It's executed on every change to any
 /// of the keys. We first check if the data concerns us. Next we
 /// update the cached values and fire the actual signals.
-void ContextPropertyInfo::onChanged(const QString& key)
+void ContextPropertyInfo::onKeyChanged(const QString& key)
 {
     QMutexLocker lock(&cacheLock);
 

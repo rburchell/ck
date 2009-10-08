@@ -181,10 +181,12 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     QStringList currentKeys = listKeys();
 
     // Emissions
-    checkAndEmitKeysAdded(currentKeys, oldKeys);
-    checkAndEmitKeysRemoved(currentKeys, oldKeys);
-    emit keysChanged(listKeys());
-    checkAndEmitChanged(currentKeys, oldKeys);
+    checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
+    checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
+    emit keysChanged(listKeys()); // DEPRECATED emission
+
+    emit listChanged();
+    checkAndEmitKeyChanged(currentKeys, oldKeys);
 }
 
 /// Called when the directory with cache.db chanes. We start to observe this
