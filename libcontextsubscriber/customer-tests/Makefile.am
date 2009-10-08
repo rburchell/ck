@@ -12,4 +12,5 @@ check-customer:
 CLEANFILES = *.pyc
 
 EXTRA_DIST = asynchronicity commander subscription runTests.sh	\
-			 tests.xml common registry pluginchanging
+             tests.xml common registry pluginchanging		\
+             coverage-build/Makefile
