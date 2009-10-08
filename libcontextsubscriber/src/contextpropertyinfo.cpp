@@ -49,8 +49,8 @@
     ContextPropertyInfo is used to obtain metadata about one
     particular key. Once created, it can be used to retrieve the type
     and provider information (DBus bus type and name) of the
-    introspected key. It also provides a couple of useful signals for
-    watching changes happening to a key.
+    introspected key. It also provides a signal to listen for changes
+    happening to a key.
 
     \section Usage
 
@@ -75,17 +75,16 @@
     ContextPropertyInfo propInfo("Something.That.Doesnt.Exist");
     propInfo.type();     //  ...returns empty string
     propInfo.doc();      //  ...returns empty string
-    propInfo.provider();  //  ...returns empty string
     \endcode
 
     You can use this functionality to wait for keys to become available in the registry.
     Just create a ContextPropertyInfo for a key that you're expecting to become present
-    and connect to the /c existsChanged signal.
+    and connect to the /c changed signal.
 
     \code
     ContextPropertyInfo propInfo("Something.That.Doesnt.Exist");
-    propInfo.exists(); // false
-    // Connect something to the existsChanged signal.
+    propInfo.declared(); // false
+    // Connect something to the changed signal, keep checking it
     \endcode
 
     \section xmlvscdb XML vs.CDB
