@@ -64,13 +64,15 @@ class Asynchronous(unittest.TestCase):
         provider_fast = CLTool("context-provide", "--v2", "com.nokia.fast",
                                "int","test.fast","44")
         provider_fast.expect(CLTool.STDOUT, "Setting key", 10) # wait for it
+        context_client = CLTool("context-listen")
+        context_client.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
         provider_slow.comment("provider_slow sleep time started at" + str(time.time()))
 
-        provider_slow.send("sleep 6")
+        provider_slow.send("sleep 3")
         provider_slow.expect(CLTool.STDOUT, "Sleeping", 3) # wait for it
 
-        context_client = CLTool("context-listen", "test.fast", "test.slow")
+        context_client.send("n test.fast ; n test.slow")
 
         # check the fast property
         self.assert_(context_client.expect(CLTool.STDOUT,
@@ -88,7 +90,7 @@ class Asynchronous(unittest.TestCase):
         slow_time = time.time()
         context_client.comment("Slow property arrived with good value at: " + str(slow_time))
 
-        if slow_time - fast_time < 2.0:
+        if slow_time - fast_time < 1.5:
             provider_slow.printio()
             context_client.printio()
             self.assert_(False,
