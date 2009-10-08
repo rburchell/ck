@@ -28,8 +28,17 @@
 #include <QDBusConnection>
 #include <QSet>
 #include <QString>
+#include <time.h>
 
 namespace ContextSubscriber {
+
+struct TimedValue
+{
+    struct timespec time;
+    QVariant value;
+    TimedValue(const QVariant &value);
+// future    bool operator<(const TimedValue &other);
+};
 
 class Provider : public QObject
 {
@@ -39,10 +48,11 @@ public:
     static Provider* instance(const QString &plugin, const QString& constructionString);
     bool subscribe(const QString &key);
     void unsubscribe(const QString &key);
+    TimedValue get(const QString &key) const;
 
 signals:
     void subscribeFinished(QString key);
-    void valueChanged(QString key, QVariant value);
+    void valueChanged(QString key);
 
 public:
     // Logging
@@ -59,9 +69,11 @@ public:
     static QStringList unsubscribeKeys;
     static QStringList unsubscribeProviderNames; // provider name of the object
     // on which it was called
+    static TimedValue cachedValue; // setValue sets, get gets
 
     // For tests
     Provider(QString name); // public only in tests
+    static void setValue(const QString &key, const QVariant &value);
     static void resetLogs();
     QString myName;
 

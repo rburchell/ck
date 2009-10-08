@@ -34,6 +34,11 @@
 
 namespace ContextSubscriber {
 
+TimedValue::TimedValue(const QVariant &value) : value(value)
+{
+    clock_gettime(CLOCK_MONOTONIC, &time);
+}
+
 /*!
   \class IProviderPlugin
   \brief Interface for provider plugins.
@@ -171,8 +176,8 @@ void Provider::constructPlugin()
     HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
     sconnect(plugin, SIGNAL(valueChanged(QString, QVariant)),
              this, SLOT(onPluginValueChanged(QString, QVariant)));
-    sconnect(this, SIGNAL(valueChanged(QString, QVariant)),
-             handleSignalRouter, SLOT(onValueChanged(QString, QVariant)));
+    sconnect(this, SIGNAL(valueChanged(QString)),
+             handleSignalRouter, SLOT(onValueChanged(QString)));
 
     sconnect(plugin, SIGNAL(ready()),
              this, SLOT(onPluginReady()));
@@ -333,10 +338,18 @@ void Provider::handleSubscribes()
 void Provider::onPluginValueChanged(QString key, QVariant newValue)
 {
     QMutexLocker lock(&subscribeLock);
-    if (subscribedKeys.contains(key))
-        emit valueChanged(key, newValue);
+    if (subscribedKeys.contains(key)) {
+        // FIXME: try out if everything works with lock.unlock() here
+        values.insert(key, TimedValue(newValue));
+        emit valueChanged(key);
+    }
     else
         contextWarning() << "Received a property not subscribed to:" << key;
+}
+
+TimedValue Provider::get(const QString &key) const
+{
+    return values.value(key, TimedValue(QVariant()));
 }
 
 /// Returns a singleton for the named \c plugin with the \c constructionString.

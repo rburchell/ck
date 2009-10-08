@@ -37,12 +37,12 @@ class PropertyHandle : public QObject
 
 public:
     static PropertyHandle* instance(const QString& key);
-    void setValue(QVariant newValue);
+    void onValueChanged();
     void setSubscribeFinished();
 
-    // For tests
 signals:
-    void setValueCalled(QString, QVariant);
+    // For tests
+    void onValueChangedCalled(QString);
     void setSubscribeFinishedCalled(QString);
 
 public:

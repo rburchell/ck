@@ -70,7 +70,7 @@ HandleSignalRouter* HandleSignalRouter::instance()
     return mockHandleSignalRouter;
 }
 
-void HandleSignalRouter::onValueChanged(QString key, QVariant value)
+void HandleSignalRouter::onValueChanged(QString key)
 {
 }
 
@@ -315,13 +315,14 @@ void ProviderUnitTests::pluginValueChanges()
     emit pluginInstances[conStr]->subscribeFinished("test.key1");
     QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents); // signal delivery is queued
 
-    QSignalSpy spy(provider, SIGNAL(valueChanged(QString, QVariant)));
+    QSignalSpy spy(provider, SIGNAL(valueChanged(QString)));
     emit pluginInstances[conStr]->valueChanged("test.key1", QVariant(42));
     emit pluginInstances[conStr]->valueChanged("test.key2", QVariant(4242));
 
-    QCOMPARE(spy.at(0).at(0).value<QString>(), QString("test.key1"));
-    QCOMPARE(spy.at(0).at(1).value<QVariant>(), QVariant(42));
     QCOMPARE(spy.size(), 1);
+    QCOMPARE(spy.at(0).size(), 1);
+    QCOMPARE(spy.at(0).at(0).value<QString>(), QString("test.key1"));
+    QCOMPARE(provider->get("test.key1").value, QVariant(42));
 }
 } // end namespace
 QTEST_MAIN(ContextSubscriber::ProviderUnitTests);

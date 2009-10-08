@@ -228,8 +228,11 @@ bool PropertyHandle::isSubscribePending() const
 /// checks are enabled.  The verification errors are signalled on the
 /// stderr.  After the check it updates the value and emits the
 /// valueChanged() signal.
-void PropertyHandle::setValue(QVariant newValue)
+void PropertyHandle::onValueChanged()
 {
+    // FIXME: implement multiprocess here
+    QVariant newValue = myProvider->get(myKey).value;
+
     if (typeCheckEnabled // type checks enabled
         && !newValue.isNull() // variable is non-null
         && myInfo->type() != "") { // the type is found in the registry
