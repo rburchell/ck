@@ -270,21 +270,23 @@ void ContextPropertyInfoUnitTest::typeChanged()
 
 void ContextPropertyInfoUnitTest::providerChanged()
 {
-    /*
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providerChanged(QString)));
 
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
-    QCOMPARE(spy.count(), 0);
+    QCOMPARE(spy.count(), 1);
+    spy.takeFirst();
 
-    constructionStringMap.insert("Battery.Charging", "system:org.freedesktop.ContextKit.robot");
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    ContextProviderInfo info;
+    info.plugin = "contextkit-dbus";
+    info.constructionString = "system:org.freedesktop.ContextKit.robot";
+    providerMap.insert("Battery.Charging", info);
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
     QCOMPARE(args.at(0).toString(), QString("org.freedesktop.ContextKit.robot"));
-    */
 }
 
 void ContextPropertyInfoUnitTest::providedChanged()
@@ -307,19 +309,22 @@ void ContextPropertyInfoUnitTest::providedChanged()
 
 void ContextPropertyInfoUnitTest::pluginChanged()
 {
-    /*
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy1(&p, SIGNAL(pluginChanged(QString, QString)));
     QSignalSpy spy2(&p, SIGNAL(providerChanged(QString)));
 
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
-    QCOMPARE(spy1.count(), 0);
-    QCOMPARE(spy2.count(), 0);
+    QCOMPARE(spy1.count(), 1);
+    spy1.takeFirst();
+    QCOMPARE(spy2.count(), 1);
+    spy2.takeFirst();
 
-    pluginMap.insert("Battery.Charging", "test.so");
-    constructionStringMap.insert("Battery.Charging", "secret:something");
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    ContextProviderInfo info;
+    info.plugin = "test.so";
+    info.constructionString = "secret:something";
+    providerMap.insert("Battery.Charging", info);
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> args1 = spy1.takeFirst();
@@ -329,25 +334,24 @@ void ContextPropertyInfoUnitTest::pluginChanged()
     QCOMPARE(spy2.count(), 1);
     QList<QVariant> args2 = spy2.takeFirst();
     QCOMPARE(args2.at(0).toString(), QString(""));
-    */
 }
 
 void ContextPropertyInfoUnitTest::dbusTypeChanged()
 {
-    /*
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providerDBusTypeChanged(QDBusConnection::BusType)));
 
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
+    QCOMPARE(spy.count(), 1);
+    spy.takeFirst();
 
-    QCOMPARE(spy.count(), 0);
+    ContextProviderInfo info;
+    info.plugin = "contextkit-dbus";
+    info.constructionString = "session:org.freedesktop.ContextKit.contextd";
+    providerMap.insert("Battery.Charging", info);
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
-    constructionStringMap.insert("Battery.Charging", "session:org.freedesktop.ContextKit.contextd");
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
-
-    // WE DON'T EMIT THE DBUS TYPE CHANGED ANYMORE!
-    QCOMPARE(spy.count(), 0);
-    */
+    QCOMPARE(spy.count(), 1);
 }
 
 #include "contextpropertyinfounittest.moc"
