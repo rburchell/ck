@@ -14,7 +14,8 @@ AM_CXXFLAGS = $(QtDBus_CFLAGS) -I$(srcdir)/../util/ \
 AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = contextpropertyinfo.cpp                   \
               contextpropertyinfo.h                     \
-              loggingfeatures.h
+              loggingfeatures.h                         \
+              contextproviderinfo.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
