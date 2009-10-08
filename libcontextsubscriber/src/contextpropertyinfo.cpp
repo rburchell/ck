@@ -238,7 +238,8 @@ QString ContextPropertyInfo::type() const
     return cachedType;
 }
 
-/// Returns true if the key exists in the registry.
+/// DEPRECATED Returns true if the key exists in the registry.
+/// This function is deprecated, use declared() instead.
 bool ContextPropertyInfo::exists() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::exists() is deprecated.";
@@ -246,6 +247,8 @@ bool ContextPropertyInfo::exists() const
     return cachedDeclared;
 }
 
+/// Returns true if the key is declared in the registry
+/// (it "exists").
 bool ContextPropertyInfo::declared() const
 {
     QMutexLocker lock(&cacheLock);
@@ -259,7 +262,8 @@ bool ContextPropertyInfo::provided() const
     return cachedProvided;
 }
 
-/// Returns the name of the plugin supplying this property
+/// DEPRECATED Returns the name of the plugin supplying this property.
+/// This function is deprecated, use listProviders() instead.
 QString ContextPropertyInfo::plugin() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::plugin() is deprecated.";
@@ -271,7 +275,8 @@ QString ContextPropertyInfo::plugin() const
         return cachedProviders.at(0).plugin;
 }
 
-/// Returns the construction parameter for the Provider supplying this property
+/// DEPRECATED Returns the construction parameter for the Provider supplying this property
+/// This function is deprecated, use listProviders() instead.
 QString ContextPropertyInfo::constructionString() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::constructionString() is deprecated.";
@@ -283,9 +288,9 @@ QString ContextPropertyInfo::constructionString() const
         return cachedProviders.at(0).constructionString;
 }
 
-/// Returns the dbus name of the provider supplying this
+/// DEPRECATED Returns the dbus name of the provider supplying this
 /// property/key. This function is maintained for backwards
-/// compatibility.
+/// compatibility. Use listProviders() instead.
 QString ContextPropertyInfo::providerDBusName() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusName() is deprecated.";
@@ -303,9 +308,9 @@ QString ContextPropertyInfo::providerDBusName() const
     }
 }
 
-/// Returns the bus type of the provider supplying this property/key.
+/// DEPRECATED Returns the bus type of the provider supplying this property/key.
 /// Ie. if it's a session bus or a system bus. This function is
-/// maintained for backwards compatibility.
+/// maintained for backwards compatibility. Use listProviders() instead.
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusType() is deprecated.";
@@ -328,7 +333,7 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 
 /* Slots */
 
-/// This slot is connected to the \a keyDataChanged signal of the
+/// This slot is connected to the \a keyChanged signal of the
 /// actual infobackend instance. It's executed on every change to any
 /// of the keys. We first check if the data concerns us. Next we
 /// update the cached values and fire the actual signals.
@@ -362,12 +367,15 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
     emit pluginChanged(plugin(), constructionString());
 }
 
+/// Returns a list of providers that provide this key.
 const QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
 {
     QMutexLocker lock(&cacheLock);
     return cachedProviders;
 }
 
+/// Called when people connect to signals. Used to emit deprecation warnings
+/// when people connect to deprecated signals.
 void ContextPropertyInfo::connectNotify(const char *signal)
 {
     QObject::connectNotify(signal);

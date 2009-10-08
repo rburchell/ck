@@ -102,7 +102,7 @@ QStringList ContextRegistryInfo::listKeys(QString providerName) const
     return keys.toList();
 }
 
-/// Returns the list of all the keys associated with the given plugin
+/// DEPRECATED Returns the list of all the keys associated with the given plugin.
 QStringList ContextRegistryInfo::listKeysForPlugin(QString plugin) const
 {
     contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listKeysForPlugin() is deprecated.";
@@ -121,7 +121,7 @@ QStringList ContextRegistryInfo::listKeysForPlugin(QString plugin) const
     return keys.toList();
 }
 
-/// Returns the list of all unique providers in the registry.
+/// DEPRECATED Returns the list of all unique providers in the registry.
 /// The lists consist of strings with dbus names of the providers.
 QStringList ContextRegistryInfo::listProviders() const
 {
@@ -140,7 +140,7 @@ QStringList ContextRegistryInfo::listProviders() const
     return providers.toList();
 }
 
-/// Returns the list of all unique plugins in the registry.
+/// DEPRECATED Returns the list of all unique plugins in the registry.
 QStringList ContextRegistryInfo::listPlugins() const
 {
     contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listPlugins() is deprecated.";
@@ -164,24 +164,29 @@ QString ContextRegistryInfo::backendName() const
 
 /* Slots */
 
-/// This is connected to the \a onKeysChanged of the actual info backend instance.
+/// This is connected to the \a keysChanged of the actual info backend instance.
+/// Will be removed when deprecated keysChanged() signal is removed.
 void ContextRegistryInfo::onKeysChanged(const QStringList& currentKeys)
 {
     emit(keysChanged(currentKeys));
 }
 
-/// This is connected to the \a onKeysAdded of the actual info backend instance.
+/// This is connected to the \a keysAdded of the actual info backend instance.
+/// Will be removed when deprecated keysAdded() signal is removed.
 void ContextRegistryInfo::onKeysAdded(const QStringList& newKeys)
 {
     emit(keysAdded(newKeys));
 }
 
-/// This is connected to the \a onKeysRemoved of the actual info backend instance.
+/// This is connected to the \a keysRemoved of the actual info backend instance.
+/// Will be removed when deprecated keysRemoved() signal is removed.
 void ContextRegistryInfo::onKeysRemoved(const QStringList& removedKeys)
 {
     emit(keysRemoved(removedKeys));
 }
 
+/// Called when people connect to signals. Used to emit deprecation warnings
+/// when people connect to deprecated signals.
 void ContextRegistryInfo::connectNotify(const char *signal)
 {
     QObject::connectNotify(signal);
@@ -194,6 +199,8 @@ void ContextRegistryInfo::connectNotify(const char *signal)
         contextWarning() << F_DEPRECATION << "ContextRegistryInfo::keysRemoved signal is deprecated.";
 }
 
+/// This is connected to the \a listChanged of the actual info backend instance.
+/// Gets called when the list of keys changes.
 void ContextRegistryInfo::onListChanged()
 {
     emit changed();
