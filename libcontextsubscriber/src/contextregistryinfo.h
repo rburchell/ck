@@ -50,6 +50,10 @@ private:
     /// Mutex protected during creation.
     static ContextRegistryInfo* registryInstance;
 
+protected:
+    void connectNotify(const char *signal);
+
+
 private slots:
     void onKeysChanged(const QStringList& currentKeys);
     void onKeysAdded(const QStringList& newKeys);

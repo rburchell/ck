@@ -179,3 +179,15 @@ void ContextRegistryInfo::onKeysRemoved(const QStringList& removedKeys)
     emit(keysRemoved(removedKeys));
 }
 
+void ContextRegistryInfo::connectNotify(const char *signal)
+{
+    QObject::connectNotify(signal);
+
+    if (signal == SIGNAL(keysChanged(QStringList)))
+        contextWarning() << F_DEPRECATION << "ContextRegistryInfo::keysChanged signal is deprecated.";
+    else if (signal == SIGNAL(keysAdded(QStringList)))
+        contextWarning() << F_DEPRECATION << "ContextRegistryInfo::keysAdded signal is deprecated.";
+    else if (signal == SIGNAL(keysRemoved(QStringList)))
+        contextWarning() << F_DEPRECATION << "ContextRegistryInfo::keysRemoved signal is deprecated.";
+}
+
