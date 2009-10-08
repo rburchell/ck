@@ -52,31 +52,21 @@ QStringList InfoBackend::listKeys() const
     return l;
 }
 
-QStringList InfoBackend::listKeysForPlugin(QString plugin) const
+const QList<ContextProviderInfo> InfoBackend::listProviders(QString key)
 {
-    if (plugin == "contextkit-dbus") {
-        QStringList l;
-        l << QString("Battery.Charging");
-        l << QString("Media.NowPlaying");
-        return l;
-    } else
-        return QStringList();
-}
+    QList<ContextProviderInfo> lst;
+    ContextProviderInfo info;
+    info.plugin = "contextkit-dbus";
 
-QStringList InfoBackend::listPlugins() const
-{
-    QStringList l;
-    l << QString("contextkit-dbus");
-    return l;
-}
+    if (key == "Battery.Charging") {
+        info.constructionString = "system:org.freedesktop.ContextKit.contextd";
+        lst << info;
+    } else if (key == "Media.NowPlaying") {
+        info.constructionString = "system:com.nokia.musicplayer";
+        lst << info;
+    }
 
-QString InfoBackend::constructionStringForKey(QString key) const
-{
-    if (key == "Battery.Charging")
-        return "system:org.freedesktop.ContextKit.contextd";
-    else if (key == "Media.NowPlaying")
-        return "system:com.nokia.musicplayer";
-    return QString();
+    return lst;
 }
 
 void InfoBackend::fireKeysChanged(const QStringList& keys)
@@ -92,6 +82,11 @@ void InfoBackend::fireKeysAdded(const QStringList& keys)
 void InfoBackend::fireKeysRemoved(const QStringList& keys)
 {
     emit keysRemoved(keys);
+}
+
+void InfoBackend::fireListChanged()
+{
+    emit listChanged();
 }
 
 /* ContextRegistryInfoUnitTest */
@@ -173,6 +168,7 @@ void ContextRegistryInfoUnitTest::signalling()
     QSignalSpy spy1(registry, SIGNAL(keysChanged(QStringList)));
     QSignalSpy spy2(registry, SIGNAL(keysAdded(QStringList)));
     QSignalSpy spy3(registry, SIGNAL(keysRemoved(QStringList)));
+    QSignalSpy spy4(registry, SIGNAL(changed()));
 
     QStringList keys;
     keys << QString("Battery.Charging");
@@ -192,6 +188,9 @@ void ContextRegistryInfoUnitTest::signalling()
     QCOMPARE(spy3.count(), 1);
     QList<QVariant> args3 = spy3.takeFirst();
     QCOMPARE(args3.at(0).toStringList(), keys);
+
+    currentBackend->fireListChanged();
+    QCOMPARE(spy4.count(), 1);
 }
 
 #include "contextregistryinfounittest.moc"
