@@ -125,6 +125,7 @@ private slots:
     void doc();
     void type();
     void exists();
+    void declared();
     void provided();
     void providerDBusName();
     void providerDBusType();
@@ -198,6 +199,16 @@ void ContextPropertyInfoUnitTest::exists()
     QCOMPARE(p1.exists(), true);
     QCOMPARE(p2.exists(), true);
     QCOMPARE(p3.exists(), false);
+}
+
+void ContextPropertyInfoUnitTest::declared()
+{
+    ContextPropertyInfo p1("Battery.Charging");
+    ContextPropertyInfo p2("Media.NowPlaying");
+    ContextPropertyInfo p3("Does.Not.Exist");
+    QCOMPARE(p1.declared(), true);
+    QCOMPARE(p2.declared(), true);
+    QCOMPARE(p3.declared(), false);
 }
 
 void ContextPropertyInfoUnitTest::provided()
