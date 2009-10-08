@@ -67,6 +67,9 @@ ContextRegistryInfo* ContextRegistryInfo::instance(const QString &backendName)
         sconnect(infoBackend, SIGNAL(keysRemoved(QStringList)),
                  registryInstance, SLOT(onKeysRemoved(QStringList)));
 
+        sconnect(infoBackend, SIGNAL(listChanged()),
+                 registryInstance, SLOT(onListChanged()));
+
         // Move the backend to the main thread
         registryInstance->moveToThread(QCoreApplication::instance()->thread());
     }
@@ -191,3 +194,7 @@ void ContextRegistryInfo::connectNotify(const char *signal)
         contextWarning() << F_DEPRECATION << "ContextRegistryInfo::keysRemoved signal is deprecated.";
 }
 
+void ContextRegistryInfo::onListChanged()
+{
+    emit changed();
+}

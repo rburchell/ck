@@ -58,6 +58,7 @@ private slots:
     void onKeysChanged(const QStringList& currentKeys);
     void onKeysAdded(const QStringList& newKeys);
     void onKeysRemoved(const QStringList& removedKeys);
+    void onListChanged();
 
 signals:
     /// Emitted when the registry changes. For performance reasons
@@ -76,6 +77,8 @@ signals:
     /// The list contains only the removed keys.
     /// \param removedKeys The list of removed keys.
     void keysRemoved(const QStringList& removedKeys);
+
+    void changed();
 };
 
 #endif
