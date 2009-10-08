@@ -54,6 +54,7 @@ public:
     /// property which nobody provides currently)
     virtual bool keyProvided(QString key) const = 0;
 
+    /// Returns a list of providers for the given key.
     virtual const QList<ContextProviderInfo> listProviders(QString key) const = 0;
 
 signals:
