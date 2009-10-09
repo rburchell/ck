@@ -3,9 +3,9 @@
 # seconds, but coverage build is slow, so we only build coverage for
 # customer tests, not always.
 
-# If you want to build a libcontextsubscriber with coverage support,
+# If you want to build a libcontextprovider with coverage support,
 # you have to run make in this directory, the output is in
-# .libs/libcontextsubscriber.so.0.0.0
+# .libs/libcontextprovider.so.0.0.0
 
 all: clean-orig Makefile.coverage
 	make -C ../../../common   # redo it now, so it won't be rebuilt with coverage
