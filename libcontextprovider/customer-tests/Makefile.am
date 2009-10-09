@@ -5,7 +5,7 @@ coverage: covoptioncheck
 .PHONY: coverage
 
 clean-local:
-	$(MAKE) -C coverage-build clean
+	-$(MAKE) -C coverage-build clean
 	rm -rf coverage
 
 check-customer:
@@ -14,6 +14,6 @@ check-customer:
 libcontextprovidertestsdir = $(datadir)/libcontextprovider-tests
 libcontextprovidertests_DATA = tests.xml
 
-EXTRA_DIST = tests.xml
+EXTRA_DIST = tests.xml coverage-build
 
 include $(top_srcdir)/am/covoptioncheck.am

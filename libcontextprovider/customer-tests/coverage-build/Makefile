@@ -8,8 +8,8 @@
 # .libs/libcontextprovider.so.0.0.0
 
 all: clean-orig Makefile.coverage
-	make -C ../../../common   # redo it now, so it won't be rebuilt with coverage
-	make -f Makefile.coverage VPATH=../../src CXXFLAGS=--coverage
+	$(MAKE) -C ../../../common   # redo it now, so it won't be rebuilt with coverage
+	$(MAKE) -f Makefile.coverage VPATH=../../src CXXFLAGS=--coverage
 
 Makefile.coverage: ../../src/Makefile clean-orig
 	cat $< | sed 's,^srcdir =.*,srcdir = ../../src, ; s,^top_builddir =.*,top_builddir = ../../.., ; s,^top_srcdir =.*,top_srcdir = ../../..,' >$@
@@ -17,11 +17,11 @@ Makefile.coverage: ../../src/Makefile clean-orig
 	cp -av ../../src/.deps .
 
 clean: clean-orig
-	make -f Makefile.coverage clean
+	-$(MAKE) -f Makefile.coverage clean
 	rm -f *.gcno
 	rm -rf .deps
 	rm -rf .libs
 	rm -f Makefile.coverage
 
 clean-orig:
-	make -C ../../src clean
+	$(MAKE) -C ../../src clean

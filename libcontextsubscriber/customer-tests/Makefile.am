@@ -13,13 +13,13 @@ check-customer:
 	./runTests.sh
 
 clean-local:
-	$(MAKE) -C coverage-build clean
+	-$(MAKE) -C coverage-build clean
 	rm -rf coverage
 
 CLEANFILES = *.pyc
 
 EXTRA_DIST = asynchronicity commander subscription runTests.sh	\
              tests.xml common registry pluginchanging		\
-             coverage-build/Makefile
+             coverage-build
 
 include $(top_srcdir)/am/covoptioncheck.am
