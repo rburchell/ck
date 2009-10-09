@@ -8,6 +8,7 @@ then
     export LD_LIBRARY_PATH=../coverage-build/.libs:$LD_LIBRARY_PATH
     rm -rf coverage-build/.libs/*.gcda
 else
+    export LD_LIBRARY_PATH=../../src/.libs:$LD_LIBRARY_PATH
     make -C ../src
 fi
 
