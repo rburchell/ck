@@ -114,7 +114,7 @@ bool InfoXmlBackend::keyProvided(QString key) const
     if (keyDataHash.contains(key) == false)
         return false;
 
-    if (keyDataHash.value(key).plugin != "")
+    if (keyProvidersHash.value(key).count() > 0)
         return true;
 
     return false;
@@ -370,6 +370,8 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
 
 const QList<ContextProviderInfo> InfoXmlBackend::listProviders(QString key) const
 {
+    return keyProvidersHash.value(key);
+    /*
     QList<ContextProviderInfo> lst;
 
     if (! keyDataHash.contains(key))
@@ -381,5 +383,6 @@ const QList<ContextProviderInfo> InfoXmlBackend::listProviders(QString key) cons
 
     lst << info;
     return lst;
+    */
 }
 
