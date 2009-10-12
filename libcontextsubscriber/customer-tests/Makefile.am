@@ -4,12 +4,10 @@ libcontextsubscribertestsdir = $(datadir)/libcontextsubscriber-tests
 libcontextsubscribertests_DATA = tests.xml
 
 coverage: covoptioncheck
-	$(MAKE) -C $(top_srcdir) all
 	COVERAGE=1 ./runTests.sh
 .PHONY: coverage
 
 check-customer:
-	$(MAKE) -C $(top_srcdir) all
 	./runTests.sh
 
 clean-local:

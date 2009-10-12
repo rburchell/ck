@@ -2,6 +2,8 @@
 
 DIRS="subscription value-changes types c-api"
 
+make -C client
+
 if [ -n "$COVERAGE" ]
 then
     make -C coverage-build

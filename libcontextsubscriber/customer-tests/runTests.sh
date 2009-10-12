@@ -4,6 +4,12 @@ cd $(dirname $0)
 DIRS="commander subscription asynchronicity registry pluginchanging"
 . ./env.sh
 
+make -C ../../libcontextprovider/src
+make -C ../../libcontextprovider/context-provide
+make -C ../cli
+make -C ../reg-cli
+make -C ../update-contextkit-providers
+
 if [ -n "$COVERAGE" ]
 then
     make -C coverage-build
