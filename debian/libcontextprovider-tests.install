@@ -1,6 +1,6 @@
 usr/share/libcontextprovider-tests/tests.xml
-usr/bin/libcontextprovider-tests/client
-usr/bin/libcontextprovider-tests/cprovidertests
-usr/bin/libcontextprovider-tests/subscriptiontests
-usr/bin/libcontextprovider-tests/typestests
-usr/bin/libcontextprovider-tests/valuechangestests
+usr/lib/libcontextprovider-tests/client
+usr/lib/libcontextprovider-tests/cprovidertests
+usr/lib/libcontextprovider-tests/subscriptiontests
+usr/lib/libcontextprovider-tests/typestests
+usr/lib/libcontextprovider-tests/valuechangestests
