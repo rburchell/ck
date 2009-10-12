@@ -62,11 +62,6 @@ public:
         return false;
     }
 
-    bool keyProvided(QString key) const
-    {
-        return false;
-    }
-
     const QList<ContextProviderInfo> listProviders(QString key) const
     {
         return QList<ContextProviderInfo> ();

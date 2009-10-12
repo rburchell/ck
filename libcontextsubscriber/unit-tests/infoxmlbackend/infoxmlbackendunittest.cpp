@@ -40,7 +40,6 @@ private slots:
     void typeForKey();
     void docForKey();
     void keyDeclared();
-    void keyProvided();
     void listProviders();
     void dynamics();
     void cleanupTestCase();
@@ -133,14 +132,6 @@ void InfoXmlBackendUnitTest::paths()
 {
     QCOMPARE(InfoXmlBackend::registryPath(), QString("./"));
     QCOMPARE(InfoXmlBackend::coreDeclPath(), QString("/dev/null"));
-}
-
-void InfoXmlBackendUnitTest::keyProvided()
-{
-    foreach (QString key, backend->listKeys())
-        QVERIFY(backend->keyProvided(key) == true);
-
-    QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
 }
 
 void InfoXmlBackendUnitTest::listProviders()

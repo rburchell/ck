@@ -27,7 +27,6 @@
 QMap <QString, ContextProviderInfo> providerMap;
 QMap <QString, QString> typeMap;
 QMap <QString, QString> docMap;
-QMap <QString, bool> providedMap;
 
 /* Mocked infobackend */
 
@@ -74,15 +73,6 @@ const QList<ContextProviderInfo> InfoBackend::listProviders(QString key)
         lst << providerMap.value(key);
 
     return lst;
-}
-
-
-bool InfoBackend::keyProvided(QString key) const
-{
-    if (providedMap.contains(key))
-        return providedMap.value(key);
-    else
-        return false;
 }
 
 void InfoBackend::connectNotify(const char *signal)
@@ -159,10 +149,6 @@ void ContextPropertyInfoUnitTest::initTestCase()
     docMap.clear();
     docMap.insert("Battery.Charging", "Battery.Charging doc");
     docMap.insert("Media.NowPlaying", "Media.NowPlaying doc");
-
-    providedMap.clear();
-    providedMap.insert("Battery.Charging", true);
-    providedMap.insert("Media.NowPlaying", true);
 }
 
 void ContextPropertyInfoUnitTest::key()
@@ -310,7 +296,7 @@ void ContextPropertyInfoUnitTest::providedChanged()
     QCOMPARE(spy.count(), 1);
     spy.takeFirst();
 
-    providedMap.insert("Battery.Charging", false);
+    providerMap.remove("Battery.Charging");
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy.count(), 1);

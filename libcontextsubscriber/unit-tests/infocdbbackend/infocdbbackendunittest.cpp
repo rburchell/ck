@@ -42,7 +42,6 @@ private slots:
     void typeForKey();
     void docForKey();
     void keyDeclared();
-    void keyProvided();
     void listProviders();
     void dynamics();
     void removed();
@@ -160,14 +159,6 @@ void InfoCdbBackendUnitTest::keyDeclared()
     QCOMPARE(backend->keyDeclared("Battery.Charging"), true);
 }
 
-void InfoCdbBackendUnitTest::keyProvided()
-{
-    foreach (QString key, backend->listKeys())
-        QVERIFY(backend->keyProvided(key) == true);
-
-    QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
-}
-
 void InfoCdbBackendUnitTest::listProviders()
 {
     QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
@@ -201,8 +192,6 @@ void InfoCdbBackendUnitTest::dynamics()
     QVERIFY(backend->listKeys().contains("Battery.Capacity"));
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
     QCOMPARE(backend->docForKey("Battery.Charging"), QString("doc1"));
-    QVERIFY(backend->keyProvided("Battery.Charging") == true);
-    QVERIFY(backend->keyProvided("Internet.BytesOut") == false);
 
     // Test emissions
     QCOMPARE(spy1.count(), 1);
