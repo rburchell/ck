@@ -92,14 +92,6 @@ bool InfoCdbBackend::keyDeclared(QString key) const
         return false;
 }
 
-bool InfoCdbBackend::keyProvided(QString key) const
-{
-    if (listProviders(key).count() > 0)
-        return true;
-    else
-        return false;
-}
-
 /// Returns true if the database file is present.
 bool InfoCdbBackend::databaseExists()
 {

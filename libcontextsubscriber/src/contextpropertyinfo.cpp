@@ -211,7 +211,6 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
         cachedType = infoBackend->typeForKey(keyName);
         cachedDoc = infoBackend->docForKey(keyName);
         cachedDeclared = infoBackend->keyDeclared(keyName);
-        cachedProvided = infoBackend->keyProvided(keyName);
         cachedProviders = infoBackend->listProviders(keyName);
     }
 }
@@ -258,7 +257,7 @@ bool ContextPropertyInfo::declared() const
 bool ContextPropertyInfo::provided() const
 {
     QMutexLocker lock(&cacheLock);
-    return cachedProvided;
+    return (cachedProviders.size() > 0);
 }
 
 /// DEPRECATED Returns the name of the plugin supplying this property.
@@ -347,7 +346,6 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
     QString cachedType = InfoBackend::instance()->typeForKey(keyName);
     cachedDoc = InfoBackend::instance()->docForKey(keyName);
     cachedDeclared = InfoBackend::instance()->keyDeclared(keyName);
-    cachedProvided = InfoBackend::instance()->keyProvided(keyName);
     cachedProviders = InfoBackend::instance()->listProviders(keyName);
 
     // Release the lock before emitting the signals; otherwise
@@ -359,7 +357,7 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
     emit changed(keyName);
     emit typeChanged(cachedType);
     emit existsChanged(cachedDeclared);
-    emit providedChanged(cachedProvided);
+    emit providedChanged((cachedProviders.size() > 0));
 
     emit providerChanged(providerDBusName());
     emit providerDBusTypeChanged(providerDBusType());
