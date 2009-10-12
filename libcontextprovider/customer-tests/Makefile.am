@@ -14,6 +14,6 @@ check-customer:
 libcontextprovidertestsdir = $(datadir)/libcontextprovider-tests
 libcontextprovidertests_DATA = tests.xml
 
-EXTRA_DIST = tests.xml coverage-build
+EXTRA_DIST = tests.xml coverage-build runTests.sh
 
 include $(top_srcdir)/am/covoptioncheck.am
