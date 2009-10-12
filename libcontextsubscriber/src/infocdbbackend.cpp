@@ -94,11 +94,10 @@ bool InfoCdbBackend::keyDeclared(QString key) const
 
 bool InfoCdbBackend::keyProvided(QString key) const
 {
-    QString plugin = reader.valueForKey(key + ":KEYPLUGIN").toString();
-    if (plugin == "")
+    if (listProviders(key).count() > 0)
+        return true;
+    else
         return false;
-
-    return true;
 }
 
 /// Returns true if the database file is present.
@@ -201,12 +200,13 @@ void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
 
 const QList<ContextProviderInfo> InfoCdbBackend::listProviders(QString key) const
 {
-    ContextProviderInfo info;
-    info.plugin = reader.valueForKey(key + ":KEYPLUGIN").toString();
-    info.constructionString = reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING").toString();
-
+    QList<QVariant> providers = reader.valuesForKey(key + ":PROVIDERS");
     QList<ContextProviderInfo> lst;
-    if (info.plugin != "") {
+
+    foreach (QVariant variant, providers) {
+        ContextProviderInfo info;
+        info.plugin = variant.toHash().value("plugin").toString();
+        info.plugin = variant.toHash().value("constructionString").toString();
         lst << info;
     }
 
