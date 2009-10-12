@@ -79,7 +79,7 @@
 
     You can use this functionality to wait for keys to become available in the registry.
     Just create a ContextPropertyInfo for a key that you're expecting to become present
-    and connect to the /c changed signal.
+    and connect to the \c changed signal.
 
     \code
     ContextPropertyInfo propInfo("Something.That.Doesnt.Exist");

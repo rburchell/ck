@@ -62,7 +62,7 @@ private:
     QString cachedType; ///< Cached (stored) type of the key.
     bool cachedDeclared; ///< Cached state of the key (existance).
     bool cachedProvided; ///< Cached state of the key (whether someone provides it).
-    QList <ContextProviderInfo> cachedProviders; ///< Cached list of providers for this key.
+    QList<ContextProviderInfo> cachedProviders; ///< Cached list of providers for this key.
     mutable QMutex cacheLock; ///< Lock for the cache.
 
 private slots:
