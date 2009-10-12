@@ -68,6 +68,21 @@ void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
     writer.add("Battery.Charging:KEYPLUGIN", "contextkit-dbus");
     writer.add("Battery.Charging:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
     writer.add("Internet.BytesOut:KEYCONSTRUCTIONSTRING", "session:org.freedesktop.ContextKit.contextd2");
+
+    QVariantList providers1;
+    QHash <QString, QVariant> provider1;
+    provider1.insert("plugin", "contextkit-dbus");
+    provider1.insert("constructionString", "system:org.freedesktop.ContextKit.contextd1");
+    providers1 << QVariant(provider1);
+    writer.add("Battery.Charging:PROVIDERS", QVariant(providers1));
+
+    QVariantList providers2;
+    QHash <QString, QVariant> provider2;
+    provider2.insert("plugin", "contextkit-dbus");
+    provider2.insert("constructionString", "session:org.freedesktop.ContextKit.contextd2");
+    providers2 << QVariant(provider2);
+    writer.add("Internet.BytesOut:PROVIDERS", QVariant(providers2));
+
     writer.close();
 }
 
@@ -91,6 +106,21 @@ void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
     writer.add("Battery.Capacity:KEYDOC", "doc3");
     writer.add("Battery.Capacity:KEYPLUGIN", "contextkit-dbus");
     writer.add("Battery.Capacity:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
+
+    QVariantList providers1;
+    QHash <QString, QVariant> provider1;
+    provider1.insert("plugin", "contextkit-dbus");
+    provider1.insert("constructionString", "system:org.freedesktop.ContextKit.contextd1");
+    providers1 << QVariant(provider1);
+    writer.add("Battery.Charging:PROVIDERS", QVariant(providers1));
+
+    QVariantList providers2;
+    QHash <QString, QVariant> provider2;
+    provider2.insert("plugin", "contextkit-dbus");
+    provider2.insert("constructionString", "system:org.freedesktop.ContextKit.contextd1");
+    providers2 << QVariant(provider2);
+    writer.add("Battery.Capacity:PROVIDERS", providers2);
+
     writer.close();
 }
 
@@ -228,8 +258,8 @@ void InfoCdbBackendUnitTest::removed()
 
 void InfoCdbBackendUnitTest::cleanupTestCase()
 {
-     QFile::remove("cache.cdb");
-     QFile::remove("cache-next.cdb");
+    QFile::remove("cache.cdb");
+    QFile::remove("cache-next.cdb");
 }
 
 #include "infocdbbackendunittest.moc"
