@@ -19,7 +19,7 @@ clean-local:
 CLEANFILES = *.pyc
 
 EXTRA_DIST = asynchronicity commander subscription runTests.sh	\
-             tests.xml common registry pluginchanging		\
+             tests.xml common registry pluginchanging env.sh	\
              coverage-build
 
 include $(top_srcdir)/am/covoptioncheck.am
