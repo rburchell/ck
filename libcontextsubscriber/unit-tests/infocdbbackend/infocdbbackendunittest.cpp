@@ -58,16 +58,9 @@ void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Internet.BytesOut");
-    writer.add("PLUGINS", "contextkit-dbus");
-    writer.add("contextkit-dbus:KEYS", "Battery.Charging");
-    writer.add("contextkit-dbus:KEYS", "Internet.BytesOut");
     writer.add("Battery.Charging:KEYTYPE", "TRUTH");
     writer.add("Internet.BytesOut:KEYTYPE", "INTEGER");
     writer.add("Battery.Charging:KEYDOC", "doc1");
-    writer.add("Internet.BytesOut:KEYPLUGIN", "contextkit-dbus");
-    writer.add("Battery.Charging:KEYPLUGIN", "contextkit-dbus");
-    writer.add("Battery.Charging:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
-    writer.add("Internet.BytesOut:KEYCONSTRUCTIONSTRING", "session:org.freedesktop.ContextKit.contextd2");
 
     QVariantList providers1;
     QHash <QString, QVariant> provider1;
@@ -95,17 +88,10 @@ void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Battery.Capacity");
-    writer.add("PLUGINS", "contextkit-dbus");
-    writer.add("contextkit-dbus:KEYS", "Battery.Charging");
-    writer.add("contextkit-dbus:KEYS", "Battery.Capacity");
     writer.add("Battery.Charging:KEYTYPE", "INTEGER");
     writer.add("Battery.Charging:KEYDOC", "doc1");
-    writer.add("Battery.Charging:KEYPLUGIN", "contextkit-dbus");
-    writer.add("Battery.Charging:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
     writer.add("Battery.Capacity:KEYTYPE", "INTEGER");
     writer.add("Battery.Capacity:KEYDOC", "doc3");
-    writer.add("Battery.Capacity:KEYPLUGIN", "contextkit-dbus");
-    writer.add("Battery.Capacity:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
 
     QVariantList providers1;
     QHash <QString, QVariant> provider1;
