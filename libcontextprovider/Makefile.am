@@ -8,6 +8,7 @@ check-sum:
 
 coverage: covoptioncheck
 	$(MAKE) -C unit-tests coverage
+	$(MAKE) -C customer-tests coverage
 
 check-customer:
 	$(MAKE) -C customer-tests check-customer
