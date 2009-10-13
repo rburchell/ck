@@ -28,6 +28,7 @@
 #include <QStringList>
 #include <QObject>
 #include <QDBusConnection>
+#include "contextproviderinfo.h"
 
 class ContextPropertyInfo : public QObject
 {
@@ -38,21 +39,12 @@ public:
 
     QString type() const;
 
-    bool exists() const;
     bool provided() const;
-    QString plugin() const;
-    QString constructionString() const;
-
-    QString providerDBusName() const;
-    QDBusConnection::BusType providerDBusType() const;
+    bool declared() const;
+    QList<ContextProviderInfo> listProviders() const;
 
 signals:
-    void providerChanged(QString newProvider);
-    void providerDBusTypeChanged(QDBusConnection::BusType newBusType);
-    void typeChanged(QString newType);
-    void existsChanged(bool exists);
-    void providedChanged(bool provided);
-    void pluginChanged(QString, QString);
+    void changed(QString);
 
 public:
     // For the test program

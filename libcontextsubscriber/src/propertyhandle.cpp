@@ -24,6 +24,7 @@
 #include "sconnect.h"
 #include "contextpropertyinfo.h"
 #include "contextregistryinfo.h"
+#include "contextproviderinfo.h"
 #include "dbusnamelistener.h"
 #include "logging.h"
 #include "loggingfeatures.h"

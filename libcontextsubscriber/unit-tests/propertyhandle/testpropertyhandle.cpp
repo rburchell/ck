@@ -52,24 +52,17 @@ QString ContextPropertyInfo::type() const
     return myType;
 }
 
-bool ContextPropertyInfo::exists() const
-{
-    return myType != "";
-}
-
 bool ContextPropertyInfo::provided() const
 {
     return true;
 }
 
-QString ContextPropertyInfo::plugin() const
+QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
 {
-    return "fakeplugin";
-}
-
-QString ContextPropertyInfo::constructionString() const
-{
-    return "fakeconstructionstring";
+    ContextProviderInfo info;
+    info.plugin = "fakeplugin";
+    info.constructionString = "fakeconstructionstring";
+    return QList<ContextProviderInfo>() << info;
 }
 
 // Mock implementation of the ContextRegistryInfo
