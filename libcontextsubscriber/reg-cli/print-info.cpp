@@ -29,7 +29,7 @@ int main(int argc, char **argv)
         out << "Existence: " << (declared ? "true" : "false")  << endl;
         if (declared) {
 
-            foreach(ContextProviderInfo prov, info->listProviders())
+            foreach(ContextProviderInfo prov, info->providers())
                 out << "Proivder: " << prov.plugin << " (" << prov.constructionString << ")" << endl;
 
             out << "Documentation: " << info->doc() << endl;

@@ -138,7 +138,7 @@ int main(int argc, char **argv)
 
         // Write the providers
         QVariantList providers;
-        foreach(const ContextProviderInfo info, keyInfo.listProviders()) {
+        foreach(const ContextProviderInfo info, keyInfo.providers()) {
             QHash <QString, QVariant> provider;
             provider.insert("plugin", info.plugin);
             provider.insert("constructionString", info.constructionString);

@@ -177,7 +177,7 @@ void CommandWatcher::interpret(const QString& command) const
         } else if (QString("plugin").startsWith(commandName)) {
             QString key = args[0];
             if (properties->contains(key)) {
-                QList<ContextProviderInfo> providers = properties->value(key)->info()->listProviders();
+                QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
                 if (providers.size() > 0)
                     out << "plugin: " << providers.at(0).plugin;
                 else
@@ -187,7 +187,7 @@ void CommandWatcher::interpret(const QString& command) const
         } else if (QString("constructionstring").startsWith(commandName)) {
             QString key = args[0];
             if (properties->contains(key)) {
-                QList<ContextProviderInfo> providers = properties->value(key)->info()->listProviders();
+                QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
                 if (providers.size() > 0)
                     out << "constructionstring: " << providers.at(0).constructionString;
                 else
@@ -197,7 +197,7 @@ void CommandWatcher::interpret(const QString& command) const
         } else if (QString("providers").startsWith(commandName)) {
             QString key = args[0];
             if (properties->contains(key)) {
-                QList<ContextProviderInfo> providers = properties->value(key)->info()->listProviders();
+                QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
                 foreach(ContextProviderInfo info, providers)
                     out << "Provider:" << info.plugin << ":" << info.constructionString;
             } else

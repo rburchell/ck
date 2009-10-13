@@ -261,7 +261,7 @@ bool ContextPropertyInfo::provided() const
 }
 
 /// DEPRECATED Returns the name of the plugin supplying this property.
-/// This function is deprecated, use listProviders() instead.
+/// This function is deprecated, use providers() instead.
 QString ContextPropertyInfo::plugin() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::plugin() is deprecated.";
@@ -274,7 +274,7 @@ QString ContextPropertyInfo::plugin() const
 }
 
 /// DEPRECATED Returns the construction parameter for the Provider supplying this property
-/// This function is deprecated, use listProviders() instead.
+/// This function is deprecated, use providers() instead.
 QString ContextPropertyInfo::constructionString() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::constructionString() is deprecated.";
@@ -288,7 +288,7 @@ QString ContextPropertyInfo::constructionString() const
 
 /// DEPRECATED Returns the dbus name of the provider supplying this
 /// property/key. This function is maintained for backwards
-/// compatibility. Use listProviders() instead.
+/// compatibility. Use providers() instead.
 QString ContextPropertyInfo::providerDBusName() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusName() is deprecated.";
@@ -308,7 +308,7 @@ QString ContextPropertyInfo::providerDBusName() const
 
 /// DEPRECATED Returns the bus type of the provider supplying this property/key.
 /// Ie. if it's a session bus or a system bus. This function is
-/// maintained for backwards compatibility. Use listProviders() instead.
+/// maintained for backwards compatibility. Use providers() instead.
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusType() is deprecated.";
@@ -365,7 +365,7 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
 }
 
 /// Returns a list of providers that provide this key.
-const QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
+const QList<ContextProviderInfo> ContextPropertyInfo::providers() const
 {
     QMutexLocker lock(&cacheLock);
     return cachedProviders;

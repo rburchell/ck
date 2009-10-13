@@ -53,7 +53,7 @@ public:
 
     QString plugin() const;
     QString constructionString() const;
-    virtual const QList<ContextProviderInfo> listProviders() const;
+    virtual const QList<ContextProviderInfo> providers() const;
     ResolutionStrategy resolutionStrategy() const;
 
 protected:
