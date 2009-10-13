@@ -30,23 +30,14 @@ function dotest {
     querydb "KEYS" "KEYS"
     compare "KEYS.expected" "KEYS.actual"
 
-    querydb "PLUGINS" "PLUGINS"
-    compare "PLUGINS.expected" "PLUGINS.actual"
-
-    querydb "contextkit-dbus:KEYS" "contextkit-dbus_KEYS"
-    compare "contextkit-dbus_KEYS.expected" "contextkit-dbus_KEYS.actual"
-
     querydb "Battery.Charging:KEYTYPE" "Battery.Charging_KEYTYPE"
     compare "Battery.Charging_KEYTYPE.expected" "Battery.Charging_KEYTYPE.actual"
 
     querydb "Battery.Charging:KEYDOC" "Battery.Charging_KEYDOC"
     compare "Battery.Charging_KEYDOC.expected" "Battery.Charging_KEYDOC.actual"
 
-    querydb "Battery.Charging:KEYPLUGIN" "Battery.Charging_KEYPLUGIN"
-    compare "Battery.Charging_KEYPLUGIN.expected" "Battery.Charging_KEYPLUGIN.actual"
-
-    querydb "Battery.Charging:KEYCONSTRUCTIONSTRING" "Battery.Charging_KEYCONSTRUCTIONSTRING"
-    compare "Battery.Charging_KEYCONSTRUCTIONSTRING.expected" "Battery.Charging_KEYCONSTRUCTIONSTRING.actual"
+    querydb "Battery.Charging:PROVIDERS" "Battery.Charging_PROVIDERS"
+    compare "Battery.Charging_PROVIDERS.expected" "Battery.Charging_PROVIDERS.actual"
 }
 
 # Ensure that the cache file permissions are ok
