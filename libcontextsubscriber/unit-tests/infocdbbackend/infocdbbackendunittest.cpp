@@ -39,14 +39,11 @@ private slots:
     void databaseExists();
     void databaseDirectory();
     void listKeys();
-    void listPlugins();
-    void listKeysForPlugin();
     void typeForKey();
     void docForKey();
-    void pluginForKey();
-    void keyExists();
-    void constructionStringForKey();
+    void keyDeclared();
     void keyProvided();
+    void listProviders();
     void dynamics();
     void removed();
     void cleanupTestCase();
@@ -108,7 +105,7 @@ void InfoCdbBackendUnitTest::initTestCase()
 
 void InfoCdbBackendUnitTest::databaseDirectory()
 {
-    QCOMPARE(backend->databaseDirectory(), QString("./"));
+    QVERIFY(backend->databaseDirectory() == QString("./") || backend->databaseDirectory() == QString("."));
 }
 
 void InfoCdbBackendUnitTest::databaseExists()
@@ -122,24 +119,6 @@ void InfoCdbBackendUnitTest::listKeys()
     QCOMPARE(keys.count(), 2);
     QVERIFY(keys.contains("Battery.Charging"));
     QVERIFY(keys.contains("Internet.BytesOut"));
-}
-
-void InfoCdbBackendUnitTest::listPlugins()
-{
-    QStringList plugins = backend->listPlugins();
-    QCOMPARE(plugins.count(), 1);
-    QVERIFY(plugins.contains("contextkit-dbus"));
-}
-
-void InfoCdbBackendUnitTest::listKeysForPlugin()
-{
-    QStringList keys1 = backend->listKeysForPlugin("contextkit-dbus");
-    QCOMPARE(keys1.count(), 2);
-    QVERIFY(keys1.contains("Battery.Charging"));
-    QVERIFY(keys1.contains("Internet.BytesOut"));
-
-    QStringList keys2 = backend->listKeysForPlugin("non-existant");
-    QCOMPARE(keys2.count(), 0);
 }
 
 void InfoCdbBackendUnitTest::typeForKey()
@@ -156,30 +135,13 @@ void InfoCdbBackendUnitTest::docForKey()
     QCOMPARE(backend->docForKey("Does.Not.Exist"), QString());
 }
 
-void InfoCdbBackendUnitTest::pluginForKey()
+void InfoCdbBackendUnitTest::keyDeclared()
 {
     foreach (QString key, backend->listKeys())
-        QCOMPARE(backend->pluginForKey(key), QString("contextkit-dbus"));
+        QCOMPARE(backend->keyDeclared(key), true);
 
-    QCOMPARE(backend->pluginForKey("Does.Not.Exist"), QString());
-}
-
-void InfoCdbBackendUnitTest::keyExists()
-{
-    foreach (QString key, backend->listKeys())
-        QCOMPARE(backend->keyExists(key), true);
-
-    QCOMPARE(backend->keyExists("Does.Not.Exist"), false);
-    QCOMPARE(backend->keyExists("Battery.Charging"), true);
-}
-
-void InfoCdbBackendUnitTest::constructionStringForKey()
-{
-    foreach (QString key, backend->listKeys())
-        QVERIFY(backend->constructionStringForKey(key) != QString());
-
-    QCOMPARE(backend->constructionStringForKey("Battery.Charging"), QString("system:org.freedesktop.ContextKit.contextd1"));
-    QCOMPARE(backend->constructionStringForKey("Does.Not.Exist"), QString());
+    QCOMPARE(backend->keyDeclared("Does.Not.Exist"), false);
+    QCOMPARE(backend->keyDeclared("Battery.Charging"), true);
 }
 
 void InfoCdbBackendUnitTest::keyProvided()
@@ -190,6 +152,17 @@ void InfoCdbBackendUnitTest::keyProvided()
     QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
 }
 
+void InfoCdbBackendUnitTest::listProviders()
+{
+    QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
+    QCOMPARE(list1.count(), 1);
+    QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));
+
+    QList <ContextProviderInfo> list2 = backend->listProviders("Does.Not.Exist");
+    QCOMPARE(list2.count(), 0);
+}
+
 void InfoCdbBackendUnitTest::dynamics()
 {
     backend->connectNotify("-"); // Fake it. Spy does something fishy here.
@@ -197,7 +170,7 @@ void InfoCdbBackendUnitTest::dynamics()
     // Setup the spy observers
     QSignalSpy spy1(backend, SIGNAL(keysRemoved(QStringList)));
     QSignalSpy spy2(backend, SIGNAL(keysChanged(QStringList)));
-    QSignalSpy spy3(backend, SIGNAL(keyDataChanged(QString)));
+    QSignalSpy spy3(backend, SIGNAL(keyChanged(QString)));
     QSignalSpy spy4(backend, SIGNAL(keysAdded(QStringList)));
 
     createAlternateDatabase("cache-next.cdb");

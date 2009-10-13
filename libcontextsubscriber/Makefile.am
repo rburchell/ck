@@ -11,6 +11,7 @@ check-customer:
 
 coverage: covoptioncheck
 	$(MAKE) -C unit-tests coverage
+	$(MAKE) -C customer-tests coverage
 
 .PHONY: coverage check-sum
 

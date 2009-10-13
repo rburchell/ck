@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<provider plugin="contextkit-dbus" constructionString="session:org.freedesktop.ContextKit.contextd1">
-  <key name="Battery.LowBattery">
-    <type>INT</type>
-    <doc>
-        This is > 0 when battery is low
-    </doc>
-  </key>
-</provider>

@@ -25,6 +25,7 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
+#include "contextproviderinfo.h"
 
 class InfoBackend : public QObject
 {
@@ -35,18 +36,18 @@ public:
 
     QString name() const;
     QStringList listKeys() const;
-    QStringList listKeysForPlugin(QString plugin) const;
-    QStringList listPlugins() const;
-    QString constructionStringForKey(QString key) const;
+    const QList<ContextProviderInfo> listProviders(QString key);
 
     void fireKeysChanged(const QStringList& keys);
     void fireKeysAdded(const QStringList& keys);
     void fireKeysRemoved(const QStringList& keys);
+    void fireListChanged();
 
 signals:
     void keysChanged(const QStringList& currentKeys);
     void keysAdded(const QStringList& newKeys);
     void keysRemoved(const QStringList& removedKeys);
+    void listChanged();
 };
 
 #endif // INFOBACKEND_H

@@ -1,2 +1,4 @@
 mocs.cpp
 contextprovider-1.0.pc
+/customer-tests/coverage-build/Makefile.coverage
+coverage/

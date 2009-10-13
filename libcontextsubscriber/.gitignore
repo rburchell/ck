@@ -38,6 +38,7 @@ coverage/
 
 /customer-tests/testplugins/contextsubscribertime1.so
 /customer-tests/testplugins/contextsubscribertime2.so
+/customer-tests/coverage-build/Makefile.coverage
 
 # Other binaries
 /cli/context-listen
