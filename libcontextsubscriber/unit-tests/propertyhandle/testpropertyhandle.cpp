@@ -59,10 +59,7 @@ bool ContextPropertyInfo::provided() const
 
 QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
 {
-    ContextProviderInfo info;
-    info.plugin = "fakeplugin";
-    info.constructionString = "fakeconstructionstring";
-    return QList<ContextProviderInfo>() << info;
+    return QList<ContextProviderInfo>() << ContextProviderInfo("fakeplugin", "fakeconstructionstring");
 }
 
 // Mock implementation of the ContextRegistryInfo
@@ -123,12 +120,12 @@ QStringList Provider::unsubscribeProviderNames;
 
 TimedValue Provider::cachedValue = TimedValue(QVariant());
 
-Provider* Provider::instance(const QString &plugin, const QString& constructionString)
+Provider* Provider::instance(const ContextProviderInfo& providerInfo)
 {
     ++ instanceCount;
-    instancePluginNames << plugin;
-    instancePluginConstructionStrings << constructionString;
-    if (constructionString.contains("Commander")) {
+    instancePluginNames << providerInfo.plugin;
+    instancePluginConstructionStrings << providerInfo.constructionString;
+    if (providerInfo.constructionString.contains("Commander")) {
         return mockCommanderProvider;
     }
     return mockProvider;

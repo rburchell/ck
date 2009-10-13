@@ -23,6 +23,7 @@
 #define PROVIDER_H
 
 #include "queuedinvoker.h"
+#include "contextproviderinfo.h"
 
 #include <QObject>
 #include <QDBusConnection>
@@ -53,7 +54,7 @@ class Provider : public QueuedInvoker
     Q_OBJECT
 
 public:
-    static Provider* instance(const QString& plugin, const QString& constructionString);
+    static Provider* instance(const ContextProviderInfo& providerInfo);
     bool subscribe(const QString &key);
     void unsubscribe(const QString &key);
     TimedValue get(const QString &key) const;
@@ -71,15 +72,14 @@ private slots:
 
 private:
     enum PluginState { INITIALIZING, READY, FAILED };
-    Provider(const QString &plugin, const QString &constructionString);
+    Provider(const ContextProviderInfo& providerInfo);
     Q_INVOKABLE void handleSubscribes();
     Q_INVOKABLE void constructPlugin();
     void signalSubscribeFinished(QString key);
 
     IProviderPlugin* plugin; ///< Plugin instance communicating with the concrete provider.
     PluginState pluginState;
-    QString pluginName;
-    QString constructionString; ///< Parameter used for initialize the plugin.
+    ContextProviderInfo providerInfo;  ///< Parameters used to initialize the plugin.
 
     QMutex subscribeLock;
     QSet<QString> toSubscribe; ///< Keys pending for subscription

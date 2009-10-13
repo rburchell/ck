@@ -24,6 +24,8 @@
 #ifndef PROVIDER_H
 #define PROVIDER_H
 
+#include "contextproviderinfo.h"
+
 #include <QObject>
 #include <QDBusConnection>
 #include <QSet>
@@ -45,7 +47,7 @@ class Provider : public QObject
     Q_OBJECT
 
 public:
-    static Provider* instance(const QString &plugin, const QString& constructionString);
+    static Provider* instance(const ContextProviderInfo& providerInfo);
     bool subscribe(const QString &key);
     void unsubscribe(const QString &key);
     TimedValue get(const QString &key) const;

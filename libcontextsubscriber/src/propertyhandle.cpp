@@ -41,8 +41,7 @@ namespace ContextSubscriber {
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
 static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
-static const QString commanderPluginName = "contextkit-dbus";
-static const QString commanderPluginString = "session:org.freedesktop.ContextKit.Commander";
+static const ContextProviderInfo commanderInfo("contextkit-dbus", "session:org.freedesktop.ContextKit.Commander");
 
 DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusType, commanderDBusName);
 bool PropertyHandle::commandingEnabled = true;
@@ -134,7 +133,7 @@ void PropertyHandle::updateProvider()
     if (commandingEnabled && commanderListener->isServicePresent() == DBusNameListener::Present) {
         // If commander is present it should be able to override the
         // property, so connect to it.
-        newProvider = Provider::instance(commanderPluginName, commanderPluginString);
+        newProvider = Provider::instance(commanderInfo);
     } else {
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
@@ -149,8 +148,7 @@ void PropertyHandle::updateProvider()
             else if (providers.size() == 0)
                 contextCritical() << "property provided() but no listProviders() is empty";
 
-            newProvider = Provider::instance(providers[0].plugin,
-                                             providers[0].constructionString);
+            newProvider = Provider::instance(providers[0]);
         } else {
             // Otherwise we keep the pointer to the old provider.
             // This way, we can still continue communicating with the

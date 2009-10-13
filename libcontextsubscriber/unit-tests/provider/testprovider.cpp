@@ -170,7 +170,7 @@ void ProviderUnitTests::initializing()
     // Note: For each test, we need to create a separate instance.
     // Otherwise the tests are dependent on each other.
     QString conStr = "session:Fake.Bus.Name." + QString(__FUNCTION__);
-    Provider *provider = Provider::instance("contextkit-dbus", conStr);
+    Provider *provider = Provider::instance(ContextProviderInfo("contextkit-dbus", conStr));
 
     // Let the provider process the deferred events
     provider->callAllMethodsInQueue();
@@ -189,7 +189,7 @@ void ProviderUnitTests::pluginReadyHandled()
     // we signal ready from the plugin.  The pending subscriptions
     // should be forwarded to the plugin then.
     QString conStr = "session:Fake.Bus.Name." + QString(__FUNCTION__);
-    Provider *provider = Provider::instance("contextkit-dbus", conStr);
+    Provider *provider = Provider::instance(ContextProviderInfo("contextkit-dbus", conStr));
     provider->callAllMethodsInQueue();
 
     provider->subscribe("test.key1");
@@ -210,7 +210,7 @@ void ProviderUnitTests::pluginFailedHandled()
     // same as in the ready case, but we emit failed, so the
     // subscriptions shouldn't be requested
     QString conStr = "session:Fake.Bus.Name." + QString(__FUNCTION__);
-    Provider *provider = Provider::instance("contextkit-dbus", conStr);
+    Provider *provider = Provider::instance(ContextProviderInfo("contextkit-dbus", conStr));
     provider->callAllMethodsInQueue();
 
     provider->subscribe("test.key1");
@@ -231,7 +231,7 @@ void ProviderUnitTests::badPluginName()
     // Test:
     // If we pass a bad plugin name, no crashes
     QString conStr = "session:Fake.Bus.Name." + QString(__FUNCTION__);
-    Provider *provider = Provider::instance("non-existent-plugin", conStr);
+    Provider *provider = Provider::instance(ContextProviderInfo("non-existent-plugin", conStr));
     provider->callAllMethodsInQueue();
 
     QCOMPARE(pluginInstances.size(), 0);
@@ -243,7 +243,7 @@ void ProviderUnitTests::unsubscribe()
     // If a key subscribed, then we unsubscribe, an unsubscribed
     // request is sent to the plugin.
     QString conStr = "session:Fake.Bus.Name." + QString(__FUNCTION__);
-    Provider *provider = Provider::instance("contextkit-dbus", conStr);
+    Provider *provider = Provider::instance(ContextProviderInfo("contextkit-dbus", conStr));
     provider->callAllMethodsInQueue();
     emit pluginInstances[conStr]->ready(); // set the plugin to ready
     provider->callAllMethodsInQueue();
@@ -278,7 +278,7 @@ void ProviderUnitTests::pluginSubscriptionFinishes()
     // succeeds or fails, the SubscribeFinished(keyname) should be emitted.
 
     QString conStr = "session:Fake.Bus.Name." + QString(__FUNCTION__);
-    Provider *provider = Provider::instance("contextkit-dbus", conStr);
+    Provider *provider = Provider::instance(ContextProviderInfo("contextkit-dbus", conStr));
     provider->callAllMethodsInQueue();
     emit pluginInstances[conStr]->ready(); // set the plugin to ready
     provider->callAllMethodsInQueue();
@@ -305,7 +305,7 @@ void ProviderUnitTests::pluginValueChanges()
     // to.
 
     QString conStr = "session:Fake.Bus.Name." + QString(__FUNCTION__);
-    Provider *provider = Provider::instance("contextkit-dbus", conStr);
+    Provider *provider = Provider::instance(ContextProviderInfo("contextkit-dbus", conStr));
     provider->callAllMethodsInQueue();
     emit pluginInstances[conStr]->ready(); // set the plugin to ready
     provider->callAllMethodsInQueue();

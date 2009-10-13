@@ -112,8 +112,8 @@ TimedValue::TimedValue(const QVariant &value) : value(value)
 
 /// Stores the passed plugin name and construction paramater, then
 /// moves into the main thread and queues a constructPlugin call.
-Provider::Provider(const QString &plugin, const QString &constructionString)
-    : plugin(0), pluginState(INITIALIZING), pluginName(plugin), constructionString(constructionString)
+Provider::Provider(const ContextProviderInfo& providerInfo)
+    : plugin(0), pluginState(INITIALIZING), providerInfo(providerInfo)
 {
     // Move the PropertyHandle (and all children) to main thread.
     moveToThread(QCoreApplication::instance()->thread());
@@ -129,10 +129,11 @@ Provider::Provider(const QString &plugin, const QString &constructionString)
 void Provider::constructPlugin()
 {
     contextDebug() << F_PLUGINS;
-    if (pluginName == "contextkit-dbus") {
-        plugin = contextKitPluginFactory(constructionString);
+    if (providerInfo.plugin == "contextkit-dbus") {
+        plugin = contextKitPluginFactory(providerInfo.constructionString);
     }
-    else if (pluginName.startsWith("/")) { // Require the plugin name to start with /
+    else if (providerInfo.plugin.startsWith("/")) {
+        // Dynamically loaded plugins have to start with a '/', otherwise we consider them internal.
         // Enable overriding the plugin location with an environment variable
         const char *pluginPath = getenv("CONTEXT_SUBSCRIBER_PLUGINS");
         if (! pluginPath)
@@ -144,7 +145,7 @@ void Provider::constructPlugin()
             pluginFilename.chop(1);
         }
 
-        pluginFilename.append(pluginName);
+        pluginFilename.append(providerInfo.plugin);
 
         QLibrary library(pluginFilename);
         library.load();
@@ -153,7 +154,7 @@ void Provider::constructPlugin()
             PluginFactoryFunc factory = (PluginFactoryFunc) library.resolve("pluginFactory");
             if (factory) {
                 contextDebug() << "Resolved factory function";
-                plugin = factory(constructionString);
+                plugin = factory(providerInfo.constructionString);
             } else {
                 contextCritical() << "Error resolving function pluginFactory from plugin" << pluginFilename;
             }
@@ -163,7 +164,7 @@ void Provider::constructPlugin()
         }
     }
     else {
-        contextCritical() << "Illegal plugin name" << pluginName << ", doesn't start with /";
+        contextCritical() << "Illegal plugin name" << providerInfo.plugin << ", doesn't start with /";
     }
 
     if (plugin == 0) {
@@ -253,8 +254,6 @@ void Provider::onPluginSubscribeFailed(QString key, QString error)
 /// finalized.
 bool Provider::subscribe(const QString &key)
 {
-    contextDebug() << "plugin" << pluginName << constructionString;
-
     QMutexLocker lock(&subscribeLock);
     // Note: the intention is saved in all cases; whether we can really subscribe or not.
     subscribedKeys.insert(key);
@@ -281,8 +280,6 @@ bool Provider::subscribe(const QString &key)
 /// entered the next time.
 void Provider::unsubscribe(const QString &key)
 {
-    contextDebug() << "Provider::unsubscribe, plugin" << pluginName << constructionString;
-
     QMutexLocker lock(&subscribeLock);
     // Save the intention of the higher level
     subscribedKeys.remove(key);
@@ -353,21 +350,21 @@ TimedValue Provider::get(const QString &key) const
 }
 
 /// Returns a singleton for the named \c plugin with the \c constructionString.
-Provider* Provider::instance(const QString& plugin, const QString& constructionString)
+Provider* Provider::instance(const ContextProviderInfo& providerInfo)
 {
     // Singleton instance container
     // plugin path, constructionstring -> Provider
-    static QMap<QPair<QString, QString>, Provider*> providerInstances;
-    QPair<QString, QString> lookupValue(plugin, constructionString);
+    static QMap<ContextProviderInfo, Provider*> providerInstances;
 
     static QMutex providerInstancesLock;
     QMutexLocker locker(&providerInstancesLock);
-    if (!providerInstances.contains(lookupValue))
-        providerInstances.insert(lookupValue, new Provider(plugin, constructionString));
+    if (!providerInstances.contains(providerInfo))
+        providerInstances.insert(providerInfo, new Provider(providerInfo));
 
-    contextDebug() << "Returning provider instance for" << plugin << ":" << constructionString;
+    contextDebug() << "Returning provider instance for" << providerInfo.plugin
+                   << ":" << providerInfo.constructionString;
 
-    return providerInstances[lookupValue];
+    return providerInstances[providerInfo];
 }
 
 } // end namespace
