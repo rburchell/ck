@@ -19,3 +19,4 @@ logging.h
 loggingfeatures.h
 nanoxml.h
 nanoxml.cpp
+contextproviderinfo.h

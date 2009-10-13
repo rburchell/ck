@@ -27,6 +27,7 @@
 #include <QObject>
 #include <QDBusConnection>
 #include <QMutex>
+#include "contextproviderinfo.h"
 
 class ContextPropertyInfo : public QObject
 {
@@ -42,6 +43,7 @@ public:
     QString doc() const;
     QString type() const;
     bool exists() const;
+    bool declared() const;
     bool provided() const;
 
     QString providerDBusName() const;
@@ -49,39 +51,46 @@ public:
 
     QString plugin() const;
     QString constructionString() const;
+    virtual const QList<ContextProviderInfo> listProviders() const;
+
+protected:
+    virtual void connectNotify(const char *signal);
 
 private:
     QString keyName; ///< The name of the key his ContextPropertyInfo represents.
-    QString cachedDoc; ///< The documentation of the key.
+    QString cachedDoc; ///< Cached documentation of the key.
     QString cachedType; ///< Cached (stored) type of the key.
-    QString cachedPlugin; ///< Cached name of the plugin providing the key
-    QString cachedConstructionString; ///< Cached construction string for the Provider
-    bool cachedExists; ///< Cached state of the key (existance).
+    bool cachedDeclared; ///< Cached state of the key (existance).
     bool cachedProvided; ///< Cached state of the key (whether someone provides it).
+    QList<ContextProviderInfo> cachedProviders; ///< Cached list of providers for this key.
     mutable QMutex cacheLock; ///< Lock for the cache.
 
 private slots:
-    void onKeyDataChanged(const QString& key);
+    void onKeyChanged(const QString& key);
 
 signals:
+    /// DEPRECATED, use changed() signal.
     /// Emitted when the provider of the key changes. The \a newProvider
     /// contains the name of the new provider. This is a strict signal -
     /// it's emitted only when there was an actual change in the value.
     /// \param newProvider The DBus name of the new provider.
     void providerChanged(const QString& newProvider);
 
+    /// DEPRECATED, use changed() signal.
     /// Emitted when the bus type of provider of the key changes. The
     /// \a newBusType is the type of new bus This is a strict signal -
     /// it's emitted only when there was an actual change in the value.
     /// \param newBusType The DBus bus type of the provider.
     void providerDBusTypeChanged(QDBusConnection::BusType newBusType);
 
+    /// DEPRECATED, use changed() signal.
     /// Emitted when the key type changes. The \a newType is the new type
     /// of the introspected key. This is a strict signal - it's emitted only
     /// when there was an actual change in the value.
     /// \param newType The new type of the key.
     void typeChanged(const QString& newType);
 
+    /// DEPRECATED, use changed() signal.
     /// Emitted when the key existance in the registry changes. The \a exists
     /// is the new state of the introspected key. This is a strict signal - it's
     /// emitted only when there was an actual change in the state. Using this
@@ -89,6 +98,7 @@ signals:
     /// \param exists The new state of the key.
     void existsChanged(bool exists);
 
+    /// DEPRECATED, use changed() signal.
     /// Emitted when the key gets a provider or loses a provider. The \a provided
     /// is the new state of the introspected key. This is a strict signal - it's
     /// emitted only when there was an actual change in the state. Using this
@@ -96,6 +106,7 @@ signals:
     /// \param provided The new state of the key.
     void providedChanged(bool provided);
 
+    /// DEPRECATED, use changed() signal.
     /// Emitted when the libcontextsubscriber plugin providing the key
     /// changes, or the construction parameter to give to the plugin
     /// changes.. The \a plugin is the name of the new plugin
@@ -103,6 +114,10 @@ signals:
     /// construction parameter to give to the plugin.
     void pluginChanged(QString plugin, QString constructionString);
 
+    /// Emitted when any of the key parameters/data changes.
+    /// This is not a strict signal - it might be emitted even when
+    /// no actual change happened.
+    void changed(QString key);
 };
 
 #endif // CONTEXTPROPERTYINFO_H

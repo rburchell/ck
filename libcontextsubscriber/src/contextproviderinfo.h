@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Nokia Corporation.
+ * Copyright (C) 2008 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,14 +19,16 @@
  *
  */
 
-#ifndef LOGGINGFEATURES_H
-#define LOGGINGFEATURES_H
+#ifndef CONTEXTPROVIDERINFO_H
+#define CONTEXTPROVIDERINFO_H
 
-#define F_DEPRECATION   (ContextFeature("deprecation"))
-#define F_THREADS       (ContextFeature("threads"))
-#define F_XML           (ContextFeature("xml"))
-#define F_CDB           (ContextFeature("cdb"))
-#define F_DESTROY       (ContextFeature("destroy"))
-#define F_PLUGINS       (ContextFeature("plugins"))
+#include <QObject>
+#include <QString>
 
-#endif
+struct ContextProviderInfo
+{
+    QString plugin;
+    QString constructionString;
+};
+
+#endif // CONTEXTPROVIDERINFO

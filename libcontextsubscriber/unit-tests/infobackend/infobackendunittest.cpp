@@ -57,17 +57,7 @@ public:
         return QString();
     }
 
-    QString pluginForKey(QString key) const
-    {
-        return QString();
-    }
-
-    QString constructionStringForKey(QString key) const
-    {
-        return QString();
-    }
-
-    bool keyExists(QString key) const
+    bool keyDeclared(QString key) const
     {
         return false;
     }
@@ -75,6 +65,11 @@ public:
     bool keyProvided(QString key) const
     {
         return false;
+    }
+
+    const QList<ContextProviderInfo> listProviders(QString key) const
+    {
+        return QList<ContextProviderInfo> ();
     }
 };
 
@@ -88,7 +83,7 @@ private slots:
     void initTestCase();
     void checkAndEmitKeysAdded();
     void checkAndEmitKeysRemoved();
-    void checkAndEmitKeysChanged();
+    void checkAndEmitKeyChanged();
     void connectNotify();
     void instance();
     void cleanupTestCase();
@@ -138,9 +133,9 @@ void InfoBackendUnitTest::checkAndEmitKeysRemoved()
     QCOMPARE(args.at(0).toStringList().at(0), QString("Key.Two"));
 }
 
-void InfoBackendUnitTest::checkAndEmitKeysChanged()
+void InfoBackendUnitTest::checkAndEmitKeyChanged()
 {
-    QSignalSpy spy(backend, SIGNAL(keyDataChanged(QString)));
+    QSignalSpy spy(backend, SIGNAL(keyChanged(QString)));
 
     QStringList currentKeys;
     QStringList oldKeys;
@@ -150,7 +145,7 @@ void InfoBackendUnitTest::checkAndEmitKeysChanged()
     oldKeys << "Key.Two";
     oldKeys << "Key.One";
 
-    backend->checkAndEmitKeysChanged(currentKeys, oldKeys);
+    backend->checkAndEmitKeyChanged(currentKeys, oldKeys);
 
     QCOMPARE(spy.count(), 3);
 }

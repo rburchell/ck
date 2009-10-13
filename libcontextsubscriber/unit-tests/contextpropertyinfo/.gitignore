@@ -2,3 +2,4 @@ contextpropertyinfo.cpp
 contextpropertyinfo.h
 contextpropertyinfounittest
 loggingfeatures.h
+contextproviderinfo.h

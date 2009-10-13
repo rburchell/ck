@@ -25,6 +25,7 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
+#include "contextproviderinfo.h"
 
 class InfoBackend : public QObject
 {
@@ -40,31 +41,21 @@ public:
     /// Returns the list of all the keys in the registry.
     virtual QStringList listKeys() const = 0;
 
-    /// Returns the list of all the keys in the registry provided
-    /// by the given \a plugin.
-    virtual QStringList listKeysForPlugin(QString plugin) const = 0;
-
-    /// Returns a list of all the unique plugins in the database.
-    virtual QStringList listPlugins() const = 0;
-
     /// Returns a type for the given \a key.
     virtual QString typeForKey(QString key) const = 0;
 
     /// Returns the documentation for the given \a key name.
     virtual QString docForKey(QString key) const = 0;
 
-    /// Returns the constructor plugin name for the given \a key name.
-    virtual QString pluginForKey(QString key) const = 0;
-
-    /// Returns the constructor plugin parameter for the given \a key name.
-    virtual QString constructionStringForKey(QString key) const = 0;
-
     /// Returns true if the given key exists.
-    virtual bool keyExists(QString key) const = 0;
+    virtual bool keyDeclared(QString key) const = 0;
 
     /// Returns true if the given key is provided (i.e., not a core
     /// property which nobody provides currently)
     virtual bool keyProvided(QString key) const = 0;
+
+    /// Returns a list of providers for the given key.
+    virtual const QList<ContextProviderInfo> listProviders(QString key) const = 0;
 
 signals:
     /// Emitted when key list changes. ContextRegistryInfo listens on that.
@@ -76,8 +67,11 @@ signals:
     /// Emitted when keys are removed. ContextRegistryInfo listens on that.
     void keysRemoved(const QStringList& removedKeys);
 
-    /// Emitted when key data changes. ContextPropertyInfo instances listen on that.
-    void keyDataChanged(const QString& key);
+    /// Emitted when key data/info changes. ContextPropertyInfo instances listen on that.
+    void keyChanged(const QString& key);
+
+    /// Emitted when the key list changes. ContextRegistryInfo listens on that.
+    void listChanged();
 
 protected:
     virtual void connectNotify(const char *signal);
@@ -93,7 +87,7 @@ private:
 
     void checkAndEmitKeysAdded(const QStringList &currentKeys, const QStringList &oldKeys);
     void checkAndEmitKeysRemoved(const QStringList &currentKeys, const QStringList &oldKeys);
-    void checkAndEmitKeysChanged(const QStringList &currentKeys, const QStringList &oldKeys);
+    void checkAndEmitKeyChanged(const QStringList &currentKeys, const QStringList &oldKeys);
 
     /// Private operator. Do not use.
     InfoBackend& operator=(const InfoBackend&);
