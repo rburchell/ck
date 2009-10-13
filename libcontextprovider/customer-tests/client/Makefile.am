@@ -1,4 +1,4 @@
-testdir = $(bindir)/libcontextprovider-tests
+testdir = $(libdir)/libcontextprovider-tests
 test_PROGRAMS = client
 
 client_SOURCES = client.cpp commandwatcher.h commandwatcher.cpp
