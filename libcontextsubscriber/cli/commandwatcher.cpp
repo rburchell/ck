@@ -176,15 +176,23 @@ void CommandWatcher::interpret(const QString& command) const
                 qDebug() << "no such key:" << key;
         } else if (QString("plugin").startsWith(commandName)) {
             QString key = args[0];
-            if (properties->contains(key))
-                out << "plugin: " << properties->value(key)->info()->plugin() << endl;
-            else
+            if (properties->contains(key)) {
+                QList<ContextProviderInfo> providers = properties->value(key)->info()->listProviders();
+                if (providers.size() > 0)
+                    out << "plugin: " << providers.at(0).plugin;
+                else
+                    out << "no plugin for key:" << key;
+            } else
                 qDebug() << "no such key:" << key;
         } else if (QString("constructionstring").startsWith(commandName)) {
             QString key = args[0];
-            if (properties->contains(key))
-                out << "constructionstring: " << properties->value(key)->info()->constructionString() << endl;
-            else
+            if (properties->contains(key)) {
+                QList<ContextProviderInfo> providers = properties->value(key)->info()->listProviders();
+                if (providers.size() > 0)
+                    out << "constructionstring: " << providers.at(0).constructionString;
+                else
+                    out << "no constructionString for key:" << key;
+            } else
                 qDebug() << "no such key:" << key;
         } else if (QString("flush").startsWith(commandName)) {
             out << "FLUSHED" << endl;
