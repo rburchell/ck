@@ -179,9 +179,9 @@ void CommandWatcher::interpret(const QString& command) const
             if (properties->contains(key)) {
                 QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
                 if (providers.size() > 0)
-                    out << "plugin: " << providers.at(0).plugin;
+                    out << "plugin: " << providers.at(0).plugin << endl;
                 else
-                    out << "no plugin for key:" << key;
+                    out << "no plugin for key:" << key << endl;
             } else
                 qDebug() << "no such key:" << key;
         } else if (QString("constructionstring").startsWith(commandName)) {
@@ -189,9 +189,9 @@ void CommandWatcher::interpret(const QString& command) const
             if (properties->contains(key)) {
                 QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
                 if (providers.size() > 0)
-                    out << "constructionstring: " << providers.at(0).constructionString;
+                    out << "constructionstring: " << providers.at(0).constructionString << endl;
                 else
-                    out << "no constructionString for key:" << key;
+                    out << "no constructionString for key:" << key << endl;
             } else
                 qDebug() << "no such key:" << key;
         } else if (QString("providers").startsWith(commandName)) {
@@ -199,7 +199,7 @@ void CommandWatcher::interpret(const QString& command) const
             if (properties->contains(key)) {
                 QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
                 foreach(ContextProviderInfo info, providers)
-                    out << "Provider:" << info.plugin << ":" << info.constructionString;
+                    out << "Provider:" << info.plugin << ":" << info.constructionString << endl;
             } else
                 qDebug() << "no such key:" << key;
         } else if (QString("flush").startsWith(commandName)) {
