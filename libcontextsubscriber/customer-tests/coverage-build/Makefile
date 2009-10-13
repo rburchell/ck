@@ -25,3 +25,5 @@ clean: clean-orig
 
 clean-orig:
 	$(MAKE) -C ../../src clean
+
+.PHONY: all clean clean-orig
