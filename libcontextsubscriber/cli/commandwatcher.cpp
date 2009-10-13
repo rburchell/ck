@@ -194,6 +194,14 @@ void CommandWatcher::interpret(const QString& command) const
                     out << "no constructionString for key:" << key;
             } else
                 qDebug() << "no such key:" << key;
+        } else if (QString("providers").startsWith(commandName)) {
+            QString key = args[0];
+            if (properties->contains(key)) {
+                QList<ContextProviderInfo> providers = properties->value(key)->info()->listProviders();
+                foreach(ContextProviderInfo info, providers)
+                    out << "Provider:" << info.plugin << ":" << info.constructionString;
+            } else
+                qDebug() << "no such key:" << key;
         } else if (QString("flush").startsWith(commandName)) {
             out << "FLUSHED" << endl;
             out.flush();
