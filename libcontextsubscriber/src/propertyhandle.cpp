@@ -84,9 +84,7 @@ PropertyHandle::PropertyHandle(const QString& key)
     myInfo = new ContextPropertyInfo(myKey, this);
 
     // Start listening to changes in property introspection (e.g., added to registry, plugin changes)
-    sconnect(myInfo, SIGNAL(providedChanged(bool)),
-             this, SLOT(updateProvider()));
-    sconnect(myInfo, SIGNAL(pluginChanged(QString, QString)),
+    sconnect(myInfo, SIGNAL(changed(QString)),
              this, SLOT(updateProvider()));
 
     // Start listening for the context commander, and also initiate a
@@ -144,8 +142,14 @@ void PropertyHandle::updateProvider()
             // If myInfo knows the current provider which should be
             // connected to, connect to it.
             contextDebug() << F_PLUGINS << "Key exists";
-            newProvider = Provider::instance(myInfo->plugin(),
-                                             myInfo->constructionString());
+            QList<ContextProviderInfo> providers = myInfo->listProviders();
+            if (providers.size() > 1)
+                contextCritical() << "multi-process not implemented yet";
+            else if (providers.size() == 0)
+                contextCritical() << "property provided() but no listProviders() is empty";
+
+            newProvider = Provider::instance(providers[0].plugin,
+                                             providers[0].constructionString);
         } else {
             // Otherwise we keep the pointer to the old provider.
             // This way, we can still continue communicating with the
