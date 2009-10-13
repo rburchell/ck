@@ -391,4 +391,7 @@ void ContextPropertyInfo::connectNotify(const char *signal)
         contextWarning() << F_DEPRECATION << "ContextPropertyInfo::pluginChanged signal is deprecated.";
 }
 
-
+ContextPropertyInfo::ResolutionStrategy ContextPropertyInfo::resolutionStrategy() const
+{
+    return ContextPropertyInfo::LastValue;
+}

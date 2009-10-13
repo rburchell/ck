@@ -34,6 +34,8 @@ class ContextPropertyInfo : public QObject
     Q_OBJECT
 
 public:
+    enum ResolutionStrategy { LastValue };
+
     explicit ContextPropertyInfo(const QString &key, QObject *parent = 0);
 
     /// Destroys the object.
@@ -52,6 +54,7 @@ public:
     QString plugin() const;
     QString constructionString() const;
     virtual const QList<ContextProviderInfo> listProviders() const;
+    ResolutionStrategy resolutionStrategy() const;
 
 protected:
     virtual void connectNotify(const char *signal);
