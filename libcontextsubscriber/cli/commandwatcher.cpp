@@ -198,9 +198,13 @@ void CommandWatcher::interpret(const QString& command) const
         } else if (QString("providers").startsWith(commandName)) {
             QString key = args[0];
             if (properties->contains(key)) {
+                out << "provider: ";
                 QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
+
                 foreach(ContextProviderInfo info, providers)
-                    out << "Provider:" << info.plugin << ":" << info.constructionString << endl;
+                    out << info.plugin << "/" << info.constructionString << " ";
+
+                out << endl;
             } else
                 qDebug() << "no such key:" << key;
         } else if (QString("flush").startsWith(commandName)) {
