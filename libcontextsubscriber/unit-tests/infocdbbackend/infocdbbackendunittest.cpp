@@ -101,9 +101,13 @@ void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
 
     QVariantList providers2;
     QHash <QString, QVariant> provider2;
+    QHash <QString, QVariant> provider3;
     provider2.insert("plugin", "contextkit-dbus");
     provider2.insert("constructionString", "system:org.freedesktop.ContextKit.contextd1");
+    provider3.insert("plugin", "contextkit-dbus");
+    provider3.insert("constructionString", "system:org.freedesktop.ContextKit.contextdX");
     providers2 << QVariant(provider2);
+    providers2 << QVariant(provider3);
     writer.add("Battery.Capacity:PROVIDERS", providers2);
 
     writer.close();
@@ -192,6 +196,18 @@ void InfoCdbBackendUnitTest::dynamics()
     QVERIFY(backend->listKeys().contains("Battery.Capacity"));
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
     QCOMPARE(backend->docForKey("Battery.Charging"), QString("doc1"));
+
+    // Check providers
+    QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
+    QCOMPARE(list1.count(), 1);
+    QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));
+    QList <ContextProviderInfo> list2 = backend->listProviders("Battery.Capacity");
+    QCOMPARE(list2.count(), 2);
+    QCOMPARE(list2.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list2.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));
+    QCOMPARE(list2.at(1).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list2.at(1).constructionString, QString("system:org.freedesktop.ContextKit.contextdX"));
 
     // Test emissions
     QCOMPARE(spy1.count(), 1);
