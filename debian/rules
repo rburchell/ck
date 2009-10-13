@@ -6,7 +6,7 @@
 LDFLAGS+=-Wl,--as-needed
 
 Makefile:
-	./configure --prefix /usr --sysconfdir=/etc --disable-doc --disable-coverage \
+	./configure --prefix /usr --sysconfdir=/etc --disable-doc --disable-coverage
 
 build: build-stamp
 build-stamp: Makefile
