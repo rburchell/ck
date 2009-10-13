@@ -7,20 +7,25 @@ context-ls
 .SH DESCRIPTION
 context-ls is a simple tool to introspect (inspect) the current context properties registry. It will list all the properties defined in the registry and optionally filter them through a regular expression. Additional parameters can be specified to tweak the output.
 .SH OPTIONS
-.TP 13
+.TP 17
 --xml, -x
 force the usage of the xml registry.
-.TP 13
+.TP 17
 --cdb, -c
 force the usage of the cdb (cached database) registry.
-.TP 13
---provided
+.TP 17
+--provided, -p
 show only the properties which are provided (have a defined provider).
-.TP 13
---long
+.TP 17
+--long, -l
 long(detailed) listing format.
-.TP 13
+.TP 17
 filter
-limit the output to the entries matching the specified regular expression.
-
-
+limit the output to the entries matching the specified wildcard expression.
+.SH EXAMPLES
+.TP 8
+context-ls -l
+Creates long listing of all properties
+.TP 8
+context-ls -p 'Bl*'
+Creates short listing of all provided properties which name start with string 'Bl'.

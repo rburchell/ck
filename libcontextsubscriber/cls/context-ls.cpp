@@ -1,4 +1,5 @@
-#include <infobackend.h>
+#include <contextregistryinfo.h>
+#include <contextpropertyinfo.h>
 #include <QCoreApplication>
 #include <QString>
 #include <QStringList>
@@ -8,47 +9,57 @@
 
 int main(int argc, char **argv)
 {
-    QCoreApplication app(argc, argv);
+    int retValue = 1;
+    {
+        QCoreApplication app(argc, argv);
 
-    QStringList args = app.arguments();
-    QString backendName = "";
-    bool provided = false;
-    bool longListing = false;
-    QString filter = "*";
+        QStringList args = app.arguments();
+        QString backendName = "";
+        bool provided = false;
+        bool longListing = false;
+        bool hasFilter = false;
+        QString filter = "*";
 
-    args.pop_front();
-    foreach (QString arg, args) {
-        if (arg == "--xml" || arg == "-x") {
-            backendName = "xml";
-        } else if (arg == "--cdb" || arg == "-c") {
-            backendName = "cdb";
-        } else if (arg == "--provided" || arg == "-p") {
-            provided = true;
-        } else if (arg == "--long" || arg == "-l") {
-            longListing = true;
-        } else {
-            filter = arg;
+        args.pop_front();
+        foreach (QString arg, args) {
+            if (arg == "--xml" || arg == "-x") {
+                backendName = "xml";
+            } else if (arg == "--cdb" || arg == "-c") {
+                backendName = "cdb";
+            } else if (arg == "--provided" || arg == "-p") {
+                provided = true;
+            } else if (arg == "--long" || arg == "-l") {
+                longListing = true;
+            } else {
+                if (hasFilter) {
+                    qWarning("WARNING: Only the first filter string is considered.");
+                } else {
+                    hasFilter = true;
+                    filter = arg;
+                }
+            }
         }
-    }
 
-    InfoBackend *backend = InfoBackend::instance(backendName);
-    QStringList keys = backend->listKeys();
- 
-    QRegExp rx(filter, Qt::CaseSensitive, QRegExp::Wildcard);
-    QTextStream out(stdout);
-    foreach (QString key, keys) {
-        if (!rx.exactMatch(key))
-            continue;
-        if (provided && !backend->keyProvided(key))
-            continue;
-        if (longListing) {
-            out << key << "\t" << backend->typeForKey(key) << "\t" << backend->pluginForKey(key) << "\t"
-                << backend->constructionStringForKey(key) << "\t" << backend->docForKey(key) << "\n";
-        } else
-            out << key << "\n";
-    }
-    out.flush();
+        ContextRegistryInfo *regInfo = ContextRegistryInfo::instance(backendName);
+        QStringList keys = regInfo->listKeys();
+     
+        QRegExp rx(filter, Qt::CaseSensitive, QRegExp::Wildcard);
+        QTextStream out(stdout);
+        foreach (QString key, keys) {
+            if (!rx.exactMatch(key))
+                continue;
+            ContextPropertyInfo info(key);
+            if (provided && !info.provided())
+                continue;
+            if (longListing) {
+                out << key << "\t" << info.type() << "\t" << info.listProviders()[0].plugin << "\t"
+                    << info.listProviders()[0].constructionString << "\t" << info.doc() << "\n";
+            } else
+                out << key << "\n";
+            retValue = 0;
+        }
+        out.flush();
 
-    exit(0);
-    return app.exec();
+    }
+    return retValue;
 }
