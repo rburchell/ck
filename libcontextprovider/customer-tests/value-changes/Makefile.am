@@ -1,4 +1,4 @@
-testdir = $(bindir)/libcontextprovider-tests
+testdir = $(libdir)/libcontextprovider-tests
 test_PROGRAMS = valuechangestests
 
 valuechangestests_SOURCES = valuechangestests.cpp valuechangestests.h
