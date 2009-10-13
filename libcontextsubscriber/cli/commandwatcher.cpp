@@ -82,6 +82,7 @@ void CommandWatcher::help()
     qDebug() << "  type KEY                        - get the info()->type for a key";
     qDebug() << "  plugin KEY                      - get the info()->plugin for a key";
     qDebug() << "  constructionstring KEY          - get the info()->constructionstring for a key";
+    qDebug() << "  providers KEY                   - get the info()->providers for a key";
     qDebug() << "  flush                           - write FLUSHED to stderr and stdout";
     qDebug() << "Any prefix of a command can be used as an abbreviation";
 }
