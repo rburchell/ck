@@ -198,7 +198,7 @@ void CommandWatcher::interpret(const QString& command) const
         } else if (QString("providers").startsWith(commandName)) {
             QString key = args[0];
             if (properties->contains(key)) {
-                out << "provider: ";
+                out << "providers: ";
                 QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
 
                 foreach(ContextProviderInfo info, providers)
