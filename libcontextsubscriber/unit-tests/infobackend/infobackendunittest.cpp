@@ -26,12 +26,12 @@
 class InfoTestBackend : public InfoBackend
 {
 public:
-    
+
     QString name() const
     {
         return "test";
     }
-    
+
     QStringList listKeys() const
     {
         return QStringList();
@@ -41,12 +41,12 @@ public:
     {
         return QStringList();
     }
-    
+
     QStringList listPlugins() const
     {
         return QStringList();
     }
-    
+
     QString typeForKey(QString key) const
     {
         return QString();
@@ -56,22 +56,22 @@ public:
     {
         return QString();
     }
-    
+
     QString pluginForKey(QString key) const
     {
         return QString();
     }
-    
+
     QString constructionStringForKey(QString key) const
     {
         return QString();
     }
-    
+
     bool keyExists(QString key) const
     {
         return false;
     }
-    
+
     bool keyProvided(QString key) const
     {
         return false;
@@ -81,9 +81,9 @@ public:
 class InfoBackendUnitTest : public QObject
 {
     Q_OBJECT
-    
+
     InfoBackend *backend;
-    
+
 private slots:
     void initTestCase();
     void checkAndEmitKeysAdded();
@@ -91,6 +91,7 @@ private slots:
     void checkAndEmitKeysChanged();
     void connectNotify();
     void instance();
+    void cleanupTestCase();
 };
 
 void InfoBackendUnitTest::initTestCase()
@@ -102,16 +103,16 @@ void InfoBackendUnitTest::initTestCase()
 void InfoBackendUnitTest::checkAndEmitKeysAdded()
 {
     QSignalSpy spy(backend, SIGNAL(keysAdded(QStringList)));
-    
+
     QStringList currentKeys;
     QStringList oldKeys;
-    
+
     currentKeys << "Key.One";
     currentKeys << "Key.Two";
     oldKeys << "Key.One";
-    
+
     backend->checkAndEmitKeysAdded(currentKeys, oldKeys);
-    
+
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
     QCOMPARE(args.at(0).toList().size(), 1);
@@ -121,16 +122,16 @@ void InfoBackendUnitTest::checkAndEmitKeysAdded()
 void InfoBackendUnitTest::checkAndEmitKeysRemoved()
 {
     QSignalSpy spy(backend, SIGNAL(keysRemoved(QStringList)));
-    
+
     QStringList currentKeys;
     QStringList oldKeys;
-    
+
     currentKeys << "Key.One";
     oldKeys << "Key.Two";
     oldKeys << "Key.One";
-    
+
     backend->checkAndEmitKeysRemoved(currentKeys, oldKeys);
-    
+
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
     QCOMPARE(args.at(0).toList().size(), 1);
@@ -140,17 +141,17 @@ void InfoBackendUnitTest::checkAndEmitKeysRemoved()
 void InfoBackendUnitTest::checkAndEmitKeysChanged()
 {
     QSignalSpy spy(backend, SIGNAL(keyDataChanged(QString)));
-    
+
     QStringList currentKeys;
     QStringList oldKeys;
-    
+
     currentKeys << "Key.One";
     currentKeys << "Key.Three";
     oldKeys << "Key.Two";
     oldKeys << "Key.One";
-    
+
     backend->checkAndEmitKeysChanged(currentKeys, oldKeys);
-    
+
     QCOMPARE(spy.count(), 3);
 }
 
@@ -165,23 +166,35 @@ void InfoBackendUnitTest::connectNotify()
 
 void InfoBackendUnitTest::instance()
 {
+    InfoBackend::destroyInstance();
+    backend = NULL;
+
     InfoBackend *instance;
-    
+
     InfoBackend::backendInstance = NULL;
     instance = InfoBackend::instance("xml");
     QCOMPARE(instance, InfoBackend::backendInstance);
     QCOMPARE(instance->name(), QString("xml"));
-    
+    InfoBackend::destroyInstance();
+    QVERIFY(InfoBackend::backendInstance == NULL);
+
     InfoBackend::backendInstance = NULL;
     instance = InfoBackend::instance("cdb");
     QCOMPARE(instance, InfoBackend::backendInstance);
     QCOMPARE(instance->name(), QString("cdb"));
+    InfoBackend::destroyInstance();
+    QVERIFY(InfoBackend::backendInstance == NULL);
 
     InfoBackend::backendInstance = new InfoTestBackend();
     InfoBackend::destroyInstance();
     QVERIFY(InfoBackend::backendInstance == NULL);
 }
 
+void InfoBackendUnitTest::cleanupTestCase()
+{
+    QVERIFY(InfoBackend::backendInstance == NULL);
+    InfoBackend::destroyInstance();
+}
 
 #include "infobackendunittest.moc"
 QTEST_MAIN(InfoBackendUnitTest);
