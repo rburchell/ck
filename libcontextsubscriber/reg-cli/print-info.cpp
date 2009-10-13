@@ -25,13 +25,15 @@ int main(int argc, char **argv)
             return 1;
         }
         out << "Key: " << key << endl;
-        bool exists = info->exists();
-        out << "Existence: " << (exists ? "true" : "false")  << endl;
-        if (exists) {
-            QDBusConnection::BusType busType = info->providerDBusType();
-            out << "Provider DBus type: " << (busType == QDBusConnection::SessionBus ? "session" : "system") << endl;
-            out << "Provider DBus name: " << info->providerDBusName() << endl;
+        bool declared = info->declared();
+        out << "Existence: " << (declared ? "true" : "false")  << endl;
+        if (declared) {
+
+            foreach(ContextProviderInfo prov, info->listProviders())
+                out << "Proivder: " << prov.plugin << " (" << prov.constructionString << ")" << endl;
+
             out << "Documentation: " << info->doc() << endl;
+            out << "Type: " << info->type() << endl;
         }
         out << "----------" << endl;
     }
