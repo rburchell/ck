@@ -25,11 +25,13 @@
 #include <QXmlSimpleReader>
 #include <QXmlInputSource>
 #include <QFile>
+#include <QList>
 #include <stdlib.h>
 #include "sconnect.h"
 #include "infoxmlbackend.h"
 #include "logging.h"
 #include "loggingfeatures.h"
+#include "contextproviderinfo.h"
 #include "nanoxml.h"
 
 /*!
@@ -83,36 +85,6 @@ QStringList InfoXmlBackend::listKeys() const
     return list;
 }
 
-QStringList InfoXmlBackend::listKeysForPlugin(QString plugin) const
-{
-    // This is slow and not nice, but we're an xml backend and
-    // we can afford to not be the first in the run
-    QStringList list;
-
-    foreach (QString key, keyDataHash.keys()) {
-        InfoKeyData data = keyDataHash.value(key);
-        if (data.plugin == plugin) {
-            list << data.name;
-        }
-    }
-
-    return list;
-}
-
-QStringList InfoXmlBackend::listPlugins() const
-{
-    // Again -- slow.
-    QStringList list;
-
-    foreach (QString key, keyDataHash.keys()) {
-        InfoKeyData data = keyDataHash.value(key);
-        if (! list.contains(data.plugin))
-            list << data.plugin;
-    }
-
-    return list;
-}
-
 QString InfoXmlBackend::typeForKey(QString key) const
 {
     if (! keyDataHash.contains(key))
@@ -129,23 +101,7 @@ QString InfoXmlBackend::docForKey(QString key) const
     return keyDataHash.value(key).doc;
 }
 
-QString InfoXmlBackend::pluginForKey(QString key) const
-{
-    if (! keyDataHash.contains(key))
-        return "";
-
-    return keyDataHash.value(key).plugin;
-}
-
-QString InfoXmlBackend::constructionStringForKey(QString key) const
-{
-    if (! keyDataHash.contains(key))
-        return "";
-
-    return keyDataHash.value(key).constructionString;
-}
-
-bool InfoXmlBackend::keyExists(QString key) const
+bool InfoXmlBackend::keyDeclared(QString key) const
 {
     if (keyDataHash.contains(key))
         return true;
@@ -206,10 +162,12 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     // is not an issue.
 
     // Emissions
-    checkAndEmitKeysAdded(currentKeys, oldKeys);
-    checkAndEmitKeysRemoved(currentKeys, oldKeys);
-    emit keysChanged(listKeys());
-    checkAndEmitKeysChanged(currentKeys, oldKeys);
+    checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
+    checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
+    emit keysChanged(listKeys()); // DEPRECATED emission
+
+    emit listChanged();
+    checkAndEmitKeyChanged(currentKeys, oldKeys);
 }
 
 /// Called when the registry directory changed (ie. file removed or added).
@@ -241,10 +199,12 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
     // is not an issue.
 
     // Emissions
-    checkAndEmitKeysAdded(currentKeys, oldKeys);
-    checkAndEmitKeysRemoved(currentKeys, oldKeys);
-    emit keysChanged(listKeys());
-    checkAndEmitKeysChanged(currentKeys, oldKeys);
+    checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
+    checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
+    emit keysChanged(listKeys()); // DEPRECATED emission
+
+    emit listChanged();
+    checkAndEmitKeyChanged(currentKeys, oldKeys);
 }
 
 /* Private */
@@ -391,4 +351,19 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
            }
         }
     }
+}
+
+const QList<ContextProviderInfo> InfoXmlBackend::listProviders(QString key) const
+{
+    QList<ContextProviderInfo> lst;
+
+    if (! keyDataHash.contains(key))
+        return lst;
+
+    ContextProviderInfo info;
+    info.plugin = keyDataHash.value(key).plugin;
+    info.constructionString = keyDataHash.value(key).constructionString;
+
+    lst << info;
+    return lst;
 }

@@ -23,7 +23,8 @@ FROM_SOURCE = 							\
 	infokeydata.h 						\
 	loggingfeatures.h                                       \
         nanoxml.h                                               \
-        nanoxml.cpp
+        nanoxml.cpp						\
+	contextproviderinfo.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =

@@ -37,14 +37,11 @@ private slots:
     void paths();
     void name();
     void listKeys();
-    void listPlugins();
-    void listKeysForPlugin();
     void typeForKey();
     void docForKey();
-    void constructionStringForKey();
-    void pluginForKey();
-    void keyExists();
+    void keyDeclared();
     void keyProvided();
+    void listProviders();
     void dynamics();
     void cleanupTestCase();
 };
@@ -95,29 +92,6 @@ void InfoXmlBackendUnitTest::name()
     QCOMPARE(backend->name(), QString("xml"));
 }
 
-void InfoXmlBackendUnitTest::listPlugins()
-{
-    QStringList plugins = backend->listPlugins();
-    QCOMPARE(plugins.count(), 1);
-    QVERIFY(plugins.contains("contextkit-dbus"));
-}
-
-void InfoXmlBackendUnitTest::listKeysForPlugin()
-{
-    QStringList keys = backend->listKeysForPlugin("contextkit-dbus");
-    QVERIFY(keys.contains("Battery.ChargePercentage"));
-    QVERIFY(keys.contains("Battery.LowBattery"));
-    QVERIFY(keys.contains("Key.With.Attribute"));
-    QVERIFY(keys.contains("Key.With.bool"));
-    QVERIFY(keys.contains("Key.With.int32"));
-    QVERIFY(keys.contains("Key.With.string"));
-    QVERIFY(keys.contains("Key.With.double"));
-    QVERIFY(keys.contains("Key.With.complex"));
-    QVERIFY(keys.contains("Battery.Charging"));
-    QVERIFY(keys.contains("Battery.Voltage"));
-    QVERIFY(backend->listKeysForPlugin("does-not-exist").count() == 0);
-}
-
 void InfoXmlBackendUnitTest::typeForKey()
 {
     QCOMPARE(backend->typeForKey("Battery.ChargePercentage"), QString());
@@ -146,37 +120,19 @@ void InfoXmlBackendUnitTest::docForKey()
     QCOMPARE(backend->docForKey("Does.Not.Exist"), QString());
 }
 
-void InfoXmlBackendUnitTest::pluginForKey()
+void InfoXmlBackendUnitTest::keyDeclared()
 {
     foreach (QString key, backend->listKeys())
-        QCOMPARE(backend->pluginForKey(key), QString("contextkit-dbus"));
+        QCOMPARE(backend->keyDeclared(key), true);
 
-    QCOMPARE(backend->pluginForKey("Does.Not.Exist"), QString());
-}
-
-void InfoXmlBackendUnitTest::keyExists()
-{
-    foreach (QString key, backend->listKeys())
-        QCOMPARE(backend->keyExists(key), true);
-
-    QCOMPARE(backend->keyExists("Does.Not.Exist"), false);
-    QCOMPARE(backend->keyExists("Battery.Charging"), true);
+    QCOMPARE(backend->keyDeclared("Does.Not.Exist"), false);
+    QCOMPARE(backend->keyDeclared("Battery.Charging"), true);
 }
 
 void InfoXmlBackendUnitTest::paths()
 {
     QCOMPARE(InfoXmlBackend::registryPath(), QString("./"));
     QCOMPARE(InfoXmlBackend::coreDeclPath(), QString("/dev/null"));
-}
-
-void InfoXmlBackendUnitTest::constructionStringForKey()
-{
-    foreach (QString key, backend->listKeys())
-        QVERIFY(backend->constructionStringForKey(key) != QString());
-
-    QCOMPARE(backend->constructionStringForKey("Battery.Charging"), QString("system:org.freedesktop.ContextKit.contextd2"));
-    QCOMPARE(backend->constructionStringForKey("Key.With.bool"), QString("session:org.freedesktop.ContextKit.contextd1"));
-    QCOMPARE(backend->constructionStringForKey("Does.Not.Exist"), QString());
 }
 
 void InfoXmlBackendUnitTest::keyProvided()
@@ -187,25 +143,36 @@ void InfoXmlBackendUnitTest::keyProvided()
     QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
 }
 
+void InfoXmlBackendUnitTest::listProviders()
+{
+    QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
+    QCOMPARE(list1.count(), 1);
+    QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd2"));
+
+    QList <ContextProviderInfo> list2 = backend->listProviders("Does.Not.Exist");
+    QCOMPARE(list2.count(), 0);
+}
+
 void InfoXmlBackendUnitTest::dynamics()
 {
     // Sanity check
     QStringList keys = backend->listKeys();
     QCOMPARE(keys.count(), 10);
     QVERIFY(keys.contains("Battery.Charging"));
-    QCOMPARE(backend->keyExists("System.Active"), false);
+    QCOMPARE(backend->keyDeclared("System.Active"), false);
 
     // Setup the spy observers
     QSignalSpy spy1(backend, SIGNAL(keysRemoved(QStringList)));
     QSignalSpy spy2(backend, SIGNAL(keysChanged(QStringList)));
-    QSignalSpy spy3(backend, SIGNAL(keyDataChanged(QString)));
+    QSignalSpy spy3(backend, SIGNAL(keyChanged(QString)));
     QSignalSpy spy4(backend, SIGNAL(keysAdded(QStringList)));
 
     utilCopyLocalWithRemove("providers2v2.src", "providers2.context");
     utilCopyLocalWithRemove("providers3.src", "providers3.context");
 
     // Again, some basic check
-    QCOMPARE(backend->keyExists("System.Active"), true);
+    QCOMPARE(backend->keyDeclared("System.Active"), true);
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
 
     // Test emissions

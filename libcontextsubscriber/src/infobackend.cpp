@@ -80,7 +80,7 @@ InfoBackend* InfoBackend::instance(const QString &backendName)
 
 /// Given the \a currentKeys list of keys and the \a oldKeys list of keys,
 /// emit a signal containing the new keys (keys that are in \a currentKeys
-/// but are no in \a oldKeys).
+/// but are no in \a oldKeys). To be removed in future.
 void InfoBackend::checkAndEmitKeysAdded(const QStringList &currentKeys,
                                         const QStringList &oldKeys)
 {
@@ -96,7 +96,7 @@ void InfoBackend::checkAndEmitKeysAdded(const QStringList &currentKeys,
 
 /// Given the \a currentKeys list of keys and the \a oldKeys list of keys,
 /// emit a signal containing the removed keys (keys that are in \a oldKeys
-/// but are no in \a currentKeys).
+/// but are no in \a currentKeys). To be removed in future.
 void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys,
                                           const QStringList &oldKeys)
 {
@@ -111,17 +111,17 @@ void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys,
 }
 
 /// Given the \a currentKeys list of keys and the \a oldKeys list of keys,
-/// emit a signal containing the union of those two lists.
-void InfoBackend::checkAndEmitKeysChanged(const QStringList &currentKeys,
-                                          const QStringList &oldKeys)
+/// emit a keyChanged signal containing the union of those two lists.
+void InfoBackend::checkAndEmitKeyChanged(const QStringList &currentKeys,
+                                         const QStringList &oldKeys)
 {
     foreach(QString key, oldKeys) {
-        emit keyDataChanged(key);
+        emit keyChanged(key);
     }
 
     foreach(QString key, currentKeys) {
         if (! oldKeys.contains(key))
-            emit keyDataChanged(key);
+            emit keyChanged(key);
     }
 }
 

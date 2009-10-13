@@ -25,6 +25,7 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
+#include "contextproviderinfo.h"
 
 class InfoBackend : public QObject
 {
@@ -35,10 +36,9 @@ public:
     static InfoBackend* instance(const QString &backendName = "");
     QString typeForKey(QString key) const;
     QString docForKey(QString key) const;
-    QString pluginForKey(QString key) const;
-    QString constructionStringForKey(QString key) const;
-    bool keyExists(QString key) const;
+    bool keyDeclared(QString key) const;
     bool keyProvided(QString key) const;
+    const QList<ContextProviderInfo> listProviders(QString key);
 
     void connectNotify(const char *signal);
     void disconnectNotify(const char *signal);
@@ -46,13 +46,13 @@ public:
     void fireKeysChanged(const QStringList& keys);
     void fireKeysAdded(const QStringList& keys);
     void fireKeysRemoved(const QStringList& keys);
-    void fireKeyDataChanged(const QString& key);
+    void fireKeyChanged(const QString& key);
 
 signals:
     void keysChanged(const QStringList& currentKeys);
     void keysAdded(const QStringList& newKeys);
     void keysRemoved(const QStringList& removedKeys);
-    void keyDataChanged(const QString& key);
+    void keyChanged(const QString& key);
 
 };
 

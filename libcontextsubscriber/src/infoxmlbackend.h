@@ -30,6 +30,7 @@
 #include <QFileSystemWatcher>
 #include "infobackend.h"
 #include "infokeydata.h"
+#include "contextproviderinfo.h"
 
 class InfoXmlBackend : public InfoBackend
 {
@@ -40,14 +41,11 @@ public:
 
     virtual QString name() const;
     virtual QStringList listKeys() const;
-    virtual QStringList listKeysForPlugin(QString plugin) const;
-    virtual QStringList listPlugins() const;
     virtual QString typeForKey(QString key) const;
     virtual QString docForKey(QString key) const;
-    virtual QString pluginForKey(QString key) const;
-    virtual QString constructionStringForKey(QString key) const;
-    virtual bool keyExists(QString key) const;
+    virtual bool keyDeclared(QString key) const;
     virtual bool keyProvided(QString key) const;
+    virtual const QList<ContextProviderInfo> listProviders(QString key) const;
 
     static QString registryPath();
     static QString coreDeclPath();

@@ -24,10 +24,9 @@
 #include "contextpropertyinfo.h"
 #include "infobackend.h"
 
-QMap <QString, QString> constructionStringMap;
+QMap <QString, ContextProviderInfo> providerMap;
 QMap <QString, QString> typeMap;
 QMap <QString, QString> docMap;
-QMap <QString, QString> pluginMap;
 QMap <QString, bool> providedMap;
 
 /* Mocked infobackend */
@@ -42,14 +41,6 @@ InfoBackend* InfoBackend::instance(const QString &backendName)
         currentBackend = new InfoBackend();
         return currentBackend;
     }
-}
-
-QString InfoBackend::constructionStringForKey(QString key) const
-{
-    if (constructionStringMap.contains(key))
-        return constructionStringMap.value(key);
-    else
-        return QString();
 }
 
 QString InfoBackend::typeForKey(QString key) const
@@ -68,21 +59,23 @@ QString InfoBackend::docForKey(QString key) const
         return QString();
 }
 
-QString InfoBackend::pluginForKey(QString key) const
-{
-    if (pluginMap.contains(key))
-        return pluginMap.value(key);
-    else
-        return QString();
-}
-
-bool InfoBackend::keyExists(QString key) const
+bool InfoBackend::keyDeclared(QString key) const
 {
     if (typeMap.contains(key))
         return true;
     else
         return false;
 }
+
+const QList<ContextProviderInfo> InfoBackend::listProviders(QString key)
+{
+    QList<ContextProviderInfo> lst;
+    if (providerMap.contains(key))
+        lst << providerMap.value(key);
+
+    return lst;
+}
+
 
 bool InfoBackend::keyProvided(QString key) const
 {
@@ -115,9 +108,9 @@ void InfoBackend::fireKeysRemoved(const QStringList& keys)
     emit keysRemoved(keys);
 }
 
-void InfoBackend::fireKeyDataChanged(const QString& key)
+void InfoBackend::fireKeyChanged(const QString& key)
 {
-    emit keyDataChanged(key);
+    emit keyChanged(key);
 }
 
 /* ContextRegistryInfoUnitTest */
@@ -132,6 +125,7 @@ private slots:
     void doc();
     void type();
     void exists();
+    void declared();
     void provided();
     void providerDBusName();
     void providerDBusType();
@@ -146,9 +140,17 @@ private slots:
 
 void ContextPropertyInfoUnitTest::initTestCase()
 {
-    constructionStringMap.clear();
-    constructionStringMap.insert("Battery.Charging", "system:org.freedesktop.ContextKit.contextd");
-    constructionStringMap.insert("Media.NowPlaying", "session:com.nokia.musicplayer");
+    providerMap.clear();
+
+    ContextProviderInfo info1;
+    info1.plugin = "contextkit-dbus";
+    info1.constructionString = "system:org.freedesktop.ContextKit.contextd";
+    providerMap.insert("Battery.Charging", info1);
+
+    ContextProviderInfo info2;
+    info2.plugin = "contextkit-dbus";
+    info2.constructionString = "session:com.nokia.musicplayer";
+    providerMap.insert("Media.NowPlaying", info2);
 
     typeMap.clear();
     typeMap.insert("Battery.Charging", "TRUTH");
@@ -157,10 +159,6 @@ void ContextPropertyInfoUnitTest::initTestCase()
     docMap.clear();
     docMap.insert("Battery.Charging", "Battery.Charging doc");
     docMap.insert("Media.NowPlaying", "Media.NowPlaying doc");
-
-    pluginMap.clear();
-    pluginMap.insert("Battery.Charging", "contextkit-dbus");
-    pluginMap.insert("Media.NowPlaying", "contextkit-dbus");
 
     providedMap.clear();
     providedMap.insert("Battery.Charging", true);
@@ -201,6 +199,16 @@ void ContextPropertyInfoUnitTest::exists()
     QCOMPARE(p1.exists(), true);
     QCOMPARE(p2.exists(), true);
     QCOMPARE(p3.exists(), false);
+}
+
+void ContextPropertyInfoUnitTest::declared()
+{
+    ContextPropertyInfo p1("Battery.Charging");
+    ContextPropertyInfo p2("Media.NowPlaying");
+    ContextPropertyInfo p3("Does.Not.Exist");
+    QCOMPARE(p1.declared(), true);
+    QCOMPARE(p2.declared(), true);
+    QCOMPARE(p3.declared(), false);
 }
 
 void ContextPropertyInfoUnitTest::provided()
@@ -258,12 +266,13 @@ void ContextPropertyInfoUnitTest::typeChanged()
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(typeChanged(QString)));
 
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
-    QCOMPARE(spy.count(), 0);
+    QCOMPARE(spy.count(), 1);
+    spy.takeFirst();
 
     typeMap.insert("Battery.Charging", "INT");
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
@@ -275,12 +284,16 @@ void ContextPropertyInfoUnitTest::providerChanged()
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providerChanged(QString)));
 
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
-    QCOMPARE(spy.count(), 0);
+    QCOMPARE(spy.count(), 1);
+    spy.takeFirst();
 
-    constructionStringMap.insert("Battery.Charging", "system:org.freedesktop.ContextKit.robot");
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    ContextProviderInfo info;
+    info.plugin = "contextkit-dbus";
+    info.constructionString = "system:org.freedesktop.ContextKit.robot";
+    providerMap.insert("Battery.Charging", info);
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
@@ -292,15 +305,17 @@ void ContextPropertyInfoUnitTest::providedChanged()
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providedChanged(bool)));
 
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
-    QCOMPARE(spy.count(), 0);
+    QCOMPARE(spy.count(), 1);
+    spy.takeFirst();
 
     providedMap.insert("Battery.Charging", false);
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
+    QCOMPARE(args.at(0).toBool(), false);
 }
 
 void ContextPropertyInfoUnitTest::pluginChanged()
@@ -309,14 +324,18 @@ void ContextPropertyInfoUnitTest::pluginChanged()
     QSignalSpy spy1(&p, SIGNAL(pluginChanged(QString, QString)));
     QSignalSpy spy2(&p, SIGNAL(providerChanged(QString)));
 
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
-    QCOMPARE(spy1.count(), 0);
-    QCOMPARE(spy2.count(), 0);
+    QCOMPARE(spy1.count(), 1);
+    spy1.takeFirst();
+    QCOMPARE(spy2.count(), 1);
+    spy2.takeFirst();
 
-    pluginMap.insert("Battery.Charging", "test.so");
-    constructionStringMap.insert("Battery.Charging", "secret:something");
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    ContextProviderInfo info;
+    info.plugin = "test.so";
+    info.constructionString = "secret:something";
+    providerMap.insert("Battery.Charging", info);
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> args1 = spy1.takeFirst();
@@ -333,15 +352,17 @@ void ContextPropertyInfoUnitTest::dbusTypeChanged()
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providerDBusTypeChanged(QDBusConnection::BusType)));
 
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
+    QCOMPARE(spy.count(), 1);
+    spy.takeFirst();
 
-    QCOMPARE(spy.count(), 0);
+    ContextProviderInfo info;
+    info.plugin = "contextkit-dbus";
+    info.constructionString = "session:org.freedesktop.ContextKit.contextd";
+    providerMap.insert("Battery.Charging", info);
+    currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
-    constructionStringMap.insert("Battery.Charging", "session:org.freedesktop.ContextKit.contextd");
-    currentBackend->fireKeyDataChanged(QString("Battery.Charging"));
-
-    // WE DON'T EMIT THE DBUS TYPE CHANGED ANYMORE!
-    QCOMPARE(spy.count(), 0);
+    QCOMPARE(spy.count(), 1);
 }
 
 #include "contextpropertyinfounittest.moc"

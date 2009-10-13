@@ -29,6 +29,7 @@
 #include "infocdbbackend.h"
 #include "logging.h"
 #include "loggingfeatures.h"
+#include "contextproviderinfo.h"
 
 /*!
     \class InfoCdbBackend
@@ -68,20 +69,9 @@ QStringList InfoCdbBackend::variantListToStringList(const QVariantList &l)
     return ret;
 }
 
-
 QStringList InfoCdbBackend::listKeys() const
 {
     return variantListToStringList(reader.valuesForKey("KEYS"));
-}
-
-QStringList InfoCdbBackend::listKeysForPlugin(QString plugin) const
-{
-    return variantListToStringList(reader.valuesForKey(plugin + ":KEYS"));
-}
-
-QStringList InfoCdbBackend::listPlugins() const
-{
-    return variantListToStringList(reader.valuesForKey("PLUGINS"));
 }
 
 QString InfoCdbBackend::typeForKey(QString key) const
@@ -94,17 +84,7 @@ QString InfoCdbBackend::docForKey(QString key) const
     return reader.valueForKey(key + ":KEYDOC").toString();
 }
 
-QString InfoCdbBackend::pluginForKey(QString key) const
-{
-    return reader.valueForKey(key + ":KEYPLUGIN").toString();
-}
-
-QString InfoCdbBackend::constructionStringForKey(QString key) const
-{
-    return reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING").toString();
-}
-
-bool InfoCdbBackend::keyExists(QString key) const
+bool InfoCdbBackend::keyDeclared(QString key) const
 {
     if (reader.valuesForKey("KEYS").contains(key))
         return true;
@@ -201,10 +181,12 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     QStringList currentKeys = listKeys();
 
     // Emissions
-    checkAndEmitKeysAdded(currentKeys, oldKeys);
-    checkAndEmitKeysRemoved(currentKeys, oldKeys);
-    emit keysChanged(listKeys());
-    checkAndEmitKeysChanged(currentKeys, oldKeys);
+    checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
+    checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
+    emit keysChanged(listKeys()); // DEPRECATED emission
+
+    emit listChanged();
+    checkAndEmitKeyChanged(currentKeys, oldKeys);
 }
 
 /// Called when the directory with cache.db chanes. We start to observe this
@@ -215,4 +197,18 @@ void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
         return;
 
     onDatabaseFileChanged(path);
+}
+
+const QList<ContextProviderInfo> InfoCdbBackend::listProviders(QString key) const
+{
+    ContextProviderInfo info;
+    info.plugin = reader.valueForKey(key + ":KEYPLUGIN").toString();
+    info.constructionString = reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING").toString();
+
+    QList<ContextProviderInfo> lst;
+    if (info.plugin != "") {
+        lst << info;
+    }
+
+    return lst;
 }

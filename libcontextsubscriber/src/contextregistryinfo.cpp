@@ -22,6 +22,9 @@
 #include "contextregistryinfo.h"
 #include "infobackend.h"
 #include "sconnect.h"
+#include "logging.h"
+#include "loggingfeatures.h"
+#include "contextproviderinfo.h"
 #include <QMutex>
 #include <QMutexLocker>
 #include <QCoreApplication>
@@ -64,6 +67,9 @@ ContextRegistryInfo* ContextRegistryInfo::instance(const QString &backendName)
         sconnect(infoBackend, SIGNAL(keysRemoved(QStringList)),
                  registryInstance, SLOT(onKeysRemoved(QStringList)));
 
+        sconnect(infoBackend, SIGNAL(listChanged()),
+                 registryInstance, SLOT(onListChanged()));
+
         // Move the backend to the main thread
         registryInstance->moveToThread(QCoreApplication::instance()->thread());
     }
@@ -80,43 +86,74 @@ QStringList ContextRegistryInfo::listKeys() const
 /// Returns the list of all the keys associated with the given provider.
 QStringList ContextRegistryInfo::listKeys(QString providerName) const
 {
-    // TBD: obsolete this?
-    QStringList keys = InfoBackend::instance()->listKeysForPlugin("contextkit-dbus");
-    QStringList toReturn;
-    foreach (const QString& key, keys) {
-        QString constructionString = InfoBackend::instance()->constructionStringForKey(key);
-        if (constructionString.split(":").last() == providerName) {
-            toReturn << key;
+    contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listKeys(QString provider) is deprecated.";
+
+    QSet<QString> keys;
+
+    foreach (QString key, listKeys()) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+            if (info.plugin == "contextkit-dbus" &&
+                info.constructionString.split(":").last() == providerName) {
+                keys.insert(key);
+            }
         }
     }
-    return toReturn;
+
+    return keys.toList();
 }
 
-/// Returns the list of all the keys associated with the given plugin
+/// DEPRECATED Returns the list of all the keys associated with the given plugin.
 QStringList ContextRegistryInfo::listKeysForPlugin(QString plugin) const
 {
-    return InfoBackend::instance()->listKeysForPlugin(plugin);
+    contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listKeysForPlugin() is deprecated.";
+
+    QSet<QString> keys;
+
+    foreach (QString key, listKeys()) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+            if (info.plugin == plugin) {
+                keys.insert(key);
+            }
+        }
+
+    }
+
+    return keys.toList();
 }
 
-/// Returns the list of all unique providers in the registry.
+/// DEPRECATED Returns the list of all unique providers in the registry.
 /// The lists consist of strings with dbus names of the providers.
 QStringList ContextRegistryInfo::listProviders() const
 {
-    // TBD: obsolete this?
-    QStringList keys = InfoBackend::instance()->listKeysForPlugin("contextkit-dbus");
-    QSet<QString> foundProviders;
-    foreach (const QString& key, keys) {
-        QString constructionString = InfoBackend::instance()->constructionStringForKey(key);
-        foundProviders.insert(constructionString.split(":").last());
+    contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listProviders() is deprecated.";
+
+    QSet<QString> providers;
+
+    foreach (QString key, listKeys()) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+            if (info.plugin == "contextkit-dbus") {
+                providers.insert(info.constructionString.split(":").last());
+            }
+        }
     }
-    QStringList toReturn(foundProviders.toList());
-    return toReturn;
+
+    return providers.toList();
 }
 
-/// Returns the list of all unique plugins in the registry.
+/// DEPRECATED Returns the list of all unique plugins in the registry.
 QStringList ContextRegistryInfo::listPlugins() const
 {
-    return InfoBackend::instance()->listPlugins();
+    contextWarning() << F_DEPRECATION << "ContextRegistryInfo::listPlugins() is deprecated.";
+
+    QSet<QString> plugins;
+
+    foreach (QString key, listKeys()) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+            plugins.insert(info.plugin);
+        }
+    }
+
+    return plugins.toList();
 }
 
 /// Returns the name of the currently used registry backend. Ie. "cdb" or "xml".
@@ -127,21 +164,44 @@ QString ContextRegistryInfo::backendName() const
 
 /* Slots */
 
-/// This is connected to the \a onKeysChanged of the actual info backend instance.
+/// This is connected to the \a keysChanged of the actual info backend instance.
+/// Will be removed when deprecated keysChanged() signal is removed.
 void ContextRegistryInfo::onKeysChanged(const QStringList& currentKeys)
 {
     emit(keysChanged(currentKeys));
 }
 
-/// This is connected to the \a onKeysAdded of the actual info backend instance.
+/// This is connected to the \a keysAdded of the actual info backend instance.
+/// Will be removed when deprecated keysAdded() signal is removed.
 void ContextRegistryInfo::onKeysAdded(const QStringList& newKeys)
 {
     emit(keysAdded(newKeys));
 }
 
-/// This is connected to the \a onKeysRemoved of the actual info backend instance.
+/// This is connected to the \a keysRemoved of the actual info backend instance.
+/// Will be removed when deprecated keysRemoved() signal is removed.
 void ContextRegistryInfo::onKeysRemoved(const QStringList& removedKeys)
 {
     emit(keysRemoved(removedKeys));
 }
 
+/// Called when people connect to signals. Used to emit deprecation warnings
+/// when people connect to deprecated signals.
+void ContextRegistryInfo::connectNotify(const char *signal)
+{
+    QObject::connectNotify(signal);
+
+    if (signal == SIGNAL(keysChanged(QStringList)))
+        contextWarning() << F_DEPRECATION << "ContextRegistryInfo::keysChanged signal is deprecated.";
+    else if (signal == SIGNAL(keysAdded(QStringList)))
+        contextWarning() << F_DEPRECATION << "ContextRegistryInfo::keysAdded signal is deprecated.";
+    else if (signal == SIGNAL(keysRemoved(QStringList)))
+        contextWarning() << F_DEPRECATION << "ContextRegistryInfo::keysRemoved signal is deprecated.";
+}
+
+/// This is connected to the \a listChanged of the actual info backend instance.
+/// Gets called when the list of keys changes.
+void ContextRegistryInfo::onListChanged()
+{
+    emit changed();
+}
