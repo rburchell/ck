@@ -125,6 +125,8 @@ signals:
     /// This is not a strict signal - it might be emitted even when
     /// no actual change happened.
     void changed(QString key);
+    
+    friend class ContextPropertyInfoUnitTest;
 };
 
 #endif // CONTEXTPROPERTYINFO_H

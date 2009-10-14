@@ -264,6 +264,7 @@ void ContextPropertyInfoUnitTest::typeChanged()
 {
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(typeChanged(QString)));
+    p.connectNotify("typeChanged(QString)");
 
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
@@ -282,6 +283,7 @@ void ContextPropertyInfoUnitTest::providerChanged()
 {
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providerChanged(QString)));
+    p.connectNotify("providerChanged(QString)");
 
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
@@ -301,6 +303,7 @@ void ContextPropertyInfoUnitTest::providedChanged()
 {
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providedChanged(bool)));
+    p.connectNotify("providedChanged(bool)");
 
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
@@ -320,6 +323,8 @@ void ContextPropertyInfoUnitTest::pluginChanged()
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy1(&p, SIGNAL(pluginChanged(QString, QString)));
     QSignalSpy spy2(&p, SIGNAL(providerChanged(QString)));
+    p.connectNotify("providerChanged(QString)");
+    p.connectNotify("pluginChanged(QString)");
 
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
@@ -346,6 +351,7 @@ void ContextPropertyInfoUnitTest::dbusTypeChanged()
 {
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providerDBusTypeChanged(QDBusConnection::BusType)));
+    p.connectNotify("providerDBusTypeChanged(QDBusConnection::BusType)");
 
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
     QCOMPARE(spy.count(), 1);
