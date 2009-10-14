@@ -163,6 +163,7 @@ void InfoXmlBackendUnitTest::dynamics()
     utilCopyLocalWithRemove("providers2v2.src", "providers2.context");
     utilCopyLocalWithRemove("providers3.src", "providers3.context");
     utilCopyLocalWithRemove("providers4.src", "providers4.context");
+    utilCopyLocalWithRemove("providers5.src", "providers5.context");
 
     // Again, some basic check
     QCOMPARE(backend->keyDeclared("System.Active"), true);
@@ -183,11 +184,13 @@ void InfoXmlBackendUnitTest::dynamics()
     QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd2"));
 
     QList <ContextProviderInfo> list2 = backend->listProviders("System.Active");
-    QCOMPARE(list2.count(), 2);
+    QCOMPARE(list2.count(), 3);
     QCOMPARE(list2.at(0).plugin, QString("contextkit-dbus"));
     QCOMPARE(list2.at(0).constructionString, QString("system:com.nokia.daemon"));
     QCOMPARE(list2.at(1).plugin, QString("test.so"));
     QCOMPARE(list2.at(1).constructionString, QString("some-string"));
+    QCOMPARE(list2.at(2).plugin, QString("another.so"));
+    QCOMPARE(list2.at(2).constructionString, QString("some-other-string"));
 
     QList <ContextProviderInfo> list3 = backend->listProviders("Battery.Voltage");
     QCOMPARE(list3.count(), 0);
@@ -199,6 +202,7 @@ void InfoXmlBackendUnitTest::cleanupTestCase()
      QFile::remove("providers2.context");
      QFile::remove("providers3.context");
      QFile::remove("providers4.context");
+     QFile::remove("providers5.context");
 }
 
 #include "infoxmlbackendunittest.moc"
