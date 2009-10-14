@@ -26,9 +26,9 @@
 #include "subscriberinterface.h"
 #include "provider.h"
 #include "iproviderplugin.h"
+#include "asyncdbusinterface.h"
 #include <QString>
 #include <QDBusConnection>
-#include <QDBusInterface>
 #include <QDBusObjectPath>
 #include <QSet>
 #include <QVariant>
@@ -71,7 +71,7 @@ private:
 
     DBusNameListener *providerListener; ///< Listens to provider's (dis)appearance over DBus
     SubscriberInterface *subscriberInterface; ///< The D-Bus interface for the Subscriber object
-    QDBusInterface *managerInterface; ///< The D-Bus interface for the Manager object
+    QDBusAbstractInterface *managerInterface; ///< The D-Bus interface for the Manager object
 
     QDBusConnection *connection; ///< The connection to DBus
     QString busName; ///< The D-Bus service name of the ContextKit provider connected to

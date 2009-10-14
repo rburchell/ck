@@ -72,7 +72,7 @@ class Asynchronous(unittest.TestCase):
         provider_slow.send("sleep 3")
         provider_slow.expect(CLTool.STDOUT, "Sleeping", 3) # wait for it
 
-        context_client.send("n test.fast ; n test.slow")
+        context_client.send("n test.slow ; n test.fast")
 
         # check the fast property
         self.assert_(context_client.expect(CLTool.STDOUT,

@@ -6,18 +6,18 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	contextpropertyinfo.cpp contextpropertyinfo.h			\
 	contextregistryinfo.cpp contextregistryinfo.h infobackend.h	\
 	infobackend.cpp infoxmlbackend.h infoxmlbackend.cpp		\
-	infokeydata.h		                                        \
-	cdbwriter.h cdbwriter.cpp cdbreader.cpp cdbreader.h		\
-	infocdbbackend.cpp infocdbbackend.h dbusnamelistener.h		\
-	dbusnamelistener.cpp handlesignalrouter.cpp			\
+	infokeydata.h cdbwriter.h cdbwriter.cpp cdbreader.cpp		\
+	cdbreader.h infocdbbackend.cpp infocdbbackend.h			\
+	dbusnamelistener.h dbusnamelistener.cpp handlesignalrouter.cpp	\
 	handlesignalrouter.h queuedinvoker.cpp queuedinvoker.h		\
 	loggingfeatures.h contextkitplugin.h contextkitplugin.cpp	\
-	iproviderplugin.h contextproviderinfo.h nanoxml.h nanoxml.cpp
+	iproviderplugin.h contextproviderinfo.h nanoxml.h nanoxml.cpp	\
+	asyncdbusinterface.cpp
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h			\
 	contextpropertyinfo.h contextregistryinfo.h iproviderplugin.h	\
-	contextproviderinfo.h
+	contextproviderinfo.h asyncdbusinterface.h
 
 AM_CXXFLAGS = -I$(top_srcdir)/common \
 	      $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
