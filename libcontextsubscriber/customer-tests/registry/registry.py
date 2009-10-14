@@ -20,17 +20,6 @@
 ## Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA
 ##
-##
-## This test:
-##   - prints out the information that is present in the registry for a property
-##   - checks for the provided values on the client stdout
-##   - starts a commander with a different value for that property
-##   - checks the output for the changed value
-##   - changes the value inside the commander to unknown, check it
-##   - changes the value inside the commander back to some meaningful value, check it
-##   - kills the commander
-##   - checks that value goes back to normal
-##
 
 import sys
 import os
@@ -49,10 +38,10 @@ class PrintInfoRunning(unittest.TestCase):
                           "truth", "test.truth", "False")
         provider.send("dump")
         self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 10)) # wait for it
-        info_client = CLTool("context-print-info", "test.int", "test.string", "test.double", "test.truth", "test.nothing")
+        info_client = CLTool("context-ls","test.*")
 
         returnValue = info_client.wait()
-        self.assertEqual(returnValue, 0, "context-print-info exited with return value != 0")
+        self.assertEqual(returnValue, 0, "context-ls exited with return value != 0")
         provider.kill()
 
 class PrintingProperties(unittest.TestCase):
@@ -68,12 +57,12 @@ class PrintingProperties(unittest.TestCase):
         provider.send("dump")
         self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 10),
                      "context-provide.context couldn't been written by context-provide")
-        info_client = CLTool("context-ls","-l","test.*")
+        info_client = CLTool("context-ls","-l","-d","test.*")
 
-        expected_results = ["test.int\tINT\tcontextkit-dbus\tsession:com.nokia.test\tA phony but very flexible property.",
-                            "test.double\tDOUBLE\tcontextkit-dbus\tsession:com.nokia.test\tA phony but very flexible property.",
-                            "test.truth\tTRUTH\tcontextkit-dbus\tsession:com.nokia.test\tA phony but very flexible property.",
-                            "test.string\tSTRING\tcontextkit-dbus\tsession:com.nokia.test\tA phony but very flexible property."]
+        expected_results = ["test.int\tINT\tcontextkit-dbus\tsession:com.nokia.test\nDocumentation: A phony but very flexible property.",
+            "test.double\tDOUBLE\tcontextkit-dbus\tsession:com.nokia.test\nDocumentation: A phony but very flexible property.",
+            "test.truth\tTRUTH\tcontextkit-dbus\tsession:com.nokia.test\nDocumentation: A phony but very flexible property.",
+            "test.string\tSTRING\tcontextkit-dbus\tsession:com.nokia.test\nDocumentation: A phony but very flexible property."]
 
         self.assert_(info_client.expect(CLTool.STDOUT,
                                         "\n".join(expected_results),
