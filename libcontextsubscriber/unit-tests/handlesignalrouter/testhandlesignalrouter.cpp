@@ -73,9 +73,9 @@ PropertyHandle::PropertyHandle(const QString& key)
 {
 }
 
-void PropertyHandle::setValue(QVariant value)
+void PropertyHandle::onValueChanged()
 {
-    emit setValueCalled(myKey, value);
+    emit onValueChangedCalled(myKey);
 }
 
 void PropertyHandle::setSubscribeFinished()
@@ -142,27 +142,30 @@ void HandleSignalRouterUnitTests::routingSignals()
     // Get the object to be tested
     handleSignalRouter = HandleSignalRouter::instance();
     // Start spying the mock handles
-    QSignalSpy spy1(mockHandleOne, SIGNAL(setValueCalled(QString, QVariant)));
-    QSignalSpy spy2(mockHandleTwo, SIGNAL(setValueCalled(QString, QVariant)));
-    QSignalSpy spy3(mockHandleThree, SIGNAL(setValueCalled(QString, QVariant)));
+    QSignalSpy spy1(mockHandleOne, SIGNAL(onValueChangedCalled(QString)));
+    QSignalSpy spy2(mockHandleTwo, SIGNAL(onValueChangedCalled(QString)));
+    QSignalSpy spy3(mockHandleThree, SIGNAL(onValueChangedCalled(QString)));
     QSignalSpy sspy1(mockHandleOne, SIGNAL(setSubscribeFinishedCalled(QString)));
     QSignalSpy sspy2(mockHandleTwo, SIGNAL(setSubscribeFinishedCalled(QString)));
     QSignalSpy sspy3(mockHandleThree, SIGNAL(setSubscribeFinishedCalled(QString)));
 
     // Test:
     // Send a signal to the HandleSignalRouter
-    handleSignalRouter->onValueChanged("Property.One", QVariant(4.3));
+    handleSignalRouter->onValueChanged("Property.One");
     handleSignalRouter->onSubscribeFinished("Property.One");
 
     // Expected results:
     // The mockHandleOne.setValue was called
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> parameters = spy1.takeFirst();
+    QCOMPARE(parameters.size(), 1);
     QCOMPARE(parameters.at(0), QVariant("Property.One"));
-    QCOMPARE(parameters.at(1).value<QVariant >(), QVariant(4.3));
+
     QCOMPARE(sspy1.count(), 1);
     parameters = sspy1.takeFirst();
+    QCOMPARE(parameters.size(), 1);
     QCOMPARE(parameters.at(0), QVariant("Property.One"));
+
     // The setValue of other mock handles were not called
     QCOMPARE(spy2.count(), 0);
     QCOMPARE(spy3.count(), 0);
@@ -171,7 +174,7 @@ void HandleSignalRouterUnitTests::routingSignals()
 
     // Test:
     // Send a signal to the HandleSignalRouter
-    handleSignalRouter->onValueChanged("Property.Two", QVariant("value"));
+    handleSignalRouter->onValueChanged("Property.Two");
     handleSignalRouter->onSubscribeFinished("Property.Two");
 
     // Expected results:
@@ -179,9 +182,10 @@ void HandleSignalRouterUnitTests::routingSignals()
     QCOMPARE(spy2.count(), 1);
     QCOMPARE(sspy2.count(), 1);
     parameters = spy2.takeFirst();
+    QCOMPARE(parameters.size(), 1);
     QCOMPARE(parameters.at(0), QVariant("Property.Two"));
-    QCOMPARE(parameters.at(1).value<QVariant >(), QVariant("value"));
     parameters = sspy2.takeFirst();
+    QCOMPARE(parameters.size(), 1);
     QCOMPARE(parameters.at(0), QVariant("Property.Two"));
     // The setValue of other mock handles were not called
     QCOMPARE(spy1.count(), 0);

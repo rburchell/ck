@@ -201,14 +201,10 @@ void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
 
 const QList<ContextProviderInfo> InfoCdbBackend::listProviders(QString key) const
 {
-    ContextProviderInfo info;
-    info.plugin = reader.valueForKey(key + ":KEYPLUGIN").toString();
-    info.constructionString = reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING").toString();
+    ContextProviderInfo info(reader.valueForKey(key + ":KEYPLUGIN").toString(),
+                             reader.valueForKey(key + ":KEYCONSTRUCTIONSTRING").toString());
 
-    QList<ContextProviderInfo> lst;
-    if (info.plugin != "") {
-        lst << info;
-    }
-
-    return lst;
+    if (info.plugin == "")
+        return QList<ContextProviderInfo>();
+    return QList<ContextProviderInfo>() << info;
 }

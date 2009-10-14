@@ -1,3 +1,4 @@
+contextproviderinfo.h
 iproviderplugin.h
 provider.cpp
 provider.h

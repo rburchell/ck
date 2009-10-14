@@ -65,6 +65,11 @@ private:
     QList<ContextProviderInfo> cachedProviders; ///< Cached list of providers for this key.
     mutable QMutex cacheLock; ///< Lock for the cache.
 
+    QString providerDBusName_i() const;
+    QDBusConnection::BusType providerDBusType_i() const;
+    QString plugin_i() const;
+    QString constructionString_i() const;
+
 private slots:
     void onKeyChanged(const QString& key);
 

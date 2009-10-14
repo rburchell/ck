@@ -266,7 +266,11 @@ bool ContextPropertyInfo::provided() const
 QString ContextPropertyInfo::plugin() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::plugin() is deprecated.";
+    return plugin_i();
+}
 
+QString ContextPropertyInfo::plugin_i() const
+{
     QMutexLocker lock(&cacheLock);
     if (cachedProviders.size() == 0)
         return "";
@@ -279,7 +283,11 @@ QString ContextPropertyInfo::plugin() const
 QString ContextPropertyInfo::constructionString() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::constructionString() is deprecated.";
+    return constructionString_i();
+}
 
+QString ContextPropertyInfo::constructionString_i() const
+{
     QMutexLocker lock(&cacheLock);
     if (cachedProviders.size() == 0)
         return "";
@@ -287,13 +295,8 @@ QString ContextPropertyInfo::constructionString() const
         return cachedProviders.at(0).constructionString;
 }
 
-/// DEPRECATED Returns the dbus name of the provider supplying this
-/// property/key. This function is maintained for backwards
-/// compatibility. Use listProviders() instead.
-QString ContextPropertyInfo::providerDBusName() const
+QString ContextPropertyInfo::providerDBusName_i() const
 {
-    contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusName() is deprecated.";
-
     QMutexLocker lock(&cacheLock);
     if (cachedProviders.size() == 0)
         return "";
@@ -307,13 +310,17 @@ QString ContextPropertyInfo::providerDBusName() const
     }
 }
 
-/// DEPRECATED Returns the bus type of the provider supplying this property/key.
-/// Ie. if it's a session bus or a system bus. This function is
-/// maintained for backwards compatibility. Use listProviders() instead.
-QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
-{
-    contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusType() is deprecated.";
 
+/// DEPRECATED Returns the dbus name of the provider supplying this
+/// property/key. This function is maintained for backwards
+/// compatibility. Use listProviders() instead.
+QString ContextPropertyInfo::providerDBusName() const
+{
+    contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusName() is deprecated.";
+    return providerDBusName_i();
+}
+QDBusConnection::BusType ContextPropertyInfo::providerDBusType_i() const
+{
     QMutexLocker lock(&cacheLock);
     QString busType = "";
 
@@ -328,6 +335,16 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
         return QDBusConnection::SystemBus;
     else /* if (busType == "session") */
         return QDBusConnection::SessionBus;
+}
+
+
+/// DEPRECATED Returns the bus type of the provider supplying this property/key.
+/// Ie. if it's a session bus or a system bus. This function is
+/// maintained for backwards compatibility. Use listProviders() instead.
+QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
+{
+    contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusType() is deprecated.";
+    return providerDBusType_i();
 }
 
 /* Slots */
@@ -361,9 +378,9 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
     emit existsChanged(cachedDeclared);
     emit providedChanged(cachedProvided);
 
-    emit providerChanged(providerDBusName());
-    emit providerDBusTypeChanged(providerDBusType());
-    emit pluginChanged(plugin(), constructionString());
+    emit providerChanged(providerDBusName_i());
+    emit providerDBusTypeChanged(providerDBusType_i());
+    emit pluginChanged(plugin_i(), constructionString_i());
 }
 
 /// Returns a list of providers that provide this key.
@@ -375,9 +392,10 @@ const QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
 
 /// Called when people connect to signals. Used to emit deprecation warnings
 /// when people connect to deprecated signals.
-void ContextPropertyInfo::connectNotify(const char *signal)
+void ContextPropertyInfo::connectNotify(const char *_signal)
 {
-    QObject::connectNotify(signal);
+    QObject::connectNotify(_signal);
+    QLatin1String signal(_signal);
 
     if (signal == SIGNAL(providerChanged(QString)))
         contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerChanged signal is deprecated.";
@@ -389,6 +407,6 @@ void ContextPropertyInfo::connectNotify(const char *signal)
         contextWarning() << F_DEPRECATION << "ContextPropertyInfo::existsChanged signal is deprecated.";
     else if (signal == SIGNAL(providedChanged(bool)))
         contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providedChanged signal is deprecated.";
-    else if (signal == SIGNAL(pluginChanged(QString, QString)))
+    else if (signal == SIGNAL(pluginChanged(QString,QString)))
         contextWarning() << F_DEPRECATION << "ContextPropertyInfo::pluginChanged signal is deprecated.";
 }

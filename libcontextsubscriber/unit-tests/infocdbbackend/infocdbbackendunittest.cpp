@@ -105,7 +105,8 @@ void InfoCdbBackendUnitTest::initTestCase()
 
 void InfoCdbBackendUnitTest::databaseDirectory()
 {
-    QVERIFY(backend->databaseDirectory() == QString("./") || backend->databaseDirectory() == QString("."));
+    QVERIFY(backend->databaseDirectory() == QString("./") ||
+            backend->databaseDirectory() == QString("."));
 }
 
 void InfoCdbBackendUnitTest::databaseExists()

@@ -29,6 +29,13 @@ struct ContextProviderInfo
 {
     QString plugin;
     QString constructionString;
+    ContextProviderInfo(const QString& plugin, const QString& constructionString)
+    : plugin(plugin), constructionString(constructionString) { }
+    bool operator<(const ContextProviderInfo& other) const
+        {
+            return plugin < other.plugin ||
+                (plugin == other.plugin && constructionString < other.constructionString);
+        }
 };
 
 #endif // CONTEXTPROVIDERINFO

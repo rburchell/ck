@@ -51,7 +51,7 @@ public:
 
     static PropertyHandle* instance(const QString& key);
 
-    void setValue(QVariant newValue);
+    void onValueChanged();
     void setSubscribeFinished();
     static void ignoreCommander();
     static void setTypeCheck(bool typeCheck);
