@@ -38,6 +38,7 @@ private slots:
     void firstLevelAccessor();
     void secondLevelAccessor();
     void thirdLevelAccessor();
+    void keyValues();
     void treeDump();
 };
 
@@ -215,6 +216,32 @@ void NanoXmlUnitTest::doesNotExist()
     NanoXml nano("does-not-exist.xml");
     QCOMPARE(nano.didFail(), true);
     QCOMPARE(nano.root(), QVariant());
+}
+
+void NanoXmlUnitTest::keyValues()
+{
+    QVariantList list1;
+    QVariantList list2;
+    QVariantList list3;
+    QVariantList list4;
+    
+    list2 << "provider";
+    list2 << "value1";
+    list3 << "provider";
+    list3 << "value2";
+    list4 << "other";
+    list4 << "value3";
+    
+    list1 << QVariant(list2);
+    list1 << QVariant(list3);
+    list1 << QVariant(list4);
+    
+    QVariantList result = NanoXml::keyValues("provider", QVariant(list1));
+    QCOMPARE(result.size(), 2);
+    QCOMPARE(result.at(0).toList().at(0).toString(), QString("provider"));
+    QCOMPARE(result.at(0).toList().at(1).toString(), QString("value1"));
+    QCOMPARE(result.at(1).toList().at(0).toString(), QString("provider"));
+    QCOMPARE(result.at(1).toList().at(1).toString(), QString("value2"));
 }
 
 void NanoXmlUnitTest::treeDump()
