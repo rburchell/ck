@@ -46,7 +46,12 @@ struct TimedValue
     struct timespec time;
     QVariant value;
     TimedValue(const QVariant &value);
-// future    bool operator<(const TimedValue &other);
+    bool operator<(const TimedValue &other)
+		{
+			return ((time.tv_sec < other.time.tv_sec) ||
+					(time.tv_sec == other.time.tv_sec &&
+					 time.tv_nsec < other.time.tv_nsec));
+		}
 };
 
 class Provider : public QueuedInvoker
@@ -60,7 +65,7 @@ public:
     TimedValue get(const QString &key) const;
 
 signals:
-    void subscribeFinished(QString key);
+    void subscribeFinished(Provider *provider, QString key);
     void valueChanged(QString key);
 
 private slots:

@@ -28,6 +28,8 @@
 
 namespace ContextSubscriber {
 
+class Provider;
+
 class HandleSignalRouter : public QObject
 {
     Q_OBJECT
@@ -36,7 +38,7 @@ public:
 
 public slots:
     void onValueChanged(QString key);
-    void onSubscribeFinished(QString key);
+    void onSubscribeFinished(Provider *provider, QString key);
 
 private:
     HandleSignalRouter();
