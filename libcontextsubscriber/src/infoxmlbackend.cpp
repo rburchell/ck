@@ -288,9 +288,7 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
     }
 
     // Add provider details
-    ContextProviderInfo providerInfo;
-    providerInfo.plugin = plugin;
-    providerInfo.constructionString = constructionString;
+    ContextProviderInfo providerInfo(plugin, constructionString);
 
     // Suport old-style XML...
     if (providerInfo.plugin == "") {
