@@ -195,12 +195,9 @@ const QList<ContextProviderInfo> InfoCdbBackend::listProviders(QString key) cons
     QVariant providers = reader.valueForKey(key + ":PROVIDERS");
     QList<ContextProviderInfo> lst;
 
-    foreach (QVariant variant, providers.toList()) {
-        ContextProviderInfo info;
-        info.plugin = variant.toHash().value("plugin").toString();
-        info.constructionString = variant.toHash().value("constructionString").toString();
-        lst << info;
-    }
+    foreach (QVariant variant, providers.toList()) 
+        lst << ContextProviderInfo(variant.toHash().value("plugin").toString(), 
+                                   variant.toHash().value("constructionString").toString());
 
     return lst;
 }

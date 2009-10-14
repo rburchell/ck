@@ -55,8 +55,7 @@ QStringList InfoBackend::listKeys() const
 const QList<ContextProviderInfo> InfoBackend::listProviders(QString key)
 {
     QList<ContextProviderInfo> lst;
-    ContextProviderInfo info;
-    info.plugin = "contextkit-dbus";
+    ContextProviderInfo info("contextkit-dbus", "");
 
     if (key == "Battery.Charging") {
         info.constructionString = "system:org.freedesktop.ContextKit.contextd";

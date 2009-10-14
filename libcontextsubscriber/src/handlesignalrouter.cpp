@@ -47,10 +47,10 @@ HandleSignalRouter* HandleSignalRouter::instance()
     return &myInstance;
 }
 
-void HandleSignalRouter::onValueChanged(QString key, QVariant value)
+void HandleSignalRouter::onValueChanged(QString key)
 {
     PropertyHandle* handle = PropertyHandle::instance(key);
-    handle->setValue(value);
+    handle->onValueChanged();
 }
 
 void HandleSignalRouter::onSubscribeFinished(QString key)

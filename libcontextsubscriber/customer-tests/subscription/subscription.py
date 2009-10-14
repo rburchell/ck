@@ -72,7 +72,7 @@ class Subscription(unittest.TestCase):
                                           "\ntest.int = int:1\n",
                                           "\ntest.string = QString:foobar\n",
                                           "\ntest.truth = bool:true\n"],
-                                         1),
+                                         10),
                         "Actual key values pairs do not match expected")
 
                 provider.send("test.int = 100")

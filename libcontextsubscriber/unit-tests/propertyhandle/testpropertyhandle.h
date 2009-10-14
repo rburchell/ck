@@ -55,9 +55,9 @@ private slots:
 
     void subscriptionPendingAndFinished();
 
-    void setValueWithoutTypeCheck();
-    void setValueWithTypeCheckAndCorrectTypes();
-    void setValueWithTypeCheckAndIncorrectTypes();
+    void onValueChangedWithoutTypeCheck();
+    void onValueChangedWithTypeCheckAndCorrectTypes();
+    void onValueChangedWithTypeCheckAndIncorrectTypes();
 
     void commanderAppearsAndDisappears();
     void commandingDisabled();
