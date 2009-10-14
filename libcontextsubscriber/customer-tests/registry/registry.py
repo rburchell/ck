@@ -59,13 +59,14 @@ class PrintingProperties(unittest.TestCase):
                      "context-provide.context couldn't been written by context-provide")
         info_client = CLTool("context-ls","-l","-d","test.*")
 
-        expected_results = ["test.int\tINT\tcontextkit-dbus\tsession:com.nokia.test\nDocumentation: A phony but very flexible property.",
-            "test.double\tDOUBLE\tcontextkit-dbus\tsession:com.nokia.test\nDocumentation: A phony but very flexible property.",
-            "test.truth\tTRUTH\tcontextkit-dbus\tsession:com.nokia.test\nDocumentation: A phony but very flexible property.",
-            "test.string\tSTRING\tcontextkit-dbus\tsession:com.nokia.test\nDocumentation: A phony but very flexible property."]
+        expected_results = ["\ntest.int\tINT\tcontextkit-dbus\tsession:com.nokia.test\n",
+                            "\ntest.double\tDOUBLE\tcontextkit-dbus\tsession:com.nokia.test\n",
+                            "\ntest.truth\tTRUTH\tcontextkit-dbus\tsession:com.nokia.test\n",
+                            "\ntest.string\tSTRING\tcontextkit-dbus\tsession:com.nokia.test\n",
+                            "\nDocumentation: A phony but very flexible property.\n"]
 
-        self.assert_(info_client.expect(CLTool.STDOUT,
-                                        "\n".join(expected_results),
+        self.assert_(info_client.expectAll(CLTool.STDOUT,
+                                        expected_results,
                                         1),
                      "Bad introspection result from context-ls")
 
