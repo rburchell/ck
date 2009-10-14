@@ -169,6 +169,11 @@ void ContextRegistryInfoUnitTest::signalling()
     QSignalSpy spy3(registry, SIGNAL(keysRemoved(QStringList)));
     QSignalSpy spy4(registry, SIGNAL(changed()));
 
+    registry->connectNotify("keysChanged(QStringList)");
+    registry->connectNotify("keysAdded(QStringList)");
+    registry->connectNotify("keysRemoved(QStringList)");
+    registry->connectNotify("changed()");
+
     QStringList keys;
     keys << QString("Battery.Charging");
     keys << QString("Media.NowPlaying");
