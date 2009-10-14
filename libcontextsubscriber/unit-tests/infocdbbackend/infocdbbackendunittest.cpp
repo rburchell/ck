@@ -36,6 +36,7 @@ private:
 
 private slots:
     void initTestCase();
+    void name();
     void databaseExists();
     void databaseDirectory();
     void listKeys();
@@ -120,6 +121,11 @@ void InfoCdbBackendUnitTest::initTestCase()
     utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoCdbBackend();
+}
+
+void InfoCdbBackendUnitTest::name()
+{
+    QCOMPARE(backend->name(), QString("cdb"));
 }
 
 void InfoCdbBackendUnitTest::databaseDirectory()
