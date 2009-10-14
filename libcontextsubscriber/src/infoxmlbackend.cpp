@@ -361,17 +361,4 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
 const QList<ContextProviderInfo> InfoXmlBackend::listProviders(QString key) const
 {
     return keyProvidersHash.value(key);
-    /*
-    QList<ContextProviderInfo> lst;
-
-    if (! keyDataHash.contains(key))
-        return lst;
-
-    ContextProviderInfo info;
-    info.plugin = keyDataHash.value(key).plugin;
-    info.constructionString = keyDataHash.value(key).constructionString;
-
-    lst << info;
-    return lst;
-    */
 }

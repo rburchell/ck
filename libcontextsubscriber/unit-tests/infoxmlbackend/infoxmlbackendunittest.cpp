@@ -130,7 +130,8 @@ void InfoXmlBackendUnitTest::keyDeclared()
 
 void InfoXmlBackendUnitTest::paths()
 {
-    QVERIFY(InfoXmlBackend::registryPath() == QString("./") || InfoXmlBackend::registryPath() == QString("."));
+    QVERIFY(InfoXmlBackend::registryPath() == QString("./") ||
+            InfoXmlBackend::registryPath() == QString("."));
     QCOMPARE(InfoXmlBackend::coreDeclPath(), QString("/dev/null"));
 }
 

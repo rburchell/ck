@@ -52,24 +52,14 @@ QString ContextPropertyInfo::type() const
     return myType;
 }
 
-bool ContextPropertyInfo::exists() const
-{
-    return myType != "";
-}
-
 bool ContextPropertyInfo::provided() const
 {
     return true;
 }
 
-QString ContextPropertyInfo::plugin() const
+QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
 {
-    return "fakeplugin";
-}
-
-QString ContextPropertyInfo::constructionString() const
-{
-    return "fakeconstructionstring";
+    return QList<ContextProviderInfo>() << ContextProviderInfo("fakeplugin", "fakeconstructionstring");
 }
 
 // Mock implementation of the ContextRegistryInfo
@@ -110,6 +100,12 @@ Provider* mockProvider;
 Provider* mockCommanderProvider;
 DBusNameListener* mockDBusNameListener;
 
+// Mock implementation of TimedValue
+TimedValue::TimedValue(const QVariant &value) : value(value)
+{
+    clock_gettime(CLOCK_MONOTONIC, &time);
+}
+
 // Mock implementation of the Provider
 int Provider::instanceCount = 0;
 QStringList Provider::instancePluginNames;
@@ -122,12 +118,14 @@ int Provider::unsubscribeCount = 0;
 QStringList Provider::unsubscribeKeys;
 QStringList Provider::unsubscribeProviderNames;
 
-Provider* Provider::instance(const QString &plugin, const QString& constructionString)
+TimedValue Provider::cachedValue = TimedValue(QVariant());
+
+Provider* Provider::instance(const ContextProviderInfo& providerInfo)
 {
     ++ instanceCount;
-    instancePluginNames << plugin;
-    instancePluginConstructionStrings << constructionString;
-    if (constructionString.contains("Commander")) {
+    instancePluginNames << providerInfo.plugin;
+    instancePluginConstructionStrings << providerInfo.constructionString;
+    if (providerInfo.constructionString.contains("Commander")) {
         return mockCommanderProvider;
     }
     return mockProvider;
@@ -153,6 +151,17 @@ void Provider::unsubscribe(const QString& key)
     ++unsubscribeCount;
     unsubscribeKeys << key;
     unsubscribeProviderNames << myName;
+}
+
+void Provider::setValue(const QString &key, const QVariant &value)
+{
+    cachedValue = TimedValue(value);
+    PropertyHandle::instance(key)->onValueChanged();
+}
+
+TimedValue Provider::get(const QString &key) const
+{
+    return cachedValue;
 }
 
 void Provider::resetLogs()
@@ -426,7 +435,7 @@ void PropertyHandleUnitTests::subscribeTwiceAndUnsubscribeTwice()
     QCOMPARE(Provider::unsubscribeKeys.at(0), key);
 }
 
-void PropertyHandleUnitTests::setValueWithoutTypeCheck()
+void PropertyHandleUnitTests::onValueChangedWithoutTypeCheck()
 {
     // Setup:
     // Create the object to be tested
@@ -442,7 +451,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a double
-    propertyHandle->setValue(QVariant(1.4));
+    Provider::setValue(key, QVariant(1.4));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -453,7 +462,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     // Test:
     spy.clear();
     // Command the PropertyHandle to set its value to the same value it already has
-    propertyHandle->setValue(QVariant(1.4));
+    Provider::setValue(key, QVariant(1.4));
 
     // Expected results:
     // The valueChanged signal is not emitted
@@ -463,7 +472,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is an integer
-    propertyHandle->setValue(QVariant(-8));
+    Provider::setValue(key, QVariant(-8));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -475,7 +484,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     // Test:
     spy.clear();
     // Command the PropertyHandle to set its value to the same value it already has
-    propertyHandle->setValue(QVariant(-8));
+    Provider::setValue(key, QVariant(-8));
 
     // Expected results:
     // The valueChanged signal is not emitted
@@ -485,7 +494,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a string
-    propertyHandle->setValue(QVariant("myValue"));
+    Provider::setValue(key, QVariant("myValue"));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -497,7 +506,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     // Test:
     spy.clear();
     // Command the PropertyHandle to set its value to the same value it already has
-    propertyHandle->setValue(QVariant("myValue"));
+    Provider::setValue(key, QVariant("myValue"));
 
     // Expected results:
     // The valueChanged signal is not emitted
@@ -507,7 +516,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a boolean
-    propertyHandle->setValue(QVariant(true));
+    Provider::setValue(key, QVariant(true));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -519,7 +528,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     // Test:
     spy.clear();
     // Command the PropertyHandle to set its value to the same value it already has
-    propertyHandle->setValue(QVariant(true));
+    Provider::setValue(key, QVariant(true));
 
     // Expected results:
     // The valueChanged signal is not emitted
@@ -529,7 +538,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a null
-    propertyHandle->setValue(QVariant());
+    Provider::setValue(key, QVariant());
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -541,7 +550,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
     // Test:
     spy.clear();
     // Command the PropertyHandle to set its value to the same value it already has
-    propertyHandle->setValue(QVariant());
+    Provider::setValue(key, QVariant());
 
     // Expected results:
     // The valueChanged signal is not emitted
@@ -549,7 +558,7 @@ void PropertyHandleUnitTests::setValueWithoutTypeCheck()
 
 }
 
-void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
+void PropertyHandleUnitTests::onValueChangedWithTypeCheckAndCorrectTypes()
 {
     // Setup:
     // Create the object to be tested
@@ -572,7 +581,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     // Test:
     // Command the PropertyHandle to change its value
     // The new value is a double
-    propertyHandle->setValue(QVariant(1.4));
+    Provider::setValue(key, QVariant(1.4));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -584,7 +593,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a null
-    propertyHandle->setValue(QVariant());
+    Provider::setValue(key, QVariant());
 
     // Expected results:
     // The NULL value is always accepcted (not depending on the type)
@@ -602,7 +611,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     // Test:
     // Command the PropertyHandle to change its value
     // The new value is an integer
-    propertyHandle->setValue(QVariant(-8));
+    Provider::setValue(key, QVariant(-8));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -615,7 +624,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a null
-    propertyHandle->setValue(QVariant());
+    Provider::setValue(key, QVariant());
 
     // Expected results:
     // The NULL value is always accepcted (not depending on the type)
@@ -633,7 +642,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     // Test:
     // Command the PropertyHandle to change its value
     // The new value is a string
-    propertyHandle->setValue(QVariant("myValue"));
+    Provider::setValue(key, QVariant("myValue"));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -646,7 +655,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a null
-    propertyHandle->setValue(QVariant());
+    Provider::setValue(key, QVariant());
 
     // Expected results:
     // The NULL value is always accepcted (not depending on the type)
@@ -664,7 +673,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     // Test:
     // Command the PropertyHandle to change its value
     // The new value is a boolean
-    propertyHandle->setValue(QVariant(true));
+    Provider::setValue(key, QVariant(true));
 
     // Expected results:
     // The valueChanged signal was emitted
@@ -677,7 +686,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
     spy.clear();
     // Command the PropertyHandle to change its value
     // The new value is a null
-    propertyHandle->setValue(QVariant());
+    Provider::setValue(key, QVariant());
 
     // Expected results:
     // The NULL value is always accepcted (not depending on the type)
@@ -689,7 +698,7 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndCorrectTypes()
 
 }
 
-void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
+void PropertyHandleUnitTests::onValueChangedWithTypeCheckAndIncorrectTypes()
 {
     // Setup:
     // Create the object to be tested
@@ -708,15 +717,15 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
     // Set the type to DOUBLE
     mockContextPropertyInfo->myType = "DOUBLE";
     // Set an initial value
-    propertyHandle->setValue(QVariant(4.2));
+    Provider::setValue(key, QVariant(4.2));
     spy.clear();
 
     // Test:
     // Command the PropertyHandle to change its value multiple times but with
     // incorrect types.
-    propertyHandle->setValue(QVariant(5));
-    propertyHandle->setValue(QVariant("string"));
-    propertyHandle->setValue(QVariant(false));
+    Provider::setValue(key, QVariant(5));
+    Provider::setValue(key, QVariant("string"));
+    Provider::setValue(key, QVariant(false));
 
     // Expected results:
     // The valueChanged signal was not emitted
@@ -728,15 +737,15 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
     // Set the type to INT
     mockContextPropertyInfo->myType = "INT";
     // Set an initial value
-    propertyHandle->setValue(QVariant(22));
+    Provider::setValue(key, QVariant(22));
     spy.clear();
 
     // Test:
     // Command the PropertyHandle to change its value multiple times but with
     // incorrect types.
-    propertyHandle->setValue(QVariant(5.6));
-    propertyHandle->setValue(QVariant("string"));
-    propertyHandle->setValue(QVariant(false));
+    Provider::setValue(key, QVariant(5.6));
+    Provider::setValue(key, QVariant("string"));
+    Provider::setValue(key, QVariant(false));
 
     // Expected results:
     // The valueChanged signal was not emitted
@@ -748,15 +757,15 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
     // Set the type to STRING
     mockContextPropertyInfo->myType = "STRING";
     // Set an initial value
-    propertyHandle->setValue(QVariant("myString"));
+    Provider::setValue(key, QVariant("myString"));
     spy.clear();
 
     // Test:
     // Command the PropertyHandle to change its value multiple times but with
     // incorrect types.
-    propertyHandle->setValue(QVariant(5.4));
-    propertyHandle->setValue(QVariant(-8));
-    propertyHandle->setValue(QVariant(false));
+    Provider::setValue(key, QVariant(5.4));
+    Provider::setValue(key, QVariant(-8));
+    Provider::setValue(key, QVariant(false));
 
     // Expected results:
     // The valueChanged signal was not emitted
@@ -768,15 +777,15 @@ void PropertyHandleUnitTests::setValueWithTypeCheckAndIncorrectTypes()
     // Set the type to TRUTH
     mockContextPropertyInfo->myType = "TRUTH";
     // Set an initial value
-    propertyHandle->setValue(QVariant(false));
+    Provider::setValue(key, QVariant(false));
     spy.clear();
 
     // Test:
     // Command the PropertyHandle to change its value multiple times but with
     // incorrect types.
-    propertyHandle->setValue(QVariant(5.4));
-    propertyHandle->setValue(QVariant(-8));
-    propertyHandle->setValue(QVariant("string"));
+    Provider::setValue(key, QVariant(5.4));
+    Provider::setValue(key, QVariant(-8));
+    Provider::setValue(key, QVariant("string"));
 
     // Expected results:
     // The valueChanged signal was not emitted

@@ -23,11 +23,13 @@
 #define PROVIDER_H
 
 #include "queuedinvoker.h"
+#include "contextproviderinfo.h"
 
 #include <QObject>
 #include <QDBusConnection>
 #include <QSet>
 #include <QMutex>
+#include <time.h>
 
 class ContextPropertyInfo;
 
@@ -39,18 +41,27 @@ class DBusNameListener;
 class ManagerInterface;
 class IProviderPlugin;
 
+struct TimedValue
+{
+    struct timespec time;
+    QVariant value;
+    TimedValue(const QVariant &value);
+// future    bool operator<(const TimedValue &other);
+};
+
 class Provider : public QueuedInvoker
 {
     Q_OBJECT
 
 public:
-    static Provider* instance(const QString& plugin, const QString& constructionString);
+    static Provider* instance(const ContextProviderInfo& providerInfo);
     bool subscribe(const QString &key);
     void unsubscribe(const QString &key);
+    TimedValue get(const QString &key) const;
 
 signals:
     void subscribeFinished(QString key);
-    void valueChanged(QString key, QVariant value);
+    void valueChanged(QString key);
 
 private slots:
     void onPluginReady();
@@ -61,15 +72,14 @@ private slots:
 
 private:
     enum PluginState { INITIALIZING, READY, FAILED };
-    Provider(const QString &plugin, const QString &constructionString);
+    Provider(const ContextProviderInfo& providerInfo);
     Q_INVOKABLE void handleSubscribes();
     Q_INVOKABLE void constructPlugin();
     void signalSubscribeFinished(QString key);
 
     IProviderPlugin* plugin; ///< Plugin instance communicating with the concrete provider.
     PluginState pluginState;
-    QString pluginName;
-    QString constructionString; ///< Parameter used for initialize the plugin.
+    ContextProviderInfo providerInfo;  ///< Parameters used to initialize the plugin.
 
     QMutex subscribeLock;
     QSet<QString> toSubscribe; ///< Keys pending for subscription
@@ -77,6 +87,8 @@ private:
 
     // FIXME: rename this to something which contains the word intention in it
     QSet<QString> subscribedKeys; ///< The keys that should be currently subscribed to
+
+    QMap<QString, TimedValue> values; ///< A cache of values already received from the plugin
 };
 
 } // end namespace

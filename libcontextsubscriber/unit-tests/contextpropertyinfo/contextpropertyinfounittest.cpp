@@ -70,7 +70,7 @@ const QList<ContextProviderInfo> InfoBackend::listProviders(QString key)
 {
     QList<ContextProviderInfo> lst;
     if (providerMap.contains(key))
-        lst << providerMap.value(key);
+        lst << providerMap.value(key, ContextProviderInfo("", ""));
 
     return lst;
 }
@@ -132,14 +132,10 @@ void ContextPropertyInfoUnitTest::initTestCase()
 {
     providerMap.clear();
 
-    ContextProviderInfo info1;
-    info1.plugin = "contextkit-dbus";
-    info1.constructionString = "system:org.freedesktop.ContextKit.contextd";
+    ContextProviderInfo info1("contextkit-dbus", "system:org.freedesktop.ContextKit.contextd");
     providerMap.insert("Battery.Charging", info1);
 
-    ContextProviderInfo info2;
-    info2.plugin = "contextkit-dbus";
-    info2.constructionString = "session:com.nokia.musicplayer";
+    ContextProviderInfo info2("contextkit-dbus", "session:com.nokia.musicplayer");
     providerMap.insert("Media.NowPlaying", info2);
 
     typeMap.clear();
@@ -275,9 +271,7 @@ void ContextPropertyInfoUnitTest::providerChanged()
     QCOMPARE(spy.count(), 1);
     spy.takeFirst();
 
-    ContextProviderInfo info;
-    info.plugin = "contextkit-dbus";
-    info.constructionString = "system:org.freedesktop.ContextKit.robot";
+    ContextProviderInfo info("contextkit-dbus", "system:org.freedesktop.ContextKit.robot");
     providerMap.insert("Battery.Charging", info);
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
@@ -317,9 +311,7 @@ void ContextPropertyInfoUnitTest::pluginChanged()
     QCOMPARE(spy2.count(), 1);
     spy2.takeFirst();
 
-    ContextProviderInfo info;
-    info.plugin = "test.so";
-    info.constructionString = "secret:something";
+    ContextProviderInfo info("test.so", "secret:something");
     providerMap.insert("Battery.Charging", info);
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
@@ -342,9 +334,7 @@ void ContextPropertyInfoUnitTest::dbusTypeChanged()
     QCOMPARE(spy.count(), 1);
     spy.takeFirst();
 
-    ContextProviderInfo info;
-    info.plugin = "contextkit-dbus";
-    info.constructionString = "session:org.freedesktop.ContextKit.contextd";
+    ContextProviderInfo info("contextkit-dbus", "session:org.freedesktop.ContextKit.contextd");
     providerMap.insert("Battery.Charging", info);
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 

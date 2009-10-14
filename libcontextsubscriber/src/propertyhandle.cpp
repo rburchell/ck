@@ -24,6 +24,7 @@
 #include "sconnect.h"
 #include "contextpropertyinfo.h"
 #include "contextregistryinfo.h"
+#include "contextproviderinfo.h"
 #include "dbusnamelistener.h"
 #include "logging.h"
 #include "loggingfeatures.h"
@@ -40,8 +41,7 @@ namespace ContextSubscriber {
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
 static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
-static const QString commanderPluginName = "contextkit-dbus";
-static const QString commanderPluginString = "session:org.freedesktop.ContextKit.Commander";
+static const ContextProviderInfo commanderInfo("contextkit-dbus", "session:org.freedesktop.ContextKit.Commander");
 
 DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusType, commanderDBusName);
 bool PropertyHandle::commandingEnabled = true;
@@ -84,9 +84,7 @@ PropertyHandle::PropertyHandle(const QString& key)
     myInfo = new ContextPropertyInfo(myKey, this);
 
     // Start listening to changes in property introspection (e.g., added to registry, plugin changes)
-    sconnect(myInfo, SIGNAL(providedChanged(bool)),
-             this, SLOT(updateProvider()));
-    sconnect(myInfo, SIGNAL(pluginChanged(QString, QString)),
+    sconnect(myInfo, SIGNAL(changed(QString)),
              this, SLOT(updateProvider()));
 
     // Start listening for the context commander, and also initiate a
@@ -135,7 +133,7 @@ void PropertyHandle::updateProvider()
     if (commandingEnabled && commanderListener->isServicePresent() == DBusNameListener::Present) {
         // If commander is present it should be able to override the
         // property, so connect to it.
-        newProvider = Provider::instance(commanderPluginName, commanderPluginString);
+        newProvider = Provider::instance(commanderInfo);
     } else {
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
@@ -144,8 +142,13 @@ void PropertyHandle::updateProvider()
             // If myInfo knows the current provider which should be
             // connected to, connect to it.
             contextDebug() << F_PLUGINS << "Key exists";
-            newProvider = Provider::instance(myInfo->plugin(),
-                                             myInfo->constructionString());
+            QList<ContextProviderInfo> providers = myInfo->listProviders();
+            if (providers.size() > 1)
+                contextCritical() << "multi-process not implemented yet";
+            else if (providers.size() == 0)
+                contextCritical() << "property provided() but no listProviders() is empty";
+
+            newProvider = Provider::instance(providers[0]);
         } else {
             // Otherwise we keep the pointer to the old provider.
             // This way, we can still continue communicating with the
@@ -228,8 +231,11 @@ bool PropertyHandle::isSubscribePending() const
 /// checks are enabled.  The verification errors are signalled on the
 /// stderr.  After the check it updates the value and emits the
 /// valueChanged() signal.
-void PropertyHandle::setValue(QVariant newValue)
+void PropertyHandle::onValueChanged()
 {
+    // FIXME: implement multiprocess here
+    QVariant newValue = myProvider->get(myKey).value;
+
     if (typeCheckEnabled // type checks enabled
         && !newValue.isNull() // variable is non-null
         && myInfo->type() != "") { // the type is found in the registry
