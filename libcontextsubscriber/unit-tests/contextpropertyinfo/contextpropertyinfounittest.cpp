@@ -118,6 +118,7 @@ private slots:
     void declared();
     void provided();
     void providers();
+    void resolutionStrategy();
     void providerDBusName();
     void providerDBusType();
     void plugin();
@@ -221,6 +222,12 @@ void ContextPropertyInfoUnitTest::providers()
     QCOMPARE(providers.size(), 1);
     QCOMPARE(providers.at(0).plugin, QString("contextkit-dbus"));
     QCOMPARE(providers.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd"));
+}
+
+void ContextPropertyInfoUnitTest::resolutionStrategy()
+{
+    ContextPropertyInfo p("Battery.Charging");
+    QCOMPARE(p.resolutionStrategy(), ContextPropertyInfo::LastValue);
 }
 
 void ContextPropertyInfoUnitTest::providerDBusType()
