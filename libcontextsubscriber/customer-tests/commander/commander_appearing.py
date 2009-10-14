@@ -50,7 +50,7 @@ class CommanderAppearing(unittest.TestCase):
 
         self.assert_(listen.expect(CLTool.STDOUT,
                                            CLTool.wanted("test.int", "int", "42"),
-                                           1),
+                                           10),
                      "Bad value initially from the real provider, wanted 42")
 
         commander =  CLTool("context-provide", "--v2")
