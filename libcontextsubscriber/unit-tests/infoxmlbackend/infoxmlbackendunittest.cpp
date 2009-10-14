@@ -169,6 +169,7 @@ void InfoXmlBackendUnitTest::dynamics()
     QCOMPARE(backend->keyDeclared("System.Active"), true);
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
     QCOMPARE(backend->typeForKey("System.Active"), QString("TRUTH"));
+    QCOMPARE(backend->docForKey("System.Active"), QString("This is true when system is active"));
 
     // Test emissions
     QVERIFY(inSpyHasOneInList(spy1, "Battery.Voltage"));
