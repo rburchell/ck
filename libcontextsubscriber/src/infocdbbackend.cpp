@@ -190,13 +190,13 @@ void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
     onDatabaseFileChanged(path);
 }
 
-const QList<ContextProviderInfo> InfoCdbBackend::listProviders(QString key) const
+const QList<ContextProviderInfo> InfoCdbBackend::providersForKey(QString key) const
 {
     QVariant providers = reader.valueForKey(key + ":PROVIDERS");
     QList<ContextProviderInfo> lst;
 
-    foreach (QVariant variant, providers.toList()) 
-        lst << ContextProviderInfo(variant.toHash().value("plugin").toString(), 
+    foreach (QVariant variant, providers.toList())
+        lst << ContextProviderInfo(variant.toHash().value("plugin").toString(),
                                    variant.toHash().value("constructionString").toString());
 
     return lst;

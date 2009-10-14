@@ -43,7 +43,7 @@ private slots:
     void typeForKey();
     void docForKey();
     void keyDeclared();
-    void listProviders();
+    void providersForKey();
     void dynamics();
     void removed();
     void cleanupTestCase();
@@ -170,14 +170,14 @@ void InfoCdbBackendUnitTest::keyDeclared()
     QCOMPARE(backend->keyDeclared("Battery.Charging"), true);
 }
 
-void InfoCdbBackendUnitTest::listProviders()
+void InfoCdbBackendUnitTest::providersForKey()
 {
-    QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
+    QList <ContextProviderInfo> list1 = backend->providersForKey("Battery.Charging");
     QCOMPARE(list1.count(), 1);
     QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
     QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));
 
-    QList <ContextProviderInfo> list2 = backend->listProviders("Does.Not.Exist");
+    QList <ContextProviderInfo> list2 = backend->providersForKey("Does.Not.Exist");
     QCOMPARE(list2.count(), 0);
 }
 
@@ -205,11 +205,11 @@ void InfoCdbBackendUnitTest::dynamics()
     QCOMPARE(backend->docForKey("Battery.Charging"), QString("doc1"));
 
     // Check providers
-    QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
+    QList <ContextProviderInfo> list1 = backend->providersForKey("Battery.Charging");
     QCOMPARE(list1.count(), 1);
     QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
     QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));
-    QList <ContextProviderInfo> list2 = backend->listProviders("Battery.Capacity");
+    QList <ContextProviderInfo> list2 = backend->providersForKey("Battery.Capacity");
     QCOMPARE(list2.count(), 2);
     QCOMPARE(list2.at(0).plugin, QString("contextkit-dbus"));
     QCOMPARE(list2.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));

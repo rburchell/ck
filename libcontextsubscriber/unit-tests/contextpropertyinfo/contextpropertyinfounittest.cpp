@@ -66,7 +66,7 @@ bool InfoBackend::keyDeclared(QString key) const
         return false;
 }
 
-const QList<ContextProviderInfo> InfoBackend::listProviders(QString key)
+const QList<ContextProviderInfo> InfoBackend::providersForKey(QString key)
 {
     QList<ContextProviderInfo> lst;
     if (providerMap.contains(key))

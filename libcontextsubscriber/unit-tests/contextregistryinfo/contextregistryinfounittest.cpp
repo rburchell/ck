@@ -52,7 +52,7 @@ QStringList InfoBackend::listKeys() const
     return l;
 }
 
-const QList<ContextProviderInfo> InfoBackend::listProviders(QString key)
+const QList<ContextProviderInfo> InfoBackend::providersForKey(QString key)
 {
     QList<ContextProviderInfo> lst;
     ContextProviderInfo info("contextkit-dbus", "");

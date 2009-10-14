@@ -211,7 +211,7 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
         cachedType = infoBackend->typeForKey(keyName);
         cachedDoc = infoBackend->docForKey(keyName);
         cachedDeclared = infoBackend->keyDeclared(keyName);
-        cachedProviders = infoBackend->listProviders(keyName);
+        cachedProviders = infoBackend->providersForKey(keyName);
     }
 }
 
@@ -365,7 +365,7 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
     QString cachedType = InfoBackend::instance()->typeForKey(keyName);
     cachedDoc = InfoBackend::instance()->docForKey(keyName);
     cachedDeclared = InfoBackend::instance()->keyDeclared(keyName);
-    cachedProviders = InfoBackend::instance()->listProviders(keyName);
+    cachedProviders = InfoBackend::instance()->providersForKey(keyName);
 
     // Release the lock before emitting the signals; otherwise
     // listeners trying to access cached values would create a
