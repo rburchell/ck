@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<xml>
+    <provider plugin="test.so" constructionString="some-string">
+        <key name="System.Active" />
+    </provider>
+</xml>
