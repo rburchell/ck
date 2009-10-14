@@ -29,11 +29,13 @@ int main(int argc, char **argv)
         out << "Existence: " << (declared ? "true" : "false")  << endl;
         if (declared) {
 
-            foreach(ContextProviderInfo prov, info->providers())
-                out << "Proivder: " << prov.plugin << " (" << prov.constructionString << ")" << endl;
-
+            // This will be obsoleted by the upcoming context-ls, so,
+            // don't change the old format and just print out the
+            // first provider.
+            ContextProviderInfo prov = info->providers()[0];
+            out << "Provider DBus type: " << prov.constructionString.split(":")[0] << endl;
+            out << "Provider DBus name: " << prov.constructionString.split(":")[1] << endl;
             out << "Documentation: " << info->doc() << endl;
-            out << "Type: " << info->type() << endl;
         }
         out << "----------" << endl;
     }
