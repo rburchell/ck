@@ -54,14 +54,14 @@ BASEDIR=`dirname $0`
 
 # Test using command line param
 export CONTEXT_PROVIDERS="/tmp/wrong/path"
-../../update-contextkit-providers/update-contextkit-providers "./"
+../../update-contextkit-providers/.libs/update-contextkit-providers "./"
 dotest
 checkperm
 clean
 
 # Test using env var 
 export CONTEXT_PROVIDERS="./"
-../../update-contextkit-providers/update-contextkit-providers
+../../update-contextkit-providers/.libs/update-contextkit-providers
 dotest
 checkperm
 clean

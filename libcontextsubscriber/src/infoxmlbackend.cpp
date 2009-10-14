@@ -374,4 +374,3 @@ const QList<ContextProviderInfo> InfoXmlBackend::listProviders(QString key) cons
     return lst;
     */
 }
-

@@ -204,4 +204,3 @@ const QList<ContextProviderInfo> InfoCdbBackend::listProviders(QString key) cons
 
     return lst;
 }
-

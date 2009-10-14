@@ -81,6 +81,7 @@ private slots:
     void checkAndEmitKeyChanged();
     void connectNotify();
     void instance();
+    void cleanupTestCase();
 };
 
 void InfoBackendUnitTest::initTestCase()
@@ -155,23 +156,35 @@ void InfoBackendUnitTest::connectNotify()
 
 void InfoBackendUnitTest::instance()
 {
+    InfoBackend::destroyInstance();
+    backend = NULL;
+
     InfoBackend *instance;
 
     InfoBackend::backendInstance = NULL;
     instance = InfoBackend::instance("xml");
     QCOMPARE(instance, InfoBackend::backendInstance);
     QCOMPARE(instance->name(), QString("xml"));
+    InfoBackend::destroyInstance();
+    QVERIFY(InfoBackend::backendInstance == NULL);
 
     InfoBackend::backendInstance = NULL;
     instance = InfoBackend::instance("cdb");
     QCOMPARE(instance, InfoBackend::backendInstance);
     QCOMPARE(instance->name(), QString("cdb"));
+    InfoBackend::destroyInstance();
+    QVERIFY(InfoBackend::backendInstance == NULL);
 
     InfoBackend::backendInstance = new InfoTestBackend();
     InfoBackend::destroyInstance();
     QVERIFY(InfoBackend::backendInstance == NULL);
 }
 
+void InfoBackendUnitTest::cleanupTestCase()
+{
+    QVERIFY(InfoBackend::backendInstance == NULL);
+    InfoBackend::destroyInstance();
+}
 
 #include "infobackendunittest.moc"
 QTEST_MAIN(InfoBackendUnitTest);

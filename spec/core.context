@@ -15,11 +15,6 @@ package.
 change for some time still.  Only the ones explicitly marked as stable
 should be used for now.
 
-*TODO*
-
-- Rename Internet.SignalStrength to Wifi.SignalStrength, maybe.
-  Same for Internet.NetworkName.
-
 Display screens
 ---------------
 
@@ -217,14 +212,16 @@ Information about the connection of the devide to the Internet.
       string
     </type>
     <doc>
-The type of the current connection to the Internet, such as GPRS,
-WLAN, etc.  The possible value are TBD.
+The type of the current connection to the Internet, such as "wlan",
+"cellular", "bluetooth", "ethernet", or "usb".  The possible values
+are still TBD.
     </doc>
   </key>
+
   <key name="Internet.NetworkName">
     <type>string</type>
     <doc>
-      The name of the current access point.
+      The name of the current network.
     </doc>
   </key>
 
@@ -243,36 +240,16 @@ WLAN, etc.  The possible value are TBD.
     </doc>
   </key>
   
-  <key name="Internet.NetworkID">
-    <type>string</type>
-    <doc>
-The unique id of the network.
-    </doc>
-  </key>
-
-  <key name="Internet.ServiceName">
-    <type>string</type>
-    <doc>
-(Unclear)
-    </doc>
-  </key>
-
   <key name="Internet.SignalStrength">
     <type>
       <!--percentage-->
       int32
     </type>
     <doc>
-The signal strength of the current connection to the Internet.  This
-will be 100% percent for wired connections, usually.
-    </doc>
-  </key>
-
-  <key name="Internet.IsCheap">
-    <type>bool</type>
-    <doc>
-Whether or not traffic to/from the Internet is billed per data volume
-(property is false) or per time (property is true).
+The signal strength of the current connection to the Internet. For
+example, when Internet.NetworkType is "cellular", this is the signal
+strength at the cellular radio, when it is "wlan", it is the signal
+strength at the WLAN radio.
     </doc>
   </key>
 

@@ -1,11 +1,11 @@
-testdir = $(bindir)/libcontextprovider-tests
+testdir = $(libdir)/libcontextprovider-tests
 test_PROGRAMS = subscriptiontests
 
 subscriptiontests_SOURCES = subscriptiontests.cpp \
 			    subscriptiontests.h
 
-check-customer:
-	PATH=$$PATH:../client CONTEXT_LOG_VERBOSITY=WARNING ./subscriptiontests
+check-customer: $(test_PROGRAMS)
+	PATH=../client:$$PATH CONTEXT_LOG_VERBOSITY=WARNING ./.libs/subscriptiontests
 
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)  $(QtTest_CFLAGS) -I$(srcdir)/../../src \
 	      -I$(top_srcdir)/common
@@ -18,7 +18,7 @@ subscriptiontests_LDADD = ../../src/libcontextprovider.la $(top_builddir)/common
 
 $(top_builddir)/common/libcommon.la:
 	$(MAKE) -C $(top_builddir)/common libcommon.la
-	
+
 .PHONY: ../../libcontextprovider.la $(top_builddir)/libcommon.la
 
 # moccing
