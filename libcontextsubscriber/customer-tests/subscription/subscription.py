@@ -176,6 +176,89 @@ class Subscription(unittest.TestCase):
                 provider.kill()
                 listen.kill()
 
+        def testTypes(self):
+                provider = CLTool("context-provide", "--v2", "com.nokia.test",
+                                 "int","test.int","1",
+                                 "string","test.string","foobar",
+                                 "double","test.double","2.5",
+                                 "truth","test.truth","True")
+                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                provider.send("dump")
+                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth", "test.fake")
+                listen.expectAll(CLTool.STDOUT,
+                                 ["\ntest.double = double:2.5\n",
+                                  "\ntest.int = int:1\n",
+                                  "\ntest.string = QString:foobar\n",
+                                  "\ntest.truth = bool:true\n"],
+                                 10) # wait for it
+
+		# test querying the type of all properties
+                listen.send("type test.int")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\ntype: INT\n",
+                                      1))
+
+                listen.send("type test.double")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\ntype: DOUBLE\n",
+                                      1))
+
+                listen.send("type test.truth")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\ntype: TRUTH\n",
+                                      1))
+
+                listen.send("type test.string")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\ntype: STRING\n",
+                                      1))
+
+                listen.send("type test.fake")
+                self.assert_(
+			listen.expect(CLTool.STDOUT,
+				      "\ntype:\n",
+				      1))
+
+                provider.kill()
+                listen.kill()
+
+        def testProviders(self):
+                provider = CLTool("context-provide", "--v2", "com.nokia.test",
+                                 "int","test.int","1",
+                                 "string","test.string","foobar",
+                                 "double","test.double","2.5",
+                                 "truth","test.truth","True")
+                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                provider.send("dump")
+                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth", "test.fake")
+                listen.expectAll(CLTool.STDOUT,
+                                 ["\ntest.double = double:2.5\n",
+                                  "\ntest.int = int:1\n",
+                                  "\ntest.string = QString:foobar\n",
+                                  "\ntest.truth = bool:true\n"],
+                                 10) # wait for it
+
+		# test querying the provider(s)
+                listen.send("providers test.int")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\nproviders: contextkit-dbus/session:com.nokia.test\n",
+                                      1))
+
+                listen.send("providers test.fake")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\nproviders:\n",
+                                      1))
+                provider.kill()
+                listen.kill()
+
         def testAllDataTypes(self):
                 """
                 Description
