@@ -171,6 +171,21 @@ void InfoXmlBackendUnitTest::dynamics()
     QVERIFY(inSpyHasOneInList(spy2, "Battery.Charging"));
     QVERIFY(inSpyHasOneInList(spy3, "Battery.Charging"));
     QVERIFY(inSpyHasOneInList(spy4, "System.Active"));
+    
+    // Check providers
+    QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
+        
+    QCOMPARE(list1.count(), 1);
+    QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd2"));
+    
+    QList <ContextProviderInfo> list2 = backend->listProviders("System.Active");
+    QCOMPARE(list2.count(), 1);
+    QCOMPARE(list2.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list2.at(0).constructionString, QString("system:com.nokia.daemon"));
+
+    QList <ContextProviderInfo> list3 = backend->listProviders("Battery.Voltage");
+    QCOMPARE(list3.count(), 0);
 }
 
 void InfoXmlBackendUnitTest::cleanupTestCase()
