@@ -117,6 +117,8 @@ private slots:
     void exists();
     void declared();
     void provided();
+    void providers();
+    void resolutionStrategy();
     void providerDBusName();
     void providerDBusType();
     void plugin();
@@ -211,6 +213,21 @@ void ContextPropertyInfoUnitTest::providerDBusName()
     QCOMPARE(p1.providerDBusName(), QString("org.freedesktop.ContextKit.contextd"));
     QCOMPARE(p2.providerDBusName(), QString("com.nokia.musicplayer"));
     QCOMPARE(p3.providerDBusName(), QString());
+}
+
+void ContextPropertyInfoUnitTest::providers()
+{
+    ContextPropertyInfo p("Battery.Charging");
+    QList<ContextProviderInfo> providers = p.providers();
+    QCOMPARE(providers.size(), 1);
+    QCOMPARE(providers.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(providers.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd"));
+}
+
+void ContextPropertyInfoUnitTest::resolutionStrategy()
+{
+    ContextPropertyInfo p("Battery.Charging");
+    QCOMPARE(p.resolutionStrategy(), ContextPropertyInfo::LastValue);
 }
 
 void ContextPropertyInfoUnitTest::providerDBusType()
