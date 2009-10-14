@@ -162,28 +162,32 @@ void InfoXmlBackendUnitTest::dynamics()
 
     utilCopyLocalWithRemove("providers2v2.src", "providers2.context");
     utilCopyLocalWithRemove("providers3.src", "providers3.context");
+    utilCopyLocalWithRemove("providers4.src", "providers4.context");
 
     // Again, some basic check
     QCOMPARE(backend->keyDeclared("System.Active"), true);
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
+    QCOMPARE(backend->typeForKey("System.Active"), QString("TRUTH"));
 
     // Test emissions
     QVERIFY(inSpyHasOneInList(spy1, "Battery.Voltage"));
     QVERIFY(inSpyHasOneInList(spy2, "Battery.Charging"));
     QVERIFY(inSpyHasOneInList(spy3, "Battery.Charging"));
     QVERIFY(inSpyHasOneInList(spy4, "System.Active"));
-    
+
     // Check providers
     QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
-        
+
     QCOMPARE(list1.count(), 1);
     QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
     QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd2"));
-    
+
     QList <ContextProviderInfo> list2 = backend->listProviders("System.Active");
-    QCOMPARE(list2.count(), 1);
+    QCOMPARE(list2.count(), 2);
     QCOMPARE(list2.at(0).plugin, QString("contextkit-dbus"));
     QCOMPARE(list2.at(0).constructionString, QString("system:com.nokia.daemon"));
+    QCOMPARE(list2.at(1).plugin, QString("test.so"));
+    QCOMPARE(list2.at(1).constructionString, QString("some-string"));
 
     QList <ContextProviderInfo> list3 = backend->listProviders("Battery.Voltage");
     QCOMPARE(list3.count(), 0);
@@ -194,6 +198,7 @@ void InfoXmlBackendUnitTest::cleanupTestCase()
      QFile::remove("providers1.context");
      QFile::remove("providers2.context");
      QFile::remove("providers3.context");
+     QFile::remove("providers4.context");
 }
 
 #include "infoxmlbackendunittest.moc"
