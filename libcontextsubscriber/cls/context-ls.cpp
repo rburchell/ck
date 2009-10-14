@@ -15,6 +15,7 @@ int main(int argc, char **argv)
 
         QStringList args = app.arguments();
         QString backendName = "";
+        bool doc = false;
         bool provided = false;
         bool longListing = false;
         bool hasFilter = false;
@@ -30,6 +31,8 @@ int main(int argc, char **argv)
                 provided = true;
             } else if (arg == "--long" || arg == "-l") {
                 longListing = true;
+            } else if (arg == "--doc" || arg == "-d") {
+                doc = true;
             } else {
                 if (hasFilter) {
                     qWarning("WARNING: Only the first filter string is considered.");
@@ -52,10 +55,14 @@ int main(int argc, char **argv)
             if (provided && !info.provided())
                 continue;
             if (longListing) {
-                out << key << "\t" << info.type() << "\t" << info.listProviders()[0].plugin << "\t"
-                    << info.listProviders()[0].constructionString << "\t" << info.doc() << "\n";
+                for (int i = 0; i < info.listProviders().size(); i++ )
+                    out << key << "\t" << info.type() << "\t" << info.listProviders()[i].plugin << "\t"
+                        << info.listProviders()[i].constructionString << "\n";
             } else
                 out << key << "\n";
+            if (doc) {
+                out << "Documentation: " << info.doc() << "\n";
+            }
             retValue = 0;
         }
         out.flush();
