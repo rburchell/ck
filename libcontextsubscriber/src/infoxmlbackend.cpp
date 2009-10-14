@@ -272,10 +272,10 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
     if (keyDataHash.contains(key)) {
         InfoKeyData keyData = keyDataHash.value(key);
 
-        if (keyData.type != type)
+        if (type != "" && keyData.type != type)
             contextWarning() << F_XML << key << "already has type declared -" << keyData.type;
 
-        if (keyData.doc != doc)
+        if (doc != "" && keyData.doc != doc)
             contextWarning() << F_XML << key << "already has doc declared -" << keyData.doc;
     } else {
         InfoKeyData keyData;
