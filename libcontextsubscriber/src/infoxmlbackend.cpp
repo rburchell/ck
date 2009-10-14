@@ -203,6 +203,7 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
 void InfoXmlBackend::regenerateKeyDataList()
 {
     keyDataHash.clear();
+    keyProvidersHash.clear();
     countOfFilesInLastParse = 0;
 
     // Stop watching all files. We do keep wathching the dir though.
