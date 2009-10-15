@@ -115,6 +115,7 @@
       <all>
 	<element minOccurs="0" ref="provider:doc"/>
 	<element minOccurs="0" ref="provider:type"/>
+	<element minOccurs="0" ref="provider:typedoc"/>
       </all>
       <attribute name="name" use="required" type="token">
 	<annotation><documentation>
@@ -126,10 +127,27 @@
 	  The type of this key, if it is a simple string.
 	</documentation></annotation>
       </attribute>
+      <attribute name="typedoc" use="optional" type="token">
+	<annotation><documentation>
+	  The type of this key, if it is a simple string.
+	</documentation></annotation>
+      </attribute>
     </complexType>
   </element>
 
   <element name="type">
+    <annotation><documentation>
+      The type of this key.
+    </documentation></annotation>
+    <!-- XXX - not very strict -->
+    <complexType mixed="true">
+      <sequence>
+        <any minOccurs="0" processContents="lax"/>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="typedoc">
     <annotation><documentation>
       The type of this key.
     </documentation></annotation>
