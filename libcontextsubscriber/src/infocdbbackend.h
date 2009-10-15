@@ -54,6 +54,7 @@ private:
     bool databaseCompatible; ///< If the currently open database is compatible (versions match).
     void watch();
     static QStringList variantListToStringList(const QVariantList &l);
+    void checkCompatibility();
 
 private slots:
     void onDatabaseFileChanged(const QString &path);

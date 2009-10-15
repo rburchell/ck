@@ -51,6 +51,7 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
     watch();
+    checkCompatibility();
 }
 
 /// Returns 'cdb'.
@@ -133,6 +134,23 @@ QString InfoCdbBackend::databaseDirectory()
 
 /* Private */
 
+/// Update the database compatibility field.
+void InfoCdbBackend::checkCompatibility()
+{
+    if (!reader.isReadable())
+        databaseCompatible = false;
+    else {
+        QString version = reader.valueForKey("VERSION").toString();
+        if (version != "" && version != BACKEND_COMPATIBILITY_NAMESPACE) {
+            databaseCompatible = false;
+            contextWarning() << F_CDB << "Incompatible database version:" << version;
+        } else
+            databaseCompatible = true;
+    }
+}
+
+/// Start watching directory and database path IF we're not watching
+/// it already and IF the directory/file exists.
 void InfoCdbBackend::watch()
 {
     if (! watcher.directories().contains(InfoCdbBackend::databaseDirectory()) &&
@@ -157,12 +175,8 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     watch();
 
     // Check the version
-    QString version = reader.valueForKey("VERSION").toString();
-    if (version != "" && version != BACKEND_COMPATIBILITY_NAMESPACE) {
-        databaseCompatible = false;
-        contextWarning() << F_CDB << "Incompatible database version:" << version;
-    } else
-        databaseCompatible = true;
+    if (reader.isReadable())
+        checkCompatibility();
 
     // If nobody is watching us anyways, drop out now and skip
     // the further processing. This could be made more granular
