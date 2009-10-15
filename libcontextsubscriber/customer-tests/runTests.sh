@@ -7,14 +7,14 @@ DIRS="commander subscription asynchronicity registry pluginchanging"
 make -C ../../libcontextprovider/src
 make -C ../../libcontextprovider/context-provide
 make -C ../cli
-make -C ../reg-cli
+make -C ../cls
 make -C ../update-contextkit-providers
 
 if [ -n "$COVERAGE" ]
 then
     make -C coverage-build
     export LD_LIBRARY_PATH=../coverage-build/.libs:$LD_LIBRARY_PATH
-    export PATH=../../../python:../../../libcontextprovider/context-provide:../../cli/.libs:../../reg-cli/.libs:$PATH
+    export PATH=../../../python:../../../libcontextprovider/context-provide:../../cli/.libs:../../cls/.libs:$PATH
     rm -rf coverage-build/.libs/*.gcda
 else
     make -C ../src
