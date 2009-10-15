@@ -777,4 +777,41 @@ Applications should be prepared to see all states in any kind of order
 without getting confused.
     </doc>
   </key>
+  <doc>
+Media
+-----
+
+Information about media related activity.
+  </doc>
+  <key name="Media.NowPlaying">
+    <typedoc>
+      <map>
+        <allowed-keys>
+          <resource   type="nepomuk-uri"/>
+          <title      type="string"/>
+          <artist     type="string"/>
+          <genre      type="string"/>
+          <album      type="string"/>
+          <duration   type="duration"/>
+          <start-time type="time"/>
+          <state      type="string-enum"/>
+        </allowed-keys>
+      </map>
+    </typedoc>
+    <doc>
+The currently playing media, such as a video or audio track.  The
+value is a dictionary with the listed entries.  If "resource" is
+included, then "title", "artist", "genre", and "album" are consistent
+with what Tracker has stored.
+
+The current position in the media is always "current-time -
+start-time".  If the user seeks then that is expressed by changing
+"start-time".  In other words, "start-time" is not the point in time
+when the user has clicked the play button, it is the point in time
+when the media would have had to start to play uninterrupted to reach
+its current position now.  This slight complication is done in favor
+of transmitting the position directly to avoid telling you once every
+second that it is now one second later.
+    </doc>
+  </key>
 </properties>
