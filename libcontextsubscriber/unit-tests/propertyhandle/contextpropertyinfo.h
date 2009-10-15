@@ -41,7 +41,7 @@ public:
 
     bool provided() const;
     bool declared() const;
-    QList<ContextProviderInfo> listProviders() const;
+    QList<ContextProviderInfo> providers() const;
 
 signals:
     void changed(QString);

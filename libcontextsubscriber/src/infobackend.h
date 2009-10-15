@@ -50,12 +50,8 @@ public:
     /// Returns true if the given key exists.
     virtual bool keyDeclared(QString key) const = 0;
 
-    /// Returns true if the given key is provided (i.e., not a core
-    /// property which nobody provides currently)
-    virtual bool keyProvided(QString key) const = 0;
-
     /// Returns a list of providers for the given key.
-    virtual const QList<ContextProviderInfo> listProviders(QString key) const = 0;
+    virtual const QList<ContextProviderInfo> providersForKey(QString key) const = 0;
 
 signals:
     /// Emitted when key list changes. ContextRegistryInfo listens on that.

@@ -34,6 +34,8 @@ class ContextPropertyInfo : public QObject
     Q_OBJECT
 
 public:
+    enum ResolutionStrategy { LastValue };
+
     explicit ContextPropertyInfo(const QString &key, QObject *parent = 0);
 
     /// Destroys the object.
@@ -51,7 +53,8 @@ public:
 
     QString plugin() const;
     QString constructionString() const;
-    virtual const QList<ContextProviderInfo> listProviders() const;
+    virtual const QList<ContextProviderInfo> providers() const;
+    ResolutionStrategy resolutionStrategy() const;
 
 protected:
     virtual void connectNotify(const char *signal);
@@ -61,7 +64,6 @@ private:
     QString cachedDoc; ///< Cached documentation of the key.
     QString cachedType; ///< Cached (stored) type of the key.
     bool cachedDeclared; ///< Cached state of the key (existance).
-    bool cachedProvided; ///< Cached state of the key (whether someone provides it).
     QList<ContextProviderInfo> cachedProviders; ///< Cached list of providers for this key.
     mutable QMutex cacheLock; ///< Lock for the cache.
 
@@ -123,6 +125,8 @@ signals:
     /// This is not a strict signal - it might be emitted even when
     /// no actual change happened.
     void changed(QString key);
+    
+    friend class ContextPropertyInfoUnitTest;
 };
 
 #endif // CONTEXTPROPERTYINFO_H

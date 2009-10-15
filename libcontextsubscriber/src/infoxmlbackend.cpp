@@ -109,17 +109,6 @@ bool InfoXmlBackend::keyDeclared(QString key) const
         return false;
 }
 
-bool InfoXmlBackend::keyProvided(QString key) const
-{
-    if (keyDataHash.contains(key) == false)
-        return false;
-
-    if (keyDataHash.value(key).plugin != "")
-        return true;
-
-    return false;
-}
-
 /// Returns the full path to the registry directory. Takes the
 /// \c CONTEXT_PROVIDERS env variable into account.
 QString InfoXmlBackend::registryPath()
@@ -214,6 +203,7 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
 void InfoXmlBackend::regenerateKeyDataList()
 {
     keyDataHash.clear();
+    keyProvidersHash.clear();
     countOfFilesInLastParse = 0;
 
     // Stop watching all files. We do keep wathching the dir though.
@@ -273,46 +263,59 @@ QString InfoXmlBackend::canonicalizeType (const QString &type)
 void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerTree)
 {
     QString key = NanoXml::keyValue("name", keyTree).toString();
+    QString plugin = NanoXml::keyValue("plugin", providerTree).toString();
+    QString constructionString = NanoXml::keyValue("constructionString", providerTree).toString();
+    QString type = canonicalizeType(NanoXml::keyValue("type", keyTree).toString());
+    QString doc = NanoXml::keyValue("doc", keyTree).toString();
 
-    // Build new data
-    InfoKeyData old_data = keyDataHash.value(key);
+    // Warn about description mismatch or add new
+    if (keyDataHash.contains(key)) {
+        InfoKeyData keyData = keyDataHash.value(key);
 
-    InfoKeyData new_data;
-    new_data.plugin = NanoXml::keyValue("plugin", providerTree).toString();
-    new_data.constructionString = NanoXml::keyValue("constructionString", providerTree).toString();;
+        if (type != "" && keyData.type != type)
+            contextWarning() << F_XML << key << "already has type declared -" << keyData.type;
+
+        if (doc != "" && keyData.doc != doc)
+            contextWarning() << F_XML << key << "already has doc declared -" << keyData.doc;
+    } else {
+        InfoKeyData keyData;
+        keyData.name = key;
+        keyData.type = type;
+        keyData.doc = doc;
+
+        contextDebug() << F_XML << "Adding new key" << key << "with type:" << keyData.type;
+        keyDataHash.insert(key, keyData);
+    }
+
+    // Add provider details
+    ContextProviderInfo providerInfo(plugin, constructionString);
 
     // Suport old-style XML...
-    if (new_data.plugin == "") {
+    if (providerInfo.plugin == "") {
         QString currentProvider = NanoXml::keyValue("service", providerTree).toString();
         QString currentBus = NanoXml::keyValue("bus", providerTree).toString();
 
         if (currentBus != "" && currentProvider != "") {
-            new_data.plugin = "contextkit-dbus";
-            new_data.constructionString = currentBus + ":" + currentProvider;
+            providerInfo.plugin = "contextkit-dbus";
+            providerInfo.constructionString = currentBus + ":" + currentProvider;
         } else
-            new_data.constructionString = "";
+            providerInfo.constructionString = "";
     }
 
-    new_data.name = key;
-    new_data.doc = NanoXml::keyValue("doc", keyTree).toString();
-    new_data.type = canonicalizeType(NanoXml::keyValue("type", keyTree).toString());
+    // If providerInfo is empty, do not add to the list
+    if (providerInfo.plugin == "") {
+        contextDebug() << F_XML << "Not adding provider info for key" << key << "no data";
+        return;
+    } else
+        contextDebug() << F_XML << "Adding provider info for key" << key << "plugin:" << providerInfo.plugin << "constructionString:" << providerInfo.constructionString;
 
-    if (keyDataHash.contains(key)) {
+    // Add to the list of providers
+    QList<ContextProviderInfo> list;
+    if (keyProvidersHash.contains(key))
+        list = keyProvidersHash.value(key);
 
-        // Carefully merge new data into old.  We only allow
-        // addition of plugin name / construction string.
-
-        if (old_data.plugin == "") {
-            old_data.plugin = new_data.plugin;
-            old_data.constructionString = new_data.constructionString;
-            keyDataHash.insert(key, old_data);
-        } else {
-            contextWarning() << "Key" << key << "already defined in previous xml file. Ignoring.";
-        }
-    } else {
-        contextDebug() << "Adding new key" << key << "with type:" << new_data.type;
-        keyDataHash.insert(key, new_data);
-    }
+    list.append(providerInfo);
+    keyProvidersHash.insert(key, list);
 }
 
 /// Parses a given \a path file and adds it's contents to the hash.
@@ -353,10 +356,7 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     }
 }
 
-const QList<ContextProviderInfo> InfoXmlBackend::listProviders(QString key) const
+const QList<ContextProviderInfo> InfoXmlBackend::providersForKey(QString key) const
 {
-    if (! keyDataHash.contains(key))
-        return QList<ContextProviderInfo>();
-    return QList<ContextProviderInfo>() <<
-        ContextProviderInfo(keyDataHash.value(key).plugin, keyDataHash.value(key).constructionString);
+    return keyProvidersHash.value(key);
 }

@@ -42,8 +42,7 @@ public:
     virtual QString typeForKey(QString key) const;
     virtual QString docForKey(QString key) const;
     virtual bool keyDeclared(QString key) const;
-    virtual bool keyProvided(QString key) const;
-    virtual const QList<ContextProviderInfo> listProviders(QString key) const;
+    virtual const QList<ContextProviderInfo> providersForKey(QString key) const;
 
     static QString databaseDirectory();
     static QString databasePath();
@@ -52,9 +51,7 @@ public:
 private:
     QFileSystemWatcher watcher; ///< A watched object obsering the database file. Delivers synced notifications.
     CDBReader reader; ///< The cdb reader object used to access the cdb database.
-    void watchPathOrDirectory();
-    void watchDirectory();
-    void watchPath();
+    void watch();
     static QStringList variantListToStringList(const QVariantList &l);
 
 private slots:

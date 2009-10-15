@@ -53,7 +53,6 @@ private:
 protected:
     void connectNotify(const char *signal);
 
-
 private slots:
     void onKeysChanged(const QStringList& currentKeys);
     void onKeysAdded(const QStringList& newKeys);
@@ -86,6 +85,8 @@ signals:
     /// for the emission to happen even if no actual change
     /// happened.
     void changed();
+
+    friend class ContextRegistryInfoUnitTest;
 };
 
 #endif

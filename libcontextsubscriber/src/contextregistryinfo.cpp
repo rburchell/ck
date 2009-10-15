@@ -91,7 +91,7 @@ QStringList ContextRegistryInfo::listKeys(QString providerName) const
     QSet<QString> keys;
 
     foreach (QString key, listKeys()) {
-        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
             if (info.plugin == "contextkit-dbus" &&
                 info.constructionString.split(":").last() == providerName) {
                 keys.insert(key);
@@ -110,7 +110,7 @@ QStringList ContextRegistryInfo::listKeysForPlugin(QString plugin) const
     QSet<QString> keys;
 
     foreach (QString key, listKeys()) {
-        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
             if (info.plugin == plugin) {
                 keys.insert(key);
             }
@@ -130,7 +130,7 @@ QStringList ContextRegistryInfo::listProviders() const
     QSet<QString> providers;
 
     foreach (QString key, listKeys()) {
-        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
             if (info.plugin == "contextkit-dbus") {
                 providers.insert(info.constructionString.split(":").last());
             }
@@ -148,7 +148,7 @@ QStringList ContextRegistryInfo::listPlugins() const
     QSet<QString> plugins;
 
     foreach (QString key, listKeys()) {
-        foreach (ContextProviderInfo info, InfoBackend::instance()->listProviders(key)) {
+        foreach (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
             plugins.insert(info.plugin);
         }
     }

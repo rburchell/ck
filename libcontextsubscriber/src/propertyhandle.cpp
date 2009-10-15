@@ -137,7 +137,7 @@ void PropertyHandle::updateProvider()
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
 
-        foreach (ContextProviderInfo info, myInfo->listProviders())
+        foreach (ContextProviderInfo info, myInfo->providers())
             newProviders << Provider::instance(info);
         contextDebug() << newProviders.size() << "providers for" << myKey;
     }
