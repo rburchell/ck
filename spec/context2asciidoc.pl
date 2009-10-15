@@ -21,17 +21,18 @@ sub to_nano_dom {
     my @children = $node->getChildNodes();
 
     if ($#children == 0 && $children[0]->getNodeType() == 3) {
-        return unindent ($node->getFirstChild()->getNodeValue());
+        return [ unindent ($node->getFirstChild()->getNodeValue()) ];
     } else {
-        my $result = {};
+        my $result = [];
 
         foreach ($node->getAttributes()->getValues()) {
-            $result->{$_->getNodeName()} = $_->getNodeValue();
+            push (@{$result}, [$_->getNodeName(), $_->getNodeValue()]);
         }
         
         foreach (@children) {
             if ($_->getNodeType() == 1) {
-                $result->{$_->getNodeName()} = to_nano_dom ($_);
+                my @elt = ($_->getNodeName(), @{to_nano_dom ($_)});
+                push (@{$result}, \@elt);
             }
         }
         
@@ -39,19 +40,61 @@ sub to_nano_dom {
     }
 }
 
-sub dump_nano_dom {
-    my $level = shift;
-    my $key = shift;
-    my $value = shift;
+sub car {
+    my ($nano) = @_;
+    return @{$nano}[0];
+}
 
-    if (ref $value) {
-        print $level . " " . $key . "\n";
-        for my $k (keys %{$value}) {
-            dump_nano_dom ($level + 1, $k, $value->{$k});
-        }
-    } else {
-        print $level . " " . $key . ": '" . $value . "'\n";
+sub cdr {
+    my ($nano) = @_;
+    # XXX - one free beer if you can express this array slices.
+    my $res = [];
+    for ($i = 1; $i < @{$nano}; $i++) {
+        push (@{$res}, $nano->[$i]);
     }
+    return $res;
+}
+
+sub nano_assoc {
+    my ($nano, $key) = @_;
+
+    if (ref $nano) {
+        foreach (@{$nano}) {
+            if (ref $_ && car ($_) eq $key) {
+                return cdr ($_);
+            }
+        }
+    }
+    
+    return nil;
+}
+
+sub nano_ref {
+    my ($nano, $key) = @_;
+
+    return car (nano_assoc($nano, $key));
+}
+
+sub pk1 {
+    my ($v) = @_;
+
+    if (ref $v) {
+        print STDERR "[ ";
+        foreach (@{$v}) {
+            pk1 ($_);
+            print STDERR ", ";
+        }
+        print STDERR "]";
+    } else {
+        print STDERR $v;
+    }
+}
+
+sub pk {
+    my ($l,$v) = @_;
+    print STDERR "$l: ";
+    pk1 ($v);
+    print STDERR "\n";
 }
 
 sub output_doc {
@@ -63,7 +106,7 @@ sub type_name {
     my $type = shift;
 
     if (ref $type) {
-        return (keys %{$type})[0];
+        return car ($type);
     } else {
         return $type;
     }
@@ -72,10 +115,10 @@ sub type_name {
 sub type_parms {
     my $type = shift;
 
-    if (ref ($type)) {
-        return (values %{$type})[0];
+    if (ref $type) {
+        return cdr ($type);
     } else {
-        return { };
+        return [];
     }
 }
 
@@ -86,9 +129,9 @@ sub type_short_desc {
     my $parms = type_parms ($type);
 
     if ($name eq "uniform-list") {
-        return "List of __" . type_parms($type)->{type} . "__s";
+        return "List of __" . nano_ref ($parms, 'type') . "__s";
     } elsif ($name eq "string-enum") {
-        return "Enumeration of __string__s" . type_parms($type)->{type};
+        return "Enumeration of __string__s" . nano_ref ($parms, 'type');
     } elsif ($name eq "map") {
         return "Map";
     } else {
@@ -103,25 +146,25 @@ sub print_type_long_desc {
     my $parms = type_parms ($type);
 
     if ($name eq "uniform-list"
-        || !%{$parms}) {
+        || !@{$parms}) {
         # do nothing
     } elsif ($name eq "string-enum") {
         print "+\n--\nPossible enumeration values: \n[horizontal]\n";
-        for my $key (keys %{$parms}) {
-            print $key . ":: " . $parms->{$key}->{doc} . "\n";
+        foreach (@{$parms}) {
+            print car ($_) . ":: " . nano_ref (cdr ($_), 'doc') . "\n";
         }
         print "--\n";
     } elsif ($name eq "map") {
         print "+\n--\nPossible map keys: \n[horizontal]\n";
-        my $keys = $parms->{'allowed-keys'};
-        for my $key (keys %{$keys}) {
-            print $key . ":: " . $keys->{$key}->{doc} . "\n";
+        my $keys = nano_assoc ($parms, 'allowed-keys');
+        foreach (@{$keys}) {
+            print car ($_) . ":: " . nano_ref (cdr ($_), 'doc') . "\n";
         }
         print "--\n";
     } else {
         print "+\n--\nType: " . type_name ($type) . "\n[horizontal]\n";
-        for my $key (keys %{$parms}) {
-            print "$key :: $parms->{$key}\n";
+        foreach (@{$parms}) {
+            print car ($_) . " :: " . cdr ($_) . "\n";
         }
         print "--\n";
     }
@@ -130,17 +173,15 @@ sub print_type_long_desc {
 sub output_key {
     my $key = to_nano_dom (shift);
 
-    # dump_nano_dom (0, "Key", $key);
-
-    my $type = $key->{typedoc};
+    my $type = nano_ref ($key, 'typedoc');
     if (!$type)
     {
-        $type = $key->{type};
+        $type = nano_ref ($key, 'type');
     }
 
     print "\n";
-    print "*" . $key->{name} . "* (" . type_short_desc ($type) . ")::\n";
-    print $key->{doc} . "\n";
+    print "*" . nano_ref ($key, 'name') . "* (" . type_short_desc ($type) . ")::\n";
+    print nano_ref ($key, 'doc') . "\n";
     print_type_long_desc ($type);
 }
 
