@@ -248,7 +248,7 @@ class Subscription(unittest.TestCase):
                 listen.send("providers test.int")
                 self.assert_(
                         listen.expect(CLTool.STDOUT,
-                                      "\nproviders: contextkit-dbus/session:com.nokia.test\n",
+                                      "\nproviders: session:com.nokia.test@contextkit-dbus\n",
                                       1))
 
                 listen.send("providers test.fake")

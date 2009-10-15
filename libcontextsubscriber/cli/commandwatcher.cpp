@@ -202,7 +202,7 @@ void CommandWatcher::interpret(const QString& command) const
                 QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
 
                 foreach(ContextProviderInfo info, providers)
-                    out << info.plugin << "/" << info.constructionString << " ";
+                    out << info.constructionString << "@" << info.plugin << " ";
 
                 out << endl;
             } else
