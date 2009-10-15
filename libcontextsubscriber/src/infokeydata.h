@@ -38,8 +38,6 @@ struct InfoKeyData
     QString name; ///< Name of the we're storing data for.
     QString type; ///< Type of the key.
     QString doc; ///< Doc for the key.
-    QString plugin; ///< Name of the plugin which can construct the PropertyProvider instance for this property
-    QString constructionString; ///< Parameter to give to the constructor plugin.
 };
 
 #endif // INFOKEYDATA_H

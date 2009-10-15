@@ -142,11 +142,11 @@ void PropertyHandle::updateProvider()
             // If myInfo knows the current provider which should be
             // connected to, connect to it.
             contextDebug() << F_PLUGINS << "Key exists";
-            QList<ContextProviderInfo> providers = myInfo->listProviders();
+            QList<ContextProviderInfo> providers = myInfo->providers();
             if (providers.size() > 1)
                 contextCritical() << "multi-process not implemented yet";
             else if (providers.size() == 0)
-                contextCritical() << "property provided() but no listProviders() is empty";
+                contextCritical() << "property provided() but no providers() is empty";
 
             newProvider = Provider::instance(providers[0]);
         } else {

@@ -27,7 +27,6 @@
 QMap <QString, ContextProviderInfo> providerMap;
 QMap <QString, QString> typeMap;
 QMap <QString, QString> docMap;
-QMap <QString, bool> providedMap;
 
 /* Mocked infobackend */
 
@@ -67,22 +66,13 @@ bool InfoBackend::keyDeclared(QString key) const
         return false;
 }
 
-const QList<ContextProviderInfo> InfoBackend::listProviders(QString key)
+const QList<ContextProviderInfo> InfoBackend::providersForKey(QString key)
 {
     QList<ContextProviderInfo> lst;
     if (providerMap.contains(key))
         lst << providerMap.value(key, ContextProviderInfo("", ""));
 
     return lst;
-}
-
-
-bool InfoBackend::keyProvided(QString key) const
-{
-    if (providedMap.contains(key))
-        return providedMap.value(key);
-    else
-        return false;
 }
 
 void InfoBackend::connectNotify(const char *signal)
@@ -127,6 +117,8 @@ private slots:
     void exists();
     void declared();
     void provided();
+    void providers();
+    void resolutionStrategy();
     void providerDBusName();
     void providerDBusType();
     void plugin();
@@ -155,10 +147,6 @@ void ContextPropertyInfoUnitTest::initTestCase()
     docMap.clear();
     docMap.insert("Battery.Charging", "Battery.Charging doc");
     docMap.insert("Media.NowPlaying", "Media.NowPlaying doc");
-
-    providedMap.clear();
-    providedMap.insert("Battery.Charging", true);
-    providedMap.insert("Media.NowPlaying", true);
 }
 
 void ContextPropertyInfoUnitTest::key()
@@ -227,6 +215,21 @@ void ContextPropertyInfoUnitTest::providerDBusName()
     QCOMPARE(p3.providerDBusName(), QString());
 }
 
+void ContextPropertyInfoUnitTest::providers()
+{
+    ContextPropertyInfo p("Battery.Charging");
+    QList<ContextProviderInfo> providers = p.providers();
+    QCOMPARE(providers.size(), 1);
+    QCOMPARE(providers.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(providers.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd"));
+}
+
+void ContextPropertyInfoUnitTest::resolutionStrategy()
+{
+    ContextPropertyInfo p("Battery.Charging");
+    QCOMPARE(p.resolutionStrategy(), ContextPropertyInfo::LastValue);
+}
+
 void ContextPropertyInfoUnitTest::providerDBusType()
 {
     ContextPropertyInfo p1("Battery.Charging");
@@ -261,6 +264,7 @@ void ContextPropertyInfoUnitTest::typeChanged()
 {
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(typeChanged(QString)));
+    p.connectNotify("typeChanged(QString)");
 
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
@@ -279,6 +283,7 @@ void ContextPropertyInfoUnitTest::providerChanged()
 {
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providerChanged(QString)));
+    p.connectNotify("providerChanged(QString)");
 
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
@@ -298,13 +303,14 @@ void ContextPropertyInfoUnitTest::providedChanged()
 {
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providedChanged(bool)));
+    p.connectNotify("providedChanged(bool)");
 
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy.count(), 1);
     spy.takeFirst();
 
-    providedMap.insert("Battery.Charging", false);
+    providerMap.remove("Battery.Charging");
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy.count(), 1);
@@ -317,6 +323,8 @@ void ContextPropertyInfoUnitTest::pluginChanged()
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy1(&p, SIGNAL(pluginChanged(QString, QString)));
     QSignalSpy spy2(&p, SIGNAL(providerChanged(QString)));
+    p.connectNotify("providerChanged(QString)");
+    p.connectNotify("pluginChanged(QString)");
 
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
@@ -343,6 +351,7 @@ void ContextPropertyInfoUnitTest::dbusTypeChanged()
 {
     ContextPropertyInfo p("Battery.Charging");
     QSignalSpy spy(&p, SIGNAL(providerDBusTypeChanged(QDBusConnection::BusType)));
+    p.connectNotify("providerDBusTypeChanged(QDBusConnection::BusType)");
 
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
     QCOMPARE(spy.count(), 1);

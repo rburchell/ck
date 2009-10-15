@@ -36,7 +36,7 @@ public:
 
     QString name() const;
     QStringList listKeys() const;
-    const QList<ContextProviderInfo> listProviders(QString key);
+    const QList<ContextProviderInfo> providersForKey(QString key);
 
     void fireKeysChanged(const QStringList& keys);
     void fireKeysAdded(const QStringList& keys);

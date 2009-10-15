@@ -25,12 +25,16 @@ int main(int argc, char **argv)
             return 1;
         }
         out << "Key: " << key << endl;
-        bool exists = info->exists();
-        out << "Existence: " << (exists ? "true" : "false")  << endl;
-        if (exists) {
-            QDBusConnection::BusType busType = info->providerDBusType();
-            out << "Provider DBus type: " << (busType == QDBusConnection::SessionBus ? "session" : "system") << endl;
-            out << "Provider DBus name: " << info->providerDBusName() << endl;
+        bool declared = info->declared();
+        out << "Existence: " << (declared ? "true" : "false")  << endl;
+        if (declared) {
+
+            // This will be obsoleted by the upcoming context-ls, so,
+            // don't change the old format and just print out the
+            // first provider.
+            ContextProviderInfo prov = info->providers()[0];
+            out << "Provider DBus type: " << prov.constructionString.split(":")[0] << endl;
+            out << "Provider DBus name: " << prov.constructionString.split(":")[1] << endl;
             out << "Documentation: " << info->doc() << endl;
         }
         out << "----------" << endl;

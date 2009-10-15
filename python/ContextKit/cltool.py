@@ -104,6 +104,10 @@ class CLTool:
         # can be changed to this, when python 2.6 is everywhere on maemo:
         #self.__process.kill()
 
+    def close(self):
+        # close the stdin of the process
+        self.__process.stdin.close()
+
     def wait(self):
             return self.__process.wait()
 

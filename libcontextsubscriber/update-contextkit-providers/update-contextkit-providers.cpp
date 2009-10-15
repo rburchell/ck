@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include "contextregistryinfo.h"
 #include "contextpropertyinfo.h"
+#include "contextproviderinfo.h"
 #include "cdbwriter.h"
 #include "fcntl.h"
 
@@ -112,7 +113,7 @@ int main(int argc, char **argv)
     QDir dir(path);
     checkDirectory(dir);
     QString tmpDbPath = dir.absoluteFilePath("cache-XXXXXX");
-    QString finalDbPath = dir.absoluteFilePath("cache.cdb"); 
+    QString finalDbPath = dir.absoluteFilePath("cache.cdb");
     QByteArray templ = tmpDbPath.toUtf8();
 
     char *tempPath = templ.data();
@@ -135,21 +136,17 @@ int main(int argc, char **argv)
         // Write doc
         writer.replace(key + ":KEYDOC", keyInfo.doc());
 
-        // Write the name of the plugin constructing the PropertyProvider instance
-        writer.replace(key + ":KEYPLUGIN", keyInfo.plugin());
+        // Write the providers
+        QVariantList providers;
+        foreach(const ContextProviderInfo info, keyInfo.providers()) {
+            QHash <QString, QVariant> provider;
+            provider.insert("plugin", info.plugin);
+            provider.insert("constructionString", info.constructionString);
+            providers << QVariant(provider);
 
-        // Write the construction parameter for the plugin
-        writer.replace(key + ":KEYCONSTRUCTIONSTRING", keyInfo.constructionString());
-
-    }
-
-    foreach(const QString& plugin, context->listPlugins()) {
-        // Write provider itself
-        writer.add("PLUGINS", plugin);
-
-        foreach(QString key, context->listKeysForPlugin(plugin)) {
-            writer.add(plugin + ":KEYS", key);
         }
+
+        writer.add(key + ":PROVIDERS", QVariant(providers));
     }
 
     if (fsync(writer.fileDescriptor()) != 0) {

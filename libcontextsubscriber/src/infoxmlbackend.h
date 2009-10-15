@@ -44,8 +44,7 @@ public:
     virtual QString typeForKey(QString key) const;
     virtual QString docForKey(QString key) const;
     virtual bool keyDeclared(QString key) const;
-    virtual bool keyProvided(QString key) const;
-    virtual const QList<ContextProviderInfo> listProviders(QString key) const;
+    virtual const QList<ContextProviderInfo> providersForKey(QString key) const;
 
     static QString registryPath();
     static QString coreDeclPath();
@@ -57,6 +56,7 @@ private slots:
 private:
     QFileSystemWatcher watcher; ///< A watched object obsering the database file. Delivers synced notifications.
     QHash <QString, InfoKeyData> keyDataHash; ///< This hash contains the full state of registry in memory.
+    QHash <QString, QList<ContextProviderInfo> > keyProvidersHash; ///< This hash contains providers for keys.
     int countOfFilesInLastParse; ///< The number of xml files we parsed in last registry update.
 
     void regenerateKeyDataList();

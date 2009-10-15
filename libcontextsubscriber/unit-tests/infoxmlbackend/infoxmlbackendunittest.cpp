@@ -40,8 +40,7 @@ private slots:
     void typeForKey();
     void docForKey();
     void keyDeclared();
-    void keyProvided();
-    void listProviders();
+    void providersForKey();
     void dynamics();
     void cleanupTestCase();
 };
@@ -136,22 +135,14 @@ void InfoXmlBackendUnitTest::paths()
     QCOMPARE(InfoXmlBackend::coreDeclPath(), QString("/dev/null"));
 }
 
-void InfoXmlBackendUnitTest::keyProvided()
+void InfoXmlBackendUnitTest::providersForKey()
 {
-    foreach (QString key, backend->listKeys())
-        QVERIFY(backend->keyProvided(key) == true);
-
-    QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
-}
-
-void InfoXmlBackendUnitTest::listProviders()
-{
-    QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
+    QList <ContextProviderInfo> list1 = backend->providersForKey("Battery.Charging");
     QCOMPARE(list1.count(), 1);
     QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
     QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd2"));
 
-    QList <ContextProviderInfo> list2 = backend->listProviders("Does.Not.Exist");
+    QList <ContextProviderInfo> list2 = backend->providersForKey("Does.Not.Exist");
     QCOMPARE(list2.count(), 0);
 }
 
@@ -171,16 +162,39 @@ void InfoXmlBackendUnitTest::dynamics()
 
     utilCopyLocalWithRemove("providers2v2.src", "providers2.context");
     utilCopyLocalWithRemove("providers3.src", "providers3.context");
+    utilCopyLocalWithRemove("providers4.src", "providers4.context");
+    utilCopyLocalWithRemove("providers5.src", "providers5.context");
 
     // Again, some basic check
     QCOMPARE(backend->keyDeclared("System.Active"), true);
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
+    QCOMPARE(backend->typeForKey("System.Active"), QString("TRUTH"));
+    QCOMPARE(backend->docForKey("System.Active"), QString("This is true when system is active"));
 
     // Test emissions
     QVERIFY(inSpyHasOneInList(spy1, "Battery.Voltage"));
     QVERIFY(inSpyHasOneInList(spy2, "Battery.Charging"));
     QVERIFY(inSpyHasOneInList(spy3, "Battery.Charging"));
     QVERIFY(inSpyHasOneInList(spy4, "System.Active"));
+
+    // Check providers
+    QList <ContextProviderInfo> list1 = backend->providersForKey("Battery.Charging");
+
+    QCOMPARE(list1.count(), 1);
+    QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd2"));
+
+    QList <ContextProviderInfo> list2 = backend->providersForKey("System.Active");
+    QCOMPARE(list2.count(), 3);
+    QCOMPARE(list2.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list2.at(0).constructionString, QString("system:com.nokia.daemon"));
+    QCOMPARE(list2.at(1).plugin, QString("test.so"));
+    QCOMPARE(list2.at(1).constructionString, QString("some-string"));
+    QCOMPARE(list2.at(2).plugin, QString("another.so"));
+    QCOMPARE(list2.at(2).constructionString, QString("some-other-string"));
+
+    QList <ContextProviderInfo> list3 = backend->providersForKey("Battery.Voltage");
+    QCOMPARE(list3.count(), 0);
 }
 
 void InfoXmlBackendUnitTest::cleanupTestCase()
@@ -188,6 +202,8 @@ void InfoXmlBackendUnitTest::cleanupTestCase()
      QFile::remove("providers1.context");
      QFile::remove("providers2.context");
      QFile::remove("providers3.context");
+     QFile::remove("providers4.context");
+     QFile::remove("providers5.context");
 }
 
 #include "infoxmlbackendunittest.moc"
