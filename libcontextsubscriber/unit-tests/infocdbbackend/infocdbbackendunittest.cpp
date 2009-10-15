@@ -33,6 +33,7 @@ class InfoCdbBackendUnitTest : public QObject
 private:
     void createBaseDatabase(QString path);
     void createAlternateDatabase(QString path);
+    void createIncompatibleDatabase(QString path);
 
 private slots:
     void initTestCase();
@@ -46,6 +47,7 @@ private slots:
     void providersForKey();
     void dynamics();
     void removed();
+    void incompatibleDatabase();
     void cleanupTestCase();
 };
 
@@ -110,6 +112,28 @@ void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
     providers2 << QVariant(provider2);
     providers2 << QVariant(provider3);
     writer.add("Battery.Capacity:PROVIDERS", providers2);
+
+    writer.close();
+}
+
+void InfoCdbBackendUnitTest::createIncompatibleDatabase(QString path)
+{
+    CDBWriter writer(path);
+
+    if (! writer.isWritable())
+        qFatal("Failed to open %s for reading!", path.toLocal8Bit().data());
+
+    writer.add("KEYS", "Battery.Charging");
+    writer.add("Battery.Charging:KEYTYPE", "INTEGER");
+    writer.add("Battery.Charging:KEYDOC", "doc1");
+
+    QVariantList providers;
+    QHash <QString, QVariant> provider1;
+    provider1.insert("plugin", "contextkit-dbus");
+    provider1.insert("constructionString", "system:org.freedesktop.ContextKit.contextd1");
+    providers << QVariant(provider1);
+    writer.add("Battery.Charging:PROVIDERS", QVariant(providers));
+    writer.add("VERSION", "bull");
 
     writer.close();
 }
@@ -252,6 +276,20 @@ void InfoCdbBackendUnitTest::removed()
     QCOMPARE(args.at(0).toList().size(), 2);
 
     backend->disconnectNotify("-"); // Fake it. Spy does something fishy here.
+}
+
+void InfoCdbBackendUnitTest::incompatibleDatabase()
+{
+    QFile::remove("cache.cdb");
+    QTest::qWait(DEFAULT_WAIT_PERIOD);
+    createIncompatibleDatabase("cache.cdb");
+    QTest::qWait(DEFAULT_WAIT_PERIOD);
+
+    QCOMPARE(backend->databaseExists(), true);
+    QCOMPARE(backend->listKeys().count(), 0);
+    QCOMPARE(backend->typeForKey("Battery.Charging"), QString());
+    QCOMPARE(backend->docForKey("Battery.Charging"), QString());
+    QCOMPARE(backend->providersForKey("Battery.Charging").size(), 0);
 }
 
 void InfoCdbBackendUnitTest::cleanupTestCase()
