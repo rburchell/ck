@@ -202,18 +202,23 @@ Internet connectivity
 
 Information about the connection of the devide to the Internet.
   </doc>
-  <key name="Internet.NetworkType">
-    <type>
-      <!--<string-enum>
-        <GPRS/>
-        <WLAN/>
-	</string-enum>-->
-      string
-    </type>
+  <key name="Internet.NetworkType"
+       type="string">
+    <typedoc>
+      <string-enum>
+        <wifi/>
+        <wimax/>
+        <cellular/>
+        <bluetooth/>
+        <ethernet/>
+        <usb/>
+      </string-enum>
+    </typedoc>
     <doc>
-The type of the current connection to the Internet, such as "wlan",
-"cellular", "bluetooth", "ethernet", or "usb".  The possible values
-are still TBD.
+The type of the current connection to the Internet.  This is one of
+the strings "wifi", "wimax", "cellular", "bluetooth", "ethernet", or
+"usb".  (From ConnMan.  New types might be defined in the future, of
+course.)
     </doc>
   </key>
 
@@ -234,8 +239,8 @@ are still TBD.
       </string-enum>
     </typedoc>
     <doc>
-      The state of the Internet connection, values TBD but will include
-      things like "connected", "disconnected", "connecting".
+      The state of the Internet connection, as one of "connected",
+      "disconnected", and "connecting".
     </doc>
   </key>
   
@@ -245,7 +250,7 @@ are still TBD.
     <doc>
 The signal strength of the current connection to the Internet. For
 example, when Internet.NetworkType is "cellular", this is the signal
-strength at the cellular radio, when it is "wlan", it is the signal
+strength at the cellular radio, when it is "wifi", it is the signal
 strength at the WLAN radio.
     </doc>
   </key>
