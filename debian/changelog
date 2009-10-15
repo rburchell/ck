@@ -1,8 +1,10 @@
 contextkit (0.3.10~unreleased) unstable; urgency=low
 
-  *
+  * Introspection part of libcontextsubscriber now supports multiple
+    providers for one property.
+  * New tool: context-ls for listing available context properties.
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 06 Oct 2009 17:27:04 +0300
+ -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Tue, 15 Oct 2009 16:25:04 +0300
 
 contextkit (0.3.9) unstable; urgency=low
 
