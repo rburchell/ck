@@ -60,7 +60,6 @@ const QString ContextKitPlugin::managerIName = "org.freedesktop.ContextKit.Manag
 ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& busName)
     : providerListener(new DBusNameListener(bus, busName, this)),
       subscriberInterface(0),
-//      managerInterface(new QDBusInterface(busName, managerPath, managerIName, bus, this)),
       managerInterface(0),
       connection(new QDBusConnection(bus)),
       busName(busName)
@@ -87,7 +86,7 @@ void ContextKitPlugin::onProviderAppeared()
     delete subscriberInterface;
     subscriberInterface = 0;
     delete managerInterface;
-    managerInterface = new QDBusInterface(busName, managerPath, managerIName, *connection, this);
+    managerInterface = new AsyncDBusInterface(busName, managerPath, managerIName, *connection, this);
     if (!managerInterface->callWithCallback("GetSubscriber",
                                             QList<QVariant>(),
                                             this,
