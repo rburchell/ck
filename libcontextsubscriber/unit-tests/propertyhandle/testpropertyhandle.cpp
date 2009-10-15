@@ -57,7 +57,7 @@ bool ContextPropertyInfo::provided() const
     return true;
 }
 
-QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
+QList<ContextProviderInfo> ContextPropertyInfo::providers() const
 {
     return QList<ContextProviderInfo>() << ContextProviderInfo("fakeplugin", "fakeconstructionstring");
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<xml>
+    <provider plugin="another.so" constructionString="some-other-string">
+        <key name="System.Active" type="INTEGER" doc="should not work"/>
+    </provider>
+</xml>

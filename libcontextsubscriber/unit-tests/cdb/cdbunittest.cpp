@@ -129,6 +129,7 @@ void CDBUnitTest::reading()
     complex << QVariant("test") << QVariant(map) << QVariant(list);
 
     QCOMPARE(QVariant(complex), reader.valuesForKey("COMPLEX")[0]);
+    QCOMPARE(42, reader.valueForKey("COMPLEX").toList().at(1).toMap().value("fortytwo").toInt());
 }
 
 void CDBUnitTest::cleanupTestCase()
