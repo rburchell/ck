@@ -26,6 +26,9 @@ types = dict(int=(INT, int),
 properties = []
 
 if len(sys.argv) < 2:
+    print >>sys.stderr, 'This tool is deprecated, and will be removed really soon!'
+    print >>sys.stderr, 'Please start using the --v2 option and read context-provide-v2(1)!'
+    print >>sys.stderr
     print __doc__
     sys.exit(1)
 sys.argv.pop(0)
@@ -33,6 +36,9 @@ sys.argv.pop(0)
 # Support for new context-provide
 if sys.argv[0] == "--v2":
     os.execvp("context-provide-internal", [ "context-provide" ] + sys.argv)
+
+print >>sys.stderr, 'This tool is deprecated, and will be removed really soon!'
+print >>sys.stderr, 'Please start using the --v2 option and read context-provide-v2(1)!'
 
 busaddress = sys.argv.pop(0).split(':')
 if len(busaddress) == 1:
