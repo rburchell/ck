@@ -290,6 +290,7 @@ void InfoCdbBackendUnitTest::incompatibleDatabase()
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString());
     QCOMPARE(backend->docForKey("Battery.Charging"), QString());
     QCOMPARE(backend->providersForKey("Battery.Charging").size(), 0);
+    QCOMPARE(backend->keyDeclared("Battery.Charging"), false);
 }
 
 void InfoCdbBackendUnitTest::cleanupTestCase()
