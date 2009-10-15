@@ -290,6 +290,7 @@ class Subscription(unittest.TestCase):
                 provider.send("dump")
                 provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 listen = CLTool("context-listen", "test.string")
+                listen.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
                 self.assert_(
                         listen.expect(CLTool.STDOUT,
@@ -458,6 +459,7 @@ class MultipleProviders(unittest.TestCase):
                 provider2.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
                 listen = CLTool("context-listen","test.int","test.truth")
+                listen.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
                 provider2.send("test.int = -68")
 
