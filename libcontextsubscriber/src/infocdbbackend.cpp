@@ -70,22 +70,33 @@ QStringList InfoCdbBackend::variantListToStringList(const QVariantList &l)
 
 QStringList InfoCdbBackend::listKeys() const
 {
-    return variantListToStringList(reader.valuesForKey("KEYS"));
+    if (databaseCompatible)
+        return variantListToStringList(reader.valuesForKey("KEYS"));
+    else
+        return QStringList();
 }
 
 QString InfoCdbBackend::typeForKey(QString key) const
 {
-    return reader.valueForKey(key + ":KEYTYPE").toString();
+    if (databaseCompatible)
+        return reader.valueForKey(key + ":KEYTYPE").toString();
+    else
+        return QString();
 }
 
 QString InfoCdbBackend::docForKey(QString key) const
 {
-    return reader.valueForKey(key + ":KEYDOC").toString();
+    if (databaseCompatible)
+        return reader.valueForKey(key + ":KEYDOC").toString();
+    else
+        return QString();
 }
 
 bool InfoCdbBackend::keyDeclared(QString key) const
 {
-    if (reader.valuesForKey("KEYS").contains(key))
+    if (!databaseCompatible)
+        return false;
+    else if (reader.valuesForKey("KEYS").contains(key))
         return true;
     else
         return false;
@@ -144,6 +155,14 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
 
     reader.reopen();
     watch();
+
+    // Check the version
+    QString version = reader.valueForKey("VERSION");
+    if (version != "" && version != BACKEND_COMPATIBILITY_NAMESPACE) {
+        databaseCompatible = false;
+        contextWarning() << F_CDB << "Incompatible database version:" << version;
+    } else
+        databaseCompatible = true;
 
     // If nobody is watching us anyways, drop out now and skip
     // the further processing. This could be made more granular
