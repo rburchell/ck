@@ -132,10 +132,16 @@ sub output_key {
 
     # dump_nano_dom (0, "Key", $key);
 
+    my $type = $key->{typedoc};
+    if (!$type)
+    {
+        $type = $key->{type};
+    }
+
     print "\n";
-    print "*" . $key->{name} . "* (" . type_short_desc ($key->{type}) . ")::\n";
+    print "*" . $key->{name} . "* (" . type_short_desc ($type) . ")::\n";
     print $key->{doc} . "\n";
-    print_type_long_desc ($key->{type});
+    print_type_long_desc ($type);
 }
 
 my $document = XML::DOM::Parser->new()->parse(STDIN);
