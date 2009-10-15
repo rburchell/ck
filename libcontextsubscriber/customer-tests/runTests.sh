@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 cd $(dirname $0)
 DIRS="commander subscription asynchronicity registry pluginchanging"
@@ -28,7 +28,7 @@ then
 		echo "Running tests in $dir"
 		cd $dir
 		for file in *.py; do
-			python2.5 $file || exit 1
+			python2.5 $file
 		done
 		cd ..
 	done
@@ -38,7 +38,7 @@ else
 fi
 
 echo "Running update-contextkit-providers customer check"
-( cd update-contextkit-providers && ./test.sh )
+cd update-contextkit-providers ; ./test.sh ; cd ..
 
 if [ -n "$COVERAGE" ]
 then
