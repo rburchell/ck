@@ -46,6 +46,7 @@ class Subscription(unittest.TestCase):
                         self.assert_(False, "Couldn't find the test time plugins")
 
                 self.context_client = CLTool("context-listen", "Test.Time")
+                self.context_client.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
                 # Copy the declaration file, declaring libcontextsubscribertime1 plugin.
                 os.system('cp time1.context.temp time.context.temp')
