@@ -124,6 +124,9 @@ int main(int argc, char **argv)
         exit(128);
     }
 
+    // Write the compatibility string
+    writer.add("VERSION", BACKEND_COMPATIBILITY_NAMESPACE);
+
     foreach(const QString& key, context->listKeys()) {
         ContextPropertyInfo keyInfo(key);
 
