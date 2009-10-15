@@ -31,6 +31,8 @@
 
 namespace ContextSubscriber {
 
+class Provider;
+
 class PropertyHandle : public QObject
 {
     Q_OBJECT
@@ -38,12 +40,12 @@ class PropertyHandle : public QObject
 public:
     static PropertyHandle* instance(const QString& key);
     void onValueChanged();
-    void setSubscribeFinished();
+    void setSubscribeFinished(Provider *);
 
 signals:
     // For tests
     void onValueChangedCalled(QString);
-    void setSubscribeFinishedCalled(QString);
+    void setSubscribeFinishedCalled(Provider *,QString);
 
 public:
     PropertyHandle(const QString& key);

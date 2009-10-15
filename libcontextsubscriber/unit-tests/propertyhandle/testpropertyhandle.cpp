@@ -100,12 +100,6 @@ Provider* mockProvider;
 Provider* mockCommanderProvider;
 DBusNameListener* mockDBusNameListener;
 
-// Mock implementation of TimedValue
-TimedValue::TimedValue(const QVariant &value) : value(value)
-{
-    clock_gettime(CLOCK_MONOTONIC, &time);
-}
-
 // Mock implementation of the Provider
 int Provider::instanceCount = 0;
 QStringList Provider::instancePluginNames;
@@ -374,7 +368,7 @@ void PropertyHandleUnitTests::subscriptionPendingAndFinished()
     QVERIFY(propertyHandle->isSubscribePending());
 
     // finished
-    propertyHandle->setSubscribeFinished();
+    propertyHandle->setSubscribeFinished(mockProvider);
 
     // Expected results:
     // The subscription is no longer marked as pending
@@ -868,9 +862,12 @@ void PropertyHandleUnitTests::commandingDisabled()
     emit mockDBusNameListener->nameAppeared();
 
     // Expected results:
-    // The PropertyHandle ignores the Commander
-    QCOMPARE(Provider::unsubscribeCount, 0);
-    QCOMPARE(Provider::subscribeCount, 0);
+    // The PropertyHandle unsubscribes from and resubscribes to the same key,
+    // practically ignoring commander appearance.
+    QCOMPARE(Provider::unsubscribeCount, 1);
+    QCOMPARE(Provider::subscribeCount, 1);
+    QVERIFY(Provider::subscribeKeys == Provider::unsubscribeKeys);
+    QVERIFY(Provider::subscribeProviderNames == Provider::unsubscribeProviderNames);
 
     // Setup:
     // Clear the logs from the subscription
@@ -882,9 +879,11 @@ void PropertyHandleUnitTests::commandingDisabled()
     emit mockDBusNameListener->nameDisappeared();
 
     // Expected results:
-    // The PropertyHandle ignores the Commander
-    QCOMPARE(Provider::unsubscribeCount, 0);
-    QCOMPARE(Provider::subscribeCount, 0);
+    // Same thing as above.
+    QCOMPARE(Provider::unsubscribeCount, 1);
+    QCOMPARE(Provider::subscribeCount, 1);
+    QVERIFY(Provider::subscribeKeys == Provider::unsubscribeKeys);
+    QVERIFY(Provider::subscribeProviderNames == Provider::unsubscribeProviderNames);
 }
 
 } // end namespace

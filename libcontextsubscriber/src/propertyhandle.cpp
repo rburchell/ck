@@ -86,6 +86,9 @@ PropertyHandle::PropertyHandle(const QString& key)
     // Start listening for the context commander, and also initiate a
     // NameHasOwner check.
 
+    // Because of the waitForSubscription() feature, we immediately need to
+    // subscribe to the real providers when the commander presence becomes
+    // known.  So, these connect()s need to be synchronous (not queued).
     sconnect(commanderListener, SIGNAL(nameAppeared()),
              this, SLOT(updateProvider()));
     sconnect(commanderListener, SIGNAL(nameDisappeared()),
@@ -134,28 +137,28 @@ void PropertyHandle::updateProvider()
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
 
-		foreach (ContextProviderInfo info, myInfo->listProviders())
-			newProviders << Provider::instance(info);
-		contextDebug() << newProviders.size() << "providers for" << myKey;
+        foreach (ContextProviderInfo info, myInfo->listProviders())
+            newProviders << Provider::instance(info);
+        contextDebug() << newProviders.size() << "providers for" << myKey;
     }
     if (subscribeCount > 0) {
-		// Unsubscribe from old providers and subscribe to the new ones.
-		foreach (Provider *oldprovider, myProviders)
-			oldprovider->unsubscribe(myKey);
-		pendingSubscriptions.clear();
-		foreach (Provider *newprovider, newProviders)
-			if (newprovider->subscribe(myKey))
-				pendingSubscriptions << newprovider;
+        // Unsubscribe from old providers and subscribe to the new ones.
+        foreach (Provider *oldprovider, myProviders)
+            oldprovider->unsubscribe(myKey);
+        pendingSubscriptions.clear();
+        foreach (Provider *newprovider, newProviders)
+            if (newprovider->subscribe(myKey))
+                pendingSubscriptions << newprovider;
     }
     myProviders = newProviders;
-	// Trigger computing the new value as the providers have changed.
-	onValueChanged();
+    // Trigger computing the new value as the providers have changed.
+    onValueChanged();
 }
 
 /// Sets \c subscribePending to false.
 void PropertyHandle::setSubscribeFinished(Provider *provider)
 {
-	pendingSubscriptions.remove(provider);
+    pendingSubscriptions.remove(provider);
 }
 
 /// Increase the \c subscribeCount of this context property and
@@ -167,10 +170,10 @@ void PropertyHandle::subscribe()
     QMutexLocker locker(&subscribeCountLock);
     ++subscribeCount;
     if (subscribeCount == 1) {
-		pendingSubscriptions.clear();
-		foreach (Provider *provider, myProviders)
-			if (provider->subscribe(myKey))
-				pendingSubscriptions << provider;
+        pendingSubscriptions.clear();
+        foreach (Provider *provider, myProviders)
+            if (provider->subscribe(myKey))
+                pendingSubscriptions << provider;
     }
 }
 
@@ -182,9 +185,9 @@ void PropertyHandle::unsubscribe()
     QMutexLocker locker(&subscribeCountLock);
     --subscribeCount;
     if (subscribeCount == 0) {
-		pendingSubscriptions.clear();
-		foreach (Provider *provider, myProviders)
-			provider->unsubscribe(myKey);
+        pendingSubscriptions.clear();
+        foreach (Provider *provider, myProviders)
+            provider->unsubscribe(myKey);
     }
 }
 
@@ -201,8 +204,14 @@ QVariant PropertyHandle::value() const
 
 bool PropertyHandle::isSubscribePending() const
 {
-    return commanderListener->isServicePresent() == DBusNameListener::Unknown ||
-		pendingSubscriptions.size() != 0;
+    // We wait until commander presence is unknown ...
+    if (commanderListener->isServicePresent() == DBusNameListener::Unknown)
+        return true;
+    // ... or until we get some value ...
+    if (!myValue.isNull())
+        return false;
+    // ... or all pending subscriptions finished.
+    return pendingSubscriptions.size() != 0;
 }
 
 /// Used by the \c HandleSignalRouter to change the value of the
@@ -212,22 +221,22 @@ bool PropertyHandle::isSubscribePending() const
 /// valueChanged() signal.
 void PropertyHandle::onValueChanged()
 {
-	bool found = false;
-	TimedValue latest = QVariant();
+    bool found = false;
+    TimedValue latest = QVariant();
 
-	foreach (Provider *provider, myProviders) {
-		TimedValue current = provider->get(myKey);
-		if (current.value.isNull())
-			continue;
-		if (!found) {
-			found = true;
-			latest = current;
-		} else if (latest < current)
-			latest = current;
-	}
+    foreach (Provider *provider, myProviders) {
+        TimedValue current = provider->get(myKey);
+        if (current.value.isNull())
+            continue;
+        if (!found) {
+            found = true;
+            latest = current;
+        } else if (latest < current)
+            latest = current;
+    }
     QVariant newValue;
-	if (found)
-		newValue = latest.value;
+    if (found)
+        newValue = latest.value;
 
     if (typeCheckEnabled // type checks enabled
         && !newValue.isNull() // variable is non-null
@@ -246,7 +255,7 @@ void PropertyHandle::onValueChanged()
         }
 
         if (!checked) {
-            contextCritical() << "Provider error, bad type for " << myKey <<
+             contextCritical() << "Provider error, bad type for " << myKey <<
                 "wanted:" << myType << "got:" << newValue.typeName();
             return;
         }

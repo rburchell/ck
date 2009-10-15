@@ -24,12 +24,12 @@
 
 #include "queuedinvoker.h"
 #include "contextproviderinfo.h"
+#include "timedvalue.h"
 
 #include <QObject>
 #include <QDBusConnection>
 #include <QSet>
 #include <QMutex>
-#include <time.h>
 
 class ContextPropertyInfo;
 
@@ -40,19 +40,6 @@ class SubscriberInterface;
 class DBusNameListener;
 class ManagerInterface;
 class IProviderPlugin;
-
-struct TimedValue
-{
-    struct timespec time;
-    QVariant value;
-    TimedValue(const QVariant &value);
-    bool operator<(const TimedValue &other)
-		{
-			return ((time.tv_sec < other.time.tv_sec) ||
-					(time.tv_sec == other.time.tv_sec &&
-					 time.tv_nsec < other.time.tv_nsec));
-		}
-};
 
 class Provider : public QueuedInvoker
 {

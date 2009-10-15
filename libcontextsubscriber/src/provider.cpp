@@ -34,11 +34,6 @@
 
 namespace ContextSubscriber {
 
-TimedValue::TimedValue(const QVariant &value) : value(value)
-{
-    clock_gettime(CLOCK_MONOTONIC, &time);
-}
-
 /*!
   \class IProviderPlugin
   \brief Interface for provider plugins.

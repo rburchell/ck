@@ -12,7 +12,7 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	handlesignalrouter.h queuedinvoker.cpp queuedinvoker.h		\
 	loggingfeatures.h contextkitplugin.h contextkitplugin.cpp	\
 	iproviderplugin.h contextproviderinfo.h nanoxml.h nanoxml.cpp	\
-	asyncdbusinterface.cpp
+	asyncdbusinterface.cpp timedvalue.h
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h			\
