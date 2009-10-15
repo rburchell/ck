@@ -125,10 +125,10 @@ QString InfoCdbBackend::databaseDirectory()
 void InfoCdbBackend::watch()
 {
     if (! watcher.directories().contains(InfoCdbBackend::databaseDirectory()) &&
-        QDir.exists(InfoCdbBackend::databaseDirectory()))
+        QDir(InfoCdbBackend::databaseDirectory()).exists(InfoCdbBackend::databaseDirectory()))
         watcher.addPath(InfoCdbBackend::databaseDirectory());
     if (! watcher.files().contains(InfoCdbBackend::databasePath()) &&
-        QFile.exists(InfoCdbBackend::databasePath()))
+        QFile::exists(InfoCdbBackend::databasePath()))
         watcher.addPath(InfoCdbBackend::databasePath());
 }
 
@@ -167,10 +167,8 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
 /// directory only when we don't have the cache.db in the first place.
 void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
 {
-    if (reader.isReadable())
-        return;
-
-    onDatabaseFileChanged(path);
+    if (reader.isReadable() != QFile::exists(InfoCdbBackend::databasePath()))
+        onDatabaseFileChanged(path);
 }
 
 const QList<ContextProviderInfo> InfoCdbBackend::providersForKey(QString key) const

@@ -247,9 +247,9 @@ void InfoCdbBackendUnitTest::removed()
 
     QTest::qWait(DEFAULT_WAIT_PERIOD);
 
-    //QCOMPARE(spy.count(), 1);
-    //QList<QVariant> args = spy.takeFirst();
-    //QCOMPARE(args.at(0).toList().size(), 2);
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> args = spy.takeFirst();
+    QCOMPARE(args.at(0).toList().size(), 2);
 
     backend->disconnectNotify("-"); // Fake it. Spy does something fishy here.
 }
