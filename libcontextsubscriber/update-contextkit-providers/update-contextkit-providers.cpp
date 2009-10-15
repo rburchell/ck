@@ -27,6 +27,7 @@
 #include "contextproviderinfo.h"
 #include "cdbwriter.h"
 #include "fcntl.h"
+#include "infobackend.h"
 
 /*!
    \page UpdatingContextProviders
