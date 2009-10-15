@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
-export CONTEXT_CORE_DECLARATIONS=.
-export CONTEXT_PROVIDERS=.
+export CONTEXT_CORE_DECLARATIONS=/dev/null
+export CONTEXT_PROVIDERS=./
 
 # Remove all temp files
 function clean {
