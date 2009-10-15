@@ -209,6 +209,9 @@ const QList<ContextProviderInfo> InfoCdbBackend::providersForKey(QString key) co
     QVariant providers = reader.valueForKey(key + ":PROVIDERS");
     QList<ContextProviderInfo> lst;
 
+    if (!databaseCompatible)
+        return lst;
+
     foreach (QVariant variant, providers.toList())
         lst << ContextProviderInfo(variant.toHash().value("plugin").toString(),
                                    variant.toHash().value("constructionString").toString());
