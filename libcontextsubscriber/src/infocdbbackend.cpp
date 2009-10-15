@@ -157,7 +157,7 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     watch();
 
     // Check the version
-    QString version = reader.valueForKey("VERSION");
+    QString version = reader.valueForKey("VERSION").toString();
     if (version != "" && version != BACKEND_COMPATIBILITY_NAMESPACE) {
         databaseCompatible = false;
         contextWarning() << F_CDB << "Incompatible database version:" << version;
