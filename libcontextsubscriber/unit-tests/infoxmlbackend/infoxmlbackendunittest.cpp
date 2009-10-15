@@ -65,6 +65,7 @@ void InfoXmlBackendUnitTest::initTestCase()
 {
     utilCopyLocalAtomically("providers1.src", "providers1.context");
     utilCopyLocalWithRemove("providers2v1.src", "providers2.context");
+    utilCopyLocalWithRemove("providers6.src", "providers6.context");
     utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoXmlBackend();
@@ -73,6 +74,9 @@ void InfoXmlBackendUnitTest::initTestCase()
 void InfoXmlBackendUnitTest::listKeys()
 {
     QStringList keys = backend->listKeys();
+
+    QVERIFY(! keys.contains("System.ProcessingData"));
+
     QCOMPARE(keys.count(), 10);
     QVERIFY(keys.contains("Battery.ChargePercentage"));
     QVERIFY(keys.contains("Battery.LowBattery"));
@@ -204,6 +208,7 @@ void InfoXmlBackendUnitTest::cleanupTestCase()
      QFile::remove("providers3.context");
      QFile::remove("providers4.context");
      QFile::remove("providers5.context");
+     QFile::remove("providers6.context");
 }
 
 #include "infoxmlbackendunittest.moc"

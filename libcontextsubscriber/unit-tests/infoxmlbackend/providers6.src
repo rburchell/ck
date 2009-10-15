@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<xml>
+    <provider bus="system" service="com.nokia.worker">
+        <key name="System.ProcessingData" xmlns="http://www.nokia.com/bull">
+            <type>TRUTH</type>
+            <doc>This true when the system is processing some data.</doc>
+        </key>
+    </provider>
+</xml>

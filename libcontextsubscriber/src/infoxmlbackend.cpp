@@ -334,7 +334,7 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
 
     // Check the version of the file
     if (nano.namespaceUri() != "" && nano.namespaceUri() != BACKEND_COMPATIBILITY_NAMESPACE) {
-        contextWarning() << F_XML << "Reading" << path << "failed, invalid format";
+        contextWarning() << F_XML << "Reading" << path << "failed, invalid version:" << nano.namespaceUri();
         return;
     }
 
