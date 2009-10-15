@@ -332,13 +332,11 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
         return;
     }
 
-    // FIXME: Check the format, for forward-compatibility branch
-    /*
+    // Check the version of the file
     if (nano.namespaceUri() != "" && nano.namespaceUri() != BACKEND_COMPATIBILITY_NAMESPACE) {
         contextWarning() << F_XML << "Reading" << path << "failed, invalid format";
         return;
     }
-    */
 
     if (nano.root().toList().at(0).toString() == "provider" ||
         nano.root().toList().at(0).toString() == "properties") {
