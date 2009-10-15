@@ -55,9 +55,9 @@ int main(int argc, char **argv)
             if (provided && !info.provided())
                 continue;
             if (longListing) {
-                for (int i = 0; i < info.listProviders().size(); i++ )
-                    out << key << "\t" << info.type() << "\t" << info.listProviders()[i].plugin << "\t"
-                        << info.listProviders()[i].constructionString << "\n";
+                for (int i = 0; i < info.providers().size(); i++ )
+                    out << key << "\t" << info.type() << "\t" << info.providers()[i].plugin << "\t"
+                        << info.providers()[i].constructionString << "\n";
             } else
                 out << key << "\n";
             if (doc) {
