@@ -597,6 +597,7 @@ class SubscriptionPause (unittest.TestCase):
                 self.provider.send("dump")
                 self.provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 self.listen = CLTool("context-listen","test.int")
+                self.listen.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
                 self.assert_(
                         self.listen.expect(CLTool.STDOUT,
