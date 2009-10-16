@@ -4,6 +4,8 @@ contextkit (0.3.10~unreleased) unstable; urgency=low
     providers for one property.
   * New tool: context-ls for listing available context properties.
 
+  Implemented: CntFr-324, CntFr-318, CntFr-343
+
  -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Tue, 15 Oct 2009 16:25:04 +0300
 
 contextkit (0.3.9) unstable; urgency=low
