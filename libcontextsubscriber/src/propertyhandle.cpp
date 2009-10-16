@@ -260,8 +260,13 @@ void PropertyHandle::onValueChanged()
     }
 
     QWriteLocker lock(&valueLock);
-    if (myValue != newValue || myValue.isNull() != newValue.isNull()) {
-        // The value was new
+    // Since QVariant(QVariant::Int) == QVariant(0), it's not enough to check
+    // whether myValue and newValue are unequal.  Also, for completeness we
+    // don't want to lose a valueChanged signal if the type changes.
+    if (myValue != newValue ||
+        myValue.isNull() != newValue.isNull() ||
+        myValue.type() != newValue.type())
+    {
         myValue = newValue;
         emit valueChanged();
     }
