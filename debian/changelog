@@ -1,4 +1,4 @@
-contextkit (0.3.10~unreleased) unstable; urgency=low
+contextkit (0.3.10) unstable; urgency=low
 
   * Introspection part of libcontextsubscriber now supports multiple
     providers for one property.
