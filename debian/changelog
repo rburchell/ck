@@ -1,3 +1,9 @@
+contextkit (0.3.11~unreleased) unstable; urgency=low
+
+  *
+
+ -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Tue, 15 Oct 2009 16:25:04 +0300
+
 contextkit (0.3.10) unstable; urgency=low
 
   * Introspection part of libcontextsubscriber now supports multiple
