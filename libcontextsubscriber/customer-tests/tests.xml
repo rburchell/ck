@@ -84,7 +84,7 @@
       </case>
       <case name="libsub017" description="Multiple providers"
 	    requirement="" timeout="20">
-        <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/subscription; python multiproviders.py</step>
+        <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/subscription; python multiprovider.py</step>
       </case>
 
       <environments>
