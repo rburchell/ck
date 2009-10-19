@@ -35,6 +35,7 @@ class Service;
 class Manager;
 
 class PropertyPrivate;
+class ServiceBackend;
 
 class Property : public QObject
 {
@@ -54,7 +55,7 @@ public:
 
 private:
     PropertyPrivate *priv;
-    void init (Manager *manger, const QString &key);
+    void init (ServiceBackend *serviceBackend, const QString &key);
 
 private slots:
     void onManagerFirstSubscriberAppeared(const QString &key);

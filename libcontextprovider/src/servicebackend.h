@@ -29,11 +29,13 @@
 #include <QDBusConnection>
 #include <QHash>
 #include <QVariant>
+#include <QSet>
 
 class ServiceBackendUnitTest;
 
 namespace ContextProvider {
 
+class PropertyAdaptor;
 class Property;
 class ServiceBackendPrivate;
 
@@ -65,13 +67,20 @@ public:
     friend class ::ServiceBackendUnitTest;
     friend class Service;
 
+    void addProperty(const QString& key, Property* property);
+
 private:
+    QString objectPath(QString key);
+
     Manager myManager;
     QDBusConnection connection;
     int refCount;
     QString busName;
 
     static QHash <QString, ServiceBackend*> instances;
+    QHash<QString, Property*> properties;
+    QSet<PropertyAdaptor*> createdAdaptors;
+
 };
 
 } // end namespace

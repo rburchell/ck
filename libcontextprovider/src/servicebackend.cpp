@@ -18,7 +18,7 @@
  * 02110-1301 USA
  *
  */
-
+#include "propertyadaptor.h"
 #include "servicebackend.h"
 #include "logging.h"
 #include "manager.h"
@@ -92,20 +92,31 @@ void ServiceBackend::setValue(const QString &key, const QVariant &val)
     myManager.setKeyValue(key, val);
 }
 
+void ServiceBackend::addProperty(const QString& key, Property* property)
+{
+    properties.insert(key, property);
+}
+
 /// Start the Service again after it has been stopped. In the case of
 /// shared connection, the objects will be registered to D-Bus. In the
 /// case of non-shared connection, also the service name will be
 /// registered on D-Bus. Returns true on success, false otherwise.
 bool ServiceBackend::start()
 {
-    ManagerAdaptor *managerAdaptor = new ManagerAdaptor(&myManager, &connection);
-
+    foreach (const QString& key, properties.keys()) {
+        PropertyAdaptor* propertyAdaptor = new PropertyAdaptor(properties[key], &connection);
+        createdAdaptors.insert(propertyAdaptor);
+        if (!connection.registerObject(objectPath(key), propertyAdaptor)) {
+            return false;
+        }
+    }
     // Register object
-    if (managerAdaptor && !connection.registerObject("/org/freedesktop/ContextKit/Manager", &myManager)) {
+    /**if (managerAdaptor && !connection.registerObject("/org/freedesktop/ContextKit/Manager", &myManager)) {
         contextCritical() << F_SERVICE_BACKEND << "Failed to register the Manager object for" << busName;
         contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
         return false;
-    }
+    }**/
+
 
     if (!sharedConnection()) {
         if (!connection.registerService(busName)) {
@@ -210,4 +221,12 @@ bool ServiceBackend::sharedConnection()
 {
     return busName == "";
 }
+
+QString ServiceBackend::objectPath(QString key)
+{
+    if (!key.startsWith("/"))
+        return QString("/org/maemo/contextkit/") + key.replace(".", "/");
+    return key;
+}
+
 } // end namespace

@@ -41,7 +41,7 @@ namespace ContextProvider {
 */
 
 struct PropertyPrivate {
-    Manager *manager;
+    ServiceBackend* serviceBackend;
     QString myKey;
 };
 
@@ -49,7 +49,7 @@ struct PropertyPrivate {
 Property::Property(Service &service, const QString &k, QObject* parent)
     : QObject(parent)
 {
-    init(service.backend->manager(), k);
+    init(service.backend, k);
 }
 
 /// Create a Property object on the default service for the key \a k.
@@ -62,28 +62,31 @@ Property::Property(const QString &k, QObject* parent)
         abort();
     }
 
-    init (ServiceBackend::defaultServiceBackend->manager(), k);
+    init (ServiceBackend::defaultServiceBackend, k);
 }
 
-void Property::init (Manager *manager, const QString &key)
+void Property::init (ServiceBackend *serviceBackend, const QString &key)
 {
     contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
 
     priv = new PropertyPrivate;
     priv->myKey = key;
-    priv->manager = manager;
+    priv->serviceBackend = serviceBackend;
 
-    priv->manager->addKey (priv->myKey);
-    sconnect(priv->manager, SIGNAL(firstSubscriberAppeared(const QString&)),
+    priv->serviceBackend->addProperty (priv->myKey, this);
+    /*sconnect(priv->manager, SIGNAL(firstSubscriberAppeared(const QString&)),
              this, SLOT(onManagerFirstSubscriberAppeared(const QString&)));
     sconnect(priv->manager, SIGNAL(lastSubscriberDisappeared(const QString&)),
              this, SLOT(onManagerLastSubscriberDisappeared(const QString&)));
+    */
+    // FIXME: where do these signals come from?
 }
 
 /// Returns true if the key is set (it's value is determined).
 bool Property::isSet() const
 {
-    return (priv->manager->getKeyValue(priv->myKey) != QVariant());
+    return true; // FIXME
+    //return (priv->manager->getKeyValue(priv->myKey) != QVariant());
 }
 
 /// Returns the name of the key this Property represents.
@@ -96,20 +99,21 @@ QString Property::key() const
 /// QVariant.
 void Property::unsetValue()
 {
-    priv->manager->setKeyValue(priv->myKey, QVariant());
+    //priv->manager->setKeyValue(priv->myKey, QVariant());
 }
 
 /// Sets the property value to QVariant \a v.
 void Property::setValue(const QVariant &v)
 {
-    priv->manager->setKeyValue(priv->myKey, v);
+    //priv->manager->setKeyValue(priv->myKey, v);
 }
 
 /// Returns the current value of the property. The returned QVariant is invalid
 /// if the key value is undetermined or the Property is invalid.
 QVariant Property::value()
 {
-    return priv->manager->getKeyValue(priv->myKey);
+    return QVariant(); // FIXME
+    //return priv->manager->getKeyValue(priv->myKey);
 }
 
 /// Called by Manager when first subscriber appears. Delegated if
