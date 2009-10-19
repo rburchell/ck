@@ -151,3 +151,12 @@ Description: libcontextsubscriber automated customer tests
  .
  This package contains an automated customer testsuite of the
  libcontextsubscriber library.
+
+Package: propertymonitor-tests
+Section: devel
+Architecture: any
+Depends: contextkit-utils
+XB-Maemo-CI-Stage: staging, validation
+Description: Property monitor
+ .
+ This package contains an automated test suite for monitoring which Context FW properties are provided.
