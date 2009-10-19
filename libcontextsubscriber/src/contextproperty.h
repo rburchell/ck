@@ -57,6 +57,8 @@ signals:
 
 private:
     ContextPropertyPrivate *priv;
+private slots:
+    void onValueChanged();
 };
 
 #endif
