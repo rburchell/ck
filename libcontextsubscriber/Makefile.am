@@ -1,4 +1,4 @@
-SUBDIRS = src unit-tests customer-tests multithreading-tests cli cls update-contextkit-providers doc man
+SUBDIRS = src unit-tests customer-tests multithreading-tests cli cls update-contextkit-providers doc man propertymonitor
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextsubscriber-1.0.pc

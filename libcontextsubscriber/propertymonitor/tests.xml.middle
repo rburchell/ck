@@ -1,0 +1,6 @@
+      <case name="PROPNAME-provider" description="Provider for PROPNAME" requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;cd /usr/share/propertymonitor-tests;python /usr/share/propertymonitor-tests/has_provider.py PROPNAME</step>
+      </case>
+      <case name="PROPNAME-value" description="Value for PROPNAME" requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;cd /usr/share/propertymonitor-tests;python /usr/share/propertymonitor-tests/has_value.py PROPNAME</step>
+      </case>

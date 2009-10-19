@@ -89,6 +89,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/multithreading-tests/wait-for-subscription-only-in-thread/Makefile
         libcontextsubscriber/multithreading-tests/wait-for-subscription-thread/Makefile
         libcontextsubscriber/update-contextkit-providers/Makefile
+        libcontextsubscriber/propertymonitor/Makefile
 	libcontextprovider/contextprovider-1.0.pc
 	libcontextprovider/Makefile
 	libcontextprovider/doc/Makefile
