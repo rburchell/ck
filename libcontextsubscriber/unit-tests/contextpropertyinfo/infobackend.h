@@ -37,8 +37,7 @@ public:
     QString typeForKey(QString key) const;
     QString docForKey(QString key) const;
     bool keyDeclared(QString key) const;
-    bool keyProvided(QString key) const;
-    const QList<ContextProviderInfo> listProviders(QString key);
+    const QList<ContextProviderInfo> providersForKey(QString key);
 
     void connectNotify(const char *signal);
     void disconnectNotify(const char *signal);

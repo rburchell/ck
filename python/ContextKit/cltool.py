@@ -23,7 +23,8 @@ import time
 from pprint import pprint
 from subprocess import Popen, PIPE
 from fcntl import fcntl, F_GETFL, F_SETFL
-from os import O_NONBLOCK, system
+import os
+import signal
 
 class CLTool:
     STDOUT = 1
@@ -31,6 +32,7 @@ class CLTool:
     def __init__(self, *cline):
         self.__process = Popen(cline, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         self.__io = []
+        self.last_output = ''
 
     def send(self, string):
         self.__io.append((0, string))
@@ -54,9 +56,9 @@ class CLTool:
         # set the stream to nonblocking
         fd = stream.fileno()
         flags = fcntl(fd, F_GETFL)
-        fcntl(fd, F_SETFL, flags | O_NONBLOCK)
+        fcntl(fd, F_SETFL, flags | os.O_NONBLOCK)
 
-        cur_str = ""
+        self.last_output = ""
         start_time = time.time()
         while True:
             try:
@@ -70,7 +72,7 @@ class CLTool:
                     self.__io.append((fileno, "--------- EXPECT ERR -----------"))
                     return False
                 line = line.rstrip()
-                cur_str += line + "\n"
+                self.last_output += line + "\n"
                 self.__io.append((fileno, line))
             except:
                 time.sleep(0.1) # no data were available
@@ -79,7 +81,7 @@ class CLTool:
             while i < len(exp_l):
                 # this is a hack, so you can have expressions like "\nwhole line\n"
                 # and they will match even for the first line
-                if re.search(exp_l[i], "\n" + cur_str):
+                if re.search(exp_l[i], "\n" + self.last_output):
                     del(exp_l[i])
                     i -= 1
                 i += 1
@@ -99,10 +101,20 @@ class CLTool:
     def comment(self, st):
         self.__io.append((-1, st))
 
+    def suspend(self):
+        os.kill(self.__process.pid, signal.SIGSTOP)
+
+    def resume(self):
+        os.kill(self.__process.pid, signal.SIGCONT)
+
     def kill(self):
-        system('../common/rec-kill.sh %d' % self.__process.pid)
+        os.system('../common/rec-kill.sh %d' % self.__process.pid)
         # can be changed to this, when python 2.6 is everywhere on maemo:
         #self.__process.kill()
+
+    def close(self):
+        # close the stdin of the process
+        self.__process.stdin.close()
 
     def wait(self):
             return self.__process.wait()

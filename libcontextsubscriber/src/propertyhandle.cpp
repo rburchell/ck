@@ -142,11 +142,11 @@ void PropertyHandle::updateProvider()
             // If myInfo knows the current provider which should be
             // connected to, connect to it.
             contextDebug() << F_PLUGINS << "Key exists";
-            QList<ContextProviderInfo> providers = myInfo->listProviders();
+            QList<ContextProviderInfo> providers = myInfo->providers();
             if (providers.size() > 1)
                 contextCritical() << "multi-process not implemented yet";
             else if (providers.size() == 0)
-                contextCritical() << "property provided() but no listProviders() is empty";
+                contextCritical() << "property provided() but no providers() is empty";
 
             newProvider = Provider::instance(providers[0]);
         } else {
@@ -260,8 +260,13 @@ void PropertyHandle::onValueChanged()
     }
 
     QWriteLocker lock(&valueLock);
-    if (myValue != newValue || myValue.isNull() != newValue.isNull()) {
-        // The value was new
+    // Since QVariant(QVariant::Int) == QVariant(0), it's not enough to check
+    // whether myValue and newValue are unequal.  Also, for completeness we
+    // don't want to lose a valueChanged signal if the type changes.
+    if (myValue != newValue ||
+        myValue.isNull() != newValue.isNull() ||
+        myValue.type() != newValue.type())
+    {
         myValue = newValue;
         emit valueChanged();
     }

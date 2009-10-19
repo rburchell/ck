@@ -114,8 +114,8 @@ class Subscription(unittest.TestCase):
                                       1),
                         "Key command returned wrong value")
 
-                provider.kill()
-                listen.kill()
+                provider.close()
+                listen.close()
 
         def testInfos(self):
                 """
@@ -173,8 +173,91 @@ class Subscription(unittest.TestCase):
                                       "\ntype: DOUBLE\n",
                                       1),
                         "type didn't work")
-                provider.kill()
-                listen.kill()
+                provider.close()
+                listen.close()
+
+        def testTypes(self):
+                provider = CLTool("context-provide", "--v2", "com.nokia.test",
+                                 "int","test.int","1",
+                                 "string","test.string","foobar",
+                                 "double","test.double","2.5",
+                                 "truth","test.truth","True")
+                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                provider.send("dump")
+                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth", "test.fake")
+                listen.expectAll(CLTool.STDOUT,
+                                 ["\ntest.double = double:2.5\n",
+                                  "\ntest.int = int:1\n",
+                                  "\ntest.string = QString:foobar\n",
+                                  "\ntest.truth = bool:true\n"],
+                                 10) # wait for it
+
+		# test querying the type of all properties
+                listen.send("type test.int")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\ntype: INT\n",
+                                      1))
+
+                listen.send("type test.double")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\ntype: DOUBLE\n",
+                                      1))
+
+                listen.send("type test.truth")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\ntype: TRUTH\n",
+                                      1))
+
+                listen.send("type test.string")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\ntype: STRING\n",
+                                      1))
+
+                listen.send("type test.fake")
+                self.assert_(
+			listen.expect(CLTool.STDOUT,
+				      "\ntype:\n",
+				      1))
+
+                provider.close()
+                listen.close()
+
+        def testProviders(self):
+                provider = CLTool("context-provide", "--v2", "com.nokia.test",
+                                 "int","test.int","1",
+                                 "string","test.string","foobar",
+                                 "double","test.double","2.5",
+                                 "truth","test.truth","True")
+                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                provider.send("dump")
+                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth", "test.fake")
+                listen.expectAll(CLTool.STDOUT,
+                                 ["\ntest.double = double:2.5\n",
+                                  "\ntest.int = int:1\n",
+                                  "\ntest.string = QString:foobar\n",
+                                  "\ntest.truth = bool:true\n"],
+                                 10) # wait for it
+
+		# test querying the provider(s)
+                listen.send("providers test.int")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\nproviders: session:com.nokia.test@contextkit-dbus\n",
+                                      1))
+
+                listen.send("providers test.fake")
+                self.assert_(
+                        listen.expect(CLTool.STDOUT,
+                                      "\nproviders:\n",
+                                      1))
+                provider.close()
+                listen.close()
 
         def testAllDataTypes(self):
                 """
@@ -213,8 +296,8 @@ class Subscription(unittest.TestCase):
                                           "\ntest.truth = bool:true\n"],
                                          10),
                         "Actual key values pairs do not match expected")
-                provider.kill()
-                listen.kill()
+                provider.close()
+                listen.close()
 
         def testTruthTypePermutations(self):
                 """
@@ -262,8 +345,8 @@ class Subscription(unittest.TestCase):
                                       "\ntest.truth = bool:true\n",
                                       1),
                         "setting to true didn't work")
-                provider.kill()
-                listen.kill()
+                provider.close()
+                listen.close()
 
         def testStringTypePermutations(self):
                 """
@@ -312,8 +395,8 @@ class Subscription(unittest.TestCase):
                                       1),
                         "setting to null didn't work")
 
-                provider.kill()
-                listen.kill()
+                provider.close()
+                listen.close()
 
 class MultipleSubscribers(unittest.TestCase):
         def setUp(self):
@@ -335,11 +418,11 @@ class MultipleSubscribers(unittest.TestCase):
                 self.context_client4.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
         def tearDown(self):
-                self.flexiprovider.kill()
-                self.context_client1.kill()
-                self.context_client2.kill()
-                self.context_client3.kill()
-                self.context_client4.kill()
+                self.flexiprovider.close()
+                self.context_client1.close()
+                self.context_client2.close()
+                self.context_client3.close()
+                self.context_client4.close()
                 os.unlink('./context-provide.context')
 
         def testInitialSubscription(self):
@@ -474,14 +557,14 @@ class MultipleProviders(unittest.TestCase):
                         listen.expect(CLTool.STDOUT,
                                       "\ntest.truth = bool:false\n",
                                       1))
-                provider1.kill()
-                provider2.kill()
-                listen.kill()
+                provider1.close()
+                provider2.close()
+                listen.close()
 
 class SubscriptionPause (unittest.TestCase):
         def tearDown(self):
-                self.provider.kill()
-                self.listen.kill()
+                self.provider.close()
+                self.listen.close()
                 os.unlink('context-provide.context')
 
         def testPause(self):
@@ -514,6 +597,7 @@ class SubscriptionPause (unittest.TestCase):
                 self.provider.send("dump")
                 self.provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
                 self.listen = CLTool("context-listen","test.int")
+                self.listen.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
                 self.assert_(
                         self.listen.expect(CLTool.STDOUT,
@@ -613,7 +697,7 @@ class SubscriptionWaitError (unittest.TestCase):
                                                    "wait finished for test.nonexistent",
                                                    3),
                              "Wait for subscription is probably in a dead state")
-                context_client.kill()
+                context_client.close()
 
 if __name__ == "__main__":
         sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)

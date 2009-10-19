@@ -211,8 +211,7 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
         cachedType = infoBackend->typeForKey(keyName);
         cachedDoc = infoBackend->docForKey(keyName);
         cachedDeclared = infoBackend->keyDeclared(keyName);
-        cachedProvided = infoBackend->keyProvided(keyName);
-        cachedProviders = infoBackend->listProviders(keyName);
+        cachedProviders = infoBackend->providersForKey(keyName);
     }
 }
 
@@ -258,11 +257,11 @@ bool ContextPropertyInfo::declared() const
 bool ContextPropertyInfo::provided() const
 {
     QMutexLocker lock(&cacheLock);
-    return cachedProvided;
+    return (cachedProviders.size() > 0);
 }
 
 /// DEPRECATED Returns the name of the plugin supplying this property.
-/// This function is deprecated, use listProviders() instead.
+/// This function is deprecated, use providers() instead.
 QString ContextPropertyInfo::plugin() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::plugin() is deprecated.";
@@ -279,7 +278,7 @@ QString ContextPropertyInfo::plugin_i() const
 }
 
 /// DEPRECATED Returns the construction parameter for the Provider supplying this property
-/// This function is deprecated, use listProviders() instead.
+/// This function is deprecated, use providers() instead.
 QString ContextPropertyInfo::constructionString() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::constructionString() is deprecated.";
@@ -295,6 +294,9 @@ QString ContextPropertyInfo::constructionString_i() const
         return cachedProviders.at(0).constructionString;
 }
 
+/// DEPRECATED Returns the dbus name of the provider supplying this
+/// property/key. This function is maintained for backwards
+/// compatibility. Use providers() instead.
 QString ContextPropertyInfo::providerDBusName_i() const
 {
     QMutexLocker lock(&cacheLock);
@@ -309,7 +311,6 @@ QString ContextPropertyInfo::providerDBusName_i() const
             return "";
     }
 }
-
 
 /// DEPRECATED Returns the dbus name of the provider supplying this
 /// property/key. This function is maintained for backwards
@@ -364,8 +365,7 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
     QString cachedType = InfoBackend::instance()->typeForKey(keyName);
     cachedDoc = InfoBackend::instance()->docForKey(keyName);
     cachedDeclared = InfoBackend::instance()->keyDeclared(keyName);
-    cachedProvided = InfoBackend::instance()->keyProvided(keyName);
-    cachedProviders = InfoBackend::instance()->listProviders(keyName);
+    cachedProviders = InfoBackend::instance()->providersForKey(keyName);
 
     // Release the lock before emitting the signals; otherwise
     // listeners trying to access cached values would create a
@@ -376,7 +376,7 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
     emit changed(keyName);
     emit typeChanged(cachedType);
     emit existsChanged(cachedDeclared);
-    emit providedChanged(cachedProvided);
+    emit providedChanged((cachedProviders.size() > 0));
 
     emit providerChanged(providerDBusName_i());
     emit providerDBusTypeChanged(providerDBusType_i());
@@ -384,7 +384,7 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
 }
 
 /// Returns a list of providers that provide this key.
-const QList<ContextProviderInfo> ContextPropertyInfo::listProviders() const
+const QList<ContextProviderInfo> ContextPropertyInfo::providers() const
 {
     QMutexLocker lock(&cacheLock);
     return cachedProviders;
@@ -409,4 +409,11 @@ void ContextPropertyInfo::connectNotify(const char *_signal)
         contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providedChanged signal is deprecated.";
     else if (signal == SIGNAL(pluginChanged(QString,QString)))
         contextWarning() << F_DEPRECATION << "ContextPropertyInfo::pluginChanged signal is deprecated.";
+}
+
+/// Returns resolution strategy for this property. Resolution strategy defines how values
+/// are computed in relation to multiple providers being present for one property.
+ContextPropertyInfo::ResolutionStrategy ContextPropertyInfo::resolutionStrategy() const
+{
+    return ContextPropertyInfo::LastValue;
 }

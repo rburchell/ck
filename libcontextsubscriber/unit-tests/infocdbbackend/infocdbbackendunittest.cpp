@@ -36,14 +36,14 @@ private:
 
 private slots:
     void initTestCase();
+    void name();
     void databaseExists();
     void databaseDirectory();
     void listKeys();
     void typeForKey();
     void docForKey();
     void keyDeclared();
-    void keyProvided();
-    void listProviders();
+    void providersForKey();
     void dynamics();
     void removed();
     void cleanupTestCase();
@@ -58,16 +58,24 @@ void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Internet.BytesOut");
-    writer.add("PLUGINS", "contextkit-dbus");
-    writer.add("contextkit-dbus:KEYS", "Battery.Charging");
-    writer.add("contextkit-dbus:KEYS", "Internet.BytesOut");
     writer.add("Battery.Charging:KEYTYPE", "TRUTH");
     writer.add("Internet.BytesOut:KEYTYPE", "INTEGER");
     writer.add("Battery.Charging:KEYDOC", "doc1");
-    writer.add("Internet.BytesOut:KEYPLUGIN", "contextkit-dbus");
-    writer.add("Battery.Charging:KEYPLUGIN", "contextkit-dbus");
-    writer.add("Battery.Charging:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
-    writer.add("Internet.BytesOut:KEYCONSTRUCTIONSTRING", "session:org.freedesktop.ContextKit.contextd2");
+
+    QVariantList providers1;
+    QHash <QString, QVariant> provider1;
+    provider1.insert("plugin", "contextkit-dbus");
+    provider1.insert("constructionString", "system:org.freedesktop.ContextKit.contextd1");
+    providers1 << QVariant(provider1);
+    writer.add("Battery.Charging:PROVIDERS", QVariant(providers1));
+
+    QVariantList providers2;
+    QHash <QString, QVariant> provider2;
+    provider2.insert("plugin", "contextkit-dbus");
+    provider2.insert("constructionString", "session:org.freedesktop.ContextKit.contextd2");
+    providers2 << QVariant(provider2);
+    writer.add("Internet.BytesOut:PROVIDERS", QVariant(providers2));
+
     writer.close();
 }
 
@@ -80,17 +88,29 @@ void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Battery.Capacity");
-    writer.add("PLUGINS", "contextkit-dbus");
-    writer.add("contextkit-dbus:KEYS", "Battery.Charging");
-    writer.add("contextkit-dbus:KEYS", "Battery.Capacity");
     writer.add("Battery.Charging:KEYTYPE", "INTEGER");
     writer.add("Battery.Charging:KEYDOC", "doc1");
-    writer.add("Battery.Charging:KEYPLUGIN", "contextkit-dbus");
-    writer.add("Battery.Charging:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
     writer.add("Battery.Capacity:KEYTYPE", "INTEGER");
     writer.add("Battery.Capacity:KEYDOC", "doc3");
-    writer.add("Battery.Capacity:KEYPLUGIN", "contextkit-dbus");
-    writer.add("Battery.Capacity:KEYCONSTRUCTIONSTRING", "system:org.freedesktop.ContextKit.contextd1");
+
+    QVariantList providers1;
+    QHash <QString, QVariant> provider1;
+    provider1.insert("plugin", "contextkit-dbus");
+    provider1.insert("constructionString", "system:org.freedesktop.ContextKit.contextd1");
+    providers1 << QVariant(provider1);
+    writer.add("Battery.Charging:PROVIDERS", QVariant(providers1));
+
+    QVariantList providers2;
+    QHash <QString, QVariant> provider2;
+    QHash <QString, QVariant> provider3;
+    provider2.insert("plugin", "contextkit-dbus");
+    provider2.insert("constructionString", "system:org.freedesktop.ContextKit.contextd1");
+    provider3.insert("plugin", "contextkit-dbus");
+    provider3.insert("constructionString", "system:org.freedesktop.ContextKit.contextdX");
+    providers2 << QVariant(provider2);
+    providers2 << QVariant(provider3);
+    writer.add("Battery.Capacity:PROVIDERS", providers2);
+
     writer.close();
 }
 
@@ -101,6 +121,11 @@ void InfoCdbBackendUnitTest::initTestCase()
     utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoCdbBackend();
+}
+
+void InfoCdbBackendUnitTest::name()
+{
+    QCOMPARE(backend->name(), QString("cdb"));
 }
 
 void InfoCdbBackendUnitTest::databaseDirectory()
@@ -145,22 +170,14 @@ void InfoCdbBackendUnitTest::keyDeclared()
     QCOMPARE(backend->keyDeclared("Battery.Charging"), true);
 }
 
-void InfoCdbBackendUnitTest::keyProvided()
+void InfoCdbBackendUnitTest::providersForKey()
 {
-    foreach (QString key, backend->listKeys())
-        QVERIFY(backend->keyProvided(key) == true);
-
-    QCOMPARE(backend->keyProvided("Does.Not.Exist"), false);
-}
-
-void InfoCdbBackendUnitTest::listProviders()
-{
-    QList <ContextProviderInfo> list1 = backend->listProviders("Battery.Charging");
+    QList <ContextProviderInfo> list1 = backend->providersForKey("Battery.Charging");
     QCOMPARE(list1.count(), 1);
     QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
     QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));
 
-    QList <ContextProviderInfo> list2 = backend->listProviders("Does.Not.Exist");
+    QList <ContextProviderInfo> list2 = backend->providersForKey("Does.Not.Exist");
     QCOMPARE(list2.count(), 0);
 }
 
@@ -186,8 +203,18 @@ void InfoCdbBackendUnitTest::dynamics()
     QVERIFY(backend->listKeys().contains("Battery.Capacity"));
     QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
     QCOMPARE(backend->docForKey("Battery.Charging"), QString("doc1"));
-    QVERIFY(backend->keyProvided("Battery.Charging") == true);
-    QVERIFY(backend->keyProvided("Internet.BytesOut") == false);
+
+    // Check providers
+    QList <ContextProviderInfo> list1 = backend->providersForKey("Battery.Charging");
+    QCOMPARE(list1.count(), 1);
+    QCOMPARE(list1.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list1.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));
+    QList <ContextProviderInfo> list2 = backend->providersForKey("Battery.Capacity");
+    QCOMPARE(list2.count(), 2);
+    QCOMPARE(list2.at(0).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list2.at(0).constructionString, QString("system:org.freedesktop.ContextKit.contextd1"));
+    QCOMPARE(list2.at(1).plugin, QString("contextkit-dbus"));
+    QCOMPARE(list2.at(1).constructionString, QString("system:org.freedesktop.ContextKit.contextdX"));
 
     // Test emissions
     QCOMPARE(spy1.count(), 1);
@@ -220,17 +247,17 @@ void InfoCdbBackendUnitTest::removed()
 
     QTest::qWait(DEFAULT_WAIT_PERIOD);
 
-    //QCOMPARE(spy.count(), 1);
-    //QList<QVariant> args = spy.takeFirst();
-    //QCOMPARE(args.at(0).toList().size(), 2);
+    QCOMPARE(spy.count(), 1);
+    QList<QVariant> args = spy.takeFirst();
+    QCOMPARE(args.at(0).toList().size(), 2);
 
     backend->disconnectNotify("-"); // Fake it. Spy does something fishy here.
 }
 
 void InfoCdbBackendUnitTest::cleanupTestCase()
 {
-     QFile::remove("cache.cdb");
-     QFile::remove("cache-next.cdb");
+    QFile::remove("cache.cdb");
+    QFile::remove("cache-next.cdb");
 }
 
 #include "infocdbbackendunittest.moc"

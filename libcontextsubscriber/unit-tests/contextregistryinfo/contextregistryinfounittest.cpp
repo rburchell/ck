@@ -52,7 +52,7 @@ QStringList InfoBackend::listKeys() const
     return l;
 }
 
-const QList<ContextProviderInfo> InfoBackend::listProviders(QString key)
+const QList<ContextProviderInfo> InfoBackend::providersForKey(QString key)
 {
     QList<ContextProviderInfo> lst;
     ContextProviderInfo info("contextkit-dbus", "");
@@ -168,6 +168,11 @@ void ContextRegistryInfoUnitTest::signalling()
     QSignalSpy spy2(registry, SIGNAL(keysAdded(QStringList)));
     QSignalSpy spy3(registry, SIGNAL(keysRemoved(QStringList)));
     QSignalSpy spy4(registry, SIGNAL(changed()));
+
+    registry->connectNotify("keysChanged(QStringList)");
+    registry->connectNotify("keysAdded(QStringList)");
+    registry->connectNotify("keysRemoved(QStringList)");
+    registry->connectNotify("changed()");
 
     QStringList keys;
     keys << QString("Battery.Charging");
