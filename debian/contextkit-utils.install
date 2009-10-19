@@ -1,6 +1,5 @@
 usr/bin/context-provide
 usr/bin/context-listen
-usr/bin/context-print-info
 usr/bin/context-provide-internal
 usr/bin/context-ls
 usr/share/man/man1/context-provide.1
