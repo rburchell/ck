@@ -86,6 +86,10 @@
 	    requirement="" timeout="20">
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/subscription; python multiprovider.py</step>
       </case>
+      <case name="libsub018" description="Rapid changes"
+	    requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/asynchronicity; python rapidchanges.py</step>
+      </case>
 
       <environments>
         <scratchbox>false</scratchbox>
