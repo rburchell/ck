@@ -37,12 +37,16 @@ void PropertyPrivate::setValue(const QVariant& v)
 {
     if (v == value && v.isNull() == value.isNull()) {
         // Same value, skip
+        // FIXME: should the time stamp be updated?
         return;
     }
 
     contextDebug() << F_PROPERTY << "Setting key:" << key << "to type:" << v.typeName();
     value = v;
-    emit valueChanged();
+
+    QVariantList values;
+    values << value;
+    emit valueChanged(values, 0); // FIXME: timestamp
 }
 
 

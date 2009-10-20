@@ -19,11 +19,12 @@
  *
  */
 
-#include <QDBusConnection>
 #include "propertyadaptor.h"
 #include "logging.h"
 #include "sconnect.h"
 #include "propertyprivate.h"
+
+#include <QDBusConnection>
 
 namespace ContextProvider {
 
@@ -39,9 +40,10 @@ PropertyAdaptor::PropertyAdaptor(PropertyPrivate* property, QDBusConnection *con
 {
     /*sconnect((QObject*) connection->interface(), SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
       this, SLOT(OnServiceOwnerChanged(const QString &, const QString&, const QString&)));*/
+
 }
 
-void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QList<QVariant>& value, qlonglong& timestamp)
+void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& value, qlonglong& timestamp)
 {
 }
 

@@ -41,16 +41,17 @@ public:
 
 public slots:
     //QList<QVariant> Subscribe(int64 &timestamp);
-    void Subscribe(const QDBusMessage& msg, QList<QVariant> &values, qlonglong& timestamp);
+    void Subscribe(const QDBusMessage& msg, QVariantList& values, qlonglong& timestamp);
     void Unsubscribe();
     //void OnServiceOwnerChanged(const QString&, const QString&, const QString&);
 
 signals:
-    void Changed(const QList<QVariant> &values, const qlonglong& timestamp);
+    void ValueChanged(const QVariantList &values, const qlonglong& timestamp);
 
 private:
     PropertyPrivate *property; ///< The managed object.
     QDBusConnection *connection; ///< The connection to operate on.
+
 };
 
 } // namespace ContextProvider

@@ -46,7 +46,7 @@ private:
     friend class Property;
 
 signals:
-    void valueChanged();
+    void valueChanged(const QVariantList& values, const qlonglong& timestamp);
 };
 
 } // end namespace
