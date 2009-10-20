@@ -5,6 +5,8 @@ libcontextprovider_la_SOURCES = loggingfeatures.h       \
                                 service.cpp             \
                                 property.h              \
                                 property.cpp            \
+                                propertyprivate.h       \
+                                propertyprivate.cpp     \
                                 manager.h               \
                                 manager.cpp             \
                                 manageradaptor.h        \
@@ -21,9 +23,9 @@ libcontextprovider_la_SOURCES = loggingfeatures.h       \
                                 contextc.cpp            \
                                 listeners.h             \
                                 listeners.cpp		\
-								context_provider.h	\
-								servicebackend.h	\
-								servicebackend.cpp  \
+                                context_provider.h	\
+                                servicebackend.h	\
+                                servicebackend.cpp      \
                                 propertyadaptor.h       \
                                 propertyadaptor.cpp
 

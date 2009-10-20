@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2008, 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,36 +19,32 @@
  *
  */
 
-#ifndef PROPERTYPRIVATE_H
-#define PROPERTYPRIVATE_H
-
-#include <QObject>
-#include <QString>
-#include <QVariant>
+#include "propertyprivate.h"
+#include "servicebackend.h"
+#include "logging.h"
+#include "sconnect.h"
+#include "loggingfeatures.h"
 
 namespace ContextProvider {
 
-class ServiceBackend;
 
-class PropertyPrivate : public QObject
+PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent)
+    : QObject(parent), serviceBackend(serviceBackend), key(key), value(QVariant())
 {
-    Q_OBJECT
+}
 
-public:
-    explicit PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent = 0);
+void PropertyPrivate::setValue(const QVariant& v)
+{
+    if (v == value && v.isNull() == value.isNull()) {
+        // Same value, skip
+        return;
+    }
 
-    void setValue(const QVariant& v);
+    contextDebug() << F_PROPERTY << "Setting key:" << key << "to type:" << v.typeName();
+    value = v;
+    emit valueChanged();
+}
 
-private:
-    ServiceBackend* serviceBackend;
-    QString key;
-    QVariant value;
-    friend class Property;
-
-signals:
-    void valueChanged();
-};
 
 } // end namespace
 
-#endif

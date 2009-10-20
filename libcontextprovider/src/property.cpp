@@ -19,9 +19,10 @@
  *
  */
 
+#include "property.h"
+#include "propertyprivate.h"
 #include "service.h"
 #include "servicebackend.h"
-#include "property.h"
 #include "logging.h"
 #include "manager.h"
 #include "sconnect.h"
@@ -39,12 +40,6 @@ namespace ContextProvider {
     Each Property object is associated with a Service object at
     construction time.
 */
-
-struct PropertyPrivate {
-    ServiceBackend* serviceBackend;
-    QString key;
-    QVariant value;
-};
 
 /// Create a Property object on \a service for the key \a k.
 Property::Property(Service &service, const QString &k, QObject* parent)
@@ -70,9 +65,7 @@ void Property::init (ServiceBackend *serviceBackend, const QString &key)
 {
     contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
 
-    priv = new PropertyPrivate;
-    priv->key = key;
-    priv->serviceBackend = serviceBackend;
+    priv = new PropertyPrivate(serviceBackend, key);
 
     priv->serviceBackend->addProperty (priv->key, this);
     /*sconnect(priv->manager, SIGNAL(firstSubscriberAppeared(const QString&)),
@@ -106,8 +99,7 @@ void Property::unsetValue()
 /// Sets the property value to QVariant \a v.
 void Property::setValue(const QVariant &v)
 {
-    priv->value = 
-    //priv->manager->setKeyValue(priv->key, v);
+    priv->setValue(v);
 }
 
 /// Returns the current value of the property. The returned QVariant is invalid
