@@ -10,7 +10,8 @@ AC_PROG_CC
 CFLAGS="$CXXFLAGS -Wall"
 AC_PROG_CXX
 CXXFLAGS="$CXXFLAGS -Wall"
-AC_PROG_LIBTOOL
+LT_INIT([disable-static])
+DOLT
 AM_PATH_PYTHON
 
 # check for libraries
