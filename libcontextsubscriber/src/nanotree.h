@@ -37,15 +37,15 @@ public:
     NanoTree(const NanoTree &tree);
     const QVariant& root() const;
 
-    QVariant keySub(const QString &key);
-    QVariant keyValue(const QString &key);
-    QVariant keyValue(const QString &key1, const QString &key2);
-    QVariant keyValue(const QString &key1, const QString &key2, const QString &key3);
+    QVariant keySub(const QString &key) const;
+    QVariant keyValue(const QString &key) const;
+    QVariant keyValue(const QString &key1, const QString &key2) const;
+    QVariant keyValue(const QString &key1, const QString &key2, const QString &key3) const;
     QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
-                      const QString &key4);
+                      const QString &key4) const;
     QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
-                      const QString &key4, const QString &key5);
-    QVariantList keyValues(const QString &key);
+                      const QString &key4, const QString &key5) const;
+    QVariantList keyValues(const QString &key) const;
 
     static QVariant keySub(const QString &key, const QVariant &dom);
     static QVariant keyValue(const QString &key, const QVariant &dom);

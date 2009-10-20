@@ -63,46 +63,46 @@ QString NanoTree::dumpTree(const QVariant &tree, int level)
 /* Local accessors */
 
 /// Returns the sub (the trailing) after a given \a key in the root nanodom tree.
-QVariant NanoTree::keySub(const QString &key)
+QVariant NanoTree::keySub(const QString &key) const
 {
 	return NanoTree::keySub(key, rootVariant);
 }
 
 /// 1st level accessor. Returns a value for a \a key in the root nanodom tree.
-QVariant NanoTree::keyValue(const QString &key)
+QVariant NanoTree::keyValue(const QString &key) const
 {
 	return NanoTree::keyValue(key, rootVariant);
 }
 
 /// Returns the list of QVariants matching the \a key in the root tree. A QVariant
 /// node matches if it's a list by and it's first element is \a key.
-QVariantList NanoTree::keyValues(const QString &key)
+QVariantList NanoTree::keyValues(const QString &key) const
 {
     return NanoTree::keyValues(key, rootVariant);
 }
 
 /// 2nd level accessor. Returns a value for a \a key1 \a key2 in the root nanodom tree.
-QVariant NanoTree::keyValue(const QString &key1, const QString &key2)
+QVariant NanoTree::keyValue(const QString &key1, const QString &key2) const
 {
 	return NanoTree::keyValue(key1, key2, rootVariant);
 }
 
 /// 3rd level accessor. Returns a value for a \a key1 \a key2 \a key3 in the root nanodom tree.
-QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QString &key3)
+QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QString &key3) const
 {
 	return NanoTree::keyValue(key1, key2, key3, rootVariant);
 }
 
 /// 4rd level accessor. Returns a value for a \a key1 \a key2 \a key3 \a key4 in the root nanodom tree.
 QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QString &key3,
-                           const QString &key4)
+                           const QString &key4) const
 {
 	return NanoTree::keyValue(key1, key2, key3, key4, rootVariant);
 }
 
 /// 5th level accessor. Returns a value for a \a key1 \a key2 \a key3 \a key4 \a key5 in the root nanodom tree.
 QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QString &key3,
-                           const QString &key4, const QString &key5)
+                           const QString &key4, const QString &key5) const
 {
 	return NanoTree::keyValue(key1, key2, key3, key4, key5, rootVariant);
 }
