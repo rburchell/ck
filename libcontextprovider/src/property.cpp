@@ -42,7 +42,8 @@ namespace ContextProvider {
 
 struct PropertyPrivate {
     ServiceBackend* serviceBackend;
-    QString myKey;
+    QString key;
+    QVariant value;
 };
 
 /// Create a Property object on \a service for the key \a k.
@@ -70,10 +71,10 @@ void Property::init (ServiceBackend *serviceBackend, const QString &key)
     contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
 
     priv = new PropertyPrivate;
-    priv->myKey = key;
+    priv->key = key;
     priv->serviceBackend = serviceBackend;
 
-    priv->serviceBackend->addProperty (priv->myKey, this);
+    priv->serviceBackend->addProperty (priv->key, this);
     /*sconnect(priv->manager, SIGNAL(firstSubscriberAppeared(const QString&)),
              this, SLOT(onManagerFirstSubscriberAppeared(const QString&)));
     sconnect(priv->manager, SIGNAL(lastSubscriberDisappeared(const QString&)),
@@ -86,41 +87,41 @@ void Property::init (ServiceBackend *serviceBackend, const QString &key)
 bool Property::isSet() const
 {
     return true; // FIXME
-    //return (priv->manager->getKeyValue(priv->myKey) != QVariant());
+    //return (priv->manager->getKeyValue(priv->key) != QVariant());
 }
 
 /// Returns the name of the key this Property represents.
 QString Property::key() const
 {
-    return priv->myKey;
+    return priv->key;
 }
 
 /// Unsets the value. This is equivalent to setting it to a null
 /// QVariant.
 void Property::unsetValue()
 {
-    //priv->manager->setKeyValue(priv->myKey, QVariant());
+    //priv->manager->setKeyValue(priv->key, QVariant());
 }
 
 /// Sets the property value to QVariant \a v.
 void Property::setValue(const QVariant &v)
 {
-    //priv->manager->setKeyValue(priv->myKey, v);
+    priv->value = 
+    //priv->manager->setKeyValue(priv->key, v);
 }
 
 /// Returns the current value of the property. The returned QVariant is invalid
 /// if the key value is undetermined or the Property is invalid.
 QVariant Property::value()
 {
-    return QVariant(); // FIXME
-    //return priv->manager->getKeyValue(priv->myKey);
+    return priv->value;
 }
 
 /// Called by Manager when first subscriber appears. Delegated if
 /// this concerns us.
 void Property::onManagerFirstSubscriberAppeared(const QString &key)
 {
-    if (key == priv->myKey) {
+    if (key == priv->key) {
         contextDebug() << F_SIGNALS << F_PROPERTY << "First subscriber appeared for key:" << key;
         emit firstSubscriberAppeared(key);
     }
@@ -130,7 +131,7 @@ void Property::onManagerFirstSubscriberAppeared(const QString &key)
 /// this concerns us.
 void Property::onManagerLastSubscriberDisappeared(const QString &key)
 {
-    if (key == priv->myKey) {
+    if (key == priv->key) {
         contextDebug() << F_SIGNALS << F_PROPERTY << "Last subscriber disappeared for key:" << key;
         emit lastSubscriberDisappeared(key);
     }
@@ -139,7 +140,7 @@ void Property::onManagerLastSubscriberDisappeared(const QString &key)
 /// Destructor.
 Property::~Property()
 {
-    contextDebug() << F_PROPERTY << F_DESTROY << "Destroying Property for key:" << priv->myKey;
+    contextDebug() << F_PROPERTY << F_DESTROY << "Destroying Property for key:" << priv->key;
     delete priv;
 }
 

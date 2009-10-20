@@ -103,20 +103,17 @@ void ServiceBackend::addProperty(const QString& key, Property* property)
 /// registered on D-Bus. Returns true on success, false otherwise.
 bool ServiceBackend::start()
 {
+
+    // Register Property objects on D-Bus
     foreach (const QString& key, properties.keys()) {
         PropertyAdaptor* propertyAdaptor = new PropertyAdaptor(properties[key], &connection);
         createdAdaptors.insert(propertyAdaptor);
         if (!connection.registerObject(objectPath(key), propertyAdaptor)) {
+            contextCritical() << F_SERVICE_BACKEND << "Failed to register the Property object for" << key;
+            contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
             return false;
         }
     }
-    // Register object
-    /**if (managerAdaptor && !connection.registerObject("/org/freedesktop/ContextKit/Manager", &myManager)) {
-        contextCritical() << F_SERVICE_BACKEND << "Failed to register the Manager object for" << busName;
-        contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
-        return false;
-    }**/
-
 
     if (!sharedConnection()) {
         if (!connection.registerService(busName)) {
@@ -139,9 +136,15 @@ void ServiceBackend::stop()
     // Unregister service name
     if (!sharedConnection())
         connection.unregisterService(busName);
-    // Unregister manager
-    connection.unregisterObject("/org/freedesktop/ContextKit/Manager");
-    // FIXME: unregister subscribers
+
+    // Unregister Property objects
+    foreach (const QString& key, properties.keys())
+        connection.unregisterObject(objectPath(key));
+
+    // Delete PropertyAdaptors set
+    foreach (PropertyAdaptor* adaptor, createdAdaptors)
+        delete adaptor;
+    createdAdaptors.clear();
 }
 
 /// Sets the ServiceBackend object as the default one to use when
