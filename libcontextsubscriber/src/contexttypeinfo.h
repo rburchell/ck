@@ -36,7 +36,7 @@ public:
     QString name() const;
 
 protected:
-    NanoTree nanoTree;
+    QString typeName;
 };
 
 #endif

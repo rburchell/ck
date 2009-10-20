@@ -20,13 +20,27 @@
  */
 
 #include "contexttypeinfo.h"
+#include "logging.h"
 
-ContextTypeInfo::ContextTypeInfo(const NanoTree &tree) : nanoTree(tree)
+ContextTypeInfo::ContextTypeInfo(const NanoTree &nanoTree)
 {
+    QVariant root = nanoTree.root();
+
+    if (root.type() != QVariant::List &&
+        root.toList().at(0).toString() != "type") {
+        contextWarning() << "Nanotree does not represent type!";
+        return;
+    }
+
+    if (root.toList().at(1).type() == QVariant::String)
+        typeName = root.toList().at(1).toString();
+    else if (root.toList().at(1).type() == QVariant::List)
+        typeName = root.toList().at(1).toList().at(0).toString();
+    else
+        typeName = "";
 }
 
 QString ContextTypeInfo::name() const
 {
-    QVariant typeName = nanoTree.keyValue("type");
-    return typeName.toString();
+    return typeName;
 }
