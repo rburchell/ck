@@ -59,8 +59,10 @@ private slots:
     void onPluginReady();
     void onPluginFailed(QString error);
     void onPluginSubscribeFinished(QString key);
+    void onPluginSubscribeFinished(QString key, TimedValue value);
     void onPluginSubscribeFailed(QString failedKey, QString error);
     void onPluginValueChanged(QString key, QVariant newValue);
+    void onPluginValueChanged(QString key, TimedValue newValue);
 
 private:
     enum PluginState { INITIALIZING, READY, FAILED };
