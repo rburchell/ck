@@ -25,6 +25,7 @@
 #include "manageradaptor.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
+#include "propertyprivate.h"
 
 namespace ContextProvider {
 
@@ -92,7 +93,7 @@ void ServiceBackend::setValue(const QString &key, const QVariant &val)
     myManager.setKeyValue(key, val);
 }
 
-void ServiceBackend::addProperty(const QString& key, Property* property)
+void ServiceBackend::addProperty(const QString& key, PropertyPrivate* property)
 {
     properties.insert(key, property);
 }
@@ -108,7 +109,8 @@ bool ServiceBackend::start()
     foreach (const QString& key, properties.keys()) {
         PropertyAdaptor* propertyAdaptor = new PropertyAdaptor(properties[key], &connection);
         createdAdaptors.insert(propertyAdaptor);
-        if (!connection.registerObject(objectPath(key), propertyAdaptor)) {
+        PropertyPrivate* propertyPrivate = properties[key];
+        if (!connection.registerObject(objectPath(key), propertyPrivate)) {
             contextCritical() << F_SERVICE_BACKEND << "Failed to register the Property object for" << key;
             contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
             return false;

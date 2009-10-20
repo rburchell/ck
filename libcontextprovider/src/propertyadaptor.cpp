@@ -23,7 +23,7 @@
 #include "propertyadaptor.h"
 #include "logging.h"
 #include "sconnect.h"
-#include "property.h"
+#include "propertyprivate.h"
 
 namespace ContextProvider {
 
@@ -34,14 +34,14 @@ namespace ContextProvider {
 
 /// Constructor. Creates new adaptor for the given manager with the given
 /// dbus connection. The connection \a conn is not retained.
-PropertyAdaptor::PropertyAdaptor(Property* property, QDBusConnection *conn)
+PropertyAdaptor::PropertyAdaptor(PropertyPrivate* property, QDBusConnection *conn)
     : QDBusAbstractAdaptor(property), property(property), connection(conn)
 {
     /*sconnect((QObject*) connection->interface(), SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
       this, SLOT(OnServiceOwnerChanged(const QString &, const QString&, const QString&)));*/
 }
 
-void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QList<QVariant>& value, int timestamp)
+void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QList<QVariant>& value, qlonglong& timestamp)
 {
 }
 

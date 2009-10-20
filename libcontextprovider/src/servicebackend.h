@@ -36,8 +36,7 @@ class ServiceBackendUnitTest;
 namespace ContextProvider {
 
 class PropertyAdaptor;
-class Property;
-class ServiceBackendPrivate;
+class PropertyPrivate;
 
 class ServiceBackend : public QObject
 {
@@ -67,7 +66,7 @@ public:
     friend class ::ServiceBackendUnitTest;
     friend class Service;
 
-    void addProperty(const QString& key, Property* property);
+    void addProperty(const QString& key, PropertyPrivate* property);
 
 private:
     QString objectPath(QString key);
@@ -78,7 +77,7 @@ private:
     QString busName;
 
     static QHash <QString, ServiceBackend*> instances;
-    QHash<QString, Property*> properties;
+    QHash<QString, PropertyPrivate*> properties;
     QSet<PropertyAdaptor*> createdAdaptors;
 
 };

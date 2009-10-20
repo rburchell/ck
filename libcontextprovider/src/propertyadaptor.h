@@ -29,7 +29,7 @@
 
 namespace ContextProvider {
 
-class Property;
+class PropertyPrivate;
 
 class PropertyAdaptor: public QDBusAbstractAdaptor
 {
@@ -37,19 +37,19 @@ class PropertyAdaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Interface", "org.maemo.contextkit.Property")
 
 public:
-    PropertyAdaptor(Property* property, QDBusConnection *connection);
+    PropertyAdaptor(PropertyPrivate* property, QDBusConnection *connection);
 
 public slots:
     //QList<QVariant> Subscribe(int64 &timestamp);
-    void Subscribe(const QDBusMessage& msg, QList<QVariant> &values, int timestamp);
+    void Subscribe(const QDBusMessage& msg, QList<QVariant> &values, qlonglong& timestamp);
     void Unsubscribe();
     //void OnServiceOwnerChanged(const QString&, const QString&, const QString&);
 
 signals:
-    void Changed(const QList<QVariant> &values, const int& timestamp);
+    void Changed(const QList<QVariant> &values, const qlonglong& timestamp);
 
 private:
-    Property *property; ///< The managed object.
+    PropertyPrivate *property; ///< The managed object.
     QDBusConnection *connection; ///< The connection to operate on.
 };
 

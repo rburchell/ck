@@ -67,7 +67,7 @@ void Property::init (ServiceBackend *serviceBackend, const QString &key)
 
     priv = new PropertyPrivate(serviceBackend, key);
 
-    priv->serviceBackend->addProperty (priv->key, this);
+    priv->serviceBackend->addProperty (priv->key, priv);
     /*sconnect(priv->manager, SIGNAL(firstSubscriberAppeared(const QString&)),
              this, SLOT(onManagerFirstSubscriberAppeared(const QString&)));
     sconnect(priv->manager, SIGNAL(lastSubscriberDisappeared(const QString&)),
