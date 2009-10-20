@@ -22,9 +22,13 @@
 #include "nanotree.h"
 #include <QDebug>
 
-NanoTree::NanoTree(const QVariant &root)
+NanoTree::NanoTree(const QVariant &root) : rootVariant(root)
 {
-    rootVariant = root;
+}
+
+NanoTree::NanoTree(const NanoTree &tree)
+{
+    rootVariant = tree.rootVariant;
 }
 
 const QVariant& NanoTree::root()
