@@ -49,6 +49,16 @@ void PropertyPrivate::setValue(const QVariant& v)
     emit valueChanged(values, 0); // FIXME: timestamp
 }
 
+void PropertyPrivate::firstSubscriberAppeared()
+{
+    contextDebug() << F_PROPERTY << "First subscriber";
+}
+
+void PropertyPrivate::lastSubscriberDisappeared()
+{
+    contextDebug() << F_PROPERTY << "Last subscriber";
+}
+
 
 } // end namespace
 

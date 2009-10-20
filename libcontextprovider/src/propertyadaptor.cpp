@@ -35,8 +35,8 @@ namespace ContextProvider {
 
 /// Constructor. Creates new adaptor for the given manager with the given
 /// dbus connection. The connection \a conn is not retained.
-PropertyAdaptor::PropertyAdaptor(PropertyPrivate* property, QDBusConnection *conn)
-    : QDBusAbstractAdaptor(property), property(property), connection(conn)
+PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnection *conn)
+    : QDBusAbstractAdaptor(propertyPrivate), propertyPrivate(propertyPrivate), connection(conn)
 {
     /*sconnect((QObject*) connection->interface(), SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
       this, SLOT(OnServiceOwnerChanged(const QString &, const QString&, const QString&)));*/
@@ -45,10 +45,32 @@ PropertyAdaptor::PropertyAdaptor(PropertyPrivate* property, QDBusConnection *con
 
 void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& value, qlonglong& timestamp)
 {
+    contextDebug() << "Subscribe called";
+
+    // Store the information of the subscription
+    QString clientDBusName = msg.service();
+    if (clientDBusNames.contains(clientDBusName) == false) {
+        clientDBusNames.insert(clientDBusName);
+        if (clientDBusNames.size() == 1) {
+            propertyPrivate->firstSubscriberAppeared();
+        }
+    }
+
+    // Construct the retun value
+    // FIXME
 }
 
-void PropertyAdaptor::Unsubscribe()
+void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
 {
+    contextDebug() << "Unsubscribe called";
+    QString clientDBusName = msg.service();
+    if (clientDBusNames.contains(clientDBusName)) {
+        clientDBusNames.remove(clientDBusName);
+        if (clientDBusNames.size() == 0) {
+            propertyPrivate->lastSubscriberDisappeared();
+        }
+    }
+
 }
 
 /// Dbus interface slot. The PropertyAdaptor listens for dbus bus names changing

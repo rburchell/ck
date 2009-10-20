@@ -38,12 +38,15 @@ public:
     explicit PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent = 0);
 
     void setValue(const QVariant& v);
+    void firstSubscriberAppeared();
+    void lastSubscriberDisappeared();
 
 private:
     ServiceBackend* serviceBackend;
     QString key;
     QVariant value;
     friend class Property;
+    friend class PropertyAdaptor;
 
 signals:
     void valueChanged(const QVariantList& values, const qlonglong& timestamp);

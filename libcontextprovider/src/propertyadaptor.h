@@ -26,6 +26,8 @@
 #include <QDBusAbstractAdaptor>
 #include <QDBusMessage>
 #include <QDBusConnection>
+#include <QSet>
+#include <QString>
 
 namespace ContextProvider {
 
@@ -42,15 +44,16 @@ public:
 public slots:
     //QList<QVariant> Subscribe(int64 &timestamp);
     void Subscribe(const QDBusMessage& msg, QVariantList& values, qlonglong& timestamp);
-    void Unsubscribe();
+    void Unsubscribe(const QDBusMessage& msg);
     //void OnServiceOwnerChanged(const QString&, const QString&, const QString&);
 
 signals:
     void ValueChanged(const QVariantList &values, const qlonglong& timestamp);
 
 private:
-    PropertyPrivate *property; ///< The managed object.
+    PropertyPrivate *propertyPrivate; ///< The managed object.
     QDBusConnection *connection; ///< The connection to operate on.
+    QSet<QString> clientDBusNames; ///< D-Bus names of the processes subscribed to this property
 
 };
 
