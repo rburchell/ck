@@ -117,6 +117,9 @@ struct ContextPropertyPrivate
 {
     PropertyHandle *handle; ///< The common handle behind this context property
     bool subscribed; ///< True, if we are subscribed to the handle behind us
+    QVariant value; ///< Our knowledge of the value.  Needed because several
+                    /// valueChanged signals might be emitted (queued) by the
+                    /// PropertyHandle, without us handling them.
 };
 
 /*!
@@ -236,6 +239,20 @@ QVariant ContextProperty::value(const QVariant &def) const
         return val;
 }
 
+// A safety measure to avoid emitting unnecessary signals, see
+// ContextPropertyPrivate::value.
+void ContextProperty::onValueChanged()
+{
+    QVariant newValue = priv->handle->value();
+    if (priv->value != newValue ||
+        priv->value.isNull() != newValue.isNull() ||
+        priv->value.type() != newValue.type())
+    {
+        priv->value = newValue;
+        emit valueChanged();
+    }
+}
+
 /// Starts subscribtion to the context property, if it isn't
 /// subscribed already. If you need to wait for it to be complete, use
 /// waitForSubscription().
@@ -248,7 +265,7 @@ void ContextProperty::subscribe() const
     // the users' valueChanged() handlers with locks and if they do
     // something fancy (for example unsubscribe) it can cause a
     // deadlock.
-    sconnect(priv->handle, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()), Qt::QueuedConnection);
+    sconnect(priv->handle, SIGNAL(valueChanged()), this, SLOT(onValueChanged()), Qt::QueuedConnection);
     priv->handle->subscribe();
     priv->subscribed = true;
 }

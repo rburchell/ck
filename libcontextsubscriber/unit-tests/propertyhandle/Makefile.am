@@ -13,7 +13,8 @@ COVERAGE_FILES = propertyhandle.cpp
 AM_CXXFLAGS = $(QtDBus_CFLAGS) '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"'
 AM_LDFLAGS = $(QtDBus_LIBS)
 # copy these files from the real source
-FROM_SOURCE = propertyhandle.cpp propertyhandle.h loggingfeatures.h contextproviderinfo.h
+FROM_SOURCE = propertyhandle.cpp propertyhandle.h loggingfeatures.h	\
+	contextproviderinfo.h timedvalue.h
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
 include $(top_srcdir)/am/tests.am

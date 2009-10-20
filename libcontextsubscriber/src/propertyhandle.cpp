@@ -73,12 +73,8 @@ bool PropertyHandle::typeCheckEnabled = false;
 */
 
 PropertyHandle::PropertyHandle(const QString& key)
-    :  myProvider(0), myInfo(0), subscribeCount(0), subscribePending(true), myKey(key)
+    : myInfo(0), subscribeCount(0), myKey(key)
 {
-    // Note: We set subscribePending to true, assuming that the
-    // intention of the upper layer is to subscribe construction time.
-    // If this intention is changed, changes are needed here as well.
-
     // Read the information about the provider. This needs to be
     // done before calling updateProvider.
     myInfo = new ContextPropertyInfo(myKey, this);
@@ -90,6 +86,9 @@ PropertyHandle::PropertyHandle(const QString& key)
     // Start listening for the context commander, and also initiate a
     // NameHasOwner check.
 
+    // Because of the waitForSubscription() feature, we immediately need to
+    // subscribe to the real providers when the commander presence becomes
+    // known.  So, these connect()s need to be synchronous (not queued).
     sconnect(commanderListener, SIGNAL(nameAppeared()),
              this, SLOT(updateProvider()));
     sconnect(commanderListener, SIGNAL(nameDisappeared()),
@@ -127,55 +126,39 @@ void PropertyHandle::setTypeCheck(bool typeCheck)
 /// renews the subscriptions.
 void PropertyHandle::updateProvider()
 {
-    Provider *newProvider;
+    QList<Provider*> newProviders;
     contextDebug() << F_PLUGINS;
 
     if (commandingEnabled && commanderListener->isServicePresent() == DBusNameListener::Present) {
         // If commander is present it should be able to override the
         // property, so connect to it.
-        newProvider = Provider::instance(commanderInfo);
+        newProviders << Provider::instance(commanderInfo);
     } else {
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
 
-        if (myInfo->provided()) {
-            // If myInfo knows the current provider which should be
-            // connected to, connect to it.
-            contextDebug() << F_PLUGINS << "Key exists";
-            QList<ContextProviderInfo> providers = myInfo->providers();
-            if (providers.size() > 1)
-                contextCritical() << "multi-process not implemented yet";
-            else if (providers.size() == 0)
-                contextCritical() << "property provided() but no providers() is empty";
-
-            newProvider = Provider::instance(providers[0]);
-        } else {
-            // Otherwise we keep the pointer to the old provider.
-            // This way, we can still continue communicating with the
-            // provider even though the key is no longer in the
-            // registry.
-            contextDebug() << F_PLUGINS << "Key doesn't exist -> keep old provider info";
-
-            newProvider = myProvider;
-
-            if (newProvider == 0) {
-                // This is the first place where we can know that the
-                // provider for this property doesn't exist. We
-                // shouldn't block waiting for subscription for such a property.
-                subscribePending = false;
-            }
-        }
+        foreach (ContextProviderInfo info, myInfo->providers())
+            newProviders << Provider::instance(info);
+        contextDebug() << newProviders.size() << "providers for" << myKey;
     }
-
-    if (newProvider != myProvider && subscribeCount > 0) {
-        // The provider has changed and ContextProperty classes are subscribed to this handle.
-        // Unsubscribe from the old provider
-        if (myProvider) myProvider->unsubscribe(myKey);
-        // And subscribe to the new provider
-        if (newProvider) subscribePending = newProvider->subscribe(myKey);
+    if (subscribeCount > 0) {
+        // Unsubscribe from old providers and subscribe to the new ones.
+        foreach (Provider *oldprovider, myProviders)
+            oldprovider->unsubscribe(myKey);
+        pendingSubscriptions.clear();
+        foreach (Provider *newprovider, newProviders)
+            if (newprovider->subscribe(myKey))
+                pendingSubscriptions << newprovider;
     }
+    myProviders = newProviders;
+    // Trigger computing the new value as the providers have changed.
+    onValueChanged();
+}
 
-    myProvider = newProvider;
+/// Sets \c subscribePending to false.
+void PropertyHandle::setSubscribeFinished(Provider *provider)
+{
+    pendingSubscriptions.remove(provider);
 }
 
 /// Increase the \c subscribeCount of this context property and
@@ -186,8 +169,11 @@ void PropertyHandle::subscribe()
 
     QMutexLocker locker(&subscribeCountLock);
     ++subscribeCount;
-    if (subscribeCount == 1 && myProvider != 0) {
-        subscribePending = myProvider->subscribe(myKey);
+    if (subscribeCount == 1) {
+        pendingSubscriptions.clear();
+        foreach (Provider *provider, myProviders)
+            if (provider->subscribe(myKey))
+                pendingSubscriptions << provider;
     }
 }
 
@@ -198,16 +184,11 @@ void PropertyHandle::unsubscribe()
 {
     QMutexLocker locker(&subscribeCountLock);
     --subscribeCount;
-    if (subscribeCount == 0 && myProvider != 0) {
-        subscribePending = false;
-        myProvider->unsubscribe(myKey);
+    if (subscribeCount == 0) {
+        pendingSubscriptions.clear();
+        foreach (Provider *provider, myProviders)
+            provider->unsubscribe(myKey);
     }
-}
-
-/// Sets \c subscribePending to false.
-void PropertyHandle::setSubscribeFinished()
-{
-    subscribePending = false;
 }
 
 QString PropertyHandle::key() const
@@ -223,7 +204,14 @@ QVariant PropertyHandle::value() const
 
 bool PropertyHandle::isSubscribePending() const
 {
-    return subscribePending;
+    // We wait until commander presence is unknown ...
+    if (commanderListener->isServicePresent() == DBusNameListener::Unknown)
+        return true;
+    // ... or until we get some value ...
+    if (!myValue.isNull())
+        return false;
+    // ... or all pending subscriptions finished.
+    return pendingSubscriptions.size() != 0;
 }
 
 /// Used by the \c HandleSignalRouter to change the value of the
@@ -233,8 +221,22 @@ bool PropertyHandle::isSubscribePending() const
 /// valueChanged() signal.
 void PropertyHandle::onValueChanged()
 {
-    // FIXME: implement multiprocess here
-    QVariant newValue = myProvider->get(myKey).value;
+    bool found = false;
+    TimedValue latest = QVariant();
+
+    foreach (Provider *provider, myProviders) {
+        TimedValue current = provider->get(myKey);
+        if (current.value.isNull())
+            continue;
+        if (!found) {
+            found = true;
+            latest = current;
+        } else if (latest < current)
+            latest = current;
+    }
+    QVariant newValue;
+    if (found)
+        newValue = latest.value;
 
     if (typeCheckEnabled // type checks enabled
         && !newValue.isNull() // variable is non-null
@@ -253,15 +255,20 @@ void PropertyHandle::onValueChanged()
         }
 
         if (!checked) {
-            contextCritical() << "Provider error, bad type for " << myKey <<
+             contextCritical() << "Provider error, bad type for " << myKey <<
                 "wanted:" << myType << "got:" << newValue.typeName();
             return;
         }
     }
 
     QWriteLocker lock(&valueLock);
-    if (myValue != newValue || myValue.isNull() != newValue.isNull()) {
-        // The value was new
+    // Since QVariant(QVariant::Int) == QVariant(0), it's not enough to check
+    // whether myValue and newValue are unequal.  Also, for completeness we
+    // don't want to lose a valueChanged signal if the type changes.
+    if (myValue != newValue ||
+        myValue.isNull() != newValue.isNull() ||
+        myValue.type() != newValue.type())
+    {
         myValue = newValue;
         emit valueChanged();
     }

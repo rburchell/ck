@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2008, 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,32 +19,31 @@
  *
  */
 
-#ifndef HANDLESIGNALROUTER_H
-#define HANDLESIGNALROUTER_H
+#ifndef TIMEDVALUE_H
+#define TIMEDVALUE_H
 
-#include <QObject>
-#include <QString>
+#include <time.h>
 #include <QVariant>
 
 namespace ContextSubscriber {
 
-class Provider;
-
-class HandleSignalRouter : public QObject
+struct TimedValue
 {
-    Q_OBJECT
-public:
-    static HandleSignalRouter* instance();
+    struct timespec time;
+    QVariant value;
 
-public slots:
-    void onValueChanged(QString key);
-    void onSubscribeFinished(Provider *provider, QString key);
-
-private:
-    HandleSignalRouter();
-    static HandleSignalRouter myInstance; ///< Singleton instance
+    TimedValue(const QVariant &value) : value(value)
+        {
+            clock_gettime(CLOCK_MONOTONIC, &time);
+        }
+    bool operator<(const TimedValue &other)
+		{
+			return ((time.tv_sec < other.time.tv_sec) ||
+					(time.tv_sec == other.time.tv_sec &&
+					 time.tv_nsec < other.time.tv_nsec));
+		}
 };
 
-} // end namespace
+}
 
 #endif

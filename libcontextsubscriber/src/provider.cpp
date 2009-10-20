@@ -34,11 +34,6 @@
 
 namespace ContextSubscriber {
 
-TimedValue::TimedValue(const QVariant &value) : value(value)
-{
-    clock_gettime(CLOCK_MONOTONIC, &time);
-}
-
 /*!
   \class IProviderPlugin
   \brief Interface for provider plugins.
@@ -189,8 +184,8 @@ void Provider::constructPlugin()
              this, SLOT(onPluginSubscribeFinished(QString)), Qt::QueuedConnection);
     sconnect(plugin, SIGNAL(subscribeFailed(QString, QString)),
              this, SLOT(onPluginSubscribeFailed(QString, QString)), Qt::QueuedConnection);
-    sconnect(this, SIGNAL(subscribeFinished(QString)),
-             handleSignalRouter, SLOT(onSubscribeFinished(QString)));
+    sconnect(this, SIGNAL(subscribeFinished(Provider *,QString)),
+             handleSignalRouter, SLOT(onSubscribeFinished(Provider *,QString)));
 }
 
 /// Updates \c pluginState to \c READY and requests subscription for
@@ -229,7 +224,7 @@ void Provider::signalSubscribeFinished(QString key)
 {
     QMutexLocker lock(&subscribeLock);
     if (subscribedKeys.contains(key))
-        emit subscribeFinished(key);
+        emit subscribeFinished(this, key);
 }
 
 /// Forwards the call to \c signalSubscribeFinished.
@@ -318,7 +313,7 @@ void Provider::handleSubscribes()
         contextDebug() << "Plugin init has failed";
         if (toSubscribe.size() > 0)
             foreach (QString key, toSubscribe)
-                emit subscribeFinished(key);
+                emit subscribeFinished(this, key);
         toSubscribe.clear();
         toUnsubscribe.clear();
         break;
