@@ -23,8 +23,6 @@
 #include "servicebackend.h"
 #include "property.h"
 #include "logging.h"
-#include "manager.h"
-#include "manageradaptor.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
 #include <QDBusConnection>
@@ -248,7 +246,7 @@ void Service::setAsDefault()
 /// it.
 void Service::setValue(const QString &key, const QVariant &val)
 {
-    backend->manager()->setKeyValue(key, val);
+    backend->setValue(key, val);
 }
 
 /// Set (override) the QDBusConnection used by the

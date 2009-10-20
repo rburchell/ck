@@ -7,16 +7,8 @@ libcontextprovider_la_SOURCES = loggingfeatures.h       \
                                 property.cpp            \
                                 propertyprivate.h       \
                                 propertyprivate.cpp     \
-                                manager.h               \
-                                manager.cpp             \
-                                manageradaptor.h        \
-                                manageradaptor.cpp      \
                                 group.h			\
                                 group.cpp		\
-                                subscriber.cpp          \
-                                subscriber.h            \
-                                subscriberadaptor.h     \
-                                subscriberadaptor.cpp   \
                                 queuedinvoker.h         \
                                 queuedinvoker.cpp       \
                                 contextc.h              \
@@ -39,7 +31,7 @@ AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS) \
 	      -I$(top_srcdir)/common			       \
               '-DCONTEXT_LOG_MODULE_NAME="libcontextprovider"'
 
-LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) 
+LIBS += $(QtCore_LIBS) $(QtDBus_LIBS)
 libcontextprovider_la_LIBADD=$(top_builddir)/common/libcommon.la
 
 $(top_builddir)/common/libcommon.la:

@@ -21,8 +21,6 @@
 #include "propertyadaptor.h"
 #include "servicebackend.h"
 #include "logging.h"
-#include "manager.h"
-#include "manageradaptor.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
 #include "propertyprivate.h"
@@ -35,8 +33,8 @@ namespace ContextProvider {
     \brief A ServiceBackend is the real worker behind Service.
 
     Multiple Service instances can share same ServiceBackend.
-    The backend is the actual worker that operates on D-Bus,
-    has a Manager and registers properties.
+    The backend is the actual worker that operates on D-Bus
+    and registers properties.
 
     The Service class actually proxies all methods to the ServiceBackend.
 */
@@ -45,9 +43,9 @@ QHash<QString, ServiceBackend*> ServiceBackend::instances;
 ServiceBackend *ServiceBackend::defaultServiceBackend;
 
 /// Creates new ServiceBackend with the given QDBusConnection. The
-/// backend automatically creates it's Manager. The connection will be
-/// shared between Service and the provider program, and the
-/// ServiceBackend will not register any service names.
+/// connection will be shared between Service and the provider
+/// program, and the ServiceBackend will not register any service
+/// names.
 ServiceBackend::ServiceBackend(QDBusConnection connection) :
     connection(connection),
     refCount(0),
@@ -57,9 +55,8 @@ ServiceBackend::ServiceBackend(QDBusConnection connection) :
 }
 
 /// Creates new ServiceBackend with the given QDBusConnection and a
-/// service name to register. The backend automatically creates it's
-/// Manager. The connection will not be shared between the Service and
-/// the provider program.
+/// service name to register. The connection will not be shared
+/// between the Service and the provider program.
 ServiceBackend::ServiceBackend(QDBusConnection connection, const QString &busName) :
     connection(connection),
     refCount(0),
@@ -79,18 +76,15 @@ ServiceBackend::~ServiceBackend()
         ServiceBackend::defaultServiceBackend = 0;
 }
 
-/// Returns the Manager associated with this backend.
-Manager *ServiceBackend::manager()
-{
-    return &myManager;
-}
-
 /// Set the value of \a key to \a val.  A property named \a key must
 /// have been registered already, by creating a Property object for
 /// it.
-void ServiceBackend::setValue(const QString &key, const QVariant &val)
+void ServiceBackend::setValue(const QString &key, const QVariant &v)
 {
-    myManager.setKeyValue(key, val);
+    if (properties.contains(key))
+        properties[key]->setValue(v);
+    else
+        contextWarning() << "Cannot set value for Property" << key << ", it does not exist";
 }
 
 void ServiceBackend::addProperty(const QString& key, PropertyPrivate* property)
@@ -104,7 +98,6 @@ void ServiceBackend::addProperty(const QString& key, PropertyPrivate* property)
 /// registered on D-Bus. Returns true on success, false otherwise.
 bool ServiceBackend::start()
 {
-
     // Register Property objects on D-Bus
     foreach (const QString& key, properties.keys()) {
         PropertyAdaptor* propertyAdaptor = new PropertyAdaptor(properties[key], &connection);

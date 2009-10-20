@@ -24,7 +24,6 @@
 #include "service.h"
 #include "servicebackend.h"
 #include "logging.h"
-#include "manager.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
 
@@ -68,12 +67,10 @@ void Property::init (ServiceBackend *serviceBackend, const QString &key)
     priv = new PropertyPrivate(serviceBackend, key);
 
     priv->serviceBackend->addProperty (priv->key, priv);
-    /*sconnect(priv->manager, SIGNAL(firstSubscriberAppeared(const QString&)),
-             this, SLOT(onManagerFirstSubscriberAppeared(const QString&)));
-    sconnect(priv->manager, SIGNAL(lastSubscriberDisappeared(const QString&)),
-             this, SLOT(onManagerLastSubscriberDisappeared(const QString&)));
-    */
-    // FIXME: where do these signals come from?
+    sconnect(priv, SIGNAL(firstSubscriberAppeared(const QString&)),
+             this, SIGNAL(firstSubscriberAppeared(const QString&)));
+    sconnect(priv, SIGNAL(lastSubscriberDisappeared(const QString&)),
+             this, SIGNAL(lastSubscriberDisappeared(const QString&)));
 }
 
 /// Returns true if the key is set (it's value is determined).
@@ -107,26 +104,6 @@ void Property::setValue(const QVariant &v)
 QVariant Property::value()
 {
     return priv->value;
-}
-
-/// Called by Manager when first subscriber appears. Delegated if
-/// this concerns us.
-void Property::onManagerFirstSubscriberAppeared(const QString &key)
-{
-    if (key == priv->key) {
-        contextDebug() << F_SIGNALS << F_PROPERTY << "First subscriber appeared for key:" << key;
-        emit firstSubscriberAppeared(key);
-    }
-}
-
-/// Called by Manager when last subscriber disappears. Delegate if
-/// this concerns us.
-void Property::onManagerLastSubscriberDisappeared(const QString &key)
-{
-    if (key == priv->key) {
-        contextDebug() << F_SIGNALS << F_PROPERTY << "Last subscriber disappeared for key:" << key;
-        emit lastSubscriberDisappeared(key);
-    }
 }
 
 /// Destructor.

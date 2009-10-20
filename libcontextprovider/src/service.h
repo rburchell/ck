@@ -33,7 +33,6 @@ class ServiceUnitTest;
 
 namespace ContextProvider {
 
-class Manager;
 class Property;
 class ServiceBackend;
 

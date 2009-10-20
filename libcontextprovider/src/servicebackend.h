@@ -22,7 +22,6 @@
 #ifndef SERVICEBACKEND_H
 #define SERVICEBACKEND_H
 
-#include "manager.h"
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -53,7 +52,6 @@ public:
 
     void setAsDefault();
     void setValue(const QString &key, const QVariant &val);
-    Manager *manager();
 
     void ref();
     void unref();
@@ -71,7 +69,6 @@ public:
 private:
     QString objectPath(QString key);
 
-    Manager myManager;
     QDBusConnection connection;
     int refCount;
     QString busName;

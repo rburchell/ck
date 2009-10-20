@@ -55,16 +55,6 @@ void PropertyPrivate::setValue(const QVariant& v)
     emit valueChanged(values, timestamp);
 }
 
-void PropertyPrivate::firstSubscriberAppeared()
-{
-    contextDebug() << F_PROPERTY << "First subscriber";
-}
-
-void PropertyPrivate::lastSubscriberDisappeared()
-{
-    contextDebug() << F_PROPERTY << "Last subscriber";
-}
-
 qlonglong PropertyPrivate::currentTimestamp()
 {
     struct timespec time;
