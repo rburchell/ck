@@ -42,9 +42,10 @@ public:
     void lastSubscriberDisappeared();
 
 private:
-    ServiceBackend* serviceBackend;
-    QString key;
-    QVariant value;
+    ServiceBackend* serviceBackend; ///< Pointer to the serviceBackend taking care of D-Bus related things
+    QString key; ///< Key of this property
+    QVariant value; ///< Current value of the property, QVariant() if null
+    qlonglong timestamp; ///< Time when the value was set
     friend class Property;
     friend class PropertyAdaptor;
 

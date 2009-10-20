@@ -43,7 +43,7 @@ PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnecti
 
 }
 
-void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& value, qlonglong& timestamp)
+void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, qlonglong& timestamp)
 {
     contextDebug() << "Subscribe called";
 
@@ -56,8 +56,11 @@ void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& value, ql
         }
     }
 
-    // Construct the retun value
-    // FIXME
+    // Construct the return values
+    if (propertyPrivate->value.isNull() == false) {
+        values << propertyPrivate->value;
+    }
+    timestamp = propertyPrivate->timestamp;
 }
 
 void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)

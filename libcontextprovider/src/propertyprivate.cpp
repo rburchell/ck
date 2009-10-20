@@ -31,6 +31,7 @@ namespace ContextProvider {
 PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent)
     : QObject(parent), serviceBackend(serviceBackend), key(key), value(QVariant())
 {
+    // FIXME: set timestamp
 }
 
 void PropertyPrivate::setValue(const QVariant& v)
@@ -43,10 +44,13 @@ void PropertyPrivate::setValue(const QVariant& v)
 
     contextDebug() << F_PROPERTY << "Setting key:" << key << "to type:" << v.typeName();
     value = v;
+    // FIXME: udpate timestamp
 
     QVariantList values;
-    values << value;
-    emit valueChanged(values, 0); // FIXME: timestamp
+    if (value.isNull() == false) {
+        values << value;
+    }
+    emit valueChanged(values, timestamp);
 }
 
 void PropertyPrivate::firstSubscriberAppeared()
