@@ -75,6 +75,15 @@ void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
     }
 }
 
+void PropertyAdaptor::Get(const QDBusMessage &msg, QVariantList& values, qlonglong& timestamp)
+{
+    // Construct the return values
+    if (propertyPrivate->value.isNull() == false) {
+        values << propertyPrivate->value;
+    }
+    timestamp = propertyPrivate->timestamp;
+}
+
 /// Dbus interface slot. The PropertyAdaptor listens for dbus bus names changing
 /// to notify the managed Property that a bus name is gone. It does it through
 /// Property::busNameIsGone function.

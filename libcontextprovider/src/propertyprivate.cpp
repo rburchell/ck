@@ -70,7 +70,7 @@ qlonglong PropertyPrivate::currentTimestamp()
     struct timespec time;
     clock_gettime(CLOCK_MONOTONIC, &time);
     qlonglong toReturn = time.tv_nsec;
-    toReturn += ((long)pow(10,9) * time.tv_sec);
+    toReturn += ((qlonglong)pow(10,9) * time.tv_sec);
     return toReturn;
 }
 

@@ -42,9 +42,9 @@ public:
     PropertyAdaptor(PropertyPrivate* property, QDBusConnection *connection);
 
 public slots:
-    //QList<QVariant> Subscribe(int64 &timestamp);
     void Subscribe(const QDBusMessage& msg, QVariantList& values, qlonglong& timestamp);
     void Unsubscribe(const QDBusMessage& msg);
+    void Get(const QDBusMessage& msg, QVariantList& values, qlonglong& timestamp);
     //void OnServiceOwnerChanged(const QString&, const QString&, const QString&);
 
 signals:
