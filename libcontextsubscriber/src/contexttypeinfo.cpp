@@ -24,3 +24,8 @@
 ContextTypeInfo::ContextTypeInfo(const NanoTree &tree) : nanoTree(tree)
 {
 }
+
+QString ContextTypeInfo::name() const
+{
+    return nanoTree.root().toList().at(0).toString();
+}

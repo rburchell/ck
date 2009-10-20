@@ -35,7 +35,7 @@ class NanoTree : public QObject
 public:
     NanoTree(const QVariant &root);
     NanoTree(const NanoTree &tree);
-    const QVariant& root();
+    const QVariant& root() const;
 
     QVariant keySub(const QString &key);
     QVariant keyValue(const QString &key);

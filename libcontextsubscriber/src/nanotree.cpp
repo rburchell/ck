@@ -31,7 +31,7 @@ NanoTree::NanoTree(const NanoTree &tree)
     rootVariant = tree.rootVariant;
 }
 
-const QVariant& NanoTree::root()
+const QVariant& NanoTree::root() const
 {
     return rootVariant;
 }

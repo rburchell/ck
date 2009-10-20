@@ -33,9 +33,10 @@ class ContextTypeInfo : public QObject
 
 public:
     explicit ContextTypeInfo(const NanoTree& tree);
+    QString name() const;
 
 protected:
-    const NanoTree nanoTree;
+    NanoTree nanoTree;
 };
 
 #endif
