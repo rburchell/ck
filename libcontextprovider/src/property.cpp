@@ -93,7 +93,7 @@ QString Property::key() const
 /// QVariant.
 void Property::unsetValue()
 {
-    //priv->manager->setKeyValue(priv->key, QVariant());
+    priv->setValue(QVariant());
 }
 
 /// Sets the property value to QVariant \a v.

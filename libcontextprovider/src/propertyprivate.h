@@ -42,6 +42,8 @@ public:
     void lastSubscriberDisappeared();
 
 private:
+    static qlonglong currentTimestamp();
+
     ServiceBackend* serviceBackend; ///< Pointer to the serviceBackend taking care of D-Bus related things
     QString key; ///< Key of this property
     QVariant value; ///< Current value of the property, QVariant() if null

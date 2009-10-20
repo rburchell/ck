@@ -24,14 +24,16 @@
 #include "logging.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
+#include <time.h>
+#include <math.h>
 
 namespace ContextProvider {
 
 
 PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent)
-    : QObject(parent), serviceBackend(serviceBackend), key(key), value(QVariant())
+    : QObject(parent), serviceBackend(serviceBackend),
+      key(key), value(QVariant()),  timestamp(currentTimestamp())
 {
-    // FIXME: set timestamp
 }
 
 void PropertyPrivate::setValue(const QVariant& v)
@@ -44,7 +46,7 @@ void PropertyPrivate::setValue(const QVariant& v)
 
     contextDebug() << F_PROPERTY << "Setting key:" << key << "to type:" << v.typeName();
     value = v;
-    // FIXME: udpate timestamp
+    timestamp = currentTimestamp();
 
     QVariantList values;
     if (value.isNull() == false) {
@@ -61,6 +63,15 @@ void PropertyPrivate::firstSubscriberAppeared()
 void PropertyPrivate::lastSubscriberDisappeared()
 {
     contextDebug() << F_PROPERTY << "Last subscriber";
+}
+
+qlonglong PropertyPrivate::currentTimestamp()
+{
+    struct timespec time;
+    clock_gettime(CLOCK_MONOTONIC, &time);
+    qlonglong toReturn = time.tv_nsec;
+    toReturn += ((long)pow(10,9) * time.tv_sec);
+    return toReturn;
 }
 
 

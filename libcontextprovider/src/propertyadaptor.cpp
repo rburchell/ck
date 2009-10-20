@@ -73,7 +73,6 @@ void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
             propertyPrivate->lastSubscriberDisappeared();
         }
     }
-
 }
 
 /// Dbus interface slot. The PropertyAdaptor listens for dbus bus names changing
