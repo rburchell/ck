@@ -44,8 +44,8 @@ public:
 public slots:
     void Subscribe(const QDBusMessage& msg, QVariantList& values, qlonglong& timestamp);
     void Unsubscribe(const QDBusMessage& msg);
-    void Get(const QDBusMessage& msg, QVariantList& values, qlonglong& timestamp);
-    //void OnServiceOwnerChanged(const QString&, const QString&, const QString&);
+    void Get(QVariantList& values, qlonglong& timestamp);
+    void OnServiceOwnerChanged(const QString&, const QString&, const QString&);
 
 signals:
     void ValueChanged(const QVariantList &values, const qlonglong& timestamp);
@@ -53,8 +53,7 @@ signals:
 private:
     PropertyPrivate *propertyPrivate; ///< The managed object.
     QDBusConnection *connection; ///< The connection to operate on.
-    QSet<QString> clientDBusNames; ///< D-Bus names of the processes subscribed to this property
-
+    QSet<QString> clientServiceNames; ///< How many times each client (recognized by D-Bus service name) has subscribed
 };
 
 } // namespace ContextProvider

@@ -38,8 +38,8 @@ namespace ContextProvider {
 PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnection *conn)
     : QDBusAbstractAdaptor(propertyPrivate), propertyPrivate(propertyPrivate), connection(conn)
 {
-    /*sconnect((QObject*) connection->interface(), SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
-      this, SLOT(OnServiceOwnerChanged(const QString &, const QString&, const QString&)));*/
+    sconnect((QObject*) connection->interface(), SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
+             this, SLOT(OnServiceOwnerChanged(const QString &, const QString&, const QString&)));
 
 }
 
@@ -47,35 +47,43 @@ void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, q
 {
     contextDebug() << "Subscribe called";
 
-    // Store the information of the subscription
-    QString clientDBusName = msg.service();
-    if (clientDBusNames.contains(clientDBusName) == false) {
-        clientDBusNames.insert(clientDBusName);
-        if (clientDBusNames.size() == 1) {
+    // Store the information of the subscription. For each client, we
+    // record how many times the client has subscribed.
+    QString client = msg.service();
+
+    if (clientServiceNames.contains(client) == false) {
+        clientServiceNames.insert(client);
+        if (clientServiceNames.size() == 1) {
             propertyPrivate->firstSubscriberAppeared();
         }
     }
+    else {
+        contextWarning() << "Client" << client << "subscribed to property" << propertyPrivate->key << "multiple times";
+        // FIXME: D-Bus error
+    }
 
     // Construct the return values
-    if (propertyPrivate->value.isNull() == false) {
-        values << propertyPrivate->value;
-    }
-    timestamp = propertyPrivate->timestamp;
+    Get(values, timestamp);
 }
 
 void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
 {
     contextDebug() << "Unsubscribe called";
-    QString clientDBusName = msg.service();
-    if (clientDBusNames.contains(clientDBusName)) {
-        clientDBusNames.remove(clientDBusName);
-        if (clientDBusNames.size() == 0) {
+    QString client = msg.service();
+
+    if (clientServiceNames.contains(client)) {
+        clientServiceNames.remove(client);
+        if (clientServiceNames.size() == 0) {
             propertyPrivate->lastSubscriberDisappeared();
         }
     }
+    else {
+        contextWarning() << "Client" << client << "unsubscribed from property" << propertyPrivate->key << "without subscribing";
+        // FIXME: D-Bus error
+    }
 }
 
-void PropertyAdaptor::Get(const QDBusMessage &msg, QVariantList& values, qlonglong& timestamp)
+void PropertyAdaptor::Get(QVariantList& values, qlonglong& timestamp)
 {
     // Construct the return values
     if (propertyPrivate->value.isNull() == false) {
@@ -87,12 +95,18 @@ void PropertyAdaptor::Get(const QDBusMessage &msg, QVariantList& values, qlonglo
 /// Dbus interface slot. The PropertyAdaptor listens for dbus bus names changing
 /// to notify the managed Property that a bus name is gone. It does it through
 /// Property::busNameIsGone function.
-/*void PropertyAdaptor::OnServiceOwnerChanged(const QString &name, const QString &oldName, const QString &newName)
+void PropertyAdaptor::OnServiceOwnerChanged(const QString &name, const QString &oldName, const QString &newName)
 
 {
-    if (newName == "")
-        manager->busNameIsGone(name);
-
-}*/
+    if (newName == "") {
+        if (clientServiceNames.contains(name)) {
+            // It was one of our clients
+            clientServiceNames.remove(name);
+            if (clientServiceNames.size() == 0) {
+                propertyPrivate->lastSubscriberDisappeared();
+            }
+        }
+    }
+}
 
 } // namespace ContextProvider
