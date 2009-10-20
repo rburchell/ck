@@ -40,7 +40,31 @@ ContextTypeInfo::ContextTypeInfo(const NanoTree &nanoTree)
         typeName = "";
 }
 
+ContextTypeInfo::ContextTypeInfo(const QString &tn) : typeName(tn)
+{
+}
+
+ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo &ti) : typeName(ti.typeName)
+{
+}
+
 QString ContextTypeInfo::name() const
 {
     return typeName;
 }
+
+ContextTypeInfo ContextTypeInfo::int64Type()
+{
+    return ContextTypeInfo("int64");
+}
+
+ContextTypeInfo ContextTypeInfo::stringType()
+{
+    return ContextTypeInfo("string");
+}
+
+ContextTypeInfo ContextTypeInfo::intType()
+{
+    return ContextTypeInfo("int");
+}
+

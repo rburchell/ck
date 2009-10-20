@@ -32,8 +32,14 @@ class ContextTypeInfo : public QObject
     Q_OBJECT
 
 public:
-    explicit ContextTypeInfo(const NanoTree& tree);
+    explicit ContextTypeInfo(const NanoTree &tree);
+    explicit ContextTypeInfo(const QString &typeName);
+    ContextTypeInfo(const ContextTypeInfo &ti);
+
     QString name() const;
+    static ContextTypeInfo int64Type();
+    static ContextTypeInfo intType();
+    static ContextTypeInfo stringType();
 
 protected:
     QString typeName;
