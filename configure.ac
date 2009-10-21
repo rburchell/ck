@@ -55,7 +55,7 @@ AM_CONDITIONAL([CONTEXTKIT_COVERAGE], [test "$missing_deps_COVERAGE" = ""])
 AC_CONFIG_FILES([
         Makefile
         doc/Makefile
-	common/Makefile
+        common/Makefile
         libcontextsubscriber/Makefile
         libcontextsubscriber/cli/Makefile
         libcontextsubscriber/cls/Makefile
@@ -89,26 +89,24 @@ AC_CONFIG_FILES([
         libcontextsubscriber/multithreading-tests/wait-for-subscription-only-in-thread/Makefile
         libcontextsubscriber/multithreading-tests/wait-for-subscription-thread/Makefile
         libcontextsubscriber/update-contextkit-providers/Makefile
-	libcontextprovider/contextprovider-1.0.pc
-	libcontextprovider/Makefile
-	libcontextprovider/doc/Makefile
-	libcontextprovider/src/Makefile
-	libcontextprovider/context-provide/Makefile
-	libcontextprovider/man/Makefile
-	libcontextprovider/unit-tests/Makefile
-	libcontextprovider/unit-tests/manager/Makefile
-	libcontextprovider/unit-tests/subscriber/Makefile
-	libcontextprovider/unit-tests/contextgroup/Makefile
-	libcontextprovider/unit-tests/property/Makefile
-	libcontextprovider/unit-tests/contextc/Makefile
-	libcontextprovider/unit-tests/service/Makefile
-	libcontextprovider/unit-tests/servicebackend/Makefile
-	libcontextprovider/customer-tests/Makefile
-	libcontextprovider/customer-tests/subscription/Makefile
-	libcontextprovider/customer-tests/client/Makefile
-	libcontextprovider/customer-tests/value-changes/Makefile
-	libcontextprovider/customer-tests/types/Makefile
-	libcontextprovider/customer-tests/c-api/Makefile
+        libcontextprovider/contextprovider-1.0.pc
+        libcontextprovider/Makefile
+        libcontextprovider/doc/Makefile
+        libcontextprovider/src/Makefile
+        libcontextprovider/context-provide/Makefile
+        libcontextprovider/man/Makefile
+        libcontextprovider/unit-tests/Makefile
+        libcontextprovider/unit-tests/contextgroup/Makefile
+        libcontextprovider/unit-tests/property/Makefile
+        libcontextprovider/unit-tests/contextc/Makefile
+        libcontextprovider/unit-tests/service/Makefile
+        libcontextprovider/unit-tests/servicebackend/Makefile
+        libcontextprovider/customer-tests/Makefile
+        libcontextprovider/customer-tests/subscription/Makefile
+        libcontextprovider/customer-tests/client/Makefile
+        libcontextprovider/customer-tests/value-changes/Makefile
+        libcontextprovider/customer-tests/types/Makefile
+        libcontextprovider/customer-tests/c-api/Makefile
         python/Makefile
         spec/Makefile
         tools/Makefile

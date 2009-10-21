@@ -1,10 +1,8 @@
-SUBDIRS = manager	\
-	  subscriber	\
-	  property	\
-	  contextgroup	\
-	  contextc	\
-	  service       \
-          servicebackend
+SUBDIRS = property	\
+	contextgroup	\
+	contextc		\
+	service			\
+	servicebackend
 
 check-sum: all
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
