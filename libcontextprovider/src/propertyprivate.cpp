@@ -39,18 +39,21 @@ PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &
 
 void PropertyPrivate::setValue(const QVariant& v)
 {
-    // Even if the value was the same as before, we still update the
-    // time stamp and send the valueChanged signal.
+    // Always update the time stamp, whether or not the values is the same
+    timestamp = currentTimestamp();
+
+    // If the value is the same, don't emit anything
+    if (v == value && v.isNull() == value.isNull()) {
+        return;
+    }
 
     contextDebug() << F_PROPERTY << "Setting key:" << key << "to type:" << v.typeName();
     value = v;
-    timestamp = currentTimestamp();
 
     QVariantList values;
     if (value.isNull() == false) {
         values << value;
     }
-    contextDebug() << "signal should be emitted";
     emit valueChanged(values, timestamp);
 }
 

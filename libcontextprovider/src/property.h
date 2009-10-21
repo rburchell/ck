@@ -32,7 +32,6 @@
 namespace ContextProvider {
 
 class Service;
-class Manager;
 
 class PropertyPrivate;
 class ServiceBackend;
@@ -56,10 +55,6 @@ public:
 private:
     PropertyPrivate *priv;
     void init(ServiceBackend *serviceBackend, const QString &key);
-
-private slots:
-    void onManagerFirstSubscriberAppeared(const QString &key);
-    void onManagerLastSubscriberDisappeared(const QString &key);
 
 signals:
     /// This is emitted when the first subscriber appears for this

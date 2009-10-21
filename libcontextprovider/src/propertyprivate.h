@@ -50,8 +50,10 @@ private:
 
     ServiceBackend* serviceBackend; ///< Pointer to the serviceBackend taking care of D-Bus related things
     QString key; ///< Key of this property
-    QVariant value; ///< Current value of the property, QVariant() if null
+    QVariant value; ///< Current value of the property, set by this provider. QVariant() if null.
     qlonglong timestamp; ///< Time when the value was set
+    QVariant overheardValue; ///< Latest value of the property set by any provider over D-Bus
+    qlonglong overheardTimestamp; ///< Time when the overheardValue was set
     static QHash<QPair<ServiceBackend*, QString>, PropertyPrivate*> propertyPrivateMap;
     friend class Property;
     friend class PropertyAdaptor;

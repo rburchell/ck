@@ -28,6 +28,7 @@
 #include <QDBusConnection>
 #include <QSet>
 #include <QString>
+#define DBUS_INTERFACE "org.maemo.contextkit.Property"
 
 namespace ContextProvider {
 
@@ -40,6 +41,7 @@ class PropertyAdaptor: public QDBusAbstractAdaptor
 
 public:
     PropertyAdaptor(PropertyPrivate* property, QDBusConnection *connection);
+    QString objectPath() const;
 
 public slots:
     void Subscribe(const QDBusMessage& msg, QVariantList& values, qlonglong& timestamp);
@@ -51,6 +53,7 @@ signals:
 
 private slots:
     void OnServiceOwnerChanged(const QString&, const QString&, const QString&);
+    void onValueChanged(QVariantList values, qlonglong timestamp);
 
 private:
     PropertyPrivate *propertyPrivate; ///< The managed object.

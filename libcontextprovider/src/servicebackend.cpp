@@ -100,10 +100,10 @@ bool ServiceBackend::start()
 {
     // Register Property objects on D-Bus
     foreach (const QString& key, properties.keys()) {
-        PropertyAdaptor* propertyAdaptor = new PropertyAdaptor(properties[key], &connection);
-        createdAdaptors.insert(propertyAdaptor);
+        PropertyAdaptor* adaptor = new PropertyAdaptor(properties[key], &connection);
+        createdAdaptors.insert(adaptor);
         PropertyPrivate* propertyPrivate = properties[key];
-        if (!connection.registerObject(objectPath(key), propertyPrivate)) {
+        if (!connection.registerObject(adaptor->objectPath(), propertyPrivate)) {
             contextCritical() << F_SERVICE_BACKEND << "Failed to register the Property object for" << key;
             contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
             return false;
@@ -132,14 +132,13 @@ void ServiceBackend::stop()
     if (!sharedConnection())
         connection.unregisterService(busName);
 
-    // Unregister Property objects
-    foreach (const QString& key, properties.keys())
-        connection.unregisterObject(objectPath(key));
-
-    // Delete PropertyAdaptors set
-    foreach (PropertyAdaptor* adaptor, createdAdaptors)
-        delete adaptor;
-    createdAdaptors.clear();
+    // Unregister Property objects and clean up PropertyAdaptors set
+    foreach (PropertyAdaptor* adaptor, createdAdaptors) {
+        connection.unregisterObject(adaptor->objectPath());
+        delete adaptor; // this doesn't touch the createdAdaptors set
+        // (it contains invalid pointers now, though)
+    }
+    createdAdaptors.clear(); // but we clear it here
 }
 
 /// Sets the ServiceBackend object as the default one to use when
@@ -218,13 +217,6 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
 bool ServiceBackend::sharedConnection()
 {
     return busName == "";
-}
-
-QString ServiceBackend::objectPath(QString key)
-{
-    if (!key.startsWith("/"))
-        return QString("/org/maemo/contextkit/") + key.replace(".", "/");
-    return key;
 }
 
 } // end namespace

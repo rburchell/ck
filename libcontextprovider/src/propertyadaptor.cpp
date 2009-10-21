@@ -43,6 +43,15 @@ PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnecti
              this, SLOT(OnServiceOwnerChanged(const QString &, const QString&, const QString&)));
     sconnect(propertyPrivate, SIGNAL(valueChanged(const QVariantList&, const qlonglong&)),
              this, SIGNAL(ValueChanged(const QVariantList&, const qlonglong&)));
+
+    bool ret;
+    ret = QDBusConnection::sessionBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
+                                                this, SLOT(onValueChanged(QVariantList, qlonglong)));
+    contextCritical() << "Connecting to valuechanged (session):" << ret;
+
+    ret = QDBusConnection::systemBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
+                                               this, SLOT(onValueChanged(QVariantList, qlonglong)));
+    contextCritical() << "Connecting to valuechanged (system):" << ret;
 }
 
 void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, qlonglong& timestamp)
@@ -94,6 +103,12 @@ void PropertyAdaptor::Get(QVariantList& values, qlonglong& timestamp)
     timestamp = propertyPrivate->timestamp;
 }
 
+void PropertyAdaptor::onValueChanged(QVariantList values, qlonglong timestamp)
+{
+    contextCritical() << "******Got a value" << values << timestamp;
+}
+
+
 /// Dbus interface slot. The PropertyAdaptor listens for dbus bus names changing
 /// to notify the managed Property that a bus name is gone. It does it through
 /// Property::busNameIsGone function.
@@ -109,6 +124,13 @@ void PropertyAdaptor::OnServiceOwnerChanged(const QString &name, const QString &
             }
         }
     }
+}
+
+QString PropertyAdaptor::objectPath() const
+{
+    if (!propertyPrivate->key.startsWith("/"))
+        return QString("/org/maemo/contextkit/") + propertyPrivate->key.replace(".", "/");
+    return propertyPrivate->key;
 }
 
 } // namespace ContextProvider

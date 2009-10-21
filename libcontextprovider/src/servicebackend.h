@@ -50,6 +50,8 @@ public:
     bool start();
     void stop();
 
+    void addProperty(const QString& key, PropertyPrivate* property);
+
     void setAsDefault();
     void setValue(const QString &key, const QVariant &val);
 
@@ -64,11 +66,7 @@ public:
     friend class ::ServiceBackendUnitTest;
     friend class Service;
 
-    void addProperty(const QString& key, PropertyPrivate* property);
-
 private:
-    QString objectPath(QString key);
-
     QDBusConnection connection;
     int refCount;
     QString busName;
