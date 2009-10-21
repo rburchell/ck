@@ -49,4 +49,13 @@ protected:
     NanoTree nanoTree;
 };
 
+class ContextMapTypeInfo : public ContextTypeInfo
+{
+    Q_OBJECT
+
+public:
+    QString keyDoc(QString key);
+    ContextTypeInfo keyType(QString key);
+};
+
 #endif

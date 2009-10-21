@@ -100,3 +100,14 @@ ContextTypeInfo ContextTypeInfo::intType()
     lst << QVariant("int64");
     return ContextTypeInfo(QVariant(lst));
 }
+
+QString ContextMapTypeInfo::keyDoc(QString key)
+{
+    return nanoTree.keyValue(QString("params"), QString("keys"), key, QString("doc")).toString();
+}
+
+ContextTypeInfo ContextMapTypeInfo::keyType(QString key)
+{
+    return ContextTypeInfo(nanoTree.keyValue(QString("params"), QString("keys"), key, QString("type")));
+}
+
