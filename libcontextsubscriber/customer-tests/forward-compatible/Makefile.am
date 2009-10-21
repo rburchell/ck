@@ -1,4 +1,4 @@
-EXTRA_DIST = cache1.cdb cache2.cdb
+EXTRA_DIST = cache1.cdb cache2.cdb test.sh
 
 bin_PROGRAMS = check-version
 
@@ -17,4 +17,4 @@ check_version_LDADD = ../../src/libcontextsubscriber.la
 
 check-customer:                                                                                                                
 	$(MAKE) -C @abs_top_srcdir@ all                                                                                        
-	./check-version
+	./test.sh

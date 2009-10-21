@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     QCoreApplication app(argc, argv);
 
     QFile::remove("cache.cdb");
-    if (! QFile::copy("cache2.cdb", "cache.cdb")) {
+    if (! QFile::copy("cache1.cdb", "cache.cdb")) {
         qDebug() << "Can't copy cache1.cdb!";
         fail();
     }
@@ -58,6 +58,9 @@ int main(int argc, char **argv)
         qDebug() << "Can't copy cache2.cdb!";
         fail();
     }
+
+    for (int i = 0; i < 1000; i++)
+        app.processEvents();
 
     ContextPropertyInfo info2("Battery.OnBattery");
     if (info2.provided() == true) {
