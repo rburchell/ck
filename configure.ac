@@ -80,6 +80,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/unit-tests/provider/Makefile
         libcontextsubscriber/unit-tests/util/Makefile
         libcontextsubscriber/unit-tests/nanoxml/Makefile
+        libcontextsubscriber/unit-tests/contexttypeinfo/Makefile
         libcontextsubscriber/multithreading-tests/Makefile
         libcontextsubscriber/multithreading-tests/new-property-in-thread/Makefile
         libcontextsubscriber/multithreading-tests/old-property-in-thread/Makefile

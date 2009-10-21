@@ -8,7 +8,8 @@ SUBDIRSTESTS =                                                          \
 	contextregistryinfo               				\
         contextpropertyinfo						\
 	infobackend                                                     \
-        nanoxml
+        nanoxml								\
+	contexttypeinfo
 
 SUBDIRS = $(SUBDIRSTESTS) util
 
