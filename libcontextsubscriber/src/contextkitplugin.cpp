@@ -64,6 +64,7 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
       connection(new QDBusConnection(bus)),
       busName(busName)
 {
+    reset();
     // Notice if the provider on the dbus comes and goes
     sconnect(providerListener, SIGNAL(nameAppeared()),
              this, SLOT(onProviderAppeared()));
@@ -77,23 +78,29 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
     QMetaObject::invokeMethod(this, "onProviderAppeared", Qt::QueuedConnection);
 }
 
+void ContextKitPlugin::reset()
+{
+    delete(subscriberInterface);
+    subscriberInterface = 0;
+    delete(managerInterface);
+    managerInterface = 0;
+    newProtocol = false;
+}
+
 /// Gets a new subscriber interface from manager when the provider
 /// appears.
 void ContextKitPlugin::onProviderAppeared()
 {
     contextDebug() << "ContextKitPlugin::onProviderAppeared";
 
-    delete subscriberInterface;
-    subscriberInterface = 0;
-    delete managerInterface;
+    reset();
     managerInterface = new AsyncDBusInterface(busName, managerPath, managerIName, *connection, this);
     if (!managerInterface->callWithCallback("GetSubscriber",
                                             QList<QVariant>(),
                                             this,
                                             SLOT(onDBusGetSubscriberFinished(QDBusObjectPath)),
                                             SLOT(onDBusGetSubscriberFailed(QDBusError)))) {
-        emit failed(QString("Wasn't able to call GetSubscriber on the managerinterface: ") +
-                    managerInterface->lastError().message());
+        onDBusGetSubscriberFailed(managerInterface->lastError());
     }
 }
 
@@ -101,8 +108,7 @@ void ContextKitPlugin::onProviderAppeared()
 void ContextKitPlugin::onProviderDisappeared()
 {
     contextDebug() << "ContextKitPlugin::onProviderDisappeared";
-    delete subscriberInterface;
-    subscriberInterface = 0;
+    reset();
     emit failed("Provider went away");
 }
 
@@ -130,7 +136,12 @@ void ContextKitPlugin::onDBusGetSubscriberFinished(QDBusObjectPath objectPath)
 
 void ContextKitPlugin::onDBusGetSubscriberFailed(QDBusError err)
 {
-    emit failed("Was unable to get subscriber object on dbus: " + err.message());
+    contextWarning() <<
+        "Trying new protocol, because were not able to get subscriber object on dbus: " +
+        err.message();
+    reset();
+    newProtocol = true;
+    emit ready();
 }
 
 /// Signals the Provider that the subscribe is finished.
@@ -150,13 +161,21 @@ void ContextKitPlugin::onDBusSubscribeFailed(QList<QString> keys, QString error)
 /// Forwards the subscribe request to the wire.
 void ContextKitPlugin::subscribe(QSet<QString> keys)
 {
-    subscriberInterface->subscribe(keys);
+    if (newProtocol)
+        foreach (QString key, keys)
+            emit subscribeFailed(key, "new protocol not supported yet");
+    else
+        subscriberInterface->subscribe(keys);
 }
 
 /// Forwards the unsubscribe request to the wire.
 void ContextKitPlugin::unsubscribe(QSet<QString> keys)
 {
-    subscriberInterface->unsubscribe(keys);
+    if (newProtocol);
+//        foreach (QString key, keys)
+//            emit failed(key, "new protocol not supported yet");
+    else
+        subscriberInterface->unsubscribe(keys);
 }
 
 /// Forwards value changes from the wire to the upper layer (Provider).

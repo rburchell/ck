@@ -67,6 +67,8 @@ private slots:
     void onProviderDisappeared();
 
 private:
+    void reset();
+
     QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
 
     DBusNameListener *providerListener; ///< Listens to provider's (dis)appearance over DBus
@@ -75,6 +77,8 @@ private:
 
     QDBusConnection *connection; ///< The connection to DBus
     QString busName; ///< The D-Bus service name of the ContextKit provider connected to
+
+    bool newProtocol; ///< The provider on D-Bus speaks the new protocol only.
 
     static const QString managerIName; ///< org.freedesktop.ContextKit.Manager
     static const QString subscriberIName; ///< org.freedesktop.ContextKit.Subscriber
