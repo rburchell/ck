@@ -29,6 +29,7 @@
 
 namespace ContextProvider {
 
+QHash<QPair<ServiceBackend*,QString>, PropertyPrivate*> PropertyPrivate::propertyPrivateMap;
 
 PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent)
     : QObject(parent), serviceBackend(serviceBackend),
@@ -38,11 +39,8 @@ PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &
 
 void PropertyPrivate::setValue(const QVariant& v)
 {
-    if (v == value && v.isNull() == value.isNull()) {
-        // Same value, skip
-        // FIXME: should the time stamp be updated?
-        return;
-    }
+    // Even if the value was the same as before, we still update the
+    // time stamp and send the valueChanged signal.
 
     contextDebug() << F_PROPERTY << "Setting key:" << key << "to type:" << v.typeName();
     value = v;
@@ -52,6 +50,7 @@ void PropertyPrivate::setValue(const QVariant& v)
     if (value.isNull() == false) {
         values << value;
     }
+    contextDebug() << "signal should be emitted";
     emit valueChanged(values, timestamp);
 }
 

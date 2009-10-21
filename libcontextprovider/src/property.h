@@ -55,7 +55,7 @@ public:
 
 private:
     PropertyPrivate *priv;
-    void init (ServiceBackend *serviceBackend, const QString &key);
+    void init(ServiceBackend *serviceBackend, const QString &key);
 
 private slots:
     void onManagerFirstSubscriberAppeared(const QString &key);

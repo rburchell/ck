@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QString>
 #include <QVariant>
+#include <QPair>
 
 namespace ContextProvider {
 
@@ -51,6 +52,7 @@ private:
     QString key; ///< Key of this property
     QVariant value; ///< Current value of the property, QVariant() if null
     qlonglong timestamp; ///< Time when the value was set
+    static QHash<QPair<ServiceBackend*, QString>, PropertyPrivate*> propertyPrivateMap;
     friend class Property;
     friend class PropertyAdaptor;
 };

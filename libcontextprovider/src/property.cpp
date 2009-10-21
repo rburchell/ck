@@ -26,7 +26,7 @@
 #include "logging.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
-
+#include <QPair>
 
 namespace ContextProvider {
 
@@ -57,16 +57,23 @@ Property::Property(const QString &k, QObject* parent)
         abort();
     }
 
-    init (ServiceBackend::defaultServiceBackend, k);
+    init(ServiceBackend::defaultServiceBackend, k);
 }
 
-void Property::init (ServiceBackend *serviceBackend, const QString &key)
+void Property::init(ServiceBackend *serviceBackend, const QString &key)
 {
     contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
 
-    priv = new PropertyPrivate(serviceBackend, key);
+    QPair<ServiceBackend*, QString> lookup(serviceBackend, key);
 
-    priv->serviceBackend->addProperty (priv->key, priv);
+    if (PropertyPrivate::propertyPrivateMap.contains(lookup)) {
+        priv = PropertyPrivate::propertyPrivateMap[lookup];
+    }
+    else {
+        priv = new PropertyPrivate(serviceBackend, key);
+        priv->serviceBackend->addProperty(priv->key, priv);
+        PropertyPrivate::propertyPrivateMap.insert(lookup, priv);
+    }
     sconnect(priv, SIGNAL(firstSubscriberAppeared(const QString&)),
              this, SIGNAL(firstSubscriberAppeared(const QString&)));
     sconnect(priv, SIGNAL(lastSubscriberDisappeared(const QString&)),
@@ -76,8 +83,7 @@ void Property::init (ServiceBackend *serviceBackend, const QString &key)
 /// Returns true if the key is set (it's value is determined).
 bool Property::isSet() const
 {
-    return true; // FIXME
-    //return (priv->manager->getKeyValue(priv->key) != QVariant());
+    return (!priv->value.isNull());
 }
 
 /// Returns the name of the key this Property represents.
@@ -110,7 +116,6 @@ QVariant Property::value()
 Property::~Property()
 {
     contextDebug() << F_PROPERTY << F_DESTROY << "Destroying Property for key:" << priv->key;
-    delete priv;
 }
 
 } // end namespace

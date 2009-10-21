@@ -38,9 +38,11 @@ namespace ContextProvider {
 PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnection *conn)
     : QDBusAbstractAdaptor(propertyPrivate), propertyPrivate(propertyPrivate), connection(conn)
 {
-    sconnect((QObject*) connection->interface(), SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
+    sconnect((QObject*) connection->interface(),
+             SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
              this, SLOT(OnServiceOwnerChanged(const QString &, const QString&, const QString&)));
-
+    sconnect(propertyPrivate, SIGNAL(valueChanged(const QVariantList&, const qlonglong&)),
+             this, SIGNAL(ValueChanged(const QVariantList&, const qlonglong&)));
 }
 
 void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, qlonglong& timestamp)
