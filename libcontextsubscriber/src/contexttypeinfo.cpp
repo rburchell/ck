@@ -59,6 +59,11 @@ QList<QVariant> ContextTypeInfo::parameters() const
     return nanoTree.keyValues("params");
 }
 
+QVariant ContextTypeInfo::parameter(QString p) const
+{
+    return nanoTree.keyValue("param", p);
+}
+
 ContextTypeInfo ContextTypeInfo::int64Type()
 {
     QVariantList lst;
