@@ -6,12 +6,14 @@ then
     exit 1
 fi
 
+which context-ls
+
 # Beginning of the tests.xml template
 cat $2 > tests.xml
 
 export CONTEXT_CORE_DECLARATIONS=$1
 # core properties start with a capital letter; list them
-for prop in `../cls/context-ls | grep ^[A-Z] | sort`
+for prop in `context-ls | grep ^[A-Z] | sort`
 do
     # for each core property, create a test case
     sed "s/PROPNAME/$prop/g" $3 >> tests.xml

@@ -1,5 +1,5 @@
 all:
-	$(srcdir)/generate-tests-xml.sh $(top_srcdir)/spec/core.context $(srcdir)/tests.xml.begin $(srcdir)/tests.xml.middle $(srcdir)/tests.xml.end
+	PATH=$(builddir)/../cls/:$(PATH) $(srcdir)/generate-tests-xml.sh $(top_srcdir)/spec/core.context $(srcdir)/tests.xml.begin $(srcdir)/tests.xml.middle $(srcdir)/tests.xml.end
 
 clean-local:
 	rm -f tests.xml
