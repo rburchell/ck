@@ -36,7 +36,6 @@ ContextTypeInfo::ContextTypeInfo(const NanoTree &tree) : nanoTree(tree)
         contextWarning() << "Nanotree does not represent type!";
         return;
     }
-
 }
 
 ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo &ti) : nanoTree(ti.nanoTree)
@@ -53,6 +52,11 @@ QString ContextTypeInfo::name() const
         return root.toList().at(1).toList().at(0).toString();
     else
         return "";
+}
+
+QList<QVariant> ContextTypeInfo::parameters() const
+{
+    return nanoTree.keyValues("params");
 }
 
 ContextTypeInfo ContextTypeInfo::int64Type()
@@ -78,4 +82,3 @@ ContextTypeInfo ContextTypeInfo::intType()
     lst << QVariant("int64");
     return ContextTypeInfo(QVariant(lst));
 }
-

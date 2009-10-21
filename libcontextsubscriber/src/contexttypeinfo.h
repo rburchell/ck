@@ -37,6 +37,8 @@ public:
     ContextTypeInfo(const ContextTypeInfo &ti);
 
     QString name() const;
+    QList<QVariant> parameters() const;
+
     static ContextTypeInfo int64Type();
     static ContextTypeInfo intType();
     static ContextTypeInfo stringType();
