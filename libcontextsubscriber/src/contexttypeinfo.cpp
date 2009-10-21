@@ -54,6 +54,21 @@ QString ContextTypeInfo::name() const
         return "";
 }
 
+ContextTypeInfo ContextTypeInfo::base() const
+{
+    QString n = name();
+    if (n == "duration")
+        return ContextTypeInfo::int64Type();
+    else if (n == "time")
+        return ContextTypeInfo::int64Type();
+    else if (n == "string-enum")
+        return ContextTypeInfo::stringType();
+    else if (n == "percentage")
+        return ContextTypeInfo::intType();
+    else
+        return ContextTypeInfo(QVariant());
+}
+
 QList<QVariant> ContextTypeInfo::parameters() const
 {
     return nanoTree.keyValues("params");
