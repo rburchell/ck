@@ -1,4 +1,4 @@
-SUBDIRS = update-contextkit-providers testplugins
+SUBDIRS = update-contextkit-providers testplugins forward-compatible
 
 libcontextsubscribertestsdir = $(datadir)/libcontextsubscriber-tests
 libcontextsubscribertests_DATA = tests.xml
@@ -18,6 +18,6 @@ CLEANFILES = *.pyc
 
 EXTRA_DIST = asynchronicity commander subscription runTests.sh	\
              tests.xml common registry pluginchanging env.sh	\
-             coverage-build
+             coverage-build forward-compatible
 
 include $(top_srcdir)/am/covoptioncheck.am
