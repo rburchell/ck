@@ -33,6 +33,7 @@ class NanoTree : public QObject
     Q_OBJECT
 
 public:
+    NanoTree();
     NanoTree(const QVariant &root);
     NanoTree(const NanoTree &tree);
     const QVariant& root() const;

@@ -22,7 +22,12 @@
 #include "contexttypeinfo.h"
 #include "logging.h"
 
-ContextTypeInfo::ContextTypeInfo(const NanoTree &nanoTree)
+ContextTypeInfo::ContextTypeInfo(const QVariant &variant)
+{
+    ContextTypeInfo(NanoTree(variant));
+}
+
+ContextTypeInfo::ContextTypeInfo(const NanoTree &tree) : nanoTree(tree)
 {
     QVariant root = nanoTree.root();
 
@@ -32,39 +37,45 @@ ContextTypeInfo::ContextTypeInfo(const NanoTree &nanoTree)
         return;
     }
 
-    if (root.toList().at(1).type() == QVariant::String)
-        typeName = root.toList().at(1).toString();
-    else if (root.toList().at(1).type() == QVariant::List)
-        typeName = root.toList().at(1).toList().at(0).toString();
-    else
-        typeName = "";
 }
 
-ContextTypeInfo::ContextTypeInfo(const QString &tn) : typeName(tn)
-{
-}
-
-ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo &ti) : typeName(ti.typeName)
+ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo &ti) : nanoTree(ti.nanoTree)
 {
 }
 
 QString ContextTypeInfo::name() const
 {
-    return typeName;
+    QVariant root = nanoTree.root();
+
+    if (root.toList().at(1).type() == QVariant::String)
+        return root.toList().at(1).toString();
+    else if (root.toList().at(1).type() == QVariant::List)
+        return root.toList().at(1).toList().at(0).toString();
+    else
+        return "";
 }
 
 ContextTypeInfo ContextTypeInfo::int64Type()
 {
-    return ContextTypeInfo("int64");
+    QVariantList lst;
+    lst << QVariant("type");
+    lst << QVariant("int64");
+    return ContextTypeInfo(QVariant(lst));
 }
 
 ContextTypeInfo ContextTypeInfo::stringType()
 {
-    return ContextTypeInfo("string");
+    QVariantList lst;
+    lst << QVariant("type");
+    lst << QVariant("int64");
+    return ContextTypeInfo(QVariant(lst));
 }
 
 ContextTypeInfo ContextTypeInfo::intType()
 {
-    return ContextTypeInfo("int");
+    QVariantList lst;
+    lst << QVariant("type");
+    lst << QVariant("int64");
+    return ContextTypeInfo(QVariant(lst));
 }
 

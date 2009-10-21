@@ -22,6 +22,10 @@
 #include "nanotree.h"
 #include <QDebug>
 
+NanoTree::NanoTree()
+{
+}
+
 NanoTree::NanoTree(const QVariant &root) : rootVariant(root)
 {
 }
