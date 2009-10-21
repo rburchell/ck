@@ -37,8 +37,8 @@ public:
     ContextTypeInfo(const ContextTypeInfo &ti);
 
     QString name() const;
-    QList<QVariant> parameters() const;
-    QVariant parameter(QString p) const;
+    QList<NanoTree> parameters() const;
+    NanoTree parameter(QString p) const;
     ContextTypeInfo base() const;
 
     static ContextTypeInfo int64Type();

@@ -44,14 +44,7 @@ ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo &ti) : nanoTree(ti.nanoTr
 
 QString ContextTypeInfo::name() const
 {
-    QVariant root = nanoTree.root();
-
-    if (root.toList().at(1).type() == QVariant::String)
-        return root.toList().at(1).toString();
-    else if (root.toList().at(1).type() == QVariant::List)
-        return root.toList().at(1).toList().at(0).toString();
-    else
-        return "";
+    return nanoTree.keyValue("name").toString();
 }
 
 ContextTypeInfo ContextTypeInfo::base() const
@@ -69,14 +62,19 @@ ContextTypeInfo ContextTypeInfo::base() const
         return ContextTypeInfo(QVariant());
 }
 
-QList<QVariant> ContextTypeInfo::parameters() const
+QList<NanoTree> ContextTypeInfo::parameters() const
 {
-    return nanoTree.keyValues("params");
+    QList<NanoTree> lst;
+    foreach (QVariant v, nanoTree.keySub("params").toList()) {
+        lst.append(NanoTree(v));
+    }
+
+    return lst;
 }
 
-QVariant ContextTypeInfo::parameter(QString p) const
+NanoTree ContextTypeInfo::parameter(QString p) const
 {
-    return nanoTree.keyValue("param", p);
+    return NanoTree(nanoTree.keyValue("params", p));
 }
 
 ContextTypeInfo ContextTypeInfo::int64Type()
