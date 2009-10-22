@@ -89,7 +89,7 @@ void PropertyPrivate::setUnsubscribed()
     emit lastSubscriberDisappeared(key);
 }
 
-void PropertyPrivate::updateOverheardValue(const QVariantList& v, const qlonglong& t)
+void PropertyPrivate::updateOverheardValue(const QVariantList& v, const quint64& t)
 {
     contextDebug() << "Updating overheard value" << v << t;
     if (t > overheardTimestamp) {
@@ -111,12 +111,12 @@ void PropertyPrivate::updateOverheardValue(const QVariantList& v, const qlonglon
 }
 
 
-qlonglong PropertyPrivate::currentTimestamp()
+quint64 PropertyPrivate::currentTimestamp()
 {
     struct timespec time;
     clock_gettime(CLOCK_MONOTONIC, &time);
-    qlonglong toReturn = time.tv_nsec;
-    toReturn += ((qlonglong)pow(10,9) * time.tv_sec);
+    quint64 toReturn = time.tv_nsec;
+    toReturn += ((quint64)pow(10,9) * time.tv_sec);
     return toReturn;
 }
 

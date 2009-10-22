@@ -40,17 +40,17 @@ PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnecti
     sconnect((QObject*) connection->interface(),
              SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
              this, SLOT(OnServiceOwnerChanged(const QString &, const QString&, const QString&)));
-    sconnect(propertyPrivate, SIGNAL(valueChanged(const QVariantList&, const qlonglong&)),
-             this, SIGNAL(ValueChanged(const QVariantList&, const qlonglong&)));
+    sconnect(propertyPrivate, SIGNAL(valueChanged(const QVariantList&, const quint64&)),
+             this, SIGNAL(ValueChanged(const QVariantList&, const quint64&)));
 
     QDBusConnection::sessionBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
-                                                this, SLOT(onValueChanged(QVariantList, qlonglong)));
+                                                this, SLOT(onValueChanged(QVariantList, quint64)));
 
     QDBusConnection::systemBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
-                                               this, SLOT(onValueChanged(QVariantList, qlonglong)));
+                                               this, SLOT(onValueChanged(QVariantList, quint64)));
 }
 
-void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, qlonglong& timestamp)
+void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, quint64& timestamp)
 {
     contextDebug() << "Subscribe called";
 
@@ -94,7 +94,7 @@ void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
     }
 }
 
-void PropertyAdaptor::Get(QVariantList& values, qlonglong& timestamp)
+void PropertyAdaptor::Get(QVariantList& values, quint64& timestamp)
 {
     // Construct the return values
     if (propertyPrivate->value.isNull() == false) {
@@ -103,7 +103,7 @@ void PropertyAdaptor::Get(QVariantList& values, qlonglong& timestamp)
     timestamp = propertyPrivate->timestamp;
 }
 
-void PropertyAdaptor::onValueChanged(QVariantList values, qlonglong timestamp)
+void PropertyAdaptor::onValueChanged(QVariantList values, quint64 timestamp)
 {
     propertyPrivate->updateOverheardValue(values, timestamp);
 }

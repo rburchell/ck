@@ -44,16 +44,16 @@ public:
     QString objectPath() const;
 
 public slots:
-    void Subscribe(const QDBusMessage& msg, QVariantList& values, qlonglong& timestamp);
+    void Subscribe(const QDBusMessage& msg, QVariantList& values, quint64& timestamp);
     void Unsubscribe(const QDBusMessage& msg);
-    void Get(QVariantList& values, qlonglong& timestamp);
+    void Get(QVariantList& values, quint64& timestamp);
 
 signals:
-    void ValueChanged(const QVariantList &values, const qlonglong& timestamp);
+    void ValueChanged(const QVariantList &values, const quint64& timestamp);
 
 private slots:
     void OnServiceOwnerChanged(const QString&, const QString&, const QString&);
-    void onValueChanged(QVariantList values, qlonglong timestamp);
+    void onValueChanged(QVariantList values, quint64 timestamp);
 
 private:
     PropertyPrivate *propertyPrivate; ///< The managed object.
