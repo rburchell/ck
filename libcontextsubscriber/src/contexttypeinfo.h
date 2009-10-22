@@ -58,4 +58,12 @@ public:
     ContextTypeInfo keyType(QString key);
 };
 
+class ContextUniformListTypeInfo : public ContextTypeInfo
+{
+    Q_OBJECT
+
+public:
+    ContextTypeInfo elementType();
+};
+
 #endif

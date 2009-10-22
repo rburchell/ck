@@ -101,6 +101,8 @@ ContextTypeInfo ContextTypeInfo::intType()
     return ContextTypeInfo(QVariant(lst));
 }
 
+/* ContextMapTypeInfo */
+
 QString ContextMapTypeInfo::keyDoc(QString key)
 {
     return nanoTree.keyValue(QString("params"), QString("keys"), key, QString("doc")).toString();
@@ -111,3 +113,9 @@ ContextTypeInfo ContextMapTypeInfo::keyType(QString key)
     return ContextTypeInfo(nanoTree.keyValue(QString("params"), QString("keys"), key, QString("type")));
 }
 
+/* ContextUniformListTypeInfo */
+
+ContextTypeInfo ContextUniformListTypeInfo::elementType()
+{
+    return ContextTypeInfo(nanoTree.keyValue(QString("params"), QString("type")));
+}
