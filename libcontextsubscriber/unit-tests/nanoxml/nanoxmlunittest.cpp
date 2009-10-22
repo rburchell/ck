@@ -35,6 +35,7 @@ private slots:
     void test2();
     void test3();
     void test4Comments();
+    void test5();
     void firstLevelAccessor();
     void secondLevelAccessor();
     void thirdLevelAccessor();
@@ -153,6 +154,13 @@ void NanoXmlUnitTest::test3()
     NanoXml nano(LOCAL_FILE("test3.xml"));
     QCOMPARE(nano.didFail(), false);
     QCOMPARE(nano.namespaceUri(), QString("http://www.test.org/document"));
+}
+
+void NanoXmlUnitTest::test5()
+{
+    NanoXml nano(LOCAL_FILE("test5.xml"));
+    QCOMPARE(nano.didFail(), false);
+    QCOMPARE(nano.keyValue("param1").toString(), QString("value1"));
 }
 
 void NanoXmlUnitTest::firstLevelAccessor()
