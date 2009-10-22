@@ -5,7 +5,7 @@ contextkit (0.4~unreleased) unstable; urgency=low
   * Support both the old and the new ContextKit D-Bus protocol in
     libcontextsubscriber.
 
-  Implemented: CntFr-349
+  Implemented: SWP#CntFr-349
 
  -- Gergely Risko <gergely+context@risko.hu>  Thu, 22 Oct 2009 13:42:27 +0300
 
@@ -15,7 +15,7 @@ contextkit (0.3.10) unstable; urgency=low
     providers for one property.
   * New tool: context-ls for listing available context properties.
 
-  Implemented: CntFr-324, CntFr-318, CntFr-343
+  Implemented: SWP#CntFr-324, SWP#CntFr-318, SWP#CntFr-343
 
  -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Tue, 15 Oct 2009 16:25:04 +0300
 
@@ -25,7 +25,7 @@ contextkit (0.3.9) unstable; urgency=low
   * Removed complex types from core.context, since they're not
     supported yet.
 
-  Implemented: CntFr-337, CntFr-203
+  Implemented: SWP#CntFr-337, SWP#CntFr-203
 
  -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Tue, 06 Oct 2009 15:00:00 +0300
 
@@ -37,7 +37,7 @@ contextkit (0.3.8) unstable; urgency=low
   * New package libcontextprovider-tests added, containing customer tests
     of the libcontextprovider.
 
-  Implemented: CntFr-323
+  Implemented: SWP#CntFr-323
 
  -- Gergely Risko <gergely+context@risko.hu>  Mon, 05 Oct 2009 09:02:50 +0300
 
@@ -72,7 +72,7 @@ contextkit (0.3.5) unstable; urgency=low
     stderr from the libcontextprovider library
   * Fixes: NB#121556 - C API of libcontextprovider uses Glib types
 
-  Implemented: CntFr-305
+  Implemented: SWP#CntFr-305
 
  -- Gergely Risko <gergely+context@risko.hu>  Mon, 22 Sep 2009 11:36:40 +0300
 
