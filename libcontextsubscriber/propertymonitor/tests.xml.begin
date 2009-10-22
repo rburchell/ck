@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<testdefinition version="0.1">
-  <suite name="contextfw-property-monitor">
-    <set name="core" description="core properties">
-      <pre_steps>
-      </pre_steps>
