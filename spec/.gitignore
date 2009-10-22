@@ -1,4 +1,6 @@
 context.valid.stamp
+introspect/
 context-provider-schema.html
 context-properties.html
 contextkit.html
+
