@@ -12,8 +12,14 @@ which context-ls
 cat $2 > tests.xml
 
 export CONTEXT_CORE_DECLARATIONS=$1
-export CONTEXT_LOG_VERBOSITY=DEBUG
+#export CONTEXT_LOG_VERBOSITY=DEBUG
 # core properties start with a capital letter; list them
+echo "all keys:"
+context-ls
+echo "core keys:"
+context-ls | grep ^[A-Z]
+echo "core keys sorted:"
+context-ls | grep ^[A-Z] | sort
 for prop in `context-ls | grep ^[A-Z] | sort`
 do
     # for each core property, create a test case
