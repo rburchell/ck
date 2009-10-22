@@ -89,6 +89,14 @@ QString ContextTypeInfo::parameterStringValue(QString p) const
     return key.stringValue();    
 }
 
+int ContextTypeInfo::parameterIntValue(QString p) const
+{
+    // FIXME: Unify with other
+    NanoTree params = NanoTree(nanoTree.keySub(QString("params")));
+    NanoTree key = NanoTree(params.keySub(p));
+    return key.intValue();    
+}
+
 ContextTypeInfo ContextTypeInfo::int64Type()
 {
     QVariantList lst;

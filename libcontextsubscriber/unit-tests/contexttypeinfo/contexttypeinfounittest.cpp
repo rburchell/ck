@@ -52,8 +52,8 @@ void ContextTypeInfoUnitTest::customDoubleType()
     QCOMPARE(nano.didFail(), false);
 
     ContextTypeInfo typeInfo(nano);    
-    QCOMPARE(typeInfo.parameterStringValue("min"), QString("1"));
-    QCOMPARE(typeInfo.parameterStringValue("max"), QString("666"));
+    QCOMPARE(typeInfo.parameterIntValue("min"), 1);
+    QCOMPARE(typeInfo.parameterIntValue("max"), 666);
     QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
     QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
 }
