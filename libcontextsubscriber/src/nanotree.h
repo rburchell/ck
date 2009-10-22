@@ -48,6 +48,7 @@ public:
     QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
                       const QString &key4, const QString &key5) const;
     QVariantList keyValues(const QString &key) const;
+    QString stringValue() const;
 
     static QVariant keySub(const QString &key, const QVariant &dom);
     static QVariant keyValue(const QString &key, const QVariant &dom);
@@ -59,6 +60,7 @@ public:
     static QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
                              const QString &key4, const QString &key5, const QVariant &dom);
     static QVariantList keyValues(const QString &key, const QVariant &dom);
+    static QString stringValue(const QVariant &dom);
 
     static QString dumpTree(const QVariant &tree, int level);
 

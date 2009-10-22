@@ -111,6 +111,11 @@ QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QStr
 	return NanoTree::keyValue(key1, key2, key3, key4, key5, rootVariant);
 }
 
+QString NanoTree::stringValue() const
+{
+    return NanoTree::stringValue(rootVariant);
+}
+
 /* Static accessors */
 
 /// Returns the sub (the trailing) after a given \a key in the specified \a dom tree.
@@ -206,5 +211,21 @@ QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QStr
                            const QString &key4, const QString &key5, const QVariant &dom)
 {
     return NanoTree::keyValue(key2, key3, key4, key5, keySub(key1, dom));
+}
+
+QString NanoTree::stringValue(const QVariant &dom)
+{
+    if (dom.type() != QVariant::List)
+        return QString();
+        
+    if (dom.toList().size() < 2)
+        return QString();
+    
+    foreach(QVariant v, dom.toList()) {
+       if (v.type() == QVariant::String)
+           return v.toString();
+    }
+    
+    return QString();
 }
 
