@@ -40,6 +40,8 @@ public:
 
     void setValue(const QVariant& v);
     void updateOverheardValue(const QVariantList&, const qlonglong&);
+    void setSubscribed();
+    void setUnsubscribed();
 
 signals:
     void valueChanged(const QVariantList& values, const qlonglong& timestamp);
@@ -56,6 +58,7 @@ private:
     qlonglong timestamp; ///< Time when the value was set
     QVariant overheardValue; ///< Latest value of the property set by any provider over D-Bus
     qlonglong overheardTimestamp; ///< Time when the overheardValue was set
+    bool subscribed;
     static QHash<QPair<ServiceBackend*, QString>, PropertyPrivate*> propertyPrivateMap;
     friend class Property;
     friend class PropertyAdaptor;

@@ -33,7 +33,7 @@ QHash<QPair<ServiceBackend*,QString>, PropertyPrivate*> PropertyPrivate::propert
 
 PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent)
     : QObject(parent), serviceBackend(serviceBackend),
-      key(key), value(QVariant()),  timestamp(currentTimestamp()), overheardTimestamp(timestamp)
+      key(key), value(QVariant()),  timestamp(currentTimestamp()), overheardTimestamp(timestamp), subscribed(false)
 {
 }
 
@@ -67,11 +67,26 @@ void PropertyPrivate::setValue(const QVariant& v)
 
 void PropertyPrivate::emitValue()
 {
+    if (!subscribed) {
+        return;
+    }
     QVariantList values;
     if (value.isNull() == false) {
         values << value;
     }
     emit valueChanged(values, timestamp);
+}
+
+void PropertyPrivate::setSubscribed()
+{
+    subscribed = true;
+    emit firstSubscriberAppeared(key);
+}
+
+void PropertyPrivate::setUnsubscribed()
+{
+    subscribed = false;
+    emit lastSubscriberDisappeared(key);
 }
 
 void PropertyPrivate::updateOverheardValue(const QVariantList& v, const qlonglong& t)

@@ -61,7 +61,7 @@ void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, q
     if (clientServiceNames.contains(client) == false) {
         clientServiceNames.insert(client);
         if (clientServiceNames.size() == 1) {
-            emit propertyPrivate->firstSubscriberAppeared(propertyPrivate->key);
+            propertyPrivate->setSubscribed();
         }
     }
     else {
@@ -83,7 +83,7 @@ void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
     if (clientServiceNames.contains(client)) {
         clientServiceNames.remove(client);
         if (clientServiceNames.size() == 0) {
-            emit propertyPrivate->lastSubscriberDisappeared(propertyPrivate->key);
+            propertyPrivate->setUnsubscribed();
         }
     }
     else {
@@ -120,7 +120,7 @@ void PropertyAdaptor::OnServiceOwnerChanged(const QString &name, const QString &
             // It was one of our clients
             clientServiceNames.remove(name);
             if (clientServiceNames.size() == 0) {
-                emit propertyPrivate->lastSubscriberDisappeared(propertyPrivate->key);
+                propertyPrivate->setUnsubscribed();
             }
         }
     }
