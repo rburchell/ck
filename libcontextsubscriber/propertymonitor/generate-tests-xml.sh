@@ -12,6 +12,7 @@ which context-ls
 cat $2 > tests.xml
 
 export CONTEXT_CORE_DECLARATIONS=$1
+export CONTEXT_LOG_VERBOSITY=DEBUG
 # core properties start with a capital letter; list them
 for prop in `context-ls | grep ^[A-Z] | sort`
 do
