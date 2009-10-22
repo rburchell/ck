@@ -23,7 +23,6 @@
 #include "logging.h"
 #include "sconnect.h"
 #include "propertyprivate.h"
-
 #include <QDBusConnection>
 
 namespace ContextProvider {
@@ -44,14 +43,11 @@ PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnecti
     sconnect(propertyPrivate, SIGNAL(valueChanged(const QVariantList&, const qlonglong&)),
              this, SIGNAL(ValueChanged(const QVariantList&, const qlonglong&)));
 
-    bool ret;
-    ret = QDBusConnection::sessionBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
+    QDBusConnection::sessionBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
                                                 this, SLOT(onValueChanged(QVariantList, qlonglong)));
-    contextCritical() << "Connecting to valuechanged (session):" << ret;
 
-    ret = QDBusConnection::systemBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
+    QDBusConnection::systemBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
                                                this, SLOT(onValueChanged(QVariantList, qlonglong)));
-    contextCritical() << "Connecting to valuechanged (system):" << ret;
 }
 
 void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, qlonglong& timestamp)
@@ -70,7 +66,9 @@ void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, q
     }
     else {
         contextWarning() << "Client" << client << "subscribed to property" << propertyPrivate->key << "multiple times";
-        // FIXME: D-Bus error
+        QDBusMessage error = msg.createErrorReply("org.maemo.contextkit.Error.MultipleSubscribe",
+                             "Subscribing to " + propertyPrivate->key + " multiple times");
+        connection->send(error);
     }
 
     // Construct the return values
@@ -90,7 +88,9 @@ void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
     }
     else {
         contextWarning() << "Client" << client << "unsubscribed from property" << propertyPrivate->key << "without subscribing";
-        // FIXME: D-Bus error
+        QDBusMessage error = msg.createErrorReply("org.maemo.contextkit.Error.IllegalUnsubscribe",
+                             "Unsubscribing from a non-subscribed property " + propertyPrivate->key);
+        connection->send(error);
     }
 }
 
@@ -105,7 +105,7 @@ void PropertyAdaptor::Get(QVariantList& values, qlonglong& timestamp)
 
 void PropertyAdaptor::onValueChanged(QVariantList values, qlonglong timestamp)
 {
-    contextCritical() << "******Got a value" << values << timestamp;
+    propertyPrivate->updateOverheardValue(values, timestamp);
 }
 
 

@@ -39,6 +39,7 @@ public:
     explicit PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent = 0);
 
     void setValue(const QVariant& v);
+    void updateOverheardValue(const QVariantList&, const qlonglong&);
 
 signals:
     void valueChanged(const QVariantList& values, const qlonglong& timestamp);
@@ -47,6 +48,7 @@ signals:
 
 private:
     static qlonglong currentTimestamp();
+    void emitValue();
 
     ServiceBackend* serviceBackend; ///< Pointer to the serviceBackend taking care of D-Bus related things
     QString key; ///< Key of this property

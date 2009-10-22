@@ -33,29 +33,68 @@ QHash<QPair<ServiceBackend*,QString>, PropertyPrivate*> PropertyPrivate::propert
 
 PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent)
     : QObject(parent), serviceBackend(serviceBackend),
-      key(key), value(QVariant()),  timestamp(currentTimestamp())
+      key(key), value(QVariant()),  timestamp(currentTimestamp()), overheardTimestamp(timestamp)
 {
 }
 
 void PropertyPrivate::setValue(const QVariant& v)
 {
-    // Always update the time stamp, whether or not the values is the same
+    contextDebug() << F_PROPERTY << "Setting key:" << key << "to type:" << v.typeName();
+
+    // Always update the time stamp, whether or not we will emit a
+    // D-Bus signal
     timestamp = currentTimestamp();
 
-    // If the value is the same, don't emit anything
-    if (v == value && v.isNull() == value.isNull()) {
+    if (v != value || v.isNull() != value.isNull()) {
+        // Provider sets a different value -> emit always
+        value = v;
+        emitValue();
         return;
     }
 
-    contextDebug() << F_PROPERTY << "Setting key:" << key << "to type:" << v.typeName();
-    value = v;
+    // Now the value set by the provider is the same that we already
+    // have
 
+    if (v != overheardValue || v.isNull() != overheardValue.isNull()) {
+        // We have overheard a value which is different from the value
+        // we had previously (and which we try to set now)
+        if (timestamp > overheardTimestamp) {
+            // Our value is more recent
+            emitValue();
+        }
+    }
+}
+
+void PropertyPrivate::emitValue()
+{
     QVariantList values;
     if (value.isNull() == false) {
         values << value;
     }
     emit valueChanged(values, timestamp);
 }
+
+void PropertyPrivate::updateOverheardValue(const QVariantList& v, const qlonglong& t)
+{
+    contextDebug() << "Updating overheard value" << v << t;
+    if (t > overheardTimestamp) {
+        // Update the "overheard" value
+        if (v.size() == 0) {
+            overheardValue = QVariant();
+        }
+        else {
+            overheardValue = v[0];
+        }
+
+        if (timestamp > t) {
+            // We have a more recent value; make sure that it's
+            // emitted. Note: here we might do an unnecessary emission,
+            // but we don't care
+            emitValue();
+        }
+    }
+}
+
 
 qlonglong PropertyPrivate::currentTimestamp()
 {
