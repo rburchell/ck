@@ -113,7 +113,12 @@ QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QStr
 
 QString NanoTree::stringValue() const
 {
-    return NanoTree::stringValue(rootVariant);
+    return NanoTree::variantValue(rootVariant).toString();
+}
+
+int NanoTree::intValue() const
+{
+    return NanoTree::variantValue(rootVariant).toInt();
 }
 
 /* Static accessors */
@@ -208,19 +213,19 @@ QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QStr
     return NanoTree::keyValue(key2, key3, key4, key5, keySub(key1, dom));
 }
 
-QString NanoTree::stringValue(const QVariant &dom)
+QVariant NanoTree::variantValue(const QVariant &dom)
 {
     if (dom.type() != QVariant::List)
-        return QString();
+        return QVariant();
         
     if (dom.toList().size() < 2)
-        return QString();
+        return QVariant();
     
     foreach(QVariant v, dom.toList()) {
-       if (v.type() == QVariant::String)
-           return v.toString();
+       if (v.type() != QVariant::List)
+           return v;
     }
     
-    return QString();
+    return QVariant();
 }
 
