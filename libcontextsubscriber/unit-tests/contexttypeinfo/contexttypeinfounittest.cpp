@@ -31,6 +31,7 @@ class ContextTypeInfoUnitTest : public QObject
 
 private slots:
     void doubleType();
+    void customDoubleType();
 };
 
 void ContextTypeInfoUnitTest::doubleType()
@@ -40,11 +41,21 @@ void ContextTypeInfoUnitTest::doubleType()
 
     ContextTypeInfo typeInfo(nano);
     QCOMPARE(typeInfo.name(), QString("double"));
-    QCOMPARE(typeInfo.parameters().at(0).keyValue("doc").toString(), QString("Minimum value"));
-    QCOMPARE(typeInfo.parameters().at(1).keyValue("doc").toString(), QString("Maximum value"));
+    QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
+    QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
     QCOMPARE(typeInfo.parameters().size(), 2);
-    QCOMPARE(typeInfo.parameter("min").keyValue("doc").toString(), QString("Minimum value"));
-    QCOMPARE(typeInfo.parameter("max").keyValue("doc").toString(), QString("Maximum value"));
+}
+
+void ContextTypeInfoUnitTest::customDoubleType()
+{
+    NanoXml nano(LOCAL_FILE("custom-double.xml"));
+    QCOMPARE(nano.didFail(), false);
+
+    ContextTypeInfo typeInfo(nano);    
+    QCOMPARE(typeInfo.parameterStringValue("min"), QString("1"));
+    QCOMPARE(typeInfo.parameterStringValue("max"), QString("666"));
+    QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
+    QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
 }
 
 #include "contexttypeinfounittest.moc"

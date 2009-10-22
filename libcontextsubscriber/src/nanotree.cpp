@@ -171,14 +171,9 @@ QVariant NanoTree::keyValue(const QString &key, const QVariant &dom)
     if (dom.type() != QVariant::List)
         return QVariant();
 
-    // Short-circuit case
-    if (dom.toList().count() > 0 &&
-        dom.toList().at(0) == keyVariant)
-        return dom.toList().at(1);
-
     foreach(QVariant child, dom.toList())
     {
-        if (child.type() == QVariant::List && child.toList().count() == 2 &&
+        if (child.type() == QVariant::List && child.toList().count() >= 2 &&
             child.toList().at(0) == keyVariant)
             return child.toList().at(1);
     }
