@@ -1,17 +1,17 @@
 check_PROGRAMS = propertyunittest
 
 # test's sources
-propertyunittest_SOURCES = propertyunittest.cpp manager.h service.h servicebackend.h
+propertyunittest_SOURCES = propertyunittest.cpp service.h servicebackend.h property.h propertyprivate.h
 
-COVERAGE_FILES = property.cpp
+COVERAGE_FILES = property.cpp propretyprivate.cpp
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)
 AM_LDFLAGS = $(QtCore_LIBS) $(QtDBus_LIBS)
-FROM_SOURCE = loggingfeatures.h property.cpp property.h # copy these files from the real source
+FROM_SOURCE = loggingfeatures.h property.cpp propertyprivate.cpp # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
-LDADD = 
+LDADD =
 include $(top_srcdir)/am/tests.am
 
 nodist_propertyunittest_SOURCES = mocs.cpp
