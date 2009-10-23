@@ -6,6 +6,7 @@
 #include <QDBusConnection>
 #include <QTextStream>
 #include <QStringList>
+#include <QDBusMessage>
 
 class QSocketNotifier;
 
@@ -32,12 +33,12 @@ private:
     QDBusConnection getConnection(const QString& busType);
     QString describeValue(QList<QVariant> value, quint64 timestamp);
     QString describeQVariant(QVariant value);
-    void listenToChanged(const QString& name);
+    bool listenToChanged(const QString& name);
     QString keyToPath(QString key);
 
 private slots:
     void onActivated();
-    void onValueChanged(QList<QVariant> value, quint64 timestamp, QDBusMessage& msg);
+    void onValueChanged(QList<QVariant> value, quint64 timestamp, QDBusMessage msg);
 
 private:
     // Connection types and bus names for each custom name

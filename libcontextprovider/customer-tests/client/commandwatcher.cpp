@@ -76,8 +76,12 @@ void CommandWatcher::interpret(const QString& command)
                     QPair <QString, QString> pair(busType, busName);
                     connectionMap.insert(args.at(2), pair);
                     // Also start listening to ValueChanged signal
-                    listenToChanged(args.at(2));
-                    out << "Assigned " << args.at(2) << endl;
+                    if (listenToChanged(args.at(2))) {
+                        out << "Assigned " << args.at(2) << endl;
+                    }
+                    else {
+                        out << "Error: cannot listen to ValueChanged signals" << endl;
+                    }
                 }
                 else {
                     // Print the error message to output (so that the test program waiting for input won't block)
@@ -127,18 +131,17 @@ void CommandWatcher::interpret(const QString& command)
     }
 }
 
-void CommandWatcher::listenToChanged(const QString& name)
+bool CommandWatcher::listenToChanged(const QString& name)
 {
     if (connectionMap.contains(name) == false) {
-        return;
+        return false;
     }
     QPair<QString, QString> connData = connectionMap[name];
     QDBusConnection connection = getConnection(connData.first);
 
     // Start listening to the Changed signal
-    connection.connect(connData.second, "", PROPERTY, "ValueChanged",
+    return connection.connect(connData.second, "", PROPERTY, "ValueChanged",
                            this, SLOT(onValueChanged(QList<QVariant>,quint64,QDBusMessage)));
-
 }
 
 void CommandWatcher::callGet(const QString& busName, const QString& key)
@@ -182,7 +185,7 @@ void CommandWatcher::callSubscribe(const QString& name, const QString& key)
     pc.waitForFinished();
     QDBusPendingReply<QList<QVariant>, quint64> reply = pc;
     if (reply.isError()) {
-        out << "Subscribe error: " << reply.reply().errorName() << endl;
+        out << "Subscribe error: " << reply.reply().errorName() << reply.reply().errorMessage() << endl;
         return;
     }
     out << "Subscribe returned: " << describeValue(reply.argumentAt<0>(), reply.argumentAt<1>()) << endl;
@@ -225,14 +228,14 @@ void CommandWatcher::waitForChanged(int timeout)
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
     if (changedSignalReceived) {
-        out << "Changed signal received, parameters: " << changedSignalParameters.at(0) << endl;
+        out << "ValueChanged: " << changedSignalParameters.at(0) << endl;
     }
     else {
         out << "Timeout" << endl;
     }
 }
 
-void CommandWatcher::onValueChanged(QList<QVariant> value, quint64 timestamp, QDBusMessage& msg)
+void CommandWatcher::onValueChanged(QList<QVariant> value, quint64 timestamp, QDBusMessage msg)
 {
     changedSignalReceived = true;
     changedSignalParameters.append(msg.path() + " " + describeValue(value, timestamp));
