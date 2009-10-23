@@ -85,7 +85,7 @@ void ValueChangesTests::cleanup()
     delete test_int; test_int = NULL;
     delete test_double; test_double = NULL;
 
-    // ServiceBackedns are deleted in a deferred way, thus we need to
+    // ServiceBackends are deleted in a deferred way, thus we need to
     // get them deleted
     QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
 }
@@ -105,7 +105,7 @@ void ValueChangesTests::subscribedPropertyChanges()
     QString actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: the client got the Changed signal
-    QString expected = "Changed signal received, parameters: Known keys: Test.Double(double:51.987) Unknown keys:";
+    QString expected = "ValueChanged: /org/maemo/contextkit/Test/Double double:51.987";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 
@@ -118,7 +118,7 @@ void ValueChangesTests::subscribedPropertyChanges()
     actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: the client got the Changed signal
-    expected = "Changed signal received, parameters: Known keys: Unknown keys: Test.Double";
+    expected = "ValueChanged: /org/maemo/contextkit/Test/Double Unknown";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 }
@@ -201,17 +201,28 @@ void ValueChangesTests::sameValueSet()
     // Set a value to a property
     test_int->setValue(555);
 
+    while (true) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents);
+    }
+
     // Subscribe to 2 properties (one is currently unknown, the other has a value)
-    writeToClient("subscribe service1 Test.Int\n");
-    writeToClient("subscribe service1 Test.Double\n");
+    QString actual = writeToClient("subscribe service1 Test.Int\n");
+    QString expected = "Subscribe returned: int:555";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    actual = writeToClient("subscribe service1 Test.Double\n");
+    expected = "Subscribe returned: Unknown";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    writeToClient("resetsignalstatus\n");
 
     // Test: Set the value of the property to its current value
     test_int->setValue(555);
     // and tell the client to wait for the Changed signal
-    QString actual = writeToClient("waitforchanged 3000\n");
+    actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: the client didn't get the Changed signal since the value didn't really change
-    QString expected = "Timeout";
+    expected = "Timeout";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 
@@ -239,7 +250,7 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
     QString actual = writeToClient("subscribe service1 Test.Int\n");
 
     // Verify that the property really was unknown
-    QString expected = "Known keys: Unknown keys: Test.Int";
+    QString expected = "Subscribe returned: Unknown";
     QCOMPARE(actual.simplified(), expected.simplified());
 
     // Test: Change the value of the property to 0
@@ -248,7 +259,7 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
     actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: the client got the Changed signal
-    expected = "Changed signal received, parameters: Known keys: Test.Int(int:0) Unknown keys:";
+    expected = "ValueChanged: /org/maemo/contextkit/Test/Int int:0";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 
@@ -261,7 +272,7 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
     actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: the client got the Changed signal
-    expected = "Changed signal received, parameters: Known keys: Unknown keys: Test.Int";
+    expected = "ValueChanged: /org/maemo/contextkit/Test/Int Unknown";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 }
