@@ -33,7 +33,7 @@ QHash<QPair<ServiceBackend*,QString>, PropertyPrivate*> PropertyPrivate::propert
 
 PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent)
     : QObject(parent), serviceBackend(serviceBackend),
-      key(key), value(QVariant()),  timestamp(currentTimestamp()), subscribed(false), 
+      key(key), value(QVariant()),  timestamp(currentTimestamp()), subscribed(false),
       emittedValue(value), emittedTimestamp(timestamp), overheard(false)
 {
 }
@@ -63,9 +63,6 @@ void PropertyPrivate::setValue(const QVariant& v)
 
 void PropertyPrivate::emitValue()
 {
-    if (!subscribed) {
-        return;
-    }
     // No difference between intention and emitted value, nothing happens
     if (emittedTimestamp == timestamp && emittedValue == value
         && emittedValue.isNull() == value.isNull())
@@ -74,6 +71,12 @@ void PropertyPrivate::emitValue()
     emittedValue = value;
     emittedTimestamp = timestamp;
     overheard = false;
+
+    // If nobody is subscribed to us, no D-Bus signal needs to be
+    // emitted. Note: The bookkeeping above must be done, though.
+    if (!subscribed) {
+        return;
+    }
 
     QVariantList values;
     if (value.isNull() == false) {
