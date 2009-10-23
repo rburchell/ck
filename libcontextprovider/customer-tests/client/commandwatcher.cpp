@@ -158,7 +158,7 @@ void CommandWatcher::callGet(const QString& busName, const QString& key)
     pc.waitForFinished();
     QDBusPendingReply<QList<QVariant>, quint64> reply = pc;
     if (reply.isError()) {
-        out << "Get error: invalid reply" << endl;
+        out << "Get error: " << reply.reply().errorName() << endl;
         return;
     }
     out << "Get returned: " << describeValue(reply.argumentAt<0>(), reply.argumentAt<1>()) << endl;
@@ -182,7 +182,7 @@ void CommandWatcher::callSubscribe(const QString& name, const QString& key)
     pc.waitForFinished();
     QDBusPendingReply<QList<QVariant>, quint64> reply = pc;
     if (reply.isError()) {
-        out << "Subscribe error: invalid reply" << endl;
+        out << "Subscribe error: " << reply.reply().errorName() << endl;
         return;
     }
     out << "Subscribe returned: " << describeValue(reply.argumentAt<0>(), reply.argumentAt<1>()) << endl;
@@ -202,6 +202,10 @@ void CommandWatcher::callUnsubscribe(const QString& name, const QString& key)
                                                                               PROPERTY,
                                                                               "Unsubscribe"));
     pc.waitForFinished();
+    if (pc.isError()) {
+        out << "Unsubscribe error: " << pc.reply().errorName() << endl;
+        return;
+    }
 
     out << "Unsubscribe called" << endl;
 }

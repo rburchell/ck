@@ -52,13 +52,9 @@ void SubscriptionTests::init()
     test_int = new Property(*service1, "Test.Int");
     test_double = new Property(*service1, "Test.Double");
 
-    service1->start(); // FIXME: should work without
-
     service2 = new Service(QDBusConnection::SessionBus, SERVICE_NAME2);
     test_string = new Property (*service2, "Test.String");
     test_bool = new Property(*service2, "Test.Bool");
-
-    service2->start(); // FIXME: should work without
 
     // Process the events so that the services get started
     QCoreApplication::processEvents(QEventLoop::AllEvents);
@@ -256,6 +252,39 @@ QString SubscriptionTests::writeToClient(const char* input)
     return client->readAll();
 }
 
+void SubscriptionTests::multiSubscribe()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call Subscribe for a property twice. The
+    // property exists and is currently unknown since we haven't set a
+    // value for it.
+    writeToClient("subscribe service1 Test.Int\n");
+
+    QString actual = writeToClient("subscribe service1 Test.Int\n");
+
+    // Expected result: Unsubscribe returns a D-Bus error
+    QString expected("Subscribe error: org.maemo.contextkit.Error.MultipleSubscribe");
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void SubscriptionTests::illegalUnsubscribe()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call Unubscribe for a property which we're
+    // not subscribed to. The property exists and is currently unknown
+    // since we haven't set a value for it.
+    QString actual = writeToClient("unsubscribe service1 Test.Int\n");
+
+    // Expected result: Unsubscribe returns a D-Bus error
+    QString expected("Unsubscribe error: org.maemo.contextkit.Error.IllegalUnsubscribe");
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
 
 } // end namespace
 

@@ -34,6 +34,9 @@ private slots:
 
     void subscriberNotifications();
 
+    void multiSubscribe();
+    void illegalUnsubscribe();
+
 public slots:
     void readStandardOutput();
 
