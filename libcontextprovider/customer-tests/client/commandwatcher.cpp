@@ -49,9 +49,10 @@ void CommandWatcher::onActivated()
 void CommandWatcher::help()
 {
         qDebug() << "Available commands:";
-        qDebug() << "  getsubscriber BUSTYPE BUSNAME   - execute GetSubscriber over DBus";
-        qDebug() << "  subscribe BUSNAME KEY...        - subscribe to keys for a known BUSNAME";
-        qDebug() << "  unsubscribe BUSNAME KEY...      - unsubscribe from keys for a known BUSNAME";
+        qDebug() << "  assign BUSTYPE BUSNAME NAME     - assign BUSTYPE and BUSNAME to a custom NAME ";
+        qDebug() << "  get NAME KEY                    - get value of a key (long name) for a known NAME ";
+        qDebug() << "  subscribe NAME KEY...           - subscribe to keys for a known NAME";
+        qDebug() << "  unsubscribe NAME KEY...         - unsubscribe from keys for a known NAME";
         qDebug() << "  resetsignalstatus               - forget any previously received Changed signals";
         qDebug() << "  waitforchanged TIMEOUT          - wait until the Changed signal arrives over DBus";
         qDebug() << "Any prefix of a command can be used as an abbreviation";
@@ -66,15 +67,15 @@ void CommandWatcher::interpret(const QString& command)
         QString commandName = args[0];
         args.pop_front();
 
-        if (QString("getsubscriber").startsWith(commandName)) {
-            if (args.size() == 2) {
+        if (QString("assign").startsWith(commandName)) {
+            if (args.size() == 3) {
                 // Create the DBus connection to the correct bus (session or system)
                 QString busType = args.at(0);
                 if (busType == "session" || busType == "system") {
                     // Store the bus type
                     QString busName = args.at(1);
-                    connectionTypes.insert(busName, busType);
-                    callGetSubscriber(getConnection(busType), busName);
+                    QPair <QString, QString> pair(busName, busType);
+                    connectionsMap.insert(args.at(2), pair);
                 }
                 else {
                     // Print the error message to output (so that the test program waiting for input won't block)
@@ -86,17 +87,23 @@ void CommandWatcher::interpret(const QString& command)
             }
         } else if (QString("subscribe").startsWith(commandName)) {
             if (args.size() >= 1) {
-                QString busName = args[0];
+                QString name = args[0];
                 args.pop_front();
-                callSubscribe(busName, args);
+                callSubscribe(name, args);
             }
             else
                 out << "Error: wrong number of parameters" << endl;
+        } else if (QString("get").startsWith(commandName)) {
+            if (args.size() >= 1) {
+                QString name = args[0];
+                args.pop_front();
+                callGet(name, args);
+            }
         } else if (QString("unsubscribe").startsWith(commandName)) {
             if (args.size() >= 1) {
-                QString busName = args[0];
+                QString name = args[0];
                 args.pop_front();
-                callUnsubscribe(busName, args);
+                callUnsubscribe(name, args);
             }
             else
                 out << "Error: wrong number of parameters" << endl;
@@ -122,9 +129,9 @@ void CommandWatcher::interpret(const QString& command)
     }
 }
 
-void CommandWatcher::callGetSubscriber(QDBusConnection connection, const QString& busName)
+void CommandWatcher::callGet(const QString& name, const QStringList& args)
 {
-    // Call GetSubscriber synchronously
+    // Call Get synchronously
     QDBusInterface manager(busName, "/org/freedesktop/ContextKit/Manager",
                            "org.freedesktop.ContextKit.Manager", connection);
     QDBusReply<QDBusObjectPath> reply = manager.call("GetSubscriber");
@@ -146,13 +153,13 @@ void CommandWatcher::callGetSubscriber(QDBusConnection connection, const QString
     }
 }
 
-void CommandWatcher::callSubscribe(const QString& busName, const QStringList& args)
+void CommandWatcher::callSubscribe(const QString& name, const QStringList& args)
 {
-    QString subscriberPath = subscriberPaths[busName];
+    QString subscriberPath = subscriberPaths[name];
     if (subscriberPath != "") {
         // We have a proper subscriber path
 
-        QDBusConnection connection = getConnection(connectionTypes[busName]);
+        QDBusConnection connection = getConnection(connectionsMap[name]);
 
         QDBusInterface subscriber(busName, subscriberPath,
                                   "org.freedesktop.ContextKit.Subscriber", connection);
@@ -185,7 +192,7 @@ void CommandWatcher::callUnsubscribe(const QString& busName, const QStringList& 
     if (subscriberPath != "") {
         // We have a proper subscriber path
 
-        QDBusConnection connection = getConnection(connectionTypes[busName]);
+        QDBusConnection connection = getConnection(connectionsMap[busName]);
 
         QDBusInterface subscriber(busName, subscriberPath,
                                   "org.freedesktop.ContextKit.Subscriber", connection);

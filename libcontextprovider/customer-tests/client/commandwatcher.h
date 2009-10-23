@@ -20,7 +20,7 @@ private:
     void interpret(const QString& command);
     static void help();
     // Processing commands
-    void callGetSubscriber(QDBusConnection connection, const QString& busName);
+    void callGet(const QString& busName, const QStringList& args);
     void callSubscribe(const QString& busName, const QStringList& args);
     void callUnsubscribe(const QString& busName, const QStringList& args);
     void resetSignalStatus();
@@ -41,8 +41,8 @@ private:
     // and [system bus, name x] at the same time.
     QMap<QString, QString> subscriberPaths;
 
-    // Connection types for each provider bus name
-    QMap<QString, QString> connectionTypes;
+    // Assign custom Name to bus types and provider bus name
+    QMap<QString,QPair<QString, QString> > connectionsMap;
 
     QTextStream out;
 
