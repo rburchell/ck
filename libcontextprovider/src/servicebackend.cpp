@@ -90,7 +90,25 @@ void ServiceBackend::setValue(const QString &key, const QVariant &v)
 void ServiceBackend::addProperty(const QString& key, PropertyPrivate* property)
 {
     properties.insert(key, property);
+    contextDebug() << F_SERVICE << "registering property" << key;
+    registerProperty(key, property);
 }
+
+/// Register a Property with the given name on D-Bus. Returns true if
+/// succeeded, false if failed.
+bool ServiceBackend::registerProperty(const QString& key, PropertyPrivate* property)
+{
+    PropertyAdaptor* adaptor = new PropertyAdaptor(property, &connection);
+    if (!connection.registerObject(adaptor->objectPath(), property)) {
+        contextCritical() << F_SERVICE_BACKEND << "Failed to register the Property object for" << key;
+        contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
+        delete adaptor;
+        return false;
+    }
+    createdAdaptors.insert(key, adaptor);
+    return true;
+}
+
 
 /// Start the Service again after it has been stopped. In the case of
 /// shared connection, the objects will be registered to D-Bus. In the
@@ -98,18 +116,19 @@ void ServiceBackend::addProperty(const QString& key, PropertyPrivate* property)
 /// registered on D-Bus. Returns true on success, false otherwise.
 bool ServiceBackend::start()
 {
-    // Register Property objects on D-Bus
+    contextDebug() << createdAdaptors;
+    // Re-register existing Property objects on D-Bus
     foreach (const QString& key, properties.keys()) {
-        PropertyAdaptor* adaptor = new PropertyAdaptor(properties[key], &connection);
-        createdAdaptors.insert(adaptor);
-        PropertyPrivate* propertyPrivate = properties[key];
-        if (!connection.registerObject(adaptor->objectPath(), propertyPrivate)) {
-            contextCritical() << F_SERVICE_BACKEND << "Failed to register the Property object for" << key;
-            contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
-            return false;
+        if (createdAdaptors.contains(key) == false) {
+            contextDebug() << F_SERVICE << "registering property" << key;
+            // Property not currently registered on D-Bus; register it now
+            if (!registerProperty(key, properties[key])) {
+                return false;
+            }
         }
     }
 
+    // Register the service name over D-Bus
     if (!sharedConnection()) {
         if (!connection.registerService(busName)) {
             contextCritical() << F_SERVICE_BACKEND << "Failed to register service with name" << busName;

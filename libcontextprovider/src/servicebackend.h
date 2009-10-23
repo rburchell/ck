@@ -67,14 +67,19 @@ public:
     friend class Service;
 
 private:
+    bool registerProperty(const QString& key, PropertyPrivate* property);
+
     QDBusConnection connection;
     int refCount;
     QString busName;
 
     static QHash <QString, ServiceBackend*> instances;
-    QHash<QString, PropertyPrivate*> properties;
-    QSet<PropertyAdaptor*> createdAdaptors;
 
+    /// Properties associated with the current service
+    QHash<QString, PropertyPrivate*> properties;
+
+    /// Adaptors for property objects (if they are currently registered on D-Bus.
+    QHash<QString, PropertyAdaptor*> createdAdaptors;
 };
 
 } // end namespace

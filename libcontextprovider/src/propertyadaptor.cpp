@@ -129,8 +129,8 @@ void PropertyAdaptor::OnServiceOwnerChanged(const QString &name, const QString &
 QString PropertyAdaptor::objectPath() const
 {
     if (!propertyPrivate->key.startsWith("/"))
-        return QString("/org/maemo/contextkit/") + propertyPrivate->key.replace(".", "/");
-    return propertyPrivate->key;
+        return QString("/org/maemo/contextkit/") + QString(propertyPrivate->key).replace(".", "/");
+    return QString(propertyPrivate->key);
 }
 
 } // namespace ContextProvider
