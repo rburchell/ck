@@ -133,6 +133,7 @@ void PropertyHandle::updateProvider()
         // If commander is present it should be able to override the
         // property, so connect to it.
         newProviders << Provider::instance(commanderInfo);
+        Provider::instance(commanderInfo)->clearValues();
     } else {
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.

@@ -213,6 +213,13 @@ void Provider::onPluginReady()
     handleSubscribes();
 }
 
+/// Clears the cached values for this provider.  This is used when the
+/// provider instance is (re)connected to the commander.
+void Provider::clearValues()
+{
+    values.clear();
+}
+
 /// Updates \c pluginState to \c FAILED and signals subscribeFinished
 /// for keys we are trying to subscribe to.
 void Provider::onPluginFailed(QString error)
