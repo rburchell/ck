@@ -66,7 +66,9 @@ class RapidChanges(unittest.TestCase):
         context_client.resume()
         # /.^/ is a regexp that doesn't match anything
         context_client.expect(CLTool.STDOUT, ".^", 3, wantdump=False)
-        self.assertEqual(context_client.last_output, "test.fast = int:54\n",
+        if context_client.last_output != "test.fast = int:54\n":
+            context_client.printio()
+            self.assert_(False,
                          "expected a single valueChanged")
 
         provider_fast.close()
