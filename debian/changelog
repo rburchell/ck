@@ -4,6 +4,8 @@ contextkit (0.4~unreleased) unstable; urgency=low
     providers for one property.
   * Support both the old and the new ContextKit D-Bus protocol in
     libcontextsubscriber.
+  * The start command in context-provide is now able to reregister
+    the service name if needed as advertised in the help.
 
   Implemented: SWP#CntFr-349
 
