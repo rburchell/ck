@@ -56,9 +56,10 @@ private:
     QString key; ///< Key of this property
     QVariant value; ///< Current value of the property, set by this provider. QVariant() if null.
     quint64 timestamp; ///< Time when the value was set
-    QVariant overheardValue; ///< Latest value of the property set by any provider over D-Bus
-    quint64 overheardTimestamp; ///< Time when the overheardValue was set
     bool subscribed;
+    QVariant emittedValue; ///< Last value emitted by this provider.
+    quint64 emittedTimestamp; ///< Time when the emittedValue was emitted.
+    bool overheard; ///< True if provider overheard a value over D-Bus (must be different and more recent than emitted)
     static QHash<QPair<ServiceBackend*, QString>, PropertyPrivate*> propertyPrivateMap;
     friend class Property;
     friend class PropertyAdaptor;
