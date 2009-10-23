@@ -24,11 +24,13 @@
 #ifndef CONTEXTKITPLUGIN_H
 #define CONTEXTKITPLUGIN_H
 
+#include "iproviderplugin.h"
+#include "timedvalue.h"
+
 #include <QString>
 #include <QDBusConnection>
 #include <QSet>
 #include <QVariant>
-#include "iproviderplugin.h"
 
 extern "C" {
     ContextSubscriber::IProviderPlugin* contextKitPluginFactory(QString constructionString);
@@ -47,8 +49,10 @@ signals:
     void ready();
     void failed(QString error);
     void subscribeFinished(QString key);
+    void subscribeFinished(QString key, TimedValue value);
     void subscribeFailed(QString failedKey, QString error);
     void valueChanged(QString key, QVariant value);
+    void valueChanged(QString key, TimedValue value);
 
 private:
     QSet<QString> subscribeRequested;

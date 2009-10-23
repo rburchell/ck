@@ -14,16 +14,13 @@ AM_CXXFLAGS += -I$(srcdir)/../src \
 
 context_provide_internal_LDADD = ../src/libcontextprovider.la $(top_builddir)/common/libcommon.la $(top_builddir)/libcontextsubscriber/src/libcontextsubscriber.la
 
-../src/libcontextprovider.la:
+../src/libcontextprovider.la: FORCE
 	$(MAKE) -C ../src libcontextprovider.la
 
-../../libcontextsubscriber/src/libcontextsubscriber.la:
+../../libcontextsubscriber/src/libcontextsubscriber.la: FORCE
 	$(MAKE) -C ../../libcontextsubscriber/src libcontextsubscriber.la
 
-$(top_builddir)/common/libcommon.la:
-	$(MAKE) -C $(top_builddir)/common libcommon.la
-
-.PHONY: ../src/libcontextprovider.la $(top_builddir)/common/libcommon.la
+.PHONY: FORCE
 
 # moccing
 nodist_context_provide_internal_SOURCES = mocs.cpp

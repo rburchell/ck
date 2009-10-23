@@ -26,13 +26,13 @@ AM_CXXFLAGS = -I$(top_srcdir)/common \
 	      '-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"' \
 	      '-DCONTEXT_LOG_MODULE_NAME="libcontextsubscriber"'
 
-$(top_builddir)/common/libcommon.la:
+$(top_builddir)/common/libcommon.la: FORCE
 	$(MAKE) -C $(top_builddir)/common libcommon.la
 
 LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtXml_LIBS) $(QtDBus_LIBS)
 libcontextsubscriber_la_LIBADD=$(top_builddir)/common/libcommon.la
 
-.PHONY: $(top_builddir)/common/libcommon.la
+.PHONY: FORCE
 
 # moccing
 nodist_libcontextsubscriber_la_SOURCES = mocs.cpp

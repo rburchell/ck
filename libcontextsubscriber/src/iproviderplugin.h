@@ -22,6 +22,8 @@
 #ifndef IPROVIDERPLUGIN_H
 #define IPROVIDERPLUGIN_H
 
+#include "timedvalue.h"
+
 #include <QObject>
 #include <QVariant>
 
@@ -43,8 +45,10 @@ signals:
     void ready();
     void failed(QString error);
     void subscribeFinished(QString key);
+    void subscribeFinished(QString key, TimedValue timedvalue);
     void subscribeFailed(QString failedKey, QString error);
     void valueChanged(QString key, QVariant value);
+    void valueChanged(QString key, TimedValue timedvalue);
 };
 
 typedef IProviderPlugin* (*PluginFactoryFunc)(QString constructionString);

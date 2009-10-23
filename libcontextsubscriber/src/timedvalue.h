@@ -29,18 +29,22 @@ namespace ContextSubscriber {
 
 struct TimedValue
 {
-    struct timespec time;
+    quint64 time;
     QVariant value;
 
+    TimedValue() : time(0), value(QVariant())
+        { }
+    TimedValue(const QVariant &value, quint64 time) : time(time), value(value)
+        { }
     TimedValue(const QVariant &value) : value(value)
         {
-            clock_gettime(CLOCK_MONOTONIC, &time);
+            struct timespec t;
+            clock_gettime(CLOCK_MONOTONIC, &t);
+            time = t.tv_sec * Q_UINT64_C(1000000000) + t.tv_nsec;
         }
     bool operator<(const TimedValue &other)
 		{
-			return ((time.tv_sec < other.time.tv_sec) ||
-					(time.tv_sec == other.time.tv_sec &&
-					 time.tv_nsec < other.time.tv_nsec));
+			return time < other.time;
 		}
 };
 
