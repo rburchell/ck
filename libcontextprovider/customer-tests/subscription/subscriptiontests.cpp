@@ -52,9 +52,13 @@ void SubscriptionTests::init()
     test_int = new Property(*service1, "Test.Int");
     test_double = new Property(*service1, "Test.Double");
 
+    service1->start(); // FIXME: should work without
+
     service2 = new Service(QDBusConnection::SessionBus, SERVICE_NAME2);
     test_string = new Property (*service2, "Test.String");
     test_bool = new Property(*service2, "Test.Bool");
+
+    service2->start(); // FIXME: should work without
 
     // Process the events so that the services get started
     QCoreApplication::processEvents(QEventLoop::AllEvents);
@@ -110,7 +114,7 @@ void SubscriptionTests::subscribeReturnValueForUnknownProperty()
     QString actual = writeToClient("subscribe service1 Test.Int\n");
 
     // Expected result: The return value of Subscribe contains the key as unknown.
-    QString expected("Known keys: Unknown keys: Test.Int");
+    QString expected("Subscribe returned: Unknown");
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
@@ -128,7 +132,7 @@ void SubscriptionTests::subscribeReturnValueForKnownProperty()
     QString actual = writeToClient("subscribe service1 Test.Double\n");
 
     // Expected result: The return value of Subscribe contains the key and its value.
-    QString expected("Known keys: Test.Double(double:-8.22) Unknown keys: ");
+    QString expected("Subscribe returned: double:-8.22");
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
