@@ -152,8 +152,6 @@ void PropertyHandle::updateProvider()
                 pendingSubscriptions << newprovider;
     }
     myProviders = newProviders;
-    // Trigger computing the new value as the providers have changed.
-    onValueChanged();
 }
 
 /// Sets \c subscribePending to false.
