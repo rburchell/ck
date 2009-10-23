@@ -34,6 +34,8 @@
 #include <QMap>
 #include <QDir>
 
+const QString CommandWatcher::commanderBusName = "org.freedesktop.ContextKit.Commander";
+
 CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int commandfd, QObject *parent) :
     QObject(parent), commandfd(commandfd), out(stdout), busName(bn), busType(bt), started(false)
 {
@@ -164,7 +166,7 @@ void CommandWatcher::addCommand(const QStringList& args)
         setCommand(keyName + "=\"" + QStringList(args.mid(2)).join(" ") + "\"");
 
     // if service is already started then it has to be restarted after a property is added
-    if (started)
+    if (started && busName != CommandWatcher::commanderBusName)
         startCommand();
 }
 

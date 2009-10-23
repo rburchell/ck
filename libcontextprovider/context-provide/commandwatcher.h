@@ -41,6 +41,7 @@ public:
     CommandWatcher(QString busName, QDBusConnection::BusType busType, int commandfd, QObject *parent = 0);
     ~CommandWatcher();
     void addCommand(const QStringList& args);
+    static const QString commanderBusName;
 
 private:
     void interpret(const QString& command);

@@ -33,8 +33,6 @@
 
 using namespace ContextProvider;
 
-#define COMMANDER "org.freedesktop.ContextKit.Commander"
-
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
@@ -58,7 +56,7 @@ int main(int argc, char **argv)
         // Help? Show it and be gone.
         // FIXME: has to replace this with argv[0]
         out << "Usage: context-provide --v2 [--session | --system] [BUSNAME]\n";
-        out << "BUSNAME is " COMMANDER " by default, and bus is session.\n";
+        out << "BUSNAME is " << CommandWatcher::commanderBusName << " by default, and bus is session.\n";
         return 0;
     }
 
@@ -80,7 +78,7 @@ int main(int argc, char **argv)
 
     if (args.count() < 2) {
         // No arguments at all? Use commander by default.
-        args.push_back(COMMANDER);
+        args.push_back(CommandWatcher::commanderBusName);
     }
 
     // Parameter? Extract the session bus and type from it.
@@ -111,7 +109,7 @@ int main(int argc, char **argv)
     for (int i=2; i < args.count(); i+=3)
         commandWatcher.addCommand(args.mid(i, 3));
 
-    if (busName == QString(COMMANDER))
+    if (busName == QString(CommandWatcher::commanderBusName))
         foreach (QString key, ContextRegistryInfo::instance()->listKeys())
             if (ContextPropertyInfo(key).provided()) {
                 new PropertyProxy(key, &app);
