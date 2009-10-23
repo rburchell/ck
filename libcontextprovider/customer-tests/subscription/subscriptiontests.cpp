@@ -70,8 +70,10 @@ void SubscriptionTests::init()
     clientStarted = client->waitForStarted();
 
     // Associate shorter names for the test services when communicating with the client
-    writeToClient("assign session " SERVICE_NAME1 " service1");
-    writeToClient("assign session " SERVICE_NAME1 " service2");
+    if (clientStarted) {
+        writeToClient("assign session " SERVICE_NAME1 " service1\n");
+        writeToClient("assign session " SERVICE_NAME2 " service2\n");
+    }
 }
 
 // After each test
@@ -232,17 +234,20 @@ void SubscriptionTests::readStandardOutput()
     isReadyToRead = true;
 }
 
+// Note: input must end with \n
 QString SubscriptionTests::writeToClient(const char* input)
 {
     isReadyToRead = false;
     client->write(input);
     client->waitForBytesWritten();
+
     // Blocking for reading operation is bad idea since the client
     // expects provider to reply to dbus calls
 
     while (!isReadyToRead) {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
+
     // Return the output from the client
     return client->readAll();
 }

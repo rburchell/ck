@@ -31,6 +31,8 @@
 #include <QStringList>
 #include <QProcess>
 
+#define SERVICE_NAME1 "org.maemo.contextkit.testProvider1"
+
 namespace ContextProvider {
 
 void ValueChangesTests::initTestCase()
@@ -45,7 +47,7 @@ void ValueChangesTests::cleanupTestCase()
 void ValueChangesTests::init()
 {
     // Start the services
-    service = new Service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1");
+    service = new Service(QDBusConnection::SessionBus, SERVICE_NAME1);
     test_int = new Property(*service, "Test.Int");
     test_double = new Property(*service, "Test.Double");
 
@@ -61,6 +63,11 @@ void ValueChangesTests::init()
     client->start("client");
     // Record whether the client was successfully started
     clientStarted = client->waitForStarted();
+
+    // Associate shorter names for the test services when communicating with the client
+    if (clientStarted) {
+        writeToClient("assign session " SERVICE_NAME1 " service1\n");
+    }
 }
 
 // After each test
@@ -89,11 +96,8 @@ void ValueChangesTests::subscribedPropertyChanges()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
     // Subscribe to a property (which is currently unknown)
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
+    writeToClient("subscribe service1 Test.Double\n");
 
     // Test: Change the value of the property
     test_double->setValue(51.987);
@@ -125,11 +129,8 @@ void ValueChangesTests::nonsubscribedPropertyChanges()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
     // Subscribe to a property (which is currently unknown)
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
+    writeToClient("subscribe service1 Test.Double\n");
 
     // Test: Change the value of the property
     test_int->setValue(100);
@@ -161,14 +162,11 @@ void ValueChangesTests::unsubscribedPropertyChanges()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
     // Subscribe to a property (which is currently unknown)
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
+    writeToClient("subscribe service1 Test.Double\n");
 
     // Unsubscribe from the property
-    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
+    writeToClient("unsubscribe service1 Test.Double\n");
 
     // Test: Change the value of the property
     test_int->setValue(100);
@@ -194,60 +192,18 @@ void ValueChangesTests::unsubscribedPropertyChanges()
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
-void ValueChangesTests::twoPropertiesChange()
-{
-    // Check that the initialization went well.
-    // Doing this only in init() is not enough; doesn't stop the test case.
-    QVERIFY(clientStarted);
-
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
-    // Subscribe to 2 properties (which are currently unknown)
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double\n");
-
-    // Test: Change the value of both properties
-    test_int->setValue(100);
-    test_double->setValue(4.111);
-    // and tell the client to wait for the Changed signal
-    QString actual = writeToClient("waitforchanged 3000\n");
-
-    // Expected result: the client gets one Changed signal with both properties
-    QString expected = "Changed signal received, parameters: Known keys: Test.Double(double:4.111) "
-        "Test.Int(int:100) Unknown keys:";
-
-    QCOMPARE(actual.simplified(), expected.simplified());
-
-    // Reset the signal status of the client (makes it forget that it has received the signal)
-    writeToClient("resetsignalstatus\n");
-
-    // Test: Set both properties to unknown
-    test_int->unsetValue();
-    test_double->unsetValue();
-    // and tell the client to wait for the Changed signal
-    actual = writeToClient("waitforchanged 3000\n");
-
-    // Expected result: the client gets one Changed signal with both properties
-    expected = "Changed signal received, parameters: Known keys: Unknown keys: Test.Double Test.Int";
-
-    QCOMPARE(actual.simplified(), expected.simplified());
-
-}
-
 void ValueChangesTests::sameValueSet()
 {
     // Check that the initialization went well.
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
     // Set a value to a property
     test_int->setValue(555);
 
     // Subscribe to 2 properties (one is currently unknown, the other has a value)
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double\n");
+    writeToClient("subscribe service1 Test.Int\n");
+    writeToClient("subscribe service1 Test.Double\n");
 
     // Test: Set the value of the property to its current value
     test_int->setValue(555);
@@ -279,11 +235,8 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
     // Subscribe to a property (which is currently unknown)
-    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int\n");
+    QString actual = writeToClient("subscribe service1 Test.Int\n");
 
     // Verify that the property really was unknown
     QString expected = "Known keys: Unknown keys: Test.Int";
