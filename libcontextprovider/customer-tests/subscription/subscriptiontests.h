@@ -29,12 +29,8 @@ private slots:
     void init();
     void cleanup();
 
-    void testGetSubscriber();
-    void testGetSubscriberTwice();
-
     void subscribeReturnValueForUnknownProperty();
     void subscribeReturnValueForKnownProperty();
-    void subscribeReturnValueForInvalidProperty();
 
     void subscriberNotifications();
 
