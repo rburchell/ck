@@ -46,9 +46,10 @@ class CommanderDisabled(unittest.TestCase):
         commander.expect(CLTool.STDOUT, "Added", 10) # wait for it
         os.environ["CONTEXT_CLI_IGNORE_COMMANDER"] = ""
         listen = CLTool("context-listen", "test.int")
+        listen.expect(CLTool.STDERR, "Available commands", 10) # wait for it
         self.assert_(listen.expect(CLTool.STDOUT,
                                    CLTool.wanted("test.int", "int", "42"),
-                                   1),
+                                   3),
                      "Provider provided value is wrong")
 
 def runTests():
