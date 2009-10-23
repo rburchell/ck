@@ -78,6 +78,7 @@ void CommandWatcher::help()
     qDebug() << "  add TYPE KEY [VALUE]            - create new key with the given type";
     qDebug() << "  KEY=VALUE                       - set KEY to the given VALUE";
     qDebug() << "  unset KEY                       - sets KEY to unknown";
+    qDebug() << "  del KEY                         - delete KEY, useful if the tool is commander";
     qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
     qDebug() << "  dump [FILENAME]                 - dump the xml content of the defined props";
     qDebug() << "  start                           - (re)register everything on D-Bus";
@@ -101,6 +102,8 @@ void CommandWatcher::interpret(const QString& command)
         // Interpret commands
         if (QString("add").startsWith(commandName)) {
             addCommand(args);
+        } else if (QString("del").startsWith(commandName)) {
+            delCommand(args);
         } else if (QString("sleep").startsWith(commandName)) {
             sleepCommand(args);
         } else if (QString("exit").startsWith(commandName)) {
@@ -163,6 +166,21 @@ void CommandWatcher::addCommand(const QStringList& args)
     // if service is already started then it has to be restarted after a property is added
     if (started)
         startCommand();
+}
+
+void CommandWatcher::delCommand(const QStringList &args)
+{
+    if (args.count() < 1) {
+        qDebug() << "ERROR: need to specify both KEY and TYPE";
+        return;
+    }
+
+    const QString keyName = unquote(args.at(0));
+
+    types.remove(keyName);
+    properties.remove(keyName);
+    out << "Deleted key: " << keyName << endl;
+    out.flush();
 }
 
 void CommandWatcher::sleepCommand(const QStringList& args)

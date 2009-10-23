@@ -50,6 +50,7 @@ private:
     void sleepCommand(const QStringList& args);
     void flushCommand();
     void dumpCommand(const QStringList& args);
+    void delCommand(const QStringList& args);
     void startCommand();
     QString unquote(const QString& str);
 
