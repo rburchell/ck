@@ -257,9 +257,9 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
     QString key = NanoXml::keyValue("name", keyTree).toString();
     QString plugin = NanoXml::keyValue("plugin", providerTree).toString();
     QString constructionString = NanoXml::keyValue("constructionString", providerTree).toString();
-    QString type = canonicalizeType(NanoXml::keyValue("type", keyTree).toString());
+    QString type = NanoXml::keyValue("type", keyTree).toString();
     QString doc = NanoXml::keyValue("doc", keyTree).toString();
-    ContextTypeInfo typeInfo = ContextTypeInfo::typeFromOldType(type);
+    ContextTypeInfo typeInfo = ContextTypeInfo::resolveTypeName(type);
 
     // Warn about description mismatch or add new
     if (keyDataHash.contains(key)) {

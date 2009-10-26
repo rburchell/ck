@@ -52,10 +52,11 @@ public:
 
     static ContextTypeInfo nullType();
     static ContextTypeInfo int64Type();
-    static ContextTypeInfo intType();
+    static ContextTypeInfo int32Type();
     static ContextTypeInfo stringType();
     static ContextTypeInfo boolType();
-    static ContextTypeInfo typeFromOldType(QString t); // FIXME: should be typeInfoFromOldType
+    static ContextTypeInfo doubleType();
+    static ContextTypeInfo resolveTypeName(QString t);
 
 protected:
     NanoTree nanoTree;

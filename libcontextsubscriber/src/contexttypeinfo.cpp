@@ -70,7 +70,7 @@ ContextTypeInfo ContextTypeInfo::base() const
     else if (n == "string-enum")
         return ContextTypeInfo::stringType();
     else if (n == "percentage")
-        return ContextTypeInfo::intType();
+        return ContextTypeInfo::int32Type();
     else
         return ContextTypeInfo(QVariant());
 }
@@ -141,12 +141,12 @@ ContextTypeInfo ContextTypeInfo::stringType()
     return ContextTypeInfo(QVariant(tree));
 }
 
-ContextTypeInfo ContextTypeInfo::intType()
+ContextTypeInfo ContextTypeInfo::doubleType()
 {
     QVariantList type;
     QVariantList tree;
     type << QVariant("name");
-    type << QVariant("int");
+    type << QVariant("double");
     tree << QVariant("type");
     tree << QVariant(type);
     return ContextTypeInfo(QVariant(tree));
@@ -163,16 +163,41 @@ ContextTypeInfo ContextTypeInfo::boolType()
     return ContextTypeInfo(QVariant(tree));
 }
 
-ContextTypeInfo ContextTypeInfo::typeFromOldType(QString t)
+ContextTypeInfo ContextTypeInfo::resolveTypeName(QString t)
 {
+    // Support for the old types
     if (t == "TRUTH")
         return ContextTypeInfo::boolType();
     else if (t == "STRING")
         return ContextTypeInfo::stringType();
     else if (t == "INT")
-        return ContextTypeInfo::intType();
+        return ContextTypeInfo::int32Type();
+    else if (t == "INTEGER")
+        return ContextTypeInfo::int32Type();
+    // New types
+    else if (t == "string")
+        return ContextTypeInfo::stringType();
+    else if (t == "double")
+        return ContextTypeInfo::doubleType();
+    else if (t == "int32")
+        return ContextTypeInfo::int32Type();
+    else if (t == "int64")
+        return ContextTypeInfo::int64Type();
+    else if (t == "bool")
+        return ContextTypeInfo::boolType();
     else
         return ContextTypeInfo(QVariant());
+}
+
+ContextTypeInfo ContextTypeInfo::int32Type()
+{
+    QVariantList type;
+    QVariantList tree;
+    type << QVariant("name");
+    type << QVariant("int32");
+    tree << QVariant("type");
+    tree << QVariant(type);
+    return ContextTypeInfo(QVariant(tree));
 }
 
 /* ContextMapTypeInfo */
