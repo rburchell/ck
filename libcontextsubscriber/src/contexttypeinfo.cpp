@@ -84,16 +84,15 @@ QString ContextTypeInfo::parameterDoc(QString p) const
 
 QString ContextTypeInfo::parameterStringValue(QString p) const
 {
-    NanoTree params = NanoTree(nanoTree.keySub(QString("params")));
-    NanoTree key = NanoTree(params.keySub(p));
+    NanoTree params = nanoTree.keySub("params");
+    NanoTree key = params.keySub(p);
     return key.stringValue();
 }
 
 int ContextTypeInfo::parameterIntValue(QString p) const
 {
-    // FIXME: Unify with other
-    NanoTree params = NanoTree(nanoTree.keySub(QString("params")));
-    NanoTree key = NanoTree(params.keySub(p));
+    NanoTree params = nanoTree.keySub("params");
+    NanoTree key = params.keySub(p);
     return key.intValue();
 }
 
@@ -137,7 +136,7 @@ ContextTypeInfo ContextMapTypeInfo::keyType(QString key)
 
 ContextTypeInfo ContextUniformListTypeInfo::elementType()
 {
-    NanoTree params = NanoTree(nanoTree.keySub(QString("params")));
-    NanoTree key = NanoTree(params.keySub("type"));
+    NanoTree params = nanoTree.keySub("params");
+    NanoTree key = params.keySub("type");
     return ContextTypeInfo(key);
 }
