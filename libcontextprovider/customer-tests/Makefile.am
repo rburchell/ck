@@ -1,4 +1,4 @@
-SUBDIRS = client subscription value-changes types c-api
+SUBDIRS = client subscription value-changes types c-api service
 
 coverage: covoptioncheck
 	COVERAGE=1 ./runTests.sh

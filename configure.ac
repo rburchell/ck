@@ -107,6 +107,7 @@ AC_CONFIG_FILES([
         libcontextprovider/customer-tests/value-changes/Makefile
         libcontextprovider/customer-tests/types/Makefile
         libcontextprovider/customer-tests/c-api/Makefile
+        libcontextprovider/customer-tests/service/Makefile
         python/Makefile
         spec/Makefile
         tools/Makefile
