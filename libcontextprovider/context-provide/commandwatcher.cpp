@@ -35,7 +35,7 @@
 #include <QDir>
 
 CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int commandfd, QObject *parent) :
-    QObject(parent), commandfd(commandfd), out(stdout), busName(bn), busType(bt)
+    QObject(parent), commandfd(commandfd), out(stdout), busName(bn), busType(bt), started(false)
 {
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
     sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
@@ -159,6 +159,10 @@ void CommandWatcher::addCommand(const QStringList& args)
     // handle default value
     if (args.count() > 2)
         setCommand(keyName + "=\"" + QStringList(args.mid(2)).join(" ") + "\"");
+
+    // if service is already started then it has to be restarted after a property is added
+    if (started)
+        startCommand();
 }
 
 void CommandWatcher::sleepCommand(const QStringList& args)
@@ -279,10 +283,12 @@ void CommandWatcher::unsetCommand(const QStringList& args)
 void CommandWatcher::startCommand()
 {
     Service service(busType, busName);
+    service.stop(); // this is harmless if we are not started yet, but useful if we are
     if (!service.start()) {
-        qDebug() << "Starting service failed";
+        qDebug() << "Starting service failed, no D-Bus or the service name is already taken";
         exit(2);
     }
     out << "Service started" << endl;
     out.flush();
+    started = true;
 }

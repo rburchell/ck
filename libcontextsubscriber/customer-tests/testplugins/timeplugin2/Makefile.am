@@ -19,13 +19,13 @@ AM_CXXFLAGS = -I$(top_srcdir)/common	\
 
 contextsubscribertime2_la_LDFLAGS = -avoid-version -module
 
-$(top_builddir)/common/libcommon.a:
+$(top_builddir)/common/libcommon.a: FORCE
 	$(MAKE) -C $(top_builddir)/common libcommon.a
 
 LIBS += $(CDB_LIBS) $(QtCore_LIBS) $(QtDBus_LIBS)
 contextsubscribertime2_la_LIBADD=$(top_builddir)/common/libcommon.la
 
-.PHONY: $(top_builddir)/common/libcommon.la
+.PHONY: FORCE
 
 # moccing
 nodist_contextsubscribertime2_la_SOURCES = mocs.cpp

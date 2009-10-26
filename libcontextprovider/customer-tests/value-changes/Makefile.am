@@ -9,9 +9,10 @@ check-customer: $(test_PROGRAMS)
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS)  $(QtTest_CFLAGS) -I$(srcdir)/../../src -I$(top_srcdir)/common
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS) $(QtTest_LIBS)
 valuechangestests_LDADD = ../../src/libcontextprovider.la
-../../src/libcontextprovider.la:
+
+../../src/libcontextprovider.la: FORCE
 	$(MAKE) -C ../../src libcontextprovider.la
-.PHONY: ../../libcontextprovider.la
+.PHONY: FORCE
 
 # moccing
 nodist_valuechangestests_SOURCES = mocs.cpp

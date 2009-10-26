@@ -170,6 +170,8 @@ void Provider::constructPlugin()
 
     // Connect the signal of changing values to the class who handles it
     HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
+    sconnect(plugin, SIGNAL(valueChanged(QString, TimedValue)),
+             this, SLOT(onPluginValueChanged(QString, TimedValue)));
     sconnect(plugin, SIGNAL(valueChanged(QString, QVariant)),
              this, SLOT(onPluginValueChanged(QString, QVariant)));
     sconnect(this, SIGNAL(valueChanged(QString)),
@@ -180,6 +182,12 @@ void Provider::constructPlugin()
     sconnect(plugin, SIGNAL(failed(QString)),
              this, SLOT(onPluginFailed(QString)));
 
+    // The following signals are queued, because a plugin might emit
+    // subscribeFinished() right in the subscribe() call.
+    qRegisterMetaType<TimedValue>("TimedValue");
+    sconnect(plugin, SIGNAL(subscribeFinished(QString, TimedValue)),
+             this, SLOT(onPluginSubscribeFinished(QString, TimedValue)),
+             Qt::QueuedConnection);
     sconnect(plugin, SIGNAL(subscribeFinished(QString)),
              this, SLOT(onPluginSubscribeFinished(QString)), Qt::QueuedConnection);
     sconnect(plugin, SIGNAL(subscribeFailed(QString, QString)),
@@ -228,6 +236,13 @@ void Provider::signalSubscribeFinished(QString key)
 }
 
 /// Forwards the call to \c signalSubscribeFinished.
+void Provider::onPluginSubscribeFinished(QString key, TimedValue value)
+{
+    signalSubscribeFinished(key);
+    onPluginValueChanged(key, value);
+}
+
+/// Deprecated.
 void Provider::onPluginSubscribeFinished(QString key)
 {
     contextDebug() << key;
@@ -325,6 +340,21 @@ void Provider::handleSubscribes()
     contextDebug() << "Provider::handleSubscribes processed";
 }
 
+/// Forwards the \c newValue for \c key received from the plugin to
+/// the upper layers via \c HandleSignalRouter.
+void Provider::onPluginValueChanged(QString key, TimedValue newValue)
+{
+    QMutexLocker lock(&subscribeLock);
+    if (subscribedKeys.contains(key)) {
+        // FIXME: try out if everything works with lock.unlock() here
+        values.insert(key, newValue);
+        emit valueChanged(key);
+    }
+    else
+        contextWarning() << "Received a property not subscribed to:" << key;
+}
+
+/// Deprecated: plugins should use the variant taking a TimedValue.
 /// Forwards the \c newValue for \c key received from the plugin to
 /// the upper layers via \c HandleSignalRouter.
 void Provider::onPluginValueChanged(QString key, QVariant newValue)
