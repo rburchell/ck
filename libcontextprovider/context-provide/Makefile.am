@@ -1,9 +1,9 @@
 bin_PROGRAMS = context-provide-internal
 context_provide_internal_SOURCES = context-provide.cpp commandwatcher.cpp commandwatcher.h
 
-AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) \
+AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(QJson_CFLAGS) \
 	        '-DCONTEXT_LOG_MODULE_NAME="context-provide"'
-LIBS += $(QtCore_LIBS)
+LIBS += $(QtCore_LIBS) $(QJson_LIBS)
 
 # library dependency hack for seamless make
 AM_CXXFLAGS += -I$(srcdir)/../src \

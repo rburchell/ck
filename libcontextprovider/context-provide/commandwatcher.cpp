@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <QMap>
 #include <QDir>
+#include <qjson/parser.h>
 
 CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int commandfd, QObject *parent) :
     QObject(parent), commandfd(commandfd), out(stdout), busName(bn), busType(bt), started(false)
@@ -139,9 +140,9 @@ void CommandWatcher::addCommand(const QStringList& args)
     QString keyType = unquote(args.at(0)).toUpper();
     const QString keyName = unquote(args.at(1));
 
-    if (keyType != "INT" && keyType != "STRING" &&
+    if (keyType != "COMPLEX" && keyType != "INT" && keyType != "STRING" &&
         keyType != "DOUBLE" && keyType != "TRUTH" && keyType != "BOOL") {
-        qDebug() << "ERROR: Unknown type (has to be: INT, STRING, DOUBLE, BOOL or TRUTH)";
+        qDebug() << "ERROR: Unknown type (has to be: COMPLEX, INT, STRING, DOUBLE, BOOL or TRUTH)";
         return;
     }
     if (keyType == "BOOL") keyType = "TRUTH";
@@ -253,9 +254,20 @@ void CommandWatcher::setCommand(const QString& command)
             v = QVariant(true);
         else
             v = QVariant(false);
+    } else if (keyType == "COMPLEX") {
+        QJson::Parser parser;
+        bool ok;
+
+        v = parser.parse(value.toUtf8(), &ok);
+        if (!ok) {
+            qDebug() << "An error occurred during parsing";
+            return;
+        }
     }
 
-    out << "Setting key: " << keyName << " to value: " << v.toString() << endl;
+    QString vstr;
+    QDebug(&vstr) << v; 
+    out << "Setting key: " << keyName << " to value: " << vstr << endl;
     out.flush();
     prop->setValue(v);
 }

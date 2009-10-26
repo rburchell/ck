@@ -19,6 +19,7 @@ PKG_CHECK_MODULES_SUBST([QtTest], [QtTest])
 PKG_CHECK_MODULES_SUBST([QtCore], [QtCore])
 PKG_CHECK_MODULES_SUBST([QtDBus], [QtDBus])
 PKG_CHECK_MODULES_SUBST([QtXml], [QtXml])
+PKG_CHECK_MODULES_SUBST([QJson], [QJson])
 # only for compiling c code
 PKG_CHECK_MODULES_SUBST([DBUS], [dbus-1])
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.12.0])
