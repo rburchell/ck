@@ -157,7 +157,7 @@ ContextTypeInfo ContextTypeInfo::boolType()
     return ContextTypeInfo(QVariant(lst));
 }
 
-ContextTypeInfo typeFromOldType(QString t)
+ContextTypeInfo ContextTypeInfo::typeFromOldType(QString t)
 {
     if (t == "TRUTH")
         return ContextTypeInfo::boolType();
@@ -189,3 +189,9 @@ ContextTypeInfo ContextUniformListTypeInfo::elementType()
     NanoTree key = params.keySub("type");
     return ContextTypeInfo(key);
 }
+
+NanoTree ContextTypeInfo::tree()
+{
+    return nanoTree;
+}
+

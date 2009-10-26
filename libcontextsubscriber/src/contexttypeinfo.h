@@ -48,6 +48,7 @@ public:
     int parameterIntValue(QString p) const;
     ContextTypeInfo base() const;
     QString doc();
+    NanoTree tree();
 
     static ContextTypeInfo nullType();
     static ContextTypeInfo int64Type();

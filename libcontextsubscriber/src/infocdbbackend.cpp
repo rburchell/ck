@@ -73,13 +73,6 @@ QStringList InfoCdbBackend::listKeys() const
     return variantListToStringList(reader.valuesForKey("KEYS"));
 }
 
-/*
-QString InfoCdbBackend::typeForKey(QString key) const
-{
-    return reader.valueForKey(key + ":KEYTYPE").toString();
-}
-*/
-
 QString InfoCdbBackend::docForKey(QString key) const
 {
     return reader.valueForKey(key + ":KEYDOC").toString();
@@ -187,5 +180,5 @@ const QList<ContextProviderInfo> InfoCdbBackend::providersForKey(QString key) co
 
 ContextTypeInfo InfoCdbBackend::typeInfoForKey(QString key) const
 {
-    return ContextTypeInfo(QVariant());
+    return ContextTypeInfo(reader.valueForKey(key + ":KEYTYPEINFO"));
 }
