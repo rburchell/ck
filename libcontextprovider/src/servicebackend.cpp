@@ -176,8 +176,12 @@ void ServiceBackend::stop()
     if (!sharedConnection())
         connection.unregisterService(busName);
 
-    // Unregister Property objects and clean up PropertyAdaptors set
+    // Unregister Property objects and clean up PropertyAdaptors set.
+    // Also, command Property objects to forget their subscriptions
+    // (if the service is started again, clients will resubscribe).
+
     foreach (PropertyAdaptor* adaptor, createdAdaptors) {
+        adaptor->forgetClients();
         connection.unregisterObject(adaptor->objectPath());
     }
 }

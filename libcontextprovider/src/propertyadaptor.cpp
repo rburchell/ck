@@ -133,4 +133,11 @@ QString PropertyAdaptor::objectPath() const
     return QString(propertyPrivate->key);
 }
 
+void PropertyAdaptor::forgetClients()
+{
+    clientServiceNames.clear();
+    propertyPrivate->setUnsubscribed();
+}
+
+
 } // namespace ContextProvider

@@ -42,6 +42,7 @@ class PropertyAdaptor: public QDBusAbstractAdaptor
 public:
     PropertyAdaptor(PropertyPrivate* property, QDBusConnection *connection);
     QString objectPath() const;
+    void forgetClients();
 
 public slots:
     void Subscribe(const QDBusMessage& msg, QVariantList& values, quint64& timestamp);
