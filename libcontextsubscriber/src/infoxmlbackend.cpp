@@ -364,5 +364,8 @@ const QList<ContextProviderInfo> InfoXmlBackend::providersForKey(QString key) co
 
 ContextTypeInfo InfoXmlBackend::typeInfoForKey(QString key) const
 {
-    return ContextTypeInfo(QVariant());
+    if (! keyDataHash.contains(key))
+        return ContextTypeInfo();
+
+    return keyDataHash.value(key).typeInfo;
 }
