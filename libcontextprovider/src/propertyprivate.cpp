@@ -36,20 +36,23 @@ PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &
       key(key), value(QVariant()),  timestamp(currentTimestamp()), subscribed(false),
       emittedValue(value), emittedTimestamp(timestamp), overheard(false)
 {
-    // Associate the property to the service backend
-    serviceBackend->addProperty(key, this);
 }
 
 PropertyPrivate::~PropertyPrivate()
 {
-    // Remove the property from the service backend
-    serviceBackend->removeProperty(key);
 }
 
 /// Increase the reference count by one. Property calls this.
 void PropertyPrivate::ref()
 {
     refCount++;
+    if (refCount == 1) {
+        // Increase the reference count of serviceBackend to ensure it
+        // stays alive
+        serviceBackend->ref();
+        // Associate the property to the service backend
+        serviceBackend->addProperty(key, this);
+    }
 }
 
 /// Decrease the reference count by one. Property calls this. If the
@@ -60,6 +63,11 @@ void PropertyPrivate::unref()
     refCount--;
 
     if (refCount == 0) {
+        // Remove the property from the service backend
+        serviceBackend->removeProperty(key);
+        // Now serviceBackend can be deleted if nobody else needs it.
+        serviceBackend->unref();
+
         // For now, remove the PropertyPrivate from the instance
         // map. If this is changed, we need to check carefully what
         // happens if a new ServiceBackend is created with the same
