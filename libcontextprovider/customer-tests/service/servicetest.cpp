@@ -57,10 +57,10 @@ void ServiceTests::init()
     clientStarted = client->waitForStarted();
 
     // Associate shorter names for the test services when communicating with the client
-    /*if (clientStarted) {
+    if (clientStarted) {
         qDebug() << "Writing";
         writeToClient("assign session " SERVICE_NAME " service\n");
-        }*/
+    }
 }
 
 // After each test
@@ -80,12 +80,33 @@ void ServiceTests::startStopStart()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
+    // Test: create a Service and an associated Property
     Service* service = new Service(QDBusConnection::SessionBus, SERVICE_NAME);
-
     Property* property = new Property(*service, "Test.Property");
 
+    // Test: command client to subscribe
+    QString actual = writeToClient("subscribe service Test.Property\n");
+
+    // Expected result: service is started automatically and Subscribe works
+    QString expected = "Subscribe returned: Unknown";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Test: stop the service and try to subscribe again
     service->stop();
+    actual = writeToClient("subscribe service Test.Property\n");
+
+    // Expected result: the client can no more subscribe
+    expected = "Subscribe error: org.freedesktop.DBus.Error.ServiceUnknown";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Test: start the service and try to subscribe again
     service->start();
+    actual = writeToClient("subscribe service Test.Property\n");
+
+    // Expected result: service is started and Subscribe works
+    expected = "Subscribe returned: Unknown";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
 }
 
 void ServiceTests::readStandardOutput()
