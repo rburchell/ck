@@ -41,6 +41,9 @@ void ContextTypeInfoUnitTest::basicTypes()
     QCOMPARE(ContextTypeInfo::boolType().name(), QString("bool"));
     QCOMPARE(ContextTypeInfo::stringType().name(), QString("string"));
     QCOMPARE(ContextTypeInfo::int64Type().name(), QString("int64"));
+    QCOMPARE(ContextTypeInfo::int32Type().name(), QString("int32"));
+    QCOMPARE(ContextTypeInfo::doubleType().name(), QString("double"));
+    QCOMPARE(ContextTypeInfo::nullType().name(), QString(""));
 }
 
 void ContextTypeInfoUnitTest::doubleType()
