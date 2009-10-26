@@ -89,6 +89,11 @@ QString ContextTypeInfo::parameterStringValue(QString p) const
     return key.stringValue();
 }
 
+QString ContextTypeInfo::doc()
+{
+    return nanoTree.keyValue("doc").toString();
+}
+
 int ContextTypeInfo::parameterIntValue(QString p) const
 {
     NanoTree params = nanoTree.keySub("params");

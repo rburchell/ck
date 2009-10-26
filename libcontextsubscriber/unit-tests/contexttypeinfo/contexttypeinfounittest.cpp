@@ -45,6 +45,7 @@ void ContextTypeInfoUnitTest::doubleType()
     QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
     QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
     QCOMPARE(typeInfo.parameters().size(), 2);
+    QCOMPARE(typeInfo.doc(), QString("A double value within the given limits."));
 }
 
 void ContextTypeInfoUnitTest::customDoubleType()
@@ -58,6 +59,7 @@ void ContextTypeInfoUnitTest::customDoubleType()
     QCOMPARE(typeInfo.parameterIntValue("max"), 666);
     QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
     QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
+    QCOMPARE(typeInfo.doc(), QString("A double value that represents the level of hell in you."));
 }
 
 void ContextTypeInfoUnitTest::uniformList()
@@ -71,6 +73,7 @@ void ContextTypeInfoUnitTest::uniformList()
     QCOMPARE(elementTypeInfo.name(), QString("double"));
     QCOMPARE(elementTypeInfo.parameterIntValue("min"), 0);
     QCOMPARE(elementTypeInfo.parameterIntValue("max"), 10);
+    QCOMPARE(elementTypeInfo.doc(), QString("A double value within the given limits."));
 }
 
 #include "contexttypeinfounittest.moc"

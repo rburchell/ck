@@ -43,6 +43,7 @@ public:
     QString parameterStringValue(QString p) const;
     int parameterIntValue(QString p) const;
     ContextTypeInfo base() const;
+    QString doc();
 
     static ContextTypeInfo int64Type();
     static ContextTypeInfo intType();
