@@ -38,8 +38,27 @@ ContextTypeInfo::ContextTypeInfo(const NanoTree &tree) : nanoTree(tree)
     }
 }
 
+ContextTypeInfo::ContextTypeInfo() : nanoTree(QVariant())
+{
+}
+
 ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo &ti) : nanoTree(ti.nanoTree)
 {
+}
+
+bool ContextTypeInfo::operator==(const ContextTypeInfo &other) const
+{
+    return (name() == other.name());
+}
+
+bool ContextTypeInfo::operator!=(const ContextTypeInfo &other) const
+{
+    return (name() != other.name());
+}
+
+ContextTypeInfo ContextTypeInfo::operator=(const ContextTypeInfo& info)
+{
+    return ContextTypeInfo(info);
 }
 
 QString ContextTypeInfo::name() const
@@ -99,6 +118,11 @@ int ContextTypeInfo::parameterIntValue(QString p) const
     NanoTree params = nanoTree.keySub("params");
     NanoTree key = params.keySub(p);
     return key.intValue();
+}
+
+ContextTypeInfo ContextTypeInfo::nullType()
+{
+    return ContextTypeInfo(QVariant());
 }
 
 ContextTypeInfo ContextTypeInfo::int64Type()
