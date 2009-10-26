@@ -136,7 +136,7 @@ ContextTypeInfo ContextTypeInfo::boolType()
 ContextTypeInfo typeFromOldType(QString t)
 {
     if (t == "TRUTH")
-        return ContextTypeInfo::intType();
+        return ContextTypeInfo::boolType();
     else if (t == "STRING")
         return ContextTypeInfo::stringType();
     else if (t == "INTEGER")
