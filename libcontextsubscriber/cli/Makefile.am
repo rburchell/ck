@@ -13,13 +13,10 @@ AM_CXXFLAGS += -I$(srcdir)/../src \
 
 context_listen_LDADD = ../src/libcontextsubscriber.la $(top_builddir)/common/libcommon.la
 
-../src/libcontextsubscriber.la:
+../src/libcontextsubscriber.la: FORCE
 	$(MAKE) -C ../src libcontextsubscriber.la
 
-$(top_builddir)/common/libcommon.la:
-	$(MAKE) -C $(top_builddir)/common libcommon.la
-
-.PHONY: ../src/libcontextsubscriber.la $(top_builddir)/common/libcommon.la
+.PHONY: FORCE
 
 # moccing
 nodist_context_listen_SOURCES = mocs.cpp

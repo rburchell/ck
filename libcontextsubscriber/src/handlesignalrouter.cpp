@@ -53,10 +53,10 @@ void HandleSignalRouter::onValueChanged(QString key)
     handle->onValueChanged();
 }
 
-void HandleSignalRouter::onSubscribeFinished(QString key)
+void HandleSignalRouter::onSubscribeFinished(Provider *provider, QString key)
 {
     PropertyHandle* handle = PropertyHandle::instance(key);
-    handle->setSubscribeFinished();
+    handle->setSubscribeFinished(provider);
 }
 
 } // end namespace

@@ -10,9 +10,9 @@ AM_LDFLAGS = $(QtXml_LIBS) $(QtCore_LIBS)
 
 # library dependency hack for seamless make in update-contextkit-providers/
 update_contextkit_providers_LDADD = ../src/libcontextsubscriber.la
-../src/libcontextsubscriber.la:
+../src/libcontextsubscriber.la: FORCE
 	$(MAKE) -C ../src libcontextsubscriber.la
-.PHONY: ../src/libcontextsubscriber.la
+.PHONY: FORCE
 
 # moccing
 # Note: enable these 2 lines when there is something to mock

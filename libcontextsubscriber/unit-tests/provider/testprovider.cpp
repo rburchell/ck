@@ -74,7 +74,7 @@ void HandleSignalRouter::onValueChanged(QString key)
 {
 }
 
-void HandleSignalRouter::onSubscribeFinished(QString key)
+void HandleSignalRouter::onSubscribeFinished(Provider *provider, QString key)
 {
 }
 
@@ -283,17 +283,18 @@ void ProviderUnitTests::pluginSubscriptionFinishes()
     emit pluginInstances[conStr]->ready(); // set the plugin to ready
     provider->callAllMethodsInQueue();
 
-    QSignalSpy spy(provider, SIGNAL(subscribeFinished(QString)));
+    QSignalSpy spy(provider, SIGNAL(subscribeFinished(Provider *, QString)));
     provider->subscribe("test.key1");
     provider->subscribe("test.key2");
     provider->callAllMethodsInQueue();
     emit pluginInstances[conStr]->subscribeFinished("test.key1");
     emit pluginInstances[conStr]->subscribeFailed("test.key2", "error");
     QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents); // signal delivery is queued
-    QCOMPARE((QList<QList<QVariant> >)spy,
-             QList<QList<QVariant> >()
-             << (QList<QVariant>() << "test.key1")
-             << (QList<QVariant>() << "test.key2"));
+    QCOMPARE(spy.size(), 2);
+    QCOMPARE(spy[0].size(), 2);
+    QCOMPARE(spy[1].size(), 2);
+    QCOMPARE(spy[0][1], QVariant("test.key1"));
+    QCOMPARE(spy[1][1], QVariant("test.key2"));
 }
 
 void ProviderUnitTests::pluginValueChanges()

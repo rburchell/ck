@@ -24,12 +24,12 @@
 
 #include "queuedinvoker.h"
 #include "contextproviderinfo.h"
+#include "timedvalue.h"
 
 #include <QObject>
 #include <QDBusConnection>
 #include <QSet>
 #include <QMutex>
-#include <time.h>
 
 class ContextPropertyInfo;
 
@@ -40,14 +40,6 @@ class SubscriberInterface;
 class DBusNameListener;
 class ManagerInterface;
 class IProviderPlugin;
-
-struct TimedValue
-{
-    struct timespec time;
-    QVariant value;
-    TimedValue(const QVariant &value);
-// future    bool operator<(const TimedValue &other);
-};
 
 class Provider : public QueuedInvoker
 {
@@ -60,15 +52,17 @@ public:
     TimedValue get(const QString &key) const;
 
 signals:
-    void subscribeFinished(QString key);
+    void subscribeFinished(Provider *provider, QString key);
     void valueChanged(QString key);
 
 private slots:
     void onPluginReady();
     void onPluginFailed(QString error);
     void onPluginSubscribeFinished(QString key);
+    void onPluginSubscribeFinished(QString key, TimedValue value);
     void onPluginSubscribeFailed(QString failedKey, QString error);
     void onPluginValueChanged(QString key, QVariant newValue);
+    void onPluginValueChanged(QString key, TimedValue newValue);
 
 private:
     enum PluginState { INITIALIZING, READY, FAILED };

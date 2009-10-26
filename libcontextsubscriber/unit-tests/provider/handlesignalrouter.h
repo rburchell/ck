@@ -38,7 +38,7 @@ public:
 
 public slots:
     void onValueChanged(QString key);
-    void onSubscribeFinished(QString key);
+    void onSubscribeFinished(Provider *provider, QString key);
 };
 
 } // end namespace

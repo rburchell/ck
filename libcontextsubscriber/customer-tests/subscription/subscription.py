@@ -418,6 +418,7 @@ class MultipleSubscribers(unittest.TestCase):
                 self.context_client4.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
         def tearDown(self):
+		self.flexiprovider.send("exit")
                 self.flexiprovider.close()
                 self.context_client1.close()
                 self.context_client2.close()

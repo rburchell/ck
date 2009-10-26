@@ -7,9 +7,10 @@ LIBS += $(QtCore_LIBS) $(QtDBus_LIBS)
 # library dependency hack for seamless make in cli/
 AM_CXXFLAGS += -I$(srcdir)/../../src
 run_test_LDADD = ../../src/libcontextsubscriber.la
-../../src/libcontextsubscriber.la:
+
+../../src/libcontextsubscriber.la: FORCE
 	$(MAKE) -C ../../src libcontextsubscriber.la
-.PHONY: ../../src/libcontextsubscriber.la
+.PHONY: FORCE
 
 # moccing
 nodist_run_test_SOURCES = mocs.cpp

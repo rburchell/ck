@@ -82,7 +82,20 @@
       <case name="libsub016" description="Plugin loading of libcontextsubscriber" requirement="" timeout="20">
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/pluginchanging;python /usr/share/libcontextsubscriber-tests/pluginchanging/pluginchanging.py</step>
       </case>
-
+      <case name="libsub017" description="Multiple providers"
+	    requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/subscription; python multiprovider.py</step>
+      </case>
+      <case name="libsub018" description="Rapid changes"
+	    requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/asynchronicity; python rapidchanges.py</step>
+      </case>
+      <!-- Please add this as soon as the provider library supports the new protocol
+      <case name="libsub019" description="Multiprovider timestamp"
+	    requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/subscription; python multiprovider2.py</step>
+      </case>
+      -->
       <environments>
         <scratchbox>false</scratchbox>
         <hardware>true</hardware>

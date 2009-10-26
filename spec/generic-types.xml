@@ -7,6 +7,12 @@
     <tp:member type="v" name="Value"/>
   </tp:mapping>
 
+  <tp:simple-type name="Maybe_Variant" type="av">
+    <tp:docstring>A list of variants where empty list represents
+    unknown, otherwise it represents the same variant as the contained
+    first variant.  This hack is needed because D-Bus doesn't support
+    null values on the wire.</tp:docstring>
+  </tp:simple-type>
 </tp:generic-types>
 
 

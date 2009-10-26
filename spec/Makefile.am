@@ -17,7 +17,8 @@ SPEC_TOOLS = spec-to-introspect.xsl \
 
 INTERFACES = \
 	Manager.xml \
-	Subscriber.xml
+	Subscriber.xml \
+	ContextKit.xml
 
 SPEC_FILES = \
 	$(INTERFACES) \

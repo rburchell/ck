@@ -4,7 +4,9 @@ endif
 
 DOXYCFG = $(srcdir)/doxy.cfg
 
-doxygen:
+doxygen: html/index.html
+
+html/index.html: ../src/*.cpp ../src/*.h
 	@if test x$(srcdir) = x. ; then \
 		echo srcdir=$(srcdir) $(DOXYGEN) $(DOXYCFG); \
 		srcdir=$(srcdir) $(DOXYGEN) $(DOXYCFG); \
