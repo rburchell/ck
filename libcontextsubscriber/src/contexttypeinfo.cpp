@@ -199,9 +199,8 @@ ContextTypeInfo ContextMapTypeInfo::keyType(QString key)
 
 ContextTypeInfo ContextUniformListTypeInfo::elementType()
 {
-    NanoTree params = nanoTree.keySub("params");
-    NanoTree key = params.keySub("type");
-    return ContextTypeInfo(key);
+    QString typeName = parameterStringValue("type");
+    return resolveTypeName(typeName);
 }
 
 NanoTree ContextTypeInfo::tree()

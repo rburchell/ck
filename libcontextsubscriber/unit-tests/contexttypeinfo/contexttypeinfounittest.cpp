@@ -32,9 +32,9 @@ class ContextTypeInfoUnitTest : public QObject
 private slots:
     void basicTypes();
     void resolveTypeName();
-    void doubleType();
-    void customDoubleType();
-    void uniformList();
+    void parseDoubleType();
+    void parseCustomDoubleType();
+    void parseUniformList();
 };
 
 void ContextTypeInfoUnitTest::basicTypes()
@@ -61,7 +61,7 @@ void ContextTypeInfoUnitTest::resolveTypeName()
     QCOMPARE(ContextTypeInfo::resolveTypeName("string").name(), QString("string"));
 }
 
-void ContextTypeInfoUnitTest::doubleType()
+void ContextTypeInfoUnitTest::parseDoubleType()
 {
     NanoXml nano(LOCAL_FILE("double.xml"));
     QCOMPARE(nano.didFail(), false);
@@ -74,7 +74,7 @@ void ContextTypeInfoUnitTest::doubleType()
     QCOMPARE(typeInfo.doc(), QString("A double value within the given limits."));
 }
 
-void ContextTypeInfoUnitTest::customDoubleType()
+void ContextTypeInfoUnitTest::parseCustomDoubleType()
 {
     NanoXml nano(LOCAL_FILE("custom-double.xml"));
     QCOMPARE(nano.didFail(), false);
@@ -88,7 +88,7 @@ void ContextTypeInfoUnitTest::customDoubleType()
     QCOMPARE(typeInfo.doc(), QString("A double value that represents the level of hell in you."));
 }
 
-void ContextTypeInfoUnitTest::uniformList()
+void ContextTypeInfoUnitTest::parseUniformList()
 {
     NanoXml nano(LOCAL_FILE("uniform-list.xml"));
     QCOMPARE(nano.didFail(), false);
@@ -97,9 +97,7 @@ void ContextTypeInfoUnitTest::uniformList()
     QCOMPARE(listInfo.name(), QString("uniform-list"));
     ContextTypeInfo elementTypeInfo = listInfo.elementType();
     QCOMPARE(elementTypeInfo.name(), QString("double"));
-    QCOMPARE(elementTypeInfo.parameterIntValue("min"), 0);
-    QCOMPARE(elementTypeInfo.parameterIntValue("max"), 10);
-    QCOMPARE(elementTypeInfo.doc(), QString("A double value within the given limits."));
+    QCOMPARE(elementTypeInfo, ContextTypeInfo::doubleType());
 }
 
 #include "contexttypeinfounittest.moc"

@@ -2,15 +2,7 @@
   <params>
     <min doc="Minimum length"/>
     <max doc="Maximum length"/>
-    <type doc="Type of the elements" name="double">
-        <params>
-            <min doc="Minimum value">0</min>
-            <max doc="Maximum value">10</max>
-        </params>
-        <doc>
-            A double value within the given limits.
-        </doc>
-    </type>
+    <type doc="Type of the elements">double</type>
   </params>
   <doc>
     A list of values of the given type, with the
