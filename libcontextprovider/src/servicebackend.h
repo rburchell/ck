@@ -79,7 +79,8 @@ private:
     /// Properties associated with the current service
     QHash<QString, PropertyPrivate*> properties;
 
-    /// Adaptors for property objects (if they are currently registered on D-Bus.
+    /// Adaptors for property objects. According to Qt documentation,
+    /// adaptors should not be deleted.
     QHash<QString, PropertyAdaptor*> createdAdaptors;
 };
 

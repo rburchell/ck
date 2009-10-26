@@ -109,10 +109,9 @@ void ServiceBackend::removeProperty(const QString& key)
     properties.remove(key);
 
     // Unregister the object on D-Bus
-    PropertyAdaptor* adaptor = createdAdaptors.take(key);
+    PropertyAdaptor* adaptor = createdAdaptors[key];
     if (adaptor != 0) {
         connection.unregisterObject(adaptor->objectPath());
-        delete adaptor;
     }
 }
 
@@ -120,14 +119,22 @@ void ServiceBackend::removeProperty(const QString& key)
 /// succeeded, false if failed.
 bool ServiceBackend::registerProperty(const QString& key, PropertyPrivate* property)
 {
-    PropertyAdaptor* adaptor = new PropertyAdaptor(property, &connection);
+    if (createdAdaptors.contains(key) == false) {
+        PropertyAdaptor* adaptor = new PropertyAdaptor(property, &connection);
+        createdAdaptors.insert(key, adaptor);
+    }
+    PropertyAdaptor* adaptor = createdAdaptors[key];
+
+    if (connection.objectRegisteredAt(adaptor->objectPath()) != 0) {
+        // Object already registered; don't do anything
+        return true;
+    }
+
     if (!connection.registerObject(adaptor->objectPath(), property)) {
         contextCritical() << F_SERVICE_BACKEND << "Failed to register the Property object for" << key;
         contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
-        delete adaptor;
         return false;
     }
-    createdAdaptors.insert(key, adaptor);
     return true;
 }
 
@@ -141,12 +148,8 @@ bool ServiceBackend::start()
     contextDebug() << createdAdaptors;
     // Re-register existing Property objects on D-Bus
     foreach (const QString& key, properties.keys()) {
-        if (createdAdaptors.contains(key) == false) {
-            contextDebug() << F_SERVICE << "registering property" << key;
-            // Property not currently registered on D-Bus; register it now
-            if (!registerProperty(key, properties[key])) {
-                return false;
-            }
+        if (!registerProperty(key, properties[key])) {
+            return false;
         }
     }
 
@@ -176,10 +179,7 @@ void ServiceBackend::stop()
     // Unregister Property objects and clean up PropertyAdaptors set
     foreach (PropertyAdaptor* adaptor, createdAdaptors) {
         connection.unregisterObject(adaptor->objectPath());
-        delete adaptor; // this doesn't touch the createdAdaptors set
-        // (it contains invalid pointers now, though)
     }
-    createdAdaptors.clear(); // but we clear it here
 }
 
 /// Sets the ServiceBackend object as the default one to use when
