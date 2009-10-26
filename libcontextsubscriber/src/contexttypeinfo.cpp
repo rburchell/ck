@@ -166,6 +166,8 @@ ContextTypeInfo ContextTypeInfo::resolveTypeName(QString t)
         return ContextTypeInfo::int32Type();
     else if (t == "INTEGER")
         return ContextTypeInfo::int32Type();
+    else if (t == "DOUBLE")
+        return ContextTypeInfo::doubleType();
     // New types
     else if (t == "string")
         return ContextTypeInfo::stringType();

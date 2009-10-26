@@ -31,6 +31,7 @@ class ContextTypeInfoUnitTest : public QObject
 
 private slots:
     void basicTypes();
+    void resolveTypeName();
     void doubleType();
     void customDoubleType();
     void uniformList();
@@ -44,6 +45,20 @@ void ContextTypeInfoUnitTest::basicTypes()
     QCOMPARE(ContextTypeInfo::int32Type().name(), QString("int32"));
     QCOMPARE(ContextTypeInfo::doubleType().name(), QString("double"));
     QCOMPARE(ContextTypeInfo::nullType().name(), QString(""));
+}
+
+void ContextTypeInfoUnitTest::resolveTypeName()
+{
+    QCOMPARE(ContextTypeInfo::resolveTypeName("TRUTH").name(), QString("bool"));
+    QCOMPARE(ContextTypeInfo::resolveTypeName("INT").name(), QString("int32"));
+    QCOMPARE(ContextTypeInfo::resolveTypeName("INTEGER").name(), QString("int32"));
+    QCOMPARE(ContextTypeInfo::resolveTypeName("DOUBLE").name(), QString("double"));
+    QCOMPARE(ContextTypeInfo::resolveTypeName("STRING").name(), QString("string"));
+    QCOMPARE(ContextTypeInfo::resolveTypeName("int32").name(), QString("int32"));
+    QCOMPARE(ContextTypeInfo::resolveTypeName("int64").name(), QString("int64"));
+    QCOMPARE(ContextTypeInfo::resolveTypeName("double").name(), QString("double"));
+    QCOMPARE(ContextTypeInfo::resolveTypeName("bool").name(), QString("bool"));
+    QCOMPARE(ContextTypeInfo::resolveTypeName("string").name(), QString("string"));
 }
 
 void ContextTypeInfoUnitTest::doubleType()
