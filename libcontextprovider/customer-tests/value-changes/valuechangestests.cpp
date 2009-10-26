@@ -48,6 +48,8 @@ void ValueChangesTests::init()
 {
     // Start the services
     service = new Service(QDBusConnection::SessionBus, SERVICE_NAME1);
+
+    // Create separate properties for each test case so that they don't
     test_int = new Property(*service, "Test.Int");
     test_double = new Property(*service, "Test.Double");
 
@@ -80,13 +82,14 @@ void ValueChangesTests::cleanup()
     }
     delete client; client = NULL;
 
-    delete service; service = NULL;
-
+    // Note: we need to delete the properties before deleting the service
     delete test_int; test_int = NULL;
     delete test_double; test_double = NULL;
 
-    // ServiceBackends are deleted in a deferred way, thus we need to
-    // get them deleted
+    delete service; service = NULL;
+
+    // PropertyPrivate and ServiceBackend objects are deleted in a
+    // deferred way, thus we need to get them deleted
     QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
 }
 
@@ -201,10 +204,6 @@ void ValueChangesTests::sameValueSet()
     // Set a value to a property
     test_int->setValue(555);
 
-    while (true) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents);
-    }
-
     // Subscribe to 2 properties (one is currently unknown, the other has a value)
     QString actual = writeToClient("subscribe service1 Test.Int\n");
     QString expected = "Subscribe returned: int:555";
@@ -273,7 +272,6 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
 
     // Expected result: the client got the Changed signal
     expected = "ValueChanged: /org/maemo/contextkit/Test/Int Unknown";
-
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
