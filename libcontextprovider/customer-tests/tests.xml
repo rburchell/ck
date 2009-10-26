@@ -16,7 +16,9 @@
       <case name="libprov004" description="Clients getting value change notifications" requirement="" timeout="50">
         <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/lib/libcontextprovider-tests/;./valuechangestests</step>
       </case>
-
+      <case name="service" description="Operations on the Service class" requirement="" timeout="50">
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/lib/libcontextprovider-tests/;./servicetest</step>
+      </case>
       <environments>
         <scratchbox>false</scratchbox>
         <hardware>true</hardware>
