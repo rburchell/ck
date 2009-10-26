@@ -53,6 +53,7 @@ void ContextTypeInfoUnitTest::customDoubleType()
     QCOMPARE(nano.didFail(), false);
 
     ContextTypeInfo typeInfo(nano);
+    QCOMPARE(typeInfo.name(), QString("custom-double"));
     QCOMPARE(typeInfo.parameterIntValue("min"), 1);
     QCOMPARE(typeInfo.parameterIntValue("max"), 666);
     QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
@@ -65,12 +66,11 @@ void ContextTypeInfoUnitTest::uniformList()
     QCOMPARE(nano.didFail(), false);
 
     ContextUniformListTypeInfo listInfo(nano);
+    QCOMPARE(listInfo.name(), QString("uniform-list"));
     ContextTypeInfo elementTypeInfo = listInfo.elementType();
     QCOMPARE(elementTypeInfo.name(), QString("double"));
     QCOMPARE(elementTypeInfo.parameterIntValue("min"), 0);
     QCOMPARE(elementTypeInfo.parameterIntValue("max"), 10);
-    //QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
-    //QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
 }
 
 #include "contexttypeinfounittest.moc"
