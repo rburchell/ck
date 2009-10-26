@@ -33,6 +33,8 @@
 #include <sys/socket.h>
 #include <string.h>
 
+#define SERVICE_NAME "org.freedesktop.ContextKit.testProvider"
+
 /* Keys (names of the context properties) divided in groups.
 */
 
@@ -171,7 +173,7 @@ int test_init()
 {
     /* Test: initialize using the library */
     int ret = context_provider_init (DBUS_BUS_SESSION,
-                                     "org.freedesktop.ContextKit.testProvider");
+                                     SERVICE_NAME);
     /* Expected result: return value == success */
     if (!ret) return 1;
 
@@ -195,41 +197,32 @@ int test_init()
     return 0;
 }
 
-int test_get_subscriber()
-{
-    /* Test: Command the client to execute GetSubscriber over DBus. */
-    write_to_client("getsubscriber "
-                    "session org.freedesktop.ContextKit.testProvider\n");
-
-    /* Expected result: the client got a correct subscriber path */
-    int mismatch = compare_output("GetSubscriber returned "
-                           "/org/freedesktop/ContextKit/Subscriber/0\n");
-    if (mismatch) return 1;
-    return 0;
-}
-
 int test_subscription()
 {
     /* Test: Command the client to execute Subscribe over DBus. */
-    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
-                    "Group1.Int\n");
+    write_to_client("assign session " SERVICE_NAME " service\n");
+
+    write_to_client("subscribe service Group1.Int\n");
 
     /* Expected result: the client got the key as Unknown */
-    int mismatch = compare_output("Known keys: Unknown keys: Group1.Int \n");
+    int mismatch = compare_output("Subscribe returned: Unknown\n");
     if (mismatch) return 1;
 
     /* Expected result: we are notified that the client is now subscribed */
-    if (!group1_subscribed) return 1;
-    if (group1_cb_callcount != 1) return 1;
-
+    if (group1_cb_callcount != 1) {
+        fprintf(stderr, "Error: group 1 callcount is %d instead of 1\n", group1_cb_callcount);
+        return 1;
+    }
+    if (!group1_subscribed) {
+        fprintf(stderr, "Error: group 1 not subscribed\n");
+        return 1;
+    }
     /* Test: set a value to a key and command the client to subscribe to it */
     context_provider_set_double("Group1.Double", 55.2);
-    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
-                    "Group1.Double\n");
+    write_to_client("subscribe service Group1.Double\n");
 
     /* Expected result: the client got the key and the value */
-    mismatch = compare_output("Known keys: Group1.Double(double:55.2) "
-                                  "Unknown keys:  \n");
+    mismatch = compare_output("Subscribe returned: double:55.2\n");
     if (mismatch) return 1;
 
     /* Expected result: we are still subscribed but not notified again */
@@ -240,18 +233,24 @@ int test_subscription()
     context_provider_set_string("Group1.String", "teststring");
     context_provider_set_boolean("Group1.Bool", 1);
 
-    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
-                    "Group1.String Group1.Bool Invalid.Key\n");
+    write_to_client("subscribe service Group1.String\n");
+    mismatch = compare_output("Subscribe returned: QString:teststring\n");
+    if (mismatch) return 1;
 
-    /* Expected result: the client got the keys and the values */
-    mismatch = compare_output("Known keys: Group1.Bool(bool:true) "
-                              "Group1.String(QString:teststring) "
-                              "Unknown keys:  \n");
+    write_to_client("subscribe service Group1.Bool\n");
+    mismatch = compare_output("Subscribe returned: bool:true\n");
     if (mismatch) return 1;
 
     /* Expected result: we are still subscribed but not notified again */
-    if (!group1_subscribed) return 1;
-    if (group1_cb_callcount != 1) return 1;
+    if (!group1_subscribed) {
+        fprintf(stderr, "Error: group 1 not subscribed\n");
+        return 1;
+    }
+
+    if (group1_cb_callcount != 1) {
+        fprintf(stderr, "Error: group 1 callcount is %d instead of 1\n", group1_cb_callcount);
+        return 1;
+    }
 
     /* Expected result: during the whole test, non-relevant callbacks
      * are not called */
@@ -265,16 +264,14 @@ int test_subscription()
 int test_callbacks()
 {
     /* Test: Command the client to subscribe to a property */
-    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
-                    "Single1.Key\n");
+    write_to_client("subscribe service Single1.Key\n");
 
     /* Expected result: we are notified that the client is now subscribed */
     if (!single1_subscribed) return 1;
     if (single1_cb_callcount != 1) return 1;
 
     /* Test: Command the client to unsubscribe */
-    write_to_client("unsubscribe org.freedesktop.ContextKit.testProvider "
-                    "Single1.Key\n");
+    write_to_client("unsubscribe service Single1.Key\n");
 
     /* Expected result: we are notified that the client is now unsubscribed */
     if (single1_subscribed) return 1;
@@ -291,9 +288,9 @@ int test_value_changes()
     write_to_client("waitforchanged 3000\n");
 
     /* Expected result: the client got the signal */
-    int mismatch = compare_output("Changed signal received, parameters: "
-                              "Known keys: Group1.Double(double:-41.987) "
-                              "Unknown keys:  \n");
+    int mismatch = compare_output("ValueChanged: "
+                                  "/org/maemo/contextkit/Group1/Double "
+                                  "double:-41.987\n");
     if (mismatch) return 1;
 
     write_to_client("resetsignalstatus\n");
@@ -303,9 +300,8 @@ int test_value_changes()
     write_to_client("waitforchanged 3000\n");
 
     /* Expected result: the client got the signal */
-    mismatch = compare_output("Changed signal received, parameters: "
-                              "Known keys: "
-                              "Unknown keys: Group1.String \n");
+    mismatch = compare_output("ValueChanged: "
+                              "/org/maemo/contextkit/Group1/String Unknown\n");
     if (mismatch) return 1;
 
     write_to_client("resetsignalstatus\n");
@@ -318,24 +314,11 @@ int test_value_changes()
     mismatch = compare_output("Timeout\n");
     if (mismatch) return 1;
 
-    /* Test: two properties change at the same time */
-    context_provider_set_integer("Group1.Int", 343);
-    context_provider_set_boolean("Group1.Bool", 0);
-
-    write_to_client("waitforchanged 3000\n");
-
-    /* Expected result: the client gets both in the same signal */
-    mismatch = compare_output("Changed signal received, parameters: "
-                              "Known keys: Group1.Bool(bool:false) "
-                              "Group1.Int(int:343) "
-                              "Unknown keys: \n");
-    if (mismatch) return 1;
-
     write_to_client("resetsignalstatus\n");
 
     /* Test: set two properties the same values they already have */
-    context_provider_set_integer("Group1.Int", 343);
-    context_provider_set_boolean("Group1.Bool", 0);
+    context_provider_set_double("Group1.Double", -41.987);
+    context_provider_set_null("Group1.String");
 
     write_to_client("waitforchanged 3000\n");
 
@@ -349,8 +332,11 @@ int test_value_changes()
 int test_unsubscription()
 {
     /* Test: Command the client to unsubscribe from all Group1 keys. */
-    write_to_client("unsubscribe org.freedesktop.ContextKit.testProvider "
-                    "Group1.Int Group1.Bool Group1.Double Group1.String\n");
+    write_to_client("unsubscribe service Group1.Int\n");
+    write_to_client("unsubscribe service Group1.Bool\n");
+    write_to_client("unsubscribe service Group1.Double\n");
+    write_to_client("unsubscribe service Group1.String\n");
+
     /* Expected result: we are notified that group1 is no longer
      * subscribed to*/
     if (group1_subscribed) return 1;
@@ -381,42 +367,22 @@ int test_resetting_values()
      * reset-to-null=true, group2 and single2 with reset-to-null=false */
 
     /* Test: Command the client to subscribe */
-    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
-                    "Group1.Int Group2.Key2 Single1.Key Single2.Key\n");
-    /* Expected result: the key is in the unknown list*/
-    int mismatch = compare_output("Known keys: "
-                                  "Unknown keys: Group1.Int Group2.Key2 "
-                                  "Single1.Key Single2.Key \n");
+    /* Expected result: the keys with reset-to-null=true are unknown*/
+
+    write_to_client("subscribe service Group1.Int\n"); /* resetted */
+    int mismatch = compare_output("Subscribe returned: Unknown\n");
     if (mismatch) return 1;
 
-    /* Test: Set a value to the key */
-    context_provider_set_integer("Group1.Int", 44);
-    context_provider_set_integer("Group2.Key2", 100);
-    context_provider_set_string("Single1.Key", "something");
-    context_provider_set_string("Single2.Key", "else");
-    write_to_client("waitforchanged 3000\n");
-
-    /* Expected result: the client got the signal */
-    mismatch = compare_output("Changed signal received, parameters: "
-                              "Known keys: Group1.Int(int:44) "
-                              "Group2.Key2(int:100) "
-                              "Single1.Key(QString:something) "
-                              "Single2.Key(QString:else) Unknown keys:  \n");
+    write_to_client("subscribe service Group2.Key1\n");
+    mismatch = compare_output("Subscribe returned: int:-365\n");
     if (mismatch) return 1;
 
-    /* Test: Unsubscribe from the keys */
-    write_to_client("unsubscribe org.freedesktop.ContextKit.testProvider "
-                    "Group1.Int Group2.Key2 Single1.Key Single2.Key\n");
+    write_to_client("subscribe service Single1.Key\n"); /* resetted */
+    mismatch = compare_output("Subscribe returned: Unknown\n");
+    if (mismatch) return 1;
 
-    /* Test: Subscribe again */
-    write_to_client("subscribe org.freedesktop.ContextKit.testProvider "
-                    "Group1.Int Group2.Key2 Single1.Key Single2.Key\n");
-    /* Expected result: the key Group.Int is in the unknown list --
-       even if we previously set a value. But the key Group2.Key2 has
-       kept its value. The same for Single1.Key and Single2.Key.*/
-    mismatch = compare_output("Known keys: Group2.Key2(int:100) "
-                              "Single2.Key(QString:else) "
-                              "Unknown keys: Group1.Int Single1.Key \n");
+    write_to_client("subscribe service Single2.Key\n");
+    mismatch = compare_output("Subscribe returned: Unknown\n");
     if (mismatch) return 1;
 
     return 0;
@@ -428,11 +394,11 @@ int test_stopping()
     context_provider_stop();
 
     /* Expected result: the client can no longer get a subscriber */
-    write_to_client("getsubscriber "
-                    "session org.freedesktop.ContextKit.testProvider\n");
+    write_to_client("subscribe service Group1.Int\n");
 
     /* Expected result: the client got a correct subscriber path */
-    int mismatch = compare_output("GetSubscriber error: invalid reply\n");
+    int mismatch = compare_output("Subscribe error: "
+                                  "org.freedesktop.DBus.Error.ServiceUnknown\n");
     if (mismatch) return 1;
 
     return 0;
@@ -453,14 +419,6 @@ int run_tests()
     /* Uncomment this if you want to run the test program as a
        stand-alone provider:*/
     /* while (1) g_main_context_iteration(NULL, FALSE);*/
-
-    fprintf(stderr, "Running test_get_subscriber... ");
-    ret = test_get_subscriber();
-    if (ret) {
-        fprintf(stderr, "FAIL\n");
-        return ret;
-    }
-    fprintf(stderr, "PASS\n");
 
     fprintf(stderr, "Running test_subscription... ");
     ret = test_subscription();
