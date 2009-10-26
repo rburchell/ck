@@ -29,7 +29,7 @@ class PropertyProxy : public QObject
 {
     Q_OBJECT;
 public:
-    PropertyProxy(QString key, QObject *parent = 0);
+    PropertyProxy(QString key, bool enabled = true, QObject *parent = 0);
     void enable(bool enable);
     QVariant realValue() const;
 private slots:

@@ -32,6 +32,7 @@ class QFile;
 class QSocketNotifier;
 class QString;
 class PropertyProxy;
+class ContextRegistryInfo;
 template <typename K, typename V> class QMap;
 
 class CommandWatcher : public QObject
@@ -42,7 +43,6 @@ public:
     CommandWatcher(QString busName, QDBusConnection::BusType busType, int commandfd, QObject *parent = 0);
     ~CommandWatcher();
     void addCommand(const QStringList& args);
-    void makeProxy(const QString &key);
     static const QString commanderBusName;
 
 private:
@@ -63,6 +63,8 @@ private:
     QMap <QString, QString> types;          // key -> type
     QMap <QString, Property*> properties;   // property index
     QMap <QString, PropertyProxy*> proxies;
+    ContextRegistryInfo *registryInfo;
+
     QTextStream out;
     QString busName;
     QDBusConnection::BusType busType;
@@ -70,6 +72,7 @@ private:
 
 private slots:
     void onActivated();
+    void onRegistryChanged();
 };
 
 #endif

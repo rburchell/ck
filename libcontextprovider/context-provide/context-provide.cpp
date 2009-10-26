@@ -20,8 +20,7 @@
  */
 
 #include "commandwatcher.h"
-#include "contextregistryinfo.h"
-#include "contextpropertyinfo.h"
+
 #include <QCoreApplication>
 #include <QString>
 #include <QStringList>
@@ -107,12 +106,6 @@ int main(int argc, char **argv)
 
     for (int i=2; i < args.count(); i+=3)
         commandWatcher.addCommand(args.mid(i, 3));
-
-    if (busName == QString(CommandWatcher::commanderBusName))
-        foreach (QString key, ContextRegistryInfo::instance()->listKeys())
-            if (ContextPropertyInfo(key).provided()) {
-                commandWatcher.makeProxy(key);
-            }
 
     if (args.count() > 2) {
         qDebug() << "Autostarting the service, since you have had properties on the command line";

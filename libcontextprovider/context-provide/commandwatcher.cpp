@@ -22,7 +22,10 @@
 #include "commandwatcher.h"
 #include "propertyproxy.h"
 #include "sconnect.h"
+#include <contextpropertyinfo.h>
+#include <contextregistryinfo.h>
 #include <service.h>
+
 #include <QTextStream>
 #include <QFile>
 #include <QSocketNotifier>
@@ -38,23 +41,41 @@
 const QString CommandWatcher::commanderBusName = "org.freedesktop.ContextKit.Commander";
 
 CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int commandfd, QObject *parent) :
-    QObject(parent), commandfd(commandfd), out(stdout), busName(bn), busType(bt),
-    started(false)
+    QObject(parent), commandfd(commandfd),
+    registryInfo(ContextRegistryInfo::instance()),
+    out(stdout), busName(bn), busType(bt), started(false)
 {
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
     sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
+    if (busName == commanderBusName) {
+        ContextProperty::ignoreCommander();
+        sconnect(registryInfo, SIGNAL(changed()), this, SLOT(onRegistryChanged()));
+        onRegistryChanged();
+    }
 }
 
 CommandWatcher::~CommandWatcher()
 {
-    foreach(Property* p, properties) {
+    foreach(Property *p, properties)
         delete p;
-    }
+    foreach(PropertyProxy *p, proxies)
+        delete p;
 }
 
-void CommandWatcher::makeProxy(const QString &key)
+void CommandWatcher::onRegistryChanged()
 {
-    proxies.insert(key, new PropertyProxy(key, this));
+    qDebug() << "registry changed";
+    foreach (PropertyProxy *p, proxies)
+        delete p;
+    proxies.clear();
+    // (Re)create the proxies and restore the user's will of overriding.
+    foreach (QString key, registryInfo->listKeys()) {
+        if (ContextPropertyInfo(key).provided()) {
+            qDebug() << "creating proxy for" << key;
+            proxies.insert(key, new PropertyProxy(key, !properties.contains(key),
+                                                  this));
+        }
+    }
 }
 
 void CommandWatcher::onActivated()
@@ -167,7 +188,7 @@ void CommandWatcher::addCommand(const QStringList& args)
     } else {
         types.insert(keyName, keyType);
         properties.insert(keyName, new Property(keyName));
-        if (busName == CommandWatcher::commanderBusName)
+        if (busName == commanderBusName)
             proxies[keyName]->enable(false);
         out << "Added key: " << keyName << " with type: " << keyType << endl;
         out.flush();
@@ -194,8 +215,8 @@ void CommandWatcher::delCommand(const QStringList &args)
     const QString keyName = unquote(args.at(0));
 
     types.remove(keyName);
-    properties.remove(keyName);
-    if (busName == CommandWatcher::commanderBusName)
+    delete properties.take(keyName);
+    if (busName == commanderBusName)
         proxies[keyName]->enable(true);
     out << "Deleted key: " << keyName << endl;
     out.flush();
