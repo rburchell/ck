@@ -59,6 +59,8 @@ public:
     static ContextTypeInfo resolveTypeName(QString t);
 
 protected:
+    static ContextTypeInfo buildPrimitiveType(QString name);
+
     NanoTree nanoTree;
 };
 

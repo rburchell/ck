@@ -114,6 +114,17 @@ int ContextTypeInfo::parameterIntValue(QString p) const
     return key.intValue();
 }
 
+ContextTypeInfo ContextTypeInfo::buildPrimitiveType(QString name)
+{
+    QVariantList type;
+    QVariantList tree;
+    type << QVariant("name");
+    type << QVariant(name);
+    tree << QVariant("type");
+    tree << QVariant(type);
+    return ContextTypeInfo(QVariant(tree));
+}
+
 ContextTypeInfo ContextTypeInfo::nullType()
 {
     return ContextTypeInfo(QVariant());
@@ -121,46 +132,27 @@ ContextTypeInfo ContextTypeInfo::nullType()
 
 ContextTypeInfo ContextTypeInfo::int64Type()
 {
-    QVariantList type;
-    QVariantList tree;
-    type << QVariant("name");
-    type << QVariant("int64");
-    tree << QVariant("type");
-    tree << QVariant(type);
-    return ContextTypeInfo(QVariant(tree));
+    return buildPrimitiveType("int64");
 }
 
 ContextTypeInfo ContextTypeInfo::stringType()
 {
-    QVariantList type;
-    QVariantList tree;
-    type << QVariant("name");
-    type << QVariant("string");
-    tree << QVariant("type");
-    tree << QVariant(type);
-    return ContextTypeInfo(QVariant(tree));
+    return buildPrimitiveType("string");
 }
 
 ContextTypeInfo ContextTypeInfo::doubleType()
 {
-    QVariantList type;
-    QVariantList tree;
-    type << QVariant("name");
-    type << QVariant("double");
-    tree << QVariant("type");
-    tree << QVariant(type);
-    return ContextTypeInfo(QVariant(tree));
+    return buildPrimitiveType("double");
 }
 
 ContextTypeInfo ContextTypeInfo::boolType()
 {
-    QVariantList type;
-    QVariantList tree;
-    type << QVariant("name");
-    type << QVariant("bool");
-    tree << QVariant("type");
-    tree << QVariant(type);
-    return ContextTypeInfo(QVariant(tree));
+    return buildPrimitiveType("bool");
+}
+
+ContextTypeInfo ContextTypeInfo::int32Type()
+{
+    return buildPrimitiveType("int32");
 }
 
 ContextTypeInfo ContextTypeInfo::resolveTypeName(QString t)
@@ -187,17 +179,6 @@ ContextTypeInfo ContextTypeInfo::resolveTypeName(QString t)
         return ContextTypeInfo::boolType();
     else
         return ContextTypeInfo(QVariant());
-}
-
-ContextTypeInfo ContextTypeInfo::int32Type()
-{
-    QVariantList type;
-    QVariantList tree;
-    type << QVariant("name");
-    type << QVariant("int32");
-    tree << QVariant("type");
-    tree << QVariant(type);
-    return ContextTypeInfo(QVariant(tree));
 }
 
 /* ContextMapTypeInfo */
