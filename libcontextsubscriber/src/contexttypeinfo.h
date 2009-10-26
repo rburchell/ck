@@ -66,6 +66,7 @@ class ContextUniformListTypeInfo : public ContextTypeInfo
     Q_OBJECT
 
 public:
+    explicit ContextUniformListTypeInfo(const NanoTree &tree) : ContextTypeInfo(tree) {};
     ContextTypeInfo elementType();
 };
 

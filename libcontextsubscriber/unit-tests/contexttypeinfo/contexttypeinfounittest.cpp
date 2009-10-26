@@ -32,6 +32,7 @@ class ContextTypeInfoUnitTest : public QObject
 private slots:
     void doubleType();
     void customDoubleType();
+    void uniformList();
 };
 
 void ContextTypeInfoUnitTest::doubleType()
@@ -51,11 +52,25 @@ void ContextTypeInfoUnitTest::customDoubleType()
     NanoXml nano(LOCAL_FILE("custom-double.xml"));
     QCOMPARE(nano.didFail(), false);
 
-    ContextTypeInfo typeInfo(nano);    
+    ContextTypeInfo typeInfo(nano);
     QCOMPARE(typeInfo.parameterIntValue("min"), 1);
     QCOMPARE(typeInfo.parameterIntValue("max"), 666);
     QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
     QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
+}
+
+void ContextTypeInfoUnitTest::uniformList()
+{
+    NanoXml nano(LOCAL_FILE("uniform-list.xml"));
+    QCOMPARE(nano.didFail(), false);
+
+    ContextUniformListTypeInfo listInfo(nano);
+    ContextTypeInfo elementTypeInfo = listInfo.elementType();
+    QCOMPARE(elementTypeInfo.name(), QString("double"));
+    QCOMPARE(elementTypeInfo.parameterIntValue("min"), 0);
+    QCOMPARE(elementTypeInfo.parameterIntValue("max"), 10);
+    //QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
+    //QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
 }
 
 #include "contexttypeinfounittest.moc"
