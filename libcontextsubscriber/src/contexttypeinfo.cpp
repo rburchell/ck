@@ -125,6 +125,14 @@ ContextTypeInfo ContextTypeInfo::intType()
     return ContextTypeInfo(QVariant(lst));
 }
 
+ContextTypeInfo ContextTypeInfo::boolType()
+{
+    QVariantList lst;
+    lst << QVariant("type");
+    lst << QVariant("bool");
+    return ContextTypeInfo(QVariant(lst));
+}
+
 ContextTypeInfo typeFromOldType(QString t)
 {
     if (t == "TRUTH")

@@ -48,6 +48,7 @@ public:
     static ContextTypeInfo int64Type();
     static ContextTypeInfo intType();
     static ContextTypeInfo stringType();
+    static ContextTypeInfo boolType();
     static ContextTypeInfo typeFromOldType(QString t);
 
 protected:
