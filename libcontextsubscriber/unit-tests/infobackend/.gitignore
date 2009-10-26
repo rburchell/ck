@@ -17,3 +17,7 @@ loggingfeatures.h
 nanoxml.cpp
 nanoxml.h
 contextproviderinfo.h
+contexttypeinfo.cpp
+contexttypeinfo.h
+nanotree.cpp
+nanotree.h
