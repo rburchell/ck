@@ -47,6 +47,7 @@ public:
     static ContextTypeInfo int64Type();
     static ContextTypeInfo intType();
     static ContextTypeInfo stringType();
+    static ContextTypeInfo typeFromOldType(QString t);
 
 protected:
     NanoTree nanoTree;

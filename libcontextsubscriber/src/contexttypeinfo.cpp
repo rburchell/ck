@@ -120,6 +120,18 @@ ContextTypeInfo ContextTypeInfo::intType()
     return ContextTypeInfo(QVariant(lst));
 }
 
+ContextTypeInfo typeFromOldType(QString t)
+{
+    if (t == "TRUTH")
+        return ContextTypeInfo::intType();
+    else if (t == "STRING")
+        return ContextTypeInfo::stringType();
+    else if (t == "INTEGER")
+        return ContextTypeInfo::intType();
+    else
+        return ContextTypeInfo(QVariant());
+}
+
 /* ContextMapTypeInfo */
 
 QString ContextMapTypeInfo::keyDoc(QString key)
