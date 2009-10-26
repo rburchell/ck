@@ -30,11 +30,15 @@ class PropertyProxy : public QObject
     Q_OBJECT;
 public:
     PropertyProxy(QString key, QObject *parent = 0);
+    void enable(bool enable);
+    QVariant realValue() const;
 private slots:
     void onValueChanged();
 private:
     ContextProvider::Property *provider;
     ContextProperty *subscriber;
+    bool enabled;
+    QVariant value;
 };
 
 #endif

@@ -22,7 +22,6 @@
 #include "commandwatcher.h"
 #include "contextregistryinfo.h"
 #include "contextpropertyinfo.h"
-#include "propertyproxy.h"
 #include <QCoreApplication>
 #include <QString>
 #include <QStringList>
@@ -112,7 +111,7 @@ int main(int argc, char **argv)
     if (busName == QString(CommandWatcher::commanderBusName))
         foreach (QString key, ContextRegistryInfo::instance()->listKeys())
             if (ContextPropertyInfo(key).provided()) {
-                new PropertyProxy(key, &app);
+                commandWatcher.makeProxy(key);
             }
 
     if (args.count() > 2) {

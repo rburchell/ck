@@ -20,6 +20,7 @@
  */
 
 #include "commandwatcher.h"
+#include "propertyproxy.h"
 #include "sconnect.h"
 #include <service.h>
 #include <QTextStream>
@@ -37,7 +38,8 @@
 const QString CommandWatcher::commanderBusName = "org.freedesktop.ContextKit.Commander";
 
 CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int commandfd, QObject *parent) :
-    QObject(parent), commandfd(commandfd), out(stdout), busName(bn), busType(bt), started(false)
+    QObject(parent), commandfd(commandfd), out(stdout), busName(bn), busType(bt),
+    started(false)
 {
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
     sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
@@ -48,6 +50,11 @@ CommandWatcher::~CommandWatcher()
     foreach(Property* p, properties) {
         delete p;
     }
+}
+
+void CommandWatcher::makeProxy(const QString &key)
+{
+    proxies.insert(key, new PropertyProxy(key, this));
 }
 
 void CommandWatcher::onActivated()
@@ -79,6 +86,7 @@ void CommandWatcher::help()
     qDebug() << "Available commands:\n";
     qDebug() << "  add TYPE KEY [VALUE]            - create new key with the given type";
     qDebug() << "  KEY=VALUE                       - set KEY to the given VALUE";
+    qDebug() << "  info KEY                        - prints the real (proxied) value of KEY";
     qDebug() << "  unset KEY                       - sets KEY to unknown";
     qDebug() << "  del KEY                         - delete KEY, useful if the tool is commander";
     qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
@@ -106,6 +114,8 @@ void CommandWatcher::interpret(const QString& command)
             addCommand(args);
         } else if (QString("del").startsWith(commandName)) {
             delCommand(args);
+        } else if (QString("info").startsWith(commandName)) {
+             infoCommand(args);
         } else if (QString("sleep").startsWith(commandName)) {
             sleepCommand(args);
         } else if (QString("exit").startsWith(commandName)) {
@@ -157,6 +167,8 @@ void CommandWatcher::addCommand(const QStringList& args)
     } else {
         types.insert(keyName, keyType);
         properties.insert(keyName, new Property(keyName));
+        if (busName == CommandWatcher::commanderBusName)
+            proxies[keyName]->enable(false);
         out << "Added key: " << keyName << " with type: " << keyType << endl;
         out.flush();
     }
@@ -164,6 +176,8 @@ void CommandWatcher::addCommand(const QStringList& args)
     // handle default value
     if (args.count() > 2)
         setCommand(keyName + "=\"" + QStringList(args.mid(2)).join(" ") + "\"");
+    else
+        unsetCommand(QStringList(keyName));
 
     // if service is already started then it has to be restarted after a property is added
     if (started && busName != CommandWatcher::commanderBusName)
@@ -173,7 +187,7 @@ void CommandWatcher::addCommand(const QStringList& args)
 void CommandWatcher::delCommand(const QStringList &args)
 {
     if (args.count() < 1) {
-        qDebug() << "ERROR: need to specify both KEY and TYPE";
+        qDebug() << "ERROR: need to specify KEY";
         return;
     }
 
@@ -181,8 +195,28 @@ void CommandWatcher::delCommand(const QStringList &args)
 
     types.remove(keyName);
     properties.remove(keyName);
+    if (busName == CommandWatcher::commanderBusName)
+        proxies[keyName]->enable(true);
     out << "Deleted key: " << keyName << endl;
     out.flush();
+}
+
+void CommandWatcher::infoCommand(const QStringList &args)
+{
+    if (args.count() < 1) {
+        qDebug() << "ERROR: need to specify KEY";
+        return;
+    }
+    QString keyName = args.at(0);
+    if (!properties.contains(keyName)) {
+        qDebug() << "ERROR:" << keyName << "not known/added";
+        return;
+    }
+    out << types[keyName] << " " << keyName << " "
+        << properties[keyName]->value().toString() << endl;
+    if (busName == commanderBusName)
+        out << "real: " << proxies[keyName]->realValue().typeName() << " "
+            << proxies[keyName]->realValue().toString() << endl;
 }
 
 void CommandWatcher::sleepCommand(const QStringList& args)

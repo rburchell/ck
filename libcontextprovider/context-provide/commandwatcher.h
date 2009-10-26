@@ -31,6 +31,7 @@ using namespace ContextProvider;
 class QFile;
 class QSocketNotifier;
 class QString;
+class PropertyProxy;
 template <typename K, typename V> class QMap;
 
 class CommandWatcher : public QObject
@@ -41,6 +42,7 @@ public:
     CommandWatcher(QString busName, QDBusConnection::BusType busType, int commandfd, QObject *parent = 0);
     ~CommandWatcher();
     void addCommand(const QStringList& args);
+    void makeProxy(const QString &key);
     static const QString commanderBusName;
 
 private:
@@ -52,6 +54,7 @@ private:
     void flushCommand();
     void dumpCommand(const QStringList& args);
     void delCommand(const QStringList& args);
+    void infoCommand(const QStringList& args);
     void startCommand();
     QString unquote(const QString& str);
 
@@ -59,6 +62,7 @@ private:
     QSocketNotifier *commandNotifier;
     QMap <QString, QString> types;          // key -> type
     QMap <QString, Property*> properties;   // property index
+    QMap <QString, PropertyProxy*> proxies;
     QTextStream out;
     QString busName;
     QDBusConnection::BusType busType;
