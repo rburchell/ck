@@ -140,7 +140,9 @@ namespace ContextProvider {
     delete s2; // the "com.example.simple" just disappeared from D-Bus
     \endcode
 
-    Every Property object must be associated with a Service object.
+    Every Property object is associated with a Service object. If you
+    delete the Service object, the associated Property objects will
+    turn invalid and you should not use them.
 
     A Service can be running or stopped.  When it is running, it is
     visible via D-Bus and clients can subscribe to its properties.

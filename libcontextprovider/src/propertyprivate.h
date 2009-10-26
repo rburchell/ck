@@ -37,6 +37,10 @@ class PropertyPrivate : public QObject
 
 public:
     explicit PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent = 0);
+    virtual ~PropertyPrivate();
+
+    void ref();
+    void unref();
 
     void setValue(const QVariant& v);
     void updateOverheardValue(const QVariantList&, const quint64&);
@@ -52,6 +56,7 @@ private:
     static quint64 currentTimestamp();
     void emitValue();
 
+    int refCount;
     ServiceBackend* serviceBackend; ///< Pointer to the serviceBackend taking care of D-Bus related things
     QString key; ///< Key of this property
     QVariant value; ///< Current value of the property, set by this provider. QVariant() if null.

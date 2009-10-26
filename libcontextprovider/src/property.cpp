@@ -36,8 +36,10 @@ namespace ContextProvider {
     \brief A Property object represents a context property, i.e., a
     key-value pair.
 
-    Each Property object is associated with a Service object at
-    construction time.
+    Every Property object is associated with a Service object. If you
+    delete the Service object, the associated Property objects will
+    turn invalid and you should not use them.
+
 */
 
 /// Create a Property object on \a service for the key \a k.
@@ -71,9 +73,9 @@ void Property::init(ServiceBackend *serviceBackend, const QString &key)
     }
     else {
         priv = new PropertyPrivate(serviceBackend, key);
-        priv->serviceBackend->addProperty(priv->key, priv);
         PropertyPrivate::propertyPrivateMap.insert(lookup, priv);
     }
+    priv->ref();
     sconnect(priv, SIGNAL(firstSubscriberAppeared(const QString&)),
              this, SIGNAL(firstSubscriberAppeared(const QString&)));
     sconnect(priv, SIGNAL(lastSubscriberDisappeared(const QString&)),
@@ -116,6 +118,7 @@ QVariant Property::value()
 Property::~Property()
 {
     contextDebug() << F_PROPERTY << F_DESTROY << "Destroying Property for key:" << priv->key;
+    priv->unref();
 }
 
 } // end namespace

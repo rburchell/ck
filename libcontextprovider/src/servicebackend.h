@@ -51,6 +51,7 @@ public:
     void stop();
 
     void addProperty(const QString& key, PropertyPrivate* property);
+    void removeProperty(const QString& key);
 
     void setAsDefault();
     void setValue(const QString &key, const QVariant &val);

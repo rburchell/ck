@@ -72,6 +72,12 @@ ServiceBackend::~ServiceBackend()
 {
     contextDebug() << F_SERVICE_BACKEND << F_DESTROY << "Destroying Service";
     stop();
+
+    if (properties.size() > 0) {
+        contextCritical() << F_SERVICE_BACKEND << "Destroying a Service object "
+                          << "before destroying the associated Property objects.";
+    }
+
     if (ServiceBackend::defaultServiceBackend == this)
         ServiceBackend::defaultServiceBackend = 0;
 }
@@ -87,11 +93,27 @@ void ServiceBackend::setValue(const QString &key, const QVariant &v)
         contextWarning() << "Cannot set value for Property" << key << ", it does not exist";
 }
 
+/// Associate a PropertyPrivate object with this ServiceBackend. The
+/// corresponding object will appear on D-Bus.
 void ServiceBackend::addProperty(const QString& key, PropertyPrivate* property)
 {
     properties.insert(key, property);
     contextDebug() << F_SERVICE << "registering property" << key;
     registerProperty(key, property);
+}
+
+// Break the association of the PropertyPrivate object with this
+// ServiceBackend. The corresponding object will disappear from D-Bus.
+void ServiceBackend::removeProperty(const QString& key)
+{
+    properties.remove(key);
+
+    // Unregister the object on D-Bus
+    PropertyAdaptor* adaptor = createdAdaptors.take(key);
+    if (adaptor != 0) {
+        connection.unregisterObject(adaptor->objectPath());
+        delete adaptor;
+    }
 }
 
 /// Register a Property with the given name on D-Bus. Returns true if
