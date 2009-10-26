@@ -85,14 +85,6 @@ QStringList InfoXmlBackend::listKeys() const
     return list;
 }
 
-QString InfoXmlBackend::typeForKey(QString key) const
-{
-    if (! keyDataHash.contains(key))
-        return "";
-
-    return keyDataHash.value(key).typeInfo.name();
-}
-
 QString InfoXmlBackend::docForKey(QString key) const
 {
     if (! keyDataHash.contains(key))

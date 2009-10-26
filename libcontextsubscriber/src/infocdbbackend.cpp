@@ -73,10 +73,12 @@ QStringList InfoCdbBackend::listKeys() const
     return variantListToStringList(reader.valuesForKey("KEYS"));
 }
 
+/*
 QString InfoCdbBackend::typeForKey(QString key) const
 {
     return reader.valueForKey(key + ":KEYTYPE").toString();
 }
+*/
 
 QString InfoCdbBackend::docForKey(QString key) const
 {
