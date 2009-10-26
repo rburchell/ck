@@ -86,13 +86,14 @@ void SubscriptionTests::cleanup()
     }
     delete client; client = NULL;
 
-    delete service1; service1 = NULL;
-    delete service2; service2 = NULL;
-
+    // Note: we need to delete the properties before deleting the service
     delete test_int; test_int = NULL;
     delete test_double; test_double = NULL;
     delete test_bool; test_bool = NULL;
     delete test_string; test_string = NULL;
+
+    delete service1; service1 = NULL;
+    delete service2; service2 = NULL;
 
     // ServiceBackedns are deleted in a deferred way, thus we need to
     // get them deleted

@@ -185,7 +185,7 @@ void CommandWatcher::callSubscribe(const QString& name, const QString& key)
     pc.waitForFinished();
     QDBusPendingReply<QList<QVariant>, quint64> reply = pc;
     if (reply.isError()) {
-        out << "Subscribe error: " << reply.reply().errorName() << reply.reply().errorMessage() << endl;
+        out << "Subscribe error: " << reply.reply().errorName() << endl;
         return;
     }
     out << "Subscribe returned: " << describeValue(reply.argumentAt<0>(), reply.argumentAt<1>()) << endl;
