@@ -16,6 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
+
  *
  */
 
@@ -33,6 +34,12 @@ NanoTree::NanoTree(const QVariant &root) : rootVariant(root)
 NanoTree::NanoTree(const NanoTree &tree)
 {
     rootVariant = tree.rootVariant;
+}
+
+NanoTree NanoTree::operator=(const NanoTree& other)
+{
+    rootVariant = other.rootVariant;
+    return *this;
 }
 
 const QVariant& NanoTree::root() const

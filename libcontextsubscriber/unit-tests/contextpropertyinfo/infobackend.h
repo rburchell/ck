@@ -26,6 +26,7 @@
 #include <QStringList>
 #include <QObject>
 #include "contextproviderinfo.h"
+#include "contexttypeinfo.h"
 
 class InfoBackend : public QObject
 {
@@ -34,10 +35,10 @@ class InfoBackend : public QObject
 public:
 
     static InfoBackend* instance(const QString &backendName = "");
-    QString typeForKey(QString key) const;
     QString docForKey(QString key) const;
     bool keyDeclared(QString key) const;
     const QList<ContextProviderInfo> providersForKey(QString key);
+    ContextTypeInfo typeInfoForKey(QString key) const;
 
     void connectNotify(const char *signal);
     void disconnectNotify(const char *signal);

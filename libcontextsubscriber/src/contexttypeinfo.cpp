@@ -22,20 +22,13 @@
 #include "contexttypeinfo.h"
 #include "logging.h"
 
-ContextTypeInfo::ContextTypeInfo(const QVariant &variant)
+ContextTypeInfo::ContextTypeInfo(const QVariant &root) : nanoTree(NanoTree(root))
 {
-    ContextTypeInfo(NanoTree(variant));
 }
 
 ContextTypeInfo::ContextTypeInfo(const NanoTree &tree) : nanoTree(tree)
 {
     QVariant root = nanoTree.root();
-
-    if (root.type() != QVariant::List &&
-        root.toList().at(0).toString() != "type") {
-        contextWarning() << "Nanotree does not represent type!";
-        return;
-    }
 }
 
 ContextTypeInfo::ContextTypeInfo() : nanoTree(QVariant())
@@ -58,7 +51,8 @@ bool ContextTypeInfo::operator!=(const ContextTypeInfo &other) const
 
 ContextTypeInfo ContextTypeInfo::operator=(const ContextTypeInfo& info)
 {
-    return ContextTypeInfo(info);
+    nanoTree = NanoTree(info.nanoTree);
+    return *this;
 }
 
 QString ContextTypeInfo::name() const
@@ -127,34 +121,46 @@ ContextTypeInfo ContextTypeInfo::nullType()
 
 ContextTypeInfo ContextTypeInfo::int64Type()
 {
-    QVariantList lst;
-    lst << QVariant("type");
-    lst << QVariant("int64");
-    return ContextTypeInfo(QVariant(lst));
+    QVariantList type;
+    QVariantList tree;
+    type << QVariant("name");
+    type << QVariant("int64");
+    tree << QVariant("type");
+    tree << QVariant(type);
+    return ContextTypeInfo(QVariant(tree));
 }
 
 ContextTypeInfo ContextTypeInfo::stringType()
 {
-    QVariantList lst;
-    lst << QVariant("type");
-    lst << QVariant("int64");
-    return ContextTypeInfo(QVariant(lst));
+    QVariantList type;
+    QVariantList tree;
+    type << QVariant("name");
+    type << QVariant("string");
+    tree << QVariant("type");
+    tree << QVariant(type);
+    return ContextTypeInfo(QVariant(tree));
 }
 
 ContextTypeInfo ContextTypeInfo::intType()
 {
-    QVariantList lst;
-    lst << QVariant("type");
-    lst << QVariant("int64");
-    return ContextTypeInfo(QVariant(lst));
+    QVariantList type;
+    QVariantList tree;
+    type << QVariant("name");
+    type << QVariant("int");
+    tree << QVariant("type");
+    tree << QVariant(type);
+    return ContextTypeInfo(QVariant(tree));
 }
 
 ContextTypeInfo ContextTypeInfo::boolType()
 {
-    QVariantList lst;
-    lst << QVariant("type");
-    lst << QVariant("bool");
-    return ContextTypeInfo(QVariant(lst));
+    QVariantList type;
+    QVariantList tree;
+    type << QVariant("name");
+    type << QVariant("bool");
+    tree << QVariant("type");
+    tree << QVariant(type);
+    return ContextTypeInfo(QVariant(tree));
 }
 
 ContextTypeInfo ContextTypeInfo::typeFromOldType(QString t)
@@ -163,7 +169,7 @@ ContextTypeInfo ContextTypeInfo::typeFromOldType(QString t)
         return ContextTypeInfo::boolType();
     else if (t == "STRING")
         return ContextTypeInfo::stringType();
-    else if (t == "INTEGER")
+    else if (t == "INT")
         return ContextTypeInfo::intType();
     else
         return ContextTypeInfo(QVariant());

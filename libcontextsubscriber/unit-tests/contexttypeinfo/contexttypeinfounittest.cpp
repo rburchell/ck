@@ -30,10 +30,18 @@ class ContextTypeInfoUnitTest : public QObject
     Q_OBJECT
 
 private slots:
+    void basicTypes();
     void doubleType();
     void customDoubleType();
     void uniformList();
 };
+
+void ContextTypeInfoUnitTest::basicTypes()
+{
+    QCOMPARE(ContextTypeInfo::boolType().name(), QString("bool"));
+    QCOMPARE(ContextTypeInfo::stringType().name(), QString("string"));
+    QCOMPARE(ContextTypeInfo::int64Type().name(), QString("int64"));
+}
 
 void ContextTypeInfoUnitTest::doubleType()
 {

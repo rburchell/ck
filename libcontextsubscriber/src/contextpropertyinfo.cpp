@@ -236,7 +236,13 @@ QString ContextPropertyInfo::type() const
 
     QString typeInfoName = cachedTypeInfo.name();
     if (typeInfoName == "int64")
-        return "INTEGER";
+        return "INT";
+    else if (typeInfoName == "int32")
+        return "INT";
+    else if (typeInfoName == "uint32")
+        return "INT";
+    else if (typeInfoName == "uint64")
+        return "INT";
     else if (typeInfoName == "bool")
         return "TRUTH";
     else if (typeInfoName == "string")

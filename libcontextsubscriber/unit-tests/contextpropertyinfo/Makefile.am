@@ -15,7 +15,11 @@ AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = contextpropertyinfo.cpp                   \
               contextpropertyinfo.h                     \
               loggingfeatures.h                         \
-              contextproviderinfo.h
+              contextproviderinfo.h                     \
+              contexttypeinfo.h				\
+	      contexttypeinfo.cpp			\
+	      nanotree.cpp				\
+	      nanotree.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
