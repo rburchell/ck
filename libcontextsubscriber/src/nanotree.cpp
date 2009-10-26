@@ -121,6 +121,12 @@ int NanoTree::intValue() const
     return NanoTree::variantValue(rootVariant).toInt();
 }
 
+double NanoTree::doubleValue() const
+{
+    return NanoTree::variantValue(rootVariant).toDouble();
+}
+
+
 /* Static accessors */
 
 /// Returns the sub (the trailing) after a given \a key in the specified \a dom tree.
@@ -217,15 +223,15 @@ QVariant NanoTree::variantValue(const QVariant &dom)
 {
     if (dom.type() != QVariant::List)
         return QVariant();
-        
+
     if (dom.toList().size() < 2)
         return QVariant();
-    
+
     foreach(QVariant v, dom.toList()) {
        if (v.type() != QVariant::List)
            return v;
     }
-    
+
     return QVariant();
 }
 

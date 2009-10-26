@@ -50,6 +50,7 @@ public:
     QVariantList keyValues(const QString &key) const;
     QString stringValue() const;
     int intValue() const;
+    double doubleValue() const;
 
     static QVariant keySub(const QString &key, const QVariant &dom);
     static QVariant keyValue(const QString &key, const QVariant &dom);
