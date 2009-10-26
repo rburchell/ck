@@ -132,14 +132,18 @@ void PropertyPrivate::emitValue()
 
 void PropertyPrivate::setSubscribed()
 {
-    subscribed = true;
-    emit firstSubscriberAppeared(key);
+    if (subscribed == false) {
+        subscribed = true;
+        emit firstSubscriberAppeared(key);
+    }
 }
 
 void PropertyPrivate::setUnsubscribed()
 {
-    subscribed = false;
-    emit lastSubscriberDisappeared(key);
+    if (subscribed == true) {
+      subscribed = false;
+      emit lastSubscriberDisappeared(key);
+    }
 }
 
 void PropertyPrivate::updateOverheardValue(const QVariantList& v, const quint64& t)
