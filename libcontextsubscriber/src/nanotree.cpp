@@ -235,3 +235,8 @@ QVariant NanoTree::variantValue(const QVariant &dom)
     return QVariant();
 }
 
+NanoTree::operator QVariant()
+{
+    return rootVariant;
+}
+

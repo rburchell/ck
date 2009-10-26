@@ -38,6 +38,7 @@ public:
     NanoTree(const NanoTree &tree);
     const QVariant& root() const;
     NanoTree operator=(const NanoTree& o);
+    operator QVariant();
 
     QVariant keySub(const QString &key) const;
     QVariant keyValue(const QString &key) const;
