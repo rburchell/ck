@@ -26,6 +26,7 @@
 #include <QStringList>
 #include <QObject>
 #include "contextproviderinfo.h"
+#include "contexttypeinfo.h"
 
 class InfoBackend : public QObject
 {
@@ -43,6 +44,9 @@ public:
 
     /// Returns a type for the given \a key.
     virtual QString typeForKey(QString key) const = 0;
+
+    /// Returns a ContextTypeInfo for the given \a key.
+    virtual ContextTypeInfo typeInfoForKey(QString key) const = 0;
 
     /// Returns the documentation for the given \a key name.
     virtual QString docForKey(QString key) const = 0;

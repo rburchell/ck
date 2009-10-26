@@ -182,3 +182,8 @@ const QList<ContextProviderInfo> InfoCdbBackend::providersForKey(QString key) co
 
     return lst;
 }
+
+ContextTypeInfo InfoCdbBackend::typeInfoForKey(QString key) const
+{
+    return ContextTypeInfo(QVariant());
+}

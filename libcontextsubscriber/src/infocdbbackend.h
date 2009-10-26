@@ -43,6 +43,7 @@ public:
     virtual QString docForKey(QString key) const;
     virtual bool keyDeclared(QString key) const;
     virtual const QList<ContextProviderInfo> providersForKey(QString key) const;
+    virtual ContextTypeInfo typeInfoForKey(QString key) const;
 
     static QString databaseDirectory();
     static QString databasePath();
