@@ -90,7 +90,7 @@ QString InfoXmlBackend::typeForKey(QString key) const
     if (! keyDataHash.contains(key))
         return "";
 
-    return keyDataHash.value(key).type;
+    return keyDataHash.value(key).typeInfo.name();
 }
 
 QString InfoXmlBackend::docForKey(QString key) const
@@ -267,23 +267,24 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
     QString constructionString = NanoXml::keyValue("constructionString", providerTree).toString();
     QString type = canonicalizeType(NanoXml::keyValue("type", keyTree).toString());
     QString doc = NanoXml::keyValue("doc", keyTree).toString();
+    ContextTypeInfo typeInfo = ContextTypeInfo::typeFromOldType(type);
 
     // Warn about description mismatch or add new
     if (keyDataHash.contains(key)) {
         InfoKeyData keyData = keyDataHash.value(key);
 
-        if (type != "" && keyData.type != type)
-            contextWarning() << F_XML << key << "already has type declared -" << keyData.type;
+        if (typeInfo != ContextTypeInfo::nullType() && keyData.typeInfo != typeInfo)
+            contextWarning() << F_XML << key << "already has type declared -" << keyData.typeInfo.name();
 
         if (doc != "" && keyData.doc != doc)
             contextWarning() << F_XML << key << "already has doc declared -" << keyData.doc;
     } else {
         InfoKeyData keyData;
         keyData.name = key;
-        keyData.type = type;
+        keyData.typeInfo = typeInfo;
         keyData.doc = doc;
 
-        contextDebug() << F_XML << "Adding new key" << key << "with type:" << keyData.type;
+        contextDebug() << F_XML << "Adding new key" << key << "with type:" << keyData.typeInfo.name();
         keyDataHash.insert(key, keyData);
     }
 
