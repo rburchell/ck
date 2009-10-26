@@ -40,7 +40,7 @@ private slots:
     void databaseExists();
     void databaseDirectory();
     void listKeys();
-    void typeForKey();
+    void typeInfoForKey();
     void docForKey();
     void keyDeclared();
     void providersForKey();
@@ -58,8 +58,8 @@ void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Internet.BytesOut");
-    writer.add("Battery.Charging:KEYTYPE", "TRUTH");
-    writer.add("Internet.BytesOut:KEYTYPE", "INTEGER");
+    writer.add("Battery.Charging:KEYTYPEINFO", ContextTypeInfo::boolType().tree());
+    writer.add("Internet.BytesOut:KEYTYPEINFO", ContextTypeInfo::int64Type().tree());
     writer.add("Battery.Charging:KEYDOC", "doc1");
 
     QVariantList providers1;
@@ -88,9 +88,9 @@ void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Battery.Capacity");
-    writer.add("Battery.Charging:KEYTYPE", "INTEGER");
+    writer.add("Battery.Charging:KEYTYPEINFO", ContextTypeInfo::int64Type().tree());
     writer.add("Battery.Charging:KEYDOC", "doc1");
-    writer.add("Battery.Capacity:KEYTYPE", "INTEGER");
+    writer.add("Battery.Capacity:KEYTYPEINFO", ContextTypeInfo::int64Type().tree());
     writer.add("Battery.Capacity:KEYDOC", "doc3");
 
     QVariantList providers1;
@@ -147,11 +147,11 @@ void InfoCdbBackendUnitTest::listKeys()
     QVERIFY(keys.contains("Internet.BytesOut"));
 }
 
-void InfoCdbBackendUnitTest::typeForKey()
+void InfoCdbBackendUnitTest::typeInfoForKey()
 {
-    QCOMPARE(backend->typeForKey("Internet.BytesOut"), QString("INTEGER"));
-    QCOMPARE(backend->typeForKey("Battery.Charging"), QString("TRUTH"));
-    QCOMPARE(backend->typeForKey("Does.Not.Exist"), QString());
+    QCOMPARE(backend->typeInfoForKey("Internet.BytesOut").name(), QString("int64"));
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), QString("bool"));
+    QCOMPARE(backend->typeInfoForKey("Does.Not.Exist").name(), QString());
 }
 
 void InfoCdbBackendUnitTest::docForKey()
@@ -201,7 +201,7 @@ void InfoCdbBackendUnitTest::dynamics()
     QCOMPARE(backend->listKeys().count(), 2);
     QVERIFY(backend->listKeys().contains("Battery.Charging"));
     QVERIFY(backend->listKeys().contains("Battery.Capacity"));
-    QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), QString("int64"));
     QCOMPARE(backend->docForKey("Battery.Charging"), QString("doc1"));
 
     // Check providers

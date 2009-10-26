@@ -24,7 +24,11 @@ FROM_SOURCE = 							\
 	loggingfeatures.h                                       \
         nanoxml.h                                               \
         nanoxml.cpp						\
-	contextproviderinfo.h
+	contextproviderinfo.h					\
+	nanotree.h						\
+	nanotree.cpp						\
+	contexttypeinfo.h					\
+	contexttypeinfo.cpp
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
