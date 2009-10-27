@@ -110,6 +110,46 @@ void ServiceTests::startStopStart()
     delete property;
 }
 
+void ServiceTests::recreate()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Test: create a Service and an associated Property
+    Service* service = new Service(QDBusConnection::SessionBus, SERVICE_NAME);
+    Property* property = new Property(*service, "Test.Property");
+
+    // Test: command client to subscribe
+    QString actual = writeToClient("subscribe service Test.Property\n");
+
+    // Expected result: service is started automatically and Subscribe works
+    QString expected = "Subscribe returned: Unknown";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Test: delete the property and the service
+    delete property;
+    delete service;
+
+    actual = writeToClient("subscribe service Test.Property\n");
+
+    // Expected result: the client can no more subscribe
+    expected = "Subscribe error: org.freedesktop.DBus.Error.ServiceUnknown";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Test: recreate the service and try to subscribe again
+    service = new Service(QDBusConnection::SessionBus, SERVICE_NAME);
+    property = new Property(*service, "Test.Property");
+    actual = writeToClient("subscribe service Test.Property\n");
+
+    // Expected result: service is started and Subscribe works
+    expected = "Subscribe returned: Unknown";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    delete service;
+    delete property;
+}
+
 void ServiceTests::readStandardOutput()
 {
     isReadyToRead = true;

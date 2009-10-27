@@ -18,6 +18,7 @@ private slots:
     void cleanup();
 
     void startStopStart();
+    void recreate();
 
 public slots:
     void readStandardOutput();
