@@ -59,7 +59,7 @@ public:
 protected:
     static ContextTypeInfo buildPrimitiveType(QString name);
 
-    NanoTree nanoTree;
+    NanoTree nanoTree; ///< The root nano tree representing this type.
 };
 
 class ContextMapTypeInfo : public ContextTypeInfo
