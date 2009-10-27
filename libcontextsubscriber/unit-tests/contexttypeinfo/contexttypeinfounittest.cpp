@@ -35,6 +35,7 @@ private slots:
     void parseDoubleType();
     void parseCustomDoubleType();
     void parseUniformList();
+    void parseMap();
 };
 
 void ContextTypeInfoUnitTest::basicTypes()
@@ -97,6 +98,22 @@ void ContextTypeInfoUnitTest::parseUniformList()
     QCOMPARE(listInfo.name(), QString("uniform-list"));
     ContextTypeInfo elementTypeInfo = listInfo.elementType();
     QCOMPARE(elementTypeInfo.name(), QString("double"));
+}
+
+void ContextTypeInfoUnitTest::parseMap()
+{
+    NanoXml nano(LOCAL_FILE("person.xml"));
+    QCOMPARE(nano.didFail(), false);
+
+    ContextMapTypeInfo personInfo(nano);
+    QCOMPARE(personInfo.name(), QString("person"));
+    QCOMPARE(personInfo.keyDoc("name"), QString("Name of the person"));
+    QCOMPARE(personInfo.keyDoc("surname"), QString("Surname of the person"));
+    QCOMPARE(personInfo.keyDoc("age"), QString("Age of the person"));
+
+    QCOMPARE(personInfo.keyType("name").name(), QString("string"));
+    QCOMPARE(personInfo.keyType("surname").name(), QString("string"));
+    QCOMPARE(personInfo.keyType("age").name(), QString("int32"));
 }
 
 #include "contexttypeinfounittest.moc"

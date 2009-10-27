@@ -67,6 +67,7 @@ class ContextMapTypeInfo : public ContextTypeInfo
     Q_OBJECT
 
 public:
+    explicit ContextMapTypeInfo(const NanoTree &tree) : ContextTypeInfo(tree) {};
     QString keyDoc(QString key);
     ContextTypeInfo keyType(QString key);
 };

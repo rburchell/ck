@@ -221,7 +221,7 @@ QString ContextMapTypeInfo::keyDoc(QString key)
 /// equivalent of accessing params -> keys -> (key) -> type .
 ContextTypeInfo ContextMapTypeInfo::keyType(QString key)
 {
-    return ContextTypeInfo(nanoTree.keyValue(QString("params"), QString("keys"), key, QString("type")));
+    return resolveTypeName(nanoTree.keyValue(QString("params"), QString("keys"), key, QString("type")).toString());
 }
 
 /* ContextUniformListTypeInfo */
