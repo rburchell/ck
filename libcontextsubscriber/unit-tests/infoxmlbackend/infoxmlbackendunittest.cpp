@@ -93,17 +93,17 @@ void InfoXmlBackendUnitTest::name()
 
 void InfoXmlBackendUnitTest::typeInfoForKey()
 {
-    QCOMPARE(backend->typeInfoForKey("Battery.ChargePercentage"), ContextTypeInfo());
-    QCOMPARE(backend->typeInfoForKey("Key.With.Attribute"), ContextTypeInfo::boolType());
-    QCOMPARE(backend->typeInfoForKey("Battery.LowBattery"), ContextTypeInfo::boolType());
-    QCOMPARE(backend->typeInfoForKey("Key.With.bool"), ContextTypeInfo::boolType());
-    QCOMPARE(backend->typeInfoForKey("Key.With.int32"), ContextTypeInfo::int32Type());
-    QCOMPARE(backend->typeInfoForKey("Key.With.string"), ContextTypeInfo::stringType());
-    QCOMPARE(backend->typeInfoForKey("Key.With.double"), ContextTypeInfo::doubleType());
-    QCOMPARE(backend->typeInfoForKey("Key.With.complex"), ContextTypeInfo()); // FIXME
-    QCOMPARE(backend->typeInfoForKey("Battery.Charging"), ContextTypeInfo::boolType());
-    QCOMPARE(backend->typeInfoForKey("Battery.Voltage"), ContextTypeInfo::int32Type());
-    QCOMPARE(backend->typeInfoForKey("Does.Not.Exist"), ContextTypeInfo());
+    QCOMPARE(backend->typeInfoForKey("Battery.ChargePercentage").name(), ContextTypeInfo().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.Attribute").name(), ContextTypeInfo::boolType().name());
+    QCOMPARE(backend->typeInfoForKey("Battery.LowBattery").name(), ContextTypeInfo::boolType().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.bool").name(), ContextTypeInfo::boolType().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.int32").name(), ContextTypeInfo::int32Type().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.string").name(), ContextTypeInfo::stringType().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.double").name(), ContextTypeInfo::doubleType().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.complex").name(), ContextTypeInfo().name()); // FIXME
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), ContextTypeInfo::boolType().name());
+    QCOMPARE(backend->typeInfoForKey("Battery.Voltage").name(), ContextTypeInfo::int32Type().name());
+    QCOMPARE(backend->typeInfoForKey("Does.Not.Exist").name(), ContextTypeInfo().name());
 }
 
 void InfoXmlBackendUnitTest::docForKey()
@@ -167,8 +167,8 @@ void InfoXmlBackendUnitTest::dynamics()
 
     // Again, some basic check
     QCOMPARE(backend->keyDeclared("System.Active"), true);
-    QCOMPARE(backend->typeInfoForKey("Battery.Charging"), ContextTypeInfo::int32Type());
-    QCOMPARE(backend->typeInfoForKey("System.Active"), ContextTypeInfo::boolType());
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), ContextTypeInfo::int32Type().name());
+    QCOMPARE(backend->typeInfoForKey("System.Active").name(), ContextTypeInfo::boolType().name());
     QCOMPARE(backend->docForKey("System.Active"), QString("This is true when system is active"));
 
     // Test emissions

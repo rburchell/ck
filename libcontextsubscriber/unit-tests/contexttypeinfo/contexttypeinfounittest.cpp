@@ -97,7 +97,6 @@ void ContextTypeInfoUnitTest::parseUniformList()
     QCOMPARE(listInfo.name(), QString("uniform-list"));
     ContextTypeInfo elementTypeInfo = listInfo.elementType();
     QCOMPARE(elementTypeInfo.name(), QString("double"));
-    QCOMPARE(elementTypeInfo, ContextTypeInfo::doubleType());
 }
 
 #include "contexttypeinfounittest.moc"
