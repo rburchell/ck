@@ -29,8 +29,20 @@
 
 namespace ContextProvider {
 
+/*!
+    \class PropertyPrivate ContextProvider ContextProvider
+
+    \brief The private implementation of Property.
+
+    For each (ServiceBackend*, key) pair there exists only one
+    PropertyPrivate; multiple Property objects may share it.
+*/
+
+
 QHash<QPair<ServiceBackend*,QString>, PropertyPrivate*> PropertyPrivate::propertyPrivateMap;
 
+/// Constructor. Register the PropertyPrivate to its ServiceBackend;
+/// this will make the Property object appear on D-Bus.
 PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent)
     : QObject(parent), refCount(0), serviceBackend(serviceBackend),
       key(key), value(QVariant()),  timestamp(currentTimestamp()), subscribed(false),
@@ -40,10 +52,11 @@ PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &
     serviceBackend->addProperty(key, this);
 }
 
-PropertyPrivate::~PropertyPrivate()
-{
-}
-
+/// Set value for the PropertyPrivate. Results in a valueChanged
+/// signal emission, if 1) the value was different than the current
+/// value of the PropertyPrivate, or 2) The provider has overheard
+/// another provider setting a different value having a more recent
+/// time stamp than our last emission.
 void PropertyPrivate::setValue(const QVariant& v)
 {
     contextDebug() << F_PROPERTY << "Setting key:" << key << "to type:" << v.typeName();
@@ -67,9 +80,12 @@ void PropertyPrivate::setValue(const QVariant& v)
     }
 }
 
+/// Emit the valueChanged signal and update the emittedValue and
+/// emittedTimestamp. (If subscribed is false, no value is emitted.)
 void PropertyPrivate::emitValue()
 {
-    // No difference between intention and emitted value, nothing happens
+    // No difference between intention and emitted value, nothing
+    // happens
     if (emittedTimestamp == timestamp && emittedValue == value
         && emittedValue.isNull() == value.isNull())
         return;
@@ -91,6 +107,9 @@ void PropertyPrivate::emitValue()
     emit valueChanged(values, timestamp);
 }
 
+/// Set the PropertyPrivate to subscribed state. If it was in the
+/// unsubscribed state, the firstSubscriberAppeared signal is
+/// emitted. (Property transmits the signal forward.)
 void PropertyPrivate::setSubscribed()
 {
     if (subscribed == false) {
@@ -99,6 +118,9 @@ void PropertyPrivate::setSubscribed()
     }
 }
 
+/// Set the PropertyPrivate to unsubscribed state. If it was in the
+/// subscribed state, the lastSubscriberDisappeared signal is
+/// emitted. (Property transmits the signal forward.)
 void PropertyPrivate::setUnsubscribed()
 {
     if (subscribed == true) {
@@ -107,6 +129,11 @@ void PropertyPrivate::setUnsubscribed()
     }
 }
 
+/// Called by PropertyAdaptor when it has overheard another provider
+/// sending a value on D-Bus. Check if the value is different and more
+/// recent than the value we've emitted last. If so, emit our value
+/// again. This way we ensure that the client gets the correct time
+/// stamp for our value.
 void PropertyPrivate::updateOverheardValue(const QVariantList& v, const quint64& t)
 {
     contextDebug() << "Updating overheard value" << v << t;
@@ -119,7 +146,7 @@ void PropertyPrivate::updateOverheardValue(const QVariantList& v, const quint64&
     else {
         overheardValue = v[0];
     }
-    if (t > emittedTimestamp &&  overheardValue != emittedValue){
+    if (t > emittedTimestamp && overheardValue != emittedValue){
         // record that a different and more recent value than the one
         // emitted has been overheard
         overheard = true;
@@ -129,6 +156,8 @@ void PropertyPrivate::updateOverheardValue(const QVariantList& v, const quint64&
     }
 }
 
+/// Compute a unique time stamp for our value. The time stamp is based
+/// on monotonic clock and its value is: seconds * 10e9 + nanoseconds.
 quint64 PropertyPrivate::currentTimestamp()
 {
     struct timespec time;
@@ -137,7 +166,6 @@ quint64 PropertyPrivate::currentTimestamp()
     toReturn += ((quint64)pow(10,9) * time.tv_sec);
     return toReturn;
 }
-
 
 } // end namespace
 
