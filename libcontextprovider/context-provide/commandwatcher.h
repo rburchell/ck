@@ -55,6 +55,7 @@ private:
     void dumpCommand(const QStringList& args);
     void delCommand(const QStringList& args);
     void infoCommand(const QStringList& args);
+    void listCommand();
     void startCommand();
     QString unquote(const QString& str);
 

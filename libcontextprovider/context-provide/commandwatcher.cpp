@@ -37,6 +37,7 @@
 #include <errno.h>
 #include <QMap>
 #include <QDir>
+#include <QSet>
 
 const QString CommandWatcher::commanderBusName = "org.freedesktop.ContextKit.Commander";
 
@@ -49,6 +50,7 @@ CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int comm
     sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
     if (busName == commanderBusName) {
         ContextProperty::ignoreCommander();
+        ContextProperty::setTypeCheck(true);
         sconnect(registryInfo, SIGNAL(changed()), this, SLOT(onRegistryChanged()));
         onRegistryChanged();
     }
@@ -110,6 +112,7 @@ void CommandWatcher::help()
     qDebug() << "  info KEY                        - prints the real (proxied) value of KEY";
     qDebug() << "  unset KEY                       - sets KEY to unknown";
     qDebug() << "  del KEY                         - delete KEY, useful if the tool is commander";
+    qDebug() << "  list                            - same as calling info for all known keys";
     qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
     qDebug() << "  dump [FILENAME]                 - dump the xml content of the defined props";
     qDebug() << "  start                           - (re)register everything on D-Bus";
@@ -137,6 +140,8 @@ void CommandWatcher::interpret(const QString& command)
             delCommand(args);
         } else if (QString("info").startsWith(commandName)) {
              infoCommand(args);
+        } else if (QString("list").startsWith(commandName)) {
+             listCommand();
         } else if (QString("sleep").startsWith(commandName)) {
             sleepCommand(args);
         } else if (QString("exit").startsWith(commandName)) {
@@ -188,7 +193,7 @@ void CommandWatcher::addCommand(const QStringList& args)
     } else {
         types.insert(keyName, keyType);
         properties.insert(keyName, new Property(keyName));
-        if (busName == commanderBusName)
+        if (busName == commanderBusName && proxies.contains(keyName))
             proxies[keyName]->enable(false);
         out << "Added key: " << keyName << " with type: " << keyType << endl;
         out.flush();
@@ -216,10 +221,18 @@ void CommandWatcher::delCommand(const QStringList &args)
 
     types.remove(keyName);
     delete properties.take(keyName);
-    if (busName == commanderBusName)
+    if (busName == commanderBusName && proxies.contains(keyName))
         proxies[keyName]->enable(true);
     out << "Deleted key: " << keyName << endl;
     out.flush();
+}
+
+void CommandWatcher::listCommand()
+{
+    foreach (QString key,
+             QSet<QString>::fromList(properties.keys()) +
+             QSet<QString>::fromList(proxies.keys()))
+        infoCommand(QStringList(key));
 }
 
 void CommandWatcher::infoCommand(const QStringList &args)
@@ -229,15 +242,27 @@ void CommandWatcher::infoCommand(const QStringList &args)
         return;
     }
     QString keyName = args.at(0);
-    if (!properties.contains(keyName)) {
-        qDebug() << "ERROR:" << keyName << "not known/added";
-        return;
+    if (properties.contains(keyName)) {
+        out << types[keyName] << " " << keyName;
+        if (properties[keyName]->value().isNull())
+            out << " is Unknown" << endl;
+        else
+            out << " = " << properties[keyName]->value().toString() << endl;
+    } else if (busName != commanderBusName) {
+        qDebug() << "ERROR:" << keyName << "not addd";
     }
-    out << types[keyName] << " " << keyName << " "
-        << properties[keyName]->value().toString() << endl;
-    if (busName == commanderBusName)
-        out << "real: " << proxies[keyName]->realValue().typeName() << " "
-            << proxies[keyName]->realValue().toString() << endl;
+    if (busName == commanderBusName) {
+        if (!proxies.contains(keyName))
+            qDebug() << "ERROR:" << keyName << "not known";
+        else {
+            out << "real: " << proxies[keyName]->type() << " "
+                << keyName;
+            if (proxies[keyName]->realValue().isNull())
+                out << " is Unknown" << endl;
+            else
+                out << " = " << proxies[keyName]->realValue().toString() << endl;
+        }
+    }
 }
 
 void CommandWatcher::sleepCommand(const QStringList& args)

@@ -32,6 +32,7 @@ public:
     PropertyProxy(QString key, bool enabled = true, QObject *parent = 0);
     void enable(bool enable);
     QVariant realValue() const;
+    QString type() const;
 private slots:
     void onValueChanged();
 private:
