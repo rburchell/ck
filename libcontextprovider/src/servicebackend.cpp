@@ -18,12 +18,15 @@
  * 02110-1301 USA
  *
  */
-#include "propertyadaptor.h"
+
 #include "servicebackend.h"
+#include "propertyprivate.h"
+#include "propertyadaptor.h"
 #include "logging.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
-#include "propertyprivate.h"
+
+#include <QDBusError>
 
 namespace ContextProvider {
 
@@ -100,19 +103,6 @@ void ServiceBackend::addProperty(const QString& key, PropertyPrivate* property)
     properties.insert(key, property);
     contextDebug() << F_SERVICE << "registering property" << key;
     registerProperty(key, property);
-}
-
-// Break the association of the PropertyPrivate object with this
-// ServiceBackend. The corresponding object will disappear from D-Bus.
-void ServiceBackend::removeProperty(const QString& key)
-{
-    properties.remove(key);
-
-    // Unregister the object on D-Bus
-    PropertyAdaptor* adaptor = createdAdaptors[key];
-    if (adaptor != 0) {
-        connection.unregisterObject(adaptor->objectPath());
-    }
 }
 
 /// Register a Property with the given name on D-Bus. Returns true if

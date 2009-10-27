@@ -30,6 +30,7 @@
 namespace ContextProvider {
 
 class ServiceBackend;
+class Property;
 
 class PropertyPrivate : public QObject
 {

@@ -21,7 +21,6 @@
 
 #include "service.h"
 #include "servicebackend.h"
-#include "property.h"
 #include "logging.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
