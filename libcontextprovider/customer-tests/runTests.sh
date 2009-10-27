@@ -19,6 +19,9 @@ do
 	make -C $i check-customer
 done
 
+echo "Running multiproviders customer check"
+cd multiprovider; . ./env.sh; ./test.sh ; cd ..
+
 if [ -n "$COVERAGE" ]
 then
     echo "computing coverage"
