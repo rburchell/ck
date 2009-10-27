@@ -39,9 +39,6 @@ public:
     explicit PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent = 0);
     virtual ~PropertyPrivate();
 
-    void ref();
-    void unref();
-
     void setValue(const QVariant& v);
     void updateOverheardValue(const QVariantList&, const quint64&);
     void setSubscribed();

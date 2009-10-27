@@ -75,7 +75,6 @@ void Property::init(ServiceBackend *serviceBackend, const QString &key)
         priv = new PropertyPrivate(serviceBackend, key);
         PropertyPrivate::propertyPrivateMap.insert(lookup, priv);
     }
-    priv->ref();
     sconnect(priv, SIGNAL(firstSubscriberAppeared(const QString&)),
              this, SIGNAL(firstSubscriberAppeared(const QString&)));
     sconnect(priv, SIGNAL(lastSubscriberDisappeared(const QString&)),
@@ -118,7 +117,6 @@ QVariant Property::value()
 Property::~Property()
 {
     contextDebug() << F_PROPERTY << F_DESTROY << "Destroying Property for key:" << priv->key;
-    priv->unref();
 }
 
 } // end namespace

@@ -145,9 +145,11 @@ bool ServiceBackend::registerProperty(const QString& key, PropertyPrivate* prope
 /// registered on D-Bus. Returns true on success, false otherwise.
 bool ServiceBackend::start()
 {
-    contextDebug() << createdAdaptors;
+    contextDebug() << F_SERVICE_BACKEND << "Starting service for bus:" << busName;
+
     // Re-register existing Property objects on D-Bus
     foreach (const QString& key, properties.keys()) {
+        contextDebug() << F_SERVICE_BACKEND << "Re-registering" << key;
         if (!registerProperty(key, properties[key])) {
             return false;
         }
@@ -176,9 +178,9 @@ void ServiceBackend::stop()
     if (!sharedConnection())
         connection.unregisterService(busName);
 
-    // Unregister Property objects and clean up PropertyAdaptors set.
-    // Also, command Property objects to forget their subscriptions
-    // (if the service is started again, clients will resubscribe).
+    // Unregister Property objects from D-Bus. Also, command
+    // PropertyAdaptor objects to forget their subscriptions (if the
+    // service is started again, clients will resubscribe).
 
     foreach (PropertyAdaptor* adaptor, createdAdaptors) {
         adaptor->forgetClients();
@@ -205,20 +207,15 @@ void ServiceBackend::ref()
 }
 
 /// Decrease the reference count by one. Service calls this. If the
-/// reference count goes to zero, stop the ServiceBackend instance,
-/// remove it from the instance store and schedule it to be deleted.
+/// reference count goes to zero, stop the ServiceBackend
+/// instance. The instance is not removed from the instance map and
+/// not deleted, though.
 void ServiceBackend::unref()
 {
     refCount--;
 
     if (refCount == 0) {
         stop();
-        QString key = instances.key(this);
-        if (key != "")
-            instances.remove(key);
-        else
-            contextCritical() << "Backend couldn't find itself in the instance store";
-        deleteLater(); // "delete this" would be probably unsafe
     }
 }
 
@@ -251,9 +248,9 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
         ServiceBackend* backend = new ServiceBackend(
             QDBusConnection::connectToBus(busType, busName),
             busName);
-        if (autoStart) backend->start();
         instances.insert(lookup, backend);
     }
+    if (autoStart) instances[lookup]->start();
     return instances[lookup];
 }
 

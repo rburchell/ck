@@ -36,51 +36,12 @@ PropertyPrivate::PropertyPrivate(ServiceBackend* serviceBackend, const QString &
       key(key), value(QVariant()),  timestamp(currentTimestamp()), subscribed(false),
       emittedValue(value), emittedTimestamp(timestamp), overheard(false)
 {
+    // Associate the property to the service backend
+    serviceBackend->addProperty(key, this);
 }
 
 PropertyPrivate::~PropertyPrivate()
 {
-}
-
-/// Increase the reference count by one. Property calls this.
-void PropertyPrivate::ref()
-{
-    refCount++;
-    if (refCount == 1) {
-        // Increase the reference count of serviceBackend to ensure it
-        // stays alive
-        serviceBackend->ref();
-        // Associate the property to the service backend
-        serviceBackend->addProperty(key, this);
-    }
-}
-
-/// Decrease the reference count by one. Property calls this. If the
-/// reference count goes to zero, schedule the PropertyPrivate
-/// instance to be deleted.
-void PropertyPrivate::unref()
-{
-    refCount--;
-
-    if (refCount == 0) {
-        // Remove the property from the service backend
-        serviceBackend->removeProperty(key);
-        // Now serviceBackend can be deleted if nobody else needs it.
-        serviceBackend->unref();
-
-        // For now, remove the PropertyPrivate from the instance
-        // map. If this is changed, we need to check carefully what
-        // happens if a new ServiceBackend is created with the same
-        // memory address as a previous ServiceBackend (which was
-        // destructed), and having the old PropertyPrivate store the
-        // ServiceBackend pointer to that memory address.
-        QPair<ServiceBackend*, QString> key = propertyPrivateMap.key(this);
-        if (key.second != "")
-            propertyPrivateMap.remove(key);
-        else
-            contextCritical() << "PropertyPrivate couldn't find itself in the instance store";
-        deleteLater(); // "delete this" would be probably unsafe
-    }
 }
 
 void PropertyPrivate::setValue(const QVariant& v)
