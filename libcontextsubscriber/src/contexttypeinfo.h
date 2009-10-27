@@ -36,8 +36,6 @@ public:
     explicit ContextTypeInfo(const QVariant &variant);
     ContextTypeInfo();
     ContextTypeInfo(const ContextTypeInfo &ti);
-    bool operator==(const ContextTypeInfo &other) const;
-    bool operator!=(const ContextTypeInfo &other) const;
     ContextTypeInfo operator=(const ContextTypeInfo& info);
 
     QString name() const;

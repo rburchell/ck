@@ -39,16 +39,6 @@ ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo &ti) : nanoTree(ti.nanoTr
 {
 }
 
-bool ContextTypeInfo::operator==(const ContextTypeInfo &other) const
-{
-    return (name() == other.name());
-}
-
-bool ContextTypeInfo::operator!=(const ContextTypeInfo &other) const
-{
-    return (name() != other.name());
-}
-
 ContextTypeInfo ContextTypeInfo::operator=(const ContextTypeInfo& info)
 {
     nanoTree = NanoTree(info.nanoTree);

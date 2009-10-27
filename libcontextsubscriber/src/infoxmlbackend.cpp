@@ -265,7 +265,9 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
     if (keyDataHash.contains(key)) {
         InfoKeyData keyData = keyDataHash.value(key);
 
-        if (typeInfo != ContextTypeInfo::nullType() && keyData.typeInfo != typeInfo)
+        // FIXME: Comparing names here is questionable here. Need to ask mvo.
+        // Actually we need "unset" thing here or something.
+        if (typeInfo.name() != ContextTypeInfo::nullType().name() && keyData.typeInfo.name() != typeInfo.name())
             contextWarning() << F_XML << key << "already has type declared -" << keyData.typeInfo.name();
 
         if (doc != "" && keyData.doc != doc)
