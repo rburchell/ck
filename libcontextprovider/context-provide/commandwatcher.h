@@ -43,23 +43,24 @@ public:
     void addCommand(const QStringList& args);
 
 private:
-    int commandfd;
-    QSocketNotifier *commandNotifier;
     void interpret(const QString& command);
-    QMap <QString, QString> types;          // key -> type
-    QMap <QString, Property*> properties;   // property index
     void help();
-    QString unquote(const QString& str);
     void unsetCommand(const QStringList& args);
     void setCommand(const QString& command);
     void sleepCommand(const QStringList& args);
     void flushCommand();
     void dumpCommand(const QStringList& args);
     void startCommand();
+    QString unquote(const QString& str);
+
+    int commandfd;
+    QSocketNotifier *commandNotifier;
+    QMap <QString, QString> types;          // key -> type
+    QMap <QString, Property*> properties;   // property index
     QTextStream out;
-    bool silent;
     QString busName;
     QDBusConnection::BusType busType;
+    bool started;
 
 private slots:
     void onActivated();

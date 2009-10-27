@@ -1,5 +1,5 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.3.11~unreleased], [marius.vollmer@nokia.com], ContextKit)
+AC_INIT([ContextKit], [0.4~unreleased], [marius.vollmer@nokia.com], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign dist-bzip2 tar-ustar 1.9])
@@ -10,7 +10,8 @@ AC_PROG_CC
 CFLAGS="$CXXFLAGS -Wall"
 AC_PROG_CXX
 CXXFLAGS="$CXXFLAGS -Wall"
-AC_PROG_LIBTOOL
+LT_INIT([disable-static])
+DOLT
 AM_PATH_PYTHON
 
 # check for libraries
@@ -30,12 +31,6 @@ AC_SUBST([CDB_LIBS])
 
 # tools for documentation
 AX_FEATURE_DISABLEABLE([doc], [BUILD_DOCS], [disable building of documentation])
-AC_MSG_CHECKING([for gtk-doc])
-PKG_CHECK_EXISTS([gtk-doc >= 1.9],[AC_MSG_RESULT([yes])],
-			  [AC_MSG_RESULT([no])
-			   missing_deps_BUILD_DOCS="$missing_deps_BUILD_DOCS, gtk-doc >= 1.9"])
-HTML_DIR="${datadir}/gtk-doc/html"
-AC_SUBST([HTML_DIR])
 AX_DISABLE_FEATURE_ON_PROG([Dot drawing tool], [BUILD_DOCS], [DOT], [dot])
 AX_DISABLE_FEATURE_ON_PROG([Asciidoc], [BUILD_DOCS], [ASCIIDOC], [asciidoc], [8.2.7])
 AX_DISABLE_FEATURE_ON_PROG([source-highlight], [BUILD_DOCS], [SOURCE_HIGHLIGHT], [source-highlight])
@@ -43,8 +38,6 @@ AX_DISABLE_FEATURE_ON_PROG([xsltproc], [BUILD_DOCS], [XSLTPROC], [xsltproc])
 AX_DISABLE_FEATURE_ON_PROG([xmllint], [BUILD_DOCS], [XMLLINT], [xmllint])
 AX_DISABLE_FEATURE_ON_PROG([doxygen], [BUILD_DOCS], [DOXYGEN], [doxygen])
 AM_CONDITIONAL([CONTEXTKIT_BUILD_DOCS], [test "$missing_deps_BUILD_DOCS" = ""])
-AM_CONDITIONAL([GTK_DOC_USE_LIBTOOL], [test "$missing_deps_BUILD_DOCS" = ""])
-AM_CONDITIONAL([ENABLE_GTK_DOC], [test "$missing_deps_BUILD_DOCS" = ""])
 
 # coverage tools
 AX_FEATURE_DISABLEABLE([coverage], [COVERAGE], [disable unittests' coverage support])
@@ -81,14 +74,6 @@ AC_CONFIG_FILES([
         libcontextsubscriber/unit-tests/provider/Makefile
         libcontextsubscriber/unit-tests/util/Makefile
         libcontextsubscriber/unit-tests/nanoxml/Makefile
-        libcontextsubscriber/multithreading-tests/Makefile
-        libcontextsubscriber/multithreading-tests/new-property-in-thread/Makefile
-        libcontextsubscriber/multithreading-tests/old-property-in-thread/Makefile
-        libcontextsubscriber/multithreading-tests/single-thread/Makefile
-        libcontextsubscriber/multithreading-tests/stress-test/Makefile
-        libcontextsubscriber/multithreading-tests/using-backend-from-thread/Makefile
-        libcontextsubscriber/multithreading-tests/wait-for-subscription-only-in-thread/Makefile
-        libcontextsubscriber/multithreading-tests/wait-for-subscription-thread/Makefile
         libcontextsubscriber/update-contextkit-providers/Makefile
 	libcontextprovider/contextprovider-1.0.pc
 	libcontextprovider/Makefile

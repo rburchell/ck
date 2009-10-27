@@ -394,7 +394,7 @@ Packages
 
 .+contextkit+
 
-Languages:: C, C++, Vala
+Languages:: C, C++
 
 License:: LGPL 2.1
 
