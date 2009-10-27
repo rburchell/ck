@@ -1,0 +1,112 @@
+#!/usr/bin/python
+
+from sys import stderr, stdin
+from subprocess import Popen, PIPE
+from select import select
+import re
+import os
+
+class Program:
+    def __init__(self, cline):
+        d = dict(os.environ)
+        d.update({"CONTEXT_CLI_DISABLE_TYPE_CHECK": "1",
+                   "CONTEXT_CLI_IGNORE_COMMANDER": "1"})
+
+        self.__process = Popen(cline, stdin=PIPE, stdout=PIPE, stderr=PIPE,
+                               env = d)
+
+    def send(self, string):
+        print >>self.__process.stdin, string
+        self.__process.stdin.flush()
+
+    def outfd(self):
+        return self.__process.stdout.fileno()
+
+    def readline(self):
+        return self.__process.stdout.readline()
+
+    def ready(self):
+        raise NotImplementedError
+
+class Listen(Program):
+    def __init__(self, *properties):
+        Program.__init__(self, ["context-listen"] + list(properties))
+
+    def ready(self):
+        global provide
+        line = self.readline()
+        if line:
+            print >>stderr, "LISTEN:", line,
+            match = re.match("(.*?) = (.*?):(.*)\n", line)
+            if match:
+                property = match.group(1)
+                type = ""
+                if match.group(2) == "QString":
+                    type = "string"
+                elif match.group(2) == "int":
+                    type = "int"
+                elif match.group(2) == "bool":
+                    type = "truth"
+                elif match.group(2) == "double":
+                    type = "double"
+                else:
+                    raise RuntimeError("unknown type from client: " + match.group(2))
+                value = match.group(3)
+                provide.send("add " + type + " " + property + " " + value)
+            match = re.match("(.*?) is Unknown\n", line)
+            if match:
+                property = match.group(1)
+                provide.send("add " + type + " " + property)
+                provide.send("unset " + property)
+
+            return True
+        else:
+            raise RuntimeError("context-listen terminated")
+
+class Provide(Program):
+    def __init__(self):
+        Program.__init__(self, ["context-provide-internal"])
+
+    def ready(self):
+        line = self.readline()
+        if line:
+            print "PROVIDE:", line,
+            return True
+        else:
+            raise RuntimeError("context-provide terminated")
+
+class UserInput():
+    def outfd(self):
+        return stdin.fileno()
+
+    def ready(self):
+        line = self.readline()
+        if line:
+            match = re.match("(.*?) (.*)\n", line)
+            command = match.group(1)
+            return True
+        else:
+            exit(0)
+
+class Select:
+    def __init__(self, *tools):
+        self.map = dict(map(lambda t: (t.outfd(), t), tools))
+        self.rlist = map(lambda t: t.outfd(), tools)
+
+    def select(self):
+        ret = select(self.rlist, [], [])[0]
+        for i in ret:
+            stderr.flush()
+            if not self.map[i].ready():
+                self.rlist.remove(i)
+                del self.map[i]
+
+listen = Listen("test.a", "test.b")
+provide = Provide()
+provide.send("start")
+s = Select(listen, provide)
+
+while True:
+    s.select()
+    if not s.rlist:
+        break
