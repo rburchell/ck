@@ -70,10 +70,17 @@ public:
 private:
     bool registerProperty(const QString& key, PropertyPrivate* property);
 
+    /// Shared or private QDBusConnection used for registering objects
+    /// (and possibly bus names)
     QDBusConnection connection;
-    int refCount;
+
+    int refCount; ///< Number of Service objects using this as their backend
+
+    /// The bus name that should be registered by this ServiceBackend;
+    /// "" if the ServiceBackend shouldn't register any.
     QString busName;
 
+    /// Map storing the ServiceBackend instances (one instance for QString-ServiceBackend* pair).
     static QHash <QString, ServiceBackend*> instances;
 
     /// Properties associated with the current service

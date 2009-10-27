@@ -32,9 +32,9 @@ namespace ContextProvider {
 
     \brief A ServiceBackend is the real worker behind Service.
 
-    Multiple Service instances can share same ServiceBackend.
-    The backend is the actual worker that operates on D-Bus
-    and registers properties.
+    Multiple Service instances can share same ServiceBackend.  The
+    backend is the actual worker that operates on D-Bus (register
+    objects representing Property objects and possibly a bus name).
 
     The Service class actually proxies all methods to the ServiceBackend.
 */
@@ -47,8 +47,8 @@ ServiceBackend *ServiceBackend::defaultServiceBackend;
 /// program, and the ServiceBackend will not register any service
 /// names.
 ServiceBackend::ServiceBackend(QDBusConnection connection) :
-    connection(connection),
     refCount(0),
+    connection(connection),
     busName("")  // shared connection
 {
     contextDebug() << F_SERVICE_BACKEND << "Creating new ServiceBackend for" << busName;
@@ -58,8 +58,8 @@ ServiceBackend::ServiceBackend(QDBusConnection connection) :
 /// service name to register. The connection will not be shared
 /// between the Service and the provider program.
 ServiceBackend::ServiceBackend(QDBusConnection connection, const QString &busName) :
-    connection(connection),
     refCount(0),
+    connection(connection),
     busName(busName)  // private connection
 {
     contextDebug() << F_SERVICE_BACKEND << "Creating new ServiceBackend for" << busName;
@@ -119,6 +119,7 @@ void ServiceBackend::removeProperty(const QString& key)
 /// succeeded, false if failed.
 bool ServiceBackend::registerProperty(const QString& key, PropertyPrivate* property)
 {
+    // Check if there is an adaptor; if not, create it.
     if (createdAdaptors.contains(key) == false) {
         PropertyAdaptor* adaptor = new PropertyAdaptor(property, &connection);
         createdAdaptors.insert(key, adaptor);
@@ -130,6 +131,7 @@ bool ServiceBackend::registerProperty(const QString& key, PropertyPrivate* prope
         return true;
     }
 
+    // Try to register the object.
     if (!connection.registerObject(adaptor->objectPath(), property)) {
         contextCritical() << F_SERVICE_BACKEND << "Failed to register the Property object for" << key;
         contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
@@ -137,7 +139,6 @@ bool ServiceBackend::registerProperty(const QString& key, PropertyPrivate* prope
     }
     return true;
 }
-
 
 /// Start the Service again after it has been stopped. In the case of
 /// shared connection, the objects will be registered to D-Bus. In the
@@ -250,6 +251,11 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
             busName);
         instances.insert(lookup, backend);
     }
+    // Autostart also if the instance wasn't newly created: it might
+    // be that the user has deleted the Service previously, and now
+    // recreates it. In that case, the ServiceBackend remains alive,
+    // and we should start it after retrieving it from the instance
+    // map.
     if (autoStart) instances[lookup]->start();
     return instances[lookup];
 }
