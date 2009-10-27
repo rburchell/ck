@@ -58,7 +58,6 @@ void ServiceTests::init()
 
     // Associate shorter names for the test services when communicating with the client
     if (clientStarted) {
-        qDebug() << "Writing";
         writeToClient("assign session " SERVICE_NAME " service\n");
     }
 }
