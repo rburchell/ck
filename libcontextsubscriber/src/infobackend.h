@@ -42,7 +42,7 @@ public:
     /// Returns the list of all the keys in the registry.
     virtual QStringList listKeys() const = 0;
 
-    /// Returns a ContextTypeInfo for the given \a key.
+    /// Returns the type information for the given \a key.
     virtual ContextTypeInfo typeInfoForKey(QString key) const = 0;
 
     /// Returns the documentation for the given \a key name.
