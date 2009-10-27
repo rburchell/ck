@@ -152,6 +152,11 @@ void PropertyHandle::updateProvider()
                 pendingSubscriptions << newprovider;
     }
     myProviders = newProviders;
+    // If all subscriptions succeeded immediately, then we have to trigger
+    // recomputing the value now.  Otherwise we rely on the
+    // subscribeFinished signal.
+    if (subscribeCount > 0 && pendingSubscriptions.empty())
+        onValueChanged();
 }
 
 /// Sets \c subscribePending to false.

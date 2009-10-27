@@ -147,6 +147,11 @@ void Provider::unsubscribe(const QString& key)
     unsubscribeProviderNames << myName;
 }
 
+void Provider::clearValues()
+{
+    cachedValue = TimedValue(QVariant());
+}
+
 void Provider::setValue(const QString &key, const QVariant &value)
 {
     cachedValue = TimedValue(value);

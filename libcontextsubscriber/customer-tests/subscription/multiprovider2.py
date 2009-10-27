@@ -35,7 +35,7 @@ class MultiProvider(unittest.TestCase):
 	except:
 		pass
 
-    def testMultipleProviders(self):
+    def testMultipleProviders2(self):
         """
         Description
             This test verifies correct client behavior in the presence
