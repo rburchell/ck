@@ -177,13 +177,17 @@ Here is the general procedure:
 
   $ make maintainer-clean || make distclean
 
+  If you don't have any new files not commited yet, you can also use:
+
+  $ git clean -dfx
+
 - Recreate the build cruft.
 
   $ ./autogen.sh
 
 - Configure your source tree as needed for making a release.
 
-  $ ./configure --enable-maintainer-mode --enable-gtk-doc
+  $ ./configure --enable-doc
 
 - Build the source tree and do a "make distcheck"
 
@@ -200,13 +204,12 @@ the contents of the created directory.
 Building a debian package
 -------------------------
 
-After a git clone, you first have to build vala C sources and
-documentation.  If you have extracted a distribution tarball, then you
-already have these files.  Otherwise just do a ./configure, let's
-double check that all of the documentation tools and the vala compiler
-is found and make.  After that you are ready to run
-'dpkg-buildpackage -us -uc -rfakeroot -b' to get your shiny new debian
-packages.
+After a git clone, you first have to build documentation.  If you have
+extracted a distribution tarball, then you already have these files.
+Otherwise just do a ./configure, let's double check that all of the
+documentation tools and the vala compiler is found and make.  After
+that you are ready to run 'dpkg-buildpackage -us -uc -rfakeroot -b' to
+get your shiny new debian packages.
 
 Making releases
 ---------------

@@ -3,7 +3,7 @@ check_PROGRAMS = propertyunittest
 # test's sources
 propertyunittest_SOURCES = propertyunittest.cpp service.h servicebackend.h property.h propertyprivate.h
 
-COVERAGE_FILES = property.cpp propretyprivate.cpp
+COVERAGE_FILES = property.cpp propertyprivate.cpp
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always

@@ -30,6 +30,13 @@ namespace ContextProvider {
 /*!
     \class PropertyAdaptor
     \brief A DBus adaptor for implementing the org.maemo.contextkit.Property
+
+    PropertyAdaptor represents the Property object on D-Bus. It also
+    keeps track of its clients and sets the PropertyPrivate to
+    subscribed or unsubscribed accordingly.
+
+    PropertyAdaptor also listens to values sent by other providers on
+    D-Bus and notifies the PropertyPrivate about them.
 */
 
 /// Constructor. Creates new adaptor for the given manager with the given
@@ -43,6 +50,10 @@ PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnecti
     sconnect(propertyPrivate, SIGNAL(valueChanged(const QVariantList&, const quint64&)),
              this, SIGNAL(ValueChanged(const QVariantList&, const quint64&)));
 
+    // The same value can be provided on session and system bus by
+    // different providers. Unfortunately, each provider needs both a
+    // system bus connection and a session bus connection to listen to
+    // other providers.
     QDBusConnection::sessionBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
                                                 this, SLOT(onValueChanged(QVariantList, quint64)));
 
@@ -50,6 +61,7 @@ PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnecti
                                                this, SLOT(onValueChanged(QVariantList, quint64)));
 }
 
+/// Implementation of the D-Bus method Subscribe
 void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, quint64& timestamp)
 {
     contextDebug() << "Subscribe called";
@@ -75,6 +87,7 @@ void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, q
     Get(values, timestamp);
 }
 
+/// Implementation of the D-Bus method Unsubscribe
 void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
 {
     contextDebug() << "Unsubscribe called";
@@ -94,6 +107,7 @@ void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
     }
 }
 
+/// Implementation of the D-Bus method Get.
 void PropertyAdaptor::Get(QVariantList& values, quint64& timestamp)
 {
     // Construct the return values
@@ -103,15 +117,16 @@ void PropertyAdaptor::Get(QVariantList& values, quint64& timestamp)
     timestamp = propertyPrivate->timestamp;
 }
 
+/// Called when a ValueChanged signal is overheard on D-Bus. Command
+/// PropertyPrivate to update its overheard value.
 void PropertyAdaptor::onValueChanged(QVariantList values, quint64 timestamp)
 {
     propertyPrivate->updateOverheardValue(values, timestamp);
 }
 
-
-/// Dbus interface slot. The PropertyAdaptor listens for dbus bus names changing
-/// to notify the managed Property that a bus name is gone. It does it through
-/// Property::busNameIsGone function.
+/// Called when a NameOwnerChanged signal is broadcast on D-Bus. If
+/// one of our clients has disappeared from D-Bus, update the client
+/// list.
 void PropertyAdaptor::OnServiceOwnerChanged(const QString &name, const QString &oldName, const QString &newName)
 
 {
@@ -126,6 +141,11 @@ void PropertyAdaptor::OnServiceOwnerChanged(const QString &name, const QString &
     }
 }
 
+/// Object path where the corresponding PropertyPrivate object should
+/// be registered at. For a core propertiy Property.Name (not starting
+/// with /), the path is /org/maemo/contextkit/Property/Name. For a
+/// non-core property /com/my/property, the object path is
+/// /com/my/property.
 QString PropertyAdaptor::objectPath() const
 {
     if (!propertyPrivate->key.startsWith("/"))
@@ -133,11 +153,14 @@ QString PropertyAdaptor::objectPath() const
     return QString(propertyPrivate->key);
 }
 
+/// Called when the service is stopped and will disappear from
+/// D-Bus. If it appears again, the clients will resubscribe, and it
+/// shouldn't be a MultipleSubscribe error. Thus, we need to forget
+/// the clients when the service is stopped.
 void PropertyAdaptor::forgetClients()
 {
     clientServiceNames.clear();
     propertyPrivate->setUnsubscribed();
 }
-
 
 } // namespace ContextProvider

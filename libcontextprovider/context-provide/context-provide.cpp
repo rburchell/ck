@@ -19,6 +19,8 @@
  *
  */
 
+#include "commandwatcher.h"
+
 #include <QCoreApplication>
 #include <QString>
 #include <QStringList>
@@ -26,11 +28,8 @@
 #include <QDebug>
 #include <stdlib.h>
 #include <service.h>
-#include "commandwatcher.h"
 
 using namespace ContextProvider;
-
-#define COMMANDER "org.freedesktop.ContextKit.Commander"
 
 int main(int argc, char **argv)
 {
@@ -55,7 +54,7 @@ int main(int argc, char **argv)
         // Help? Show it and be gone.
         // FIXME: has to replace this with argv[0]
         out << "Usage: context-provide --v2 [--session | --system] [BUSNAME]\n";
-        out << "BUSNAME is " COMMANDER " by default, and bus is session.\n";
+        out << "BUSNAME is " << CommandWatcher::commanderBusName << " by default, and bus is session.\n";
         return 0;
     }
 
@@ -77,7 +76,7 @@ int main(int argc, char **argv)
 
     if (args.count() < 2) {
         // No arguments at all? Use commander by default.
-        args.push_back(COMMANDER);
+        args.push_back(CommandWatcher::commanderBusName);
     }
 
     // Parameter? Extract the session bus and type from it.
@@ -102,7 +101,6 @@ int main(int argc, char **argv)
 
     qDebug() << "Service:" << busName.toLocal8Bit().data() << "on" <<
         ((busType == QDBusConnection::SessionBus) ? "session" : "system");
-
 
     CommandWatcher commandWatcher(busName, busType, STDIN_FILENO, QCoreApplication::instance());
 

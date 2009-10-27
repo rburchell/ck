@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-DIRS="subscription value-changes types c-api"
+DIRS="subscription value-changes types c-api service"
 
 make -C client
 

@@ -4,7 +4,7 @@ class QProcess;
 
 namespace ContextProvider {
 
-class ServiceTests : public QObject
+class ServiceTest : public QObject
 {
     Q_OBJECT
 
@@ -18,6 +18,10 @@ private slots:
     void cleanup();
 
     void startStopStart();
+    void recreate();
+    void multiStart();
+    void defaultService();
+    void recreateProperty();
 
 public slots:
     void readStandardOutput();

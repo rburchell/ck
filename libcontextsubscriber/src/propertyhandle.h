@@ -52,7 +52,7 @@ public:
     static PropertyHandle* instance(const QString& key);
 
     void onValueChanged();
-    void setSubscribeFinished();
+    void setSubscribeFinished(Provider *provider);
     static void ignoreCommander();
     static void setTypeCheck(bool typeCheck);
 
@@ -65,12 +65,11 @@ private slots:
 private:
     PropertyHandle(const QString& key);
 
-    Provider *myProvider; ///< Provider of this property
+	QSet<Provider*> pendingSubscriptions; ///< Providers pending subscription
+    QList<Provider*> myProviders; ///< Providers of this property
     ContextPropertyInfo *myInfo; ///< Metadata for this property
     unsigned int subscribeCount; ///< Number of subscribed ContextProperty objects subscribed to this property
     QMutex subscribeCountLock;
-    bool subscribePending; ///< True when the subscription has been started, but hasn't been finished yet
-                           ///  (used by the waitForSubscription() feature)
     QString myKey; ///< Key of this property
     mutable QReadWriteLock valueLock;
     QVariant myValue; ///< Current value of this property

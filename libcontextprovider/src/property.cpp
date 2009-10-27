@@ -62,6 +62,9 @@ Property::Property(const QString &k, QObject* parent)
     init(ServiceBackend::defaultServiceBackend, k);
 }
 
+/// Initialize the private implementation: find the corresponding
+/// PropertyPrivate (create it if it doesn't exist), and connect
+/// signals from it.
 void Property::init(ServiceBackend *serviceBackend, const QString &key)
 {
     contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
@@ -75,7 +78,6 @@ void Property::init(ServiceBackend *serviceBackend, const QString &key)
         priv = new PropertyPrivate(serviceBackend, key);
         PropertyPrivate::propertyPrivateMap.insert(lookup, priv);
     }
-    priv->ref();
     sconnect(priv, SIGNAL(firstSubscriberAppeared(const QString&)),
              this, SIGNAL(firstSubscriberAppeared(const QString&)));
     sconnect(priv, SIGNAL(lastSubscriberDisappeared(const QString&)),
@@ -118,7 +120,6 @@ QVariant Property::value()
 Property::~Property()
 {
     contextDebug() << F_PROPERTY << F_DESTROY << "Destroying Property for key:" << priv->key;
-    priv->unref();
 }
 
 } // end namespace

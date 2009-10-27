@@ -53,7 +53,7 @@ public:
     void unsetValue();
 
 private:
-    PropertyPrivate *priv;
+    PropertyPrivate *priv; ///< Private implementation
     void init(ServiceBackend *serviceBackend, const QString &key);
 
 signals:

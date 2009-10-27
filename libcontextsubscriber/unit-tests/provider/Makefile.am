@@ -15,7 +15,7 @@ AM_CXXFLAGS = $(QtDBus_CFLAGS) \
 AM_LDFLAGS = $(QtDBus_LIBS)
 # copy these files from the real source
 FROM_SOURCE = provider.cpp provider.h iproviderplugin.h	\
-	loggingfeatures.h contextproviderinfo.h
+	loggingfeatures.h contextproviderinfo.h timedvalue.h
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
 include $(top_srcdir)/am/tests.am

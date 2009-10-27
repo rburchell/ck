@@ -67,7 +67,7 @@ class PrintingProperties(unittest.TestCase):
 
         self.assert_(info_client.expectAll(CLTool.STDOUT,
                                         expected_results,
-                                        1),
+                                        10),
                      "Bad introspection result from context-ls")
 
 def runTests():

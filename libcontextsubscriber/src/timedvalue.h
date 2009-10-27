@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Nokia Corporation.
+ * Copyright (C) 2008, 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,34 +19,35 @@
  *
  */
 
-#ifndef PROPERTY_H
-#define PROPERTY_H
+#ifndef TIMEDVALUE_H
+#define TIMEDVALUE_H
 
-// This is a mock implementation
+#include <time.h>
+#include <QVariant>
 
-#include <QObject>
+namespace ContextSubscriber {
 
-namespace ContextProvider {
-
-class Manager;
-class Service;
-
-class Property : public QObject
+struct TimedValue
 {
-    Q_OBJECT
-public:
-    Property(QString key, QObject* parent = 0);
-    Property(Service &service, QString key, QObject* parent = 0);
+    quint64 time;
+    QVariant value;
 
-    void setManager(Manager *);
-
-    QString key();
-
-signals:
-    void firstSubscriberAppeared(const QString &key);
-    void lastSubscriberDisappeared(const QString &key);
+    TimedValue() : time(0), value(QVariant())
+        { }
+    TimedValue(const QVariant &value, quint64 time) : time(time), value(value)
+        { }
+    TimedValue(const QVariant &value) : value(value)
+        {
+            struct timespec t;
+            clock_gettime(CLOCK_MONOTONIC, &t);
+            time = t.tv_sec * Q_UINT64_C(1000000000) + t.tv_nsec;
+        }
+    bool operator<(const TimedValue &other)
+		{
+			return time < other.time;
+		}
 };
 
-} // end namespace
+}
 
 #endif

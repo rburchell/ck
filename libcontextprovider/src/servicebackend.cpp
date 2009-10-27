@@ -18,12 +18,15 @@
  * 02110-1301 USA
  *
  */
-#include "propertyadaptor.h"
+
 #include "servicebackend.h"
+#include "propertyprivate.h"
+#include "propertyadaptor.h"
 #include "logging.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
-#include "propertyprivate.h"
+
+#include <QDBusError>
 
 namespace ContextProvider {
 
@@ -32,9 +35,9 @@ namespace ContextProvider {
 
     \brief A ServiceBackend is the real worker behind Service.
 
-    Multiple Service instances can share same ServiceBackend.
-    The backend is the actual worker that operates on D-Bus
-    and registers properties.
+    Multiple Service instances can share same ServiceBackend.  The
+    backend is the actual worker that operates on D-Bus (register
+    objects representing Property objects and possibly a bus name).
 
     The Service class actually proxies all methods to the ServiceBackend.
 */
@@ -47,8 +50,8 @@ ServiceBackend *ServiceBackend::defaultServiceBackend;
 /// program, and the ServiceBackend will not register any service
 /// names.
 ServiceBackend::ServiceBackend(QDBusConnection connection) :
-    connection(connection),
     refCount(0),
+    connection(connection),
     busName("")  // shared connection
 {
     contextDebug() << F_SERVICE_BACKEND << "Creating new ServiceBackend for" << busName;
@@ -58,8 +61,8 @@ ServiceBackend::ServiceBackend(QDBusConnection connection) :
 /// service name to register. The connection will not be shared
 /// between the Service and the provider program.
 ServiceBackend::ServiceBackend(QDBusConnection connection, const QString &busName) :
-    connection(connection),
     refCount(0),
+    connection(connection),
     busName(busName)  // private connection
 {
     contextDebug() << F_SERVICE_BACKEND << "Creating new ServiceBackend for" << busName;
@@ -102,23 +105,11 @@ void ServiceBackend::addProperty(const QString& key, PropertyPrivate* property)
     registerProperty(key, property);
 }
 
-// Break the association of the PropertyPrivate object with this
-// ServiceBackend. The corresponding object will disappear from D-Bus.
-void ServiceBackend::removeProperty(const QString& key)
-{
-    properties.remove(key);
-
-    // Unregister the object on D-Bus
-    PropertyAdaptor* adaptor = createdAdaptors[key];
-    if (adaptor != 0) {
-        connection.unregisterObject(adaptor->objectPath());
-    }
-}
-
 /// Register a Property with the given name on D-Bus. Returns true if
 /// succeeded, false if failed.
 bool ServiceBackend::registerProperty(const QString& key, PropertyPrivate* property)
 {
+    // Check if there is an adaptor; if not, create it.
     if (createdAdaptors.contains(key) == false) {
         PropertyAdaptor* adaptor = new PropertyAdaptor(property, &connection);
         createdAdaptors.insert(key, adaptor);
@@ -130,6 +121,7 @@ bool ServiceBackend::registerProperty(const QString& key, PropertyPrivate* prope
         return true;
     }
 
+    // Try to register the object.
     if (!connection.registerObject(adaptor->objectPath(), property)) {
         contextCritical() << F_SERVICE_BACKEND << "Failed to register the Property object for" << key;
         contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
@@ -138,16 +130,17 @@ bool ServiceBackend::registerProperty(const QString& key, PropertyPrivate* prope
     return true;
 }
 
-
 /// Start the Service again after it has been stopped. In the case of
 /// shared connection, the objects will be registered to D-Bus. In the
 /// case of non-shared connection, also the service name will be
 /// registered on D-Bus. Returns true on success, false otherwise.
 bool ServiceBackend::start()
 {
-    contextDebug() << createdAdaptors;
+    contextDebug() << F_SERVICE_BACKEND << "Starting service for bus:" << busName;
+
     // Re-register existing Property objects on D-Bus
     foreach (const QString& key, properties.keys()) {
+        contextDebug() << F_SERVICE_BACKEND << "Re-registering" << key;
         if (!registerProperty(key, properties[key])) {
             return false;
         }
@@ -176,9 +169,9 @@ void ServiceBackend::stop()
     if (!sharedConnection())
         connection.unregisterService(busName);
 
-    // Unregister Property objects and clean up PropertyAdaptors set.
-    // Also, command Property objects to forget their subscriptions
-    // (if the service is started again, clients will resubscribe).
+    // Unregister Property objects from D-Bus. Also, command
+    // PropertyAdaptor objects to forget their subscriptions (if the
+    // service is started again, clients will resubscribe).
 
     foreach (PropertyAdaptor* adaptor, createdAdaptors) {
         adaptor->forgetClients();
@@ -205,20 +198,15 @@ void ServiceBackend::ref()
 }
 
 /// Decrease the reference count by one. Service calls this. If the
-/// reference count goes to zero, stop the ServiceBackend instance,
-/// remove it from the instance store and schedule it to be deleted.
+/// reference count goes to zero, stop the ServiceBackend
+/// instance. The instance is not removed from the instance map and
+/// not deleted, though.
 void ServiceBackend::unref()
 {
     refCount--;
 
     if (refCount == 0) {
         stop();
-        QString key = instances.key(this);
-        if (key != "")
-            instances.remove(key);
-        else
-            contextCritical() << "Backend couldn't find itself in the instance store";
-        deleteLater(); // "delete this" would be probably unsafe
     }
 }
 
@@ -251,9 +239,14 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
         ServiceBackend* backend = new ServiceBackend(
             QDBusConnection::connectToBus(busType, busName),
             busName);
-        if (autoStart) backend->start();
         instances.insert(lookup, backend);
     }
+    // Autostart also if the instance wasn't newly created: it might
+    // be that the user has deleted the Service previously, and now
+    // recreates it. In that case, the ServiceBackend remains alive,
+    // and we should start it after retrieving it from the instance
+    // map.
+    if (autoStart) instances[lookup]->start();
     return instances[lookup];
 }
 

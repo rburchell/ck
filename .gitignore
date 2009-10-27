@@ -43,3 +43,5 @@ flexi-properties.xml
 mocs.cpp
 moc_*
 TAGS
+doltcompile
+doltlibtool

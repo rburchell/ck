@@ -56,7 +56,7 @@ public:
     void setConnection(const QDBusConnection &connection);
 
 private:
-    ServiceBackend *backend;
+    ServiceBackend *backend; ///< Private implementation of the Service
 
     friend class Property;
     friend class ::ServiceUnitTest;

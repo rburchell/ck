@@ -19,58 +19,39 @@
  *
  */
 
+#include "propertyadaptor.h" // mocked
+#include "propertyprivate.h" // mocked
+#include "servicebackend.h" // to be tested
+
 #include <QtTest/QtTest>
 #include <QtCore>
 #include <stdlib.h>
-#include "manager.h"
-#include "servicebackend.h"
-#include "manageradaptor.h"
 
 using namespace ContextProvider;
 
-struct ContextProvider::ServiceBackendPrivate {
-    QDBusConnection::BusType busType;
-    QString busName;
-    Manager *manager;
-    QDBusConnection *connection;
-    QDBusConnection *implicitConnection;
-    int refCount;
-    bool registeredService;
-};
-
-QString *lastKey = NULL;
 QVariant *lastValue = NULL;
-Manager *lastManager = NULL;
 QDBusConnection *lastConnection = NULL;
+PropertyPrivate* mockProperty;
 
-/* Mocked manager adaptor */
+// Mock implementations
 
-ManagerAdaptor::ManagerAdaptor(Manager *m, QDBusConnection *c)
-{
-    lastManager = m;
-    lastConnection = c;
-}
-
-/* Mocked Manager */
-
-Manager::Manager()
-{
-    lastManager = this;
-}
-
-void Manager::addKey(const QString &key)
+PropertyAdaptor::PropertyAdaptor(PropertyPrivate*, QDBusConnection*)
 {
 }
 
-void Manager::setKeyValue(const QString &key, const QVariant &v)
+
+void PropertyAdaptor::forgetClients()
 {
-    lastValue = new QVariant(v);
-    lastKey = new QString(key);
 }
 
-QVariant Manager::getKeyValue(const QString &key)
+QString PropertyAdaptor::objectPath() const
 {
-    return QVariant();
+    return QString("/mock/object/path");
+}
+
+void PropertyPrivate::setValue(const QVariant& value)
+{
+    lastValue = new QVariant(value);
 }
 
 class ServiceBackendUnitTest : public QObject
@@ -83,8 +64,6 @@ private slots:
     void defaults();
     void setValue();
     void refCouting();
-    void manager();
-    void startAndStop();
 
 private:
     ServiceBackend *serviceBackend;
@@ -95,13 +74,7 @@ private:
 // Before each test
 void ServiceBackendUnitTest::init()
 {
-    serviceBackend = new ServiceBackend(QDBusConnection::sessionBus(), "test.com");
-}
-
-void ServiceBackendUnitTest::manager()
-{
-    QVERIFY(lastManager != NULL);
-    QVERIFY(serviceBackend->manager() == lastManager);
+    serviceBackend = new ServiceBackend(QDBusConnection::sessionBus(), "org.maemo.contextkit.test");
 }
 
 void ServiceBackendUnitTest::sanity()
@@ -133,31 +106,14 @@ void ServiceBackendUnitTest::refCouting()
     QCOMPARE(serviceBackend->refCount, 0);
 }
 
-void ServiceBackendUnitTest::startAndStop()
-{
-    QVERIFY(serviceBackend->connection.objectRegisteredAt("/org/freedesktop/ContextKit/Manager") == 0);
-    serviceBackend->start();
-
-    QTest::qWait(100);
-    QVERIFY(serviceBackend->connection.objectRegisteredAt("/org/freedesktop/ContextKit/Manager") != 0);
-    serviceBackend->stop();
-    serviceBackend->start();
-    QTest::qWait(100);
-    QVERIFY(serviceBackend->connection.objectRegisteredAt("/org/freedesktop/ContextKit/Manager") != 0);
-
-    QTest::qWait(100);
-    serviceBackend->stop();
-    QVERIFY(serviceBackend->connection.objectRegisteredAt("/org/freedesktop/ContextKit/Manager") == 0);
-
-    serviceBackend->stop();
-    QTest::qWait(100);
-    QVERIFY(serviceBackend->connection.objectRegisteredAt("/org/freedesktop/ContextKit/Manager") == 0);
-}
-
 void ServiceBackendUnitTest::setValue()
 {
+    mockProperty = new PropertyPrivate();
+    qDebug() << "add prop";
+    serviceBackend->addProperty("Battery.ChargeLevel", mockProperty);
+    qDebug() << "set val";
     serviceBackend->setValue("Battery.ChargeLevel", 99);
-    QCOMPARE(*lastKey, QString("Battery.ChargeLevel"));
+    qDebug() << "done";
     QCOMPARE(lastValue->toInt(), 99);
 }
 

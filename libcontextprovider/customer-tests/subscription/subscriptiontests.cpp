@@ -56,8 +56,12 @@ void SubscriptionTests::init()
     test_string = new Property (*service2, "Test.String");
     test_bool = new Property(*service2, "Test.Bool");
 
-    // Process the events so that the services get started
-    QCoreApplication::processEvents(QEventLoop::AllEvents);
+    // Nullify the values (we create the same Properties over and
+    // over, and they will keep their old values.
+    test_int->unsetValue();
+    test_double->unsetValue();
+    test_string->unsetValue();
+    test_bool->unsetValue();
 
     // Initialize test program state
     isReadyToRead = false;
@@ -86,7 +90,6 @@ void SubscriptionTests::cleanup()
     }
     delete client; client = NULL;
 
-    // Note: we need to delete the properties before deleting the service
     delete test_int; test_int = NULL;
     delete test_double; test_double = NULL;
     delete test_bool; test_bool = NULL;
@@ -94,10 +97,6 @@ void SubscriptionTests::cleanup()
 
     delete service1; service1 = NULL;
     delete service2; service2 = NULL;
-
-    // ServiceBackedns are deleted in a deferred way, thus we need to
-    // get them deleted
-    QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
 }
 
 void SubscriptionTests::subscribeReturnValueForUnknownProperty()

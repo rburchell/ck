@@ -55,8 +55,16 @@ void TypesTests::init()
     dateItem = new Property(*service, "Test.Date");
     timeItem = new Property (*service, "Test.Time");
 
-    // Process the events so that the service gets started
-    QCoreApplication::processEvents(QEventLoop::AllEvents);
+    // Nullify the values (we create the same Properties over and
+    // over, and they will keep their old values.
+    intItem->unsetValue();
+    stringItem->unsetValue();
+    boolItem->unsetValue();
+    doubleItem->unsetValue();
+    stringListItem->unsetValue();
+    charItem->unsetValue();
+    dateItem->unsetValue();
+    timeItem->unsetValue();
 
     // Initialize test program state
     isReadyToRead = false;
@@ -84,8 +92,6 @@ void TypesTests::cleanup()
     }
     delete client; client = NULL;
 
-    // Note: we need to delete the properties before deleting the
-    // service
     delete intItem; intItem = NULL;
     delete doubleItem; doubleItem = NULL;
     delete boolItem; boolItem = NULL;
@@ -96,10 +102,6 @@ void TypesTests::cleanup()
     delete dateItem; dateItem = NULL;
 
     delete service; service = NULL;
-
-    // PropertyPrivate and ServiceBackend object are deleted in a
-    // deferred way, thus we need to get them deleted
-    QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
 }
 
 void TypesTests::typesInReturnValueOfSubscribe()

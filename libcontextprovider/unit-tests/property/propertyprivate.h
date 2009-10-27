@@ -41,6 +41,9 @@ public:
     explicit PropertyPrivate(ServiceBackend* serviceBackend, const QString &key, QObject *parent = 0);
 
     void setValue(const QVariant& v);
+    void updateOverheardValue(const QVariantList&, const quint64&);
+    void setSubscribed();
+    void setUnsubscribed();
 
 signals:
     void valueChanged(const QVariantList& values, const qlonglong& timestamp);
@@ -48,13 +51,23 @@ signals:
     void lastSubscriberDisappeared(const QString& key);
 
 private:
-    static qlonglong currentTimestamp();
+    static quint64 currentTimestamp();
+    void emitValue();
 
+    int refCount; ///< Number of Property instance sharing this PropertyPrivate
     ServiceBackend* serviceBackend; ///< Pointer to the serviceBackend taking care of D-Bus related things
     QString key; ///< Key of this property
-    QVariant value; ///< Current value of the property, QVariant() if null
-    qlonglong timestamp; ///< Time when the value was set
+    QVariant value; ///< Current value of the property, set by this provider. QVariant() if null.
+    quint64 timestamp; ///< Time when the value was set
+
+    bool subscribed; ///< True if this Property is subscribed to by the clients.
+    QVariant emittedValue; ///< Last value emitted by this provider.
+    quint64 emittedTimestamp; ///< Time when the emittedValue was emitted.
+    bool overheard; ///< True if provider overheard a value over D-Bus (must be different and more recent than emitted)
+
+    /// Map of PropertyPrivate instances
     static QHash<QPair<ServiceBackend*, QString>, PropertyPrivate*> propertyPrivateMap;
+
     friend class Property;
     friend class PropertyAdaptor;
 

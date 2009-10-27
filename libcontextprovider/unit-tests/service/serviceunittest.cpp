@@ -19,14 +19,13 @@
  *
  */
 
+#include "servicebackend.h" // mocked
+
+#include "service.h" // to be tested
+
 #include <QtTest/QtTest>
 #include <QtCore>
 #include <stdlib.h>
-#include "manager.h"
-#include "service.h"
-#include "servicebackend.h"
-#include "property.h"
-#include "manageradaptor.h"
 
 using namespace ContextProvider;
 
@@ -39,7 +38,6 @@ int lastState = STATE_UNDEFINED;
 
 QString *lastKey = NULL;
 QVariant *lastValue = NULL;
-Manager *lastManager = NULL;
 QDBusConnection *lastConnection = NULL;
 
 /* Mocked ServiceBackend */
@@ -50,11 +48,6 @@ ServiceBackend::ServiceBackend(QDBusConnection connection, const QString &busNam
     connection(connection)
 {
     lastState = STATE_UNDEFINED;
-}
-
-Manager* ServiceBackend::manager()
-{
-    return new Manager();
 }
 
 void ServiceBackend::setAsDefault()
@@ -104,44 +97,10 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
     return r;
 }
 
-/* Mocked Manager */
-
-Manager::Manager()
-{
-}
-
-void Manager::addKey(const QString &key)
-{
-}
-
-void Manager::setKeyValue(const QString &key, const QVariant &v)
+void ServiceBackend::setValue(const QString &key, const QVariant &v)
 {
     lastValue = new QVariant(v);
     lastKey = new QString(key);
-}
-
-QVariant Manager::getKeyValue(const QString &key)
-{
-    return QVariant();
-}
-
-/* Mocked manager adaptor */
-
-ManagerAdaptor::ManagerAdaptor(Manager *m, QDBusConnection *c)
-{
-    lastManager = m;
-    lastConnection = c;
-}
-
-/* Mocked Property */
-
-void Property::setManager(Manager *)
-{
-}
-
-QString Property::key()
-{
-    return "XXX";
 }
 
 /* Service unit test */
@@ -178,7 +137,6 @@ void ServiceUnitTest::cleanup()
 
     lastKey = NULL;
     lastValue = NULL;
-    lastManager = NULL;
     lastConnection = NULL;
 }
 
