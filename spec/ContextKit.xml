@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<node name="/org/maemo/contextkit/Some/Property"
+      xmlns:tp="http://telepathy.freedesktop.org/wiki/DbusSpec#extensions-v0">
+  <interface name="org.maemo.contextkit.Property">
+    <method name="Subscribe">
+      <tp:docstring>
+	Subscribes to the context property.
+      </tp:docstring>
+      <arg name="value" type="av" tp:type="Maybe_Variant" direction="out">
+	<tp:docstring>
+	  The actual value at the of subscription.
+	</tp:docstring>
+      </arg>
+      <arg name="timestamp" type="t" direction="out">
+	<tp:docstring>
+	  The timestamp of the value.
+	</tp:docstring>
+      </arg>
+    </method>
+    <method name="Unsubscribe">
+      <tp:docstring>
+	Unsubscribes from the property.
+      </tp:docstring>
+    </method>
+    <method name="Get">
+      <tp:docstring>
+	Returns the actual value from the provider without subscribing to it.
+      </tp:docstring>
+      <arg name="value" type="av" tp:type="Maybe_Variant" direction="out"/>
+      <arg name="timestamp" type="t" direction="out"/>
+    </method>
+    <signal name="Changed">
+      <tp:docstring>
+	Emitted when the value changed and there are at least one subscribed client.
+      </tp:docstring>
+      <arg name="value" type="av" tp:type="Maybe_Variant"/>
+      <arg name="timestamp" type="t"/>
+    </signal>
+  </interface>
+</node>

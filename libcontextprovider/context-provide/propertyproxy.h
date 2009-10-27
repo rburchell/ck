@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,32 +19,27 @@
  *
  */
 
-#ifndef HANDLESIGNALROUTER_H
-#define HANDLESIGNALROUTER_H
+#ifndef PROPERTYPROXY_H
+#define PROPERTYPROXY_H
 
-#include <QObject>
-#include <QString>
-#include <QVariant>
+#include "contextproperty.h"
+#include "property.h"
 
-namespace ContextSubscriber {
-
-class Provider;
-
-class HandleSignalRouter : public QObject
+class PropertyProxy : public QObject
 {
-    Q_OBJECT
+    Q_OBJECT;
 public:
-    static HandleSignalRouter* instance();
-
-public slots:
-    void onValueChanged(QString key);
-    void onSubscribeFinished(Provider *provider, QString key);
-
+    PropertyProxy(QString key, bool enabled = true, QObject *parent = 0);
+    void enable(bool enable);
+    QVariant realValue() const;
+    QString type() const;
+private slots:
+    void onValueChanged();
 private:
-    HandleSignalRouter();
-    static HandleSignalRouter myInstance; ///< Singleton instance
+    ContextProvider::Property *provider;
+    ContextProperty *subscriber;
+    bool enabled;
+    QVariant value;
 };
-
-} // end namespace
 
 #endif

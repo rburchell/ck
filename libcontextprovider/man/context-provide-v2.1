@@ -27,9 +27,15 @@ Properties can also be provided on the command line with \fITYPE\fR
 
 If at least one property is specified on the command line the service
 is autostarted and will start providing the properties right away,
-otherwise you have to use the \fBstart\fR command after all of the
-properties have been added by \fBadd\fR invocations.  In both cases
+otherwise you have to use the \fB`start'\fR command after all of the
+properties have been added by \fB`add'\fR invocations.  In both cases
 the service name registered for the service on D-Bus will be \fIBUSNAME\fR.
+
+If no \fIBUSNAME\fR is given the tool acts as a Commander, taking control of
+all subscribers in the system.  This mode by default proxies the real values
+of all properties.  To control a property you have to \fB`add'\fR the
+property, which stops forwarding the corresponding property.  You can undo
+this via the \fB`del'\fR command.
 
 .SH OPTIONS
 .TP
@@ -47,12 +53,25 @@ provided properties.  The initial value will be \fIINITVALUE\fR if
 specified, otherwise unset (null).  This has to be called before an
 attempt is made to set a key value.  \fITYPE\fR can be: STRING, INT,
 BOOL, DOUBLE.  Example: "add INT Battery.Status 20".
+
+In \fICommander\fR mode it also ceases proxying the real property.
+.TP
+\fBdel\fR \fIKEY\fR
+makes context-provide forget \fIKEY\fR.  In \fICommander\fR mode, restores
+proxying of the real property.
 .TP
 \fIKEY\fB=\fIVALUE\fR
 sets the given \fIKEY\fR value to the new \fIVALUE\fR. Example: "Battery.Status=99".
 .TP
 \fBunset\fR \fIKEY\fR
 sets the given \fIKEY\fR to non specified (null).
+.TP
+\fBinfo\fR \fIKEY\fR
+prints the type, name and current value of \fIKEY\fR.  In \fICommander\fR
+mode the real value (from the original provider) is printed as well.
+.TP
+\fBlist\fR
+same as calling `info' for all known keys (both proxied and added ones)
 .TP
 \fBsleep\fR \fIINTERVAL\fR
 sleeps and blocks the main loop for the given amount of seconds.  Used
@@ -64,7 +83,7 @@ by the \fIFILENAME\fR, the default is 'context-provide.context' in the
 current directory.
 .TP
 \fBstart\fR
-try publish the \fIBUSNAME\fR of the provider on D-Bus, exit if it fails.
+try to (re)publish the \fIBUSNAME\fR of the provider on D-Bus, exit if it fails.
 .TP
 \fBexit\fR
 exit from the program.

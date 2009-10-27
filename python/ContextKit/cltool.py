@@ -49,9 +49,19 @@ class CLTool:
     def expectAll(self, fileno, _exp_l, timeout, wantdump = True):
         exp_l = list(_exp_l)
         stream = 0
-        if fileno == self.STDOUT: stream = self.__process.stdout
-        if fileno == self.STDERR: stream = self.__process.stderr
-        if stream == 0: return False
+        if fileno == self.STDOUT:
+            stream = self.__process.stdout
+        elif fileno == self.STDERR:
+            stream = self.__process.stderr
+        else: return False
+
+        if not stream:
+            self.__io.append((fileno, "----- WAS NOT ABLE TO START THE PROGRAM -----"))
+            if wantdump:
+                self.printio()
+                print "Expected:"
+                pprint(exp_l)
+            return False
 
         # set the stream to nonblocking
         fd = stream.fileno()

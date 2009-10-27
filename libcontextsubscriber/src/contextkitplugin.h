@@ -27,8 +27,10 @@
 #include "provider.h"
 #include "iproviderplugin.h"
 #include "asyncdbusinterface.h"
+#include "timedvalue.h"
 #include <QString>
 #include <QDBusConnection>
+#include <QDBusPendingCallWatcher>
 #include <QDBusObjectPath>
 #include <QSet>
 #include <QVariant>
@@ -39,6 +41,26 @@ extern "C" {
 }
 
 namespace ContextSubscriber {
+class PendingSubscribeWatcher : public QDBusPendingCallWatcher
+{
+    Q_OBJECT;
+
+public:
+    PendingSubscribeWatcher(const QDBusPendingCall &call,
+                            const QString &key,
+                            QObject * parent = 0);
+private slots:
+    void onFinished();
+
+signals:
+    void subscribeFailed(QString, QString);
+    void valueChanged(QString, TimedValue);
+    void subscribeFinished(QString);
+
+private:
+    QString key;
+};
+
 class ContextKitPlugin : public IProviderPlugin
 {
     Q_OBJECT
@@ -58,6 +80,9 @@ signals:
 #endif
 
 private slots:
+    void onNewValueChanged(QList<QVariant> value,
+                           quint64 timestamp,
+                           QDBusMessage message);
     void onDBusValuesChanged(QMap<QString, QVariant> values);
     void onDBusGetSubscriberFinished(QDBusObjectPath objectPath);
     void onDBusGetSubscriberFailed(QDBusError err);
@@ -67,6 +92,11 @@ private slots:
     void onProviderDisappeared();
 
 private:
+    static QString keyToPath(QString key);
+    static QString pathToKey(QString key);
+
+    void reset();
+
     QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
 
     DBusNameListener *providerListener; ///< Listens to provider's (dis)appearance over DBus
@@ -76,9 +106,13 @@ private:
     QDBusConnection *connection; ///< The connection to DBus
     QString busName; ///< The D-Bus service name of the ContextKit provider connected to
 
+    bool newProtocol; ///< The provider on D-Bus speaks the new protocol only.
+
     static const QString managerIName; ///< org.freedesktop.ContextKit.Manager
     static const QString subscriberIName; ///< org.freedesktop.ContextKit.Subscriber
     static const QString managerPath; ///< /org/freedesktop/ContextKit/Manager
+    static const QString propertyIName; ///< org.maemo.contextkit.Property
+    static const QString corePrefix; ///< /org/maemo/contextkit/
 };
 
 

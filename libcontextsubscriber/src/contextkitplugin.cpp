@@ -24,7 +24,9 @@
 #include "subscriberinterface.h"
 #include "sconnect.h"
 #include <QStringList>
+#include <QDBusPendingCall>
 #include <QTimer>
+#include <QDBusPendingReply>
 
 /// Creates a new instance, the service to connect to has to be passed
 /// in \c constructionString in the format <tt>[session|dbus]:servicename</tt>.
@@ -53,6 +55,34 @@ namespace ContextSubscriber {
 
 const QString ContextKitPlugin::managerPath = "/org/freedesktop/ContextKit/Manager";
 const QString ContextKitPlugin::managerIName = "org.freedesktop.ContextKit.Manager";
+const QString ContextKitPlugin::propertyIName = "org.maemo.contextkit.Property";
+const QString ContextKitPlugin::corePrefix = "/org/maemo/contextkit/";
+
+/// Converts a key name to a protocol level object path.  There is a
+/// distinction, because core properties have the form
+/// <tt>/org/maemo/contextkit/Screen/TopEdge</tt> on D-Bus level, but
+/// on higher levels they are <tt>Screen.TopEdge</tt>.  Non-core
+/// properties should simply have a name like
+/// /com/nokia/modem/Specific/Feature, so they can be used as object
+/// paths without further conversions.
+QString ContextKitPlugin::keyToPath(QString key)
+{
+    if (key.startsWith("/"))
+        return key;
+
+    return corePrefix + key.replace('.', '/');
+}
+
+/// Inverse of \c keyToPath.
+QString ContextKitPlugin::pathToKey(QString path)
+{
+    if (path.startsWith(corePrefix)) {
+        QString key = path.mid(corePrefix.size());
+        return key.replace('/', '.');
+    }
+
+    return path;
+}
 
 /// Creates subscriber and manager interface, tries to get a
 /// subscriber instance from the manager and starts listening for
@@ -64,6 +94,7 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
       connection(new QDBusConnection(bus)),
       busName(busName)
 {
+    reset();
     // Notice if the provider on the dbus comes and goes
     sconnect(providerListener, SIGNAL(nameAppeared()),
              this, SLOT(onProviderAppeared()));
@@ -77,23 +108,31 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
     QMetaObject::invokeMethod(this, "onProviderAppeared", Qt::QueuedConnection);
 }
 
+void ContextKitPlugin::reset()
+{
+    delete(subscriberInterface);
+    subscriberInterface = 0;
+    delete(managerInterface);
+    managerInterface = 0;
+    newProtocol = false;
+    connection->disconnect(busName, "", propertyIName, "ValueChanged",
+                           this, SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
+}
+
 /// Gets a new subscriber interface from manager when the provider
 /// appears.
 void ContextKitPlugin::onProviderAppeared()
 {
     contextDebug() << "ContextKitPlugin::onProviderAppeared";
 
-    delete subscriberInterface;
-    subscriberInterface = 0;
-    delete managerInterface;
+    reset();
     managerInterface = new AsyncDBusInterface(busName, managerPath, managerIName, *connection, this);
     if (!managerInterface->callWithCallback("GetSubscriber",
                                             QList<QVariant>(),
                                             this,
                                             SLOT(onDBusGetSubscriberFinished(QDBusObjectPath)),
                                             SLOT(onDBusGetSubscriberFailed(QDBusError)))) {
-        emit failed(QString("Wasn't able to call GetSubscriber on the managerinterface: ") +
-                    managerInterface->lastError().message());
+        onDBusGetSubscriberFailed(managerInterface->lastError());
     }
 }
 
@@ -101,8 +140,7 @@ void ContextKitPlugin::onProviderAppeared()
 void ContextKitPlugin::onProviderDisappeared()
 {
     contextDebug() << "ContextKitPlugin::onProviderDisappeared";
-    delete subscriberInterface;
-    subscriberInterface = 0;
+    reset();
     emit failed("Provider went away");
 }
 
@@ -130,7 +168,21 @@ void ContextKitPlugin::onDBusGetSubscriberFinished(QDBusObjectPath objectPath)
 
 void ContextKitPlugin::onDBusGetSubscriberFailed(QDBusError err)
 {
-    emit failed("Was unable to get subscriber object on dbus: " + err.message());
+    contextWarning() <<
+        "Trying new protocol, because were not able to get subscriber object on dbus: " +
+        err.message();
+    reset();
+    newProtocol = true;
+
+    // connect to dbus value changes too!
+    connection->connect(busName, "", propertyIName, "ValueChanged",
+                        this, SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
+
+    // We queue the emitting of ready, because if subscribtions are
+    // already scheduled, they all will be tried in response and
+    // (apparently) we can't start a new pendingcall inside the error
+    // callback of an other one without a deadlock.
+    QMetaObject::invokeMethod(this, "ready", Qt::QueuedConnection);
 }
 
 /// Signals the Provider that the subscribe is finished.
@@ -150,13 +202,42 @@ void ContextKitPlugin::onDBusSubscribeFailed(QList<QString> keys, QString error)
 /// Forwards the subscribe request to the wire.
 void ContextKitPlugin::subscribe(QSet<QString> keys)
 {
-    subscriberInterface->subscribe(keys);
+    if (newProtocol)
+        foreach (QString key, keys) {
+            QDBusPendingCall pc = connection->asyncCall(QDBusMessage::createMethodCall(busName,
+                                                                                       keyToPath(key),
+                                                                                       propertyIName,
+                                                                                       "Subscribe"));
+            PendingSubscribeWatcher *psw = new PendingSubscribeWatcher(pc, key, this);
+            sconnect(psw,
+                     SIGNAL(subscribeFinished(QString)),
+                     this,
+                     SIGNAL(subscribeFinished(QString)));
+            sconnect(psw,
+                     SIGNAL(subscribeFailed(QString,QString)),
+                     this,
+                     SIGNAL(subscribeFailed(QString,QString)));
+            sconnect(psw,
+                     SIGNAL(valueChanged(QString,TimedValue)),
+                     this,
+                     SIGNAL(valueChanged(QString,TimedValue)));
+        }
+    else
+        subscriberInterface->subscribe(keys);
 }
 
 /// Forwards the unsubscribe request to the wire.
 void ContextKitPlugin::unsubscribe(QSet<QString> keys)
 {
-    subscriberInterface->unsubscribe(keys);
+    if (newProtocol)
+        foreach (QString key, keys) {
+            connection->asyncCall(QDBusMessage::createMethodCall(busName,
+                                                                 keyToPath(key),
+                                                                 propertyIName,
+                                                                 "Unsubscribe"));
+        }
+    else
+        subscriberInterface->unsubscribe(keys);
 }
 
 /// Forwards value changes from the wire to the upper layer (Provider).
@@ -164,6 +245,46 @@ void ContextKitPlugin::onDBusValuesChanged(QMap<QString, QVariant> values)
 {
     foreach (const QString& key, values.keys())
         emit valueChanged(key, values[key]);
+}
+
+static TimedValue createTimedValue(const QList<QVariant> value, quint64 time)
+{
+    if (value.size() == 0)
+        return TimedValue(QVariant(), time);
+    else
+        return TimedValue(value.at(0), time);
+}
+
+void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,
+                                         quint64 timestamp,
+                                         QDBusMessage message)
+{
+    emit valueChanged(pathToKey(message.path()), createTimedValue(value,
+                                                                  timestamp));
+}
+
+PendingSubscribeWatcher::PendingSubscribeWatcher(const QDBusPendingCall &call,
+                                                 const QString &key,
+                                                 QObject * parent) :
+    QDBusPendingCallWatcher(call, parent), key(key)
+{
+    sconnect(this, SIGNAL(finished(QDBusPendingCallWatcher *)),
+             this, SLOT(onFinished()));
+    sconnect(this, SIGNAL(finished(QDBusPendingCallWatcher *)),
+             this, SLOT(deleteLater()));
+}
+
+void PendingSubscribeWatcher::onFinished()
+{
+    QDBusPendingReply<QList<QVariant>, quint64> reply = *this;
+    if (reply.isError()) {
+        emit subscribeFailed(key, reply.error().message());
+        return;
+    }
+
+    emit valueChanged(key, createTimedValue(reply.argumentAt<0>(),
+                                            reply.argumentAt<1>()));
+    emit subscribeFinished(key);
 }
 
 }

@@ -25,22 +25,14 @@
 #define PROVIDER_H
 
 #include "contextproviderinfo.h"
+#include "timedvalue.h"
 
 #include <QObject>
 #include <QDBusConnection>
 #include <QSet>
 #include <QString>
-#include <time.h>
 
 namespace ContextSubscriber {
-
-struct TimedValue
-{
-    struct timespec time;
-    QVariant value;
-    TimedValue(const QVariant &value);
-// future    bool operator<(const TimedValue &other);
-};
 
 class Provider : public QObject
 {
@@ -51,6 +43,7 @@ public:
     bool subscribe(const QString &key);
     void unsubscribe(const QString &key);
     TimedValue get(const QString &key) const;
+    void clearValues();
 
 signals:
     void subscribeFinished(QString key);

@@ -31,6 +31,8 @@ using namespace ContextProvider;
 class QFile;
 class QSocketNotifier;
 class QString;
+class PropertyProxy;
+class ContextRegistryInfo;
 template <typename K, typename V> class QMap;
 
 class CommandWatcher : public QObject
@@ -41,28 +43,37 @@ public:
     CommandWatcher(QString busName, QDBusConnection::BusType busType, int commandfd, QObject *parent = 0);
     ~CommandWatcher();
     void addCommand(const QStringList& args);
+    static const QString commanderBusName;
 
 private:
-    int commandfd;
-    QSocketNotifier *commandNotifier;
     void interpret(const QString& command);
-    QMap <QString, QString> types;          // key -> type
-    QMap <QString, Property*> properties;   // property index
     void help();
-    QString unquote(const QString& str);
     void unsetCommand(const QStringList& args);
     void setCommand(const QString& command);
     void sleepCommand(const QStringList& args);
     void flushCommand();
     void dumpCommand(const QStringList& args);
+    void delCommand(const QStringList& args);
+    void infoCommand(const QStringList& args);
+    void listCommand();
     void startCommand();
+    QString unquote(const QString& str);
+
+    int commandfd;
+    QSocketNotifier *commandNotifier;
+    QMap <QString, QString> types;          // key -> type
+    QMap <QString, Property*> properties;   // property index
+    QMap <QString, PropertyProxy*> proxies;
+    ContextRegistryInfo *registryInfo;
+
     QTextStream out;
-    bool silent;
     QString busName;
     QDBusConnection::BusType busType;
+    bool started;
 
 private slots:
     void onActivated();
+    void onRegistryChanged();
 };
 
 #endif

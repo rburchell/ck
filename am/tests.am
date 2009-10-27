@@ -55,9 +55,9 @@ all-am:
 		$(MAKE) $(AM_MAKEFLAGS) $(check_LIBRARIES) $(check_PROGRAMS); \
 	fi
 
-$(top_builddir)/common/libcommon.la:
+$(top_builddir)/common/libcommon.la: FORCE
 	$(MAKE) -C $(top_builddir)/common libcommon.la
 
-.PHONY: coverage covdircheck $(top_builddir)/common/libcommon.la
+.PHONY: coverage covdircheck FORCE
 
 include $(top_srcdir)/am/covoptioncheck.am

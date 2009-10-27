@@ -12,7 +12,7 @@ SUBDIRS = \
 	tools \
 	common
 
-DISTCLEANFILES = lcov.info lcov.html
+DISTCLEANFILES = lcov.info lcov.html doltlibtool doltcompile
 MAINTAINERCLEANFILES = INSTALL
 
 check-sum:
