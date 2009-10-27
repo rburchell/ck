@@ -106,6 +106,8 @@ void ServiceTests::startStopStart()
     expected = "Subscribe returned: Unknown";
     QCOMPARE(actual.simplified(), expected.simplified());
 
+    delete service;
+    delete property;
 }
 
 void ServiceTests::readStandardOutput()

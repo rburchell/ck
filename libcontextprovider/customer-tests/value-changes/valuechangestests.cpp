@@ -53,8 +53,10 @@ void ValueChangesTests::init()
     test_int = new Property(*service, "Test.Int");
     test_double = new Property(*service, "Test.Double");
 
-    // Process the events so that the services get started
-    QCoreApplication::processEvents(QEventLoop::AllEvents);
+    // Nullify the values (we create the same Properties over and
+    // over, and they will keep their old values.
+    test_int->unsetValue();
+    test_double->unsetValue();
 
     // Initialize test program state
     isReadyToRead = false;
@@ -82,15 +84,11 @@ void ValueChangesTests::cleanup()
     }
     delete client; client = NULL;
 
-    // Note: we need to delete the properties before deleting the service
     delete test_int; test_int = NULL;
     delete test_double; test_double = NULL;
 
     delete service; service = NULL;
 
-    // PropertyPrivate and ServiceBackend objects are deleted in a
-    // deferred way, thus we need to get them deleted
-    QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
 }
 
 void ValueChangesTests::subscribedPropertyChanges()
