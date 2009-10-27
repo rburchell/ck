@@ -30,21 +30,23 @@
 #include <QtTest/QtTest>
 #include <QProcess>
 #include <QStringList>
+#include <string>
 
 #define SERVICE_NAME "org.maemo.contextkit.testProvider"
+int serviceNameIx = 0;
 
 namespace ContextProvider {
 
-void ServiceTests::initTestCase()
+void ServiceTest::initTestCase()
 {
 }
 
-void ServiceTests::cleanupTestCase()
+void ServiceTest::cleanupTestCase()
 {
 }
 
 // Before each test
-void ServiceTests::init()
+void ServiceTest::init()
 {
     // Initialize test program state
     isReadyToRead = false;
@@ -55,15 +57,10 @@ void ServiceTests::init()
     client->start("client");
     // Record whether the client was successfully started
     clientStarted = client->waitForStarted();
-
-    // Associate shorter names for the test services when communicating with the client
-    if (clientStarted) {
-        writeToClient("assign session " SERVICE_NAME " service\n");
-    }
 }
 
 // After each test
-void ServiceTests::cleanup()
+void ServiceTest::cleanup()
 {
     // Stop the client
     if (clientStarted) {
@@ -73,14 +70,19 @@ void ServiceTests::cleanup()
     delete client; client = NULL;
 }
 
-void ServiceTests::startStopStart()
+void ServiceTest::startStopStart()
 {
     // Check that the initialization went well.
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
+    // Use a different service name in each test; this way the ServiceBackends
+    QString serviceName = QString::number(serviceNameIx).prepend(SERVICE_NAME);
+    writeToClient(("assign session " + serviceName + " service\n").toStdString().c_str());
+    ++serviceNameIx;
+
     // Test: create a Service and an associated Property
-    Service* service = new Service(QDBusConnection::SessionBus, SERVICE_NAME);
+    Service* service = new Service(QDBusConnection::SessionBus, serviceName);
     Property* property = new Property(*service, "Test.Property");
 
     // Test: command client to subscribe
@@ -110,14 +112,19 @@ void ServiceTests::startStopStart()
     delete property;
 }
 
-void ServiceTests::recreate()
+void ServiceTest::recreate()
 {
     // Check that the initialization went well.
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
+    // Use a different service name in each test; this way the ServiceBackends
+    QString serviceName = QString::number(serviceNameIx).prepend(SERVICE_NAME);
+    writeToClient(("assign session " + serviceName + " service\n").toStdString().c_str());
+    ++serviceNameIx;
+
     // Test: create a Service and an associated Property
-    Service* service = new Service(QDBusConnection::SessionBus, SERVICE_NAME);
+    Service* service = new Service(QDBusConnection::SessionBus, serviceName);
     Property* property = new Property(*service, "Test.Property");
 
     // Test: command client to subscribe
@@ -138,7 +145,7 @@ void ServiceTests::recreate()
     QCOMPARE(actual.simplified(), expected.simplified());
 
     // Test: recreate the service and try to subscribe again
-    service = new Service(QDBusConnection::SessionBus, SERVICE_NAME);
+    service = new Service(QDBusConnection::SessionBus, serviceName);
     property = new Property(*service, "Test.Property");
     actual = writeToClient("subscribe service Test.Property\n");
 
@@ -150,13 +157,107 @@ void ServiceTests::recreate()
     delete property;
 }
 
-void ServiceTests::readStandardOutput()
+void ServiceTest::multiStart()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Use a different service name in each test; this way the ServiceBackends
+    QString serviceName = QString::number(serviceNameIx).prepend(SERVICE_NAME);
+    writeToClient(("assign session " + serviceName + " service\n").toStdString().c_str());
+    ++serviceNameIx;
+
+    // Test: create a Service and an associated Property
+    Service* service = new Service(QDBusConnection::SessionBus, serviceName);
+    Property* property = new Property(*service, "Test.Property");
+
+    // Test: command client to subscribe
+    QString actual = writeToClient("subscribe service Test.Property\n");
+
+    // Expected result: service is started automatically and Subscribe works
+    QString expected = "Subscribe returned: Unknown";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    // Test: start the service again (even though it's started)
+    service->start();
+
+    // Expected result: the service is still there, and remembers the client
+    actual = writeToClient("subscribe service Test.Property\n");
+    expected = "Subscribe error: org.maemo.contextkit.Error.MultipleSubscribe";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    delete service;
+    delete property;
+}
+
+void ServiceTest::defaultService()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Use a different service name in each test; this way the ServiceBackends
+    QString serviceName = QString::number(serviceNameIx).prepend(SERVICE_NAME);
+    writeToClient(("assign session " + serviceName + " service\n").toStdString().c_str());
+    ++serviceNameIx;
+
+    // Test: create a Service. Set the Service as default. Then create
+    // a Property without a Service.
+    Service* service = new Service(QDBusConnection::SessionBus, serviceName);
+    service->setAsDefault();
+    Property* property = new Property("Test.Property");
+
+    // Expected result: the Property got associated with the default
+    // Service.
+
+    // Test: command client to subscribe
+    QString actual = writeToClient("subscribe service Test.Property\n");
+
+    // Expected result: Subscribe works
+    QString expected = "Subscribe returned: Unknown";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    delete service;
+    delete property;
+}
+
+void ServiceTest::recreateProperty()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Use a different service name in each test; this way the ServiceBackends
+    QString serviceName = QString::number(serviceNameIx).prepend(SERVICE_NAME);
+    writeToClient(("assign session " + serviceName + " service\n").toStdString().c_str());
+    ++serviceNameIx;
+
+    // Test: create a Service and an associated Property. Set a value
+    // to the property.
+    Service* service = new Service(QDBusConnection::SessionBus, serviceName);
+    Property* property = new Property(*service, "Test.Property");
+
+    property->setValue("keep this value");
+
+    // Test: delete the property and create it again
+    delete property;
+    property = new Property(*service, "Test.Property");
+
+    // Expeted result: the Property has kept its value
+    QCOMPARE(property->value(), QVariant("keep this value"));
+
+    delete property;
+    delete service;
+}
+
+void ServiceTest::readStandardOutput()
 {
     isReadyToRead = true;
 }
 
 // Note: input must end with \n
-QString ServiceTests::writeToClient(const char* input)
+QString ServiceTest::writeToClient(const char* input)
 {
     isReadyToRead = false;
     client->write(input);
@@ -175,4 +276,4 @@ QString ServiceTests::writeToClient(const char* input)
 
 } // end namespace
 
-QTEST_MAIN(ContextProvider::ServiceTests);
+QTEST_MAIN(ContextProvider::ServiceTest);
