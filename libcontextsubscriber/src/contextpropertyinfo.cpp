@@ -229,7 +229,7 @@ QString ContextPropertyInfo::doc() const
     return cachedDoc;
 }
 
-/// Returns the type name for the introspected key.
+/// Returns the old-style type name for the introspected key. To be deprecated soon.
 QString ContextPropertyInfo::type() const
 {
     QMutexLocker lock(&cacheLock);
@@ -251,7 +251,7 @@ QString ContextPropertyInfo::type() const
         return "";
 }
 
-/// Returns the type info for the introspected key.
+/// Returns the advanced type info for the introspected key.
 ContextTypeInfo ContextPropertyInfo::typeInfo() const
 {
     QMutexLocker lock(&cacheLock);
