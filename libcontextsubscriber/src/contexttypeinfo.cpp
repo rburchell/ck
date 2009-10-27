@@ -71,7 +71,7 @@ ContextTypeInfo ContextTypeInfo::base() const
     else if (n == "percentage")
         return ContextTypeInfo::int32Type();
     else
-        return ContextTypeInfo(QVariant());
+        return resolveTypeName(nanoTree.keyValue("base").toString());
 }
 
 /// Returns a list of NanoDom trees representing the parameters for this type.
@@ -183,6 +183,10 @@ ContextTypeInfo ContextTypeInfo::resolveTypeName(QString t)
         return ContextTypeInfo::int64Type();
     else if (t == "bool")
         return ContextTypeInfo::boolType();
+    else if (t == "map")
+        return buildPrimitiveType("map");
+    else if (t == "list")
+        return buildPrimitiveType("list");
     else
         return ContextTypeInfo(QVariant());
 }

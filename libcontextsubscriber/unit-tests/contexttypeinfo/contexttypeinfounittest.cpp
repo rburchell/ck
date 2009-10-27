@@ -95,6 +95,7 @@ void ContextTypeInfoUnitTest::parseUniformList()
     QCOMPARE(nano.didFail(), false);
 
     ContextUniformListTypeInfo listInfo(nano);
+    QCOMPARE(listInfo.base().name(), QString("list"));
     QCOMPARE(listInfo.name(), QString("uniform-list"));
     ContextTypeInfo elementTypeInfo = listInfo.elementType();
     QCOMPARE(elementTypeInfo.name(), QString("double"));
@@ -107,6 +108,7 @@ void ContextTypeInfoUnitTest::parseMap()
 
     ContextMapTypeInfo personInfo(nano);
     QCOMPARE(personInfo.name(), QString("person"));
+    QCOMPARE(personInfo.base().name(), QString("map"));
     QCOMPARE(personInfo.keyDoc("name"), QString("Name of the person"));
     QCOMPARE(personInfo.keyDoc("surname"), QString("Surname of the person"));
     QCOMPARE(personInfo.keyDoc("age"), QString("Age of the person"));
