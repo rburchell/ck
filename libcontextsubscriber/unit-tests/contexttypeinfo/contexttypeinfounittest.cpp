@@ -82,8 +82,8 @@ void ContextTypeInfoUnitTest::parseCustomDoubleType()
 
     ContextTypeInfo typeInfo(nano);
     QCOMPARE(typeInfo.name(), QString("custom-double"));
-    QCOMPARE(typeInfo.parameterIntValue("min"), 1);
-    QCOMPARE(typeInfo.parameterIntValue("max"), 666);
+    QCOMPARE(typeInfo.parameterValue("min"), QString("1"));
+    QCOMPARE(typeInfo.parameterValue("max"), QString("666"));
     QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
     QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
     QCOMPARE(typeInfo.doc(), QString("A double value that represents the level of hell in you."));

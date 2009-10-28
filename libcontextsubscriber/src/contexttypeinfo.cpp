@@ -100,19 +100,11 @@ QString ContextTypeInfo::parameterDoc(QString p) const
 }
 
 /// Returns the value (if set) for the given parameter as string.
-QString ContextTypeInfo::parameterStringValue(QString p) const
+QString ContextTypeInfo::parameterValue(QString p) const
 {
     NanoTree params = nanoTree.keySub("params");
     NanoTree key = params.keySub(p);
     return key.stringValue();
-}
-
-/// Returns the value (if set) for the given parameter as int.
-int ContextTypeInfo::parameterIntValue(QString p) const
-{
-    NanoTree params = nanoTree.keySub("params");
-    NanoTree key = params.keySub(p);
-    return key.intValue();
 }
 
 /// Sets the \a value (as string) for the parameter \a p.
@@ -240,7 +232,7 @@ ContextTypeInfo ContextMapTypeInfo::keyType(QString key)
 /// Returns the type information for the elements in this list.
 ContextTypeInfo ContextUniformListTypeInfo::elementType()
 {
-    QString typeName = parameterStringValue("type");
+    QString typeName = parameterValue("type");
     return resolveTypeName(typeName);
 }
 

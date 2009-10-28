@@ -42,9 +42,8 @@ public:
     QList<NanoTree> parameters() const;
     NanoTree parameter(QString p) const;
     QString parameterDoc(QString p) const;
-    QString parameterStringValue(QString p) const;
+    QString parameterValue(QString p) const;
     void setParameterValue(QString p, QString value);
-    int parameterIntValue(QString p) const;
     ContextTypeInfo base() const;
     QString doc();
     NanoTree tree();
