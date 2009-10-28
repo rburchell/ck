@@ -125,20 +125,6 @@ QString NanoTree::stringValue() const
     return NanoTree::variantValue(rootVariant).toString();
 }
 
-/// Returns the value of the current tree root as int. The value is a collected
-/// non-list node that represents the value of the current key.
-int NanoTree::intValue() const
-{
-    return NanoTree::variantValue(rootVariant).toInt();
-}
-
-/// Returns the value of the current tree root as double. The value is a collected
-/// non-list node that represents the value of the current key.
-double NanoTree::doubleValue() const
-{
-    return NanoTree::variantValue(rootVariant).toDouble();
-}
-
 /// Add a string value to the current NanoTree. A value is a lose (non-list) QVariant
 /// attached to the tree root. (\a dom).
 void NanoTree::addStringValue(QString v)
