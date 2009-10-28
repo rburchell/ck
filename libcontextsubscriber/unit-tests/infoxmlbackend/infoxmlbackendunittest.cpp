@@ -100,10 +100,15 @@ void InfoXmlBackendUnitTest::typeInfoForKey()
     QCOMPARE(backend->typeInfoForKey("Key.With.int32").name(), ContextTypeInfo::int32Type().name());
     QCOMPARE(backend->typeInfoForKey("Key.With.string").name(), ContextTypeInfo::stringType().name());
     QCOMPARE(backend->typeInfoForKey("Key.With.double").name(), ContextTypeInfo::doubleType().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.complex").name(), ContextTypeInfo().name()); // FIXME
     QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), ContextTypeInfo::boolType().name());
     QCOMPARE(backend->typeInfoForKey("Battery.Voltage").name(), ContextTypeInfo::int32Type().name());
     QCOMPARE(backend->typeInfoForKey("Does.Not.Exist").name(), ContextTypeInfo().name());
+
+    ContextTypeInfo complexType = backend->typeInfoForKey("Key.With.complex");
+    QCOMPARE(complexType.name(), QString("double"));
+    QCOMPARE(complexType.doc(), QString("A double value within the given limits."));
+    QCOMPARE(complexType.parameterValue("min"), QString("0"));
+    QCOMPARE(complexType.parameterValue("max"), QString("10"));
 }
 
 void InfoXmlBackendUnitTest::docForKey()
