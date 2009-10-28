@@ -115,6 +115,13 @@ int ContextTypeInfo::parameterIntValue(QString p) const
     return key.intValue();
 }
 
+/// Sets the \a value (as string) for the parameter \a p.
+void ContextTypeInfo::setParameterValue(QString p, QString value)
+{
+    NanoTree parameterTree = parameter(p);
+    parameterTree.addStringValue(value);
+}
+
 /// Returns documentation for this ContextTypeInfo.
 QString ContextTypeInfo::doc()
 {
