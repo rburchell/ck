@@ -118,21 +118,26 @@ QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QStr
 	return NanoTree::keyValue(key1, key2, key3, key4, key5, rootVariant);
 }
 
+/// Returns the value of the current tree root as string. The value is a collected
+/// non-list node that represents the value of the current key.
 QString NanoTree::stringValue() const
 {
     return NanoTree::variantValue(rootVariant).toString();
 }
 
+/// Returns the value of the current tree root as int. The value is a collected
+/// non-list node that represents the value of the current key.
 int NanoTree::intValue() const
 {
     return NanoTree::variantValue(rootVariant).toInt();
 }
 
+/// Returns the value of the current tree root as double. The value is a collected
+/// non-list node that represents the value of the current key.
 double NanoTree::doubleValue() const
 {
     return NanoTree::variantValue(rootVariant).toDouble();
 }
-
 
 /* Static accessors */
 
@@ -226,6 +231,8 @@ QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QStr
     return NanoTree::keyValue(key2, key3, key4, key5, keySub(key1, dom));
 }
 
+/// Returns the value of the the dom tree as QVariant. The value is a collected
+/// non-list node that represents the value of the current key.
 QVariant NanoTree::variantValue(const QVariant &dom)
 {
     if (dom.type() != QVariant::List)
@@ -242,6 +249,7 @@ QVariant NanoTree::variantValue(const QVariant &dom)
     return QVariant();
 }
 
+/// Operator to cast as QVariant.
 NanoTree::operator QVariant()
 {
     return rootVariant;
