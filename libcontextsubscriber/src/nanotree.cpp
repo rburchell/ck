@@ -118,6 +118,11 @@ QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QStr
 	return NanoTree::keyValue(key1, key2, key3, key4, key5, rootVariant);
 }
 
+QStringList NanoTree::keys() const
+{
+    return NanoTree::keys(rootVariant);
+}
+
 /// Returns the value of the current tree root as string. The value is a collected
 /// non-list node that represents the value of the current key.
 QString NanoTree::stringValue() const
@@ -130,6 +135,21 @@ QString NanoTree::stringValue() const
 void NanoTree::addStringValue(QString v)
 {
     rootVariant = NanoTree::addVariantValue(QVariant(v), rootVariant);
+}
+
+void NanoTree::replaceKey(QString key, QVariant newNode)
+{
+    rootVariant = NanoTree::replaceKey(key, newNode, rootVariant);
+}
+
+QVariant NanoTree::first()
+{
+    return NanoTree::first(rootVariant);
+}
+
+QVariant NanoTree::keyNode(QString k)
+{
+    return NanoTree::keyNode(k, rootVariant);
 }
 
 /* Static accessors */
@@ -252,6 +272,70 @@ QVariant NanoTree::addVariantValue(const QVariant &value, const QVariant &dom)
     QVariantList lst = dom.toList();
     lst << value;
     return QVariant(lst);
+}
+
+QStringList NanoTree::keys(const QVariant &dom)
+{
+    if (dom.type() != QVariant::List)
+        return QStringList();
+
+    QStringList lst;
+
+    foreach(QVariant child, dom.toList()) {
+        if (child.type() == QVariant::List && child.toList().count() >= 2)
+            lst << child.toList().at(0).toString();
+    }
+
+    return lst;
+}
+
+QVariant NanoTree::replaceKey(QString key, QVariant newNode, const QVariant &dom)
+{
+    if (dom.type() != QVariant::List)
+        return dom;
+
+    const QVariant keyVariant(key); // So we can directly compare...
+    QVariantList lst;
+
+    foreach(QVariant child, dom.toList())
+    {
+        if (child.type() == QVariant::List && child.toList().count() > 0 &&
+            child.toList().at(0) == keyVariant) {
+            lst << newNode;
+        } else
+            lst << child;
+    }
+
+    return QVariant(lst);
+}
+
+QVariant NanoTree::first(QVariant &dom)
+{
+    if (dom.type() != QVariant::List)
+        return dom;
+
+    if (dom.toList().size() == 0)
+        return dom;
+
+    return QVariant(dom.toList().at(0));
+}
+
+QVariant NanoTree::keyNode(QString key, QVariant &dom)
+{
+    const QVariant keyVariant(key); // So we can directly compare...
+
+    // We expect the dom to be a list...
+    if (dom.type() != QVariant::List)
+        return QVariant();
+
+    foreach(QVariant child, dom.toList())
+    {
+        if (child.type() == QVariant::List && child.toList().count() >= 2 &&
+            child.toList().at(0) == keyVariant)
+            return child;
+    }
+
+    return QVariant();
 }
 
 /// Operator to cast as QVariant.

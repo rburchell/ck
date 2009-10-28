@@ -14,7 +14,7 @@
   <key name="Key.With.double" type="double"/>
   <key name="Key.With.complex">
     <type>
-        <double max="10" min="0" />
+        <double min="0" max="10"/>
     </type>
   </key>
 </provider>

@@ -257,9 +257,23 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
     QString key = NanoXml::keyValue("name", keyTree).toString();
     QString plugin = NanoXml::keyValue("plugin", providerTree).toString();
     QString constructionString = NanoXml::keyValue("constructionString", providerTree).toString();
-    QString type = NanoXml::keyValue("type", keyTree).toString();
     QString doc = NanoXml::keyValue("doc", keyTree).toString();
-    ContextTypeInfo typeInfo = ContextTypeInfo::resolveTypeName(type);
+
+    QVariant typeDescription = NanoXml::keyValue("type", keyTree);
+    ContextTypeInfo typeInfo;
+
+    if (typeDescription.type() == QVariant::String)
+        typeInfo = ContextTypeInfo::resolveTypeName(typeDescription.toString());
+    else {
+        NanoTree tree = NanoTree(typeDescription);
+        //parameters
+        //qDebug() << NanoTree::dumpTree(tree, 0);
+        typeInfo = ContextTypeInfo::resolveTypeName(tree.stringValue());
+        foreach(QString k, tree.keys()) {
+            QString pVal = tree.keyValue(k).toString();
+            typeInfo.setParameterValue(k, pVal);
+        }
+    }
 
     // Warn about description mismatch or add new
     if (keyDataHash.contains(key)) {

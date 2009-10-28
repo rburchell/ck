@@ -110,8 +110,11 @@ QString ContextTypeInfo::parameterValue(QString p) const
 /// Sets the \a value (as string) for the parameter \a p.
 void ContextTypeInfo::setParameterValue(QString p, QString value)
 {
-    NanoTree parameterTree = parameter(p);
+    NanoTree params = NanoTree(nanoTree.keyNode("params"));
+    NanoTree parameterTree = NanoTree(params.keyNode(p));
     parameterTree.addStringValue(value);
+    params.replaceKey(p, parameterTree);
+    nanoTree.replaceKey("params", params);
 }
 
 /// Returns documentation for this ContextTypeInfo.
@@ -141,7 +144,38 @@ ContextTypeInfo ContextTypeInfo::stringType()
 /// Returns in instance of the double type info.
 ContextTypeInfo ContextTypeInfo::doubleType()
 {
-    return buildPrimitiveType("double");
+    QVariantList type;
+    QVariantList doc;
+    QVariantList tree;
+    QVariantList params;
+    QVariantList minParam;
+    QVariantList minParamDoc;
+    QVariantList maxParam;
+    QVariantList maxParamDoc;
+
+    type << QVariant("name");
+    type << QVariant("double");
+    doc << QVariant("doc");
+    doc << QVariant("A double value within the given limits.");
+    params << QVariant("params");
+    minParam << QVariant("min");
+    minParamDoc << QVariant("doc");
+    minParamDoc << QVariant("Minimum value.");
+    minParam << QVariant(minParamDoc);
+    params << QVariant(minParam);
+
+    maxParam << QVariant("max");
+    maxParamDoc << QVariant("doc");
+    maxParamDoc << QVariant("Maximum value.");
+    maxParam << QVariant(maxParamDoc);
+    params << QVariant(maxParam);
+
+    tree << QVariant("type");
+    tree << QVariant(type);
+    tree << QVariant(doc);
+    tree << QVariant(params);
+
+    return ContextTypeInfo(QVariant(tree));
 }
 
 /// Returns in instance of the bool type info.
