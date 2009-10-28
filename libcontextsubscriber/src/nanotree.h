@@ -52,6 +52,7 @@ public:
     QString stringValue() const;
     int intValue() const;
     double doubleValue() const;
+    void addStringValue(QString v);
 
     static QVariant keySub(const QString &key, const QVariant &dom);
     static QVariant keyValue(const QString &key, const QVariant &dom);
@@ -64,6 +65,7 @@ public:
                              const QString &key4, const QString &key5, const QVariant &dom);
     static QVariantList keyValues(const QString &key, const QVariant &dom);
     static QVariant variantValue(const QVariant &dom);
+    static QVariant addVariantValue(const QVariant &value, const QVariant &dom);
 
     static QString dumpTree(const QVariant &tree, int level);
 

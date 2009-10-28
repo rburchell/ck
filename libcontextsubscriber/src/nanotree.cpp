@@ -139,6 +139,13 @@ double NanoTree::doubleValue() const
     return NanoTree::variantValue(rootVariant).toDouble();
 }
 
+/// Add a string value to the current NanoTree. A value is a lose (non-list) QVariant
+/// attached to the tree root. (\a dom).
+void NanoTree::addStringValue(QString v)
+{
+    rootVariant = NanoTree::addVariantValue(QVariant(v), rootVariant);
+}
+
 /* Static accessors */
 
 /// Returns the sub (the trailing) after a given \a key in the specified \a dom tree.
@@ -247,6 +254,18 @@ QVariant NanoTree::variantValue(const QVariant &dom)
     }
 
     return QVariant();
+}
+
+/// Add a QVariant value to the given tree. A value is a lose (non-list) QVariant
+/// attached to the current list (\a dom).
+QVariant NanoTree::addVariantValue(const QVariant &value, const QVariant &dom)
+{
+    if (dom.type() != QVariant::List)
+        return dom;
+
+    QVariantList lst = dom.toList();
+    lst << value;
+    return QVariant(lst);
 }
 
 /// Operator to cast as QVariant.
