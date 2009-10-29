@@ -36,19 +36,19 @@ public:
 
     QString dumpTree(int level) const;
     NanoTree keySub(const QString &key) const;
-    QVariant keyValue(const QString &key) const;
-    QVariant keyValue(const QString &key1, const QString &key2) const;
-    QVariant keyValue(const QString &key1, const QString &key2, const QString &key3) const;
-    QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
+    NanoTree keyValue(const QString &key) const;
+    NanoTree keyValue(const QString &key1, const QString &key2) const;
+    NanoTree keyValue(const QString &key1, const QString &key2, const QString &key3) const;
+    NanoTree keyValue(const QString &key1, const QString &key2, const QString &key3,
                       const QString &key4) const;
-    QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
+    NanoTree keyValue(const QString &key1, const QString &key2, const QString &key3,
                       const QString &key4, const QString &key5) const;
     QString stringValue() const;
     QVariantList keyValues(const QString &key) const;
     NanoTree addStringValue(QString v);
     QStringList keys() const;
-    NanoTree replaceKey(QString key, QVariant newNode);
-    QVariant keyNode(QString k);
+    NanoTree replaceKey(QString key, NanoTree newNode);
+    NanoTree keyNode(QString k);
 };
 
 #endif // NANOTREE_H
