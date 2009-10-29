@@ -90,6 +90,7 @@ private slots:
     void onDBusSubscribeFailed(QList<QString> keys, QString error);
     void onProviderAppeared();
     void onProviderDisappeared();
+    void newSubscribe(const QString& key);
 
 private:
     static QString keyToPath(QString key);
