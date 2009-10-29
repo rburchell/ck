@@ -50,15 +50,11 @@ PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnecti
     sconnect(propertyPrivate, SIGNAL(valueChanged(const QVariantList&, const quint64&)),
              this, SIGNAL(ValueChanged(const QVariantList&, const quint64&)));
 
-    // The same value can be provided on session and system bus by
-    // different providers. Unfortunately, each provider needs both a
-    // system bus connection and a session bus connection to listen to
-    // other providers.
-    QDBusConnection::sessionBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
+    // Start listening to ValueChanged signals. We only listen to the
+    // same bus we're on: that means if the same property is provided
+    // both on session and on system bus, overhearing won't work.
+    connection->connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
                                                 this, SLOT(onValueChanged(QVariantList, quint64)));
-
-    QDBusConnection::systemBus().connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
-                                               this, SLOT(onValueChanged(QVariantList, quint64)));
 }
 
 /// Implementation of the D-Bus method Subscribe
