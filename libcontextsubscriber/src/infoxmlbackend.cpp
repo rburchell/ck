@@ -349,11 +349,11 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     }
     */
 
-    if (nano.root().toList().at(0).toString() == "provider" ||
-        nano.root().toList().at(0).toString() == "properties") {
+    if (nano.toList().at(0).toString() == "provider" ||
+        nano.toList().at(0).toString() == "properties") {
         // One provider. Iterate over each key.
         foreach (QVariant keyTree, nano.keyValues("key")) {
-            parseKey(keyTree, nano.root());
+            parseKey(keyTree, nano);
         }
     } else {
         // Multiple providers... iterate over providers and keys

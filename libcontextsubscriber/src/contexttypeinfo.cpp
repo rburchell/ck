@@ -32,7 +32,6 @@ ContextTypeInfo::ContextTypeInfo(const QVariant &root) : nanoTree(NanoTree(root)
 /// Creates a new type from the given NanoDom tree.
 ContextTypeInfo::ContextTypeInfo(const NanoTree &tree) : nanoTree(tree)
 {
-    QVariant root = nanoTree.root();
 }
 
 /// Creates an empty type info representing the null type.

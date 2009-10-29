@@ -28,17 +28,11 @@
 #include <QXmlDefaultHandler>
 #include <QStack>
 
-class NanoTree : public QObject
+class NanoTree : public QVariant
 {
-    Q_OBJECT
-
 public:
-    NanoTree();
-    NanoTree(const QVariant &root);
-    NanoTree(const NanoTree &tree);
-    const QVariant& root() const;
-    NanoTree operator=(const NanoTree& o);
-    operator QVariant();
+    NanoTree() : QVariant() {};
+    NanoTree(const QVariant &root) : QVariant(root) {};
 
     QVariant keySub(const QString &key) const;
     QVariant keyValue(const QString &key) const;
@@ -50,9 +44,9 @@ public:
                       const QString &key4, const QString &key5) const;
     QVariantList keyValues(const QString &key) const;
     QString stringValue() const;
-    void addStringValue(QString v);
+    NanoTree addStringValue(QString v);
     QStringList keys() const;
-    void replaceKey(QString key, QVariant newNode);
+    NanoTree replaceKey(QString key, QVariant newNode);
     QVariant keyNode(QString k);
 
     static QVariant keySub(const QString &key, const QVariant &dom);
@@ -72,9 +66,6 @@ public:
     static QVariant keyNode(QString k, QVariant &dom);
 
     static QString dumpTree(const QVariant &tree, int level);
-
-protected:
-    QVariant rootVariant; ///< The nanodom root. A list of QVariants usually.
 };
 
 #endif // NANOTREE_H

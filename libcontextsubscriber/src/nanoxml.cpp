@@ -117,7 +117,7 @@ void NanoXml::popList()
     } else {
         // End of stack unwinding. We're done.
         current = NULL;
-        rootVariant = currentListAsVariant;
+        // FIXME! rootVariant = currentListAsVariant;
     }
 }
 

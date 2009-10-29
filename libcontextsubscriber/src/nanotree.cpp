@@ -23,30 +23,6 @@
 #include "nanotree.h"
 #include <QDebug>
 
-NanoTree::NanoTree()
-{
-}
-
-NanoTree::NanoTree(const QVariant &root) : rootVariant(root)
-{
-}
-
-NanoTree::NanoTree(const NanoTree &tree)
-{
-    rootVariant = tree.rootVariant;
-}
-
-NanoTree NanoTree::operator=(const NanoTree& other)
-{
-    rootVariant = other.rootVariant;
-    return *this;
-}
-
-const QVariant& NanoTree::root() const
-{
-    return rootVariant;
-}
-
 /// Dumps a QVariant into a multi-line string for debugging purposes.
 QString NanoTree::dumpTree(const QVariant &tree, int level)
 {
@@ -76,71 +52,71 @@ QString NanoTree::dumpTree(const QVariant &tree, int level)
 /// Returns the sub (the trailing) after a given \a key in the root nanodom tree.
 QVariant NanoTree::keySub(const QString &key) const
 {
-	return NanoTree::keySub(key, rootVariant);
+	return NanoTree::keySub(key, this);
 }
 
 /// 1st level accessor. Returns a value for a \a key in the root nanodom tree.
 QVariant NanoTree::keyValue(const QString &key) const
 {
-	return NanoTree::keyValue(key, rootVariant);
+	return NanoTree::keyValue(key, this);
 }
 
 /// Returns the list of QVariants matching the \a key in the root tree. A QVariant
 /// node matches if it's a list by and it's first element is \a key.
 QVariantList NanoTree::keyValues(const QString &key) const
 {
-    return NanoTree::keyValues(key, rootVariant);
+    return NanoTree::keyValues(key, this);
 }
 
 /// 2nd level accessor. Returns a value for a \a key1 \a key2 in the root nanodom tree.
 QVariant NanoTree::keyValue(const QString &key1, const QString &key2) const
 {
-	return NanoTree::keyValue(key1, key2, rootVariant);
+	return NanoTree::keyValue(key1, key2, this);
 }
 
 /// 3rd level accessor. Returns a value for a \a key1 \a key2 \a key3 in the root nanodom tree.
 QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QString &key3) const
 {
-	return NanoTree::keyValue(key1, key2, key3, rootVariant);
+	return NanoTree::keyValue(key1, key2, key3, this);
 }
 
 /// 4rd level accessor. Returns a value for a \a key1 \a key2 \a key3 \a key4 in the root nanodom tree.
 QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QString &key3,
                            const QString &key4) const
 {
-	return NanoTree::keyValue(key1, key2, key3, key4, rootVariant);
+	return NanoTree::keyValue(key1, key2, key3, key4, this);
 }
 
 /// 5th level accessor. Returns a value for a \a key1 \a key2 \a key3 \a key4 \a key5 in the root nanodom tree.
 QVariant NanoTree::keyValue(const QString &key1, const QString &key2, const QString &key3,
                            const QString &key4, const QString &key5) const
 {
-	return NanoTree::keyValue(key1, key2, key3, key4, key5, rootVariant);
+	return NanoTree::keyValue(key1, key2, key3, key4, key5, this);
 }
 
 QStringList NanoTree::keys() const
 {
-    return NanoTree::keys(rootVariant);
+    return NanoTree::keys(this);
 }
 
 /// Returns the value of the current tree root as string. The value is a collected
 /// non-list node that represents the value of the current key.
 QString NanoTree::stringValue() const
 {
-    return NanoTree::variantValue(rootVariant).toString();
+    return NanoTree::variantValue(this).toString();
 }
 
 /// Add a string value to the current NanoTree. A value is a lose (non-list) QVariant
 /// attached to the tree root. (\a dom).
-void NanoTree::addStringValue(QString v)
+NanoTree NanoTree::addStringValue(QString v)
 {
-    rootVariant = NanoTree::addVariantValue(QVariant(v), rootVariant);
+    return NanoTree(NanoTree::addVariantValue(QVariant(v), *this));
 }
 
 /// Replaces the key \a key with a new NanoTree node \a newNode.
-void NanoTree::replaceKey(QString key, QVariant newNode)
+NanoTree NanoTree::replaceKey(QString key, QVariant newNode)
 {
-    rootVariant = NanoTree::replaceKey(key, newNode, rootVariant);
+    return NanoTree(NanoTree::replaceKey(key, newNode, *this));
 }
 
 /// Similiar to NanoTree::keyValue (1st level accessor) but returns not the
@@ -148,7 +124,7 @@ void NanoTree::replaceKey(QString key, QVariant newNode)
 /// when building/changing the NanoTrees.
 QVariant NanoTree::keyNode(QString k)
 {
-    return NanoTree::keyNode(k, rootVariant);
+    return NanoTree::keyNode(k, *this);
 }
 
 /* Static accessors */
@@ -328,11 +304,5 @@ QVariant NanoTree::keyNode(QString key, QVariant &dom)
     }
 
     return QVariant();
-}
-
-/// Operator to cast as QVariant.
-NanoTree::operator QVariant()
-{
-    return rootVariant;
 }
 

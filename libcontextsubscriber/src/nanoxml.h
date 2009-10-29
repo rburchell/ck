@@ -31,8 +31,6 @@
 
 class NanoXml : public NanoTree, QXmlDefaultHandler
 {
-    Q_OBJECT
-
 public:
     NanoXml(const QString& path);
     ~NanoXml();
