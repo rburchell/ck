@@ -25,7 +25,6 @@
 #include "sconnect.h"
 #include "loggingfeatures.h"
 #include <time.h>
-#include <math.h>
 
 namespace ContextProvider {
 
@@ -156,6 +155,8 @@ void PropertyPrivate::updateOverheardValue(const QVariantList& v, const quint64&
     }
 }
 
+#define NSECS_IN_SEC 1000000000ULL
+
 /// Compute a unique time stamp for our value. The time stamp is based
 /// on monotonic clock and its value is: seconds * 10e9 + nanoseconds.
 quint64 PropertyPrivate::currentTimestamp()
@@ -163,7 +164,7 @@ quint64 PropertyPrivate::currentTimestamp()
     struct timespec time;
     clock_gettime(CLOCK_MONOTONIC, &time);
     quint64 toReturn = time.tv_nsec;
-    toReturn += ((quint64)pow(10,9) * time.tv_sec);
+    toReturn += (NSECS_IN_SEC * time.tv_sec);
     return toReturn;
 }
 
