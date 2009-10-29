@@ -47,8 +47,9 @@ QString NanoTree::dumpTree(int level) const
     return s;
 }
 
-/// Returns the first item of the tree.
-NanoTree NanoTree::first()
+/// Assuming this tree represents a key, return the name of the key.
+/// (first item).
+NanoTree NanoTree::keyName()
 {
     if (type() != QVariant::List)
         return NanoTree();
