@@ -110,6 +110,8 @@ void NanoTreeUnitTest::keys()
     QVERIFY(lst2.contains("param1"));
     QVERIFY(lst2.contains("param2"));
 
+    QStringList lst3 = tree.keyNode("doc").keys();
+    QCOMPARE(lst3.size(), 0);
 }
 
 #include "nanotreeunittest.moc"
