@@ -64,10 +64,10 @@ void ContextTypeInfoUnitTest::resolveTypeName()
 
 void ContextTypeInfoUnitTest::parseDoubleType()
 {
-    NanoXml nano(LOCAL_FILE("double.xml"));
-    QCOMPARE(nano.didFail(), false);
+    NanoXml parser(LOCAL_FILE("double.xml"));
+    QCOMPARE(parser.didFail(), false);
 
-    ContextTypeInfo typeInfo(nano);
+    ContextTypeInfo typeInfo(parser.result());
     QCOMPARE(typeInfo.name(), QString("double"));
     QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
     QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
@@ -77,10 +77,10 @@ void ContextTypeInfoUnitTest::parseDoubleType()
 
 void ContextTypeInfoUnitTest::parseCustomDoubleType()
 {
-    NanoXml nano(LOCAL_FILE("custom-double.xml"));
-    QCOMPARE(nano.didFail(), false);
+    NanoXml parser(LOCAL_FILE("custom-double.xml"));
+    QCOMPARE(parser.didFail(), false);
 
-    ContextTypeInfo typeInfo(nano);
+    ContextTypeInfo typeInfo(parser.result());
     QCOMPARE(typeInfo.name(), QString("custom-double"));
     QCOMPARE(typeInfo.parameterValue("min"), QString("1"));
     QCOMPARE(typeInfo.parameterValue("max"), QString("666"));
@@ -91,10 +91,10 @@ void ContextTypeInfoUnitTest::parseCustomDoubleType()
 
 void ContextTypeInfoUnitTest::parseUniformList()
 {
-    NanoXml nano(LOCAL_FILE("uniform-list.xml"));
-    QCOMPARE(nano.didFail(), false);
+    NanoXml parser(LOCAL_FILE("uniform-list.xml"));
+    QCOMPARE(parser.didFail(), false);
 
-    ContextUniformListTypeInfo listInfo(nano);
+    ContextUniformListTypeInfo listInfo(parser.result());
     QCOMPARE(listInfo.base().name(), QString("list"));
     QCOMPARE(listInfo.name(), QString("uniform-list"));
     ContextTypeInfo elementTypeInfo = listInfo.elementType();
@@ -103,10 +103,10 @@ void ContextTypeInfoUnitTest::parseUniformList()
 
 void ContextTypeInfoUnitTest::parseMap()
 {
-    NanoXml nano(LOCAL_FILE("person.xml"));
-    QCOMPARE(nano.didFail(), false);
+    NanoXml parser(LOCAL_FILE("person.xml"));
+    QCOMPARE(parser.didFail(), false);
 
-    ContextMapTypeInfo personInfo(nano);
+    ContextMapTypeInfo personInfo(parser.result());
     QCOMPARE(personInfo.name(), QString("person"));
     QCOMPARE(personInfo.base().name(), QString("map"));
     QCOMPARE(personInfo.keyDoc("name"), QString("Name of the person"));
