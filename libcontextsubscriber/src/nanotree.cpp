@@ -161,7 +161,9 @@ QString NanoTree::stringValue() const
     if (toList().size() < 2)
         return QString();
 
-    foreach(QVariant v, toList()) {
+    QVariantList lst = toList();
+    lst.removeFirst();
+    foreach(QVariant v, lst) {
        if (v.type() != QVariant::List)
            return v.toString();
     }

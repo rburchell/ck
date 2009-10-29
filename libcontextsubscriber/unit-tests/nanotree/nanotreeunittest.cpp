@@ -38,6 +38,7 @@ private slots:
     void keySub();
     void keyNode();
     void replaceKey();
+    void addStringValue();
 };
 
 NanoTree NanoTreeUnitTest::buildBasic()
@@ -77,9 +78,18 @@ NanoTree NanoTreeUnitTest::buildComplex()
     doc << QVariant("doc");
     doc << QVariant("documentation");
 
+    QVariantList type;
+    type << QVariant("type");
+
+    QVariantList description;
+    description << QVariant("description");
+    description << QVariant("some description");
+    type << QVariant(description);
+
     QVariantList tree;
     tree << QVariant(params);
     tree << QVariant(doc);
+    tree << QVariant(type);
 
     return NanoTree(tree);
 }
@@ -104,7 +114,7 @@ void NanoTreeUnitTest::keys()
     NanoTree tree = buildComplex();
     QStringList lst1 = tree.keys();
 
-    QCOMPARE(lst1.size(), 2);
+    QCOMPARE(lst1.size(), 3);
     QVERIFY(lst1.contains("params"));
     QVERIFY(lst1.contains("doc"));
 
@@ -156,6 +166,13 @@ void NanoTreeUnitTest::replaceKey()
     QCOMPARE(tree2.keyValue("param1").toString(), QString("value1"));
     QCOMPARE(tree2.keyValue("param3").toString(), QString("value3"));
     QCOMPARE(tree2.keyValue("param2").toString(), QString());
+}
+
+void NanoTreeUnitTest::addStringValue()
+{
+    NanoTree tree1 = buildComplex();
+    NanoTree tree2 = tree1.replaceKey("type", tree1.keyNode("type").addStringValue("double"));
+    QCOMPARE(tree2.keyNode("type").stringValue(), QString("double"));
 }
 
 #include "nanotreeunittest.moc"
