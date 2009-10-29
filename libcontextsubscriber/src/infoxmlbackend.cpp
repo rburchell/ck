@@ -267,7 +267,7 @@ void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerT
         typeInfo = ContextTypeInfo::resolveTypeName(typeDescriptionTree.toString());
     else {
         // Complex description
-        typeInfo = ContextTypeInfo::resolveTypeName(typeDescriptionTree.first().toString());
+        typeInfo = ContextTypeInfo::resolveTypeName(typeDescriptionTree.keyName().toString());
         foreach(QString k, typeDescriptionTree.keys()) {
             QString pVal = typeDescriptionTree.keyValue(k).toString();
             typeInfo.setParameterValue(k, pVal);
