@@ -88,7 +88,7 @@ QList<NanoTree> ContextTypeInfo::parameters() const
 /// Returns and empty tree if the parameter does not exists.
 NanoTree ContextTypeInfo::parameter(QString p) const
 {
-    return NanoTree(nanoTree.keyValue("params", p));
+    return nanoTree.keyValue("params", p);
 }
 
 /// Returns documentation as string for the given parameter.
@@ -101,19 +101,19 @@ QString ContextTypeInfo::parameterDoc(QString p) const
 /// Returns the value (if set) for the given parameter as string.
 QString ContextTypeInfo::parameterValue(QString p) const
 {
-    NanoTree params = nanoTree.keySub("params");
-    NanoTree key = params.keySub(p);
-    return key.stringValue();
+    return nanoTree.keySub("params").keySub(p).stringValue();
 }
 
 /// Sets the \a value (as string) for the parameter \a p.
 void ContextTypeInfo::setParameterValue(QString p, QString value)
 {
+    // FIXME Use chainers now...
     NanoTree params = NanoTree(nanoTree.keyNode("params"));
     NanoTree parameterTree = NanoTree(params.keyNode(p));
-    parameterTree.addStringValue(value);
-    params.replaceKey(p, parameterTree);
-    nanoTree.replaceKey("params", params);
+
+    parameterTree = parameterTree.addStringValue(value);
+    params = params.replaceKey(p, parameterTree);
+    nanoTree = nanoTree.replaceKey("params", params);
 }
 
 /// Returns documentation for this ContextTypeInfo.
@@ -182,7 +182,7 @@ ContextTypeInfo ContextTypeInfo::doubleType()
     tree << QVariant(doc);
     tree << QVariant(params);
 
-    return ContextTypeInfo(QVariant(tree));
+    return ContextTypeInfo(NanoTree(tree));
 }
 
 /// Returns in instance of the bool type info.
@@ -252,7 +252,7 @@ ContextTypeInfo ContextTypeInfo::buildPrimitiveType(QString name)
     type << QVariant(name);
     tree << QVariant("type");
     tree << QVariant(type);
-    return ContextTypeInfo(QVariant(tree));
+    return ContextTypeInfo(NanoTree(tree));
 }
 
 /* ContextMapTypeInfo */
@@ -261,14 +261,14 @@ ContextTypeInfo ContextTypeInfo::buildPrimitiveType(QString name)
 /// equivalent of accessing params -> keys -> (key) -> doc .
 QString ContextMapTypeInfo::keyDoc(QString key)
 {
-    return nanoTree.keyValue(QString("params"), QString("keys"), key, QString("doc")).toString();
+    return nanoTree.keyValue("params", "keys", key, "doc").toString();
 }
 
 /// Returns the type information for the given \a key in the map type. This is
 /// equivalent of accessing params -> keys -> (key) -> type .
 ContextTypeInfo ContextMapTypeInfo::keyType(QString key)
 {
-    return resolveTypeName(nanoTree.keyValue(QString("params"), QString("keys"), key, QString("type")).toString());
+    return resolveTypeName(nanoTree.keyValue("params", "keys", key, "type").toString());
 }
 
 /* ContextUniformListTypeInfo */
@@ -276,8 +276,6 @@ ContextTypeInfo ContextMapTypeInfo::keyType(QString key)
 /// Returns the type information for the elements in this list.
 ContextTypeInfo ContextUniformListTypeInfo::elementType()
 {
-    QString typeName = parameterValue("type");
-    return resolveTypeName(typeName);
+    return resolveTypeName(parameterValue("type"));
 }
-
 
