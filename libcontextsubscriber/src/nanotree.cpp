@@ -137,11 +137,15 @@ void NanoTree::addStringValue(QString v)
     rootVariant = NanoTree::addVariantValue(QVariant(v), rootVariant);
 }
 
+/// Replaces the key \a key with a new NanoTree node \a newNode.
 void NanoTree::replaceKey(QString key, QVariant newNode)
 {
     rootVariant = NanoTree::replaceKey(key, newNode, rootVariant);
 }
 
+/// Similiar to NanoTree::keyValue (1st level accessor) but returns not the
+/// value of the key \a k but the whole node of it. Useful to move nodes around
+/// when building/changing the NanoTrees.
 QVariant NanoTree::keyNode(QString k)
 {
     return NanoTree::keyNode(k, rootVariant);
@@ -284,6 +288,7 @@ QStringList NanoTree::keys(const QVariant &dom)
     return lst;
 }
 
+/// Replaces the key \a key with a new NanoTree node \a newNode.
 QVariant NanoTree::replaceKey(QString key, QVariant newNode, const QVariant &dom)
 {
     if (dom.type() != QVariant::List)
@@ -304,6 +309,9 @@ QVariant NanoTree::replaceKey(QString key, QVariant newNode, const QVariant &dom
     return QVariant(lst);
 }
 
+/// Similiar to NanoTree::keyValue (1st level accessor) but returns not the
+/// value of the key \a k but the whole node of it. Useful to move nodes around
+/// when building/changing the NanoTrees.
 QVariant NanoTree::keyNode(QString key, QVariant &dom)
 {
     const QVariant keyVariant(key); // So we can directly compare...
