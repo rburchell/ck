@@ -99,6 +99,19 @@ namespace ContextProvider {
   lastSubscriberDisappeared signals of the Property instances.  You
   can also use a Group if you are only interested in whether at least
   one of a set of Property objects is subscribed to.
+
+  \section PropNames Valid property names
+
+  Context FW maintains a list of core properties. If you are providing
+  a core property, you need to name it as it is described in the core
+  property list (e.g., Screen.TopEdge).
+
+  If you want to provide a non-core property, its name must be a valid
+  name for a D-Bus object path (e.g.,
+  /com/mycompany/screen/topedge). A valid D-Bus object path starts
+  with / and contains zero or more elements separated by / . Each
+  element must only contain the following characters: [A-Z][a-z][0-9]_
+
 */
 
 /*!
