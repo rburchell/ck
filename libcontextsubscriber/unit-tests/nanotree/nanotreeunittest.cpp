@@ -35,6 +35,7 @@ private slots:
     void keyValue1();
     void keyValue2();
     void keys();
+    void keySub();
 };
 
 NanoTree NanoTreeUnitTest::buildBasic()
@@ -112,6 +113,21 @@ void NanoTreeUnitTest::keys()
 
     QStringList lst3 = tree.keyNode("doc").keys();
     QCOMPARE(lst3.size(), 0);
+}
+
+void NanoTreeUnitTest::keySub()
+{
+    NanoTree tree1 = buildBasic();
+    NanoTree sub1 = tree1.keySub("param1");
+    QVERIFY(sub1.type() == QVariant::List);
+    QCOMPARE(sub1.toList().size(), 1);
+    QCOMPARE(sub1.toList().at(0).toString(), QString("value1"));
+
+    NanoTree tree2 = buildComplex();
+    NanoTree sub2 = tree2.keySub("params");
+    QVERIFY(sub2.type() == QVariant::List);
+    QCOMPARE(sub2.toList().size(), 2);
+    QCOMPARE(sub2.keyValue("param1").toString(), QString("value1"));
 }
 
 #include "nanotreeunittest.moc"
