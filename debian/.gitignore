@@ -22,6 +22,7 @@ contextkit.substvars
 contextkit-utils/
 libcontextsubscriber-tests/
 libcontextprovider-tests/
+propertymonitor-tests/
 libcontextsubscriber-dev/
 libcontextsubscriber0-dbg/
 libcontextsubscriber-doc/

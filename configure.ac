@@ -74,6 +74,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/unit-tests/util/Makefile
         libcontextsubscriber/unit-tests/nanoxml/Makefile
         libcontextsubscriber/update-contextkit-providers/Makefile
+        libcontextsubscriber/propertymonitor/Makefile
 	libcontextprovider/contextprovider-1.0.pc
 	libcontextprovider/Makefile
 	libcontextprovider/doc/Makefile
