@@ -120,30 +120,38 @@ void ContextTypeInfo::setParameterValue(QString p, QString value)
 /// Returns documentation for this ContextTypeInfo.
 QString ContextTypeInfo::doc()
 {
+    // FIXME: Temporary. Gone when registry comes.
     return nanoTree.keyValue("doc").toString();
 }
 
 /// Returns in instance of the null type info.
 ContextTypeInfo ContextTypeInfo::nullType()
 {
+    // FIXME: Temporary. Gone when registry comes.
     return ContextTypeInfo(QVariant());
 }
 
 /// Returns in instance of the int64 type info.
 ContextTypeInfo ContextTypeInfo::int64Type()
 {
+    // FIXME: Temporary. Gone when registry comes.
     return buildPrimitiveType("int64");
 }
 
 /// Returns in instance of the string type info.
 ContextTypeInfo ContextTypeInfo::stringType()
 {
+    // FIXME: Temporary. Gone when registry comes.
     return buildPrimitiveType("string");
 }
 
 /// Returns in instance of the double type info.
 ContextTypeInfo ContextTypeInfo::doubleType()
 {
+    // FIXME: This is temporary, a full manual/static specification
+    // of the double type. It'll be gone when we have the registry
+    // implementation.
+
     QVariantList type;
     QVariantList doc;
     QVariantList tree;
@@ -181,12 +189,14 @@ ContextTypeInfo ContextTypeInfo::doubleType()
 /// Returns in instance of the bool type info.
 ContextTypeInfo ContextTypeInfo::boolType()
 {
+    // FIXME: Temporary. Gone when registry comes.
     return buildPrimitiveType("bool");
 }
 
 /// Returns in instance of the int32 type info.
 ContextTypeInfo ContextTypeInfo::int32Type()
 {
+    // FIXME: Temporary. Gone when registry comes.
     return buildPrimitiveType("int32");
 }
 
@@ -236,6 +246,7 @@ NanoTree ContextTypeInfo::tree()
 /// Will be removed in future when registry comes in place.
 ContextTypeInfo ContextTypeInfo::buildPrimitiveType(QString name)
 {
+    // FIXME: Temporary. Gone when registry comes.
     QVariantList type;
     QVariantList tree;
     type << QVariant("name");
