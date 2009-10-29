@@ -53,7 +53,7 @@ signals:
     void ValueChanged(const QVariantList &values, const quint64& timestamp);
 
 private slots:
-    void OnServiceOwnerChanged(const QString&, const QString&, const QString&);
+    void onServiceOwnerChanged(const QString&, const QString&, const QString&);
     void onValueChanged(QVariantList values, quint64 timestamp);
 
 private:

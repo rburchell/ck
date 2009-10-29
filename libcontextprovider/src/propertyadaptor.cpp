@@ -44,9 +44,12 @@ namespace ContextProvider {
 PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnection *conn)
     : QDBusAbstractAdaptor(propertyPrivate), propertyPrivate(propertyPrivate), connection(conn)
 {
+    // Start listening to the NameOwnerChanged D-Bus signal, to know
+    // when our client has exited.
     sconnect((QObject*) connection->interface(),
              SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
-             this, SLOT(OnServiceOwnerChanged(const QString &, const QString&, const QString&)));
+             this, SLOT(onServiceOwnerChanged(const QString &, const QString&, const QString&)));
+
     sconnect(propertyPrivate, SIGNAL(valueChanged(const QVariantList&, const quint64&)),
              this, SIGNAL(ValueChanged(const QVariantList&, const quint64&)));
 
@@ -54,7 +57,7 @@ PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnecti
     // same bus we're on: that means if the same property is provided
     // both on session and on system bus, overhearing won't work.
     connection->connect("", objectPath(), DBUS_INTERFACE, "ValueChanged",
-                                                this, SLOT(onValueChanged(QVariantList, quint64)));
+                        this, SLOT(onValueChanged(QVariantList, quint64)));
 }
 
 /// Implementation of the D-Bus method Subscribe
@@ -96,9 +99,11 @@ void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
         }
     }
     else {
-        contextWarning() << "Client" << client << "unsubscribed from property" << propertyPrivate->key << "without subscribing";
+        contextWarning() << "Client" << client << "unsubscribed from property" <<
+            propertyPrivate->key << "without subscribing";
         QDBusMessage error = msg.createErrorReply("org.maemo.contextkit.Error.IllegalUnsubscribe",
-                             "Unsubscribing from a non-subscribed property " + propertyPrivate->key);
+                                                  "Unsubscribing from a non-subscribed property "
+                                                  + propertyPrivate->key);
         connection->send(error);
     }
 }
@@ -123,7 +128,7 @@ void PropertyAdaptor::onValueChanged(QVariantList values, quint64 timestamp)
 /// Called when a NameOwnerChanged signal is broadcast on D-Bus. If
 /// one of our clients has disappeared from D-Bus, update the client
 /// list.
-void PropertyAdaptor::OnServiceOwnerChanged(const QString &name, const QString &oldName, const QString &newName)
+void PropertyAdaptor::onServiceOwnerChanged(const QString &name, const QString &oldName, const QString &newName)
 
 {
     if (newName == "") {
