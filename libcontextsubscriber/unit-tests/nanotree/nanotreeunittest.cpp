@@ -29,9 +29,11 @@ class NanoTreeUnitTest : public QObject
 
 private:
     NanoTree buildBasic();
+    NanoTree buildComplex();
 
 private slots:
-    void keyValue();
+    void keyValue1();
+    void keyValue2();
 };
 
 NanoTree NanoTreeUnitTest::buildBasic()
@@ -51,11 +53,46 @@ NanoTree NanoTreeUnitTest::buildBasic()
     return NanoTree(tree);
 }
 
-void NanoTreeUnitTest::keyValue()
+NanoTree NanoTreeUnitTest::buildComplex()
 {
-    NanoTree basic = buildBasic();
-    QCOMPARE(basic.keyValue("param1").toString(), QString("value1"));
-    QCOMPARE(basic.keyValue("param2").toString(), QString("value2"));
+    QVariantList params;
+    params << QVariant("params");
+
+    QVariantList param1;
+    param1 << QVariant("param1");
+    param1 << QVariant("value1");
+
+    QVariantList param2;
+    param2 << QVariant("param2");
+    param2 << QVariant("value2");
+
+    params << QVariant(param1);
+    params << QVariant(param2);
+
+    QVariantList doc;
+    doc << QVariant("doc");
+    doc << QVariant("documentation");
+
+    QVariantList tree;
+    tree << QVariant(params);
+    tree << QVariant(doc);
+
+    return NanoTree(tree);
+}
+
+void NanoTreeUnitTest::keyValue1()
+{
+    NanoTree tree = buildBasic();
+    QCOMPARE(tree.keyValue("param1").toString(), QString("value1"));
+    QCOMPARE(tree.keyValue("param2").toString(), QString("value2"));
+}
+
+void NanoTreeUnitTest::keyValue2()
+{
+    NanoTree tree = buildComplex();
+    QCOMPARE(tree.keyValue("params", "param1").toString(), QString("value1"));
+    QCOMPARE(tree.keyValue("params", "param2").toString(), QString("value2"));
+    QCOMPARE(tree.keyValue("doc").toString(), QString("documentation"));
 }
 
 #include "nanotreeunittest.moc"
