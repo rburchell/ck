@@ -252,27 +252,24 @@ QString InfoXmlBackend::canonicalizeType (const QString &type)
 }
 
 /// Parse the given QVariant tree which is supposed to be a key tree.
-void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerTree)
+void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerTree)
 {
-    NanoTree nanoTree(keyTree);
-    NanoTree providerNanoTree(providerTree);
-    QString key = nanoTree.keyValue("name").toString();
-    QString plugin = nanoTree.keyValue("plugin").toString();
-    QString constructionString = nanoTree.keyValue("constructionString").toString();
-    QString doc = nanoTree.keyValue("doc").toString();
+    QString key = keyTree.keyValue("name").toString();
+    QString plugin = providerTree.keyValue("plugin").toString();
+    QString constructionString = providerTree.keyValue("constructionString").toString();
+    QString doc = keyTree.keyValue("doc").toString();
 
-    QVariant typeDescription = nanoTree.keyValue("type");
+    NanoTree typeDescriptionTree = keyTree.keyValue("type");
     ContextTypeInfo typeInfo;
 
-    if (typeDescription.type() == QVariant::String)
-        typeInfo = ContextTypeInfo::resolveTypeName(typeDescription.toString());
+    if (typeDescriptionTree.type() == QVariant::String || typeDescriptionTree.type() == QVariant::Invalid)
+        // Basic string description
+        typeInfo = ContextTypeInfo::resolveTypeName(typeDescriptionTree.toString());
     else {
-        NanoTree tree = NanoTree(typeDescription);
-        //parameters
-        //qDebug() << NanoTree::dumpTree(tree, 0);
-        typeInfo = ContextTypeInfo::resolveTypeName(tree.stringValue());
-        foreach(QString k, tree.keys()) {
-            QString pVal = tree.keyValue(k).toString();
+        // Complex description
+        typeInfo = ContextTypeInfo::resolveTypeName(typeDescriptionTree.first().toString());
+        foreach(QString k, typeDescriptionTree.keys()) {
+            QString pVal = typeDescriptionTree.keyValue(k).toString();
             typeInfo.setParameterValue(k, pVal);
         }
     }
@@ -303,8 +300,8 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
 
     // Suport old-style XML...
     if (providerInfo.plugin == "") {
-        QString currentProvider = providerNanoTree.keyValue("service").toString();
-        QString currentBus = providerNanoTree.keyValue("bus").toString();
+        QString currentProvider = providerTree.keyValue("service").toString();
+        QString currentBus = providerTree.keyValue("bus").toString();
 
         if (currentBus != "" && currentProvider != "") {
             providerInfo.plugin = "contextkit-dbus";
@@ -335,10 +332,10 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
 {
     contextDebug() << F_XML << "Reading keys from" << path;
 
-    NanoXml nano(path);
+    NanoXml parser(path);
 
     // Check if format is all ok
-    if (nano.didFail()) {
+    if (parser.didFail()) {
         contextWarning() << F_XML << "Reading" << path << "failed, parsing error.";
         return;
     }
@@ -351,15 +348,17 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     }
     */
 
-    if (nano.toList().at(0).toString() == "provider" ||
-        nano.toList().at(0).toString() == "properties") {
+    NanoTree rootTree = parser.result();
+
+    if (rootTree.toList().at(0).toString() == "provider" ||
+        rootTree.toList().at(0).toString() == "properties") {
         // One provider. Iterate over each key.
-        foreach (QVariant keyTree, nano.keyValues("key")) {
-            parseKey(keyTree, nano);
+        foreach (QVariant keyTree, rootTree.keyValues("key")) {
+            parseKey(keyTree, rootTree);
         }
     } else {
         // Multiple providers... iterate over providers and keys
-        foreach (QVariant providerTree, nano.keyValues("provider")) {
+        foreach (QVariant providerTree, rootTree.keyValues("provider")) {
            foreach (QVariant keyTree, NanoTree(providerTree).keyValues("key")) {
                parseKey(keyTree, providerTree);
            }

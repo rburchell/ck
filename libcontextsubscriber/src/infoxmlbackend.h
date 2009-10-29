@@ -31,6 +31,7 @@
 #include "infobackend.h"
 #include "infokeydata.h"
 #include "contextproviderinfo.h"
+#include "nanotree.h"
 
 class InfoXmlBackend : public InfoBackend
 {
@@ -62,7 +63,7 @@ private:
     void regenerateKeyDataList();
     void readKeyDataFromXml(const QString &path);
     QString canonicalizeType (const QString &type);
-    void parseKey(const QVariant &keyTree, const QVariant &providerTree);
+    void parseKey(const NanoTree &keyTree, const NanoTree &providerTree);
 };
 
 #endif // INFOXMLBACKEND_H
