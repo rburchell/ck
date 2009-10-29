@@ -254,12 +254,14 @@ QString InfoXmlBackend::canonicalizeType (const QString &type)
 /// Parse the given QVariant tree which is supposed to be a key tree.
 void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerTree)
 {
-    QString key = NanoXml::keyValue("name", keyTree).toString();
-    QString plugin = NanoXml::keyValue("plugin", providerTree).toString();
-    QString constructionString = NanoXml::keyValue("constructionString", providerTree).toString();
-    QString doc = NanoXml::keyValue("doc", keyTree).toString();
+    NanoTree nanoTree(keyTree);
+    NanoTree providerNanoTree(providerTree);
+    QString key = nanoTree.keyValue("name").toString();
+    QString plugin = nanoTree.keyValue("plugin").toString();
+    QString constructionString = nanoTree.keyValue("constructionString").toString();
+    QString doc = nanoTree.keyValue("doc").toString();
 
-    QVariant typeDescription = NanoXml::keyValue("type", keyTree);
+    QVariant typeDescription = nanoTree.keyValue("type");
     ContextTypeInfo typeInfo;
 
     if (typeDescription.type() == QVariant::String)
@@ -301,8 +303,8 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
 
     // Suport old-style XML...
     if (providerInfo.plugin == "") {
-        QString currentProvider = NanoXml::keyValue("service", providerTree).toString();
-        QString currentBus = NanoXml::keyValue("bus", providerTree).toString();
+        QString currentProvider = providerNanoTree.keyValue("service").toString();
+        QString currentBus = providerNanoTree.keyValue("bus").toString();
 
         if (currentBus != "" && currentProvider != "") {
             providerInfo.plugin = "contextkit-dbus";
@@ -358,7 +360,7 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     } else {
         // Multiple providers... iterate over providers and keys
         foreach (QVariant providerTree, nano.keyValues("provider")) {
-           foreach (QVariant keyTree, NanoXml::keyValues("key", providerTree)) {
+           foreach (QVariant keyTree, NanoTree(providerTree).keyValues("key")) {
                parseKey(keyTree, providerTree);
            }
         }

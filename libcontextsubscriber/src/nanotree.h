@@ -34,7 +34,8 @@ public:
     NanoTree() : QVariant() {};
     NanoTree(const QVariant &root) : QVariant(root) {};
 
-    QVariant keySub(const QString &key) const;
+    QString dumpTree(int level) const;
+    NanoTree keySub(const QString &key) const;
     QVariant keyValue(const QString &key) const;
     QVariant keyValue(const QString &key1, const QString &key2) const;
     QVariant keyValue(const QString &key1, const QString &key2, const QString &key3) const;
@@ -42,30 +43,12 @@ public:
                       const QString &key4) const;
     QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
                       const QString &key4, const QString &key5) const;
-    QVariantList keyValues(const QString &key) const;
     QString stringValue() const;
+    QVariantList keyValues(const QString &key) const;
     NanoTree addStringValue(QString v);
     QStringList keys() const;
     NanoTree replaceKey(QString key, QVariant newNode);
     QVariant keyNode(QString k);
-
-    static QVariant keySub(const QString &key, const QVariant &dom);
-    static QVariant keyValue(const QString &key, const QVariant &dom);
-    static QVariant keyValue(const QString &key1, const QString &key2, const QVariant &dom);
-    static QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
-                             const QVariant &dom);
-    static QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
-                                   const QString &key4, const QVariant &dom);
-    static QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
-                             const QString &key4, const QString &key5, const QVariant &dom);
-    static QVariantList keyValues(const QString &key, const QVariant &dom);
-    static QVariant variantValue(const QVariant &dom);
-    static QVariant addVariantValue(const QVariant &value, const QVariant &dom);
-    static QStringList keys(const QVariant &dom);
-    static QVariant replaceKey(QString key, QVariant newNode, const QVariant &dom);
-    static QVariant keyNode(QString k, QVariant &dom);
-
-    static QString dumpTree(const QVariant &tree, int level);
 };
 
 #endif // NANOTREE_H
