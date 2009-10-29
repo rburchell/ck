@@ -14,7 +14,7 @@ if [ -n "$COVERAGE" ]
 then
     make -C coverage-build
     export LD_LIBRARY_PATH=../coverage-build/.libs:$LD_LIBRARY_PATH
-    export PATH=../../../python:../../../libcontextprovider/context-provide:../../cli/.libs:../../cls/.libs:$PATH
+    export PATH=../../../python:../../../libcontextprovider/context-provide/.libs:../../cli/.libs:../../cls/.libs:$PATH
     rm -rf coverage-build/.libs/*.gcda
 else
     make -C ../src
