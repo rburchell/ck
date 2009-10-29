@@ -64,11 +64,17 @@ class MultiProvider(unittest.TestCase):
                 """
                 provider_a = CLTool("context-provide", "--v2", "--session", "com.nokia.test.a",
                                   "int","test.int","1")
+                provider_a.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+
                 provider_a.send("dump context-provide_a.context")
+                provider_a.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
                 provider_b = CLTool("context-provide", "--v2", "--session", "com.nokia.test.b",
                                   "int","test.int","2")
+                provider_b.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+
                 provider_b.send("dump context-provide_b.context")
+                provider_b.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
                 client = CLTool("client")
 
@@ -138,15 +144,18 @@ class MultiProvider(unittest.TestCase):
                 References
                         None
                 """
-
-
                 provider_a = CLTool("context-provide", "--v2", "--session", "com.nokia.test.a",
                                   "double","test.double","1.5")
+                provider_a.expect(CLTool.STDOUT, "Added key", 10) # wait for it
                 provider_a.send("dump context-provide_a.context")
+                provider_a.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
                 provider_b = CLTool("context-provide", "--v2", "--session", "com.nokia.test.b",
                                   "double","test.double","2.5")
+                provider_b.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+
                 provider_b.send("dump context-provide_b.context")
+                provider_b.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
                 client = CLTool("client")
 
@@ -214,11 +223,17 @@ class MultiProvider(unittest.TestCase):
                 """
                 provider_a = CLTool("context-provide", "--v2", "--session", "com.nokia.test.a",
                                   "truth","test.truth","true")
+                provider_a.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+
                 provider_a.send("dump context-provide_a.context")
+                provider_a.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
                 provider_b = CLTool("context-provide", "--v2", "--session", "com.nokia.test.b",
-                                  "truth","test.truth","false")
+                                    "truth","test.truth","false")
+                provider_b.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+
                 provider_b.send("dump context-provide_b.context")
+                provider_b.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
 
                 client = CLTool("client")
 
