@@ -47,6 +47,18 @@ QString NanoTree::dumpTree(int level) const
     return s;
 }
 
+/// Returns the first item of the tree.
+NanoTree NanoTree::first()
+{
+    if (type() != QVariant::List)
+        return NanoTree();
+
+    if (toList().size() == 0)
+        return NanoTree();
+
+    return NanoTree(toList().at(0));
+}
+
 /// Returns the list of QVariants matching the \a key in a given tree. A QVariant
 /// node matches if it's a list by and it's first element is \a key.
 QVariantList NanoTree::keyValues(const QString &key) const
