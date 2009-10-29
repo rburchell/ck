@@ -142,11 +142,6 @@ void NanoTree::replaceKey(QString key, QVariant newNode)
     rootVariant = NanoTree::replaceKey(key, newNode, rootVariant);
 }
 
-QVariant NanoTree::first()
-{
-    return NanoTree::first(rootVariant);
-}
-
 QVariant NanoTree::keyNode(QString k)
 {
     return NanoTree::keyNode(k, rootVariant);
@@ -307,17 +302,6 @@ QVariant NanoTree::replaceKey(QString key, QVariant newNode, const QVariant &dom
     }
 
     return QVariant(lst);
-}
-
-QVariant NanoTree::first(QVariant &dom)
-{
-    if (dom.type() != QVariant::List)
-        return dom;
-
-    if (dom.toList().size() == 0)
-        return dom;
-
-    return QVariant(dom.toList().at(0));
 }
 
 QVariant NanoTree::keyNode(QString key, QVariant &dom)

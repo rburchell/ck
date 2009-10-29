@@ -53,7 +53,6 @@ public:
     void addStringValue(QString v);
     QStringList keys() const;
     void replaceKey(QString key, QVariant newNode);
-    QVariant first();
     QVariant keyNode(QString k);
 
     static QVariant keySub(const QString &key, const QVariant &dom);
@@ -70,7 +69,6 @@ public:
     static QVariant addVariantValue(const QVariant &value, const QVariant &dom);
     static QStringList keys(const QVariant &dom);
     static QVariant replaceKey(QString key, QVariant newNode, const QVariant &dom);
-    static QVariant first(QVariant &dom);
     static QVariant keyNode(QString k, QVariant &dom);
 
     static QString dumpTree(const QVariant &tree, int level);
