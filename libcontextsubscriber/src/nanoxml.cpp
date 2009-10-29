@@ -66,7 +66,7 @@
 
 /// Constructor. Creates a new nanodom tree reading XML data from path. After creating
 /// the object you should check the didFail to see if parsing succeded.
-NanoXml::NanoXml(const QString& path) : NanoTree(QVariant())
+NanoXml::NanoXml(const QString& path)
 {
     current = NULL;
 
@@ -117,7 +117,7 @@ void NanoXml::popList()
     } else {
         // End of stack unwinding. We're done.
         current = NULL;
-        // FIXME! rootVariant = currentListAsVariant;
+        rootVariant = currentListAsVariant;
     }
 }
 
@@ -175,5 +175,11 @@ const QString NanoXml::namespaceUri()
 bool NanoXml::didFail()
 {
     return failed;
+}
+
+
+NanoTree NanoXml::result()
+{
+    return NanoTree(rootVariant);
 }
 

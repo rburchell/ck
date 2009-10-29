@@ -29,7 +29,7 @@
 #include <QStack>
 #include "nanotree.h"
 
-class NanoXml : public NanoTree, QXmlDefaultHandler
+class NanoXml : public QXmlDefaultHandler
 {
 public:
     NanoXml(const QString& path);
@@ -38,6 +38,7 @@ public:
     bool didFail();
 
 private:
+    QVariant rootVariant; ///< The root variant. Created at the end of parsing.
     QList<QVariant> *current; ///< The current list that we're adding to. Top of the stack, kinda.
     QStack<QList <QVariant>* > stack; ///< The stack of lists.
     bool failed; ///< This is set by the parser to signify an error.
@@ -52,6 +53,8 @@ public:
     bool endElement(const QString&, const QString&, const QString &name);
     bool startPrefixMapping(const QString &prefix, const QString &uri);
     bool characters(const QString &chars);
+
+    NanoTree result();
 };
 
 #endif // NANOXML_H
