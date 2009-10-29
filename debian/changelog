@@ -1,3 +1,9 @@
+contextkit (0.4~unreleased) unstable; urgency=low
+
+  *
+
+ -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Thu, 29 Oct 2009 11:12:00 +0300
+
 contextkit (0.3.11) unstable; urgency=low
 
   * Subscriber part of libcontextsubscriber now supports multiple
