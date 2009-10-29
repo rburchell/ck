@@ -149,9 +149,12 @@ void PropertyAdaptor::onServiceOwnerChanged(const QString &name, const QString &
 /// /com/my/property.
 QString PropertyAdaptor::objectPath() const
 {
-    if (!propertyPrivate->key.startsWith("/"))
-        return QString("/org/maemo/contextkit/") + QString(propertyPrivate->key).replace(".", "/");
-    return QString(propertyPrivate->key);
+    if (propertyPrivate->key.startsWith("/"))
+        return QString(propertyPrivate->key);
+
+    return QString("/org/maemo/contextkit/") +
+            QString(propertyPrivate->key).replace(".", "/").replace(QRegExp("[^A-Za-z0-9_/]"), "_");
+
 }
 
 /// Called when the service is stopped and will disappear from
