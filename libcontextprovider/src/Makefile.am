@@ -9,8 +9,6 @@ libcontextprovider_la_SOURCES = loggingfeatures.h       \
                                 propertyprivate.cpp     \
                                 group.h			\
                                 group.cpp		\
-                                queuedinvoker.h         \
-                                queuedinvoker.cpp       \
                                 contextc.h              \
                                 contextc.cpp            \
                                 listeners.h             \
