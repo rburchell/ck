@@ -19,6 +19,11 @@
       <case name="service" description="Operations on the Service class" requirement="" timeout="50">
         <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/lib/libcontextprovider-tests/;./servicetest</step>
       </case>
+      <case name="multiprovider" description="Scenarios involving
+											  several providers" requirement="" timeout="50">
+        <step expected_result="0">. /tmp/session_bus_address.user;export
+        PATH=$PATH:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/multiprovider.py</step>
+      </case>
       <environments>
         <scratchbox>false</scratchbox>
         <hardware>true</hardware>

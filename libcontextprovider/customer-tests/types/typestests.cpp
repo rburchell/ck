@@ -193,28 +193,28 @@ void TypesTests::typesInChangeSignal()
     intItem->setValue(-11);
 
     QString actual = writeToClient("waitforchanged 3000\n");
-    QString expected = "ValueChanged: /org/maemo/contextkit/Test/Int int:-11";
+    QString expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/Int int:-11";
     QCOMPARE(actual.simplified(), expected.simplified());
     writeToClient("resetsignalstatus\n");
 
     doubleItem->setValue(4.88);
 
     actual = writeToClient("waitforchanged 3000\n");
-    expected = "ValueChanged: /org/maemo/contextkit/Test/Double double:4.88";
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/Double double:4.88";
     QCOMPARE(actual.simplified(), expected.simplified());
     writeToClient("resetsignalstatus\n");
 
     stringItem->setValue("anotherstring");
 
     actual = writeToClient("waitforchanged 3000\n");
-    expected = "ValueChanged: /org/maemo/contextkit/Test/String QString:anotherstring";
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/String QString:anotherstring";
     QCOMPARE(actual.simplified(), expected.simplified());
     writeToClient("resetsignalstatus\n");
 
     boolItem->setValue(true);
 
     actual = writeToClient("waitforchanged 3000\n");
-    expected = "ValueChanged: /org/maemo/contextkit/Test/Bool bool:true";
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/Bool bool:true";
     QCOMPARE(actual.simplified(), expected.simplified());
     writeToClient("resetsignalstatus\n");
 
@@ -225,7 +225,7 @@ void TypesTests::typesInChangeSignal()
     actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: The client got the Changed signal with correct values
-    expected = "ValueChanged: /org/maemo/contextkit/Test/StringList QStringList:something/else/here";
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/StringList QStringList:something/else/here";
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 

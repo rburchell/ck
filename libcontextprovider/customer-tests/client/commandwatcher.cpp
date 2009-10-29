@@ -227,18 +227,30 @@ void CommandWatcher::waitForChanged(int timeout)
     while (changedSignalReceived == false && t.elapsed() < timeout) {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
+
     if (changedSignalReceived) {
-        out << "ValueChanged: " << changedSignalParameters.at(0) << endl;
+        out << "ValueChanged: ";
+        foreach (QString param, changedSignalParameters)
+            out << param << " ";
+        out << endl;
     }
     else {
         out << "Timeout" << endl;
     }
+    changedSignalReceived = false;
+    changedSignalParameters.clear();
 }
 
 void CommandWatcher::onValueChanged(QList<QVariant> value, quint64 timestamp, QDBusMessage msg)
 {
     changedSignalReceived = true;
-    changedSignalParameters.append(msg.path() + " " + describeValue(value, timestamp));
+    QPair<QString, QString> connData;
+    foreach (connData, connectionMap)
+    {
+        QDBusReply<QString> reply = QDBusConnection::sessionBus().interface()->serviceOwner(connData.second);
+        if (reply.value() == msg.service())
+            changedSignalParameters.append(connData.second + " " + msg.path() + " " + describeValue(value, timestamp));
+    }
 }
 
 QString CommandWatcher::describeValue(QList<QVariant> value, quint64 timestamp)

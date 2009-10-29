@@ -289,8 +289,9 @@ int test_value_changes()
 
     /* Expected result: the client got the signal */
     int mismatch = compare_output("ValueChanged: "
+                                  "org.freedesktop.ContextKit.testProvider "
                                   "/org/maemo/contextkit/Group1/Double "
-                                  "double:-41.987\n");
+                                  "double:-41.987 \n");
     if (mismatch) return 1;
 
     write_to_client("resetsignalstatus\n");
@@ -301,7 +302,8 @@ int test_value_changes()
 
     /* Expected result: the client got the signal */
     mismatch = compare_output("ValueChanged: "
-                              "/org/maemo/contextkit/Group1/String Unknown\n");
+                              "org.freedesktop.ContextKit.testProvider "
+                              "/org/maemo/contextkit/Group1/String Unknown \n");
     if (mismatch) return 1;
 
     write_to_client("resetsignalstatus\n");

@@ -106,7 +106,7 @@ void ValueChangesTests::subscribedPropertyChanges()
     QString actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: the client got the Changed signal
-    QString expected = "ValueChanged: /org/maemo/contextkit/Test/Double double:51.987";
+    QString expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/Double double:51.987";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 
@@ -119,7 +119,7 @@ void ValueChangesTests::subscribedPropertyChanges()
     actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: the client got the Changed signal
-    expected = "ValueChanged: /org/maemo/contextkit/Test/Double Unknown";
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/Double Unknown";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 }
@@ -256,7 +256,7 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
     actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: the client got the Changed signal
-    expected = "ValueChanged: /org/maemo/contextkit/Test/Int int:0";
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/Int int:0";
 
     QCOMPARE(actual.simplified(), expected.simplified());
 
@@ -269,7 +269,7 @@ void ValueChangesTests::changesBetweenZeroAndUnknown()
     actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: the client got the Changed signal
-    expected = "ValueChanged: /org/maemo/contextkit/Test/Int Unknown";
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/Int Unknown";
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
