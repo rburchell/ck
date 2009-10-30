@@ -71,8 +71,12 @@ void ContextTypeInfoUnitTest::parseDoubleType()
     QCOMPARE(typeInfo.name(), QString("double"));
     QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
     QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
-    QCOMPARE(typeInfo.parameters().size(), 2);
     QCOMPARE(typeInfo.doc(), QString("A double value within the given limits."));
+
+    QStringList params = typeInfo.parameters();
+    QCOMPARE(params.size(), 2);
+    QVERIFY(params.contains(QString("min")));
+    QVERIFY(params.contains(QString("max")));
 }
 
 void ContextTypeInfoUnitTest::parseCustomDoubleType()
