@@ -22,7 +22,7 @@
       <case name="multiprovider" description="Scenarios involving
 											  several providers" requirement="" timeout="50">
         <step expected_result="0">. /tmp/session_bus_address.user;export
-        PATH=$PATH:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py</step>
+        PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py</step>
       </case>
       <environments>
         <scratchbox>false</scratchbox>
