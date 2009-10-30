@@ -73,8 +73,14 @@ ContextTypeInfo ContextTypeInfo::base() const
         return resolveTypeName(nanoTree.keyValue("base").toString());
 }
 
+/// Returns a list of parameter names for this type.
+QStringList ContextTypeInfo::parameters() const
+{
+    return nanoTree.keyNode("params").keys();
+}
+
 /// Returns a list of NanoDom trees representing the parameters for this type.
-QList<NanoTree> ContextTypeInfo::parameters() const
+/*QList<NanoTree> ContextTypeInfo::parameters() const
 {
     QList<NanoTree> lst;
     foreach (QVariant v, nanoTree.keySub("params").toList()) {
@@ -82,14 +88,14 @@ QList<NanoTree> ContextTypeInfo::parameters() const
     }
 
     return lst;
-}
+}*/
 
 /// Returns the NanoDom tree for the specified paramemeter \a p.
 /// Returns and empty tree if the parameter does not exists.
-NanoTree ContextTypeInfo::parameter(QString p) const
-{
-    return nanoTree.keyValue("params", p);
-}
+//NanoTree ContextTypeInfo::parameter(QString p) const
+//{
+//    return nanoTree.keyValue("params", p);
+//}
 
 /// Returns documentation as string for the given parameter.
 /// Returns an empty string if the parameter does not exists.

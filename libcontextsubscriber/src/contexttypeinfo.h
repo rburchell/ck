@@ -39,8 +39,9 @@ public:
     ContextTypeInfo operator=(const ContextTypeInfo& info);
 
     QString name() const;
-    QList<NanoTree> parameters() const;
-    NanoTree parameter(QString p) const;
+    QStringList parameters() const;
+    //QList<NanoTree> parameters() const;
+    //NanoTree parameter(QString p) const;
     QString parameterDoc(QString p) const;
     QString parameterValue(QString p) const;
     void setParameterValue(QString p, QString value);
