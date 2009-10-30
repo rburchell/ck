@@ -49,7 +49,7 @@ QString NanoTree::dumpTree(int level) const
 
 /// Assuming this tree represents a key, return the name of the key.
 /// (first item).
-NanoTree NanoTree::keyName()
+NanoTree NanoTree::keyName() const
 {
     if (type() != QVariant::List)
         return NanoTree();
@@ -186,7 +186,7 @@ QString NanoTree::stringValue() const
 
 /// Add a string value to the current NanoTree. A value is a lose (non-list) QVariant
 /// attached to the tree root. (\a dom).
-NanoTree NanoTree::addStringValue(QString value)
+NanoTree NanoTree::addStringValue(QString value) const
 {
     if (type() != QVariant::List)
         return *this;
@@ -197,7 +197,7 @@ NanoTree NanoTree::addStringValue(QString value)
 }
 
 /// Replaces the key \a key with a new NanoTree node \a newNode.
-NanoTree NanoTree::replaceKey(QString key, NanoTree newNode)
+NanoTree NanoTree::replaceKey(QString key, NanoTree newNode) const
 {
     if (type() != QVariant::List)
         return *this;
@@ -220,7 +220,7 @@ NanoTree NanoTree::replaceKey(QString key, NanoTree newNode)
 /// Similiar to NanoTree::keyValue (1st level accessor) but returns not the
 /// value of the key \a k but the whole node of it. Useful to move nodes around
 /// when building/changing the NanoTrees.
-NanoTree NanoTree::keyNode(QString key)
+NanoTree NanoTree::keyNode(QString key) const
 {
     const QVariant keyVariant(key); // So we can directly compare...
 

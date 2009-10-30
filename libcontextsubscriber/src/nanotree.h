@@ -45,11 +45,11 @@ public:
                       const QString &key4, const QString &key5) const;
     QString stringValue() const;
     QVariantList keyValues(const QString &key) const;
-    NanoTree addStringValue(QString v);
+    NanoTree addStringValue(QString v) const;
     QStringList keys() const;
-    NanoTree replaceKey(QString key, NanoTree newNode);
-    NanoTree keyNode(QString k);
-    NanoTree keyName();
+    NanoTree replaceKey(QString key, NanoTree newNode) const;
+    NanoTree keyNode(QString k) const;
+    NanoTree keyName() const;
 };
 
 #endif // NANOTREE_H
