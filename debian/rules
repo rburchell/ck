@@ -48,6 +48,13 @@ install: build
 
 	chown -R root:root debian/tmp/usr/share/libcontextsubscriber-tests
 
+	# propertymonitor-tests
+	mkdir -p debian/tmp/usr/share/propertymonitor-tests
+	cp libcontextsubscriber/propertymonitor/has_value.py debian/tmp/usr/share/propertymonitor-tests
+	cp libcontextsubscriber/propertymonitor/has_provider.py debian/tmp/usr/share/propertymonitor-tests
+	cp libcontextsubscriber/propertymonitor/tests.xml debian/tmp/usr/share/propertymonitor-tests
+	chown -R root:root debian/tmp/usr/share/propertymonitor-tests
+
 	# set the executable flag on to all files that have a shebang line
 	grep -rl '^#!' debian/tmp/usr/share/libcontextsubscriber-tests | xargs chmod +x
 
