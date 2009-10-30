@@ -4,7 +4,7 @@ check_PROGRAMS = contexttypeinfounittest
 contexttypeinfounittest_SOURCES = contexttypeinfounittest.cpp
 
 COVERAGE_FILES = contexttypeinfo.cpp 
-EXTRA_DIST = double.xml double-custom.xml uniform-list.xml person.xml
+EXTRA_DIST = double.xml custom-double.xml uniform-list.xml person.xml
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
