@@ -1,3 +1,9 @@
+contextkit (0.4.1~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 30 Oct 2009 03:31:16 +0200
+
 contextkit (0.4) unstable; urgency=low
 
   * libcontextprovider now supports multiple providers for one property
