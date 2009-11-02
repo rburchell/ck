@@ -27,45 +27,20 @@
 #include <QObject>
 #include <QXmlDefaultHandler>
 #include <QStack>
+#include "nanotree.h"
 
-class NanoXml : public QObject, QXmlDefaultHandler
+class NanoXml : public QXmlDefaultHandler
 {
-    Q_OBJECT
-
 public:
     NanoXml(const QString& path);
     ~NanoXml();
-    const QVariant& root();
     const QString namespaceUri();
     bool didFail();
 
-    QVariant keySub(const QString &key);
-    QVariant keyValue(const QString &key);
-    QVariant keyValue(const QString &key1, const QString &key2);
-    QVariant keyValue(const QString &key1, const QString &key2, const QString &key3);
-    QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
-                      const QString &key4);
-    QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
-                      const QString &key4, const QString &key5);
-    QVariantList keyValues(const QString &key);
-
-    static QVariant keySub(const QString &key, const QVariant &dom);
-    static QVariant keyValue(const QString &key, const QVariant &dom);
-    static QVariant keyValue(const QString &key1, const QString &key2, const QVariant &dom);
-    static QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
-                             const QVariant &dom);
-    static QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
-                                   const QString &key4, const QVariant &dom);
-    static QVariant keyValue(const QString &key1, const QString &key2, const QString &key3,
-                             const QString &key4, const QString &key5, const QVariant &dom);
-    static QVariantList keyValues(const QString &key, const QVariant &dom);
-
-    static QString dumpTree(const QVariant &tree, int level);
-
 private:
+    QVariant rootVariant; ///< The root variant. Created at the end of parsing.
     QList<QVariant> *current; ///< The current list that we're adding to. Top of the stack, kinda.
     QStack<QList <QVariant>* > stack; ///< The stack of lists.
-    QVariant rootVariant; ///< The nanodom root. A list of QVariants usually.
     bool failed; ///< This is set by the parser to signify an error.
     QString nspace; ///< Stores the namespace uri.
 
@@ -78,6 +53,8 @@ public:
     bool endElement(const QString&, const QString&, const QString &name);
     bool startPrefixMapping(const QString &prefix, const QString &uri);
     bool characters(const QString &chars);
+
+    NanoTree result();
 };
 
 #endif // NANOXML_H

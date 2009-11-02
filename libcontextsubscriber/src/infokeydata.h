@@ -23,6 +23,7 @@
 #define INFOKEYDATA_H
 
 #include <QString>
+#include "contexttypeinfo.h"
 
 /*!
     \struct InfoKeyData
@@ -36,7 +37,7 @@
 struct InfoKeyData
 {
     QString name; ///< Name of the we're storing data for.
-    QString type; ///< Type of the key.
+    ContextTypeInfo typeInfo; ///< Type information of the key.
     QString doc; ///< Doc for the key.
 };
 

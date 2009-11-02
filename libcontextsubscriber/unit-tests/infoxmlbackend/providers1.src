@@ -13,6 +13,8 @@
   <key name="Key.With.string" type="string"/>
   <key name="Key.With.double" type="double"/>
   <key name="Key.With.complex">
-    <type><sub>SUB</sub></type>
+    <type>
+        <double min="0" max="10"/>
+    </type>
   </key>
 </provider>

@@ -1,0 +1,4 @@
+<object>
+  <param1>value1</param1>
+  <param2 type="int">value2</param2>
+</object>

@@ -1,6 +1,4 @@
 loggingfeatures.h
-nanoxml.cpp
-nanoxml.h
-nanoxmlunittest
+nanotreeunittest
 nanotree.cpp
 nanotree.h

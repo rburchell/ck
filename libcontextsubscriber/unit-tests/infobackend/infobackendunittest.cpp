@@ -47,9 +47,9 @@ public:
         return QStringList();
     }
 
-    QString typeForKey(QString key) const
+    ContextTypeInfo typeInfoForKey(QString key) const
     {
-        return QString();
+        return ContextTypeInfo();
     }
 
     QString docForKey(QString key) const

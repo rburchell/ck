@@ -1,0 +1,9 @@
+<type name="double">
+  <params>
+    <min doc="Minimum value"/>
+    <max doc="Maximum value"/>
+  </params>
+  <doc>
+    A double value within the given limits.
+  </doc>
+</type>
