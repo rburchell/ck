@@ -13,7 +13,8 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	loggingfeatures.h contextkitplugin.h contextkitplugin.cpp	\
 	iproviderplugin.h contextproviderinfo.h nanoxml.h nanoxml.cpp	\
 	asyncdbusinterface.cpp timedvalue.h nanotree.h nanotree.cpp	\
-	contexttypeinfo.cpp contexttypeinfo.h
+	contexttypeinfo.cpp contexttypeinfo.h				\
+	contexttyperegistryinfo.cpp contexttyperegistryinfo.h
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h			\
