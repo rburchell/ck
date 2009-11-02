@@ -133,6 +133,7 @@ void PropertyHandle::updateProvider()
         // If commander is present it should be able to override the
         // property, so connect to it.
         newProviders << Provider::instance(commanderInfo);
+        Provider::instance(commanderInfo)->clearValues();
     } else {
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
@@ -151,8 +152,11 @@ void PropertyHandle::updateProvider()
                 pendingSubscriptions << newprovider;
     }
     myProviders = newProviders;
-    // Trigger computing the new value as the providers have changed.
-    onValueChanged();
+    // If all subscriptions succeeded immediately, then we have to trigger
+    // recomputing the value now.  Otherwise we rely on the
+    // subscribeFinished signal.
+    if (subscribeCount > 0 && pendingSubscriptions.empty())
+        onValueChanged();
 }
 
 /// Sets \c subscribePending to false.

@@ -41,11 +41,19 @@ install: build
 	cp -rf libcontextsubscriber/customer-tests/subscription debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/registry debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/pluginchanging debian/tmp/usr/share/libcontextsubscriber-tests/
+	cp -rf libcontextprovider/customer-tests/multiprovider debian/tmp/usr/share/libcontextprovider-tests/
 
 	mkdir debian/tmp/usr/share/libcontextsubscriber-tests/common
 	cp libcontextsubscriber/customer-tests/common/*.sh debian/tmp/usr/share/libcontextsubscriber-tests/common
 
 	chown -R root:root debian/tmp/usr/share/libcontextsubscriber-tests
+
+	# propertymonitor-tests
+	mkdir -p debian/tmp/usr/share/propertymonitor-tests
+	cp libcontextsubscriber/propertymonitor/has_value.py debian/tmp/usr/share/propertymonitor-tests
+	cp libcontextsubscriber/propertymonitor/has_provider.py debian/tmp/usr/share/propertymonitor-tests
+	cp libcontextsubscriber/propertymonitor/tests.xml debian/tmp/usr/share/propertymonitor-tests
+	chown -R root:root debian/tmp/usr/share/propertymonitor-tests
 
 	# set the executable flag on to all files that have a shebang line
 	grep -rl '^#!' debian/tmp/usr/share/libcontextsubscriber-tests | xargs chmod +x

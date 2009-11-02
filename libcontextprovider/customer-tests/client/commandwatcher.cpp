@@ -14,6 +14,8 @@
 #include <errno.h>
 #include <QtDBus/QtDBus>
 
+#define PROPERTY "org.maemo.contextkit.Property"
+
 CommandWatcher::CommandWatcher(int commandfd, QObject *parent) :
     QObject(parent), commandfd(commandfd), out(stdout), changedSignalReceived(false)
 {
@@ -31,7 +33,6 @@ void CommandWatcher::onActivated()
     int readSize;
     while ((readSize = read(commandfd, &buf, 1024)) > 0)
         commandBuffer += QByteArray(buf, readSize);
-
     // handle all available whole input lines as commands
     int nextSeparator;
     while ((nextSeparator = commandBuffer.indexOf('\n')) != -1) {
@@ -41,7 +42,6 @@ void CommandWatcher::onActivated()
             interpret(command.trimmed());
         commandBuffer.remove(0, nextSeparator + 1);
     }
-
     if (readSize == 0) // EOF
         QCoreApplication::exit(0);
 }
@@ -49,11 +49,12 @@ void CommandWatcher::onActivated()
 void CommandWatcher::help()
 {
         qDebug() << "Available commands:";
-        qDebug() << "  getsubscriber BUSTYPE BUSNAME   - execute GetSubscriber over DBus";
-        qDebug() << "  subscribe BUSNAME KEY...        - subscribe to keys for a known BUSNAME";
-        qDebug() << "  unsubscribe BUSNAME KEY...      - unsubscribe from keys for a known BUSNAME";
-        qDebug() << "  resetsignalstatus               - forget any previously received Changed signals";
-        qDebug() << "  waitforchanged TIMEOUT          - wait until the Changed signal arrives over DBus";
+        qDebug() << "  assign BUSTYPE BUSNAME NAME     - assign BUSTYPE and BUSNAME to a custom NAME";
+        qDebug() << "  get NAME KEY                    - get value of a key (long name) for a known NAME";
+        qDebug() << "  subscribe NAME KEY              - subscribe to KEY for a known NAME";
+        qDebug() << "  unsubscribe NAME KEY            - unsubscribe from KEY for a known NAME";
+        qDebug() << "  resetsignalstatus               - forget any previously received ValueChanged signals";
+        qDebug() << "  waitforchanged TIMEOUT          - wait until the ValueChanged signal arrives over DBus";
         qDebug() << "Any prefix of a command can be used as an abbreviation";
 }
 
@@ -65,16 +66,22 @@ void CommandWatcher::interpret(const QString& command)
         QStringList args = command.split(" ");
         QString commandName = args[0];
         args.pop_front();
-
-        if (QString("getsubscriber").startsWith(commandName)) {
-            if (args.size() == 2) {
+        if (QString("assign").startsWith(commandName)) {
+            if (args.size() == 3) {
                 // Create the DBus connection to the correct bus (session or system)
                 QString busType = args.at(0);
                 if (busType == "session" || busType == "system") {
                     // Store the bus type
                     QString busName = args.at(1);
-                    connectionTypes.insert(busName, busType);
-                    callGetSubscriber(getConnection(busType), busName);
+                    QPair <QString, QString> pair(busType, busName);
+                    connectionMap.insert(args.at(2), pair);
+                    // Also start listening to ValueChanged signal
+                    if (listenToChanged(args.at(2))) {
+                        out << "Assigned " << args.at(2) << endl;
+                    }
+                    else {
+                        out << "Error: cannot listen to ValueChanged signals" << endl;
+                    }
                 }
                 else {
                     // Print the error message to output (so that the test program waiting for input won't block)
@@ -85,18 +92,20 @@ void CommandWatcher::interpret(const QString& command)
                 out << "Error: wrong number of parameters" << endl;
             }
         } else if (QString("subscribe").startsWith(commandName)) {
-            if (args.size() >= 1) {
-                QString busName = args[0];
-                args.pop_front();
-                callSubscribe(busName, args);
+            if (args.size() == 2) {
+                callSubscribe(args[0], args[1]);
+            }
+            else
+                out << "Error: wrong number of parameters" << endl;
+        } else if (QString("get").startsWith(commandName)) {
+            if (args.size() == 2) {
+                callGet(args[0], args[1]);
             }
             else
                 out << "Error: wrong number of parameters" << endl;
         } else if (QString("unsubscribe").startsWith(commandName)) {
-            if (args.size() >= 1) {
-                QString busName = args[0];
-                args.pop_front();
-                callUnsubscribe(busName, args);
+            if (args.size() == 2) {
+                callUnsubscribe(args[0], args[1]);
             }
             else
                 out << "Error: wrong number of parameters" << endl;
@@ -122,81 +131,86 @@ void CommandWatcher::interpret(const QString& command)
     }
 }
 
-void CommandWatcher::callGetSubscriber(QDBusConnection connection, const QString& busName)
+bool CommandWatcher::listenToChanged(const QString& name)
 {
-    // Call GetSubscriber synchronously
-    QDBusInterface manager(busName, "/org/freedesktop/ContextKit/Manager",
-                           "org.freedesktop.ContextKit.Manager", connection);
-    QDBusReply<QDBusObjectPath> reply = manager.call("GetSubscriber");
-    if (reply.isValid()) {
-        // Store the subscriber path
-        QString subscriberPath = reply.value().path();
-        subscriberPaths.insert(busName, subscriberPath);
-        // And print it out
-        out << "GetSubscriber returned " << subscriberPath << endl;
+    if (connectionMap.contains(name) == false) {
+        return false;
+    }
+    QPair<QString, QString> connData = connectionMap[name];
+    QDBusConnection connection = getConnection(connData.first);
 
-        // Start listening to the Changed signal
-        connection.connect(busName, subscriberPath, "org.freedesktop.ContextKit.Subscriber", "Changed",
-                           this, SLOT(onChanged(QMap<QString, QVariant>, QStringList)));
-    }
-    else {
-        out << "GetSubscriber error: invalid reply" << endl;
-        // Nullify the subscriber path so that we don't use it accidentally later
-        subscriberPaths.remove(busName);
-    }
+    // Start listening to the Changed signal
+    return connection.connect(connData.second, "", PROPERTY, "ValueChanged",
+                           this, SLOT(onValueChanged(QList<QVariant>,quint64,QDBusMessage)));
 }
 
-void CommandWatcher::callSubscribe(const QString& busName, const QStringList& args)
+void CommandWatcher::callGet(const QString& busName, const QString& key)
 {
-    QString subscriberPath = subscriberPaths[busName];
-    if (subscriberPath != "") {
-        // We have a proper subscriber path
-
-        QDBusConnection connection = getConnection(connectionTypes[busName]);
-
-        QDBusInterface subscriber(busName, subscriberPath,
-                                  "org.freedesktop.ContextKit.Subscriber", connection);
-
-        // Call Subscribe "synchronously", by first
-        // constructing an asynchronous call and then waiting
-        // for it to be finished.  For some reason, it seems
-        // that extracting the QMap<QString, QVariant> is
-        // tricky without using QDBusPendingReply.
-        QDBusPendingReply<QMap<QString, QVariant>, QStringList> reply = subscriber.asyncCall("Subscribe", args);
-        reply.waitForFinished();
-        if (!reply.isValid()) {
-            out << "Subscribe error: invalid reply" << endl;
-            return;
-        }
-
-        QMap<QString, QVariant> knownValues = reply.argumentAt<0>();
-        QStringList unknownKeys = reply.argumentAt<1>();
-        // Print the return value description
-        out << describeValuesAndUnknowns(knownValues, unknownKeys) << endl;
+    // Call Get synchronously
+    if (connectionMap.contains(busName) == false) {
+        out << "Error: Invalid name" << busName << endl;
+        return;
     }
-    else {
-        out << "Subscribe error: we don't have a subscriber for bus name " << busName << endl;
+    QPair<QString, QString> connData = connectionMap[busName];
+    QDBusConnection connection = getConnection(connData.first);
+
+    QDBusPendingCall pc = connection.asyncCall(QDBusMessage::createMethodCall(connData.second,
+                                                                              keyToPath(key),
+                                                                              PROPERTY,
+                                                                              "Get"));
+    pc.waitForFinished();
+    QDBusPendingReply<QList<QVariant>, quint64> reply = pc;
+    if (reply.isError()) {
+        out << "Get error: " << reply.reply().errorName() << endl;
+        return;
     }
+    out << "Get returned: " << describeValue(reply.argumentAt<0>(), reply.argumentAt<1>()) << endl;
+
 }
 
-void CommandWatcher::callUnsubscribe(const QString& busName, const QStringList& args)
+void CommandWatcher::callSubscribe(const QString& name, const QString& key)
 {
-    QString subscriberPath = subscriberPaths[busName];
-    if (subscriberPath != "") {
-        // We have a proper subscriber path
-
-        QDBusConnection connection = getConnection(connectionTypes[busName]);
-
-        QDBusInterface subscriber(busName, subscriberPath,
-                                  "org.freedesktop.ContextKit.Subscriber", connection);
-        // Call Unsubscribe synchronously
-        subscriber.call("Unsubscribe", args);
-
-        out << "Unsubscribe called" << endl;
+    // Call Subscribe synchronously
+    if (connectionMap.contains(name) == false) {
+        out << "Error: Invalid name" << name << endl;
+        return;
     }
-    else {
-        out << "Unsubscribe error: we don't have a subscriber for bus name " << busName << endl;
+    QPair<QString, QString> connData = connectionMap[name];
+    QDBusConnection connection = getConnection(connData.first);
+
+    QDBusPendingCall pc = connection.asyncCall(QDBusMessage::createMethodCall(connData.second,
+                                                                              keyToPath(key),
+                                                                              PROPERTY,
+                                                                              "Subscribe"));
+    pc.waitForFinished();
+    QDBusPendingReply<QList<QVariant>, quint64> reply = pc;
+    if (reply.isError()) {
+        out << "Subscribe error: " << reply.reply().errorName() << endl;
+        return;
     }
+    out << "Subscribe returned: " << describeValue(reply.argumentAt<0>(), reply.argumentAt<1>()) << endl;
+}
+
+void CommandWatcher::callUnsubscribe(const QString& name, const QString& key)
+{
+    // Call Unsubscribe synchronously
+    if (connectionMap.contains(name) == false) {
+        out << "Error: Invalid name" << name << endl;
+        return;
+    }
+    QPair<QString, QString> connData = connectionMap[name];
+    QDBusConnection connection = getConnection(connData.first);
+    QDBusPendingCall pc = connection.asyncCall(QDBusMessage::createMethodCall(connData.second,
+                                                                              keyToPath(key),
+                                                                              PROPERTY,
+                                                                              "Unsubscribe"));
+    pc.waitForFinished();
+    if (pc.isError()) {
+        out << "Unsubscribe error: " << pc.reply().errorName() << endl;
+        return;
+    }
+
+    out << "Unsubscribe called" << endl;
 }
 
 void CommandWatcher::resetSignalStatus()
@@ -213,47 +227,47 @@ void CommandWatcher::waitForChanged(int timeout)
     while (changedSignalReceived == false && t.elapsed() < timeout) {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
+
     if (changedSignalReceived) {
-        out << "Changed signal received, parameters: " << changedSignalParameters.at(0) << endl;
+        out << "ValueChanged: ";
+        foreach (QString param, changedSignalParameters)
+            out << param << " ";
+        out << endl;
     }
     else {
         out << "Timeout" << endl;
     }
+    changedSignalReceived = false;
+    changedSignalParameters.clear();
 }
 
-void CommandWatcher::onChanged(QMap<QString, QVariant> knownValues, QStringList unknownKeys)
+void CommandWatcher::onValueChanged(QList<QVariant> value, quint64 timestamp, QDBusMessage msg)
 {
     changedSignalReceived = true;
-    changedSignalParameters.append(describeValuesAndUnknowns(knownValues, unknownKeys));
+    QPair<QString, QString> connData;
+    foreach (connData, connectionMap)
+    {
+        QDBusReply<QString> reply = QDBusConnection::sessionBus().interface()->serviceOwner(connData.second);
+        if (reply.value() == msg.service())
+            changedSignalParameters.append(connData.second + " " + msg.path() + " " + describeValue(value, timestamp));
+    }
 }
 
-QString CommandWatcher::describeValuesAndUnknowns(const QMap<QString, QVariant>& knownValues, QStringList unknownKeys)
+QString CommandWatcher::describeValue(QList<QVariant> value, quint64 timestamp)
 {
     // Compose a string representation of the parameters
-    QString parameterDescription;
-
-    QStringList knownKeys(knownValues.keys());
-    knownKeys.sort();
-    unknownKeys.sort();
-
-    parameterDescription += "Known keys: ";
-    foreach (const QString& key, knownKeys) {
-        QVariant value = knownValues[key];
-        parameterDescription += (key + "(" + value.typeName() + ":" + describeQVariant(value) + ") ");
+    if (value.size() == 0) {
+        return "Unknown";
     }
-
-    parameterDescription +="Unknown keys: ";
-    foreach (const QString& key, unknownKeys) {
-        parameterDescription += (key + " ");
+    else {
+        return value[0].typeName() + QString(":") + describeQVariant(value[0]);
     }
-
-    return parameterDescription;
+    return "";
 }
 
 QString CommandWatcher::describeQVariant(QVariant value)
 {
     QVariant::Type type = value.type();
-
     if (type == QVariant::Bool || type == QVariant::Int || type == QVariant::Double || type == QVariant::String) {
         // Automatic conversion is OK
         return value.toString();
@@ -263,7 +277,6 @@ QString CommandWatcher::describeQVariant(QVariant value)
     }
     if (type == QVariant::UserType) {
         QDBusArgument dbusArgument = value.value<QDBusArgument >();
-
         return "";
         /* FIXME: How to extract types like QDate, QTime from this?
         If we know, what type to expect, it goes like this:
@@ -283,4 +296,12 @@ QDBusConnection CommandWatcher::getConnection(const QString& busType)
     if (busType == "system")
         return QDBusConnection::systemBus();
     return QDBusConnection::sessionBus();
+}
+
+QString CommandWatcher::keyToPath(QString key)
+{
+    if (key.startsWith("/"))
+        return key;
+
+    return "/org/maemo/contextkit/" + key.replace('.', '/');
 }

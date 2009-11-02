@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -24,14 +24,11 @@
 
 #include <QObject>
 #include <QString>
-#include <QStringList>
 #include <QDBusConnection>
-#include <QHash>
 #include <QVariant>
 
 namespace ContextProvider {
 
-class Manager;
 
 class ServiceBackend : QObject
 {
@@ -39,7 +36,6 @@ class ServiceBackend : QObject
 
 public:
     explicit ServiceBackend(QDBusConnection connection, const QString &busName = "");
-    Manager *manager();
     static ServiceBackend *defaultServiceBackend;
 
     void setAsDefault();
@@ -52,6 +48,8 @@ public:
     static ServiceBackend* instance(QDBusConnection connection);
     static ServiceBackend* instance(QDBusConnection::BusType busType,
                                     const QString &busName, bool autoStart = true);
+
+    void setValue(const QString &key, const QVariant &val);
     QDBusConnection connection;
 };
 

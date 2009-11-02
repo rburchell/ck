@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Nokia Corporation.
+ * Copyright (C) 2008 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,32 +19,27 @@
  *
  */
 
-#ifndef PROPERTY_H
-#define PROPERTY_H
-
 // This is a mock implementation
 
+#ifndef PROPERTYPRIVATE_H
+#define PROPERTYPRIVATE_H
+
 #include <QObject>
+#include <QString>
+#include <QVariant>
+#include <QPair>
 
 namespace ContextProvider {
 
-class Manager;
-class Service;
+class ServiceBackend;
 
-class Property : public QObject
+class PropertyPrivate : public QObject
 {
     Q_OBJECT
+
 public:
-    Property(QString key, QObject* parent = 0);
-    Property(Service &service, QString key, QObject* parent = 0);
+    void setValue(const QVariant& v);
 
-    void setManager(Manager *);
-
-    QString key();
-
-signals:
-    void firstSubscriberAppeared(const QString &key);
-    void lastSubscriberDisappeared(const QString &key);
 };
 
 } // end namespace

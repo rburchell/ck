@@ -20,11 +20,13 @@
  */
 
 #include "servicebackend.h"
+#include "propertyprivate.h"
+#include "propertyadaptor.h"
 #include "logging.h"
-#include "manager.h"
-#include "manageradaptor.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
+
+#include <QDBusError>
 
 namespace ContextProvider {
 
@@ -33,9 +35,9 @@ namespace ContextProvider {
 
     \brief A ServiceBackend is the real worker behind Service.
 
-    Multiple Service instances can share same ServiceBackend.
-    The backend is the actual worker that operates on D-Bus,
-    has a Manager and registers properties.
+    Multiple Service instances can share same ServiceBackend.  The
+    backend is the actual worker that operates on D-Bus (register
+    objects representing Property objects and possibly a bus name).
 
     The Service class actually proxies all methods to the ServiceBackend.
 */
@@ -44,24 +46,23 @@ QHash<QString, ServiceBackend*> ServiceBackend::instances;
 ServiceBackend *ServiceBackend::defaultServiceBackend;
 
 /// Creates new ServiceBackend with the given QDBusConnection. The
-/// backend automatically creates it's Manager. The connection will be
-/// shared between Service and the provider program, and the
-/// ServiceBackend will not register any service names.
+/// connection will be shared between Service and the provider
+/// program, and the ServiceBackend will not register any service
+/// names.
 ServiceBackend::ServiceBackend(QDBusConnection connection) :
-    connection(connection),
     refCount(0),
+    connection(connection),
     busName("")  // shared connection
 {
     contextDebug() << F_SERVICE_BACKEND << "Creating new ServiceBackend for" << busName;
 }
 
 /// Creates new ServiceBackend with the given QDBusConnection and a
-/// service name to register. The backend automatically creates it's
-/// Manager. The connection will not be shared between the Service and
-/// the provider program.
+/// service name to register. The connection will not be shared
+/// between the Service and the provider program.
 ServiceBackend::ServiceBackend(QDBusConnection connection, const QString &busName) :
-    connection(connection),
     refCount(0),
+    connection(connection),
     busName(busName)  // private connection
 {
     contextDebug() << F_SERVICE_BACKEND << "Creating new ServiceBackend for" << busName;
@@ -74,22 +75,59 @@ ServiceBackend::~ServiceBackend()
 {
     contextDebug() << F_SERVICE_BACKEND << F_DESTROY << "Destroying Service";
     stop();
+
+    if (properties.size() > 0) {
+        contextCritical() << F_SERVICE_BACKEND << "Destroying a Service object "
+                          << "before destroying the associated Property objects.";
+    }
+
     if (ServiceBackend::defaultServiceBackend == this)
         ServiceBackend::defaultServiceBackend = 0;
-}
-
-/// Returns the Manager associated with this backend.
-Manager *ServiceBackend::manager()
-{
-    return &myManager;
 }
 
 /// Set the value of \a key to \a val.  A property named \a key must
 /// have been registered already, by creating a Property object for
 /// it.
-void ServiceBackend::setValue(const QString &key, const QVariant &val)
+void ServiceBackend::setValue(const QString &key, const QVariant &v)
 {
-    myManager.setKeyValue(key, val);
+    if (properties.contains(key))
+        properties[key]->setValue(v);
+    else
+        contextWarning() << "Cannot set value for Property" << key << ", it does not exist";
+}
+
+/// Associate a PropertyPrivate object with this ServiceBackend. The
+/// corresponding object will appear on D-Bus.
+void ServiceBackend::addProperty(const QString& key, PropertyPrivate* property)
+{
+    properties.insert(key, property);
+    contextDebug() << F_SERVICE << "registering property" << key;
+    registerProperty(key, property);
+}
+
+/// Register a Property with the given name on D-Bus. Returns true if
+/// succeeded, false if failed.
+bool ServiceBackend::registerProperty(const QString& key, PropertyPrivate* property)
+{
+    // Check if there is an adaptor; if not, create it.
+    if (createdAdaptors.contains(key) == false) {
+        PropertyAdaptor* adaptor = new PropertyAdaptor(property, &connection);
+        createdAdaptors.insert(key, adaptor);
+    }
+    PropertyAdaptor* adaptor = createdAdaptors[key];
+
+    if (connection.objectRegisteredAt(adaptor->objectPath()) != 0) {
+        // Object already registered; don't do anything
+        return true;
+    }
+
+    // Try to register the object.
+    if (!connection.registerObject(adaptor->objectPath(), property)) {
+        contextCritical() << F_SERVICE_BACKEND << "Failed to register the Property object for" << key;
+        contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
+        return false;
+    }
+    return true;
 }
 
 /// Start the Service again after it has been stopped. In the case of
@@ -98,15 +136,17 @@ void ServiceBackend::setValue(const QString &key, const QVariant &val)
 /// registered on D-Bus. Returns true on success, false otherwise.
 bool ServiceBackend::start()
 {
-    ManagerAdaptor *managerAdaptor = new ManagerAdaptor(&myManager, &connection);
+    contextDebug() << F_SERVICE_BACKEND << "Starting service for bus:" << busName;
 
-    // Register object
-    if (managerAdaptor && !connection.registerObject("/org/freedesktop/ContextKit/Manager", &myManager)) {
-        contextCritical() << F_SERVICE_BACKEND << "Failed to register the Manager object for" << busName;
-        contextCritical() << F_SERVICE_BACKEND << "Error:" << connection.lastError();
-        return false;
+    // Re-register existing Property objects on D-Bus
+    foreach (const QString& key, properties.keys()) {
+        contextDebug() << F_SERVICE_BACKEND << "Re-registering" << key;
+        if (!registerProperty(key, properties[key])) {
+            return false;
+        }
     }
 
+    // Register the service name over D-Bus
     if (!sharedConnection()) {
         if (!connection.registerService(busName)) {
             contextCritical() << F_SERVICE_BACKEND << "Failed to register service with name" << busName;
@@ -128,9 +168,15 @@ void ServiceBackend::stop()
     // Unregister service name
     if (!sharedConnection())
         connection.unregisterService(busName);
-    // Unregister manager
-    connection.unregisterObject("/org/freedesktop/ContextKit/Manager");
-    // FIXME: unregister subscribers
+
+    // Unregister Property objects from D-Bus. Also, command
+    // PropertyAdaptor objects to forget their subscriptions (if the
+    // service is started again, clients will resubscribe).
+
+    foreach (PropertyAdaptor* adaptor, createdAdaptors) {
+        adaptor->forgetClients();
+        connection.unregisterObject(adaptor->objectPath());
+    }
 }
 
 /// Sets the ServiceBackend object as the default one to use when
@@ -152,20 +198,15 @@ void ServiceBackend::ref()
 }
 
 /// Decrease the reference count by one. Service calls this. If the
-/// reference count goes to zero, stop the ServiceBackend instance,
-/// remove it from the instance store and schedule it to be deleted.
+/// reference count goes to zero, stop the ServiceBackend
+/// instance. The instance is not removed from the instance map and
+/// not deleted, though.
 void ServiceBackend::unref()
 {
     refCount--;
 
     if (refCount == 0) {
         stop();
-        QString key = instances.key(this);
-        if (key != "")
-            instances.remove(key);
-        else
-            contextCritical() << "Backend couldn't find itself in the instance store";
-        deleteLater(); // "delete this" would be probably unsafe
     }
 }
 
@@ -198,9 +239,14 @@ ServiceBackend* ServiceBackend::instance(QDBusConnection::BusType busType,
         ServiceBackend* backend = new ServiceBackend(
             QDBusConnection::connectToBus(busType, busName),
             busName);
-        if (autoStart) backend->start();
         instances.insert(lookup, backend);
     }
+    // Autostart also if the instance wasn't newly created: it might
+    // be that the user has deleted the Service previously, and now
+    // recreates it. In that case, the ServiceBackend remains alive,
+    // and we should start it after retrieving it from the instance
+    // map.
+    if (autoStart) instances[lookup]->start();
     return instances[lookup];
 }
 
@@ -210,4 +256,5 @@ bool ServiceBackend::sharedConnection()
 {
     return busName == "";
 }
+
 } // end namespace

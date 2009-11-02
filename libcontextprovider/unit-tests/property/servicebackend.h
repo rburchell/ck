@@ -31,15 +31,17 @@
 
 namespace ContextProvider {
 
-class Manager;
+class PropertyPrivate;
 
 class ServiceBackend : QObject
 {
     Q_OBJECT
 
 public:
-    Manager *manager();
     static ServiceBackend *defaultServiceBackend;
+    void addProperty(const QString& key, PropertyPrivate* property);
+
+    QStringList keys;
 };
 
 } // end namespace

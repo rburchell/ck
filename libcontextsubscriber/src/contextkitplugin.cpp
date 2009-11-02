@@ -70,7 +70,7 @@ QString ContextKitPlugin::keyToPath(QString key)
     if (key.startsWith("/"))
         return key;
 
-    return corePrefix + key.replace('.', '/');
+    return corePrefix + key.replace('.', '/').replace(QRegExp("[^A-Za-z0-9_/]"), "_");
 }
 
 /// Inverse of \c keyToPath.
@@ -123,7 +123,7 @@ void ContextKitPlugin::reset()
 /// appears.
 void ContextKitPlugin::onProviderAppeared()
 {
-    contextDebug() << "ContextKitPlugin::onProviderAppeared";
+    contextDebug() << "Provider appeared:" << busName;
 
     reset();
     managerInterface = new AsyncDBusInterface(busName, managerPath, managerIName, *connection, this);
@@ -139,9 +139,9 @@ void ContextKitPlugin::onProviderAppeared()
 /// Delete our subscriber interface when the provider goes away.
 void ContextKitPlugin::onProviderDisappeared()
 {
-    contextDebug() << "ContextKitPlugin::onProviderDisappeared";
+    contextDebug() << "Provider disappeared:" << busName;
     reset();
-    emit failed("Provider went away");
+    emit failed("Provider went away " + busName);
 }
 
 /// Starts using the fresh subscriber interface when it is returned by
@@ -178,11 +178,13 @@ void ContextKitPlugin::onDBusGetSubscriberFailed(QDBusError err)
     connection->connect(busName, "", propertyIName, "ValueChanged",
                         this, SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
 
-    // We queue the emitting of ready, because if subscribtions are
-    // already scheduled, they all will be tried in response and
-    // (apparently) we can't start a new pendingcall inside the error
-    // callback of an other one without a deadlock.
-    QMetaObject::invokeMethod(this, "ready", Qt::QueuedConnection);
+
+    if (providerListener->isServicePresent() == DBusNameListener::NotPresent)
+        return;
+
+    // Ready to try out new protocol. Ready should not be queued,
+    // because otherwise ready and failed might get reordered.
+    emit ready();
 }
 
 /// Signals the Provider that the subscribe is finished.
@@ -203,28 +205,42 @@ void ContextKitPlugin::onDBusSubscribeFailed(QList<QString> keys, QString error)
 void ContextKitPlugin::subscribe(QSet<QString> keys)
 {
     if (newProtocol)
-        foreach (QString key, keys) {
-            QDBusPendingCall pc = connection->asyncCall(QDBusMessage::createMethodCall(busName,
-                                                                                       keyToPath(key),
-                                                                                       propertyIName,
-                                                                                       "Subscribe"));
-            PendingSubscribeWatcher *psw = new PendingSubscribeWatcher(pc, key, this);
-            sconnect(psw,
-                     SIGNAL(subscribeFinished(QString)),
-                     this,
-                     SIGNAL(subscribeFinished(QString)));
-            sconnect(psw,
-                     SIGNAL(subscribeFailed(QString,QString)),
-                     this,
-                     SIGNAL(subscribeFailed(QString,QString)));
-            sconnect(psw,
-                     SIGNAL(valueChanged(QString,TimedValue)),
-                     this,
-                     SIGNAL(valueChanged(QString,TimedValue)));
+        foreach (const QString& key, keys) {
+            // Queue calling the Subscribe asynchronously. Don't
+            // create the async call here: Qt will deadlock if we
+            // create an async call while handling the results of the
+            // previous async call. (We emit "ready" when handling
+            // GetSubscriber. "Ready" is not queued, and the above
+            // layer can call subscribe when handling it.)
+
+            QMetaObject::invokeMethod(this, "newSubscribe", Qt::QueuedConnection, Q_ARG(QString, key));
         }
-    else
+    else {
         subscriberInterface->subscribe(keys);
+    }
 }
+
+void ContextKitPlugin::newSubscribe(const QString& key)
+{
+    QDBusPendingCall pc = connection->asyncCall(QDBusMessage::createMethodCall(busName,
+                                                                               keyToPath(key),
+                                                                               propertyIName,
+                                                                               "Subscribe"));
+    PendingSubscribeWatcher *psw = new PendingSubscribeWatcher(pc, key, this);
+    sconnect(psw,
+             SIGNAL(subscribeFinished(QString)),
+             this,
+             SIGNAL(subscribeFinished(QString)));
+    sconnect(psw,
+             SIGNAL(subscribeFailed(QString,QString)),
+             this,
+             SIGNAL(subscribeFailed(QString,QString)));
+    sconnect(psw,
+             SIGNAL(valueChanged(QString,TimedValue)),
+             this,
+             SIGNAL(valueChanged(QString,TimedValue)));
+}
+
 
 /// Forwards the unsubscribe request to the wire.
 void ContextKitPlugin::unsubscribe(QSet<QString> keys)

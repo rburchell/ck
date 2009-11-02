@@ -177,6 +177,9 @@ void Provider::constructPlugin()
     sconnect(this, SIGNAL(valueChanged(QString)),
              handleSignalRouter, SLOT(onValueChanged(QString)));
 
+    // Ready and failed are supposed to be handled immediately; not
+    // queued. The plugin should also emit them as soon as possible
+    // and not queue them internally.
     sconnect(plugin, SIGNAL(ready()),
              this, SLOT(onPluginReady()));
     sconnect(plugin, SIGNAL(failed(QString)),
@@ -211,6 +214,13 @@ void Provider::onPluginReady()
     pluginState = READY;
     lock.unlock();
     handleSubscribes();
+}
+
+/// Clears the cached values for this provider.  This is used when the
+/// provider instance is (re)connected to the commander.
+void Provider::clearValues()
+{
+    values.clear();
 }
 
 /// Updates \c pluginState to \c FAILED and signals subscribeFinished

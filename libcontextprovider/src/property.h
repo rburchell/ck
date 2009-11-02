@@ -32,9 +32,9 @@
 namespace ContextProvider {
 
 class Service;
-class Manager;
 
 class PropertyPrivate;
+class ServiceBackend;
 
 class Property : public QObject
 {
@@ -53,12 +53,8 @@ public:
     void unsetValue();
 
 private:
-    PropertyPrivate *priv;
-    void init (Manager *manger, const QString &key);
-
-private slots:
-    void onManagerFirstSubscriberAppeared(const QString &key);
-    void onManagerLastSubscriberDisappeared(const QString &key);
+    PropertyPrivate *priv; ///< Private implementation
+    void init(ServiceBackend *serviceBackend, const QString &key);
 
 signals:
     /// This is emitted when the first subscriber appears for this

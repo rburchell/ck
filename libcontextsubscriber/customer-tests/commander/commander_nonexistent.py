@@ -44,6 +44,8 @@ class CommanderNonExistent(unittest.TestCase):
                 provider.send("dump")
                 self.assert_(provider.expect(CLTool.STDOUT, "Wrote", 10)) # wait for it
                 listen = CLTool("context-listen", "test.int", "test.string")
+                listen.expect(CLTool.STDERR, "Available commands", 10) # wait for starting
+
                 commander = CLTool("context-provide", "--v2")
                 commander.send("add string test.int foobar")
                 commander.send("add string test.string barfoo")

@@ -4,3 +4,5 @@ usr/lib/libcontextprovider-tests/cprovidertests
 usr/lib/libcontextprovider-tests/subscriptiontests
 usr/lib/libcontextprovider-tests/typestests
 usr/lib/libcontextprovider-tests/valuechangestests
+usr/lib/libcontextprovider-tests/servicetest
+usr/share/libcontextprovider-tests/multiprovider

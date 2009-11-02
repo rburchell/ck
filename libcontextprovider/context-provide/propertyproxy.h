@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, 2009 Nokia Corporation.
+ * Copyright (C) 2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,37 +19,27 @@
  *
  */
 
-#ifndef QUEUEDINVOKER_H
-#define QUEUEDINVOKER_H
+#ifndef PROPERTYPROXY_H
+#define PROPERTYPROXY_H
 
-#include <QObject>
-#include <QMutex>
-#include <QSet>
-#include <QString>
+#include "contextproperty.h"
+#include "property.h"
 
-namespace ContextProvider {
-
-class QueuedInvoker : public QObject
+class PropertyProxy : public QObject
 {
-    Q_OBJECT
-
+    Q_OBJECT;
 public:
-    QueuedInvoker(QObject* parent = 0);
-
+    PropertyProxy(QString key, bool enabled = true, QObject *parent = 0);
+    void enable(bool enable);
+    QVariant realValue() const;
+    QString type() const;
 private slots:
-    void onQueuedCall(const char *method);
-
-signals:
-    void queuedCall(const char *method);
-
-protected:
-    void queueOnce(const char *method);
-
+    void onValueChanged();
 private:
-    QMutex callQueueLock; ///< Protects the callQueue
-    QSet<QString> callQueue; ///< Methods to be invoked
+    ContextProvider::Property *provider;
+    ContextProperty *subscriber;
+    bool enabled;
+    QVariant value;
 };
-
-} // namespace ContextProvider
 
 #endif

@@ -1,4 +1,4 @@
-SUBDIRS = client subscription value-changes types c-api
+SUBDIRS = client subscription value-changes types c-api service
 
 coverage: covoptioncheck
 	COVERAGE=1 ./runTests.sh
@@ -14,6 +14,6 @@ check-customer:
 libcontextprovidertestsdir = $(datadir)/libcontextprovider-tests
 libcontextprovidertests_DATA = tests.xml
 
-EXTRA_DIST = tests.xml coverage-build runTests.sh
+EXTRA_DIST = tests.xml coverage-build runTests.sh multiprovider
 
 include $(top_srcdir)/am/covoptioncheck.am

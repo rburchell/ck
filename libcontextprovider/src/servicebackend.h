@@ -22,20 +22,20 @@
 #ifndef SERVICEBACKEND_H
 #define SERVICEBACKEND_H
 
-#include "manager.h"
 #include <QObject>
 #include <QString>
 #include <QStringList>
 #include <QDBusConnection>
 #include <QHash>
 #include <QVariant>
+#include <QSet>
 
 class ServiceBackendUnitTest;
 
 namespace ContextProvider {
 
-class Property;
-class ServiceBackendPrivate;
+class PropertyAdaptor;
+class PropertyPrivate;
 
 class ServiceBackend : public QObject
 {
@@ -50,9 +50,10 @@ public:
     bool start();
     void stop();
 
+    void addProperty(const QString& key, PropertyPrivate* property);
+
     void setAsDefault();
     void setValue(const QString &key, const QVariant &val);
-    Manager *manager();
 
     void ref();
     void unref();
@@ -66,12 +67,27 @@ public:
     friend class Service;
 
 private:
-    Manager myManager;
+    bool registerProperty(const QString& key, PropertyPrivate* property);
+
+    int refCount; ///< Number of Service objects using this as their backend
+
+    /// Shared or private QDBusConnection used for registering objects
+    /// (and possibly bus names)
     QDBusConnection connection;
-    int refCount;
+
+    /// The bus name that should be registered by this ServiceBackend;
+    /// "" if the ServiceBackend shouldn't register any.
     QString busName;
 
+    /// Map storing the ServiceBackend instances (one instance for QString-ServiceBackend* pair).
     static QHash <QString, ServiceBackend*> instances;
+
+    /// Properties associated with the current service
+    QHash<QString, PropertyPrivate*> properties;
+
+    /// Adaptors for property objects. According to Qt documentation,
+    /// adaptors should not be deleted.
+    QHash<QString, PropertyAdaptor*> createdAdaptors;
 };
 
 } // end namespace

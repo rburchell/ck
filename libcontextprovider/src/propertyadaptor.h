@@ -19,33 +19,48 @@
  *
  */
 
-#ifndef MANAGERADAPTOR_H
-#define MANAGERADAPTOR_H
+#ifndef PROPERTYADAPTOR_H
+#define PROPERTYADAPTOR_H
 
 #include <QObject>
 #include <QDBusAbstractAdaptor>
 #include <QDBusMessage>
 #include <QDBusConnection>
-#include <QDBusObjectPath>
-#include "manager.h"
+#include <QSet>
+#include <QString>
+#define DBUS_INTERFACE "org.maemo.contextkit.Property"
 
 namespace ContextProvider {
 
-class ManagerAdaptor: public QDBusAbstractAdaptor
+class PropertyPrivate;
+
+class PropertyAdaptor: public QDBusAbstractAdaptor
 {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "org.freedesktop.ContextKit.Manager")
+    Q_CLASSINFO("D-Bus Interface", "org.maemo.contextkit.Property")
 
 public:
-    ManagerAdaptor (Manager* manager, QDBusConnection *connection);
+    PropertyAdaptor(PropertyPrivate* property, QDBusConnection *connection);
+    QString objectPath() const;
+    void forgetClients();
 
 public slots:
-    QDBusObjectPath GetSubscriber(const QDBusMessage &msg);
-    void OnServiceOwnerChanged(const QString&, const QString&, const QString&);
+    void Subscribe(const QDBusMessage& msg, QVariantList& values, quint64& timestamp);
+    void Unsubscribe(const QDBusMessage& msg);
+    void Get(QVariantList& values, quint64& timestamp);
+
+signals:
+    void ValueChanged(const QVariantList &values, const quint64& timestamp);
+
+private slots:
+    void onServiceOwnerChanged(const QString&, const QString&, const QString&);
+    void onValueChanged(QVariantList values, quint64 timestamp);
 
 private:
-    Manager *manager; ///< The managed object.
+    PropertyPrivate *propertyPrivate; ///< The managed object.
     QDBusConnection *connection; ///< The connection to operate on.
+    QSet<QString> clientServiceNames; ///< How many times each client (recognized by D-Bus service name) has subscribed
+
 };
 
 } // namespace ContextProvider
