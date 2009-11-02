@@ -29,12 +29,15 @@
 #include <QHash>
 #include <QVariant>
 
+
 namespace ContextProvider {
 
 class Service;
 
 class PropertyPrivate;
 class ServiceBackend;
+
+class PropertyUnitTest; // addition for unit test
 
 class Property : public QObject
 {
@@ -53,7 +56,7 @@ public:
     void unsetValue();
 
 private:
-    PropertyPrivate *priv; ///< Private implementation
+    PropertyPrivate *priv;
     void init(ServiceBackend *serviceBackend, const QString &key);
 
 signals:
@@ -67,6 +70,9 @@ signals:
     /// harvesting the data needed for this Property (and save
     /// resources).
     void lastSubscriberDisappeared(const QString &key);
+
+private:
+    friend class PropertyUnitTest; // addition for test
 };
 
 } // end namespace

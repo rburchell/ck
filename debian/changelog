@@ -1,8 +1,17 @@
-contextkit (0.4~unreleased) unstable; urgency=low
+contextkit (0.4.1~unreleased) unstable; urgency=low
 
-  *
+  * 
 
- -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Thu, 29 Oct 2009 11:12:00 +0300
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 30 Oct 2009 03:31:16 +0200
+
+contextkit (0.4) unstable; urgency=low
+
+  * libcontextprovider now supports multiple providers for one property
+  * Support the new ContextKit D-Bus protocol in libcontextprovider
+
+  Implemented: SWP#CntFr-350
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 30 Oct 2009 03:05:24 +0200
 
 contextkit (0.3.11) unstable; urgency=low
 

@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-DIRS="subscription value-changes types c-api"
+DIRS="subscription value-changes types c-api service"
 
 make -C client
 
@@ -18,6 +18,9 @@ for i in $DIRS
 do
 	make -C $i check-customer
 done
+
+echo "Running multiproviders customer check"
+cd multiprovider; . ./env.sh; ./test.sh ; cd ..
 
 if [ -n "$COVERAGE" ]
 then

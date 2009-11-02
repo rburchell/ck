@@ -3,46 +3,44 @@
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
- * This library is free software; you can redistribute it and/or
+ * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
  * version 2.1 as published by the Free Software Foundation.
  *
- * This library is distributed in the hope that it will be useful, but
+ * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
+ * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
  *
  */
 
-#ifndef QUEUEDINVOKER_H
-#define QUEUEDINVOKER_H
-
 // This is a mock implementation
 
+#ifndef PROPERTYADAPTOR_H
+#define PROPERTYADAPTOR_H
+
 #include <QObject>
+#include <QDBusConnection>
+#include <QSet>
 #include <QString>
-#include <QStringList>
 
 namespace ContextProvider {
 
-class QueuedInvoker : public QObject
+class PropertyPrivate;
+
+class PropertyAdaptor : public QObject
 {
     Q_OBJECT
 
 public:
-    QueuedInvoker();
-    void callAllMethodsInQueue();
-
-protected:
-    void queueOnce(const char *method);
-
-private:
-    QStringList methodsToCall;
+    PropertyAdaptor(PropertyPrivate* property, QDBusConnection *connection);
+    QString objectPath() const;
+    void forgetClients();
 };
 
 } // namespace ContextProvider

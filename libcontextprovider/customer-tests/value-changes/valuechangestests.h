@@ -33,7 +33,6 @@ private slots:
     void nonsubscribedPropertyChanges();
     void unsubscribedPropertyChanges();
 
-    void twoPropertiesChange();
     void sameValueSet();
 
     void changesBetweenZeroAndUnknown();

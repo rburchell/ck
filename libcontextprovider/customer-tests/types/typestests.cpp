@@ -28,6 +28,8 @@
 #include <QStringList>
 #include <QProcess>
 
+#define SERVICE_NAME1 "org.maemo.contextkit.testProvider1"
+
 namespace ContextProvider {
 
 void TypesTests::initTestCase()
@@ -42,7 +44,7 @@ void TypesTests::cleanupTestCase()
 void TypesTests::init()
 {
     // Start the services
-    service = new Service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1");
+    service = new Service(QDBusConnection::SessionBus, SERVICE_NAME1);
 
     intItem = new Property(*service, "Test.Int");
     stringItem = new Property(*service, "Test.String");
@@ -53,8 +55,16 @@ void TypesTests::init()
     dateItem = new Property(*service, "Test.Date");
     timeItem = new Property (*service, "Test.Time");
 
-    // Process the events so that the service gets started
-    QCoreApplication::processEvents(QEventLoop::AllEvents);
+    // Nullify the values (we create the same Properties over and
+    // over, and they will keep their old values.
+    intItem->unsetValue();
+    stringItem->unsetValue();
+    boolItem->unsetValue();
+    doubleItem->unsetValue();
+    stringListItem->unsetValue();
+    charItem->unsetValue();
+    dateItem->unsetValue();
+    timeItem->unsetValue();
 
     // Initialize test program state
     isReadyToRead = false;
@@ -65,6 +75,11 @@ void TypesTests::init()
     client->start("client");
     // Record whether the client was successfully started
     clientStarted = client->waitForStarted();
+
+    // Associate shorter names for the test services when communicating with the client
+    if (clientStarted) {
+        writeToClient("assign session " SERVICE_NAME1 " service1\n");
+    }
 }
 
 // After each test
@@ -77,11 +92,6 @@ void TypesTests::cleanup()
     }
     delete client; client = NULL;
 
-    // Stop the service
-    service->stop();
-
-    delete service; service = NULL;
-
     delete intItem; intItem = NULL;
     delete doubleItem; doubleItem = NULL;
     delete boolItem; boolItem = NULL;
@@ -91,9 +101,7 @@ void TypesTests::cleanup()
     delete timeItem; timeItem = NULL;
     delete dateItem; dateItem = NULL;
 
-    // ServiceBackedns are deleted in a deferred way, thus we need to
-    // get them deleted
-    QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
+    delete service; service = NULL;
 }
 
 void TypesTests::typesInReturnValueOfSubscribe()
@@ -101,9 +109,6 @@ void TypesTests::typesInReturnValueOfSubscribe()
     // Check that the initialization went well.
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
-
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Set some values to the properties
     intItem->setValue(4510);
@@ -118,27 +123,36 @@ void TypesTests::typesInReturnValueOfSubscribe()
     timeItem->setValue(QTime(14, 30, 20));
 
     // Test: subscribe to properties
-    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double "
-                                   "Test.String Test.Bool\n");
-
     // Expected result: the values are printed correctly
-    QString expected ="Known keys: Test.Bool(bool:false) Test.Double(double:-9.031) Test.Int(int:4510) "
-                     "Test.String(QString:this-is-a-test-string) Unknown keys: ";
+    QString actual = writeToClient("subscribe service1 Test.Int\n");
+    QString expected = "Subscribe returned: int:4510";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    actual = writeToClient("subscribe service1 Test.Double\n");
+    expected = "Subscribe returned: double:-9.031";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    actual = writeToClient("subscribe service1 Test.Bool\n");
+    expected = "Subscribe returned: bool:false";
+    QCOMPARE(actual.simplified(), expected.simplified());
+
+    actual = writeToClient("subscribe service1 Test.String\n");
+    expected = "Subscribe returned: QString:this-is-a-test-string";
     QCOMPARE(actual.simplified(), expected.simplified());
 
     // Test: subscribe to more properties
-    actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.StringList\n");
+    actual = writeToClient("subscribe service1 Test.StringList\n");
 
     // Expected result: the values are printed correctly
-    expected = "Known keys: Test.StringList(QStringList:string1/string2) Unknown keys: ";
+    expected = "Subscribe returned: QStringList:string1/string2";
     QCOMPARE(actual.simplified(), expected.simplified());
 
     /* FIXME: Other types are not working yet.
     // Test: subscribe to more properties
-    actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.date\n");
+    actual = writeToClient("subscribe service1 test.date\n");
 
     // Expected result: the values are printed correctly
-    expected = "Known keys: test.stringlist(QDBusArgument:) Unknown keys: ";
+    expected = "Subscribe returned: QDBusArgument:";
     QCOMPARE(actual.simplified(), expected.simplified());
     */
 }
@@ -148,9 +162,6 @@ void TypesTests::typesInChangeSignal()
     // Check that the initialization went well.
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
-
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
 
     // Set some values to the properties
     intItem->setValue(4510);
@@ -165,40 +176,56 @@ void TypesTests::typesInChangeSignal()
     timeItem->setValue(QTime(14, 30, 20));
 
     // Subscribe to properties, ignore the return values
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double "
-                                   "Test.String Test.Bool\n");
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.StringList\n");
-    //writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 test.char test.date test.time\n");
+    writeToClient("subscribe service1 Test.Int\n");
+    writeToClient("subscribe service1 Test.String\n");
+    writeToClient("subscribe service1 Test.Bool\n");
+    writeToClient("subscribe service1 Test.Double\n");
+    writeToClient("subscribe service1 Test.StringList\n");
+
+    //writeToClient("subscribe service1 test.char\n");
+    //writeToClient("subscribe service1 test.date\n");
+    //writeToClient("subscribe service1 test.time\n");
     // FIXME: Complex types not working yet!
 
     // Test: modify the properties
-    intItem->setValue(-11);
-    doubleItem->setValue(4.88);
-    stringItem->setValue("anotherstring");
-    boolItem->setValue(true);
-    // And tell the client to wait for Changed signal
-    QString actual = writeToClient("waitforchanged 3000\n");
-
     // Expected result: The client got the Changed signal with correct values
-    QString expected = "Changed signal received, parameters: Known keys: Test.Bool(bool:true) Test.Double(double:4.88) "
-        "Test.Int(int:-11) Test.String(QString:anotherstring) Unknown keys:";
 
+    intItem->setValue(-11);
+
+    QString actual = writeToClient("waitforchanged 3000\n");
+    QString expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/Int int:-11";
     QCOMPARE(actual.simplified(), expected.simplified());
-
-    // Reset the client (make it forget the previous Changed signal)
     writeToClient("resetsignalstatus\n");
 
-    // Test: modify the properties
+    doubleItem->setValue(4.88);
+
+    actual = writeToClient("waitforchanged 3000\n");
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/Double double:4.88";
+    QCOMPARE(actual.simplified(), expected.simplified());
+    writeToClient("resetsignalstatus\n");
+
+    stringItem->setValue("anotherstring");
+
+    actual = writeToClient("waitforchanged 3000\n");
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/String QString:anotherstring";
+    QCOMPARE(actual.simplified(), expected.simplified());
+    writeToClient("resetsignalstatus\n");
+
+    boolItem->setValue(true);
+
+    actual = writeToClient("waitforchanged 3000\n");
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/Bool bool:true";
+    QCOMPARE(actual.simplified(), expected.simplified());
+    writeToClient("resetsignalstatus\n");
+
+    // Test: modify the more complex properties
     temp.clear();
     temp << "something" << "else" << "here";
     stringListItem->setValue(temp);
-    // And tell the client to wait for Changed signal
     actual = writeToClient("waitforchanged 3000\n");
 
     // Expected result: The client got the Changed signal with correct values
-    expected = "Changed signal received, parameters: Known keys: "
-        "Test.StringList(QStringList:something/else/here) Unknown keys:";
-
+    expected = "ValueChanged: org.maemo.contextkit.testProvider1 /org/maemo/contextkit/Test/StringList QStringList:something/else/here";
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
