@@ -72,4 +72,10 @@ QString ContextTypeRegistryInfo::coreTypesPath()
 
 ContextTypeRegistryInfo::ContextTypeRegistryInfo()
 {
+    contextDebug() << F_TYPES << "Reading core types from:" << ContextTypeRegistryInfo::coreTypesPath();
+    NanoXml parser(ContextTypeRegistryInfo::coreTypesPath());
+    if (parser.didFail())
+        contextWarning() << F_TYPES << "Reading core types failed, parsing error";
+    else
+        coreTree = parser.result();
 }
