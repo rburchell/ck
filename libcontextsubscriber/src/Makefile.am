@@ -13,19 +13,22 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	loggingfeatures.h contextkitplugin.h contextkitplugin.cpp	\
 	iproviderplugin.h contextproviderinfo.h nanoxml.h nanoxml.cpp	\
 	asyncdbusinterface.cpp timedvalue.h nanotree.h nanotree.cpp	\
-	contexttypeinfo.cpp contexttypeinfo.h
+	contexttypeinfo.cpp contexttypeinfo.h				\
+	contexttyperegistryinfo.cpp contexttyperegistryinfo.h
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h			\
 	contextpropertyinfo.h contextregistryinfo.h iproviderplugin.h	\
 	contextproviderinfo.h asyncdbusinterface.h contexttypeinfo.h	\
-	contexttypeinfo.cpp
+	contexttypeinfo.cpp contexttyperegistryinfo.h
 
 AM_CXXFLAGS = -I$(top_srcdir)/common \
 	      $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
 	      '-DDEFAULT_CONTEXT_SUBSCRIBER_PLUGINS="@libdir@/contextkit/subscriber-plugins"' \
 	      '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"' \
 	      '-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"' \
+	      '-DDEFAULT_CONTEXT_TYPES="@datadir@/contextkit/types/"' \
+	      '-DDEFAULT_CONTEXT_CORE_TYPES="@datadir@/contextkit/types/core.types"' \
 	      '-DCONTEXT_LOG_MODULE_NAME="libcontextsubscriber"'
 
 $(top_builddir)/common/libcommon.la: FORCE
