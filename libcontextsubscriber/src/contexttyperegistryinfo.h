@@ -32,7 +32,6 @@ class ContextTypeRegistryInfo : public QObject
 
 public:
     static ContextTypeRegistryInfo* instance();
-    QString registryPath();
 
 private:
     ContextTypeRegistryInfo() {}; ///< Private constructor. Do not use.

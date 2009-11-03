@@ -45,14 +45,3 @@ ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
     return registryInstance;
 }
 
-/// Returns the full path to the registry directory. Takes the
-/// \c CONTEXT_TYPES env variable into account.
-QString ContextTypeRegistryInfo::registryPath()
-{
-    const char *regpath = getenv("CONTEXT_TYPES");
-    if (! regpath)
-        regpath = DEFAULT_CONTEXT_TYPES;
-
-    return QString(regpath);
-}
-
