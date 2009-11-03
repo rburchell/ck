@@ -353,13 +353,13 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     if (rootTree.toList().at(0).toString() == "provider" ||
         rootTree.toList().at(0).toString() == "properties") {
         // One provider. Iterate over each key.
-        foreach (QVariant keyTree, rootTree.keyValues("key")) {
+        foreach (NanoTree keyTree, rootTree.keyValues("key")) {
             parseKey(keyTree, rootTree);
         }
     } else {
         // Multiple providers... iterate over providers and keys
-        foreach (QVariant providerTree, rootTree.keyValues("provider")) {
-           foreach (QVariant keyTree, NanoTree(providerTree).keyValues("key")) {
+        foreach (NanoTree providerTree, rootTree.keyValues("provider")) {
+           foreach (NanoTree keyTree, NanoTree(providerTree).keyValues("key")) {
                parseKey(keyTree, providerTree);
            }
         }
