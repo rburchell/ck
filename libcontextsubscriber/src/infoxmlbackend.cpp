@@ -33,6 +33,7 @@
 #include "loggingfeatures.h"
 #include "contextproviderinfo.h"
 #include "nanoxml.h"
+#include "contexttyperegistryinfo.h"
 
 /*!
     \class InfoXmlBackend
@@ -264,10 +265,10 @@ void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerT
 
     if (typeDescriptionTree.type() == QVariant::String || typeDescriptionTree.type() == QVariant::Invalid)
         // Basic string description
-        typeInfo = ContextTypeInfo::resolveTypeName(typeDescriptionTree.toString());
+        typeInfo = ContextTypeRegistryInfo::instance()->typeInfoForName(typeDescriptionTree.toString());
     else {
         // Complex description
-        typeInfo = ContextTypeInfo::resolveTypeName(typeDescriptionTree.keyName().toString());
+        typeInfo = ContextTypeRegistryInfo::instance()->typeInfoForName(typeDescriptionTree.keyName().toString());
         foreach(QString k, typeDescriptionTree.keys()) {
             QString pVal = typeDescriptionTree.keyValue(k).toString();
             typeInfo.setParameterValue(k, pVal);
@@ -280,7 +281,7 @@ void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerT
 
         // FIXME: Comparing names here is questionable here. Need to ask mvo.
         // Actually we need "unset" thing here or something.
-        if (typeInfo.name() != ContextTypeInfo::nullType().name() && keyData.typeInfo.name() != typeInfo.name())
+        if (typeInfo.name() != "" && keyData.typeInfo.name() != typeInfo.name())
             contextWarning() << F_XML << key << "already has type declared -" << keyData.typeInfo.name();
 
         if (doc != "" && keyData.doc != doc)

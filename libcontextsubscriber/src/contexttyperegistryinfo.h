@@ -34,9 +34,17 @@ class ContextTypeRegistryInfo : public QObject
 
 public:
     static ContextTypeRegistryInfo* instance();
+
     QString registryPath();
     QString coreTypesPath();
     ContextTypeInfo typeInfoForName(QString name);
+
+    ContextTypeInfo nullType();
+    ContextTypeInfo int64Type();
+    ContextTypeInfo int32Type();
+    ContextTypeInfo stringType();
+    ContextTypeInfo boolType();
+    ContextTypeInfo doubleType();
 
 private:
     ContextTypeRegistryInfo(); ///< Private constructor. Do not use.

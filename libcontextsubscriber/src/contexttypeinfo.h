@@ -48,14 +48,6 @@ public:
     QString doc();
     NanoTree tree();
 
-    static ContextTypeInfo nullType();
-    static ContextTypeInfo int64Type();
-    static ContextTypeInfo int32Type();
-    static ContextTypeInfo stringType();
-    static ContextTypeInfo boolType();
-    static ContextTypeInfo doubleType();
-    static ContextTypeInfo resolveTypeName(QString t);
-
 protected:
     static ContextTypeInfo buildPrimitiveType(QString name);
 

@@ -70,6 +70,18 @@ QString ContextTypeRegistryInfo::coreTypesPath()
 
 ContextTypeInfo ContextTypeRegistryInfo::typeInfoForName(QString name)
 {
+    // Support for the old types
+    if (name == "TRUTH")
+        return boolType();
+    else if (name == "STRING")
+        return stringType();
+    else if (name == "INT")
+        return int32Type();
+    else if (name == "INTEGER")
+        return int32Type();
+    else if (name == "DOUBLE")
+        return doubleType();
+
     // Try using the cache first
     if (typeCache.contains(name))
         return typeCache.value(name);
@@ -85,6 +97,42 @@ ContextTypeInfo ContextTypeRegistryInfo::typeInfoForName(QString name)
 
     // Not found. Return blank null type.
     return ContextTypeInfo();
+}
+
+/// Returns in instance of the null type info.
+ContextTypeInfo ContextTypeRegistryInfo::nullType()
+{
+    return ContextTypeInfo(QVariant());
+}
+
+/// Returns in instance of the int64 type info.
+ContextTypeInfo ContextTypeRegistryInfo::int64Type()
+{
+    return typeInfoForName("int64");
+}
+
+/// Returns in instance of the string type info.
+ContextTypeInfo ContextTypeRegistryInfo::stringType()
+{
+    return typeInfoForName("string");
+}
+
+/// Returns in instance of the double type info.
+ContextTypeInfo ContextTypeRegistryInfo::doubleType()
+{
+    return typeInfoForName("double");
+}
+
+/// Returns in instance of the bool type info.
+ContextTypeInfo ContextTypeRegistryInfo::boolType()
+{
+    return typeInfoForName("bool");
+}
+
+/// Returns in instance of the int32 type info.
+ContextTypeInfo ContextTypeRegistryInfo::int32Type()
+{
+    return typeInfoForName("int32");
 }
 
 /* Private */

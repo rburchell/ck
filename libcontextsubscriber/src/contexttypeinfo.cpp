@@ -21,6 +21,7 @@
 
 #include "contexttypeinfo.h"
 #include "logging.h"
+#include "contexttyperegistryinfo.h"
 
 /* Public */
 
@@ -60,6 +61,7 @@ QString ContextTypeInfo::name() const
 /// Returns the base type for this type.
 ContextTypeInfo ContextTypeInfo::base() const
 {
+    /*
     QString n = name();
     if (n == "duration")
         return ContextTypeInfo::int64Type();
@@ -70,7 +72,9 @@ ContextTypeInfo ContextTypeInfo::base() const
     else if (n == "percentage")
         return ContextTypeInfo::int32Type();
     else
-        return resolveTypeName(nanoTree.keyValue("base").toString());
+    */
+    return ContextTypeInfo();
+    //return resolveTypeName(nanoTree.keyValue("base").toString());
 }
 
 /// Returns a list of parameter names for this type.
@@ -118,116 +122,6 @@ QString ContextTypeInfo::doc()
     return nanoTree.keyValue("doc").toString();
 }
 
-/// Returns in instance of the null type info.
-ContextTypeInfo ContextTypeInfo::nullType()
-{
-    // FIXME: Temporary. Gone when registry comes.
-    return ContextTypeInfo(QVariant());
-}
-
-/// Returns in instance of the int64 type info.
-ContextTypeInfo ContextTypeInfo::int64Type()
-{
-    // FIXME: Temporary. Gone when registry comes.
-    return buildPrimitiveType("int64");
-}
-
-/// Returns in instance of the string type info.
-ContextTypeInfo ContextTypeInfo::stringType()
-{
-    // FIXME: Temporary. Gone when registry comes.
-    return buildPrimitiveType("string");
-}
-
-/// Returns in instance of the double type info.
-ContextTypeInfo ContextTypeInfo::doubleType()
-{
-    // FIXME: This is temporary, a full manual/static specification
-    // of the double type. It'll be gone when we have the registry
-    // implementation.
-
-    QVariantList type;
-    QVariantList doc;
-    QVariantList tree;
-    QVariantList params;
-    QVariantList minParam;
-    QVariantList minParamDoc;
-    QVariantList maxParam;
-    QVariantList maxParamDoc;
-
-    type << QVariant("name");
-    type << QVariant("double");
-    doc << QVariant("doc");
-    doc << QVariant("A double value within the given limits.");
-    params << QVariant("params");
-    minParam << QVariant("min");
-    minParamDoc << QVariant("doc");
-    minParamDoc << QVariant("Minimum value.");
-    minParam << QVariant(minParamDoc);
-    params << QVariant(minParam);
-
-    maxParam << QVariant("max");
-    maxParamDoc << QVariant("doc");
-    maxParamDoc << QVariant("Maximum value.");
-    maxParam << QVariant(maxParamDoc);
-    params << QVariant(maxParam);
-
-    tree << QVariant("type");
-    tree << QVariant(type);
-    tree << QVariant(doc);
-    tree << QVariant(params);
-
-    return ContextTypeInfo(NanoTree(tree));
-}
-
-/// Returns in instance of the bool type info.
-ContextTypeInfo ContextTypeInfo::boolType()
-{
-    // FIXME: Temporary. Gone when registry comes.
-    return buildPrimitiveType("bool");
-}
-
-/// Returns in instance of the int32 type info.
-ContextTypeInfo ContextTypeInfo::int32Type()
-{
-    // FIXME: Temporary. Gone when registry comes.
-    return buildPrimitiveType("int32");
-}
-
-/// Given a type name (ie. "double", "int32", "bool") returns the ContextTypeInfo
-/// representing this type.
-ContextTypeInfo ContextTypeInfo::resolveTypeName(QString t)
-{
-    // Support for the old types
-    if (t == "TRUTH")
-        return ContextTypeInfo::boolType();
-    else if (t == "STRING")
-        return ContextTypeInfo::stringType();
-    else if (t == "INT")
-        return ContextTypeInfo::int32Type();
-    else if (t == "INTEGER")
-        return ContextTypeInfo::int32Type();
-    else if (t == "DOUBLE")
-        return ContextTypeInfo::doubleType();
-    // New types
-    else if (t == "string")
-        return ContextTypeInfo::stringType();
-    else if (t == "double")
-        return ContextTypeInfo::doubleType();
-    else if (t == "int32")
-        return ContextTypeInfo::int32Type();
-    else if (t == "int64")
-        return ContextTypeInfo::int64Type();
-    else if (t == "bool")
-        return ContextTypeInfo::boolType();
-    else if (t == "map")
-        return buildPrimitiveType("map");
-    else if (t == "list")
-        return buildPrimitiveType("list");
-    else
-        return ContextTypeInfo(QVariant());
-}
-
 /// Returns the NanoDom tree representing this type.
 NanoTree ContextTypeInfo::tree()
 {
@@ -263,7 +157,7 @@ QString ContextMapTypeInfo::keyDoc(QString key)
 /// equivalent of accessing params -> keys -> (key) -> type .
 ContextTypeInfo ContextMapTypeInfo::keyType(QString key)
 {
-    return resolveTypeName(nanoTree.keyValue("params", "keys", key, "type").toString());
+    return ContextTypeRegistryInfo::instance()->typeInfoForName(nanoTree.keyValue("params", "keys", key, "type").toString());
 }
 
 /* ContextUniformListTypeInfo */
@@ -271,6 +165,6 @@ ContextTypeInfo ContextMapTypeInfo::keyType(QString key)
 /// Returns the type information for the elements in this list.
 ContextTypeInfo ContextUniformListTypeInfo::elementType()
 {
-    return resolveTypeName(parameterValue("type"));
+    return ContextTypeRegistryInfo::instance()->typeInfoForName(parameterValue("type"));
 }
 
