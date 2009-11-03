@@ -61,20 +61,18 @@ QString ContextTypeInfo::name() const
 /// Returns the base type for this type.
 ContextTypeInfo ContextTypeInfo::base() const
 {
-    /*
+    ContextTypeRegistryInfo *typeRegistry = ContextTypeRegistryInfo::instance();
     QString n = name();
     if (n == "duration")
-        return ContextTypeInfo::int64Type();
+        return typeRegistry->int64Type();
     else if (n == "time")
-        return ContextTypeInfo::int64Type();
+        return typeRegistry->int64Type();
     else if (n == "string-enum")
-        return ContextTypeInfo::stringType();
+        return typeRegistry->stringType();
     else if (n == "percentage")
-        return ContextTypeInfo::int32Type();
+        return typeRegistry->int32Type();
     else
-    */
-    return ContextTypeInfo();
-    //return resolveTypeName(nanoTree.keyValue("base").toString());
+        return typeRegistry->typeInfoForName(nanoTree.keyValue("base").toString());
 }
 
 /// Returns a list of parameter names for this type.
