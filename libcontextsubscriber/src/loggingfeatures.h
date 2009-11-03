@@ -24,7 +24,6 @@
 
 #define F_DEPRECATION   (ContextFeature("deprecation"))
 #define F_THREADS       (ContextFeature("threads"))
-#define F_TYPES         (ContextFeature("types"))
 #define F_XML           (ContextFeature("xml"))
 #define F_CDB           (ContextFeature("cdb"))
 #define F_DESTROY       (ContextFeature("destroy"))
