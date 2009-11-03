@@ -1,7 +1,7 @@
 check_PROGRAMS = servicebackendunittest
 
 # test's sources
-servicebackendunittest_SOURCES = servicebackendunittest.cpp manager.h manageradaptor.h
+servicebackendunittest_SOURCES = servicebackendunittest.cpp propertyprivate.h propertyadaptor.h
 
 COVERAGE_FILES = servicebackend.cpp 
 

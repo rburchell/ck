@@ -31,6 +31,9 @@
 #include <QProcess>
 #include <QStringList>
 
+#define SERVICE_NAME1 "org.maemo.contextkit.testProvider1"
+#define SERVICE_NAME2 "org.maemo.contextkit.testProvider2"
+
 namespace ContextProvider {
 
 void SubscriptionTests::initTestCase()
@@ -45,16 +48,20 @@ void SubscriptionTests::cleanupTestCase()
 void SubscriptionTests::init()
 {
     // Create the services
-    service1 = new Service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider1");
+    service1 = new Service(QDBusConnection::SessionBus, SERVICE_NAME1);
     test_int = new Property(*service1, "Test.Int");
     test_double = new Property(*service1, "Test.Double");
 
-    service2 = new Service(QDBusConnection::SessionBus, "org.freedesktop.ContextKit.testProvider2");
+    service2 = new Service(QDBusConnection::SessionBus, SERVICE_NAME2);
     test_string = new Property (*service2, "Test.String");
     test_bool = new Property(*service2, "Test.Bool");
 
-    // Process the events so that the services get started
-    QCoreApplication::processEvents(QEventLoop::AllEvents);
+    // Nullify the values (we create the same Properties over and
+    // over, and they will keep their old values.
+    test_int->unsetValue();
+    test_double->unsetValue();
+    test_string->unsetValue();
+    test_bool->unsetValue();
 
     // Initialize test program state
     isReadyToRead = false;
@@ -65,6 +72,12 @@ void SubscriptionTests::init()
     client->start("client");
     // Record whether the client was successfully started
     clientStarted = client->waitForStarted();
+
+    // Associate shorter names for the test services when communicating with the client
+    if (clientStarted) {
+        writeToClient("assign session " SERVICE_NAME1 " service1\n");
+        writeToClient("assign session " SERVICE_NAME2 " service2\n");
+    }
 }
 
 // After each test
@@ -77,49 +90,14 @@ void SubscriptionTests::cleanup()
     }
     delete client; client = NULL;
 
-    delete service1; service1 = NULL;
-    delete service2; service2 = NULL;
-
     delete test_int; test_int = NULL;
     delete test_double; test_double = NULL;
     delete test_bool; test_bool = NULL;
     delete test_string; test_string = NULL;
 
-    // ServiceBackedns are deleted in a deferred way, thus we need to
-    // get them deleted
-    QCoreApplication::sendPostedEvents(0, QEvent::DeferredDelete);
+    delete service1; service1 = NULL;
+    delete service2; service2 = NULL;
 }
-
-void SubscriptionTests::testGetSubscriber()
-{
-    // Check that the initialization went well.
-    // Doing this only in init() is not enough; doesn't stop the test case.
-    QVERIFY(clientStarted);
-
-    QString actual = writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
-    QString expected("GetSubscriber returned /org/freedesktop/ContextKit/Subscriber/0");
-    QCOMPARE(actual.simplified(), expected.simplified());
-}
-
-void SubscriptionTests::testGetSubscriberTwice()
-{
-    // Check that the initialization went well.
-    // Doing this only in init() is not enough; doesn't stop the test case.
-    QVERIFY(clientStarted);
-
-    // Ask the client to call GetSubscriber
-    QString result1 = writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
-    // Ask the client to call GetSubscriber again
-    QString result2 = writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
-    // Expected result: the client got the same subscriber path twice
-    QCOMPARE(result1, result2);
-}
-
-// Note: These tests don't verify that different clients get different
-// subscribers. We might want to add a test case here.
 
 void SubscriptionTests::subscribeReturnValueForUnknownProperty()
 {
@@ -127,15 +105,12 @@ void SubscriptionTests::subscribeReturnValueForUnknownProperty()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
     // Ask the client to call Subscribe with 1 valid key. The property
     // is currently unknown since we haven't set a value for it.
-    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int\n");
+    QString actual = writeToClient("subscribe service1 Test.Int\n");
 
     // Expected result: The return value of Subscribe contains the key as unknown.
-    QString expected("Known keys: Unknown keys: Test.Int");
+    QString expected("Subscribe returned: Unknown");
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
@@ -145,35 +120,15 @@ void SubscriptionTests::subscribeReturnValueForKnownProperty()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
     // Set a value for a property
     test_double->setValue(-8.22);
 
     // Ask the client to call Subscribe with 1 valid key. The property
     // has a value we just set.
-    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
+    QString actual = writeToClient("subscribe service1 Test.Double\n");
 
     // Expected result: The return value of Subscribe contains the key and its value.
-    QString expected("Known keys: Test.Double(double:-8.22) Unknown keys: ");
-    QCOMPARE(actual.simplified(), expected.simplified());
-}
-
-void SubscriptionTests::subscribeReturnValueForInvalidProperty()
-{
-    // Check that the initialization went well.
-    // Doing this only in init() is not enough; doesn't stop the test case.
-    QVERIFY(clientStarted);
-
-    // Ask the client to call GetSubscriber, ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-
-    // Ask the client to call Subscribe with 1 invalid key.
-    QString actual = writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Invalid\n");
-
-    // Expected result: The return value of Subscribe contains the key as unknown.
-    QString expected("Known keys: Unknown keys: ");
+    QString expected("Subscribe returned: double:-8.22");
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
@@ -192,12 +147,9 @@ void SubscriptionTests::subscriberNotifications()
     QSignalSpy boolItemFirst(test_bool, SIGNAL(firstSubscriberAppeared(const QString&)));
     QSignalSpy boolItemLast(test_bool, SIGNAL(lastSubscriberDisappeared(const QString&)));
 
-    // Ask the client to call GetSubscriber (for both provider bus names), ignore the result
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider1\n");
-    writeToClient("getsubscriber session org.freedesktop.ContextKit.testProvider2\n");
-
-    // Test: ask the client to call Subscribe with 2 valid keys
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider1 Test.Int Test.Double\n");
+    // Test: ask the client to call Subscribe to 2 keys
+    writeToClient("subscribe service1 Test.Int\n");
+    writeToClient("subscribe service1 Test.Double\n");
 
     // Expected result: we get the notifications for the subscribed keys
     QCOMPARE(intItemFirst.count(), 1);
@@ -218,7 +170,7 @@ void SubscriptionTests::subscriberNotifications()
     doubleItemFirst.clear();
 
     // Test: subscribe to one more key (note different bus name)
-    writeToClient("subscribe org.freedesktop.ContextKit.testProvider2 Test.Bool\n");
+    writeToClient("subscribe service2 Test.Bool\n");
 
     // Expected result: a notification for the corresponding property, not for others
     QCOMPARE(intItemFirst.count(), 0);
@@ -237,7 +189,7 @@ void SubscriptionTests::subscriberNotifications()
     boolItemFirst.clear();
 
     // Test: Unsubscribe from one of the keys
-    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 Test.Double\n");
+    writeToClient("unsubscribe service1 Test.Double\n");
 
     // Expected result:
     QCOMPARE(intItemFirst.count(), 0);
@@ -256,8 +208,8 @@ void SubscriptionTests::subscriberNotifications()
     doubleItemLast.clear();
 
     // Unsubscribe from the rest of the keys, too
-    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider1 Test.Int\n");
-    writeToClient("unsubscribe org.freedesktop.ContextKit.testProvider2 Test.Bool\n");
+    writeToClient("unsubscribe service1 Test.Int\n");
+    writeToClient("unsubscribe service2 Test.Bool\n");
 
     // Expected result:
     QCOMPARE(intItemFirst.count(), 0);
@@ -282,21 +234,57 @@ void SubscriptionTests::readStandardOutput()
     isReadyToRead = true;
 }
 
+// Note: input must end with \n
 QString SubscriptionTests::writeToClient(const char* input)
 {
     isReadyToRead = false;
     client->write(input);
     client->waitForBytesWritten();
+
     // Blocking for reading operation is bad idea since the client
     // expects provider to reply to dbus calls
 
     while (!isReadyToRead) {
         QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
+
     // Return the output from the client
     return client->readAll();
 }
 
+void SubscriptionTests::multiSubscribe()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call Subscribe for a property twice. The
+    // property exists and is currently unknown since we haven't set a
+    // value for it.
+    writeToClient("subscribe service1 Test.Int\n");
+
+    QString actual = writeToClient("subscribe service1 Test.Int\n");
+
+    // Expected result: Unsubscribe returns a D-Bus error
+    QString expected("Subscribe error: org.maemo.contextkit.Error.MultipleSubscribe");
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
+
+void SubscriptionTests::illegalUnsubscribe()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    // Ask the client to call Unubscribe for a property which we're
+    // not subscribed to. The property exists and is currently unknown
+    // since we haven't set a value for it.
+    QString actual = writeToClient("unsubscribe service1 Test.Int\n");
+
+    // Expected result: Unsubscribe returns a D-Bus error
+    QString expected("Unsubscribe error: org.maemo.contextkit.Error.IllegalUnsubscribe");
+    QCOMPARE(actual.simplified(), expected.simplified());
+}
 
 } // end namespace
 

@@ -1,6 +1,6 @@
 propertyunittest
 property.cpp
-property.h
+propertyprivate.cpp
 sconnect.h
 logging.h
 logging.cpp

@@ -32,5 +32,6 @@
 #define F_SIGNALS           (ContextFeature("signals"))
 #define F_DBUS              (ContextFeature("dbus"))
 #define F_C                 (ContextFeature("cbindings"))
+#define F_PROPERTY          (ContextFeature("property"))
 
 #endif

@@ -5,25 +5,20 @@ libcontextprovider_la_SOURCES = loggingfeatures.h       \
                                 service.cpp             \
                                 property.h              \
                                 property.cpp            \
-                                manager.h               \
-                                manager.cpp             \
-                                manageradaptor.h        \
-                                manageradaptor.cpp      \
+                                propertyprivate.h       \
+                                propertyprivate.cpp     \
                                 group.h			\
                                 group.cpp		\
-                                subscriber.cpp          \
-                                subscriber.h            \
-                                subscriberadaptor.h     \
-                                subscriberadaptor.cpp   \
-                                queuedinvoker.h         \
-                                queuedinvoker.cpp       \
                                 contextc.h              \
                                 contextc.cpp            \
                                 listeners.h             \
                                 listeners.cpp		\
-				context_provider.h	\
-				servicebackend.h	\
-				servicebackend.cpp
+                                context_provider.h	\
+                                servicebackend.h	\
+                                servicebackend.cpp      \
+                                propertyadaptor.h       \
+                                propertyadaptor.cpp
+
 
 includecontextproviderdir=$(includedir)/contextprovider
 includecontextprovider_HEADERS = ContextProvider contextc.h context_provider.h

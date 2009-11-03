@@ -50,6 +50,7 @@ public:
     bool subscribe(const QString &key);
     void unsubscribe(const QString &key);
     TimedValue get(const QString &key) const;
+    void clearValues();
 
 signals:
     void subscribeFinished(Provider *provider, QString key);

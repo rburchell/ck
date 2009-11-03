@@ -35,7 +35,7 @@ class MultiProvider(unittest.TestCase):
 	except:
 		pass
 
-    def testMultipleProviders(self):
+    def testMultipleProviders2(self):
         """
         Description
             This test verifies correct client behavior in the presence
@@ -47,13 +47,10 @@ class MultiProvider(unittest.TestCase):
             1. starts two providers (X and Y) providing the same P property
             2. X sets P to V1
             3. Y sets P to V2
-            4. starts a client and check that value for P is V2
-            5. starts a client with different provider order and
-               checks that value for P is still V2
+            4. starts a client
+            5. commands X to sleep, to make sure the client gets the value from Y first
+               checks that value for P is V2 even though it got first V2 and then V1
         """
-	# please reenable this test when new protocol on provider side is merged!
-	return
-
         provider_x = CLTool("context-provide", "--v2", "test.x",
                             "int", "test.prop", "44")
         provider_x.send("dump x.context")

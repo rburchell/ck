@@ -21,10 +21,7 @@
 
 #include "service.h"
 #include "servicebackend.h"
-#include "property.h"
 #include "logging.h"
-#include "manager.h"
-#include "manageradaptor.h"
 #include "sconnect.h"
 #include "loggingfeatures.h"
 #include <QDBusConnection>
@@ -40,8 +37,8 @@ namespace ContextProvider {
   protocol.  It has both a C++ and a C interface, so you can choose
   which you prefer. For the documentation of the C API, see \ref CApi.
 
-  The C++ interface consists mainly of the three classes Service,
-  Property, and Group in the namespace ContextProvider.  They are
+  The C++ interface consists mainly of the three classes: Service,
+  Property, and Group in the namespace ContextProvider. They are
   declared in the ContextProvider header file.
 
   Thus, you would typically gain access to the classes like this
@@ -51,7 +48,7 @@ namespace ContextProvider {
 
   using namespace ContextProvider;
 
-  Service my_service (...);
+  Service myService (...);
   \endcode
 
   If you prefer not to have generic names like "Service" in your code,
@@ -64,14 +61,14 @@ namespace ContextProvider {
 
   namespace CP = ContextProvider;
 
-  CP::Service my_service (...);
+  CP::Service myService (...);
   \endcode
 
   The basic pattern to use this library is to create a Service
   instance to represent you on D-Bus and then to add Property
   instances to it for the keys that you want to provide.  Once this is
-  done, you can call Property::set() at any time to change the value
-  of the property.
+  done, you can call Property::setValue() and Property::unsetValue()
+  at any time to change the value of the property.
 
   Communication with clients happens asynchronously and this library
   needs a running event loop for that.
@@ -87,21 +84,34 @@ namespace ContextProvider {
   {
       QApplication app(argc, argv);
 
-      Service my_service(QDBusConnection::SessionBus, "com.example.simple");
-      Property my_property(my_service, "Example.Simple");
+      Service myService(QDBusConnection::SessionBus, "com.example.simple");
+      Property myProperty(myService, "Example.Simple");
 
       // set initial value of property
-      my_property.set(100);
+      myProperty.set(100);
 
       app.exec();
   }
   \endcode
 
-  If you need to know when someone actually subscribes to one of
-  your values, you can connect to the firstSubscriberAppeared and
+  If you need to know when someone actually subscribes to one of your
+  properties, you can connect to the firstSubscriberAppeared and
   lastSubscriberDisappeared signals of the Property instances.  You
   can also use a Group if you are only interested in whether at least
   one of a set of Property objects is subscribed to.
+
+  \section PropNames Valid property names
+
+  Context FW maintains a list of core properties. If you are providing
+  a core property, you need to name it as it is described in the core
+  property list (e.g., Screen.TopEdge).
+
+  If you want to provide a non-core property, its name must be a valid
+  name for a D-Bus object path (e.g.,
+  /com/mycompany/screen/topedge). A valid D-Bus object path starts
+  with / and contains zero or more elements separated by / . Each
+  element must only contain the following characters: [A-Z][a-z][0-9]_
+
 */
 
 /*!
@@ -122,8 +132,8 @@ namespace ContextProvider {
     interface to the real D-Bus service.
 
     When the last instance of Service is destroyed, the real service
-    is automatically terminated and destroyed (there is a simple ref
-    counting mechanism involved to guarantee that).
+    is automatically stopped and it disappears from D-Bus (there is a
+    simple ref counting mechanism involved to guarantee that).
 
     Consider the following examples:
 
@@ -142,7 +152,9 @@ namespace ContextProvider {
     delete s2; // the "com.example.simple" just disappeared from D-Bus
     \endcode
 
-    Every Property object must be associated with a Service object.
+    Every Property object is associated with a Service object. If you
+    delete the Service object, the associated Property objects will
+    turn invalid and you should not use them.
 
     A Service can be running or stopped.  When it is running, it is
     visible via D-Bus and clients can subscribe to its properties.
@@ -176,7 +188,7 @@ namespace ContextProvider {
         // Now myService will share the connection and won't register
         // any service name
         Service *myService = new Service(systemBus);
-        Property* property = new Property(myService, "My.Property");
+        Property* myProperty = new Property(myService, "My.Property");
 
         // Important: registering the service name should be done as
         // late as possible, to prevent clients from connecting to us
@@ -203,7 +215,6 @@ Service::Service(QDBusConnection connection, QObject *parent)
     backend->ref();
 }
 
-
 /// Creates a Service proxy object for \a busName on the bus indicated
 /// by \a busType. The Service will register the given \a busName on
 /// D-Bus. If the service is accessed for the first time it'll be
@@ -227,9 +238,9 @@ Service::Service(QDBusConnection::BusType busType, const QString &busName, QObje
 }
 
 /// Destroys this Service instance. The actual service on D-Bus is
-/// destroyed and stopped if this object is a last instance pointing
-/// at the actual service with the given constructor parameters
-/// (QDBusConnection or bus type and bus name).
+/// stopped if this object is a last instance pointing at the actual
+/// service with the given constructor parameters (QDBusConnection or
+/// bus type and bus name).
 Service::~Service()
 {
     contextDebug() << F_SERVICE << F_DESTROY << "Destroying Service";
@@ -248,7 +259,7 @@ void Service::setAsDefault()
 /// it.
 void Service::setValue(const QString &key, const QVariant &val)
 {
-    backend->manager()->setKeyValue(key, val);
+    backend->setValue(key, val);
 }
 
 /// Set (override) the QDBusConnection used by the
