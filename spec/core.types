@@ -113,7 +113,7 @@
 
     <type name="string-enum" base="string">
         <params>
-            <rest doc="The possible values">
+            <rest doc="The possible values"/>
         </params>
         <doc>
             This is the base type for enumerations of fixed strings.  The
@@ -126,7 +126,7 @@
 
     <type name="int-enum" base="int32">
         <params>
-            <rest doc="The possible values">
+            <rest doc="The possible values"/>
         </params>
         <doc>
             This is the base type for enumerations of fixed integers.  The
