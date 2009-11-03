@@ -68,6 +68,16 @@ QString ContextTypeRegistryInfo::coreTypesPath()
     return QString(corepath);
 }
 
+ContextTypeInfo ContextTypeRegistryInfo::typeInfoForName(QString name)
+{
+    foreach (NanoTree typeTree, coreTree.keyValues("type")) {
+        if (typeTree.keyValue("name") == name)
+            return ContextTypeInfo(typeTree);
+    }
+
+    return ContextTypeInfo();
+}
+
 /* Private */
 
 ContextTypeRegistryInfo::ContextTypeRegistryInfo()
