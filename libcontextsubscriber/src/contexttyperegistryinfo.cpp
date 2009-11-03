@@ -35,6 +35,7 @@ ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
     static QMutex mutex;
     QMutexLocker locker(&mutex);
     if (! registryInstance) {
+        contextDebug() << F_TYPES << "Creating ContextTypeRegistryInfo instance";
         registryInstance = new ContextTypeRegistryInfo;
 
         // Move the backend to the main thread
