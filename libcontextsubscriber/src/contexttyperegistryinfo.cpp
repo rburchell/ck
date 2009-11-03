@@ -25,6 +25,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QCoreApplication>
+#include "nanoxml.h"
 
 ContextTypeRegistryInfo* ContextTypeRegistryInfo::registryInstance = NULL;
 
@@ -56,3 +57,19 @@ QString ContextTypeRegistryInfo::registryPath()
     return QString(regpath);
 }
 
+/// Returns the full path to the core property declaration file. Takes
+/// the \c CONTEXT_CORE_TYPES env variable into account.
+QString ContextTypeRegistryInfo::coreTypesPath()
+{
+    const char *corepath = getenv("CONTEXT_CORE_TYPES");
+    if (! corepath)
+        corepath = DEFAULT_CONTEXT_CORE_TYPES;
+
+    return QString(corepath);
+}
+
+/* Private */
+
+ContextTypeRegistryInfo::ContextTypeRegistryInfo()
+{
+}

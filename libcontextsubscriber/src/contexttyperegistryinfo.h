@@ -25,6 +25,7 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
+#include "nanotree.h"
 
 class ContextTypeRegistryInfo : public QObject
 {
@@ -33,15 +34,17 @@ class ContextTypeRegistryInfo : public QObject
 public:
     static ContextTypeRegistryInfo* instance();
     QString registryPath();
+    QString coreTypesPath();
 
 private:
-    ContextTypeRegistryInfo() {}; ///< Private constructor. Do not use.
+    ContextTypeRegistryInfo(); ///< Private constructor. Do not use.
     ContextTypeRegistryInfo(const ContextTypeRegistryInfo&); ///< Private constructor. Do not use.
     ContextTypeRegistryInfo& operator=(const ContextTypeRegistryInfo&); ///< Private operator. Do not use.
 
     /// Holds the actual pointer to the singelton instance.
     /// Mutex protected during creation.
     static ContextTypeRegistryInfo* registryInstance;
+    NanoTree coreTree;
 
     friend class ContextTypeRegistryInfoUnitTest;
 };
