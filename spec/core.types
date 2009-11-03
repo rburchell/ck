@@ -1,0 +1,237 @@
+<?xml version="1.0"?>
+<types>
+
+    <!-- Fundamental types -->
+    <type name="int32">
+        <doc>
+            A int32 value.
+        </doc>
+    </type>
+
+    <type name="int64">
+        <doc>
+            A int64 value.
+        </doc>
+    </type>
+
+    <type name="uint32">
+        <doc>
+            A uint32 value within the given limits.
+        </doc>
+    </type>
+
+    <type name="uint64">
+        <params>
+            <min doc="Minimum value"/>
+            <max doc="Maximum value"/>
+        </params>
+        <doc>
+            A uint64 value within the given limits.
+        </doc>
+    </type>
+
+    <type name="double">
+        <params>
+            <min doc="Minimum value"/>
+            <max doc="Maximum value"/>
+        </params>
+        <doc>
+            A double value within the given limits.
+        </doc>
+    </type>
+
+    <type name="string">
+        <params>
+            <must-match doc="Regular expression that must match"/>
+        </params>
+        <doc>
+            A string value that matches the given regular expression.
+        </doc>
+    </type>
+
+    <type name="list">
+        <params>
+            <min doc="Minimum length"/>
+            <max doc="Maximum length"/>
+        </params>
+        <doc>
+            A list of arbitrary values, with the minimum and maximum
+            length given by the "min" and "max" parameters, respectively.
+        </doc>
+    </type>
+
+    <type name="map">
+        <params>
+            <keys doc="Allowed keys"/>
+        </params>
+        <doc>
+            A map.  If given, the "keys" parameter determines which keys are
+            allowed.  The "keys" parameter should be a map itself, from key
+            names to a map with the attributes of the key.  Attributes of a
+            key are "doc" and "type".
+        </doc>
+    </type>
+
+    <!-- Generic types -->
+    <type name="value">
+        <doc>
+            Any representable value.
+        </doc>
+    </type>
+
+    <type name="number" base="value">
+        <doc>
+            A number, represented as either a "int32", "uint32", "int64", "uint64", or "double".
+        </doc>
+    </type>
+
+    <type name="integer" base="number">
+        <params>
+            <min doc="Lower bound"/>
+            <max doc="Upper bound"/>
+        </params>
+        <doc>
+            A integer, represented as any of the numeric types.  If the value
+            is a "double", it is rounded to an integer, but not necessarily to
+            the nearest.  The "min" and "max" parameters, when given, constrain
+            the range of the integer.
+        </doc>
+    </type>
+
+    <type name="uniform-list" base="list">
+        <params>
+            <min doc="Minimum length"/>
+            <max doc="Maximum length"/>
+            <type doc="Type of the elements"/>
+        </params>
+        <doc>
+            A list of values of the given type, with the
+            minimum and maximum length given by the "min" and "max" parameters.
+            The type of all elements is given by the "type" parameter.
+        </doc>
+    </type>
+
+    <type name="string-enum" base="string">
+        <params>
+            <rest doc="The possible values">
+        </params>
+        <doc>
+            This is the base type for enumerations of fixed strings.  The
+            parameters describe the possible values.  Each parameter is one
+            of the choices: the name of the parameter is the string for the choice
+            itself and the value of the parameter is a map with further
+            information of that choice, such as a "doc" entry.
+        </doc>
+    </type>
+
+    <type name="int-enum" base="int32">
+        <params>
+            <rest doc="The possible values">
+        </params>
+        <doc>
+            This is the base type for enumerations of fixed integers.  The
+            parameters describe the possible values.  Each parameter is one
+            of the choices: the name of the parameter is the symbolic name
+            for the choice itself and the value of the parameter is a map
+            with further information of that choice, such as a "val" entry
+            for the numerical value for that choice, and a "doc" entry.
+        </doc>
+    </type>
+    
+    <!-- Specific types -->
+    <type name="type">
+        <doc>
+            A type, represented as a map.  The map is the one you get as the Nano-DOM
+            for the type definiton.  E.g., it will have "doc" mapped to a string,
+            and "base" mapped to either a string or another map, etc.
+        </doc>
+        <base>
+            <map>
+                <allowed-keys>
+                    <name/>
+                    <params/>
+                    <doc/>
+                    <base/>
+                </allowed-keys>
+            </map>
+        </base>
+    </type>
+
+    <type name="geoloc">
+        <doc>
+            A list of two or three doubles giving a geographical location.
+            The first number is latitude, the second longitude, both in degrees.
+            If a third number is present, it is the altitude in meters.
+        </doc>
+        <base>
+            <uniform-list min="2" max="3" type="double"/>
+        </base>
+    </type>
+
+    <type name="temperature"
+          base="double"
+           doc="A temperature in Kelvin."/>
+
+    <type name="screen-edge">
+        <doc>
+            Indicates an edge of a rectangular screen, relative to
+            the natural orientation of the video hardware driving it.
+            It can be one of the four strings "top", "left", "right",
+            and "bottom".
+        </doc>
+        <base>
+            <string-enum>
+                <top/><left/><right/><bottom/>
+            </string-enum>
+        </base>
+    </type>
+
+    <type name="screen-edge-ints">
+        <doc>
+            Indicates an edge of a rectangular screen, relative to
+            the natural orientation of the video hardware driving it.
+            It can be one of the four values "top", "left", "right",
+            and "bottom", encoded as an integer.
+        </doc>
+        <base>
+            <int-enum>
+                <top val="0"/>
+                <left val="1"/>
+                <right val="2"/>
+                <bottom val="3"/>
+            </int-enum>
+        </base>
+    </type>
+
+    <type name="energy" base="double">
+        <doc>
+            An amount of energy, in Joule.
+        </doc>
+    </type>
+
+    <type name="power" base="double">
+        <doc>
+            A power, in Watt.
+        </doc>
+    </type>
+
+    <type name="time" base="int64">
+        <doc>
+            A point in time, represented as the number of nano-seconds since
+            00:00 January 1, 1970, UTC.
+        </doc>
+    </type>
+
+    <type name="duration" base="uint64">
+        <doc>
+            A time duration, in nano-seconds.
+        </doc>
+    </type>
+
+    <type name="percentage" base="int32">
+        <doc>
+            A percentage.
+        </doc>
+    </type>
+
+</types>
