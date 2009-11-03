@@ -126,22 +126,6 @@ NanoTree ContextTypeInfo::tree()
     return nanoTree;
 }
 
-/* Protected */
-
-/// A helper funtion to build a primitive type with a given name.
-/// Will be removed in future when registry comes in place.
-ContextTypeInfo ContextTypeInfo::buildPrimitiveType(QString name)
-{
-    // FIXME: Temporary. Gone when registry comes.
-    QVariantList type;
-    QVariantList tree;
-    type << QVariant("name");
-    type << QVariant(name);
-    tree << QVariant("type");
-    tree << QVariant(type);
-    return ContextTypeInfo(NanoTree(tree));
-}
-
 /* ContextMapTypeInfo */
 
 /// Returns the documentation for the given \a key in the map type. This is

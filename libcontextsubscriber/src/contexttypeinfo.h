@@ -49,8 +49,6 @@ public:
     NanoTree tree();
 
 protected:
-    static ContextTypeInfo buildPrimitiveType(QString name);
-
     NanoTree nanoTree; ///< The root nano tree representing this type.
 };
 
