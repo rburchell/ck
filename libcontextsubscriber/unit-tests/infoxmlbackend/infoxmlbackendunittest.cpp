@@ -23,11 +23,13 @@
 #include <QtCore>
 #include "fileutils.h"
 #include "infoxmlbackend.h"
+#include "contexttyperegistryinfo.h"
 
 class InfoXmlBackendUnitTest : public QObject
 {
     Q_OBJECT
     InfoXmlBackend *backend;
+    ContextTypeRegistryInfo *typeRegistry;
 
 private:
     bool inSpyHasOneInList(QSignalSpy &spy, const QString &v);
@@ -68,6 +70,7 @@ void InfoXmlBackendUnitTest::initTestCase()
     utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoXmlBackend();
+    typeRegistry = ContextTypeRegistryInfo::instance();
 }
 
 void InfoXmlBackendUnitTest::listKeys()
@@ -94,14 +97,14 @@ void InfoXmlBackendUnitTest::name()
 void InfoXmlBackendUnitTest::typeInfoForKey()
 {
     QCOMPARE(backend->typeInfoForKey("Battery.ChargePercentage").name(), ContextTypeInfo().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.Attribute").name(), ContextTypeInfo::boolType().name());
-    QCOMPARE(backend->typeInfoForKey("Battery.LowBattery").name(), ContextTypeInfo::boolType().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.bool").name(), ContextTypeInfo::boolType().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.int32").name(), ContextTypeInfo::int32Type().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.string").name(), ContextTypeInfo::stringType().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.double").name(), ContextTypeInfo::doubleType().name());
-    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), ContextTypeInfo::boolType().name());
-    QCOMPARE(backend->typeInfoForKey("Battery.Voltage").name(), ContextTypeInfo::int32Type().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.Attribute").name(), typeRegistry->boolType().name());
+    QCOMPARE(backend->typeInfoForKey("Battery.LowBattery").name(), typeRegistry->boolType().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.bool").name(), typeRegistry->boolType().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.int32").name(), typeRegistry->int32Type().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.string").name(), typeRegistry->stringType().name());
+    QCOMPARE(backend->typeInfoForKey("Key.With.double").name(), typeRegistry->doubleType().name());
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), typeRegistry->boolType().name());
+    QCOMPARE(backend->typeInfoForKey("Battery.Voltage").name(), typeRegistry->int32Type().name());
     QCOMPARE(backend->typeInfoForKey("Does.Not.Exist").name(), ContextTypeInfo().name());
 
     ContextTypeInfo complexType = backend->typeInfoForKey("Key.With.complex");
@@ -172,8 +175,8 @@ void InfoXmlBackendUnitTest::dynamics()
 
     // Again, some basic check
     QCOMPARE(backend->keyDeclared("System.Active"), true);
-    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), ContextTypeInfo::int32Type().name());
-    QCOMPARE(backend->typeInfoForKey("System.Active").name(), ContextTypeInfo::boolType().name());
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), typeRegistry->int32Type().name());
+    QCOMPARE(backend->typeInfoForKey("System.Active").name(), typeRegistry->boolType().name());
     QCOMPARE(backend->docForKey("System.Active"), QString("This is true when system is active"));
 
     // Test emissions
