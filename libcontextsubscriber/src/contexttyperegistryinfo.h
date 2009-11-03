@@ -47,6 +47,7 @@ private:
     /// Mutex protected during creation.
     static ContextTypeRegistryInfo* registryInstance;
     NanoTree coreTree;
+    QHash <QString, ContextTypeInfo> typeCache;
 
     friend class ContextTypeRegistryInfoUnitTest;
 };

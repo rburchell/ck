@@ -70,11 +70,20 @@ QString ContextTypeRegistryInfo::coreTypesPath()
 
 ContextTypeInfo ContextTypeRegistryInfo::typeInfoForName(QString name)
 {
+    // Try using the cache first
+    if (typeCache.contains(name))
+        return typeCache.value(name);
+
+    // No type in cache? Find it in the nano tree and put in cache.
     foreach (NanoTree typeTree, coreTree.keyValues("type")) {
-        if (typeTree.keyValue("name") == name)
-            return ContextTypeInfo(typeTree);
+        if (typeTree.keyValue("name") == name) {
+            ContextTypeInfo typeInfo(typeTree);
+            typeCache.insert(name, typeInfo);
+            return typeInfo;
+        }
     }
 
+    // Not found. Return blank null type.
     return ContextTypeInfo();
 }
 
