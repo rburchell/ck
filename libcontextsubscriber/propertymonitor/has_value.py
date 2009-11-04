@@ -24,7 +24,7 @@ import sys
 import os
 import time
 import unittest
-from ContextKit.cltool import CLTool
+from ContextKit.cltool2 import CLTool
 
 property_name = ""
 
@@ -34,10 +34,7 @@ class HasValue(unittest.TestCase):
 
         # start listening to the property
         context_client = CLTool("context-listen", property_name)
-        context_client.expect(CLTool.STDERR, "Available commands", 10) # wait until started
-        self.assert_(context_client.expect(CLTool.STDOUT,
-                                           "\n" + property_name + " =",
-                                           3)) # timeout == 3 seconds
+        self.assert_(context_client.expect("^" + property_name + " ="))
 
 def runTests():
     suite = unittest.TestLoader().loadTestsFromTestCase(HasValue)
