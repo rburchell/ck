@@ -19,24 +19,24 @@
  *
  */
 
-#ifndef CONTEXTTYPEINFO_H
-#define CONTEXTTYPEINFO_H
+#ifndef CONTEXTTYPEDEFINITIONINFO_H
+#define CONTEXTTYPEDEFINITIONINFO_H
 
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
 #include "nanotree.h"
 
-class ContextTypeInfo : public QObject
+class ContextTypeDefinitionInfo : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit ContextTypeInfo(const NanoTree &tree);
-    explicit ContextTypeInfo(const QVariant &variant);
-    ContextTypeInfo();
-    ContextTypeInfo(const ContextTypeInfo &ti);
-    ContextTypeInfo operator=(const ContextTypeInfo& info);
+    explicit ContextTypeDefinitionInfo(const NanoTree &tree);
+    explicit ContextTypeDefinitionInfo(const QVariant &variant);
+    ContextTypeDefinitionInfo();
+    ContextTypeDefinitionInfo(const ContextTypeInfo &ti);
+    ContextTypeDefinitionInfo operator=(const ContextTypeInfo& info);
 
     QString name() const;
     QStringList parameters() const;
@@ -44,31 +44,12 @@ public:
     QString parameterDoc(QString p) const;
     QString parameterValue(QString p) const;
     void setParameterValue(QString p, QString value);
-    ContextTypeInfo base() const;
+    ContextTypeDefinitionInfo base() const;
     QString doc();
     NanoTree tree();
 
 protected:
     NanoTree nanoTree; ///< The root nano tree representing this type.
-};
-
-class ContextMapTypeInfo : public ContextTypeInfo
-{
-    Q_OBJECT
-
-public:
-    explicit ContextMapTypeInfo(const NanoTree &tree) : ContextTypeInfo(tree) {};
-    QString keyDoc(QString key);
-    ContextTypeInfo keyType(QString key);
-};
-
-class ContextUniformListTypeInfo : public ContextTypeInfo
-{
-    Q_OBJECT
-
-public:
-    explicit ContextUniformListTypeInfo(const NanoTree &tree) : ContextTypeInfo(tree) {};
-    ContextTypeInfo elementType();
 };
 
 #endif
