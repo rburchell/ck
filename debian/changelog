@@ -1,6 +1,8 @@
-contextkit (0.4.1~unreleased) unstable; urgency=low
+contextkit (0.5~unreleased) unstable; urgency=low
 
-  * 
+  * Released as 0.5 because of a version numbering bug, no major new features,
+    which explains the version bump.
+  *
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 30 Oct 2009 03:31:16 +0200
 
