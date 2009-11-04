@@ -33,13 +33,13 @@ class ContextTypeRegistryInfo : public QObject
     Q_OBJECT
 
 public:
-    ContextTypeRegistryInfo();
-
     static ContextTypeRegistryInfo* instance();
 
+    QString registryPath();
+    QString coreTypesPath();
     ContextTypeInfo typeInfoForName(QString name);
 
-    ContextTypeInfo primitiveType(QString nameStr, QString docStr);
+    ContextTypeInfo nullType();
     ContextTypeInfo int64Type();
     ContextTypeInfo int32Type();
     ContextTypeInfo stringType();
@@ -47,8 +47,17 @@ public:
     ContextTypeInfo doubleType();
 
 private:
+    ContextTypeRegistryInfo(); ///< Private constructor. Do not use.
+    ContextTypeRegistryInfo(const ContextTypeRegistryInfo&); ///< Private constructor. Do not use.
+    ContextTypeRegistryInfo& operator=(const ContextTypeRegistryInfo&); ///< Private operator. Do not use.
 
+    /// Holds the actual pointer to the singelton instance.
+    /// Mutex protected during creation.
     static ContextTypeRegistryInfo* registryInstance;
+    NanoTree coreTree;
+    QHash <QString, ContextTypeInfo> typeCache;
+
+    friend class ContextTypeRegistryInfoUnitTest;
 };
 
 #endif
