@@ -37,9 +37,8 @@ public:
 
     QString registryPath();
     QString coreTypesPath();
-    ContextTypeInfo typeInfoForName(QString name);
+    NanoTree typeDefinitionForName(QString name);
 
-    ContextTypeInfo nullType();
     ContextTypeInfo int64Type();
     ContextTypeInfo int32Type();
     ContextTypeInfo stringType();
@@ -55,7 +54,7 @@ private:
     /// Mutex protected during creation.
     static ContextTypeRegistryInfo* registryInstance;
     NanoTree coreTree;
-    QHash <QString, ContextTypeInfo> typeCache;
+    QHash <QString, NanoTree> typeCache;
 
     friend class ContextTypeRegistryInfoUnitTest;
 };

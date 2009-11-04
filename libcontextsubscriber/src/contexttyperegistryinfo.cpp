@@ -68,7 +68,7 @@ QString ContextTypeRegistryInfo::coreTypesPath()
     return QString(corepath);
 }
 
-ContextTypeInfo ContextTypeRegistryInfo::typeInfoForName(QString name)
+NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
 {
     // Support for the old types
     if (name == "TRUTH")
@@ -89,20 +89,13 @@ ContextTypeInfo ContextTypeRegistryInfo::typeInfoForName(QString name)
     // No type in cache? Find it in the nano tree and put in cache.
     foreach (NanoTree typeTree, coreTree.keyValues("type")) {
         if (typeTree.keyValue("name") == name) {
-            ContextTypeInfo typeInfo(typeTree);
-            typeCache.insert(name, typeInfo);
-            return typeInfo;
+            typeCache.insert(name, typeTree);
+            return typeTree;
         }
     }
 
     // Not found. Return blank null type.
-    return ContextTypeInfo();
-}
-
-/// Returns in instance of the null type info.
-ContextTypeInfo ContextTypeRegistryInfo::nullType()
-{
-    return ContextTypeInfo(QVariant());
+    return NanoTree();
 }
 
 /// Returns in instance of the int64 type info.
