@@ -139,10 +139,14 @@ ContextTypeInfo ContextTypeRegistryInfo::int32Type()
 
 ContextTypeRegistryInfo::ContextTypeRegistryInfo()
 {
-    contextDebug() << F_TYPES << "Reading core types from:" << ContextTypeRegistryInfo::coreTypesPath();
-    NanoXml parser(ContextTypeRegistryInfo::coreTypesPath());
-    if (parser.didFail())
-        contextWarning() << F_TYPES << "Reading core types from" << ContextTypeRegistryInfo::coreTypesPath() << "failed, parsing error";
-    else
-        coreTree = parser.result();
+    if (QFile(ContextTypeRegistryInfo::coreTypesPath()).exists()) {
+        contextDebug() << F_TYPES << "Reading core types from:" << ContextTypeRegistryInfo::coreTypesPath();
+
+        NanoXml parser(ContextTypeRegistryInfo::coreTypesPath());
+        if (parser.didFail())
+            contextWarning() << F_TYPES << "Reading core types from" << ContextTypeRegistryInfo::coreTypesPath() << "failed, parsing error";
+        else
+            coreTree = parser.result();
+    } else
+        contextDebug() << F_TYPES << "Core types at" << ContextTypeRegistryInfo::coreTypesPath() << "missing.";
 }
