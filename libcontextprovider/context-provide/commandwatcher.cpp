@@ -181,7 +181,7 @@ void CommandWatcher::addCommand(const QStringList& args)
     QString keyType = unquote(args.at(0)).toUpper();
     const QString keyName = unquote(args.at(1));
 
-    if (keyType != "COMPLEX" && keyType != "INT" && keyType != "STRING" &&
+    if (keyType != "ANY" && keyType != "INT" && keyType != "STRING" &&
         keyType != "DOUBLE" && keyType != "TRUTH" && keyType != "BOOL") {
         qDebug() << "ERROR: Unknown type (has to be: COMPLEX, INT, STRING, DOUBLE, BOOL or TRUTH)";
         return;
@@ -332,7 +332,7 @@ void CommandWatcher::dumpCommand(const QStringList &args)
 void CommandWatcher::setCommand(const QString& command)
 {
     const QString keyName = unquote(command.left(command.indexOf('=')).trimmed());
-    const QString value = unquote(command.mid(command.indexOf('=')+1).trimmed());
+    QString value = command.mid(command.indexOf('=')+1).trimmed();
 
     if (! types.contains(keyName)) {
         qDebug() << "ERROR: key" << keyName << "not known/added";
@@ -342,6 +342,9 @@ void CommandWatcher::setCommand(const QString& command)
     Property *prop = properties.value(keyName);
     const QString keyType = types.value(keyName);
     QVariant v;
+
+    if (keyType != "ANY")
+        value = unquote(value);
 
     if (keyType == "INT")
         v = QVariant(value.toInt());
@@ -354,7 +357,7 @@ void CommandWatcher::setCommand(const QString& command)
             v = QVariant(true);
         else
             v = QVariant(false);
-    } else if (keyType == "COMPLEX") {
+    } else if (keyType == "ANY") {
         QJson::Parser parser;
         bool ok;
 
