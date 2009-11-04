@@ -49,15 +49,15 @@ QString NanoTree::dumpTree(int level) const
 
 /// Assuming this tree represents a key, return the name of the key.
 /// (first item).
-NanoTree NanoTree::keyName() const
+QString NanoTree::keyName() const
 {
     if (type() != QVariant::List)
-        return NanoTree();
+        return QString();
 
     if (toList().size() == 0)
-        return NanoTree();
+        return QString();
 
-    return NanoTree(toList().at(0));
+    return NanoTree(toList().at(0).toString());
 }
 
 /// Returns the list of QVariants matching the \a key in a given tree. A QVariant

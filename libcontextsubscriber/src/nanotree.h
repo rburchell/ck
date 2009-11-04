@@ -49,7 +49,7 @@ public:
     QStringList keys() const;
     NanoTree replaceKey(QString key, NanoTree newNode) const;
     NanoTree keyNode(QString k) const;
-    NanoTree keyName() const;
+    QString keyName() const;
 };
 
 #endif // NANOTREE_H

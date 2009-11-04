@@ -25,26 +25,26 @@
 
 /* Public */
 
-ContextTypeInfo::ContextTypeInfo(QString n) : typeName(n), typeInfo()
+ContextTypeInfo::ContextTypeInfo(NanoTree t) : tree(t)
 {
 }
 
-ContextTypeInfo::ContextTypeInfo() : typeName(""), typeInfo()
+ContextTypeInfo::ContextTypeInfo()
 {
 }
 
-ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo& info) : typeName(info.typeName), typeInfo(info.typeInfo)
+ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo& info) : tree(info.tree)
 {
 }
 
 QString ContextTypeInfo::name() const
 {
-    return typeName;
+    return tree.keyName();
 }
 
 NanoTree ContextTypeInfo::definition() const
 {
-    return ContextTypeRegistryInfo::instance()->typeDefinitionForName(typeName);
+    return ContextTypeRegistryInfo::instance()->typeDefinitionForName(name());
 }
 
 QString ContextTypeInfo::parameterDoc(QString p) const
@@ -54,12 +54,12 @@ QString ContextTypeInfo::parameterDoc(QString p) const
 
 QVariant ContextTypeInfo::parameterValue(QString p) const
 {
-    return typeInfo.keyValue(p);
+    return tree.keyValue(p);
 }
 
 void ContextTypeInfo::setParameterValue(QString p, QVariant v)
 {
-    typeInfo = typeInfo.addKeyValue(p, v);
+    tree = tree.addKeyValue(p, v);
 }
 
 QString ContextTypeInfo::doc() const
@@ -70,7 +70,11 @@ QString ContextTypeInfo::doc() const
 ContextTypeInfo ContextTypeInfo::base() const
 {
     QString baseName = definition().keyValue("base").toString();
-    return ContextTypeInfo(baseName);
+
+    QVariantList lst;
+    lst << QVariant(baseName);
+
+    return ContextTypeInfo(NanoTree(lst));
 }
 
 QVariantList ContextTypeInfo::parameters() const
