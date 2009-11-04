@@ -39,6 +39,7 @@ class Reader(Thread):
     def run(self):
         while True:
             l = self.cltool.process.stdout.readline()
+            l = l.rstrip() + '\n'  # delete trailing whitespace
             if l:
                 event = (time.time(), CLTool.STDOUT, l)
             else:
@@ -68,14 +69,24 @@ class CLTool:
         self.reader = Reader(self)
         self.last_expect = 0
         self.reader.start()
+        self.last_output = "" # can be used externally to get the last input read during expect()
         atexit.register(self.atexit)
 
     def atexit(self):
+        self.close()
         self.reader.running = False
-        self.reader.join()
+        self.reader.join(3)
 
     def _preexec(self):
-        """Enable core dumps."""
+        """Enable core dumps and setup to be killed when the parent exits."""
+        # see prctl(2) -> / PDEATHSIG
+        # 0 -> RTLD_DEFAULT in dlopen(3), prctl is in libc.so.6
+        # 1 -> PDEATHSIG
+        # 9 -> SIGKILL
+        # 0 0 0 -> unused arguments
+        import ctypes
+        ctypes.CDLL("", handle=0).prctl(1, 9, 0, 0, 0)
+
         import resource
         resource.setrlimit(resource.RLIMIT_CORE, (-1, -1))
 
@@ -126,9 +137,9 @@ class CLTool:
             # enumerate all of the patterns and remove the matching ones
             i = 0
             now = time.time()
-            match_this = self._last_output(abs_timeout - now)
+            self.last_output = self._last_output(abs_timeout - now)
             while i < len(rexp):
-                if re.search(rexp[i], match_this):
+                if re.search(rexp[i], self.last_output):
                     del rexp[i]
                     del exp[i]
                     i -= 1
@@ -139,7 +150,7 @@ class CLTool:
                 return True
             # timed out
             if now > abs_timeout:
-                self.comment('TIMEOUT')
+                self.comment('TIMEOUT ' + str(exp))
                 self._return_event(wantdump)
                 return False
             # stream is closed
