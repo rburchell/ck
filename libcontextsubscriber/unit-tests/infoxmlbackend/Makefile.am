@@ -1,7 +1,7 @@
 check_PROGRAMS = infoxmlbackendunittest
 
 # your test's sources
-infoxmlbackendunittest_SOURCES = infoxmlbackendunittest.cpp
+infoxmlbackendunittest_SOURCES = infoxmlbackendunittest.cpp contexttyperegistryinfo.h
 
 COVERAGE_FILES = infoxmlbackend.cpp
 EXTRA_DIST = providers1.src providers2v1.src providers2v2.src providers3.src providers4.src providers5.src
@@ -29,9 +29,7 @@ FROM_SOURCE =							\
 	contexttypeinfo.h					\
 	contexttypeinfo.cpp					\
 	nanotree.h						\
-	nanotree.cpp						\
-	contexttyperegistryinfo.cpp				\
-	contexttyperegistryinfo.h
+	nanotree.cpp
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
