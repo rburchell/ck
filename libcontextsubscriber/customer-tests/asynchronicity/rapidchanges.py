@@ -27,10 +27,11 @@
 ##   - resumes the client
 ##   - verifies that the client receives only one valueChanged signal
 
+import re
 import sys
 import os
 import unittest
-from ContextKit.cltool import CLTool
+from ContextKit.cltool2 import CLTool, wanted
 
 class RapidChanges(unittest.TestCase):
     def testRapidChanges(self):
@@ -51,24 +52,30 @@ class RapidChanges(unittest.TestCase):
 
         provider_fast = CLTool("context-provide", "--v2", "com.nokia.fast",
                                "int","test.fast","44")
-        provider_fast.expect(CLTool.STDOUT, "Setting key", 10)
+        provider_fast.expect("Setting key")
         context_client = CLTool("context-listen", "test.fast")
-        self.assert_(context_client.expect(CLTool.STDOUT,
-                                           CLTool.wanted("test.fast", "int", "44"),
-                                           3), # timeout == 3 seconds
+        self.assert_(context_client.expect(wanted("test.fast", "int", "44")),
                      "Bad value for the fast property, wanted 44")
 
         context_client.suspend()
         provider_fast.send("test.fast = 34")
-        provider_fast.expect(CLTool.STDOUT, "Setting key", 10)
+        provider_fast.expect("Setting key")
         provider_fast.send("test.fast = 54")
-        provider_fast.expect(CLTool.STDOUT, "Setting key", 10)
+        provider_fast.expect("Setting key")
         context_client.resume()
-        # /.^/ is a regexp that doesn't match anything
-        context_client.expect(CLTool.STDOUT, ".^", 3, wantdump=False)
-        if context_client.last_output != "test.fast = int:54\n":
+
+        context_client.expect(wanted("test.fast", "int", "54"))
+
+        # the two value changes can happen very close in time, so we
+        # have to check that beyond the good value there are no other
+        # value(s)
+        if len(re.findall("test.fast =", context_client.last_output)) != 1:
             context_client.printio()
             self.assert_(False,
+                         "expected a single valueChanged")
+
+        # not even after waiting one second
+        self.assertFalse(context_client.expect("test.fast =", wantdump = False, timeout=1),
                          "expected a single valueChanged")
 
         provider_fast.close()

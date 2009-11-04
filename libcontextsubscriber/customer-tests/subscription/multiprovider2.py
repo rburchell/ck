@@ -22,18 +22,18 @@ import sys
 import os
 import unittest
 import time
-from ContextKit.cltool import CLTool
+from ContextKit.cltool2 import CLTool
 
 class MultiProvider(unittest.TestCase):
     def tearDown(self):
-	try:
-	        os.unlink("x.context")
-	except:
-		pass
-	try:
-	        os.unlink("y.context")
-	except:
-		pass
+        try:
+                os.unlink("x.context")
+        except:
+                pass
+        try:
+                os.unlink("y.context")
+        except:
+                pass
 
     def testMultipleProviders2(self):
         """
@@ -54,25 +54,23 @@ class MultiProvider(unittest.TestCase):
         provider_x = CLTool("context-provide", "--v2", "test.x",
                             "int", "test.prop", "44")
         provider_x.send("dump x.context")
-        provider_x.expect(CLTool.STDOUT, "Wrote", 10)
+        provider_x.expect("Wrote")
 
         provider_y = CLTool("context-provide", "--v2", "test.y",
                             "int", "test.prop", "22")
         provider_y.send("dump y.context")
-        provider_y.expect(CLTool.STDOUT, "Wrote", 10)
+        provider_y.expect("Wrote")
 
         client = CLTool("context-listen")
-        client.expect(CLTool.STDERR, "Available commands", 3)
+        client.expect("Available commands")
         provider_x.send("sleep 2")
-        provider_x.expect(CLTool.STDOUT, "Sleeping", 10)
+        provider_x.expect("Sleeping")
         client.send("n test.prop")
 
         time.sleep(4)
 
         client.send("value test.prop")
-        self.assert_(client.expect(CLTool.STDOUT,
-                                   "\nvalue: int:22\n",
-                                   3))
+        self.assert_(client.expect("\nvalue: int:22\n"))
         client.close()
         provider_x.close()
         provider_y.close()

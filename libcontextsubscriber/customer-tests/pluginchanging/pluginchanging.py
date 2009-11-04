@@ -26,7 +26,7 @@
 import sys
 import unittest
 import os
-from ContextKit.cltool import CLTool
+from ContextKit.cltool2 import CLTool
 
 class Subscription(unittest.TestCase):
         def tearDown(self):
@@ -46,7 +46,7 @@ class Subscription(unittest.TestCase):
                         self.assert_(False, "Couldn't find the test time plugins")
 
                 self.context_client = CLTool("context-listen", "Test.Time")
-                self.context_client.expect(CLTool.STDERR, "Available commands", 10) # wait for it
+                self.context_client.expect("Available commands") # wait for it
 
                 # Copy the declaration file, declaring libcontextsubscribertime1 plugin.
                 os.system('cp time1.context.temp time.context.temp')
@@ -54,14 +54,14 @@ class Subscription(unittest.TestCase):
                 #print "now reading"
 
                 # Expect value coming from plugin libcontextsubscribertime1
-                self.assert_(self.context_client.expect(CLTool.STDOUT, "Test.Time = QString:Time1:", 10))
+                self.assert_(self.context_client.expect("Test.Time = QString:Time1:"))
 
                 # Modify the registry so that the key is now provided by libcontextsubscribertime2
                 os.system('cp time2.context.temp time.context.temp')
                 os.system('mv time.context.temp time.context')
 
                 # Expect value coming from plugin libcontextsubscribertime2
-                self.assert_(self.context_client.expect(CLTool.STDOUT, "Test.Time = QString:Time2:", 10))
+                self.assert_(self.context_client.expect("Test.Time = QString:Time2:"))
 
 if __name__ == "__main__":
         sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)

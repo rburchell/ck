@@ -27,7 +27,7 @@
 import sys
 import unittest
 import os
-from ContextKit.cltool import CLTool
+from ContextKit.cltool2 import CLTool, wanted, wantedUnknown
 
 class Subscription(unittest.TestCase):
         def tearDown(self):
@@ -64,54 +64,42 @@ class Subscription(unittest.TestCase):
                                  "double","test.double","2.5",
                                  "truth","test.truth","True")
                 provider.send("dump")
-                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth")
                 self.assert_(
-                        listen.expectAll(CLTool.STDOUT,
-                                         ["\ntest.double = double:2.5\n",
-                                          "\ntest.int = int:1\n",
-                                          "\ntest.string = QString:foobar\n",
-                                          "\ntest.truth = bool:true\n"],
-                                         10),
+                        listen.expect(["^test.double = double:2.5$",
+                                          "^test.int = int:1$",
+                                          "^test.string = QString:foobar$",
+                                          "^test.truth = bool:true$"]),
                         "Actual key values pairs do not match expected")
 
                 provider.send("test.int = 100")
-                listen.expect(CLTool.STDOUT, "int:100", 10) # wait for it
+                listen.expect("int:100") # wait for it
                 listen.send("value test.int")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\nvalue: int:100\n",
-                                      1),
+                        listen.expect("^value: int:100$"),
                         "Value command returned wrong value")
 
                 listen.send("value test.int defaultValue")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\nvalue: int:100\n",
-                                      1),
+                        listen.expect("^value: int:100$"),
                         "Value command returned wrong value")
 
                 provider.send("unset test.int")
-                listen.expect(CLTool.STDOUT, "Unknown", 10) # wait for it
+                listen.expect("Unknown") # wait for it
                 listen.send("value test.int")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\nvalue is Unknown\n",
-                                      1),
+                        listen.expect("^value is Unknown$"),
                         "Value command returned wrong value")
 
                 listen.send("value test.int defaultValue")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\nvalue: QString:defaultValue\n",
-                                      1),
+                        listen.expect("^value: QString:defaultValue$"),
                         "Value command returned wrong value")
 
                 listen.send("key test.int")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\nkey: test.int\n",
-                                      1),
+                        listen.expect("^key: test.int$"),
                         "Key command returned wrong value")
 
                 provider.close()
@@ -142,36 +130,28 @@ class Subscription(unittest.TestCase):
                                  "string","test.string","foobar",
                                  "double","test.double","2.5",
                                  "truth","test.truth","True")
-                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                provider.expect("Setting key: test.truth") # wait for it
                 provider.send("dump")
-                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth")
-                listen.expectAll(CLTool.STDOUT,
-                                 ["\ntest.double = double:2.5\n",
-                                  "\ntest.int = int:1\n",
-                                  "\ntest.string = QString:foobar\n",
-                                  "\ntest.truth = bool:true\n"],
-                                 10) # wait for it
+                listen.expect(["^test.double = double:2.5$",
+                                  "^test.int = int:1$",
+                                  "^test.string = QString:foobar$",
+                                  "^test.truth = bool:true$"]) # wait for it
                 listen.send("ikey test.int")
 
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\nikey: test.int\n",
-                                      1),
+                        listen.expect("^ikey: test.int$"),
                         "ikey didn't work")
 
                 listen.send("man test.truth")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\nman: A phony but very flexible property.\n",
-                                      1),
+                        listen.expect("^man: A phony but very flexible property.$"),
                         "man didn't work")
 
                 listen.send("type test.double")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntype: DOUBLE\n",
-                                      1),
+                        listen.expect("^type: DOUBLE$"),
                         "type didn't work")
                 provider.close()
                 listen.close()
@@ -182,47 +162,35 @@ class Subscription(unittest.TestCase):
                                  "string","test.string","foobar",
                                  "double","test.double","2.5",
                                  "truth","test.truth","True")
-                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                provider.expect("Setting key: test.truth") # wait for it
                 provider.send("dump")
-                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth", "test.fake")
-                listen.expectAll(CLTool.STDOUT,
-                                 ["\ntest.double = double:2.5\n",
-                                  "\ntest.int = int:1\n",
-                                  "\ntest.string = QString:foobar\n",
-                                  "\ntest.truth = bool:true\n"],
-                                 10) # wait for it
+                listen.expect(["^test.double = double:2.5$",
+                                  "^test.int = int:1$",
+                                  "^test.string = QString:foobar$",
+                                  "^test.truth = bool:true$"]) # wait for it
 
-		# test querying the type of all properties
+                # test querying the type of all properties
                 listen.send("type test.int")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntype: INT\n",
-                                      1))
+                        listen.expect("^type: INT$"))
 
                 listen.send("type test.double")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntype: DOUBLE\n",
-                                      1))
+                        listen.expect("^type: DOUBLE$"))
 
                 listen.send("type test.truth")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntype: TRUTH\n",
-                                      1))
+                        listen.expect("^type: TRUTH$"))
 
                 listen.send("type test.string")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntype: STRING\n",
-                                      1))
+                        listen.expect("^type: STRING$"))
 
                 listen.send("type test.fake")
                 self.assert_(
-			listen.expect(CLTool.STDOUT,
-				      "\ntype:\n",
-				      1))
+                        listen.expect("^type:$"))
 
                 provider.close()
                 listen.close()
@@ -233,29 +201,23 @@ class Subscription(unittest.TestCase):
                                  "string","test.string","foobar",
                                  "double","test.double","2.5",
                                  "truth","test.truth","True")
-                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                provider.expect("Setting key: test.truth") # wait for it
                 provider.send("dump")
-                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth", "test.fake")
-                listen.expectAll(CLTool.STDOUT,
-                                 ["\ntest.double = double:2.5\n",
-                                  "\ntest.int = int:1\n",
-                                  "\ntest.string = QString:foobar\n",
-                                  "\ntest.truth = bool:true\n"],
-                                 10) # wait for it
+                listen.expect(["^test.double = double:2.5$",
+                                  "^test.int = int:1$",
+                                  "^test.string = QString:foobar$",
+                                  "^test.truth = bool:true$"]) # wait for it
 
-		# test querying the provider(s)
+                # test querying the provider(s)
                 listen.send("providers test.int")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\nproviders: session:com.nokia.test@contextkit-dbus\n",
-                                      1))
+                        listen.expect("^providers: session:com.nokia.test@contextkit-dbus$"))
 
                 listen.send("providers test.fake")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\nproviders:\n",
-                                      1))
+                        listen.expect("^providers:$"))
                 provider.close()
                 listen.close()
 
@@ -284,17 +246,15 @@ class Subscription(unittest.TestCase):
                                  "string","test.string","foobar",
                                  "double","test.double","2.5",
                                  "truth","test.truth","True")
-                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                provider.expect("Setting key: test.truth") # wait for it
                 provider.send("dump")
-                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth")
                 self.assert_(
-                        listen.expectAll(CLTool.STDOUT,
-                                         ["\ntest.double = double:2.5\n",
-                                          "\ntest.int = int:1\n",
-                                          "\ntest.string = QString:foobar\n",
-                                          "\ntest.truth = bool:true\n"],
-                                         10),
+                        listen.expect(["^test.double = double:2.5$",
+                                          "^test.int = int:1$",
+                                          "^test.string = QString:foobar$",
+                                          "^test.truth = bool:true$"]),
                         "Actual key values pairs do not match expected")
                 provider.close()
                 listen.close()
@@ -320,30 +280,24 @@ class Subscription(unittest.TestCase):
                         None
                 """
                 provider = CLTool("context-provide", "--v2", "com.nokia.test", "truth", "test.truth", "False")
-                provider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                provider.expect("Setting key: test.truth") # wait for it
                 provider.send("dump")
-                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                provider.expect("Wrote") # wait for it
                 provider.send("test.truth = False")
-                provider.expect(CLTool.STDOUT, "Setting", 10) # wait for it
+                provider.expect("Setting") # wait for it
                 listen = CLTool("context-listen", "test.truth")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntest.truth = bool:false\n",
-                                      3),
+                        listen.expect("^test.truth = bool:false$"),
                         "setting to false didn't work")
 
                 provider.send("unset test.truth")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntest.truth is Unknown\n",
-                                      1),
+                        listen.expect("^test.truth is Unknown$"),
                         "setting to unknown didn't work")
 
                 provider.send("test.truth = True")
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntest.truth = bool:true\n",
-                                      1),
+                        listen.expect("^test.truth = bool:true$"),
                         "setting to true didn't work")
                 provider.close()
                 listen.close()
@@ -369,30 +323,23 @@ class Subscription(unittest.TestCase):
                         None
                 """
                 provider = CLTool("context-provide", "--v2", "com.nokia.test", "string", "test.string", "something")
-                provider.expect(CLTool.STDOUT, "Setting key: test.string", 10) # wait for it
+                provider.expect("Setting key: test.string") # wait for it
                 provider.send("dump")
-                provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.string")
-                listen.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntest.string = QString:something\n",
-                                      1),
+                        listen.expect("^test.string = QString:something$"),
                         "setting to 'something' didn't work")
 
                 provider.send('test.string = ""')
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntest.string = QString:\n",
-                                      1),
+                        listen.expect("^test.string = QString:$"),
                         "setting to empty string didn't work")
 
                 provider.send('unset test.string')
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntest.string is Unknown\n",
-                                      1),
+                        listen.expect("^test.string is Unknown$"),
                         "setting to null didn't work")
 
                 provider.close()
@@ -405,20 +352,16 @@ class MultipleSubscribers(unittest.TestCase):
                                             "string","test.string","foobar",
                                             "double","test.double","2.5",
                                             "truth","test.truth","True")
-                self.flexiprovider.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                self.flexiprovider.expect("Setting key: test.truth") # wait for it
                 self.flexiprovider.send("dump")
-                self.flexiprovider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                self.flexiprovider.expect("Wrote") # wait for it
                 self.context_client1 = CLTool("context-listen","test.int","test.double","test.string","test.truth")
                 self.context_client2 = CLTool("context-listen","test.int","test.double")
                 self.context_client3 = CLTool("context-listen","test.int","test.string","test.truth")
                 self.context_client4 = CLTool("context-listen","test.int","test.double","test.string")
-                self.context_client1.expect(CLTool.STDERR, "Available commands", 10) # wait for it
-                self.context_client2.expect(CLTool.STDERR, "Available commands", 10) # wait for it
-                self.context_client3.expect(CLTool.STDERR, "Available commands", 10) # wait for it
-                self.context_client4.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
         def tearDown(self):
-		self.flexiprovider.send("exit")
+                self.flexiprovider.send("exit")
                 self.flexiprovider.close()
                 self.context_client1.close()
                 self.context_client2.close()
@@ -446,23 +389,23 @@ class MultipleSubscribers(unittest.TestCase):
                         None
                 """
 
-                client1_expected = ["\ntest.double = double:2.5\n",
-                                    "\ntest.int = int:1\n",
-                                    "\ntest.string = QString:foobar\n",
-                                    "\ntest.truth = bool:true\n"]
-                client2_expected = ["\ntest.double = double:2.5\n",
-                                    "\ntest.int = int:1\n"]
-                client3_expected = ["\ntest.int = int:1\n",
-                                    "\ntest.string = QString:foobar\n",
-                                    "\ntest.truth = bool:true\n"]
-                client4_expected = ["\ntest.double = double:2.5\n",
-                                    "\ntest.int = int:1\n",
-                                    "\ntest.string = QString:foobar\n"]
+                client1_expected = ["^test.double = double:2.5$",
+                                    "^test.int = int:1$",
+                                    "^test.string = QString:foobar$",
+                                    "^test.truth = bool:true$"]
+                client2_expected = ["^test.double = double:2.5$",
+                                    "^test.int = int:1$"]
+                client3_expected = ["^test.int = int:1$",
+                                    "^test.string = QString:foobar$",
+                                    "^test.truth = bool:true$"]
+                client4_expected = ["^test.double = double:2.5$",
+                                    "^test.int = int:1$",
+                                    "^test.string = QString:foobar$"]
 
-                self.assert_(self.context_client1.expectAll(CLTool.STDOUT, client1_expected, 1), "Actual key values pairs do not match expected")
-                self.assert_(self.context_client2.expectAll(CLTool.STDOUT, client2_expected, 1), "Actual key values pairs do not match expected")
-                self.assert_(self.context_client3.expectAll(CLTool.STDOUT, client3_expected, 1), "Actual key values pairs do not match expected")
-                self.assert_(self.context_client4.expectAll(CLTool.STDOUT, client4_expected, 1), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client1.expect(client1_expected), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client2.expect(client2_expected), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client3.expect(client3_expected), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client4.expect(client4_expected), "Actual key values pairs do not match expected")
 
         def testValueChanged(self):
                 """
@@ -484,45 +427,45 @@ class MultipleSubscribers(unittest.TestCase):
                 References
                         None
                 """
-                client1_expected = ["\ntest.double = double:2.5\n",
-                                    "\ntest.int = int:1\n",
-                                    "\ntest.string = QString:foobar\n",
-                                    "\ntest.truth = bool:true\n"]
-                client2_expected = ["\ntest.double = double:2.5\n",
-                                    "\ntest.int = int:1\n"]
-                client3_expected = ["\ntest.int = int:1\n",
-                                    "\ntest.string = QString:foobar\n",
-                                    "\ntest.truth = bool:true\n"]
-                client4_expected = ["\ntest.double = double:2.5\n",
-                                    "\ntest.int = int:1\n",
-                                    "\ntest.string = QString:foobar\n"]
+                client1_expected = ["^test.double = double:2.5$",
+                                    "^test.int = int:1$",
+                                    "^test.string = QString:foobar$",
+                                    "^test.truth = bool:true$"]
+                client2_expected = ["^test.double = double:2.5$",
+                                    "^test.int = int:1$"]
+                client3_expected = ["^test.int = int:1$",
+                                    "^test.string = QString:foobar$",
+                                    "^test.truth = bool:true$"]
+                client4_expected = ["^test.double = double:2.5$",
+                                    "^test.int = int:1$",
+                                    "^test.string = QString:foobar$"]
 
-                self.assert_(self.context_client1.expectAll(CLTool.STDOUT, client1_expected, 1), "Actual key values pairs do not match expected")
-                self.assert_(self.context_client2.expectAll(CLTool.STDOUT, client2_expected, 1), "Actual key values pairs do not match expected")
-                self.assert_(self.context_client3.expectAll(CLTool.STDOUT, client3_expected, 1), "Actual key values pairs do not match expected")
-                self.assert_(self.context_client4.expectAll(CLTool.STDOUT, client4_expected, 1), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client1.expect(client1_expected), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client2.expect(client2_expected), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client3.expect(client3_expected), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client4.expect(client4_expected), "Actual key values pairs do not match expected")
 
                 self.flexiprovider.send("test.double = -5.3")
-                client1_expected = "\ntest.double = double:-5.3\n"
-                client2_expected = "\ntest.double = double:-5.3\n"
-                client4_expected = "\ntest.double = double:-5.3\n"
+                client1_expected = "^test.double = double:-5.3$"
+                client2_expected = "^test.double = double:-5.3$"
+                client4_expected = "^test.double = double:-5.3$"
 
-                self.assert_(self.context_client1.expect(CLTool.STDOUT, client1_expected, 1), "Actual key values pairs do not match expected")
-                self.assert_(self.context_client2.expect(CLTool.STDOUT, client2_expected, 1), "Actual key values pairs do not match expected")
-                self.assert_(self.context_client4.expect(CLTool.STDOUT, client4_expected, 1), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client1.expect(client1_expected), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client2.expect(client2_expected), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client4.expect(client4_expected), "Actual key values pairs do not match expected")
 
                 self.context_client3.send("type test.truth")
 
-                client3_expected = "\ntype: TRUTH\n"
+                client3_expected = "^type: TRUTH$"
 
-                self.assert_(self.context_client3.expect(CLTool.STDOUT, client3_expected, 1), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client3.expect(client3_expected), "Actual key values pairs do not match expected")
 
                 self.flexiprovider.send("unset test.truth")
-                client1_expected = "\ntest.truth is Unknown\n"
-                client3_expected = "\ntest.truth is Unknown\n"
+                client1_expected = "^test.truth is Unknown$"
+                client3_expected = "^test.truth is Unknown$"
 
-                self.assert_(self.context_client1.expect(CLTool.STDOUT, client1_expected, 1), "Actual key values pairs do not match expected")
-                self.assert_(self.context_client3.expect(CLTool.STDOUT, client3_expected, 1), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client1.expect(client1_expected), "Actual key values pairs do not match expected")
+                self.assert_(self.context_client3.expect(client3_expected), "Actual key values pairs do not match expected")
 
 class MultipleProviders(unittest.TestCase):
         def tearDown(self):
@@ -532,32 +475,28 @@ class MultipleProviders(unittest.TestCase):
         def testTwoProviders(self):
                 provider1 = CLTool("context-provide", "--v2","com.nokia.test",
                                    "truth","test.truth","True")
-                provider1.expect(CLTool.STDOUT, "Setting key: test.truth", 10) # wait for it
+                provider1.expect("Setting key: test.truth") # wait for it
                 provider1.send("dump context-provide1.context")
-                provider1.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                provider1.expect("Wrote") # wait for it
 
                 provider2 = CLTool("context-provide", "--v2","com.nokia.test2",
                                    "int","test.int","24")
-                provider2.expect(CLTool.STDOUT, "Setting key: test.int", 10) # wait for it
+                provider2.expect("Setting key: test.int") # wait for it
                 provider2.send("dump context-provide2.context")
-                provider2.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                provider2.expect("Wrote") # wait for it
 
                 listen = CLTool("context-listen","test.int","test.truth")
-                listen.expect(CLTool.STDERR, "Available commands", 10) # wait for it
+                listen.expect("Available commands") # wait for it
 
                 provider2.send("test.int = -68")
 
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntest.int = int:-68\n",
-                                      1))
+                        listen.expect("^test.int = int:-68$"))
 
                 provider1.send("test.truth = False")
 
                 self.assert_(
-                        listen.expect(CLTool.STDOUT,
-                                      "\ntest.truth = bool:false\n",
-                                      1))
+                        listen.expect("^test.truth = bool:false$"))
                 provider1.close()
                 provider2.close()
                 listen.close()
@@ -594,42 +533,30 @@ class SubscriptionPause (unittest.TestCase):
 
                 self.provider = CLTool("context-provide", "--v2","com.nokia.test",
                                        "int","test.int","1")
-                self.provider.expect(CLTool.STDOUT, "Setting key: test.int", 10) # wait for it
+                self.provider.expect("Setting key: test.int") # wait for it
                 self.provider.send("dump")
-                self.provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                self.provider.expect("Wrote") # wait for it
                 self.listen = CLTool("context-listen","test.int")
-                self.listen.expect(CLTool.STDERR, "Available commands", 10) # wait for it
 
                 self.assert_(
-                        self.listen.expect(CLTool.STDOUT,
-                                           "\ntest.int = int:1\n",
-                                           1))
+                        self.listen.expect("^test.int = int:1$"))
 
                 self.provider.send("test.int = -5")
                 self.assert_(
-                        self.listen.expect(CLTool.STDOUT,
-                                           "\ntest.int = int:-5\n",
-                                           1))
+                        self.listen.expect("^test.int = int:-5$"))
 
                 self.listen.send("unsubscribe test.int")
                 self.provider.send("test.int = 3")
                 self.assertFalse(
-                        self.listen.expect(CLTool.STDOUT,
-                                           "\ntest.int = int:3\n",
-                                           1,
-                                           False))
+                        self.listen.expect("^test.int = int:3$", wantdump = False))
 
                 self.listen.send("subscribe test.int")
                 self.assert_(
-                        self.listen.expect(CLTool.STDOUT,
-                                           "\ntest.int = int:3\n",
-                                           1))
+                        self.listen.expect("^test.int = int:3$"))
 
                 self.provider.send("test.int = 6")
                 self.assert_(
-                        self.listen.expect(CLTool.STDOUT,
-                                           "\ntest.int = int:6\n",
-                                           1))
+                        self.listen.expect("^test.int = int:6$"))
 
         def testWaitForSubscribe(self):
                 """
@@ -654,26 +581,23 @@ class SubscriptionPause (unittest.TestCase):
                 """
                 self.provider = CLTool("context-provide", "--v2","com.nokia.test",
                                        "int","test.int","1")
-                self.provider.expect(CLTool.STDOUT, "Setting key: test.int", 10) # wait for it
+                self.provider.expect("Setting key: test.int") # wait for it
                 self.provider.send("dump")
-                self.provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+                self.provider.expect("Wrote") # wait for it
                 self.provider.send("sleep 3")
-                self.provider.expect(CLTool.STDOUT, "Sleep", 10) # wait for it
+                self.provider.expect("Sleep") # wait for it
                 self.listen = CLTool("context-listen")
                 self.listen.send("new test.int")
                 self.listen.send("waitforsubscription test.int")
 
-                expected = ["\ntest.int = int:1\n",
-                            "\nwait finished for test.int\n"]
+                expected = ["^test.int = int:1$",
+                            "^wait finished for test.int$"]
 
                 # I don't get it quickly
                 self.assertFalse(
-                        self.listen.expectAll(CLTool.STDOUT,
-                                              expected,
-                                              1,
-                                              False))
+                        self.listen.expect(expected, wantdump=False, timeout=1))
                 # but get it after a while
-                self.assert_(self.listen.expectAll(CLTool.STDOUT, expected, 5))
+                self.assert_(self.listen.expect(expected))
 
 class SubscriptionWaitError (unittest.TestCase):
         def testWaitForSubscribeFail(self):
@@ -694,9 +618,7 @@ class SubscriptionWaitError (unittest.TestCase):
                 context_client.send("n test.nonexistent")
                 context_client.send("w test.nonexistent")
 
-                self.assert_(context_client.expect(CLTool.STDOUT,
-                                                   "wait finished for test.nonexistent",
-                                                   3),
+                self.assert_(context_client.expect("wait finished for test.nonexistent"),
                              "Wait for subscription is probably in a dead state")
                 context_client.close()
 

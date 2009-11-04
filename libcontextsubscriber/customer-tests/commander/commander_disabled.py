@@ -30,7 +30,7 @@
 import sys
 import os
 import unittest
-from ContextKit.cltool import CLTool
+from ContextKit.cltool2 import CLTool, wanted
 
 class CommanderDisabled(unittest.TestCase):
     def tearDown(self):
@@ -39,17 +39,14 @@ class CommanderDisabled(unittest.TestCase):
     def testCommanderFunctionality(self):
         provider = CLTool("context-provide", "--v2", "contextkit.test", "int", "test.int", "42")
         provider.send("dump")
-        provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+        provider.expect("Wrote") # wait for it
         commander = CLTool("context-provide", "--v2")
         commander.send("add int test.int 4242")
         commander.send("start")
-        commander.expect(CLTool.STDOUT, "Added", 10) # wait for it
+        commander.expect("Added") # wait for it
         os.environ["CONTEXT_CLI_IGNORE_COMMANDER"] = ""
         listen = CLTool("context-listen", "test.int")
-        listen.expect(CLTool.STDERR, "Available commands", 10) # wait for it
-        self.assert_(listen.expect(CLTool.STDOUT,
-                                   CLTool.wanted("test.int", "int", "42"),
-                                   3),
+        self.assert_(listen.expect(wanted("test.int", "int", "42")),
                      "Provider provided value is wrong")
 
 def runTests():

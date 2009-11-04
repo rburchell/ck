@@ -31,7 +31,7 @@ import sys
 import os
 import time
 import unittest
-from ContextKit.cltool import CLTool
+from ContextKit.cltool2 import CLTool, wanted
 
 class Asynchronous(unittest.TestCase):
     def testAsynchronicity(self):
@@ -60,32 +60,28 @@ class Asynchronous(unittest.TestCase):
         # start the client
         provider_slow = CLTool("context-provide", "--v2", "com.nokia.slow",
                                "int","test.slow","42")
-        provider_slow.expect(CLTool.STDOUT, "Setting key", 10) # wait for it
+        provider_slow.expect("Setting key") # wait for it
         provider_fast = CLTool("context-provide", "--v2", "com.nokia.fast",
                                "int","test.fast","44")
-        provider_fast.expect(CLTool.STDOUT, "Setting key", 10) # wait for it
+        provider_fast.expect("Setting key") # wait for it
         context_client = CLTool("context-listen")
-        context_client.expect(CLTool.STDERR, "Available commands", 10) # wait for it
+        context_client.expect("Available commands") # wait for it
 
         provider_slow.comment("provider_slow sleep time started at" + str(time.time()))
 
         provider_slow.send("sleep 3")
-        provider_slow.expect(CLTool.STDOUT, "Sleeping", 3) # wait for it
+        provider_slow.expect("Sleeping") # wait for it
 
         context_client.send("n test.slow ; n test.fast")
 
         # check the fast property
-        self.assert_(context_client.expect(CLTool.STDOUT,
-                                           CLTool.wanted("test.fast", "int", "44"),
-                                           3), # timeout == 3 seconds
+        self.assert_(context_client.expect(wanted("test.fast", "int", "44")), # timeout == 3 seconds
                      "Bad value for the fast property, wanted 44")
         fast_time = time.time()
         context_client.comment("Fast property arrived with good value at: " + str(fast_time))
 
         # check the slow property
-        self.assert_(context_client.expect(CLTool.STDOUT,
-                                           CLTool.wanted("test.slow", "int", "42"),
-                                           10), # timeout == 10 seconds max, but 5 is enough usually
+        self.assert_(context_client.expect(wanted("test.slow", "int", "42")), # timeout == 10 seconds max, but 5 is enough usually
                      "Bad value for the slow property, wanted 42")
         slow_time = time.time()
         context_client.comment("Slow property arrived with good value at: " + str(slow_time))
@@ -97,9 +93,9 @@ class Asynchronous(unittest.TestCase):
                          "The arrival time of the fast and slow property is not far enough from each other")
 
         # context_client.printio()
-
-        provider_slow.kill()
-        provider_fast.kill()
+        context_client.close()
+        provider_slow.close()
+        provider_fast.close()
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(Asynchronous)

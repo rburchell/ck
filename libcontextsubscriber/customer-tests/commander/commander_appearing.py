@@ -35,7 +35,7 @@
 import sys
 import os
 import unittest
-from ContextKit.cltool import CLTool
+from ContextKit.cltool2 import CLTool, wanted, wantedUnknown
 
 class CommanderAppearing(unittest.TestCase):
     def tearDown(self):
@@ -44,43 +44,33 @@ class CommanderAppearing(unittest.TestCase):
     def testCommanderFunctionality(self):
         provider = CLTool("context-provide", "--v2", "com.nokia.test", "int", "test.int", "42")
         provider.send("dump")
-        provider.expect(CLTool.STDOUT, "Wrote", 10) # wait for it
+        provider.expect("Wrote") # wait for it
 
         listen = CLTool("context-listen", "test.int")
 
-        self.assert_(listen.expect(CLTool.STDOUT,
-                                           CLTool.wanted("test.int", "int", "42"),
-                                           10),
+        self.assert_(listen.expect(wanted("test.int", "int", "42")),
                      "Bad value initially from the real provider, wanted 42")
 
         commander =  CLTool("context-provide", "--v2")
         commander.send("add int test.int 4242")
         commander.send("start")
-        commander.expect(CLTool.STDOUT, "Added", 10) # wait for it
+        commander.expect("Added") # wait for it
 
-        self.assert_(listen.expect(CLTool.STDOUT,
-                                           CLTool.wanted("test.int", "int", "4242"),
-                                           1),
+        self.assert_(listen.expect(wanted("test.int", "int", "4242")),
                      "Value after commander has been started is wrong, wanted 4242")
 
         commander.send("unset test.int")
         listen.comment("commander commanded test.int to unknown")
-        self.assert_(listen.expect(CLTool.STDOUT,
-                                           CLTool.wantedUnknown("test.int"),
-                                           1),
+        self.assert_(listen.expect(wantedUnknown("test.int")),
                      "Value after commander has changed it to unknown is wrong")
 
         commander.send("test.int = 1235")
-        self.assert_(listen.expect(CLTool.STDOUT,
-                                           CLTool.wanted("test.int", "int", "1235"),
-                                           1),
+        self.assert_(listen.expect(wanted("test.int", "int", "1235")),
                      "Value after commander has changed it is wrong, wanted 1235")
 
-        commander.kill()
+        commander.close()
         listen.comment("Commander killed")
-        self.assert_(listen.expect(CLTool.STDOUT,
-                                           CLTool.wanted("test.int", "int", "42"),
-                                           1),
+        self.assert_(listen.expect(wanted("test.int", "int", "42")),
                      "Value after killing the commander is wrong, wanted 42")
 
 def runTests():
