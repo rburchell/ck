@@ -184,15 +184,16 @@ QString NanoTree::stringValue() const
     return QString();
 }
 
-/// Add a string value to the current NanoTree. A value is a lose (non-list) QVariant
-/// attached to the tree root. (\a dom).
-NanoTree NanoTree::addStringValue(QString value) const
+NanoTree NanoTree::addKeyValue(QString key, QVariant v) const
 {
     if (type() != QVariant::List)
         return *this;
 
     QVariantList lst = toList();
-    lst << QVariant(value);
+    QVariantList keyNodeList;
+    keyNodeList << QVariant(key);
+    keyNodeList << v;
+    lst << QVariant(keyNodeList);
     return NanoTree(QVariant(lst));
 }
 
