@@ -33,6 +33,8 @@ class ContextTypeRegistryInfo : public QObject
     Q_OBJECT
 
 public:
+    ContextTypeRegistryInfo();
+
     static ContextTypeRegistryInfo* instance();
 
     ContextTypeInfo typeInfoForName(QString name);
@@ -45,9 +47,6 @@ public:
     ContextTypeInfo doubleType();
 
 private:
-    ContextTypeRegistryInfo(); ///< Private constructor. Do not use.
-    ContextTypeRegistryInfo(const ContextTypeRegistryInfo&); ///< Private constructor. Do not use.
-    ContextTypeRegistryInfo& operator=(const ContextTypeRegistryInfo&); ///< Private operator. Do not use.
 
     static ContextTypeRegistryInfo* registryInstance;
 };
