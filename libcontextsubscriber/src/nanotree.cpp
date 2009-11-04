@@ -164,24 +164,15 @@ QStringList NanoTree::keys() const
     return lst;
 }
 
-/// Returns the value of the current tree root as string. The value is a collected
-/// non-list node that represents the value of the current key.
-QString NanoTree::stringValue() const
+NanoTree NanoTree::keyValue() const
 {
     if (type() != QVariant::List)
-        return QString();
+        return NanoTree();
 
     if (toList().size() < 2)
-        return QString();
+        return NanoTree();
 
-    QVariantList lst = toList();
-    lst.removeFirst();
-    foreach(QVariant v, lst) {
-       if (v.type() != QVariant::List)
-           return v.toString();
-    }
-
-    return QString();
+    return NanoTree(toList().at(1));
 }
 
 NanoTree NanoTree::addKeyValue(QString key, QVariant v) const

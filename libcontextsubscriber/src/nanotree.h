@@ -43,7 +43,7 @@ public:
                       const QString &key4) const;
     NanoTree keyValue(const QString &key1, const QString &key2, const QString &key3,
                       const QString &key4, const QString &key5) const;
-    QString stringValue() const;
+    NanoTree keyValue() const;
     QVariantList keyValues(const QString &key) const;
     NanoTree addKeyValue(QString key, QVariant v) const;
     QStringList keys() const;
