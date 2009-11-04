@@ -34,6 +34,7 @@ class ContextTypeInfo : public QObject
 public:
     ContextTypeInfo(QString name);
     ContextTypeInfo(NanoTree tree);
+    ContextTypeInfo(QVariant tree);
     ContextTypeInfo();
     ContextTypeInfo(const ContextTypeInfo& info);
     ContextTypeInfo operator=(const ContextTypeInfo& info);

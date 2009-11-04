@@ -37,6 +37,10 @@ ContextTypeInfo::ContextTypeInfo(NanoTree t) : tree(t)
 {
 }
 
+ContextTypeInfo::ContextTypeInfo(QVariant t) : tree(NanoTree(t))
+{
+}
+
 ContextTypeInfo::ContextTypeInfo()
 {
 }
