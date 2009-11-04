@@ -101,31 +101,31 @@ NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
 /// Returns in instance of the int64 type info.
 ContextTypeInfo ContextTypeRegistryInfo::int64Type()
 {
-    return typeInfoForName("int64");
+    return typeDefinitionForName("int64");
 }
 
 /// Returns in instance of the string type info.
 ContextTypeInfo ContextTypeRegistryInfo::stringType()
 {
-    return typeInfoForName("string");
+    return typeDefinitionForName("string");
 }
 
 /// Returns in instance of the double type info.
 ContextTypeInfo ContextTypeRegistryInfo::doubleType()
 {
-    return typeInfoForName("double");
+    return typeDefinitionForName("double");
 }
 
 /// Returns in instance of the bool type info.
 ContextTypeInfo ContextTypeRegistryInfo::boolType()
 {
-    return typeInfoForName("bool");
+    return typeDefinitionForName("bool");
 }
 
 /// Returns in instance of the int32 type info.
 ContextTypeInfo ContextTypeRegistryInfo::int32Type()
 {
-    return typeInfoForName("int32");
+    return typeDefinitionForName("int32");
 }
 
 /* Private */

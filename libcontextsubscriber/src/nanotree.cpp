@@ -57,7 +57,7 @@ QString NanoTree::keyName() const
     if (toList().size() == 0)
         return QString();
 
-    return NanoTree(toList().at(0).toString());
+    return toList().at(0).toString();
 }
 
 /// Returns the list of QVariants matching the \a key in a given tree. A QVariant

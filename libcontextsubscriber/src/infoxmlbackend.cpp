@@ -269,12 +269,13 @@ void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerT
 
     if (typeDescriptionTree.type() == QVariant::String || typeDescriptionTree.type() == QVariant::Invalid)
         // Basic string description
-        typeInfo = ContextTypeRegistryInfo::instance()->typeInfoForName(typeDescriptionTree.toString());
+        typeInfo = ContextTypeInfo(typeDescriptionTree.toString());
     else {
         // Complex description
-        typeInfo = ContextTypeRegistryInfo::instance()->typeInfoForName(typeDescriptionTree.keyName().toString());
+        typeInfo = ContextTypeInfo(typeDescriptionTree.keyName());
+
         foreach(QString k, typeDescriptionTree.keys()) {
-            QString pVal = typeDescriptionTree.keyValue(k).toString();
+            QVariant pVal = typeDescriptionTree.keyValue(k);
             typeInfo.setParameterValue(k, pVal);
         }
     }
