@@ -211,8 +211,12 @@ void InfoXmlBackend::regenerateKeyDataList()
     if (watchedFiles.size() > 0)
         watcher.removePaths(watchedFiles);
 
-    contextDebug() << F_XML << "Reading core declarations from:" << InfoXmlBackend::coreDeclPath();
-    readKeyDataFromXml (InfoXmlBackend::coreDeclPath());
+    if (QFile(InfoXmlBackend::coreDeclPath()).exists()) {
+        contextDebug() << F_XML << "Reading core declarations from:" << InfoXmlBackend::coreDeclPath();
+        readKeyDataFromXml (InfoXmlBackend::coreDeclPath());
+    } else {
+        contextDebug() << F_XML << "Core declarations file" << InfoXmlBackend::coreDeclPath() << "does not exist.";
+    }
 
     contextDebug() << F_XML << "Re-reading xml contents from" << InfoXmlBackend::registryPath();
 
