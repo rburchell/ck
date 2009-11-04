@@ -25,12 +25,49 @@
 
 /* Public */
 
-ContextTypeInfo::ContextTypeInfo(QString n) : typeName(n)
+ContextTypeInfo::ContextTypeInfo(QString n) : typeName(n), typeInfo()
 {
 }
 
-QString ContextTypeInfo::name()
+QString ContextTypeInfo::name() const
 {
     return typeName;
+}
+
+NanoTree ContextTypeInfo::definition() const
+{
+    return ContextTypeRegistryInfo::instance()->typeDefinitionForName(name);
+}
+
+QString ContextTypeInfo::parameterDoc(QString p) const
+{
+    return definition().valueForKey("params", p, "doc");
+}
+
+QVariant parameterValue(QString p) const
+{
+    typeInfo.keyValue(p);
+}
+
+void ContextTypeInfo::setParameterValue(QString p, QVatiant v)
+{
+    typeInfo = typeInfo.addKeyValue(p, v);
+}
+
+QString ContextTypeInfo::doc() const
+{
+    return definition().valueForKey("doc");
+}
+
+ContextTypeInfo ContextTypeInfo::base() const
+{
+    QString baseName = definition().keyValue("base");
+    return ContextTypeInfo(baseName);
+}
+
+QVariantList ContextTypeInfo::parameters() const
+{
+    // FIXME What the hell here?
+    return QVariantList();
 }
 

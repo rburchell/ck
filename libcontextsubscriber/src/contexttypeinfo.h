@@ -33,10 +33,19 @@ class ContextTypeInfo : public QObject
 
 public:
     ContextTypeInfo(QString name);
-    QString name();
+
+    QString name() const;
+    QVariantList parameters() const;
+    NanoTree definition() const;
+    QString parameterDoc(QString p) const;
+    QVariant parameterValue(QString p) const;
+    void setParameterValue(QString p, QString value);
+    QString doc() const;
+    ContextTypeInfo base() const;
 
 private:
     QString typeName;
+    NanoTree typeInfo;
 };
 
 #endif
