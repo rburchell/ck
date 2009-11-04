@@ -37,6 +37,13 @@ ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo& info) : tree(info.tree)
 {
 }
 
+/// Assigment operator.
+ContextTypeInfo ContextTypeInfo::operator=(const ContextTypeInfo& info)
+{
+    tree = NanoTree(info.tree);
+    return *this;
+}
+
 QString ContextTypeInfo::name() const
 {
     return tree.keyName();

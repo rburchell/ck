@@ -35,6 +35,7 @@ public:
     ContextTypeInfo(NanoTree tree);
     ContextTypeInfo();
     ContextTypeInfo(const ContextTypeInfo& info);
+    ContextTypeInfo operator=(const ContextTypeInfo& info);
 
     QString name() const;
     QVariantList parameters() const;
@@ -44,6 +45,8 @@ public:
     void setParameterValue(QString p, QVariant value);
     QString doc() const;
     ContextTypeInfo base() const;
+    operator QVariant() { return tree; }
+    operator NanoTree() { return tree; }
 
 private:
     NanoTree tree;
