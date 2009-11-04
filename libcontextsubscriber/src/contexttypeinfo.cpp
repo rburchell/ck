@@ -25,6 +25,14 @@
 
 /* Public */
 
+ContextTypeInfo::ContextTypeInfo(QString name)
+{
+    QVariantList lst;
+    lst << QVariant(name);
+
+    tree = NanoTree(lst);
+}
+
 ContextTypeInfo::ContextTypeInfo(NanoTree t) : tree(t)
 {
 }
@@ -76,12 +84,7 @@ QString ContextTypeInfo::doc() const
 
 ContextTypeInfo ContextTypeInfo::base() const
 {
-    QString baseName = definition().keyValue("base").toString();
-
-    QVariantList lst;
-    lst << QVariant(baseName);
-
-    return ContextTypeInfo(NanoTree(lst));
+    return ContextTypeInfo(definition().keyValue("base").toString());
 }
 
 QVariantList ContextTypeInfo::parameters() const
