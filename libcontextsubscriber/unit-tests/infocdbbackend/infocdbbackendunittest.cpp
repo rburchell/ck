@@ -26,6 +26,110 @@
 #include "cdbwriter.h"
 #include "contexttyperegistryinfo.h"
 
+ContextTypeRegistryInfo* ContextTypeRegistryInfo::registryInstance = new ContextTypeRegistryInfo();
+
+/* Mocked ContextTypeRegistryInfo */
+
+ContextTypeRegistryInfo::ContextTypeRegistryInfo()
+{
+}
+
+ContextTypeInfo ContextTypeRegistryInfo::primitiveType(QString nameStr, QString docStr)
+{
+    QVariantList tree;
+    QVariantList name;
+    QVariantList doc;
+
+    name << QVariant("name");
+    name << QVariant(nameStr);
+    doc << QVariant("doc");
+    doc << QVariant(docStr);
+
+    tree << QVariant("type");
+    tree << QVariant(name);
+    tree << QVariant(doc);
+
+    return ContextTypeInfo(NanoTree(tree));
+}
+
+
+ContextTypeInfo ContextTypeRegistryInfo::boolType()
+{
+    return primitiveType("bool", "A boolean value.");
+}
+
+ContextTypeInfo ContextTypeRegistryInfo::int32Type()
+{
+    return primitiveType("int32", "An integer 32-bit value.");
+}
+
+ContextTypeInfo ContextTypeRegistryInfo::int64Type()
+{
+    return primitiveType("int64", "An integer 64-bit value.");
+}
+
+ContextTypeInfo ContextTypeRegistryInfo::stringType()
+{
+    return primitiveType("string", "A string value.");
+}
+
+ContextTypeInfo ContextTypeRegistryInfo::doubleType()
+{
+    QVariantList name;
+    QVariantList doc;
+    QVariantList tree;
+    QVariantList params;
+    QVariantList minParam;
+    QVariantList minParamDoc;
+    QVariantList maxParam;
+    QVariantList maxParamDoc;
+
+    name << QVariant("name");
+    name << QVariant("double");
+    doc << QVariant("doc");
+    doc << QVariant("A double value within the given limits.");
+    params << QVariant("params");
+    minParam << QVariant("min");
+    minParamDoc << QVariant("doc");
+    minParamDoc << QVariant("Minimum value.");
+    minParam << QVariant(minParamDoc);
+    params << QVariant(minParam);
+
+    maxParam << QVariant("max");
+    maxParamDoc << QVariant("doc");
+    maxParamDoc << QVariant("Maximum value.");
+    maxParam << QVariant(maxParamDoc);
+    params << QVariant(maxParam);
+
+    tree << QVariant("type");
+    tree << QVariant(name);
+    tree << QVariant(doc);
+    tree << QVariant(params);
+
+    return ContextTypeInfo(NanoTree(tree));
+}
+
+ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
+{
+    return registryInstance;
+}
+
+ContextTypeInfo ContextTypeRegistryInfo::typeInfoForName(QString name)
+{
+    if (name == "TRUTH" || name == "bool")
+        return boolType();
+    else if (name == "STRING" || name == "string")
+        return stringType();
+    else if (name == "INT" || name == "INTEGER" || name == "int32")
+        return int32Type();
+    else if (name == "INTEGER")
+        return int32Type();
+    else if (name == "DOUBLE" || name == "double")
+        return doubleType();
+    else
+        return ContextTypeInfo();
+}
+
 class InfoCdbBackendUnitTest : public QObject
 {
     Q_OBJECT

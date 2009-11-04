@@ -1,7 +1,7 @@
 check_PROGRAMS = infocdbbackendunittest
 
 # your test's sources
-infocdbbackendunittest_SOURCES = infocdbbackendunittest.cpp
+infocdbbackendunittest_SOURCES = infocdbbackendunittest.cpp contexttyperegistryinfo.h
 
 COVERAGE_FILES = infocdbbackend.cpp
 EXTRA_DIST = 
@@ -31,9 +31,7 @@ FROM_SOURCE = 							\
 	nanotree.h						\
 	nanotree.cpp						\
 	contexttypeinfo.h					\
-	contexttypeinfo.cpp					\
-	contexttyperegistryinfo.cpp				\
-	contexttyperegistryinfo.h
+	contexttypeinfo.cpp
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
