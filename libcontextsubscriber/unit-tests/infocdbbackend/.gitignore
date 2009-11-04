@@ -24,3 +24,5 @@ contexttypeinfo.h
 contexttypeinfo.cpp
 nanotree.h
 nanotree.cpp
+contexttyperegistryinfo.cpp
+contexttyperegistryinfo.h

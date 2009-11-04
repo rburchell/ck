@@ -10,7 +10,10 @@ EXTRA_DIST =
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtDBus_CFLAGS) -I$(srcdir)/../util/ \
               '-DDEFAULT_CONTEXT_PROVIDERS="@datadir@/contextkit/providers/"' \
-              '-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"'
+              '-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"' \
+              '-DDEFAULT_CONTEXT_TYPES="@datadir@/contextkit/types/"' \
+              '-DDEFAULT_CONTEXT_CORE_TYPES="@datadir@/contextkit/core.types"'
+
 AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = 							\
 	infobackend.cpp infoxmlbackend.cpp			\
@@ -28,7 +31,9 @@ FROM_SOURCE = 							\
 	nanotree.h						\
 	nanotree.cpp						\
 	contexttypeinfo.h					\
-	contexttypeinfo.cpp
+	contexttypeinfo.cpp					\
+	contexttyperegistryinfo.cpp				\
+	contexttyperegistryinfo.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =

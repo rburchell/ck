@@ -24,11 +24,13 @@
 #include "fileutils.h"
 #include "infocdbbackend.h"
 #include "cdbwriter.h"
+#include "contexttyperegistryinfo.h"
 
 class InfoCdbBackendUnitTest : public QObject
 {
     Q_OBJECT
     InfoCdbBackend *backend;
+    ContextTypeRegistryInfo *typeRegistry;
 
 private:
     void createBaseDatabase(QString path);
@@ -58,8 +60,8 @@ void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Internet.BytesOut");
-    writer.add("Battery.Charging:KEYTYPEINFO", ContextTypeInfo::boolType().tree());
-    writer.add("Internet.BytesOut:KEYTYPEINFO", ContextTypeInfo::int64Type().tree());
+    writer.add("Battery.Charging:KEYTYPEINFO", typeRegistry->boolType().tree());
+    writer.add("Internet.BytesOut:KEYTYPEINFO", typeRegistry->int64Type().tree());
     writer.add("Battery.Charging:KEYDOC", "doc1");
 
     QVariantList providers1;
@@ -88,9 +90,9 @@ void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Battery.Capacity");
-    writer.add("Battery.Charging:KEYTYPEINFO", ContextTypeInfo::int64Type().tree());
+    writer.add("Battery.Charging:KEYTYPEINFO", typeRegistry->int64Type().tree());
     writer.add("Battery.Charging:KEYDOC", "doc1");
-    writer.add("Battery.Capacity:KEYTYPEINFO", ContextTypeInfo::int64Type().tree());
+    writer.add("Battery.Capacity:KEYTYPEINFO", typeRegistry->int64Type().tree());
     writer.add("Battery.Capacity:KEYDOC", "doc3");
 
     QVariantList providers1;
@@ -121,6 +123,7 @@ void InfoCdbBackendUnitTest::initTestCase()
     utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoCdbBackend();
+    typeRegistry = ContextTypeRegistryInfo::instance();
 }
 
 void InfoCdbBackendUnitTest::name()
