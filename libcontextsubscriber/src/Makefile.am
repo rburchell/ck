@@ -14,7 +14,6 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	iproviderplugin.h contextproviderinfo.h nanoxml.h nanoxml.cpp	\
 	asyncdbusinterface.cpp timedvalue.h nanotree.h nanotree.cpp	\
 	contexttypeinfo.cpp contexttypeinfo.h				\
-	contexttypedefinitioninfo.cpp contexttypedefinitioninfo.h	\
 	contexttyperegistryinfo.cpp contexttyperegistryinfo.h
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
