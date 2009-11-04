@@ -29,6 +29,14 @@ ContextTypeInfo::ContextTypeInfo(QString n) : typeName(n), typeInfo()
 {
 }
 
+ContextTypeInfo::ContextTypeInfo() : typeName(""), typeInfo()
+{
+}
+
+ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo& info) : typeName(info.typeName), typeInfo(info.typeInfo)
+{
+}
+
 QString ContextTypeInfo::name() const
 {
     return typeName;
@@ -36,32 +44,32 @@ QString ContextTypeInfo::name() const
 
 NanoTree ContextTypeInfo::definition() const
 {
-    return ContextTypeRegistryInfo::instance()->typeDefinitionForName(name);
+    return ContextTypeRegistryInfo::instance()->typeDefinitionForName(typeName);
 }
 
 QString ContextTypeInfo::parameterDoc(QString p) const
 {
-    return definition().valueForKey("params", p, "doc");
+    return definition().keyValue("params", p, "doc").toString();
 }
 
-QVariant parameterValue(QString p) const
+QVariant ContextTypeInfo::parameterValue(QString p) const
 {
-    typeInfo.keyValue(p);
+    return typeInfo.keyValue(p);
 }
 
-void ContextTypeInfo::setParameterValue(QString p, QVatiant v)
+void ContextTypeInfo::setParameterValue(QString p, QVariant v)
 {
     typeInfo = typeInfo.addKeyValue(p, v);
 }
 
 QString ContextTypeInfo::doc() const
 {
-    return definition().valueForKey("doc");
+    return definition().keyValue("doc").toString();
 }
 
 ContextTypeInfo ContextTypeInfo::base() const
 {
-    QString baseName = definition().keyValue("base");
+    QString baseName = definition().keyValue("base").toString();
     return ContextTypeInfo(baseName);
 }
 
