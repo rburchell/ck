@@ -100,10 +100,7 @@ private slots:
     void definition();
     void parameterDoc();
     void ensureNewTypes();
-    void parseDoubleType();
-    void parseCustomDoubleType();
-    void parseUniformList();
-    void parseMap();
+    void parameterValue();
 };
 
 void ContextTypeInfoUnitTest::name()
@@ -152,74 +149,20 @@ void ContextTypeInfoUnitTest::ensureNewTypes()
     QCOMPARE(ContextTypeInfo(QString("bool")).ensureNewTypes().name(), QString("bool"));
 }
 
-
-void ContextTypeInfoUnitTest::parseDoubleType()
+void ContextTypeInfoUnitTest::parameterValue()
 {
-    /*
-    NanoXml parser(LOCAL_FILE("double.xml"));
-    QCOMPARE(parser.didFail(), false);
+    QVariantList lst;
+    QVariantList minParam;
+    lst << QVariant("complex");
+    minParam << QVariant("min");
+    minParam << QVariant("0");
+    lst << QVariant(minParam);
+    QVariant tree(lst);
 
-    ContextTypeInfo typeInfo(parser.result());
-    QCOMPARE(typeInfo.name(), QString("double"));
-    QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
-    QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
-    QCOMPARE(typeInfo.doc(), QString("A double value within the given limits."));
-    */
-
-    //QStringList params = typeInfo.parameters();
-    //QCOMPARE(params.size(), 2);
-    //QVERIFY(params.contains(QString("min")));
-    //QVERIFY(params.contains(QString("max")));
+    ContextTypeInfo typeInfo(tree);
+    QCOMPARE(typeInfo.parameterValue("min").toString(), QString("0"));
 }
 
-void ContextTypeInfoUnitTest::parseCustomDoubleType()
-{
-    /*
-    NanoXml parser(LOCAL_FILE("custom-double.xml"));
-    QCOMPARE(parser.didFail(), false);
-
-    ContextTypeInfo typeInfo(parser.result());
-    QCOMPARE(typeInfo.name(), QString("custom-double"));
-    QCOMPARE(typeInfo.parameterValue("min"), QString("1"));
-    QCOMPARE(typeInfo.parameterValue("max"), QString("666"));
-    QCOMPARE(typeInfo.parameterDoc("min"), QString("Minimum value"));
-    QCOMPARE(typeInfo.parameterDoc("max"), QString("Maximum value"));
-    QCOMPARE(typeInfo.doc(), QString("A double value that represents the level of hell in you."));
-    */
-}
-
-void ContextTypeInfoUnitTest::parseUniformList()
-{
-    /*
-    NanoXml parser(LOCAL_FILE("uniform-list.xml"));
-    QCOMPARE(parser.didFail(), false);
-
-    ContextUniformListTypeInfo listInfo(parser.result());
-    QCOMPARE(listInfo.base().name(), QString("list"));
-    QCOMPARE(listInfo.name(), QString("uniform-list"));
-    ContextTypeInfo elementTypeInfo = listInfo.elementType();
-    QCOMPARE(elementTypeInfo.name(), QString("double"));
-    */
-}
-
-void ContextTypeInfoUnitTest::parseMap()
-{
-    /*
-    NanoXml parser(LOCAL_FILE("person.xml"));
-    QCOMPARE(parser.didFail(), false);
-
-    ContextMapTypeInfo personInfo(parser.result());
-    QCOMPARE(personInfo.name(), QString("person"));
-    QCOMPARE(personInfo.base().name(), QString("map"));
-    QCOMPARE(personInfo.keyDoc("name"), QString("Name of the person"));
-    QCOMPARE(personInfo.keyDoc("surname"), QString("Surname of the person"));
-    QCOMPARE(personInfo.keyDoc("age"), QString("Age of the person"));
-
-    QCOMPARE(personInfo.keyType("name").name(), QString("string"));
-    QCOMPARE(personInfo.keyType("surname").name(), QString("string"));
-    QCOMPARE(personInfo.keyType("age").name(), QString("int32"));
-    */
-}
 
 #include "contexttypeinfounittest.moc"
 QTEST_MAIN(ContextTypeInfoUnitTest);
