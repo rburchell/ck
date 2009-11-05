@@ -120,11 +120,6 @@ QVariant ContextTypeInfo::parameterValue(QString p) const
     return tree.keyValue(p);
 }
 
-void ContextTypeInfo::setParameterValue(QString p, QVariant v)
-{
-    tree = tree.addKeyValue(p, v);
-}
-
 QString ContextTypeInfo::doc() const
 {
     return definition().keyValue("doc").toString();
