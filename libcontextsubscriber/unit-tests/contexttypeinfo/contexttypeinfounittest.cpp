@@ -101,7 +101,7 @@ private slots:
     void parameterDoc();
     void ensureNewTypes();
     void parameterValue();
-    void parameterSub();
+    void parameterNode();
 };
 
 void ContextTypeInfoUnitTest::name()
@@ -164,7 +164,7 @@ void ContextTypeInfoUnitTest::parameterValue()
     QCOMPARE(typeInfo.parameterValue("min").toString(), QString("0"));
 }
 
-void ContextTypeInfoUnitTest::parameterSub()
+void ContextTypeInfoUnitTest::parameterNode()
 {
     QVariantList lst;
     QVariantList minParam;
@@ -175,7 +175,7 @@ void ContextTypeInfoUnitTest::parameterSub()
     QVariant tree(lst);
 
     ContextTypeInfo typeInfo(tree);
-    QCOMPARE(typeInfo.parameterSub("min").toList().at(0).toString(), QString("0"));
+    QCOMPARE(typeInfo.parameterNode("min").toList().at(1).toString(), QString("0"));
 }
 
 
