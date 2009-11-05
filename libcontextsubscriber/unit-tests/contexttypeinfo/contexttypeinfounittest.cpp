@@ -58,14 +58,29 @@ NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
         QVariantList doc;
         QVariantList base;
         QVariantList name;
+        QVariantList params;
+        QVariantList p1;
+        QVariantList p1Doc;
+
         name << QVariant("name");
         name << QVariant("complex");
+
         doc << QVariant("doc");
         doc << QVariant("complex doc");
+
         base << QVariant("base");
         base << QVariant("double");
+
+        p1 << QVariant("p1");
+        p1Doc << QVariant("doc");
+        p1Doc << QVariant("p1 doc");
+        p1 << QVariant(p1Doc);
+        params << QVariant("params");
+        params << QVariant(p1);
+
         tree << QVariant("type");
         tree << QVariant(name);
+        tree << QVariant(params);
         tree << QVariant(doc);
         tree << QVariant(base);
         return ContextTypeInfo(QVariant(tree));
@@ -83,6 +98,7 @@ private slots:
     void doc();
     void base();
     void definition();
+    void parameterDoc();
     void parseDoubleType();
     void parseCustomDoubleType();
     void parseUniformList();
@@ -116,6 +132,13 @@ void ContextTypeInfoUnitTest::base()
     ContextTypeInfo base = ContextTypeInfo(QString("complex")).base();
     QCOMPARE(base.name(), QString("double"));
     QCOMPARE(base.doc(), QString("double doc"));
+}
+
+void ContextTypeInfoUnitTest::parameterDoc()
+{
+    ContextTypeInfo typeInfo = ContextTypeInfo(QString("complex"));
+    QCOMPARE(typeInfo.parameterDoc("p1"), QString("p1 doc"));
+
 }
 
 void ContextTypeInfoUnitTest::parseDoubleType()
