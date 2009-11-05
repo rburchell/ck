@@ -107,16 +107,7 @@ int main(int argc, char **argv)
     for (int i=2; i < args.count(); i+=3)
         commandWatcher.addCommand(args.mid(i, 3));
 
-    if (args.count() > 2) {
-        qDebug() << "Autostarting the service, since you have had properties on the command line";
-        if (!service.start()) {
-            qDebug() << "Starting service failed";
-            return 2;
-        }
-    } else {
-        qDebug() << "SERVICE NOT STARTED, since you haven't had parameters on the command line";
-        qDebug() << "Use the start command when you are ready to be registered on D-Bus";
-    }
+    commandWatcher.startCommand();
 
     return app.exec();
 }

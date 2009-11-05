@@ -169,7 +169,7 @@ void ContextKitPlugin::onDBusGetSubscriberFinished(QDBusObjectPath objectPath)
 void ContextKitPlugin::onDBusGetSubscriberFailed(QDBusError err)
 {
     contextWarning() <<
-        "Trying new protocol, because were not able to get subscriber object on dbus: " +
+        "Trying new protocol, old failed for: " + busName + ", error: " +
         err.message();
     reset();
     newProtocol = true;

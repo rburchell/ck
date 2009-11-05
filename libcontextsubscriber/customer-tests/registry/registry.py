@@ -37,12 +37,12 @@ class PrintInfoRunning(unittest.TestCase):
                           "double", "test.double", "4.231",
                           "truth", "test.truth", "False")
         provider.send("dump")
-        self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 10)) # wait for it
+        self.assert_(provider.expect("Wrote ./context-provide.context")) # wait for it
         info_client = CLTool("context-ls","test.*")
 
         returnValue = info_client.wait()
         self.assertEqual(returnValue, 0, "context-ls exited with return value != 0")
-        provider.kill()
+        provider.close()
 
 class PrintingProperties(unittest.TestCase):
     def tearDown(self):
@@ -55,20 +55,18 @@ class PrintingProperties(unittest.TestCase):
                           "double", "test.double", "4.231",
                           "truth", "test.truth", "False")
         provider.send("dump")
-        self.assert_(provider.expect(CLTool.STDOUT, "Wrote ./context-provide.context", 10),
+        self.assert_(provider.expect("Wrote ./context-provide.context"),
                      "context-provide.context couldn't been written by context-provide")
         info_client = CLTool("context-ls","-l","-d","test.*")
 
-        expected_results = ["\ntest.int\tINT\tcontextkit-dbus\tsession:com.nokia.test\n",
-                            "\ntest.double\tDOUBLE\tcontextkit-dbus\tsession:com.nokia.test\n",
-                            "\ntest.truth\tTRUTH\tcontextkit-dbus\tsession:com.nokia.test\n",
-                            "\ntest.string\tSTRING\tcontextkit-dbus\tsession:com.nokia.test\n",
-                            "\nDocumentation: A phony but very flexible property.\n"]
-
-        self.assert_(info_client.expectAll(CLTool.STDOUT,
-                                        expected_results,
-                                        10),
+        self.assert_(info_client.expect(["^test.int\tINT\tcontextkit-dbus\tsession:com.nokia.test$",
+                                         "^test.double\tDOUBLE\tcontextkit-dbus\tsession:com.nokia.test$",
+                                         "^test.truth\tTRUTH\tcontextkit-dbus\tsession:com.nokia.test$",
+                                         "^test.string\tSTRING\tcontextkit-dbus\tsession:com.nokia.test$",
+                                         "^Documentation: A phony but very flexible property.$"]),
                      "Bad introspection result from context-ls")
+
+        provider.close()
 
 def runTests():
     suitePrintInfoRunning = unittest.TestLoader().loadTestsFromTestCase(PrintInfoRunning)
