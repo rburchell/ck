@@ -25,6 +25,39 @@
 
 /* Public */
 
+/* The nano tree in a ContextTypeInfo corresponds directly to what has
+   been written in the property declarations.  For example, a property
+   declaration of this form
+
+     <key name="Foo.Bar"
+          type="string"/>
+
+   will yield a ContextTypeInfo with this nano tree:
+
+     "string"
+
+   while this declaration
+
+     <key name="Foo.Bar">
+       <type>
+         <string-enum>
+           <foo/>
+           <bar/>
+         </string-enum>
+       </type>
+     </key>
+
+   yields this nano tree
+
+     [ "string-enum", [ "foo" ], [ "bar" ] ]
+
+   The first element in this list is the name of the type, the rest of
+   the list are the parameters.
+
+   The first form of just "string" is short-hand for [ "string" ],
+   i.e., you can use it when the list of parameters is empty.
+*/
+
 ContextTypeInfo::ContextTypeInfo(QString name)
 {
     QVariantList lst;
@@ -58,7 +91,18 @@ ContextTypeInfo ContextTypeInfo::operator=(const ContextTypeInfo& info)
 
 QString ContextTypeInfo::name() const
 {
-    return tree.keyName();
+    if (tree.type == QVariant::List)
+        return tree.at(0).toString();
+    else
+        return tree.toString();
+}
+
+QVariantList ContextTypeInfo::parameters() const
+{
+    if (tree.type == QVariant::List)
+        return tree.mid(1);
+    else
+        return QVariantList();
 }
 
 NanoTree ContextTypeInfo::definition() const
@@ -73,7 +117,7 @@ QString ContextTypeInfo::parameterDoc(QString p) const
 
 QVariant ContextTypeInfo::parameterValue(QString p) const
 {
-    return tree.keyValue(p);
+    return parameters().keyValue(p);
 }
 
 void ContextTypeInfo::setParameterValue(QString p, QVariant v)
@@ -90,10 +134,3 @@ ContextTypeInfo ContextTypeInfo::base() const
 {
     return ContextTypeInfo(definition().keyValue("base").toString());
 }
-
-QVariantList ContextTypeInfo::parameters() const
-{
-    // FIXME What the hell here?
-    return QVariantList();
-}
-
