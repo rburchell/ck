@@ -2,77 +2,6 @@
 <types>
 
     <!-- Fundamental types -->
-    <type name="int32">
-        <doc>
-            A int32 value.
-        </doc>
-    </type>
-
-    <type name="int64">
-        <doc>
-            A int64 value.
-        </doc>
-    </type>
-
-    <type name="uint32">
-        <doc>
-            A uint32 value within the given limits.
-        </doc>
-    </type>
-
-    <type name="uint64">
-        <params>
-            <min doc="Minimum value"/>
-            <max doc="Maximum value"/>
-        </params>
-        <doc>
-            A uint64 value within the given limits.
-        </doc>
-    </type>
-
-    <type name="double">
-        <params>
-            <min doc="Minimum value"/>
-            <max doc="Maximum value"/>
-        </params>
-        <doc>
-            A double value within the given limits.
-        </doc>
-    </type>
-
-    <type name="string">
-        <params>
-            <must-match doc="Regular expression that must match"/>
-        </params>
-        <doc>
-            A string value that matches the given regular expression.
-        </doc>
-    </type>
-
-    <type name="list">
-        <params>
-            <min doc="Minimum length"/>
-            <max doc="Maximum length"/>
-        </params>
-        <doc>
-            A list of arbitrary values, with the minimum and maximum
-            length given by the "min" and "max" parameters, respectively.
-        </doc>
-    </type>
-
-    <type name="map">
-        <params>
-            <keys doc="Allowed keys"/>
-        </params>
-        <doc>
-            A map.  If given, the "keys" parameter determines which keys are
-            allowed.  The "keys" parameter should be a map itself, from key
-            names to a map with the attributes of the key.  Attributes of a
-            key are "doc" and "type".
-        </doc>
-    </type>
-
-    <!-- Generic types -->
     <type name="value">
         <doc>
             Any representable value.
@@ -80,8 +9,14 @@
     </type>
 
     <type name="number" base="value">
+        <params>
+            <min doc="Lower bound"/>
+            <max doc="Upper bound"/>
+        </params>
         <doc>
-            A number, represented as either a "int32", "uint32", "int64", "uint64", or "double".
+            A number with in the range indicated by the "min" and
+            "max" parameters.  The value is represented as either a
+            "int32", "uint32", "int64", "uint64", or "double".
         </doc>
     </type>
 
@@ -98,17 +33,87 @@
         </doc>
     </type>
 
-    <type name="uniform-list" base="list">
+    <type name="string" base="value">
+        <doc>
+            A string.
+        </doc>
+    </type>
+
+    <type name="list" base="value">
         <params>
-            <min doc="Minimum length"/>
-            <max doc="Maximum length"/>
-            <type doc="Type of the elements"/>
+            <min  doc="Minimum length"/>
+            <max  doc="Maximum length"/>
+            <type doc="Element type"/>
         </params>
         <doc>
-            A list of values of the given type, with the
-            minimum and maximum length given by the "min" and "max" parameters.
-            The type of all elements is given by the "type" parameter.
+            A list with elements of the given type and minimum and
+            maximum length given by the "min" and "max" parameters,
+            respectively.
+
+            When the "type" parameter is omitted, it defaults to
+            "value".
         </doc>
+    </type>
+
+    <type name="map" base="value">
+        <params>
+            <rest doc="The allowed keys"/>
+        </params>
+        <doc>
+            A map.  The parameters specify the allowed keys in the map.
+
+            Each parameter is a association tree that describes one
+            possible key.  The name of the tree is the key itself, and
+            the second level of the tree can have "doc" and "type"
+            attributes for that key.
+
+            When the special key name "allow-other-keys" is present,
+            all keys are allowed; otherwise, only the specified keys
+            have any meaning and additional keys are an error.
+
+            When no parameters are given, all keys are allowed.
+        </doc>
+    </type>
+
+    <!-- Generic types -->
+    <type name="association-tree" base="value">
+      <doc>
+        A tree made from nested lists, used to associate
+        (hierarchical) keys with values.
+
+        For example, the association tree
+
+            [ "foo", [ "bar", 12 ], [ "baz", 42 ] ]
+
+        associates "foo", "bar" with 12 and "foo", "baz" with 42.
+
+        Association trees are often used as a simple "Nano DOM" for
+        XML documents.
+
+        Formally, a association tree is a list whose first element is
+        a string, and whose rest elements are either association
+        trees, or a single value.
+
+        The "name" of a association tree is the first element of its
+        top-level list.
+
+        As a special case, a association tree with just a name and no
+        other elements can be abbreviated by just stating the name as
+        a string.  E.g., the following two values are equivalent when
+        considered as a association tree:
+
+           "foo"
+           [ "foo" ]
+      </doc>
+    </type>
+
+    <type name="association-list">
+      <base>
+        <list type="association-tree"/>
+      </base>
+      <doc>
+        A list of association trees.
+      </doc>
     </type>
 
     <type name="string-enum" base="string">
@@ -117,10 +122,12 @@
         </params>
         <doc>
             This is the base type for enumerations of fixed strings.  The
-            parameters describe the possible values.  Each parameter is one
-            of the choices: the name of the parameter is the string for the choice
-            itself and the value of the parameter is a map with further
-            information of that choice, such as a "doc" entry.
+            parameters describe the possible values.
+
+            Each parameter is a association tree that describes one of
+            the choices.  The name of the association tree is the
+            string for the choice itself and the second level of the
+            tree can have a "doc" attribute for that choice.
         </doc>
     </type>
 
@@ -129,109 +136,74 @@
             <rest doc="The possible values"/>
         </params>
         <doc>
-            This is the base type for enumerations of fixed integers.  The
-            parameters describe the possible values.  Each parameter is one
-            of the choices: the name of the parameter is the symbolic name
-            for the choice itself and the value of the parameter is a map
-            with further information of that choice, such as a "val" entry
-            for the numerical value for that choice, and a "doc" entry.
+            This is the base type for enumerations of fixed integers.
+            The parameters describe the possible values.
+
+            Each parameter is a association tree that describes one of
+            the choices.  The name of the association tree is a
+            symbolic name for the choice itself and the second level
+            of the tree must have a "value" attribute that gives the
+            numerical value of the choice in decimal.  A choice can
+            also have a "doc" attribute, of course.
         </doc>
     </type>
     
     <!-- Specific types -->
-    <type name="type">
+    <type name="type"
+          base="association-tree">
         <doc>
-            A type, represented as a map.  The map is the one you get as the Nano-DOM
-            for the type definiton.  E.g., it will have "doc" mapped to a string,
-            and "base" mapped to either a string or another map, etc.
-        </doc>
-        <base>
-            <map>
-                <allowed-keys>
-                    <name/>
-                    <params/>
-                    <doc/>
-                    <base/>
-                </allowed-keys>
-            </map>
-        </base>
-    </type>
+            A reference to a type, consisting of a name and optional
+            parameters.
 
-    <type name="geoloc">
-        <doc>
-            A list of two or three doubles giving a geographical location.
-            The first number is latitude, the second longitude, both in degrees.
-            If a third number is present, it is the altitude in meters.
+            Type references are just association trees: the name of
+            the tree names the referenced type, and the associations
+            of the association tree are the parameters.
         </doc>
-        <base>
-            <uniform-list min="2" max="3" type="double"/>
-        </base>
     </type>
 
     <type name="temperature"
-          base="double"
-           doc="A temperature in Kelvin."/>
-
-    <type name="screen-edge">
-        <doc>
-            Indicates an edge of a rectangular screen, relative to
-            the natural orientation of the video hardware driving it.
-            It can be one of the four strings "top", "left", "right",
-            and "bottom".
-        </doc>
-        <base>
-            <string-enum>
-                <top/><left/><right/><bottom/>
-            </string-enum>
-        </base>
+          doc="A temperature in Kelvin.">
+      <base>
+        <number min="0"/>
+      </base>
     </type>
 
-    <type name="screen-edge-ints">
-        <doc>
-            Indicates an edge of a rectangular screen, relative to
-            the natural orientation of the video hardware driving it.
-            It can be one of the four values "top", "left", "right",
-            and "bottom", encoded as an integer.
-        </doc>
-        <base>
-            <int-enum>
-                <top val="0"/>
-                <left val="1"/>
-                <right val="2"/>
-                <bottom val="3"/>
-            </int-enum>
-        </base>
-    </type>
-
-    <type name="energy" base="double">
+    <type name="energy"
+          base="number">
         <doc>
             An amount of energy, in Joule.
         </doc>
     </type>
 
-    <type name="power" base="double">
+    <type name="power"
+          base="number">
         <doc>
             A power, in Watt.
         </doc>
     </type>
 
-    <type name="time" base="int64">
+    <type name="time"
+          base="integer">
         <doc>
             A point in time, represented as the number of nano-seconds since
             00:00 January 1, 1970, UTC.
         </doc>
     </type>
 
-    <type name="duration" base="uint64">
+    <type name="duration"
+          base="integer">
         <doc>
             A time duration, in nano-seconds.
         </doc>
     </type>
 
-    <type name="percentage" base="int32">
-        <doc>
-            A percentage.
-        </doc>
+    <type name="percentage">
+      <base>
+        <integer min="0" max="100"/>
+      </base>
+      <doc>
+        A percentage.
+      </doc>
     </type>
 
 </types>

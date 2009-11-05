@@ -1,7 +1,7 @@
 check_PROGRAMS = contextpropertyinfounittest
 
 # your test's sources
-contextpropertyinfounittest_SOURCES = contextpropertyinfounittest.cpp infobackend.h
+contextpropertyinfounittest_SOURCES = contextpropertyinfounittest.cpp infobackend.h contexttyperegistryinfo.h
 
 COVERAGE_FILES = contextpropertyinfo.cpp
 EXTRA_DIST =
