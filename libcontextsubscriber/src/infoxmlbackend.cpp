@@ -264,33 +264,12 @@ void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerT
     QString constructionString = providerTree.keyValue("constructionString").toString();
     QString doc = keyTree.keyValue("doc").toString();
 
-    NanoTree typeDescriptionTree = keyTree.keyValue("type");
-    ContextTypeInfo typeInfo;
-
-    if (typeDescriptionTree.type() == QVariant::String || typeDescriptionTree.type() == QVariant::Invalid)
-        // Basic string description
-        typeInfo = ContextTypeInfo(typeDescriptionTree.toString());
-    else {
-        // Complex description
-        typeInfo = ContextTypeInfo(typeDescriptionTree.keyName());
-
-        foreach(QString k, typeDescriptionTree.keys()) {
-            QVariant pVal = typeDescriptionTree.keyValue(k);
-            typeInfo.setParameterValue(k, pVal);
-        }
-    }
+    ContextTypeInfo typeInfo = keyTree.keyValue("type");
 
     // Warn about description mismatch or add new
     if (keyDataHash.contains(key)) {
-        InfoKeyData keyData = keyDataHash.value(key);
-
-        // FIXME: Comparing names here is questionable here. Need to ask mvo.
-        // Actually we need "unset" thing here or something.
-        if (typeInfo.name() != "" && keyData.typeInfo.name() != typeInfo.name())
-            contextWarning() << F_XML << key << "already has type declared -" << keyData.typeInfo.name();
-
-        if (doc != "" && keyData.doc != doc)
-            contextWarning() << F_XML << key << "already has doc declared -" << keyData.doc;
+        if (typeInfo.name() != "" || doc != "")
+            contextWarning() << F_XML << key << ": redeclarations can't specify type or doc";
     } else {
         InfoKeyData keyData;
         keyData.name = key;
