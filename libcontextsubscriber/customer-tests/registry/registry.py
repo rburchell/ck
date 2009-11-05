@@ -24,7 +24,7 @@
 import sys
 import os
 import unittest
-from ContextKit.cltool2 import CLTool
+from ContextKit.cltool import CLTool
 
 class PrintInfoRunning(unittest.TestCase):
     def tearDown(self):

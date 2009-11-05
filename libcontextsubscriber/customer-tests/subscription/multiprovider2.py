@@ -22,7 +22,7 @@ import sys
 import os
 import unittest
 import time
-from ContextKit.cltool2 import CLTool
+from ContextKit.cltool import CLTool
 
 class MultiProvider(unittest.TestCase):
     def tearDown(self):

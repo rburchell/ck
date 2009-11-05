@@ -25,7 +25,7 @@ import sys
 import os
 import time
 import unittest
-from ContextKit.cltool2 import CLTool
+from ContextKit.cltool import CLTool
 
 property_name = ""
 

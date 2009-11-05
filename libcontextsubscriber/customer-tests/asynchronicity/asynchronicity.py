@@ -31,7 +31,7 @@ import sys
 import os
 import time
 import unittest
-from ContextKit.cltool2 import CLTool, wanted
+from ContextKit.cltool import CLTool, wanted
 
 class Asynchronous(unittest.TestCase):
     def testAsynchronicity(self):

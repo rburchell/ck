@@ -35,7 +35,7 @@
 import sys
 import os
 import unittest
-from ContextKit.cltool2 import CLTool, wanted, wantedUnknown
+from ContextKit.cltool import CLTool, wanted, wantedUnknown
 
 class CommanderAppearing(unittest.TestCase):
     def tearDown(self):

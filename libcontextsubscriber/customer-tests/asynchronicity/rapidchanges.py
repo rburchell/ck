@@ -31,7 +31,7 @@ import re
 import sys
 import os
 import unittest
-from ContextKit.cltool2 import CLTool, wanted
+from ContextKit.cltool import CLTool, wanted
 
 class RapidChanges(unittest.TestCase):
     def testRapidChanges(self):

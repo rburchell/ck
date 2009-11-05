@@ -33,7 +33,7 @@
 import sys
 import os
 import unittest
-from ContextKit.cltool2 import CLTool, wanted
+from ContextKit.cltool import CLTool, wanted
 
 class CommanderNonExistent(unittest.TestCase):
         def tearDown(self):

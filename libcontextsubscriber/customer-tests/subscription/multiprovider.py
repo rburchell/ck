@@ -21,7 +21,7 @@
 import sys
 import os
 import unittest
-from ContextKit.cltool2 import CLTool, wanted, wantedUnknown
+from ContextKit.cltool import CLTool, wanted, wantedUnknown
 
 class MultiProvider(unittest.TestCase):
     def testMultipleProviders(self):

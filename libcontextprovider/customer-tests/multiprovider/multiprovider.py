@@ -27,7 +27,7 @@
 import sys
 import unittest
 import os
-from ContextKit.cltool2 import CLTool
+from ContextKit.cltool import CLTool
 from time import sleep
 
 class MultiProvider(unittest.TestCase):

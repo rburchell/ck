@@ -30,7 +30,7 @@
 import sys
 import os
 import unittest
-from ContextKit.cltool2 import CLTool, wanted
+from ContextKit.cltool import CLTool, wanted
 
 class CommanderDisabled(unittest.TestCase):
     def tearDown(self):

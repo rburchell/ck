@@ -26,7 +26,7 @@
 import sys
 import unittest
 import os
-from ContextKit.cltool2 import CLTool
+from ContextKit.cltool import CLTool
 
 class Subscription(unittest.TestCase):
         def tearDown(self):
