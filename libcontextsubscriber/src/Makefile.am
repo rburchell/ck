@@ -17,7 +17,7 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h			\
 	contextpropertyinfo.h contextregistryinfo.h iproviderplugin.h	\
-	contextproviderinfo.h asyncdbusinterface.h
+	contextproviderinfo.h asyncdbusinterface.h timedvalue.h
 
 AM_CXXFLAGS = -I$(top_srcdir)/common \
 	      $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
