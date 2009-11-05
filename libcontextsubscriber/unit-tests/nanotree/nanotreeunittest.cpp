@@ -30,6 +30,7 @@ class NanoTreeUnitTest : public QObject
 private:
     NanoTree buildBasic();
     NanoTree buildComplex();
+    NanoTree buildMulti();
 
 private slots:
     void keyValue1();
@@ -39,6 +40,7 @@ private slots:
     void replaceKey();
     void addKeyValue();
     void keyName();
+    void keyValues();
 };
 
 NanoTree NanoTreeUnitTest::buildBasic()
@@ -92,6 +94,31 @@ NanoTree NanoTreeUnitTest::buildComplex()
     tree << QVariant(type);
 
     return NanoTree(tree);
+}
+
+NanoTree NanoTreeUnitTest::buildMulti()
+{
+    QVariantList param1;
+    param1 << QVariant("param");
+    param1 << QVariant("value1");
+
+    QVariantList param2;
+    param2 << QVariant("param");
+    param2 << QVariant("value2");
+
+    QVariantList tree;
+    tree << QVariant(param1);
+    tree << QVariant(param2);
+
+    return NanoTree(tree);
+}
+
+void NanoTreeUnitTest::keyValues()
+{
+    NanoTree tree = buildMulti();
+    QVariantList lst = tree.keyValues("param");
+    QCOMPARE(lst.size(), 2);
+    QCOMPARE(tree.keyValues("another").size(), 0);
 }
 
 void NanoTreeUnitTest::keyValue1()
