@@ -91,16 +91,16 @@ ContextTypeInfo ContextTypeInfo::operator=(const ContextTypeInfo& info)
 
 QString ContextTypeInfo::name() const
 {
-    if (tree.type == QVariant::List)
-        return tree.at(0).toString();
+    if (tree.type() == QVariant::List)
+        return tree.toList().at(0).toString();
     else
         return tree.toString();
 }
 
 QVariantList ContextTypeInfo::parameters() const
 {
-    if (tree.type == QVariant::List)
-        return tree.mid(1);
+    if (tree.type() == QVariant::List)
+        return tree.toList().mid(1);
     else
         return QVariantList();
 }
@@ -117,7 +117,7 @@ QString ContextTypeInfo::parameterDoc(QString p) const
 
 QVariant ContextTypeInfo::parameterValue(QString p) const
 {
-    return parameters().keyValue(p);
+    return tree.keyValue(p);
 }
 
 void ContextTypeInfo::setParameterValue(QString p, QVariant v)
