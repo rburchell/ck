@@ -44,10 +44,30 @@ NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
     if (name == "double") {
         QVariantList tree;
         QVariantList doc;
-        tree << QVariant("int32");
+        QVariantList name;
+        name << QVariant("name");
+        name << QVariant("double");
         doc << QVariant("doc");
         doc << QVariant("double doc");
+        tree << QVariant("type");
+        tree << QVariant(name);
         tree << QVariant(doc);
+        return ContextTypeInfo(QVariant(tree));
+    } else if (name == "complex") {
+        QVariantList tree;
+        QVariantList doc;
+        QVariantList base;
+        QVariantList name;
+        name << QVariant("name");
+        name << QVariant("complex");
+        doc << QVariant("doc");
+        doc << QVariant("complex doc");
+        base << QVariant("base");
+        base << QVariant("double");
+        tree << QVariant("type");
+        tree << QVariant(name);
+        tree << QVariant(doc);
+        tree << QVariant(base);
         return ContextTypeInfo(QVariant(tree));
     } else
         return ContextTypeInfo();
@@ -61,6 +81,8 @@ class ContextTypeInfoUnitTest : public QObject
 private slots:
     void name();
     void doc();
+    void base();
+    void definition();
     void parseDoubleType();
     void parseCustomDoubleType();
     void parseUniformList();
@@ -80,6 +102,20 @@ void ContextTypeInfoUnitTest::name()
 void ContextTypeInfoUnitTest::doc()
 {
     QCOMPARE(ContextTypeInfo(QString("double")).doc(), QString("double doc"));
+}
+
+void ContextTypeInfoUnitTest::definition()
+{
+    NanoTree def = ContextTypeInfo(QString("double")).definition();
+    QCOMPARE(def.keyValue("name").toString(), QString("double"));
+    QCOMPARE(def.keyValue("doc").toString(), QString("double doc"));
+}
+
+void ContextTypeInfoUnitTest::base()
+{
+    ContextTypeInfo base = ContextTypeInfo(QString("complex")).base();
+    QCOMPARE(base.name(), QString("double"));
+    QCOMPARE(base.doc(), QString("double doc"));
 }
 
 void ContextTypeInfoUnitTest::parseDoubleType()
