@@ -33,7 +33,6 @@
 #include "loggingfeatures.h"
 #include "contextproviderinfo.h"
 #include "nanoxml.h"
-#include "contexttyperegistryinfo.h"
 
 /*!
     \class InfoXmlBackend
