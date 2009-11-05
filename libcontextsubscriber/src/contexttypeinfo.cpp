@@ -82,6 +82,9 @@ ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo& info) : tree(info.tree)
 {
 }
 
+/// Returns a ContexTypeInfo where old-style type names (INTEGER, STRING, BOOL)
+/// are replaced with new-style type names (int32, string, bool). Returns self
+/// if the ContextTypeInfo is already new-style.
 ContextTypeInfo ContextTypeInfo::ensureNewTypes()
 {
     QString newName;

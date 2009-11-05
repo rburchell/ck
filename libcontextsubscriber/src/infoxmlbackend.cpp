@@ -247,7 +247,7 @@ void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerT
     QString doc = keyTree.keyValue("doc").toString();
 
     ContextTypeInfo typeInfo = keyTree.keyValue("type");
-    typeInfo = typeInfo.ensureNewTypes();
+    typeInfo = typeInfo.ensureNewTypes(); // Make sure to get rid of old names (INTEGER...)
 
     // Warn about description mismatch or add new
     if (keyDataHash.contains(key)) {
