@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# git-missing-release -- Compute the name of files, which are in the
+#                        repository currently, but not in a tag,
+#                        useful for figuring out needed EXTRA_DIST
+#                        additions.
+
+set -e
+
+if [ $# != 1 ]; then
+  echo >&2 "Usage: $0 TAGNAME"
+  exit 1
+fi
+
+! git diff --diff-filter=D --name-only HEAD $1 \
+	| grep -v '\.gitignore$' \
+	| grep -v '^sandbox/'

@@ -29,4 +29,7 @@ coverage: covoptioncheck
 
 .PHONY: coverage check-customer check-sum
 
+EXTRA_DIST = HACKING INSTALL.real MAINTAINERS autogen.sh autoclean.sh	\
+	     ltmain.sh.as-needed.patch
+
 include $(top_srcdir)/am/covoptioncheck.am

@@ -97,7 +97,6 @@ AC_CONFIG_FILES([
         python/Makefile
         spec/Makefile
         tools/Makefile
-        tools/loadmem/Makefile
 ])
 
 AC_OUTPUT

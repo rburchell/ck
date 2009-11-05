@@ -5,7 +5,7 @@ check-customer:
 clean-local:
 	rm -f *.actual *.cdb
 
-EXTRA_DIST = test.sh							\
+EXTRA_DIST = test.sh regen.sh						\
 	Battery.Charging_KEYDOC.expected				\
 	Battery.Charging_KEYTYPE.expected                               \
 	KEYS.expected							\

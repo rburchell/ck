@@ -1,7 +1,7 @@
 check_PROGRAMS = serviceunittest
 
 # test's sources
-serviceunittest_SOURCES = serviceunittest.cpp servicebackend.h
+serviceunittest_SOURCES = serviceunittest.cpp servicebackend.h manager.h manageradaptor.h
 
 COVERAGE_FILES = service.cpp 
 
