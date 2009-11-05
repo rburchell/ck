@@ -99,6 +99,7 @@ private slots:
     void base();
     void definition();
     void parameterDoc();
+    void ensureNewTypes();
     void parseDoubleType();
     void parseCustomDoubleType();
     void parseUniformList();
@@ -140,6 +141,17 @@ void ContextTypeInfoUnitTest::parameterDoc()
     QCOMPARE(typeInfo.parameterDoc("p1"), QString("p1 doc"));
 
 }
+
+void ContextTypeInfoUnitTest::ensureNewTypes()
+{
+    QCOMPARE(ContextTypeInfo(QString("INTEGER")).ensureNewTypes().name(), QString("int32"));
+    QCOMPARE(ContextTypeInfo(QString("INT")).ensureNewTypes().name(), QString("int32"));
+    QCOMPARE(ContextTypeInfo(QString("TRUTH")).ensureNewTypes().name(), QString("bool"));
+    QCOMPARE(ContextTypeInfo(QString("STRING")).ensureNewTypes().name(), QString("string"));
+    QCOMPARE(ContextTypeInfo(QString("DOUBLE")).ensureNewTypes().name(), QString("double"));
+    QCOMPARE(ContextTypeInfo(QString("bool")).ensureNewTypes().name(), QString("bool"));
+}
+
 
 void ContextTypeInfoUnitTest::parseDoubleType()
 {
