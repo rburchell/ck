@@ -37,14 +37,7 @@ public:
 
     static ContextTypeRegistryInfo* instance();
 
-    ContextTypeInfo typeInfoForName(QString name);
-
-    ContextTypeInfo primitiveType(QString nameStr, QString docStr);
-    ContextTypeInfo int64Type();
-    ContextTypeInfo int32Type();
-    ContextTypeInfo stringType();
-    ContextTypeInfo boolType();
-    ContextTypeInfo doubleType();
+    NanoTree typeDefinitionForName(QString name);
 
 private:
 

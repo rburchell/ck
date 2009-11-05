@@ -33,107 +33,20 @@ ContextTypeRegistryInfo::ContextTypeRegistryInfo()
 {
 }
 
-ContextTypeInfo ContextTypeRegistryInfo::primitiveType(QString nameStr, QString docStr)
-{
-    QVariantList tree;
-    QVariantList name;
-    QVariantList doc;
-
-    name << QVariant("name");
-    name << QVariant(nameStr);
-    doc << QVariant("doc");
-    doc << QVariant(docStr);
-
-    tree << QVariant("type");
-    tree << QVariant(name);
-    tree << QVariant(doc);
-
-    return ContextTypeInfo(NanoTree(tree));
-}
-
-
-ContextTypeInfo ContextTypeRegistryInfo::boolType()
-{
-    return primitiveType("bool", "A boolean value.");
-}
-
-ContextTypeInfo ContextTypeRegistryInfo::int32Type()
-{
-    return primitiveType("int32", "An integer 32-bit value.");
-}
-
-ContextTypeInfo ContextTypeRegistryInfo::int64Type()
-{
-    return primitiveType("int64", "An integer 64-bit value.");
-}
-
-ContextTypeInfo ContextTypeRegistryInfo::stringType()
-{
-    return primitiveType("string", "A string value.");
-}
-
-ContextTypeInfo ContextTypeRegistryInfo::doubleType()
-{
-    QVariantList name;
-    QVariantList doc;
-    QVariantList tree;
-    QVariantList params;
-    QVariantList minParam;
-    QVariantList minParamDoc;
-    QVariantList maxParam;
-    QVariantList maxParamDoc;
-
-    name << QVariant("name");
-    name << QVariant("double");
-    doc << QVariant("doc");
-    doc << QVariant("A double value within the given limits.");
-    params << QVariant("params");
-    minParam << QVariant("min");
-    minParamDoc << QVariant("doc");
-    minParamDoc << QVariant("Minimum value.");
-    minParam << QVariant(minParamDoc);
-    params << QVariant(minParam);
-
-    maxParam << QVariant("max");
-    maxParamDoc << QVariant("doc");
-    maxParamDoc << QVariant("Maximum value.");
-    maxParam << QVariant(maxParamDoc);
-    params << QVariant(maxParam);
-
-    tree << QVariant("type");
-    tree << QVariant(name);
-    tree << QVariant(doc);
-    tree << QVariant(params);
-
-    return ContextTypeInfo(NanoTree(tree));
-}
-
 ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
 {
     return registryInstance;
 }
 
-ContextTypeInfo ContextTypeRegistryInfo::typeInfoForName(QString name)
+NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
 {
-    if (name == "TRUTH" || name == "bool")
-        return boolType();
-    else if (name == "STRING" || name == "string")
-        return stringType();
-    else if (name == "INT" || name == "INTEGER" || name == "int32")
-        return int32Type();
-    else if (name == "INTEGER")
-        return int32Type();
-    else if (name == "DOUBLE" || name == "double")
-        return doubleType();
-    else
-        return ContextTypeInfo();
+    return NanoTree();
 }
 
 class InfoXmlBackendUnitTest : public QObject
 {
     Q_OBJECT
     InfoXmlBackend *backend;
-    ContextTypeRegistryInfo *typeRegistry;
 
 private:
     bool inSpyHasOneInList(QSignalSpy &spy, const QString &v);
@@ -174,7 +87,6 @@ void InfoXmlBackendUnitTest::initTestCase()
     utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoXmlBackend();
-    typeRegistry = ContextTypeRegistryInfo::instance();
 }
 
 void InfoXmlBackendUnitTest::listKeys()
@@ -200,22 +112,22 @@ void InfoXmlBackendUnitTest::name()
 
 void InfoXmlBackendUnitTest::typeInfoForKey()
 {
-    QCOMPARE(backend->typeInfoForKey("Battery.ChargePercentage").name(), ContextTypeInfo().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.Attribute").name(), typeRegistry->boolType().name());
-    QCOMPARE(backend->typeInfoForKey("Battery.LowBattery").name(), typeRegistry->boolType().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.bool").name(), typeRegistry->boolType().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.int32").name(), typeRegistry->int32Type().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.string").name(), typeRegistry->stringType().name());
-    QCOMPARE(backend->typeInfoForKey("Key.With.double").name(), typeRegistry->doubleType().name());
-    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), typeRegistry->boolType().name());
-    QCOMPARE(backend->typeInfoForKey("Battery.Voltage").name(), typeRegistry->int32Type().name());
-    QCOMPARE(backend->typeInfoForKey("Does.Not.Exist").name(), ContextTypeInfo().name());
+    QCOMPARE(backend->typeInfoForKey("Battery.ChargePercentage").name(), QString(""));
+    QCOMPARE(backend->typeInfoForKey("Key.With.Attribute").name(), QString("bool"));
+    QCOMPARE(backend->typeInfoForKey("Battery.LowBattery").name(), QString("bool"));
+    QCOMPARE(backend->typeInfoForKey("Key.With.bool").name(), QString("bool"));
+    QCOMPARE(backend->typeInfoForKey("Key.With.int32").name(), QString("int32"));
+    QCOMPARE(backend->typeInfoForKey("Key.With.string").name(), QString("string"));
+    QCOMPARE(backend->typeInfoForKey("Key.With.double").name(), QString("double"));
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), QString("bool"));
+    QCOMPARE(backend->typeInfoForKey("Battery.Voltage").name(), QString("int32"));
+    QCOMPARE(backend->typeInfoForKey("Does.Not.Exist").name(), QString(""));
 
     ContextTypeInfo complexType = backend->typeInfoForKey("Key.With.complex");
     QCOMPARE(complexType.name(), QString("double"));
     QCOMPARE(complexType.doc(), QString("A double value within the given limits."));
-    QCOMPARE(complexType.parameterValue("min"), QString("0"));
-    QCOMPARE(complexType.parameterValue("max"), QString("10"));
+    QCOMPARE(complexType.parameterValue("min"), QVariant("0"));
+    QCOMPARE(complexType.parameterValue("max"), QVariant("10"));
 }
 
 void InfoXmlBackendUnitTest::docForKey()
@@ -279,8 +191,8 @@ void InfoXmlBackendUnitTest::dynamics()
 
     // Again, some basic check
     QCOMPARE(backend->keyDeclared("System.Active"), true);
-    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), typeRegistry->int32Type().name());
-    QCOMPARE(backend->typeInfoForKey("System.Active").name(), typeRegistry->boolType().name());
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), QString("int32"));
+    QCOMPARE(backend->typeInfoForKey("System.Active").name(), QString("bool"));
     QCOMPARE(backend->docForKey("System.Active"), QString("This is true when system is active"));
 
     // Test emissions
