@@ -1,7 +1,7 @@
 check_PROGRAMS = infobackendunittest
 
 # your test's sources
-infobackendunittest_SOURCES = infobackendunittest.cpp
+infobackendunittest_SOURCES = infobackendunittest.cpp contexttyperegistryinfo.h
 
 COVERAGE_FILES = infobackend.cpp
 EXTRA_DIST = 

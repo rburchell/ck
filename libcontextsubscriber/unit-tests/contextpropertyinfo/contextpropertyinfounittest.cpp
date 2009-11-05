@@ -23,10 +23,29 @@
 #include <QtCore>
 #include "contextpropertyinfo.h"
 #include "infobackend.h"
+#include "contexttyperegistryinfo.h"
 
 QMap <QString, ContextProviderInfo> providerMap;
 QMap <QString, ContextTypeInfo> typeInfoMap;
 QMap <QString, QString> docMap;
+
+/* Mocked ContextTypeRegistryInfo */
+
+ContextTypeRegistryInfo* ContextTypeRegistryInfo::registryInstance = new ContextTypeRegistryInfo();
+
+ContextTypeRegistryInfo::ContextTypeRegistryInfo()
+{
+}
+
+ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
+{
+    return registryInstance;
+}
+
+NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
+{
+    return ContextTypeInfo();
+}
 
 /* Mocked infobackend */
 
@@ -142,8 +161,8 @@ void ContextPropertyInfoUnitTest::initTestCase()
     providerMap.insert("Media.NowPlaying", info2);
 
     typeInfoMap.clear();
-    typeInfoMap.insert("Battery.Charging", ContextTypeInfo::boolType());
-    typeInfoMap.insert("Media.NowPlaying", ContextTypeInfo::stringType());
+    typeInfoMap.insert("Battery.Charging", ContextTypeInfo(QString("bool")));
+    typeInfoMap.insert("Media.NowPlaying", ContextTypeInfo(QString("string")));
 
     docMap.clear();
     docMap.insert("Battery.Charging", "Battery.Charging doc");
@@ -272,7 +291,7 @@ void ContextPropertyInfoUnitTest::typeChanged()
     QCOMPARE(spy.count(), 1);
     spy.takeFirst();
 
-    typeInfoMap.insert("Battery.Charging", ContextTypeInfo::int64Type());
+    typeInfoMap.insert("Battery.Charging", ContextTypeInfo(QString("int64")));
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy.count(), 1);

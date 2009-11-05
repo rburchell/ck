@@ -22,6 +22,25 @@
 #include <QtTest/QtTest>
 #include <QtCore>
 #include "infobackend.h"
+#include "contexttyperegistryinfo.h"
+
+ContextTypeRegistryInfo* ContextTypeRegistryInfo::registryInstance = new ContextTypeRegistryInfo();
+
+/* Mocked ContextTypeRegistryInfo */
+
+ContextTypeRegistryInfo::ContextTypeRegistryInfo()
+{
+}
+
+ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
+{
+    return registryInstance;
+}
+
+NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
+{
+    return ContextTypeInfo();
+}
 
 class InfoTestBackend : public InfoBackend
 {

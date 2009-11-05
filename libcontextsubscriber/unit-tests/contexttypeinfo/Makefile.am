@@ -1,7 +1,7 @@
 check_PROGRAMS = contexttypeinfounittest
 
 # test's sources
-contexttypeinfounittest_SOURCES = contexttypeinfounittest.cpp
+contexttypeinfounittest_SOURCES = contexttypeinfounittest.cpp contexttyperegistryinfo.h
 
 COVERAGE_FILES = contexttypeinfo.cpp 
 EXTRA_DIST = double.xml custom-double.xml uniform-list.xml person.xml
