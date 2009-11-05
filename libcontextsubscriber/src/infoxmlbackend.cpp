@@ -238,23 +238,6 @@ void InfoXmlBackend::regenerateKeyDataList()
     }
 }
 
-/// Convert a subset of new-style type names to the currently used
-/// old-style type names.  This way we can slowly fade in new-style
-/// types.
-QString InfoXmlBackend::canonicalizeType (const QString &type)
-{
-    if (type == "bool")
-        return "TRUTH";
-    else if (type == "int32")
-        return "INT";
-    else if (type == "string")
-        return "STRING";
-    else if (type == "double")
-        return "DOUBLE";
-    else
-        return type;
-}
-
 /// Parse the given QVariant tree which is supposed to be a key tree.
 void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerTree)
 {
@@ -264,6 +247,7 @@ void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerT
     QString doc = keyTree.keyValue("doc").toString();
 
     ContextTypeInfo typeInfo = keyTree.keyValue("type");
+    typeInfo = typeInfo.ensureNewTypes();
 
     // Warn about description mismatch or add new
     if (keyDataHash.contains(key)) {

@@ -125,7 +125,6 @@ void InfoXmlBackendUnitTest::typeInfoForKey()
 
     ContextTypeInfo complexType = backend->typeInfoForKey("Key.With.complex");
     QCOMPARE(complexType.name(), QString("double"));
-    QCOMPARE(complexType.doc(), QString("A double value within the given limits."));
     QCOMPARE(complexType.parameterValue("min"), QVariant("0"));
     QCOMPARE(complexType.parameterValue("max"), QVariant("10"));
 }

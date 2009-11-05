@@ -39,6 +39,7 @@ public:
     ContextTypeInfo(const ContextTypeInfo& info);
     ContextTypeInfo operator=(const ContextTypeInfo& info);
 
+    ContextTypeInfo ensureNewTypes();
     QString name() const;
     QVariantList parameters() const;
     NanoTree definition() const;

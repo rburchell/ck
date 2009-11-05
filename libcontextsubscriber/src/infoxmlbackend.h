@@ -62,7 +62,6 @@ private:
 
     void regenerateKeyDataList();
     void readKeyDataFromXml(const QString &path);
-    QString canonicalizeType (const QString &type);
     void parseKey(const NanoTree &keyTree, const NanoTree &providerTree);
 };
 

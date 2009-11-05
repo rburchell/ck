@@ -82,6 +82,28 @@ ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo& info) : tree(info.tree)
 {
 }
 
+ContextTypeInfo ContextTypeInfo::ensureNewTypes()
+{
+    QString newName;
+    QString oldName = name();
+
+    if (oldName == "TRUTH")
+        newName = "bool";
+    else if (oldName == "INT" || oldName == "INTEGER")
+        newName = "int32";
+    else if (oldName == "STRING")
+        newName = "string";
+    else if (oldName == "DOUBLE")
+        newName = "double";
+    else
+        return *this;
+
+    QVariantList newTree;
+    newTree << QVariant(newName);
+    newTree << tree.toList().mid(1);
+    return ContextTypeInfo(newTree);
+}
+
 /// Assigment operator.
 ContextTypeInfo ContextTypeInfo::operator=(const ContextTypeInfo& info)
 {
