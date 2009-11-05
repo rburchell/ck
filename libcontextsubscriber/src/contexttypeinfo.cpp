@@ -120,6 +120,11 @@ QVariant ContextTypeInfo::parameterValue(QString p) const
     return tree.keyValue(p);
 }
 
+NanoTree ContextTypeInfo::parameterSub(QString p) const
+{
+    return tree.keySub(p);
+}
+
 QString ContextTypeInfo::doc() const
 {
     return definition().keyValue("doc").toString();
@@ -128,4 +133,21 @@ QString ContextTypeInfo::doc() const
 ContextTypeInfo ContextTypeInfo::base() const
 {
     return ContextTypeInfo(definition().keyValue("base").toString());
+}
+
+/* ContextStringEnumInfo
+ */
+
+QStringList ContextStringEnumInfo::choices() const
+{
+    QStringList result;
+    foreach (const QVariant &p, parameters()) {
+        result.append (p.toList().at(0).toString());
+    }
+    return result;
+}
+
+QString ContextStringEnumInfo::choiceDoc(const QString &choice) const
+{
+    return parameterSub(choice).keyValue ("doc").toString();
 }
