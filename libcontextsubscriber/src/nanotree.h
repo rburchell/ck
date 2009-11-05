@@ -35,21 +35,46 @@ public:
     NanoTree(const QVariant &root) : QVariant(root) {};
 
     QString dumpTree(int level) const;
-    NanoTree keySub(const QString &key) const;
-    NanoTree keyValue(const QString &key) const;
-    NanoTree keyValue(const QString &key1, const QString &key2) const;
-    NanoTree keyValue(const QString &key1, const QString &key2, const QString &key3) const;
-    NanoTree keyValue(const QString &key1, const QString &key2, const QString &key3,
+
+    QString name() const;
+    QVariant keyValue() const;
+    NanoTree keyNode(const QString &key) const;
+
+    QVariant keyValue(const QString &key1) const;
+    QVariant keyValue(const QString &key1,
+                      const QString &key2) const;
+    QVariant keyValue(const QString &key1,
+                      const QString &key2,
+                      const QString &key3) const;
+    QVariant keyValue(const QString &key1,
+                      const QString &key2,
+                      const QString &key3,
                       const QString &key4) const;
-    NanoTree keyValue(const QString &key1, const QString &key2, const QString &key3,
-                      const QString &key4, const QString &key5) const;
-    NanoTree keyValue() const;
+    QVariant keyValue(const QString &key1,
+                      const QString &key2,
+                      const QString &key3,
+                      const QString &key4,
+                      const QString &key5) const;
+
+    NanoTree keyNode(const QString &key1,
+                     const QString &key2) const;
+    NanoTree keyNode(const QString &key1,
+                     const QString &key2,
+                     const QString &key3) const;
+    NanoTree keyNode(const QString &key1,
+                     const QString &key2,
+                     const QString &key3,
+                     const QString &key4) const;
+    NanoTree keyNode(const QString &key1,
+                     const QString &key2,
+                     const QString &key3,
+                     const QString &key4,
+                     const QString &key5) const;
+
     QVariantList keyValues(const QString &key) const;
     NanoTree addKeyValue(QString key, QVariant v) const;
     QStringList keys() const;
     NanoTree replaceKey(QString key, NanoTree newNode) const;
-    NanoTree keyNode(QString k) const;
-    QString keyName() const;
 };
 
 #endif // NANOTREE_H

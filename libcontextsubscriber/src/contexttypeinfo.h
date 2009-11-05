@@ -44,7 +44,7 @@ public:
     QVariantList parameters() const;
     NanoTree definition() const;
     QVariant parameterValue(QString p) const;
-    NanoTree parameterSub(QString p) const;
+    NanoTree parameterNode(QString p) const;
     QString parameterDoc(QString p) const;
     QString doc() const;
     ContextTypeInfo base() const;
