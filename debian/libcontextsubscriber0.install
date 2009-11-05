@@ -1,4 +1,5 @@
 usr/bin/update-contextkit-providers
 usr/share/contextkit/core.context
+usr/share/contextkit/core.types
 usr/share/man/man1/update-contextkit-providers.1
 usr/lib/libcontextsubscriber.so.*
