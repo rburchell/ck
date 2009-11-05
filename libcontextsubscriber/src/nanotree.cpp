@@ -49,7 +49,7 @@ QString NanoTree::dumpTree(int level) const
 
 /// Assuming this tree represents a key, return the name of the key.
 /// (first item).
-QString NanoTree::keyName() const
+QString NanoTree::name() const
 {
     if (type() != QVariant::List)
         return QString();
@@ -82,71 +82,100 @@ QVariantList NanoTree::keyValues(const QString &key) const
     return lst;
 }
 
-/// Returns the sub (the trailing) after a given \a key in the root nanodom tree.
-NanoTree NanoTree::keySub(const QString &key) const
+NanoTree NanoTree::keyNode(const QString &key) const
 {
     const QVariant keyVariant(key); // So we can directly compare...
 
-    // We expect us to be a list...
+    // We expect the dom to be a list...
     if (type() != QVariant::List)
         return NanoTree();
 
-    foreach(QVariant child, toList())
+    foreach(const QVariant &child, toList())
     {
-        if (child.type() == QVariant::List && child.toList().count() > 0 &&
-            child.toList().at(0) == keyVariant) {
-            QVariantList lst = child.toList();
-            lst.removeAt(0);
-            return NanoTree(QVariant(lst));
-        }
+        if (child.type() == QVariant::List
+            && child.toList().count() >= 1
+            && child.toList().at(0) == keyVariant)
+            return NanoTree(child);
     }
 
     return NanoTree();
 }
 
-/// 1st level accessor. Returns a value for a \a key in the root nanodom tree.
-NanoTree NanoTree::keyValue(const QString &key) const
+NanoTree NanoTree::keyNode(const QString &key1,
+                           const QString &key2) const
 {
-    const QVariant keyVariant(key); // So we can directly compare...
+    return keyNode(key1).keyNode(key2);
+}
 
-    // We expect us to be a list...
+NanoTree NanoTree::keyNode(const QString &key1,
+                           const QString &key2,
+                           const QString &key3) const
+{
+    return keyNode(key1).keyNode(key2).keyNode(key3);
+}
+
+NanoTree NanoTree::keyNode(const QString &key1,
+                           const QString &key2,
+                           const QString &key3,
+                           const QString &key4) const
+{
+    return keyNode(key1).keyNode(key2).keyNode(key3),keyNode(key4);
+}
+
+NanoTree NanoTree::keyNode(const QString &key1,
+                           const QString &key2,
+                           const QString &key3,
+                           const QString &key4,
+                           const QString &key5) const
+{
+    return keyNode(key1).keyNode(key2).keyNode(key3),keyNode(key4).keyNode(key5);
+}
+
+
+QVariant NanoTree::keyValue() const
+{
     if (type() != QVariant::List)
-        return NanoTree();
+        return QVariant();
 
-    foreach(QVariant child, toList())
-    {
-        if (child.type() == QVariant::List && child.toList().count() >= 2 &&
-            child.toList().at(0) == keyVariant)
-            return NanoTree(child.toList().at(1));
-    }
+    if (toList().size() < 2)
+        return QVariant();
 
-    return NanoTree();
+    return toList().at(1);
 }
 
-/// 2nd level accessor. Returns a value for a \a key1 \a key2 in the root nanodom tree.
-NanoTree NanoTree::keyValue(const QString &key1, const QString &key2) const
+QVariant NanoTree::keyValue(const QString &key1) const
 {
-    return keySub(key1).keyValue(key2);
+    return keyNode(key1).keyValue();
 }
 
-/// 3rd level accessor. Returns a value for a \a key1 \a key2 \a key3 in the root nanodom tree.
-NanoTree NanoTree::keyValue(const QString &key1, const QString &key2, const QString &key3) const
+QVariant NanoTree::keyValue(const QString &key1,
+                            const QString &key2) const
 {
-    return keySub(key1).keyValue(key2, key3);
+    return keyNode(key1, key2).keyValue();
 }
 
-/// 4rd level accessor. Returns a value for a \a key1 \a key2 \a key3 \a key4 in the root nanodom tree.
-NanoTree NanoTree::keyValue(const QString &key1, const QString &key2, const QString &key3,
+QVariant NanoTree::keyValue(const QString &key1,
+                            const QString &key2,
+                            const QString &key3) const
+{
+    return keyNode(key1, key2, key3).keyValue();
+}
+
+QVariant NanoTree::keyValue(const QString &key1,
+                            const QString &key2,
+                            const QString &key3,
                             const QString &key4) const
 {
-    return keySub(key1).keyValue(key2, key3, key4);
+    return keyNode(key1, key2, key3, key4).keyValue();
 }
 
-/// 5th level accessor. Returns a value for a \a key1 \a key2 \a key3 \a key4 \a key5 in the root nanodom tree.
-NanoTree NanoTree::keyValue(const QString &key1, const QString &key2, const QString &key3,
-                            const QString &key4, const QString &key5) const
+QVariant NanoTree::keyValue(const QString &key1,
+                            const QString &key2,
+                            const QString &key3,
+                            const QString &key4,
+                            const QString &key5) const
 {
-    return keySub(key1).keyValue(key2, key3, key4, key5);
+    return keyNode(key1, key2, key3, key4, key5).keyValue();
 }
 
 QStringList NanoTree::keys() const
@@ -157,22 +186,12 @@ QStringList NanoTree::keys() const
     QStringList lst;
 
     foreach(QVariant child, toList()) {
-        if (child.type() == QVariant::List && child.toList().count() >= 2)
+        if (child.type() == QVariant::List
+            && child.toList().count() >= 1)
             lst << child.toList().at(0).toString();
     }
 
     return lst;
-}
-
-NanoTree NanoTree::keyValue() const
-{
-    if (type() != QVariant::List)
-        return NanoTree();
-
-    if (toList().size() < 2)
-        return NanoTree();
-
-    return NanoTree(toList().at(1));
 }
 
 NanoTree NanoTree::addKeyValue(QString key, QVariant v) const
@@ -208,25 +227,3 @@ NanoTree NanoTree::replaceKey(QString key, NanoTree newNode) const
 
     return NanoTree(QVariant(lst));
 }
-
-/// Similiar to NanoTree::keyValue (1st level accessor) but returns not the
-/// value of the key \a k but the whole node of it. Useful to move nodes around
-/// when building/changing the NanoTrees.
-NanoTree NanoTree::keyNode(QString key) const
-{
-    const QVariant keyVariant(key); // So we can directly compare...
-
-    // We expect the dom to be a list...
-    if (type() != QVariant::List)
-        return QVariant();
-
-    foreach(QVariant child, toList())
-    {
-        if (child.type() == QVariant::List && child.toList().count() >= 2 &&
-            child.toList().at(0) == keyVariant)
-            return child;
-    }
-
-    return NanoTree();
-}
-
