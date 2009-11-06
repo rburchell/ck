@@ -4,8 +4,9 @@
   <suite name="libcontextsubscriber-tests">
     <!-- At least one set per suite, name and description mandatory -->
     <set name="libcontextsubscriber suite" description="libcontextsubscriber tests">
-	  <!-- Possibly some pre-steps to execute before running the test cases -->
+      <!-- Possibly some pre-steps to execute before running the test cases -->
       <pre_steps>
+        <step expected_result="0">/usr/share/libcontextsubscriber-tests/waitforsilence</step>
       </pre_steps>
       <!-- At least one case per set, name mandatory, description mandatory, other optional -->
       <case name="libsub001" description="This test verifies that the asynchronicity of the subscriber library" requirement="" timeout="20">
@@ -98,6 +99,9 @@
         <scratchbox>false</scratchbox>
         <hardware>true</hardware>
       </environments>
+      <get>
+        <file>/tmp/xyzzy.log</file>
+      </get>
     </set>
   </suite>
 </testdefinition>

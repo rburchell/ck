@@ -36,6 +36,10 @@ install: build
 	# install testsets under /usr/share
 	mkdir -p debian/tmp/usr/share
 
+	cp -f libcontextsubscriber/customer-tests/waitforsilence \
+		debian/tmp/usr/share/libcontextsubscriber-tests
+	cp -f libcontextsubscriber/customer-tests/waitforsilence \
+		debian/tmp/usr/share/libcontextprovider-tests
 	cp -rf libcontextsubscriber/customer-tests/commander debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/asynchronicity debian/tmp/usr/share/libcontextsubscriber-tests/
 	cp -rf libcontextsubscriber/customer-tests/subscription debian/tmp/usr/share/libcontextsubscriber-tests/
@@ -47,6 +51,8 @@ install: build
 
 	# propertymonitor-tests
 	mkdir -p debian/tmp/usr/share/propertymonitor-tests
+	cp -f libcontextsubscriber/customer-tests/waitforsilence \
+		debian/tmp/usr/share/propertymonitor-tests
 	cp libcontextsubscriber/propertymonitor/has_value.py debian/tmp/usr/share/propertymonitor-tests
 	cp libcontextsubscriber/propertymonitor/has_provider.py debian/tmp/usr/share/propertymonitor-tests
 	cp libcontextsubscriber/propertymonitor/tests.xml debian/tmp/usr/share/propertymonitor-tests

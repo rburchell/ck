@@ -1,4 +1,5 @@
 usr/share/libcontextsubscriber-tests/*.xml
+usr/share/libcontextsubscriber-tests/waitforsilence
 usr/share/libcontextsubscriber-tests/commander/*.py
 usr/share/libcontextsubscriber-tests/subscription/*.py
 usr/share/libcontextsubscriber-tests/asynchronicity/*.py
