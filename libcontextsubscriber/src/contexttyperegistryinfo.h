@@ -53,8 +53,9 @@ private:
     /// Holds the actual pointer to the singelton instance.
     /// Mutex protected during creation.
     static ContextTypeRegistryInfo* registryInstance;
-    NanoTree coreTree;
-    QHash <QString, NanoTree> typeCache;
+
+    NanoTree coreTree; ///< The core.types as NanoTree. Read on construction.
+    QHash <QString, NanoTree> typeCache; //< Cache of QString -> type definition.
 
     friend class ContextTypeRegistryInfoUnitTest;
 };

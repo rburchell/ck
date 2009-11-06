@@ -31,6 +31,8 @@ ContextTypeRegistryInfo* ContextTypeRegistryInfo::registryInstance = NULL;
 
 /* Public */
 
+/// Returns the singleton instance of the ContextTypeRegistryInfo. The object
+/// is constructed automaticall on first access.
 ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
 {
     static QMutex mutex;
@@ -68,6 +70,8 @@ QString ContextTypeRegistryInfo::coreTypesPath()
     return QString(corepath);
 }
 
+/// Returns a type definition for the type with the given name. The type
+/// is being fetched from the registry.
 NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
 {
     // Support for the old types
@@ -98,31 +102,31 @@ NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
     return NanoTree();
 }
 
-/// Returns in instance of the int64 type info.
+/// Returns in instance of the int64 type definition.
 ContextTypeInfo ContextTypeRegistryInfo::int64Type()
 {
     return typeDefinitionForName("int64");
 }
 
-/// Returns in instance of the string type info.
+/// Returns in instance of the string type definition.
 ContextTypeInfo ContextTypeRegistryInfo::stringType()
 {
     return typeDefinitionForName("string");
 }
 
-/// Returns in instance of the double type info.
+/// Returns in instance of the double type definition.
 ContextTypeInfo ContextTypeRegistryInfo::doubleType()
 {
     return typeDefinitionForName("double");
 }
 
-/// Returns in instance of the bool type info.
+/// Returns in instance of the bool type definition.
 ContextTypeInfo ContextTypeRegistryInfo::boolType()
 {
     return typeDefinitionForName("bool");
 }
 
-/// Returns in instance of the int32 type info.
+/// Returns in instance of the int32 type definition.
 ContextTypeInfo ContextTypeRegistryInfo::int32Type()
 {
     return typeDefinitionForName("int32");
@@ -130,6 +134,7 @@ ContextTypeInfo ContextTypeRegistryInfo::int32Type()
 
 /* Private */
 
+/// Private constructor. Do not use.
 ContextTypeRegistryInfo::ContextTypeRegistryInfo()
 {
     if (QFile(ContextTypeRegistryInfo::coreTypesPath()).exists()) {
