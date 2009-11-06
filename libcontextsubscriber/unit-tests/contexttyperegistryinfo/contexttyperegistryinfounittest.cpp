@@ -36,6 +36,7 @@ private:
 private slots:
     void initTestCase();
     void cleanupTestCase();
+    void string();
 };
 
 void ContextTypeRegistryInfoUnitTest::initTestCase()
@@ -44,6 +45,13 @@ void ContextTypeRegistryInfoUnitTest::initTestCase()
     utilSetEnv("CONTEXT_TYPES", "./");
     utilSetEnv("CONTEXT_CORE_TYPES", "core.types");
     registry = ContextTypeRegistryInfo::instance();
+}
+
+void ContextTypeRegistryInfoUnitTest::string()
+{
+    NanoTree stringDef = registry->stringType();
+    QCOMPARE(stringDef.keyValue("name").toString(), QString("string"));
+    QCOMPARE(stringDef.keyValue("doc").toString(), QString("A string."));
 }
 
 void ContextTypeRegistryInfoUnitTest::cleanupTestCase()
