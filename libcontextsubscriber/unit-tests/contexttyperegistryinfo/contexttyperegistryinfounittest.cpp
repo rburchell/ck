@@ -36,7 +36,9 @@ private:
 private slots:
     void initTestCase();
     void cleanupTestCase();
-    void string();
+    void stringDef();
+    void doubleDef();
+    void int32Def();
 };
 
 void ContextTypeRegistryInfoUnitTest::initTestCase()
@@ -47,11 +49,34 @@ void ContextTypeRegistryInfoUnitTest::initTestCase()
     registry = ContextTypeRegistryInfo::instance();
 }
 
-void ContextTypeRegistryInfoUnitTest::string()
+void ContextTypeRegistryInfoUnitTest::stringDef()
 {
-    NanoTree stringDef = registry->stringType();
-    QCOMPARE(stringDef.keyValue("name").toString(), QString("string"));
-    QCOMPARE(stringDef.keyValue("doc").toString(), QString("A string."));
+    NanoTree def = registry->stringType();
+    QCOMPARE(def.keyValue("name").toString(), QString("string"));
+    QCOMPARE(def.keyValue("doc").toString(), QString("A string."));
+
+    NanoTree oldDef = registry->typeDefinitionForName("STRING");
+    QCOMPARE(oldDef.keyValue("name").toString(), QString("string"));
+}
+
+void ContextTypeRegistryInfoUnitTest::doubleDef()
+{
+    NanoTree def = registry->doubleType();
+    QCOMPARE(def.keyValue("name").toString(), QString("double"));
+    QCOMPARE(def.keyValue("doc").toString(), QString("A double."));
+
+    NanoTree oldDef = registry->typeDefinitionForName("DOUBLE");
+    QCOMPARE(oldDef.keyValue("name").toString(), QString("double"));
+}
+
+void ContextTypeRegistryInfoUnitTest::int32Def()
+{
+    NanoTree def = registry->int32Type();
+    QCOMPARE(def.keyValue("name").toString(), QString("int32"));
+    QCOMPARE(def.keyValue("doc").toString(), QString("An integer."));
+
+    NanoTree oldDef = registry->typeDefinitionForName("INT");
+    QCOMPARE(oldDef.keyValue("name").toString(), QString("int32"));
 }
 
 void ContextTypeRegistryInfoUnitTest::cleanupTestCase()

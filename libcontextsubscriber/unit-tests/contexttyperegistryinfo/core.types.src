@@ -33,9 +33,21 @@
         </doc>
     </type>
 
+    <type name="int32" base="number">
+        <doc>
+            An integer.
+        </doc>
+    </type>
+
     <type name="string" base="value">
         <doc>
             A string.
+        </doc>
+    </type>
+
+    <type name="double" base="number">
+        <doc>
+            A double.
         </doc>
     </type>
 
