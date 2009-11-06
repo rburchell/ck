@@ -35,11 +35,20 @@ private:
 
 private slots:
     void initTestCase();
+    void cleanupTestCase();
 };
 
 void ContextTypeRegistryInfoUnitTest::initTestCase()
 {
+    utilCopyLocalAtomically("core.types.src", "core.types");
+    utilSetEnv("CONTEXT_TYPES", "./");
+    utilSetEnv("CONTEXT_CORE_TYPES", "core.types");
     registry = ContextTypeRegistryInfo::instance();
+}
+
+void ContextTypeRegistryInfoUnitTest::cleanupTestCase()
+{
+     QFile::remove("core.types");
 }
 
 #include "contexttyperegistryinfounittest.moc"

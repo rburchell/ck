@@ -4,7 +4,7 @@ check_PROGRAMS = contexttyperegistryinfounittest
 contexttyperegistryinfounittest_SOURCES = contexttyperegistryinfounittest.cpp
 
 COVERAGE_FILES = contexttyperegistryinfo.cpp
-EXTRA_DIST =
+EXTRA_DIST = core.types.src
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always
