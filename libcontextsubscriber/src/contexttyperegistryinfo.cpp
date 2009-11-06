@@ -103,31 +103,31 @@ NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
 }
 
 /// Returns in instance of the int64 type definition.
-ContextTypeInfo ContextTypeRegistryInfo::int64Type()
+NanoTree ContextTypeRegistryInfo::int64Type()
 {
     return typeDefinitionForName("int64");
 }
 
 /// Returns in instance of the string type definition.
-ContextTypeInfo ContextTypeRegistryInfo::stringType()
+NanoTree ContextTypeRegistryInfo::stringType()
 {
     return typeDefinitionForName("string");
 }
 
 /// Returns in instance of the double type definition.
-ContextTypeInfo ContextTypeRegistryInfo::doubleType()
+NanoTree ContextTypeRegistryInfo::doubleType()
 {
     return typeDefinitionForName("double");
 }
 
 /// Returns in instance of the bool type definition.
-ContextTypeInfo ContextTypeRegistryInfo::boolType()
+NanoTree ContextTypeRegistryInfo::boolType()
 {
     return typeDefinitionForName("bool");
 }
 
 /// Returns in instance of the int32 type definition.
-ContextTypeInfo ContextTypeRegistryInfo::int32Type()
+NanoTree ContextTypeRegistryInfo::int32Type()
 {
     return typeDefinitionForName("int32");
 }

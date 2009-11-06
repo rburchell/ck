@@ -25,7 +25,6 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include "contexttypeinfo.h"
 #include "nanotree.h"
 
 class ContextTypeRegistryInfo : public QObject
@@ -39,11 +38,11 @@ public:
     QString coreTypesPath();
     NanoTree typeDefinitionForName(QString name);
 
-    ContextTypeInfo int64Type();
-    ContextTypeInfo int32Type();
-    ContextTypeInfo stringType();
-    ContextTypeInfo boolType();
-    ContextTypeInfo doubleType();
+    NanoTree int64Type();
+    NanoTree int32Type();
+    NanoTree stringType();
+    NanoTree boolType();
+    NanoTree doubleType();
 
 private:
     ContextTypeRegistryInfo(); ///< Private constructor. Do not use.
