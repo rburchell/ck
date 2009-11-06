@@ -39,6 +39,18 @@
         </doc>
     </type>
 
+    <type name="int64" base="number">
+        <doc>
+            An integer.
+        </doc>
+    </type>
+
+    <type name="bool" base="number">
+        <doc>
+            A boolean.
+        </doc>
+    </type>
+
     <type name="string" base="value">
         <doc>
             A string.

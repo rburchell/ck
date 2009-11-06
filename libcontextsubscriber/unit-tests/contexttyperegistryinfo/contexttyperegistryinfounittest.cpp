@@ -39,6 +39,8 @@ private slots:
     void stringDef();
     void doubleDef();
     void int32Def();
+    void int64Def();
+    void boolDef();
 };
 
 void ContextTypeRegistryInfoUnitTest::initTestCase()
@@ -77,6 +79,23 @@ void ContextTypeRegistryInfoUnitTest::int32Def()
 
     NanoTree oldDef = registry->typeDefinitionForName("INT");
     QCOMPARE(oldDef.keyValue("name").toString(), QString("int32"));
+}
+
+void ContextTypeRegistryInfoUnitTest::int64Def()
+{
+    NanoTree def = registry->int64Type();
+    QCOMPARE(def.keyValue("name").toString(), QString("int64"));
+    QCOMPARE(def.keyValue("doc").toString(), QString("An integer."));
+}
+
+void ContextTypeRegistryInfoUnitTest::boolDef()
+{
+    NanoTree def = registry->boolType();
+    QCOMPARE(def.keyValue("name").toString(), QString("bool"));
+    QCOMPARE(def.keyValue("doc").toString(), QString("A boolean."));
+
+    NanoTree oldDef = registry->typeDefinitionForName("TRUTH");
+    QCOMPARE(oldDef.keyValue("name").toString(), QString("bool"));
 }
 
 void ContextTypeRegistryInfoUnitTest::cleanupTestCase()
