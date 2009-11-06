@@ -41,6 +41,7 @@ private slots:
     void int32Def();
     void int64Def();
     void boolDef();
+    void registryPath();
 };
 
 void ContextTypeRegistryInfoUnitTest::initTestCase()
@@ -96,6 +97,11 @@ void ContextTypeRegistryInfoUnitTest::boolDef()
 
     NanoTree oldDef = registry->typeDefinitionForName("TRUTH");
     QCOMPARE(oldDef.keyValue("name").toString(), QString("bool"));
+}
+
+void ContextTypeRegistryInfoUnitTest::registryPath()
+{
+    QCOMPARE(registry->registryPath(),QString("./"));
 }
 
 void ContextTypeRegistryInfoUnitTest::cleanupTestCase()
