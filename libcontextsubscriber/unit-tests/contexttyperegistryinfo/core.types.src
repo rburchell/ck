@@ -20,19 +20,6 @@
         </doc>
     </type>
 
-    <type name="integer" base="number">
-        <params>
-            <min doc="Lower bound"/>
-            <max doc="Upper bound"/>
-        </params>
-        <doc>
-            A integer, represented as any of the numeric types.  If the value
-            is a "double", it is rounded to an integer, but not necessarily to
-            the nearest.  The "min" and "max" parameters, when given, constrain
-            the range of the integer.
-        </doc>
-    </type>
-
     <type name="int32" base="number">
         <doc>
             An integer.
