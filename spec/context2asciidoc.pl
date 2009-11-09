@@ -172,12 +172,7 @@ sub print_type_long_desc {
 
 sub output_key {
     my $key = to_nano_dom (shift);
-
-    my $type = nano_ref ($key, 'typedoc');
-    if (!$type)
-    {
-        $type = nano_ref ($key, 'type');
-    }
+    my $type = nano_ref ($key, 'type');
 
     print "\n";
     print "*" . nano_ref ($key, 'name') . "* (" . type_short_desc ($type) . ")::\n";
