@@ -1,4 +1,4 @@
-contextkit (0.5~unreleased) unstable; urgency=low
+contextkit (0.5) unstable; urgency=low
 
   * Released as 0.5 because of a version numbering bug, no major new features,
     which explains the version bump.
@@ -6,9 +6,8 @@ contextkit (0.5~unreleased) unstable; urgency=low
   * context-provide:
     - starts the service automatically, restarts on property additions
     - removed the old python version, --v2 is implied now
-  *
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 30 Oct 2009 03:31:16 +0200
+ -- Gergely Risko <gergely+context@risko.hu>  Mon, 09 Nov 2009 15:28:43 +0200
 
 contextkit (0.4) unstable; urgency=low
 
