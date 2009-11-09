@@ -126,7 +126,19 @@ a Nepomuk object inside the Content Framework.)
     <doc>
 A list of URIs for contacts that are physically nearby.
     </doc>
-  </key>    
+  </key>
+  <doc>
+Position
+---------
+
+Information about the physical position of the device.
+  </doc>
+  <key name="Position.Stable"
+       type="bool">
+    <doc>
+A boolean indicating whether or not the position is stable, i.e., the device does not move.
+    </doc>
+  </key>
   <doc>
 Battery
 -------
