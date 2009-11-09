@@ -50,7 +50,12 @@ class Reader(Thread):
             # not equivalent with a while self.running, this is repeat ... until
             if not self.running:
                 break
-        self.cltool.wait()
+        rc = self.cltool.process.wait()
+        if rc < 0:
+            self.cltool.comment("TERMINATED WITH SIGNAL %d" % -rc)
+            self.cltool.printio()
+        elif rc > 0:
+            self.cltool.comment("EXIT CODE: %d" % rc)
         self.cltool = None
 
 class CLTool:
@@ -172,14 +177,10 @@ class CLTool:
         self.process.stdin.close()
 
     def wait(self):
-        """Waits for the child (using wait(2))."""
-        rc = self.process.wait()
-        if rc < 0:
-            self.comment("TERMINATED WITH SIGNAL %d" % -rc)
-            self.printio()
-        elif rc > 0:
-            self.comment("EXIT CODE: %d" % rc)
-        return rc
+        """Close standard input and wait for the reader"""
+        self.close()
+        self.reader.join()
+        return self.process.returncode
 
     def printio(self):
         """Dump the io log to the standard output."""
