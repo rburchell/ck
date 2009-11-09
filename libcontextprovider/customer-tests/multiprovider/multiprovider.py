@@ -75,8 +75,6 @@ class MultiProvider(unittest.TestCase):
                 client.send("assign session com.nokia.test.b providerB")
                 client.expect("Assigned providerB")
 
-                sleep(2)
-
                 client.send("subscribe providerA test.int")
                 self.assert_(client.expect("Subscribe returned: int:1"))
 
@@ -143,8 +141,6 @@ class MultiProvider(unittest.TestCase):
                 client.send("assign session com.nokia.test.b providerB")
                 self.assert_(client.expect("Assigned providerB"))
 
-                sleep(2)
-
                 client.send("subscribe providerA test.double")
                 self.assert_(client.expect("Subscribe returned: double:1.5"))
 
@@ -207,8 +203,6 @@ class MultiProvider(unittest.TestCase):
 
                 client.send("assign session com.nokia.test.b providerB")
                 self.assert_(client.expect("Assigned providerB"))
-
-                sleep(2)
 
                 client.send("subscribe providerA test.truth")
                 self.assert_(client.expect("Subscribe returned: bool:true"))
