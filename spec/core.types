@@ -8,6 +8,12 @@
         </doc>
     </type>
 
+    <type name="bool" base="value">
+      <doc>
+        A boolean.
+      </doc>
+    </type>
+
     <type name="number" base="value">
         <params>
             <min doc="Lower bound"/>
