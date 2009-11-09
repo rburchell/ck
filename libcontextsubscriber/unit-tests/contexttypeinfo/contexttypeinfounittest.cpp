@@ -97,6 +97,7 @@ private slots:
     void name();
     void doc();
     void base();
+    void empty();
     void definition();
     void parameterDoc();
     void ensureNewTypes();
@@ -118,6 +119,14 @@ void ContextTypeInfoUnitTest::name()
 void ContextTypeInfoUnitTest::doc()
 {
     QCOMPARE(ContextTypeInfo(QString("double")).doc(), QString("double doc"));
+}
+
+void ContextTypeInfoUnitTest::empty()
+{
+    ContextTypeInfo cti;
+    QCOMPARE(cti.name(), QString());
+    QCOMPARE(cti.doc(), QString());
+    QVERIFY(cti.parameters().size() == 0);
 }
 
 void ContextTypeInfoUnitTest::definition()
