@@ -30,21 +30,17 @@ from ContextKit.cltool import CLTool
 property_name = ""
 
 class HasProvider(unittest.TestCase):
-
     def test_has_provider(self):
         global property_name
         # start listening to the property
         context_client = CLTool("context-listen", property_name)
-        context_client.expect(CLTool.STDERR, "Available commands", 10) # wait until started
 
         context_client.send("providers " + property_name)
 
         # assert that there is at least one provider; plugin and
         # constructionstring are separated with @ in the provider
         # desription
-        self.assert_(context_client.expect(CLTool.STDOUT,
-                                           "@",
-                                           3)) # timeout == 3 seconds
+        self.assert_(context_client.expect("@"))
 
 def runTests():
     suite = unittest.TestLoader().loadTestsFromTestCase(HasProvider)

@@ -13,7 +13,8 @@ XMLLINT = xmllint --noout --schema
 
 SPEC_TOOLS = spec-to-introspect.xsl \
              context2asciidoc.pl \
-             doc-generator.xsl
+             doc-generator.xsl \
+             xs3p
 
 INTERFACES = \
 	Manager.xml \
@@ -60,7 +61,8 @@ EXTRA_DIST = \
 	all.xml \
 	context.xsd \
 	$(SPEC_TOOLS) \
-        myfilter.conf
+        myfilter.conf \
+        Context.owl
 
 MAINTAINERCLEANFILES = \
 	$(INTROSPECT) \

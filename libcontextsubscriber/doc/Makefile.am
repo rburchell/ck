@@ -14,7 +14,7 @@ html/index.html: ../src/*.cpp ../src/*.h
 		echo This is a VPATH build, so not building doxygen; \
 	fi
 
-EXTRA_DIST = $(DOXYCFG) html
+EXTRA_DIST = $(DOXYCFG) html async-demo
 
 distclean-local:
 	rm -f doxygen.log

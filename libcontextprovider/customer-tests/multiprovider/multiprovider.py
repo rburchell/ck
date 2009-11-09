@@ -61,51 +61,41 @@ class MultiProvider(unittest.TestCase):
                 """
                 provider_a = CLTool("context-provide", "--v2", "--session", "com.nokia.test.a",
                                   "int","test.int","1")
-                provider_a.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+                provider_a.expect("Added key") # wait for it
 
                 provider_b = CLTool("context-provide", "--v2", "--session", "com.nokia.test.b",
                                   "int","test.int","2")
-                provider_b.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+                provider_b.expect("Added key") # wait for it
 
                 client = CLTool("client")
 
                 client.send("assign session com.nokia.test.a providerA")
-                client.expect(CLTool.STDOUT,
-				   "Assigned providerA",3)
+                client.expect("Assigned providerA")
 
                 client.send("assign session com.nokia.test.b providerB")
-                client.expect(CLTool.STDOUT,
-				   "Assigned providerB",3)
-
-                sleep(2)
+                client.expect("Assigned providerB")
 
                 client.send("subscribe providerA test.int")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Subscribe returned: int:1",3))
+                self.assert_(client.expect("Subscribe returned: int:1"))
 
                 client.send("subscribe providerB test.int")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Subscribe returned: int:2",3))
+                self.assert_(client.expect("Subscribe returned: int:2"))
 
                 provider_a.send("test.int = 2")
                 client.send("waitforchanged 1000")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/int int:2",3))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/int int:2"))
 
                 provider_b.send("test.int = 1")
                 client.send("waitforchanged 1000")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "ValueChanged: com.nokia.test.b /org/maemo/contextkit/test/int int:1",3))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.b /org/maemo/contextkit/test/int int:1"))
 
                 provider_a.send("test.int = 1")
                 client.send("waitforchanged 1000")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/int int:1",3))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/int int:1"))
 
                 provider_b.send("test.int = 2")
                 client.send("waitforchanged 1000")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "ValueChanged: com.nokia.test.b /org/maemo/contextkit/test/int int:2",3))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.b /org/maemo/contextkit/test/int int:2"))
 
                 client.close()
                 provider_a.close()
@@ -137,46 +127,37 @@ class MultiProvider(unittest.TestCase):
                 """
                 provider_a = CLTool("context-provide", "--v2", "--session", "com.nokia.test.a",
                                   "double","test.double","1.5")
-                provider_a.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+                provider_a.expect("Added key") # wait for it
 
                 provider_b = CLTool("context-provide", "--v2", "--session", "com.nokia.test.b",
                                   "double","test.double","2.5")
-                provider_b.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+                provider_b.expect("Added key") # wait for it
 
                 client = CLTool("client")
 
                 client.send("assign session com.nokia.test.a providerA")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Assigned providerA",3))
+                self.assert_(client.expect("Assigned providerA"))
 
                 client.send("assign session com.nokia.test.b providerB")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Assigned providerB",3))
-
-                sleep(2)
+                self.assert_(client.expect("Assigned providerB"))
 
                 client.send("subscribe providerA test.double")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Subscribe returned: double:1.5",3))
+                self.assert_(client.expect("Subscribe returned: double:1.5"))
 
                 client.send("subscribe providerB test.double")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Subscribe returned: double:2.5",3))
+                self.assert_(client.expect("Subscribe returned: double:2.5"))
 
                 provider_a.send("test.double = 3.5")
                 client.send("waitforchanged 3000")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/double double:3.5",3))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/double double:3.5"))
 
                 provider_b.send("test.double = 4.5")
                 client.send("waitforchanged 3000")
-                self.assert_(client.expect(CLTool.STDOUT,
-                    "ValueChanged: com.nokia.test.b /org/maemo/contextkit/test/double double:4.5",3))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.b /org/maemo/contextkit/test/double double:4.5"))
 
                 provider_a.send("test.double = 3.5")
                 client.send("waitforchanged 3000")
-                self.assert_(client.expect(CLTool.STDOUT,
-                    "ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/double double:3.5",3))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/double double:3.5"))
 
                 client.close()
                 provider_a.close()
@@ -209,46 +190,37 @@ class MultiProvider(unittest.TestCase):
                 """
                 provider_a = CLTool("context-provide", "--v2", "--session", "com.nokia.test.a",
                                   "truth","test.truth","true")
-                provider_a.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+                provider_a.expect("Added key") # wait for it
 
                 provider_b = CLTool("context-provide", "--v2", "--session", "com.nokia.test.b",
                                     "truth","test.truth","false")
-                provider_b.expect(CLTool.STDOUT, "Added key", 10) # wait for it
+                provider_b.expect("Added key") # wait for it
 
                 client = CLTool("client")
 
                 client.send("assign session com.nokia.test.a providerA")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Assigned providerA",3))
+                self.assert_(client.expect("Assigned providerA"))
 
                 client.send("assign session com.nokia.test.b providerB")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Assigned providerB",3))
-
-                sleep(2)
+                self.assert_(client.expect("Assigned providerB"))
 
                 client.send("subscribe providerA test.truth")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Subscribe returned: bool:true",3))
+                self.assert_(client.expect("Subscribe returned: bool:true"))
 
                 client.send("subscribe providerB test.truth")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Subscribe returned: bool:false",3))
+                self.assert_(client.expect("Subscribe returned: bool:false"))
 
                 provider_a.send("test.truth = false")
                 client.send("waitforchanged 3000")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/truth bool:false",3))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/truth bool:false"))
 
                 provider_b.send("test.truth = false")
                 client.send("waitforchanged 5000")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Timeout",6))
+                self.assert_(client.expect("Timeout", timeout = 6))
 
                 provider_a.send("test.truth = false")
                 client.send("waitforchanged 5000")
-                self.assert_(client.expect(CLTool.STDOUT,
-				   "Timeout",6))
+                self.assert_(client.expect("Timeout", timeout = 6))
 
                 client.close()
                 provider_a.close()

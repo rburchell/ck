@@ -67,7 +67,6 @@ CommandWatcher::~CommandWatcher()
 
 void CommandWatcher::onRegistryChanged()
 {
-    qDebug() << "registry changed";
     foreach (PropertyProxy *p, proxies)
         delete p;
     proxies.clear();
@@ -206,8 +205,10 @@ void CommandWatcher::addCommand(const QStringList& args)
     else
         unsetCommand(QStringList(keyName));
 
-    // if service is already started then it has to be restarted after a property is added
-    if (started && busName != CommandWatcher::commanderBusName)
+    // If service is already started then it has to be restarted after
+    // a property is added.  In commander mode if the property is
+    // already provided with a proxy, then no restart is necessary.
+    if (started && (busName != CommandWatcher::commanderBusName || !proxies.contains(keyName)))
         startCommand();
 }
 

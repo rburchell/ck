@@ -33,7 +33,7 @@
 import sys
 import os
 import unittest
-from ContextKit.cltool import CLTool
+from ContextKit.cltool import CLTool, wanted
 
 class CommanderNonExistent(unittest.TestCase):
         def tearDown(self):
@@ -42,33 +42,27 @@ class CommanderNonExistent(unittest.TestCase):
         def testCommanderFunctionality(self):
                 provider = CLTool("context-provide", "--v2", "com.nokia.test", "int", "test.int", "42")
                 provider.send("dump")
-                self.assert_(provider.expect(CLTool.STDOUT, "Wrote", 10)) # wait for it
+                self.assert_(provider.expect("Wrote")) # wait for it
                 listen = CLTool("context-listen", "test.int", "test.string")
-                listen.expect(CLTool.STDERR, "Available commands", 10) # wait for starting
+                listen.expect("Available commands") # wait for starting
 
                 commander = CLTool("context-provide", "--v2")
-                commander.send("add string test.int foobar")
-                commander.send("add string test.string barfoo")
-                commander.send("start")
-                commander.expect(CLTool.STDOUT, "Added", 10) # wait for it
-                commander.expect(CLTool.STDOUT, "Added", 10) # wait for it
 
-                self.assert_(listen.expect(CLTool.STDERR,
-                                           'Provider error, bad type for  "test.int" wanted: "INT" got: QString',
-                                           1),
+                # check type-check
+                commander.send("add string test.int foobar")
+                commander.expect("Added key: test.int")
+                self.assert_(listen.expect('Provider error, bad type for  "test.int" wanted: "INT" got: QString'),
                              "Type check didn't work")
 
                 # check the non-existent property
-                self.assert_(listen.expect(CLTool.STDOUT,
-                                           CLTool.wanted("test.string", "QString", "barfoo"),
-                                           1),
-                     "Non-existent property couldn't be commanded")
+                commander.send("add string test.string barfoo")
+                commander.expect("Added key: test.string")
+                self.assert_(listen.expect(wanted("test.string", "QString", "barfoo")),
+                             "Non-existent property couldn't be commanded")
 
                 # change the type of the non-existent property
                 commander.send("add int test.string 42")
-                self.assert_(listen.expect(CLTool.STDOUT,
-                                           CLTool.wanted("test.string", "int", "42"),
-                                           1),
+                self.assert_(listen.expect(wanted("test.string", "int", "42")),
                              "Non-existent property's type couldn't be overwritten")
 
 def runTests():

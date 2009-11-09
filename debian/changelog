@@ -1,6 +1,12 @@
-contextkit (0.4.1~unreleased) unstable; urgency=low
+contextkit (0.5~unreleased) unstable; urgency=low
 
-  * 
+  * Released as 0.5 because of a version numbering bug, no major new features,
+    which explains the version bump.
+  * New core property: Position.Stable
+  * context-provide:
+    - starts the service automatically, restarts on property additions
+    - removed the old python version, --v2 is implied now
+  *
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 30 Oct 2009 03:31:16 +0200
 

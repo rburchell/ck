@@ -10,7 +10,7 @@ Build-Depends: debhelper (>= 5),
                libcdb-dev,
                libglib2.0-dev (>= 2.12.0),
                libdbus-1-dev,
-               libqjson,
+               libqjson-dev,
                xsltproc,
                doxygen
 XS-Python-Version: all
@@ -66,7 +66,7 @@ Description: Helper library for providers of context properties
 Package: libcontextprovider-tests
 Section: devel
 Architecture: any
-Depends: libcontextprovider0, contextkit-utils, python-contextkit, ${shlibs:Depends}
+Depends: libcontextprovider0, contextkit-utils, python-contextkit, ${shlibs:Depends}, python (>= 2.5)
 XB-Maemo-CI-Packages: libcontextprovider0
 XB-Maemo-CI-Stage: staging, acceptance
 Description: libcontextprovider automated customer tests
@@ -95,7 +95,7 @@ Description: Python bindings for ContextKit APIs
 Package: contextkit-utils
 Section: utils
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-contextkit, python-dbus, python, libqjson
+Depends: ${shlibs:Depends}, ${misc:Depends}, libqjson
 Description: Command line utilities for ContextKit
  This package contains the context-provide and context-listen
  tools. You can use context-provide to quickly provide context
@@ -142,8 +142,7 @@ Description: Helper library for subscribers of context properties
 Package: libcontextsubscriber-tests
 Section: devel
 Architecture: any
-Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit, ${shlibs:Depends}
-Recommends: python2.5, python (>= 2.5)
+Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit, ${shlibs:Depends}, python (>= 2.5)
 XB-Maemo-CI-Packages: libcontextsubscriber0, libcontextprovider0
 XB-Maemo-CI-Stage: staging, acceptance
 Description: libcontextsubscriber automated customer tests
@@ -156,8 +155,7 @@ Description: libcontextsubscriber automated customer tests
 Package: propertymonitor-tests
 Section: devel
 Architecture: any
-Depends: contextkit-utils
+Depends: contextkit-utils, python (>= 2.5)
 XB-Maemo-CI-Stage: staging, validation
 Description: Property monitor
- .
  This package contains an automated test suite for monitoring which Context FW properties are provided.

@@ -18,6 +18,10 @@ endif
 
 EXTRA_DIST = $(html_ASCIIDOCS) \
              $(html_DATA) \
-             myfilter.conf
+             myfilter.conf \
+             context-cron.txt \
+             context-talk.txt \
+             protocol-suggestion.txt \
+             lgpl-2.1.txt
 
 MAINTAINERCLEANFILES = $(html_DATA)

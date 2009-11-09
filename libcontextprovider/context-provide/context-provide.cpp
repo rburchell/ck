@@ -42,26 +42,16 @@ int main(int argc, char **argv)
 
     // I hate libtool
 
-    // Check that we are not called with our internal name
-    if (args[0].endsWith("context-provide-internal") &&
-        !args[0].endsWith("lt-context-provide-internal")) {
-        out << "Please don't use this binary directly!\n";
-    }
-
-    if (args.contains("--help") || args.contains("-h") ||
-        (args[0].endsWith("context-provide-internal") &&
-         !args[0].endsWith("lt-context-provide-internal"))) {
+    if (args.contains("--help") || args.contains("-h")) {
         // Help? Show it and be gone.
-        // FIXME: has to replace this with argv[0]
-        out << "Usage: context-provide --v2 [--session | --system] [BUSNAME]\n";
+        out << "Usage: " << argv[0] << " [--session | --system] [BUSNAME]\n";
         out << "BUSNAME is " << CommandWatcher::commanderBusName << " by default, and bus is session.\n";
         return 0;
     }
 
-    // Silently dropping --v2
-    if (args.contains("--v2")) {
+    // Silently dropping --v2, which might be still used by some tests.
+    if (args.contains("--v2"))
         args.removeAll("--v2");
-    }
 
     // session/system
     if (args.contains("--session")) {
@@ -107,16 +97,7 @@ int main(int argc, char **argv)
     for (int i=2; i < args.count(); i+=3)
         commandWatcher.addCommand(args.mid(i, 3));
 
-    if (args.count() > 2) {
-        qDebug() << "Autostarting the service, since you have had properties on the command line";
-        if (!service.start()) {
-            qDebug() << "Starting service failed";
-            return 2;
-        }
-    } else {
-        qDebug() << "SERVICE NOT STARTED, since you haven't had parameters on the command line";
-        qDebug() << "Use the start command when you are ready to be registered on D-Bus";
-    }
+    commandWatcher.startCommand();
 
     return app.exec();
 }

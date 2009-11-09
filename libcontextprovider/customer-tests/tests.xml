@@ -3,6 +3,7 @@
   <suite name="libcontextprovider-tests">
     <set name="libcontextprovider suite" description="libcontextprovider tests">
       <pre_steps>
+        <step expected_result="0">/usr/share/libcontextprovider-tests/waitforsilence</step>
       </pre_steps>
       <case name="c-api" description="C API of libcontextprovider" requirement="" timeout="50">
         <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/lib/libcontextprovider-tests/;./cprovidertests</step>
@@ -19,15 +20,22 @@
       <case name="service" description="Operations on the Service class" requirement="" timeout="50">
         <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/lib/libcontextprovider-tests/;./servicetest</step>
       </case>
-      <case name="multiprovider" description="Scenarios involving
-											  several providers" requirement="" timeout="50">
-        <step expected_result="0">. /tmp/session_bus_address.user;export
-        PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py</step>
+      <case name="multiprovider1" description="Scenarios involving many providers">
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py MultiProvider.testPingPong</step>
+      </case>
+      <case name="multiprovider2" description="Scenarios involving many providers">
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py MultiProvider.testOverheardValues</step>
+      </case>
+      <case name="multiprovider3" description="Scenarios involving many providers">
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py MultiProvider.testBothProvidersSameValue</step>
       </case>
       <environments>
         <scratchbox>false</scratchbox>
         <hardware>true</hardware>
       </environments>
+      <get>
+        <file>/tmp/xyzzy.log</file>
+      </get>
     </set>
   </suite>
 </testdefinition>

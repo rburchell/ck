@@ -1,0 +1,12 @@
+prefix=
+exec_prefix=
+libdir=${pcfiledir}/src
+includedir=${pcfiledir}/src
+
+Name: contextsubscriber
+Description: ContextKit Context Subscriber library
+Version: uninstalled
+Requires: QtCore
+Requires.private: QtDBus QtXml
+Libs: -L${libdir} -lcontextsubscriber
+Cflags: -I${includedir}

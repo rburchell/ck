@@ -1,5 +1,5 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.4.1~unreleased], [marius.vollmer@nokia.com], ContextKit)
+AC_INIT([ContextKit], [0.5~unreleased], [marius.vollmer@nokia.com], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign dist-bzip2 tar-ustar 1.9])
@@ -81,7 +81,6 @@ AC_CONFIG_FILES([
         libcontextprovider/doc/Makefile
         libcontextprovider/src/Makefile
         libcontextprovider/context-provide/Makefile
-        libcontextprovider/man/Makefile
         libcontextprovider/unit-tests/Makefile
         libcontextprovider/unit-tests/contextgroup/Makefile
         libcontextprovider/unit-tests/property/Makefile
@@ -98,7 +97,6 @@ AC_CONFIG_FILES([
         python/Makefile
         spec/Makefile
         tools/Makefile
-        tools/loadmem/Makefile
 ])
 
 AC_OUTPUT

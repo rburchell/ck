@@ -1,3 +1,4 @@
 usr/share/propertymonitor-tests/has_value.py
 usr/share/propertymonitor-tests/has_provider.py
 usr/share/propertymonitor-tests/tests.xml
+usr/share/propertymonitor-tests/waitforsilence

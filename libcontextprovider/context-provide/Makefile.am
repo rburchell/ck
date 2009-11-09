@@ -1,5 +1,6 @@
-bin_PROGRAMS = context-provide-internal
-context_provide_internal_SOURCES = context-provide.cpp		\
+dist_man_MANS = context-provide.1
+bin_PROGRAMS = context-provide
+context_provide_SOURCES = context-provide.cpp		\
 	commandwatcher.cpp commandwatcher.h propertyproxy.h	\
 	propertyproxy.cpp
 
@@ -12,7 +13,7 @@ AM_CXXFLAGS += -I$(srcdir)/../src \
 	       -I$(top_srcdir)/common \
 	       -I$(top_srcdir)/libcontextsubscriber/src
 
-context_provide_internal_LDADD = ../src/libcontextprovider.la $(top_builddir)/common/libcommon.la $(top_builddir)/libcontextsubscriber/src/libcontextsubscriber.la
+context_provide_LDADD = ../src/libcontextprovider.la $(top_builddir)/common/libcommon.la $(top_builddir)/libcontextsubscriber/src/libcontextsubscriber.la
 
 ../src/libcontextprovider.la: FORCE
 	$(MAKE) -C ../src libcontextprovider.la
@@ -23,6 +24,6 @@ context_provide_internal_LDADD = ../src/libcontextprovider.la $(top_builddir)/co
 .PHONY: FORCE
 
 # moccing
-nodist_context_provide_internal_SOURCES = mocs.cpp
-QT_TOMOC = $(filter %.h, $(context_provide_internal_SOURCES))
+nodist_context_provide_SOURCES = mocs.cpp
+QT_TOMOC = $(filter %.h, $(context_provide_SOURCES))
 include $(top_srcdir)/am/qt.am

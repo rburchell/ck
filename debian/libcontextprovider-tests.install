@@ -1,4 +1,5 @@
 usr/share/libcontextprovider-tests/tests.xml
+usr/share/libcontextprovider-tests/waitforsilence
 usr/lib/libcontextprovider-tests/client
 usr/lib/libcontextprovider-tests/cprovidertests
 usr/lib/libcontextprovider-tests/subscriptiontests

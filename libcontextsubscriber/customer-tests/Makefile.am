@@ -1,7 +1,7 @@
 SUBDIRS = update-contextkit-providers testplugins
 
 libcontextsubscribertestsdir = $(datadir)/libcontextsubscriber-tests
-libcontextsubscribertests_DATA = tests.xml
+dist_libcontextsubscribertests_DATA = tests.xml
 
 coverage: covoptioncheck
 	COVERAGE=1 ./runTests.sh
@@ -17,7 +17,7 @@ clean-local:
 CLEANFILES = *.pyc
 
 EXTRA_DIST = asynchronicity commander subscription runTests.sh	\
-             tests.xml common registry pluginchanging env.sh	\
-             coverage-build
+             registry pluginchanging env.sh coverage-build      \
+             waitforsilence
 
 include $(top_srcdir)/am/covoptioncheck.am
