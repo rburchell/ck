@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Make a asciidoc document from spec/context.xml 
+# Make a asciidoc document from spec/core.context or spec/core.types
 #
 
 use XML::DOM;
@@ -156,7 +156,7 @@ sub print_type_long_desc {
         print "--\n";
     } elsif ($name eq "map") {
         print "+\n--\nPossible map keys: \n[horizontal]\n";
-        my $keys = nano_assoc ($parms, 'allowed-keys');
+        my $keys = nano_assoc ($parms, 'keys');
         foreach (@{$keys}) {
             print car ($_) . ":: " . nano_ref (cdr ($_), 'doc') . "\n";
         }
@@ -180,6 +180,34 @@ sub output_key {
     print_type_long_desc ($type);
 }
 
+sub output_typedef {
+    my $typedef = to_nano_dom (shift);
+
+    print "\n";
+    print "*" . nano_ref ($typedef, 'name') . "*::\n";
+    print nano_ref ($typedef, 'doc') . "\n";
+    print "+\n";
+    
+    my $params = nano_assoc ($typedef, 'params');
+    foreach (@{$params}) {
+        my $pt = nano_ref ($_, 'type');
+        my $pd = nano_ref ($_, 'doc');
+        print car ($_);
+        if ($pt) {
+            print " (" . type_short_desc ($pt) . ")";
+        }
+        if ($pd) {
+            print ": " . $pd;
+        }
+        print "\n+\n";
+    }
+
+    my $base = nano_ref ($typedef, 'base');
+    if ($base) {
+        print "Base: " . type_short_desc ($base) . "\n";
+    }
+}
+
 my $document = XML::DOM::Parser->new()->parse(STDIN);
 
 foreach ($document->getDocumentElement()->getChildNodes()) {
@@ -188,5 +216,7 @@ foreach ($document->getDocumentElement()->getChildNodes()) {
         output_doc ($node);
     } elsif ($node->getNodeName() eq "key") {
         output_key ($node);
+    } elsif ($node->getNodeName() eq "type") {
+        output_typedef ($node);
     }
 }
