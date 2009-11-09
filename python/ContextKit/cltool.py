@@ -27,7 +27,7 @@ import time
 import math
 import atexit
 import signal
-from threading import Thread, Lock, Event
+from threading import Thread, Lock
 from subprocess import Popen, PIPE, STDOUT
 
 class Reader(Thread):
@@ -39,15 +39,14 @@ class Reader(Thread):
     def run(self):
         while True:
             l = self.cltool.process.stdout.readline()
-            l = l.rstrip() + '\n'  # delete trailing whitespace
             if l:
+                l = l.rstrip() + '\n'  # delete trailing whitespace
                 event = (time.time(), CLTool.STDOUT, l)
             else:
                 event = (time.time(), CLTool.COMMENT, "EOF ON STDOUT")
                 self.running = False
             with self.cltool.iolock:
                 self.cltool.io.append(event)
-                self.cltool.output_notify.set()
             # not equivalent with a while self.running, this is repeat ... until
             if not self.running:
                 break
@@ -65,7 +64,6 @@ class CLTool:
                              preexec_fn=self._preexec)
         self.io = []
         self.iolock = Lock()
-        self.output_notify = Event()
         self.reader = Reader(self)
         self.last_expect = 0
         self.reader.start()
@@ -103,18 +101,14 @@ class CLTool:
         if wantdump:
             self.printio()
 
-    def _last_output(self, timeout):
+    def _last_output(self):
         """Compute the output read since the last match."""
-
-        self.output_notify.wait(timeout)
-
         r = []
         with self.iolock:
             for pos in xrange(self.last_expect, len(self.io)):
                 ts, fno, l = self.io[pos]
                 if fno == CLTool.STDOUT:
                     r.append(l)
-            self.output_notify.clear()
         return ''.join(r)
 
     # exp: is either a single or a list of regexes and all of them has to match
@@ -137,7 +131,7 @@ class CLTool:
             # enumerate all of the patterns and remove the matching ones
             i = 0
             now = time.time()
-            self.last_output = self._last_output(abs_timeout - now)
+            self.last_output = self._last_output()
             while i < len(rexp):
                 if re.search(rexp[i], self.last_output):
                     del rexp[i]
@@ -157,6 +151,7 @@ class CLTool:
             if not self.reader.running:
                 self._return_event(wantdump)
                 return False
+            time.sleep(0.1)
 
     def comment(self, st):
         """Append a comment to the io log."""
