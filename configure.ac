@@ -80,7 +80,6 @@ AC_CONFIG_FILES([
         libcontextprovider/doc/Makefile
         libcontextprovider/src/Makefile
         libcontextprovider/context-provide/Makefile
-        libcontextprovider/man/Makefile
         libcontextprovider/unit-tests/Makefile
         libcontextprovider/unit-tests/contextgroup/Makefile
         libcontextprovider/unit-tests/property/Makefile

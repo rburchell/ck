@@ -42,26 +42,16 @@ int main(int argc, char **argv)
 
     // I hate libtool
 
-    // Check that we are not called with our internal name
-    if (args[0].endsWith("context-provide-internal") &&
-        !args[0].endsWith("lt-context-provide-internal")) {
-        out << "Please don't use this binary directly!\n";
-    }
-
-    if (args.contains("--help") || args.contains("-h") ||
-        (args[0].endsWith("context-provide-internal") &&
-         !args[0].endsWith("lt-context-provide-internal"))) {
+    if (args.contains("--help") || args.contains("-h")) {
         // Help? Show it and be gone.
-        // FIXME: has to replace this with argv[0]
-        out << "Usage: context-provide --v2 [--session | --system] [BUSNAME]\n";
+        out << "Usage: " << argv[0] << " [--session | --system] [BUSNAME]\n";
         out << "BUSNAME is " << CommandWatcher::commanderBusName << " by default, and bus is session.\n";
         return 0;
     }
 
-    // Silently dropping --v2
-    if (args.contains("--v2")) {
+    // Silently dropping --v2, which might be still used by some tests.
+    if (args.contains("--v2"))
         args.removeAll("--v2");
-    }
 
     // session/system
     if (args.contains("--session")) {
