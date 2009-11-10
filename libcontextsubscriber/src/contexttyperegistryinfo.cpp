@@ -27,6 +27,29 @@
 #include <QCoreApplication>
 #include "nanoxml.h"
 
+/*!
+    \class ContextTypeRegistryInfo
+
+    \brief A class to access the type registry.
+
+    This is a singelton class used to obtain information about the core types defined
+    in the type registry. Information is provided as type definitions returned as
+    NanoTree instances. Each type definition is a QVariant tree wrapped in NanoTree
+    for easy helper key accessors.
+
+    \section Usage
+
+    To obtain a type definition for a given type:
+
+    \code
+    NanoTree typeDefinition = ContextTypeRegistryInfo::instance()->typeDefinitionForName("string-enum");
+    \endcode
+
+    Unless you're building a dedicated type-introspection application, you don't
+    want to deal with ContextTypeRegistryInfo directly. Instead, you can use the ContextTypeInfo
+    class to fetch concrete types and use the easy accessors provided there.
+*/
+
 ContextTypeRegistryInfo* ContextTypeRegistryInfo::registryInstance = NULL;
 
 /* Public */
