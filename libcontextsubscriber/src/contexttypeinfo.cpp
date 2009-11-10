@@ -58,6 +58,7 @@
    i.e., you can use it when the list of parameters is empty.
 */
 
+/// Buids a simple (no parameters) type with the given name.
 ContextTypeInfo::ContextTypeInfo(QString name)
 {
     QVariantList lst;
@@ -66,18 +67,22 @@ ContextTypeInfo::ContextTypeInfo(QString name)
     tree = NanoTree(lst);
 }
 
+/// Butilds a type based on the given tree.
 ContextTypeInfo::ContextTypeInfo(NanoTree t) : tree(t)
 {
 }
 
+/// Butilds a type based on the given variant.
 ContextTypeInfo::ContextTypeInfo(QVariant t) : tree(NanoTree(t))
 {
 }
 
+/// Butilds an empty type.
 ContextTypeInfo::ContextTypeInfo()
 {
 }
 
+/// Butilds a type cloning the other type
 ContextTypeInfo::ContextTypeInfo(const ContextTypeInfo& info) : tree(info.tree)
 {
 }
@@ -114,6 +119,7 @@ ContextTypeInfo ContextTypeInfo::operator=(const ContextTypeInfo& info)
     return *this;
 }
 
+/// Returns the name of the type (such as 'double').
 QString ContextTypeInfo::name() const
 {
     if (tree.type() == QVariant::List)
@@ -122,6 +128,8 @@ QString ContextTypeInfo::name() const
         return tree.toString();
 }
 
+/// Returns the list of parameter nodes. Each node is a QVariant with key
+/// descriptor and the key value.
 QVariantList ContextTypeInfo::parameters() const
 {
     if (tree.type() == QVariant::List)
@@ -130,31 +138,38 @@ QVariantList ContextTypeInfo::parameters() const
         return QVariantList();
 }
 
+/// Returns the NanoTree (a QVariant) with the type definition for this type.
 NanoTree ContextTypeInfo::definition() const
 {
     return ContextTypeRegistryInfo::instance()->typeDefinitionForName(name());
 }
 
+/// Returns a documentation for the parameter with name \a p.
 QString ContextTypeInfo::parameterDoc(QString p) const
 {
     return definition().keyValue("params", p, "doc").toString();
 }
 
+/// Returns the current parameter value for the parameter \a p.
 QVariant ContextTypeInfo::parameterValue(QString p) const
 {
     return tree.keyValue(p);
 }
 
+/// Returns the QVariant node (key + value) for the parameter \a p.
 NanoTree ContextTypeInfo::parameterNode(QString p) const
 {
     return tree.keyNode(p);
 }
 
+/// Returns the document for this type. The documentation is fetched according to the
+/// type definition.
 QString ContextTypeInfo::doc() const
 {
     return definition().keyValue("doc").toString();
 }
 
+/// Returns the base type for this type.
 ContextTypeInfo ContextTypeInfo::base() const
 {
     return ContextTypeInfo(definition().keyValue("base").toString());

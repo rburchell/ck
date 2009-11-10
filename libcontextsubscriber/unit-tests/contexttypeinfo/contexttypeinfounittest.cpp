@@ -97,11 +97,13 @@ private slots:
     void name();
     void doc();
     void base();
+    void empty();
     void definition();
     void parameterDoc();
     void ensureNewTypes();
     void parameterValue();
     void parameterNode();
+    void parameters();
 };
 
 void ContextTypeInfoUnitTest::name()
@@ -117,6 +119,14 @@ void ContextTypeInfoUnitTest::name()
 void ContextTypeInfoUnitTest::doc()
 {
     QCOMPARE(ContextTypeInfo(QString("double")).doc(), QString("double doc"));
+}
+
+void ContextTypeInfoUnitTest::empty()
+{
+    ContextTypeInfo cti;
+    QCOMPARE(cti.name(), QString());
+    QCOMPARE(cti.doc(), QString());
+    QVERIFY(cti.parameters().size() == 0);
 }
 
 void ContextTypeInfoUnitTest::definition()
@@ -178,6 +188,24 @@ void ContextTypeInfoUnitTest::parameterNode()
     QCOMPARE(typeInfo.parameterNode("min").toList().at(1).toString(), QString("0"));
 }
 
+void ContextTypeInfoUnitTest::parameters()
+{
+    QVariantList lst;
+    QVariantList minParam;
+    lst << QVariant("complex");
+    minParam << QVariant("min");
+    minParam << QVariant("0");
+    lst << QVariant(minParam);
+    QVariant tree(lst);
+
+    ContextTypeInfo typeInfo(tree);
+    QVariantList params = typeInfo.parameters();
+    QCOMPARE(params.size(), 1);
+    QCOMPARE(params.at(0).toList().at(0).toString(), QString("min"));
+
+    QVariant variant("double");
+    QVERIFY(ContextTypeInfo(variant).parameters().size() == 0);
+}
 
 #include "contexttypeinfounittest.moc"
 QTEST_MAIN(ContextTypeInfoUnitTest);

@@ -27,10 +27,35 @@
 #include <QCoreApplication>
 #include "nanoxml.h"
 
+/*!
+    \class ContextTypeRegistryInfo
+
+    \brief A class to access the type registry.
+
+    This is a singelton class used to obtain information about the core types defined
+    in the type registry. Information is provided as type definitions returned as
+    NanoTree instances. Each type definition is a QVariant tree wrapped in NanoTree
+    for easy helper key accessors.
+
+    \section Usage
+
+    To obtain a type definition for a given type:
+
+    \code
+    NanoTree typeDefinition = ContextTypeRegistryInfo::instance()->typeDefinitionForName("string-enum");
+    \endcode
+
+    Unless you're building a dedicated type-introspection application, you don't
+    want to deal with ContextTypeRegistryInfo directly. Instead, you can use the ContextTypeInfo
+    class to fetch concrete types and use the easy accessors provided there.
+*/
+
 ContextTypeRegistryInfo* ContextTypeRegistryInfo::registryInstance = NULL;
 
 /* Public */
 
+/// Returns the singleton instance of the ContextTypeRegistryInfo. The object
+/// is constructed automaticall on first access.
 ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
 {
     static QMutex mutex;
@@ -68,6 +93,8 @@ QString ContextTypeRegistryInfo::coreTypesPath()
     return QString(corepath);
 }
 
+/// Returns a type definition for the type with the given name. The type
+/// is being fetched from the registry.
 NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
 {
     // Support for the old types
@@ -98,38 +125,39 @@ NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
     return NanoTree();
 }
 
-/// Returns in instance of the int64 type info.
-ContextTypeInfo ContextTypeRegistryInfo::int64Type()
+/// Returns in instance of the int64 type definition.
+NanoTree ContextTypeRegistryInfo::int64Type()
 {
     return typeDefinitionForName("int64");
 }
 
-/// Returns in instance of the string type info.
-ContextTypeInfo ContextTypeRegistryInfo::stringType()
+/// Returns in instance of the string type definition.
+NanoTree ContextTypeRegistryInfo::stringType()
 {
     return typeDefinitionForName("string");
 }
 
-/// Returns in instance of the double type info.
-ContextTypeInfo ContextTypeRegistryInfo::doubleType()
+/// Returns in instance of the double type definition.
+NanoTree ContextTypeRegistryInfo::doubleType()
 {
     return typeDefinitionForName("double");
 }
 
-/// Returns in instance of the bool type info.
-ContextTypeInfo ContextTypeRegistryInfo::boolType()
+/// Returns in instance of the bool type definition.
+NanoTree ContextTypeRegistryInfo::boolType()
 {
     return typeDefinitionForName("bool");
 }
 
-/// Returns in instance of the int32 type info.
-ContextTypeInfo ContextTypeRegistryInfo::int32Type()
+/// Returns in instance of the int32 type definition.
+NanoTree ContextTypeRegistryInfo::int32Type()
 {
     return typeDefinitionForName("int32");
 }
 
 /* Private */
 
+/// Private constructor. Do not use.
 ContextTypeRegistryInfo::ContextTypeRegistryInfo()
 {
     if (QFile(ContextTypeRegistryInfo::coreTypesPath()).exists()) {
