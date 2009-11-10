@@ -52,6 +52,23 @@ Location
 Best effort location information. If any of the keys are not
 appliciable to the current location, they will be unavailable.
   </doc>
+  <key name="Location.CurrentSource">
+    <type>
+      <string-enum>
+        <satellite/>
+        <wlan/>
+        <cellular/>
+      </string-enum>
+    </type>
+    <doc>
+      The current source of location information as an enumeration of strings.
+    </doc>
+  </key>
+  <key name="Location.ActiveSources" type="string-list">
+    <doc>
+      List of active sources of location information.
+    </doc>
+  </key>
   <key name="Location.Coordinates">
     <type>
       <uniform-list type="double"/>
