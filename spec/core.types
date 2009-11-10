@@ -149,7 +149,7 @@ Generic types
     </doc>
   </type>
   
-  <type name="int-enum" base="int32">
+  <type name="int-enum" base="integer">
     <params>
       <rest doc="The possible values"/>
     </params>
@@ -227,5 +227,26 @@ Specific types
       A percentage.
     </doc>
   </type>
-  
+
+  <type name="location-source">
+    <base>
+      <string-enum>
+        <satellite/>
+        <wlan/>
+        <cellular/>
+      </string-enum>
+    </base>
+    <doc>
+      Describes a source of location information.  Possible values are
+      "satellite", "wlan", "cellular", and "timezone".
+    </doc>
+  </type>
+
+  <type name="tracker-uri"
+        base="string">
+    <doc>
+      A URI that names a object in the Tracker object store.
+    </doc>
+  </type>
+
 </types>
