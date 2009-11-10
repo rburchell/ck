@@ -71,7 +71,7 @@ appliciable to the current location, they will be unavailable.
   </key>
   <key name="Location.Coordinates">
     <type>
-      <uniform-list type="double"/>
+      <uniform-list type="number"/>
     </type>
     <doc>
 The coordinates of the current position as a list of two or three
