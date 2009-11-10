@@ -393,7 +393,7 @@ the value is Unknown.
     </doc>
   </key>
   <key name="UserAlarm.NextCookie"
-       type="int32">
+       type="integer">
     <doc>
 The cookie of the next (enabled) alarm. The cookie can be used for
 referring to the alarm when communicating with timed.
