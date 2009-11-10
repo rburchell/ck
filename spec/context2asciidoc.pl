@@ -122,20 +122,32 @@ sub type_parms {
     }
 }
 
+sub type_link {
+    my $type = shift;
+
+    my $name = type_name ($type);
+    return "link:context-types.html#type-${name}[${name}]";
+}
+    
 sub type_short_desc {
     my $type = shift;
 
     my $name = type_name ($type);
     my $parms = type_parms ($type);
 
-    if ($name eq "uniform-list") {
-        return "List of __" . nano_ref ($parms, 'type') . "__s";
+    if ($name eq "list") {
+        my $et = nano_ref ($parms, 'type');
+        if ($et) {
+            return "List of __" . type_link ($et) . "__s";
+        } else {
+            return "List";
+        }
     } elsif ($name eq "string-enum") {
-        return "Enumeration of __string__s" . nano_ref ($parms, 'type');
+        return "Enumeration of __string__s";
     } elsif ($name eq "map") {
         return "Map";
     } else {
-        return "_" . $name . "_";
+        return type_link ($type);
     }
 }
 
@@ -145,7 +157,7 @@ sub print_type_long_desc {
     my $name = type_name ($type);
     my $parms = type_parms ($type);
 
-    if ($name eq "uniform-list"
+    if ($name eq "list"
         || !@{$parms}) {
         # do nothing
     } elsif ($name eq "string-enum") {
@@ -164,7 +176,7 @@ sub print_type_long_desc {
     } else {
         print "+\n--\nType: " . type_name ($type) . "\n[horizontal]\n";
         foreach (@{$parms}) {
-            print car ($_) . " :: " . cdr ($_) . "\n";
+            print car ($_) . " :: " . nano_ref (cdr ($_), 'doc') . "\n";
         }
         print "--\n";
     }
@@ -183,6 +195,8 @@ sub output_key {
 sub output_typedef {
     my $typedef = to_nano_dom (shift);
 
+    print "\n";
+    print "anchor:type-" . nano_ref ($typedef, 'name') . "[]\n";
     print "\n";
     print "*" . nano_ref ($typedef, 'name') . "*::\n";
     print nano_ref ($typedef, 'doc') . "\n";
