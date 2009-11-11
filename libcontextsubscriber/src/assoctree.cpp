@@ -46,7 +46,7 @@ QString AssocTree::dump(int level) const
     return s;
 }
 
-/// Returns the name of this tree.
+/// Returns the name of this association tree.
 QString AssocTree::name() const
 {
     if (type() == QVariant::String)
@@ -78,6 +78,7 @@ AssocTree AssocTree::node(const QString &name) const
     return AssocTree();
 }
 
+/// Returns the sub-tree named \a name2 of the sub-tree named \a name1 
 AssocTree AssocTree::node(const QString &name1,
                           const QString &name2) const
 {
@@ -108,6 +109,7 @@ AssocTree AssocTree::node(const QString &name1,
     return node(name1).node(name2).node(name3),node(name4).node(name5);
 }
 
+/// Returns the value of this tree.
 QVariant AssocTree::value() const
 {
     if (type() != QVariant::List)
@@ -119,41 +121,43 @@ QVariant AssocTree::value() const
     return toList().at(1);
 }
 
+/// Returns the value of the sub-tree named name1.
 QVariant AssocTree::value(const QString &name1) const
 {
     return node(name1).value();
 }
 
 QVariant AssocTree::value(const QString &name1,
-                            const QString &name2) const
+                          const QString &name2) const
 {
     return node(name1, name2).value();
 }
 
 QVariant AssocTree::value(const QString &name1,
-                            const QString &name2,
-                            const QString &name3) const
+                          const QString &name2,
+                          const QString &name3) const
 {
     return node(name1, name2, name3).value();
 }
 
 QVariant AssocTree::value(const QString &name1,
-                            const QString &name2,
-                            const QString &name3,
-                            const QString &name4) const
+                          const QString &name2,
+                          const QString &name3,
+                          const QString &name4) const
 {
     return node(name1, name2, name3, name4).value();
 }
 
 QVariant AssocTree::value(const QString &name1,
-                            const QString &name2,
-                            const QString &name3,
-                            const QString &name4,
-                            const QString &name5) const
+                          const QString &name2,
+                          const QString &name3,
+                          const QString &name4,
+                          const QString &name5) const
 {
     return node(name1, name2, name3, name4, name5).value();
 }
 
+/// Returns a list of all sub-trees.
 const QVariantList AssocTree::nodes() const
 {
     if (type() == QVariant::List)
