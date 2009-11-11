@@ -73,6 +73,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/unit-tests/provider/Makefile
         libcontextsubscriber/unit-tests/util/Makefile
         libcontextsubscriber/unit-tests/nanotree/Makefile
+        libcontextsubscriber/unit-tests/assoctree/Makefile
         libcontextsubscriber/unit-tests/nanoxml/Makefile
         libcontextsubscriber/unit-tests/contexttypeinfo/Makefile
         libcontextsubscriber/unit-tests/contexttyperegistryinfo/Makefile
