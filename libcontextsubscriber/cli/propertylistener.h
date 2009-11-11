@@ -30,10 +30,11 @@ class PropertyListener : public QObject
 {
     Q_OBJECT
 public:
-    PropertyListener(ContextProperty *prop);
+    PropertyListener(const QString &key);
+    QString valueToString(QString defaultValue = QString()) const;
 private slots:
     void onValueChanged();
-private:
+public:
     ContextProperty *prop;
 };
 

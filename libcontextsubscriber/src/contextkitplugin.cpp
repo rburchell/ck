@@ -263,12 +263,57 @@ void ContextKitPlugin::onDBusValuesChanged(QMap<QString, QVariant> values)
         emit valueChanged(key, values[key]);
 }
 
+// QDBus doesn't unmarshall non-basic types inside QVariants (since it cannot
+// know the intention), but leaves them as QDBusArguments.  Here we walk the
+// structure and unpack lists and maps.
+static QVariant demarshallValue(const QVariant &v)
+{
+    if (v.userType() != qMetaTypeId<QDBusArgument>())
+        return v;
+    const QDBusArgument &dba = v.value<QDBusArgument>();
+    switch (dba.currentType()) {
+    case QDBusArgument::ArrayType: {
+        QVariantList vl;
+        dba.beginArray();
+        while (!dba.atEnd()) {
+            QVariant v;
+            dba >> v;
+            vl << demarshallValue(v);
+        }
+        dba.endArray();
+        return QVariant(vl);
+        break;
+    }
+    case QDBusArgument::MapType: {
+        dba.beginMap();
+        QVariantMap vm;
+        while (!dba.atEnd()) {
+            QString k;
+            QVariant v;
+            dba.beginMapEntry();
+            dba >> k >> v;
+            dba.endMapEntry();
+            v = demarshallValue(v);
+            vm.insert(k, v);
+        }
+        return QVariant(vm);
+        break;
+    }
+    default:
+        // Shouldn't reach this.
+        contextWarning() << "got something unexpected: QDBusArgument of type"
+                         << dba.currentType();
+        return QVariant();
+        break;
+    }
+}
+
 static TimedValue createTimedValue(const QList<QVariant> value, quint64 time)
 {
     if (value.size() == 0)
         return TimedValue(QVariant(), time);
     else
-        return TimedValue(value.at(0), time);
+        return TimedValue(demarshallValue(value.at(0)), time);
 }
 
 void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,

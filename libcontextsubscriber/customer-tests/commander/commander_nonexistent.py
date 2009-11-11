@@ -57,7 +57,7 @@ class CommanderNonExistent(unittest.TestCase):
                 # check the non-existent property
                 commander.send("add string test.string barfoo")
                 commander.expect("Added key: test.string")
-                self.assert_(listen.expect(wanted("test.string", "QString", "barfoo")),
+                self.assert_(listen.expect(wanted("test.string", "QString", "\"barfoo\"")),
                              "Non-existent property couldn't be commanded")
 
                 # change the type of the non-existent property

@@ -255,7 +255,8 @@ void PropertyHandle::onValueChanged()
         } else if (myType == "DOUBLE") {
             checked = (QVariant::Double == newValue.type());
         } else if (myType == "INT") {
-            checked = (QVariant::Int == newValue.type());
+            checked = (QVariant::ULongLong == newValue.type() ||
+                       QVariant::Int == newValue.type());
         }
 
         if (!checked) {

@@ -35,7 +35,7 @@
 #include <errno.h>
 #include <QMap>
 
-CommandWatcher::CommandWatcher(int commandfd, QMap<QString, ContextProperty*> *properties, QObject *parent) :
+CommandWatcher::CommandWatcher(int commandfd, QMap<QString, PropertyListener*> *properties, QObject *parent) :
     QObject(parent), commandfd(commandfd), properties(properties)
 {
     commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
@@ -83,7 +83,6 @@ void CommandWatcher::help()
     qDebug() << "  plugin KEY                      - get the info()->plugin for a key";
     qDebug() << "  constructionstring KEY          - get the info()->constructionstring for a key";
     qDebug() << "  providers KEY                   - get the info()->providers for a key";
-    qDebug() << "  flush                           - write FLUSHED to stderr and stdout";
     qDebug() << "Any prefix of a command can be used as an abbreviation";
 }
 
@@ -91,128 +90,107 @@ void CommandWatcher::interpret(const QString& command) const
 {
     QTextStream out(stdout);
     QTextStream err(stderr);
-    if (command == "") {
-        help();
-    } else {
-        QStringList args = command.split(" ");
-        QString commandName = args[0];
-        args.pop_front();
+    QStringList args = command.split(" ");
+    QString commandName = args[0];
+    args.pop_front();
 
-        if (args.size() == 0 && !QString("flush").startsWith(commandName)) {
-            help();
-            return;
-        }
-
-        if (QString("new").startsWith(commandName)) {
-            foreach (QString key, args)
-                if (properties->contains(key))
-                    qDebug() << "key already exists: " << key;
-                else {
-                    properties->insert(key, new ContextProperty(key, QCoreApplication::instance()));
-                    new PropertyListener(properties->value(key));
-                }
-        } else if (QString("delete").startsWith(commandName)) {
-            foreach (QString key, args)
-                if (properties->contains(key))
-                    delete properties->take(key);
-                else
-                    qDebug() << "no such key:" << key;
-        } else if (QString("subscribe").startsWith(commandName)) {
-            foreach (QString key, args)
-                if (properties->contains(key))
-                    properties->value(key)->subscribe();
-                else
-                    qDebug() << "no such key:" << key;
-        } else if (QString("waitforsubscription").startsWith(commandName)) {
-            foreach (QString key, args)
-                if (properties->contains(key)) {
-                    properties->value(key)->waitForSubscription();
-                    out << "wait finished for " << key << endl;
-                } else
-                    qDebug() << "no such key:" << key;
-        } else if (QString("unsubscribe").startsWith(commandName)) {
-            foreach (QString key, args)
-                if (properties->contains(key))
-                    properties->value(key)->unsubscribe();
-                else
-                    qDebug() << "no such key:" << key;
-        } else if (QString("value").startsWith(commandName)) {
-            QString key = args[0];
-            if (properties->contains(key)) {
-                QVariant value;
-                if (args.size() > 1) {
-                    value = properties->value(key)->value(args[1]);
-                } else {
-                    value = properties->value(key)->value();
-                }
-                if (value.isNull())
-                    out << "value is Unknown" << endl;
-                else
-                    out << "value: " << value.typeName() << ":" << value.toString() << endl;
-            } else
-                qDebug() << "no such key:" << key;
-        } else if (QString("key").startsWith(commandName)) {
-            QString key = args[0];
+    if (QString("new").startsWith(commandName)) {
+        foreach (QString key, args)
             if (properties->contains(key))
-                out << "key: " << properties->value(key)->key() << endl;
+                qDebug() << "key already exists: " << key;
+            else
+                properties->insert(key, new PropertyListener(key));
+    } else if (QString("delete").startsWith(commandName)) {
+        foreach (QString key, args)
+            if (properties->contains(key))
+                delete properties->take(key);
             else
                 qDebug() << "no such key:" << key;
-        } else if (QString("ikey").startsWith(commandName)) {
-            QString key = args[0];
+    } else if (QString("subscribe").startsWith(commandName)) {
+        foreach (QString key, args)
             if (properties->contains(key))
-                out << "ikey: " << properties->value(key)->info()->key() << endl;
+                properties->value(key)->prop->subscribe();
             else
                 qDebug() << "no such key:" << key;
-        } else if (QString("man").startsWith(commandName)) {
-            QString key = args[0];
+    } else if (QString("waitforsubscription").startsWith(commandName)) {
+        foreach (QString key, args)
+            if (properties->contains(key)) {
+                properties->value(key)->prop->waitForSubscription();
+                out << "wait finished for " << key << endl;
+            } else
+                qDebug() << "no such key:" << key;
+    } else if (QString("unsubscribe").startsWith(commandName)) {
+        foreach (QString key, args)
             if (properties->contains(key))
-                out << "man: " << properties->value(key)->info()->doc() << endl;
+                properties->value(key)->prop->unsubscribe();
             else
                 qDebug() << "no such key:" << key;
-        } else if (QString("type").startsWith(commandName)) {
-            QString key = args[0];
-            if (properties->contains(key))
-                out << "type: " << properties->value(key)->info()->type() << endl;
-            else
-                qDebug() << "no such key:" << key;
-        } else if (QString("plugin").startsWith(commandName)) {
-            QString key = args[0];
-            if (properties->contains(key)) {
-                QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
-                if (providers.size() > 0)
-                    out << "plugin: " << providers.at(0).plugin << endl;
-                else
-                    out << "no plugin for key:" << key << endl;
-            } else
-                qDebug() << "no such key:" << key;
-        } else if (QString("constructionstring").startsWith(commandName)) {
-            QString key = args[0];
-            if (properties->contains(key)) {
-                QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
-                if (providers.size() > 0)
-                    out << "constructionstring: " << providers.at(0).constructionString << endl;
-                else
-                    out << "no constructionString for key:" << key << endl;
-            } else
-                qDebug() << "no such key:" << key;
-        } else if (QString("providers").startsWith(commandName)) {
-            QString key = args[0];
-            if (properties->contains(key)) {
-                out << "providers: ";
-                QList<ContextProviderInfo> providers = properties->value(key)->info()->providers();
-
-                foreach(ContextProviderInfo info, providers)
-                    out << info.constructionString << "@" << info.plugin << " ";
-
-                out << endl;
-            } else
-                qDebug() << "no such key:" << key;
-        } else if (QString("flush").startsWith(commandName)) {
-            out << "FLUSHED" << endl;
-            out.flush();
-            err << "FLUSHED" << endl;
-            err.flush();
+    } else if (QString("value").startsWith(commandName)) {
+        QString key = args[0];
+        QString defaultValue;
+        if (args.size() > 1)
+            defaultValue = args[1];
+        if (properties->contains(key)) {
+            PropertyListener *pl = properties->value(key);
+            out << "value: " << pl->valueToString(defaultValue) << endl;
         } else
-            help();
-    }
+            qDebug() << "no such key:" << key;
+    } else if (QString("key").startsWith(commandName)) {
+        QString key = args[0];
+        if (properties->contains(key))
+            out << "key: " << properties->value(key)->prop->key() << endl;
+        else
+            qDebug() << "no such key:" << key;
+    } else if (QString("ikey").startsWith(commandName)) {
+        QString key = args[0];
+        if (properties->contains(key))
+            out << "ikey: " << properties->value(key)->prop->info()->key() << endl;
+        else
+            qDebug() << "no such key:" << key;
+    } else if (QString("man").startsWith(commandName)) {
+        QString key = args[0];
+        if (properties->contains(key))
+            out << "man: " << properties->value(key)->prop->info()->doc() << endl;
+        else
+            qDebug() << "no such key:" << key;
+    } else if (QString("type").startsWith(commandName)) {
+        QString key = args[0];
+        if (properties->contains(key))
+            out << "type: " << properties->value(key)->prop->info()->type() << endl;
+        else
+            qDebug() << "no such key:" << key;
+    } else if (QString("plugin").startsWith(commandName)) {
+        QString key = args[0];
+        if (properties->contains(key)) {
+            QList<ContextProviderInfo> providers = properties->value(key)->prop->info()->providers();
+            if (providers.size() > 0)
+                out << "plugin: " << providers.at(0).plugin << endl;
+            else
+                out << "no plugin for key:" << key << endl;
+        } else
+            qDebug() << "no such key:" << key;
+    } else if (QString("constructionstring").startsWith(commandName)) {
+        QString key = args[0];
+        if (properties->contains(key)) {
+            QList<ContextProviderInfo> providers = properties->value(key)->prop->info()->providers();
+            if (providers.size() > 0)
+                out << "constructionstring: " << providers.at(0).constructionString << endl;
+            else
+                out << "no constructionString for key:" << key << endl;
+        } else
+            qDebug() << "no such key:" << key;
+    } else if (QString("providers").startsWith(commandName)) {
+        QString key = args[0];
+        if (properties->contains(key)) {
+            out << "providers: ";
+            QList<ContextProviderInfo> providers = properties->value(key)->prop->info()->providers();
+
+            foreach(ContextProviderInfo info, providers)
+                out << info.constructionString << "@" << info.plugin << " ";
+
+            out << endl;
+        } else
+            qDebug() << "no such key:" << key;
+    } else
+        help();
 }

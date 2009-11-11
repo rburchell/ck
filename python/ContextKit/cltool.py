@@ -204,6 +204,6 @@ def wanted(name, type, value):
 
 def wantedUnknown(name):
     """Construct an expect() regexp expecting an unset context property."""
-    return "^%s is Unknown$" % (name)
+    return "^%s = Unknown$" % (name)
 
 __all__ = ['wanted', 'wantedUnknown', 'CLTool']

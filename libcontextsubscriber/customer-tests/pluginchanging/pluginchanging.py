@@ -54,14 +54,14 @@ class Subscription(unittest.TestCase):
                 #print "now reading"
 
                 # Expect value coming from plugin libcontextsubscribertime1
-                self.assert_(self.context_client.expect("Test.Time = QString:Time1:"))
+                self.assert_(self.context_client.expect("Test.Time = QString:\"Time1:"))
 
                 # Modify the registry so that the key is now provided by libcontextsubscribertime2
                 os.system('cp time2.context.temp time.context.temp')
                 os.system('mv time.context.temp time.context')
 
                 # Expect value coming from plugin libcontextsubscribertime2
-                self.assert_(self.context_client.expect("Test.Time = QString:Time2:"))
+                self.assert_(self.context_client.expect("Test.Time = QString:\"Time2:"))
 
 if __name__ == "__main__":
         sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
