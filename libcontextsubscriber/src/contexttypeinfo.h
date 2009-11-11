@@ -25,43 +25,43 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include "nanotree.h"
+#include "assoctree.h"
 
-class ContextTypeInfo : public QObject
+class ContextTypeInfo : public AssocTree
 {
-    Q_OBJECT
-
 public:
-    ContextTypeInfo(QString name);
-    ContextTypeInfo(NanoTree tree);
-    ContextTypeInfo(QVariant tree);
-    ContextTypeInfo();
-    ContextTypeInfo(const ContextTypeInfo& info);
-    ContextTypeInfo operator=(const ContextTypeInfo& info);
+    ContextTypeInfo (const AssocTree &tree) : AssocTree (tree) { }
+    ContextTypeInfo (const QVariant &tree) : AssocTree (tree) { }
+    ContextTypeInfo () { }
 
     ContextTypeInfo ensureNewTypes();
-    QString name() const;
-    QVariantList parameters() const;
-    NanoTree definition() const;
-    QVariant parameterValue(QString p) const;
-    NanoTree parameterNode(QString p) const;
-    QString parameterDoc(QString p) const;
-    QString doc() const;
-    ContextTypeInfo base() const;
-    operator QVariant() { return tree; }
-    operator NanoTree() { return tree; }
 
-private:
-    NanoTree tree;
+    QString name() const { return AssocTree::name(); }
+    QVariantList parameters() const { return nodes(); }
+    QVariant parameterValue(QString p) const { return value(p); }
+    AssocTree parameterNode(QString p) const { return node(p); }
+
+    AssocTree definition() const;
+    QString parameterDoc(QString p) const { return definition().value("params", p, "doc").toString(); }
+    QString doc() const { return definition().value("doc").toString(); }
+    ContextTypeInfo base() const { return ContextTypeInfo(definition().value("base")); }
 };
 
 class ContextStringEnumInfo : public ContextTypeInfo
 {
 public:
-    ContextStringEnumInfo (ContextTypeInfo &info) : ContextTypeInfo (info) { }
+    ContextStringEnumInfo (const ContextTypeInfo &info) : ContextTypeInfo (info) { }
 
     QStringList choices () const;
-    QString choiceDoc (const QString &choice) const;
+    QString choiceDoc (const QString &choice) const { return value (choice, "doc").toString(); }
+};
+
+class ContextListInfo : public ContextTypeInfo
+{
+public:
+    ContextListInfo (const ContextTypeInfo &info) : ContextTypeInfo (info) { }
+
+    ContextTypeInfo type() { return ContextTypeInfo(parameterValue("type")); }
 };
 
 #endif

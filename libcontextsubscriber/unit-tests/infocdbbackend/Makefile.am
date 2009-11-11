@@ -28,8 +28,8 @@ FROM_SOURCE = 							\
         nanoxml.h                                               \
         nanoxml.cpp						\
 	contextproviderinfo.h					\
-	nanotree.h						\
-	nanotree.cpp						\
+	assoctree.h						\
+	assoctree.cpp						\
 	contexttypeinfo.h					\
 	contexttypeinfo.cpp
 

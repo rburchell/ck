@@ -239,14 +239,14 @@ void InfoXmlBackend::regenerateKeyDataList()
 }
 
 /// Parse the given QVariant tree which is supposed to be a key tree.
-void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerTree)
+void InfoXmlBackend::parseKey(const AssocTree &keyTree, const AssocTree &providerTree)
 {
-    QString key = keyTree.keyValue("name").toString();
-    QString plugin = providerTree.keyValue("plugin").toString();
-    QString constructionString = providerTree.keyValue("constructionString").toString();
-    QString doc = keyTree.keyValue("doc").toString();
+    QString key = keyTree.value("name").toString();
+    QString plugin = providerTree.value("plugin").toString();
+    QString constructionString = providerTree.value("constructionString").toString();
+    QString doc = keyTree.value("doc").toString();
 
-    ContextTypeInfo typeInfo = keyTree.keyValue("type");
+    ContextTypeInfo typeInfo = keyTree.value("type");
     typeInfo = typeInfo.ensureNewTypes(); // Make sure to get rid of old names (INTEGER...)
 
     // Warn about description mismatch or add new
@@ -268,8 +268,8 @@ void InfoXmlBackend::parseKey(const NanoTree &keyTree, const NanoTree &providerT
 
     // Suport old-style XML...
     if (providerInfo.plugin == "") {
-        QString currentProvider = providerTree.keyValue("service").toString();
-        QString currentBus = providerTree.keyValue("bus").toString();
+        QString currentProvider = providerTree.value("service").toString();
+        QString currentBus = providerTree.value("bus").toString();
 
         if (currentBus != "" && currentProvider != "") {
             providerInfo.plugin = "contextkit-dbus";
@@ -316,21 +316,22 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     }
     */
 
-    NanoTree rootTree = parser.result();
+    AssocTree rootTree = parser.result();
 
     if (rootTree.toList().at(0).toString() == "provider" ||
         rootTree.toList().at(0).toString() == "properties") {
         // One provider. Iterate over each key.
-        foreach (NanoTree keyTree, rootTree.keyValues("key")) {
-            parseKey(keyTree, rootTree);
+        foreach (AssocTree keyTree, rootTree.nodes()) {
+            if (keyTree.name() == "key")
+                parseKey(keyTree, rootTree);
         }
     } else {
         // Multiple providers... iterate over providers and keys
-        foreach (NanoTree providerTree, rootTree.keyValues("provider")) {
-           foreach (NanoTree keyTree, NanoTree(providerTree).keyValues("key")) {
-               parseKey(keyTree, providerTree);
-           }
-        }
+        foreach (AssocTree providerTree, rootTree.nodes())
+            if (providerTree.name() == "provider")
+                foreach (AssocTree keyTree, providerTree.nodes())
+                    if (keyTree.name() == "key")
+                        parseKey(keyTree, providerTree);
     }
 }
 

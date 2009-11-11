@@ -25,7 +25,7 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
-#include "nanotree.h"
+#include "assoctree.h"
 
 class ContextTypeRegistryInfo : public QObject
 {
@@ -36,25 +36,19 @@ public:
 
     QString registryPath();
     QString coreTypesPath();
-    NanoTree typeDefinitionForName(QString name);
-
-    NanoTree int64Type();
-    NanoTree int32Type();
-    NanoTree stringType();
-    NanoTree boolType();
-    NanoTree doubleType();
+    AssocTree typeDefinitionForName(QString name);
 
 private:
     ContextTypeRegistryInfo(); ///< Private constructor. Do not use.
     ContextTypeRegistryInfo(const ContextTypeRegistryInfo&); ///< Private constructor. Do not use.
     ContextTypeRegistryInfo& operator=(const ContextTypeRegistryInfo&); ///< Private operator. Do not use.
 
-    /// Holds the actual pointer to the singelton instance.
+    /// Holds the actual pointer to the singleton instance.
     /// Mutex protected during creation.
     static ContextTypeRegistryInfo* registryInstance;
 
-    NanoTree coreTree; ///< The core.types as NanoTree. Read on construction.
-    QHash <QString, NanoTree> typeCache; //< Cache of QString -> type definition.
+    AssocTree coreTree; ///< The core.types as AssocTree. Read on construction.
+    QHash <QString, AssocTree> typeCache; //< Cache of QString -> type definition.
 
     friend class ContextTypeRegistryInfoUnitTest;
 };

@@ -26,7 +26,7 @@
 #include <QStringList>
 #include <QObject>
 #include "contexttypeinfo.h"
-#include "nanotree.h"
+#include "assoctree.h"
 
 class ContextTypeRegistryInfo : public QObject
 {
@@ -37,7 +37,7 @@ public:
 
     static ContextTypeRegistryInfo* instance();
 
-    NanoTree typeDefinitionForName(QString name);
+    AssocTree typeDefinitionForName(QString name);
 
 private:
 

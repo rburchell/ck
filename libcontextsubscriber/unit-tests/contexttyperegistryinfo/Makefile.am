@@ -17,8 +17,8 @@ AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = contexttyperegistryinfo.cpp			\
               contexttyperegistryinfo.h				\
               loggingfeatures.h					\
-              nanotree.h					\
-              nanotree.cpp					\
+              assoctree.h					\
+              assoctree.cpp					\
 	      nanoxml.h						\
 	      nanoxml.cpp
 

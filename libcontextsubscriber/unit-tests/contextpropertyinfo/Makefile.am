@@ -18,8 +18,8 @@ FROM_SOURCE = contextpropertyinfo.cpp                   \
               contextproviderinfo.h                     \
               contexttypeinfo.h				\
 	      contexttypeinfo.cpp			\
-	      nanotree.cpp				\
-	      nanotree.h
+	      assoctree.cpp				\
+	      assoctree.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 

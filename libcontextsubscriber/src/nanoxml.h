@@ -27,7 +27,7 @@
 #include <QObject>
 #include <QXmlDefaultHandler>
 #include <QStack>
-#include "nanotree.h"
+#include "assoctree.h"
 
 class NanoXml : public QXmlDefaultHandler
 {
@@ -54,7 +54,7 @@ public:
     bool startPrefixMapping(const QString &prefix, const QString &uri);
     bool characters(const QString &chars);
 
-    NanoTree result();
+    AssocTree result();
 };
 
 #endif // NANOXML_H

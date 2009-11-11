@@ -9,7 +9,7 @@
   </key>
   <key name="Key.With.Attribute" type="TRUTH"/>
   <key name="Key.With.bool" type="bool"/>
-  <key name="Key.With.int32" type="int32"/>
+  <key name="Key.With.integer" type="INT"/>
   <key name="Key.With.string" type="string"/>
   <key name="Key.With.double" type="double"/>
   <key name="Key.With.complex">

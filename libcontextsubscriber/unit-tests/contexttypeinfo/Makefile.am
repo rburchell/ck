@@ -10,7 +10,7 @@ EXTRA_DIST = double.xml custom-double.xml uniform-list.xml person.xml
 # tests.am is using +=, so we have to set a value here for these four always
 AM_CXXFLAGS = $(QtXml_CFLAGS) -I$(srcdir)/../util/
 AM_LDFLAGS = $(QtXml_LIBS)
-FROM_SOURCE = contexttypeinfo.cpp contexttypeinfo.h nanotree.cpp nanotree.h nanoxml.cpp nanoxml.h loggingfeatures.h # copy these files from the real source
+FROM_SOURCE = contexttypeinfo.cpp contexttypeinfo.h assoctree.cpp assoctree.h nanoxml.cpp nanoxml.h loggingfeatures.h # copy these files from the real source
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 
 include $(top_srcdir)/am/tests.am

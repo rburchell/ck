@@ -34,7 +34,7 @@
 
     This is a singelton class used to obtain information about the core types defined
     in the type registry. Information is provided as type definitions returned as
-    NanoTree instances. Each type definition is a QVariant tree wrapped in NanoTree
+    AssocTree instances. Each type definition is a QVariant tree wrapped in AssocTree
     for easy helper key accessors.
 
     \section Usage
@@ -42,7 +42,7 @@
     To obtain a type definition for a given type:
 
     \code
-    NanoTree typeDefinition = ContextTypeRegistryInfo::instance()->typeDefinitionForName("string-enum");
+    AssocTree typeDefinition = ContextTypeRegistryInfo::instance()->typeDefinitionForName("string-enum");
     \endcode
 
     Unless you're building a dedicated type-introspection application, you don't
@@ -95,64 +95,34 @@ QString ContextTypeRegistryInfo::coreTypesPath()
 
 /// Returns a type definition for the type with the given name. The type
 /// is being fetched from the registry.
-NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
+AssocTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
 {
     // Support for the old types
     if (name == "TRUTH")
-        return boolType();
+        name = "bool";
     else if (name == "STRING")
-        return stringType();
+        name = "string";
     else if (name == "INT")
-        return int32Type();
+        name = "integer";
     else if (name == "INTEGER")
-        return int32Type();
+        name = "integer";
     else if (name == "DOUBLE")
-        return doubleType();
+        name = "double";
 
     // Try using the cache first
     if (typeCache.contains(name))
         return typeCache.value(name);
 
-    // No type in cache? Find it in the nano tree and put in cache.
-    foreach (NanoTree typeTree, coreTree.keyValues("type")) {
-        if (typeTree.keyValue("name") == name) {
+    // No type in cache? Find it in the assoc tree and put in cache.
+    foreach (AssocTree typeTree, coreTree.nodes()) {
+        if (typeTree.name() == "type" && typeTree.value("name") == name) {
             typeCache.insert(name, typeTree);
             return typeTree;
         }
     }
 
     // Not found. Return blank null type.
-    return NanoTree();
-}
-
-/// Returns in instance of the int64 type definition.
-NanoTree ContextTypeRegistryInfo::int64Type()
-{
-    return typeDefinitionForName("int64");
-}
-
-/// Returns in instance of the string type definition.
-NanoTree ContextTypeRegistryInfo::stringType()
-{
-    return typeDefinitionForName("string");
-}
-
-/// Returns in instance of the double type definition.
-NanoTree ContextTypeRegistryInfo::doubleType()
-{
-    return typeDefinitionForName("double");
-}
-
-/// Returns in instance of the bool type definition.
-NanoTree ContextTypeRegistryInfo::boolType()
-{
-    return typeDefinitionForName("bool");
-}
-
-/// Returns in instance of the int32 type definition.
-NanoTree ContextTypeRegistryInfo::int32Type()
-{
-    return typeDefinitionForName("int32");
+    return AssocTree();
 }
 
 /* Private */

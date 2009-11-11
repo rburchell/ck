@@ -25,14 +25,15 @@
 /*!
     \class NanoXml
 
-    \brief Parses XML files into a nano dom.
+    \brief Parses XML files into an association tree, which serves as
+    a nano document object model.
 
-    This class is not exported in the public API. It's used to parse a formatted
-    XML into a nanodom tree. To learn about the nanadom please read the documentation
-    on the desktop types.
+    This class is not exported in the public API. It's used to parse a
+    formatted XML into a nanodom tree. To learn about the nano dom
+    please read the documentation on the desktop types.
 
-    Short overview - the following XML is being turned into the following semantic
-    structure:
+    Short overview - the following XML is being turned into the
+    following tree structure:
 
     \code
     <key name="Example.Random" type="string">
@@ -51,14 +52,14 @@
     \code
     <key name="Example.Random">
         <type>
-            <uniform-list type="number"/>
+            <list type="number"/>
         </type>
     </key>
 
     ['key',
         ['name', 'Example.Random' ],
         ['type',
-            ['uniform-list', ['type', 'number' ] ]
+            ['list', ['type', 'number' ] ]
         ]
     ]
     \endcode
@@ -178,8 +179,8 @@ bool NanoXml::didFail()
 }
 
 
-NanoTree NanoXml::result()
+AssocTree NanoXml::result()
 {
-    return NanoTree(rootVariant);
+    return AssocTree(rootVariant);
 }
 

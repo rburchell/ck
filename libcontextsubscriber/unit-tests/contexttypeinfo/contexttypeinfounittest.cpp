@@ -39,7 +39,7 @@ ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
     return registryInstance;
 }
 
-NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
+AssocTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
 {
     if (name == "double") {
         QVariantList tree;
@@ -131,9 +131,9 @@ void ContextTypeInfoUnitTest::empty()
 
 void ContextTypeInfoUnitTest::definition()
 {
-    NanoTree def = ContextTypeInfo(QString("double")).definition();
-    QCOMPARE(def.keyValue("name").toString(), QString("double"));
-    QCOMPARE(def.keyValue("doc").toString(), QString("double doc"));
+    AssocTree def = ContextTypeInfo(QString("double")).definition();
+    QCOMPARE(def.value("name").toString(), QString("double"));
+    QCOMPARE(def.value("doc").toString(), QString("double doc"));
 }
 
 void ContextTypeInfoUnitTest::base()
@@ -152,8 +152,8 @@ void ContextTypeInfoUnitTest::parameterDoc()
 
 void ContextTypeInfoUnitTest::ensureNewTypes()
 {
-    QCOMPARE(ContextTypeInfo(QString("INTEGER")).ensureNewTypes().name(), QString("int32"));
-    QCOMPARE(ContextTypeInfo(QString("INT")).ensureNewTypes().name(), QString("int32"));
+    QCOMPARE(ContextTypeInfo(QString("INTEGER")).ensureNewTypes().name(), QString("integer"));
+    QCOMPARE(ContextTypeInfo(QString("INT")).ensureNewTypes().name(), QString("integer"));
     QCOMPARE(ContextTypeInfo(QString("TRUTH")).ensureNewTypes().name(), QString("bool"));
     QCOMPARE(ContextTypeInfo(QString("STRING")).ensureNewTypes().name(), QString("string"));
     QCOMPARE(ContextTypeInfo(QString("DOUBLE")).ensureNewTypes().name(), QString("double"));

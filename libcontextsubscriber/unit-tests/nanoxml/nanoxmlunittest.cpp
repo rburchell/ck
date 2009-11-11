@@ -42,67 +42,67 @@ void NanoXmlUnitTest::test1()
 {
     NanoXml parser(LOCAL_FILE("test1.xml"));
     QCOMPARE(parser.didFail(), false);
-    NanoTree nano = parser.result();
+    AssocTree tree = parser.result();
 
-    QVERIFY(nano.type() == QVariant::List);
-    QCOMPARE(nano.toList().count(), 4);
-    QVERIFY(nano.toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(0).toString(), QString("key"));
+    QVERIFY(tree.type() == QVariant::List);
+    QCOMPARE(tree.toList().count(), 4);
+    QVERIFY(tree.toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(0).toString(), QString("key"));
 
-    QVERIFY(nano.toList().at(1).type() == QVariant::List);
-    QCOMPARE(nano.toList().at(1).toList().count(), 2);
-    QVERIFY(nano.toList().at(1).toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(1).toList().at(0).toString(), QString("name"));
-    QVERIFY(nano.toList().at(1).toList().at(1).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(1).toList().at(1).toString(), QString("Example.Random"));
+    QVERIFY(tree.toList().at(1).type() == QVariant::List);
+    QCOMPARE(tree.toList().at(1).toList().count(), 2);
+    QVERIFY(tree.toList().at(1).toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(1).toList().at(0).toString(), QString("name"));
+    QVERIFY(tree.toList().at(1).toList().at(1).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(1).toList().at(1).toString(), QString("Example.Random"));
 
-    QVERIFY(nano.toList().at(2).type() == QVariant::List);
-    QCOMPARE(nano.toList().at(2).toList().count(), 2);
-    QVERIFY(nano.toList().at(2).toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(2).toList().at(0).toString(), QString("type"));
-    QVERIFY(nano.toList().at(2).toList().at(1).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(2).toList().at(1).toString(), QString("string"));
+    QVERIFY(tree.toList().at(2).type() == QVariant::List);
+    QCOMPARE(tree.toList().at(2).toList().count(), 2);
+    QVERIFY(tree.toList().at(2).toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(2).toList().at(0).toString(), QString("type"));
+    QVERIFY(tree.toList().at(2).toList().at(1).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(2).toList().at(1).toString(), QString("string"));
 
-    QVERIFY(nano.toList().at(3).type() == QVariant::List);
-    QCOMPARE(nano.toList().at(3).toList().count(), 2);
-    QVERIFY(nano.toList().at(3).toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(3).toList().at(0).toString(), QString("doc"));
-    QVERIFY(nano.toList().at(3).toList().at(1).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(3).toList().at(1).toString(), QString("A random property."));
+    QVERIFY(tree.toList().at(3).type() == QVariant::List);
+    QCOMPARE(tree.toList().at(3).toList().count(), 2);
+    QVERIFY(tree.toList().at(3).toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(3).toList().at(0).toString(), QString("doc"));
+    QVERIFY(tree.toList().at(3).toList().at(1).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(3).toList().at(1).toString(), QString("A random property."));
 }
 
 void NanoXmlUnitTest::test2()
 {
     NanoXml parser(LOCAL_FILE("test2.xml"));
     QCOMPARE(parser.didFail(), false);
-    NanoTree nano = parser.result();
+    AssocTree tree = parser.result();
 
-    QVERIFY(nano.type() == QVariant::List);
-    QCOMPARE(nano.toList().count(), 3);
-    QVERIFY(nano.toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(0).toString(), QString("key"));
+    QVERIFY(tree.type() == QVariant::List);
+    QCOMPARE(tree.toList().count(), 3);
+    QVERIFY(tree.toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(0).toString(), QString("key"));
 
-    QVERIFY(nano.toList().at(1).type() == QVariant::List);
-    QCOMPARE(nano.toList().at(1).toList().count(), 2);
-    QVERIFY(nano.toList().at(1).toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(1).toList().at(0).toString(), QString("name"));
-    QVERIFY(nano.toList().at(1).toList().at(1).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(1).toList().at(1).toString(), QString("Example.Random"));
+    QVERIFY(tree.toList().at(1).type() == QVariant::List);
+    QCOMPARE(tree.toList().at(1).toList().count(), 2);
+    QVERIFY(tree.toList().at(1).toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(1).toList().at(0).toString(), QString("name"));
+    QVERIFY(tree.toList().at(1).toList().at(1).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(1).toList().at(1).toString(), QString("Example.Random"));
 
-    QVERIFY(nano.toList().at(2).type() == QVariant::List);
-    QCOMPARE(nano.toList().at(2).toList().count(), 2);
-    QVERIFY(nano.toList().at(2).toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(2).toList().at(0).toString(), QString("type"));
-    QVERIFY(nano.toList().at(2).toList().at(1).type() == QVariant::List);
-    QCOMPARE(nano.toList().at(2).toList().at(1).toList().count(), 2);
-    QCOMPARE(nano.toList().at(2).toList().at(1).toList().at(0).type(), QVariant::String);
-    QCOMPARE(nano.toList().at(2).toList().at(1).toList().at(0).toString(), QString("uniform-list"));
-    QCOMPARE(nano.toList().at(2).toList().at(1).toList().at(1).type(), QVariant::List);
-    QCOMPARE(nano.toList().at(2).toList().at(1).toList().at(1).toList().count(), 2);
-    QCOMPARE(nano.toList().at(2).toList().at(1).toList().at(1).toList().at(0).type(), QVariant::String);
-    QCOMPARE(nano.toList().at(2).toList().at(1).toList().at(1).toList().at(0).toString(), QString("type"));
-    QCOMPARE(nano.toList().at(2).toList().at(1).toList().at(1).toList().at(1).type(), QVariant::String);
-    QCOMPARE(nano.toList().at(2).toList().at(1).toList().at(1).toList().at(1).toString(), QString("number"));
+    QVERIFY(tree.toList().at(2).type() == QVariant::List);
+    QCOMPARE(tree.toList().at(2).toList().count(), 2);
+    QVERIFY(tree.toList().at(2).toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(2).toList().at(0).toString(), QString("type"));
+    QVERIFY(tree.toList().at(2).toList().at(1).type() == QVariant::List);
+    QCOMPARE(tree.toList().at(2).toList().at(1).toList().count(), 2);
+    QCOMPARE(tree.toList().at(2).toList().at(1).toList().at(0).type(), QVariant::String);
+    QCOMPARE(tree.toList().at(2).toList().at(1).toList().at(0).toString(), QString("uniform-list"));
+    QCOMPARE(tree.toList().at(2).toList().at(1).toList().at(1).type(), QVariant::List);
+    QCOMPARE(tree.toList().at(2).toList().at(1).toList().at(1).toList().count(), 2);
+    QCOMPARE(tree.toList().at(2).toList().at(1).toList().at(1).toList().at(0).type(), QVariant::String);
+    QCOMPARE(tree.toList().at(2).toList().at(1).toList().at(1).toList().at(0).toString(), QString("type"));
+    QCOMPARE(tree.toList().at(2).toList().at(1).toList().at(1).toList().at(1).type(), QVariant::String);
+    QCOMPARE(tree.toList().at(2).toList().at(1).toList().at(1).toList().at(1).toString(), QString("number"));
 }
 
 void NanoXmlUnitTest::test3()
@@ -116,41 +116,41 @@ void NanoXmlUnitTest::test4Comments()
 {
     NanoXml parser(LOCAL_FILE("test4.xml"));
     QCOMPARE(parser.didFail(), false);
-    NanoTree nano = parser.result();
+    AssocTree tree = parser.result();
 
-    QVERIFY(nano.type() == QVariant::List);
-    QCOMPARE(nano.toList().count(), 4);
-    QVERIFY(nano.toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(0).toString(), QString("key"));
+    QVERIFY(tree.type() == QVariant::List);
+    QCOMPARE(tree.toList().count(), 4);
+    QVERIFY(tree.toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(0).toString(), QString("key"));
 
-    QVERIFY(nano.toList().at(1).type() == QVariant::List);
-    QCOMPARE(nano.toList().at(1).toList().count(), 2);
-    QVERIFY(nano.toList().at(1).toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(1).toList().at(0).toString(), QString("name"));
-    QVERIFY(nano.toList().at(1).toList().at(1).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(1).toList().at(1).toString(), QString("Example.Key"));
+    QVERIFY(tree.toList().at(1).type() == QVariant::List);
+    QCOMPARE(tree.toList().at(1).toList().count(), 2);
+    QVERIFY(tree.toList().at(1).toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(1).toList().at(0).toString(), QString("name"));
+    QVERIFY(tree.toList().at(1).toList().at(1).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(1).toList().at(1).toString(), QString("Example.Key"));
 
-    QVERIFY(nano.toList().at(2).type() == QVariant::List);
-    QCOMPARE(nano.toList().at(2).toList().count(), 2);
-    QVERIFY(nano.toList().at(2).toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(2).toList().at(0).toString(), QString("type"));
-    QVERIFY(nano.toList().at(2).toList().at(1).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(2).toList().at(1).toString(), QString("string"));
+    QVERIFY(tree.toList().at(2).type() == QVariant::List);
+    QCOMPARE(tree.toList().at(2).toList().count(), 2);
+    QVERIFY(tree.toList().at(2).toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(2).toList().at(0).toString(), QString("type"));
+    QVERIFY(tree.toList().at(2).toList().at(1).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(2).toList().at(1).toString(), QString("string"));
 
-    QVERIFY(nano.toList().at(3).type() == QVariant::List);
-    QCOMPARE(nano.toList().at(3).toList().count(), 2);
-    QVERIFY(nano.toList().at(3).toList().at(0).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(3).toList().at(0).toString(), QString("doc"));
-    QVERIFY(nano.toList().at(3).toList().at(1).type() == QVariant::String);
-    QCOMPARE(nano.toList().at(3).toList().at(1).toString(), QString("A random property."));
+    QVERIFY(tree.toList().at(3).type() == QVariant::List);
+    QCOMPARE(tree.toList().at(3).toList().count(), 2);
+    QVERIFY(tree.toList().at(3).toList().at(0).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(3).toList().at(0).toString(), QString("doc"));
+    QVERIFY(tree.toList().at(3).toList().at(1).type() == QVariant::String);
+    QCOMPARE(tree.toList().at(3).toList().at(1).toString(), QString("A random property."));
 }
 
 void NanoXmlUnitTest::test5()
 {
     NanoXml parser(LOCAL_FILE("test5.xml"));
     QCOMPARE(parser.didFail(), false);
-    NanoTree nano = parser.result();
-    QCOMPARE(nano.keyValue("param1").toString(), QString("value1"));
+    AssocTree tree = parser.result();
+    QCOMPARE(tree.value("param1").toString(), QString("value1"));
 }
 
 void NanoXmlUnitTest::broken()

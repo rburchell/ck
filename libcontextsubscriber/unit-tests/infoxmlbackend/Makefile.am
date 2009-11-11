@@ -28,8 +28,8 @@ FROM_SOURCE =							\
 	contextproviderinfo.h					\
 	contexttypeinfo.h					\
 	contexttypeinfo.cpp					\
-	nanotree.h						\
-	nanotree.cpp
+	assoctree.h						\
+	assoctree.cpp
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =

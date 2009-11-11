@@ -20,13 +20,7 @@
         </doc>
     </type>
 
-    <type name="int32" base="number">
-        <doc>
-            An integer.
-        </doc>
-    </type>
-
-    <type name="int64" base="number">
+    <type name="integer" base="number">
         <doc>
             An integer.
         </doc>

@@ -97,7 +97,7 @@ void InfoXmlBackendUnitTest::listKeys()
     QVERIFY(keys.contains("Battery.LowBattery"));
     QVERIFY(keys.contains("Key.With.Attribute"));
     QVERIFY(keys.contains("Key.With.bool"));
-    QVERIFY(keys.contains("Key.With.int32"));
+    QVERIFY(keys.contains("Key.With.integer"));
     QVERIFY(keys.contains("Key.With.string"));
     QVERIFY(keys.contains("Key.With.double"));
     QVERIFY(keys.contains("Key.With.complex"));
@@ -116,11 +116,11 @@ void InfoXmlBackendUnitTest::typeInfoForKey()
     QCOMPARE(backend->typeInfoForKey("Key.With.Attribute").name(), QString("bool"));
     QCOMPARE(backend->typeInfoForKey("Battery.LowBattery").name(), QString("bool"));
     QCOMPARE(backend->typeInfoForKey("Key.With.bool").name(), QString("bool"));
-    QCOMPARE(backend->typeInfoForKey("Key.With.int32").name(), QString("int32"));
+    QCOMPARE(backend->typeInfoForKey("Key.With.integer").name(), QString("integer"));
     QCOMPARE(backend->typeInfoForKey("Key.With.string").name(), QString("string"));
     QCOMPARE(backend->typeInfoForKey("Key.With.double").name(), QString("double"));
     QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), QString("bool"));
-    QCOMPARE(backend->typeInfoForKey("Battery.Voltage").name(), QString("int32"));
+    QCOMPARE(backend->typeInfoForKey("Battery.Voltage").name(), QString("integer"));
     QCOMPARE(backend->typeInfoForKey("Does.Not.Exist").name(), QString(""));
 
     ContextTypeInfo complexType = backend->typeInfoForKey("Key.With.complex");
@@ -134,7 +134,7 @@ void InfoXmlBackendUnitTest::docForKey()
     QCOMPARE(backend->docForKey("Battery.ChargePercentage"), QString());
     QCOMPARE(backend->docForKey("Battery.LowBattery"), QString("This is true when battery is low"));
     QCOMPARE(backend->docForKey("Key.With.bool"), QString());
-    QCOMPARE(backend->docForKey("Key.With.int32"), QString());
+    QCOMPARE(backend->docForKey("Key.With.integer"), QString());
     QCOMPARE(backend->docForKey("Key.With.string"), QString());
     QCOMPARE(backend->docForKey("Key.With.double"), QString());
     QCOMPARE(backend->docForKey("Key.With.complex"), QString());
@@ -190,7 +190,7 @@ void InfoXmlBackendUnitTest::dynamics()
 
     // Again, some basic check
     QCOMPARE(backend->keyDeclared("System.Active"), true);
-    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), QString("int32"));
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), QString("integer"));
     QCOMPARE(backend->typeInfoForKey("System.Active").name(), QString("bool"));
     QCOMPARE(backend->docForKey("System.Active"), QString("This is true when system is active"));
 
