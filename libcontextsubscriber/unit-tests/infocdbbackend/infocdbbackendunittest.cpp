@@ -24,11 +24,31 @@
 #include "fileutils.h"
 #include "infocdbbackend.h"
 #include "cdbwriter.h"
+#include "contexttyperegistryinfo.h"
+
+ContextTypeRegistryInfo* ContextTypeRegistryInfo::registryInstance = new ContextTypeRegistryInfo();
+
+/* Mocked ContextTypeRegistryInfo */
+
+ContextTypeRegistryInfo::ContextTypeRegistryInfo()
+{
+}
+
+ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
+{
+    return registryInstance;
+}
+
+AssocTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
+{
+    return AssocTree();
+}
 
 class InfoCdbBackendUnitTest : public QObject
 {
     Q_OBJECT
     InfoCdbBackend *backend;
+    ContextTypeRegistryInfo *typeRegistry;
 
 private:
     void createBaseDatabase(QString path);
@@ -40,7 +60,7 @@ private slots:
     void databaseExists();
     void databaseDirectory();
     void listKeys();
-    void typeForKey();
+    void typeInfoForKey();
     void docForKey();
     void keyDeclared();
     void providersForKey();
@@ -58,8 +78,8 @@ void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Internet.BytesOut");
-    writer.add("Battery.Charging:KEYTYPE", "TRUTH");
-    writer.add("Internet.BytesOut:KEYTYPE", "INTEGER");
+    writer.add("Battery.Charging:KEYTYPEINFO", ContextTypeInfo(QString("bool")));
+    writer.add("Internet.BytesOut:KEYTYPEINFO", ContextTypeInfo(QString("int64")));
     writer.add("Battery.Charging:KEYDOC", "doc1");
 
     QVariantList providers1;
@@ -88,9 +108,9 @@ void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Battery.Capacity");
-    writer.add("Battery.Charging:KEYTYPE", "INTEGER");
+    writer.add("Battery.Charging:KEYTYPEINFO", ContextTypeInfo(QString("int64")));
     writer.add("Battery.Charging:KEYDOC", "doc1");
-    writer.add("Battery.Capacity:KEYTYPE", "INTEGER");
+    writer.add("Battery.Capacity:KEYTYPEINFO", ContextTypeInfo(QString("int64")));
     writer.add("Battery.Capacity:KEYDOC", "doc3");
 
     QVariantList providers1;
@@ -121,6 +141,7 @@ void InfoCdbBackendUnitTest::initTestCase()
     utilSetEnv("CONTEXT_PROVIDERS", "./");
     utilSetEnv("CONTEXT_CORE_DECLARATIONS", "/dev/null");
     backend = new InfoCdbBackend();
+    typeRegistry = ContextTypeRegistryInfo::instance();
 }
 
 void InfoCdbBackendUnitTest::name()
@@ -147,11 +168,11 @@ void InfoCdbBackendUnitTest::listKeys()
     QVERIFY(keys.contains("Internet.BytesOut"));
 }
 
-void InfoCdbBackendUnitTest::typeForKey()
+void InfoCdbBackendUnitTest::typeInfoForKey()
 {
-    QCOMPARE(backend->typeForKey("Internet.BytesOut"), QString("INTEGER"));
-    QCOMPARE(backend->typeForKey("Battery.Charging"), QString("TRUTH"));
-    QCOMPARE(backend->typeForKey("Does.Not.Exist"), QString());
+    QCOMPARE(backend->typeInfoForKey("Internet.BytesOut").name(), QString("int64"));
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), QString("bool"));
+    QCOMPARE(backend->typeInfoForKey("Does.Not.Exist").name(), QString());
 }
 
 void InfoCdbBackendUnitTest::docForKey()
@@ -201,7 +222,7 @@ void InfoCdbBackendUnitTest::dynamics()
     QCOMPARE(backend->listKeys().count(), 2);
     QVERIFY(backend->listKeys().contains("Battery.Charging"));
     QVERIFY(backend->listKeys().contains("Battery.Capacity"));
-    QCOMPARE(backend->typeForKey("Battery.Charging"), QString("INTEGER"));
+    QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), QString("int64"));
     QCOMPARE(backend->docForKey("Battery.Charging"), QString("doc1"));
 
     // Check providers

@@ -85,14 +85,6 @@ QStringList InfoXmlBackend::listKeys() const
     return list;
 }
 
-QString InfoXmlBackend::typeForKey(QString key) const
-{
-    if (! keyDataHash.contains(key))
-        return "";
-
-    return keyDataHash.value(key).type;
-}
-
 QString InfoXmlBackend::docForKey(QString key) const
 {
     if (! keyDataHash.contains(key))
@@ -246,48 +238,28 @@ void InfoXmlBackend::regenerateKeyDataList()
     }
 }
 
-/// Convert a subset of new-style type names to the currently used
-/// old-style type names.  This way we can slowly fade in new-style
-/// types.
-QString InfoXmlBackend::canonicalizeType (const QString &type)
-{
-    if (type == "bool")
-        return "TRUTH";
-    else if (type == "int32")
-        return "INT";
-    else if (type == "string")
-        return "STRING";
-    else if (type == "double")
-        return "DOUBLE";
-    else
-        return type;
-}
-
 /// Parse the given QVariant tree which is supposed to be a key tree.
-void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerTree)
+void InfoXmlBackend::parseKey(const AssocTree &keyTree, const AssocTree &providerTree)
 {
-    QString key = NanoXml::keyValue("name", keyTree).toString();
-    QString plugin = NanoXml::keyValue("plugin", providerTree).toString();
-    QString constructionString = NanoXml::keyValue("constructionString", providerTree).toString();
-    QString type = canonicalizeType(NanoXml::keyValue("type", keyTree).toString());
-    QString doc = NanoXml::keyValue("doc", keyTree).toString();
+    QString key = keyTree.value("name").toString();
+    QString plugin = providerTree.value("plugin").toString();
+    QString constructionString = providerTree.value("constructionString").toString();
+    QString doc = keyTree.value("doc").toString();
+
+    ContextTypeInfo typeInfo = keyTree.value("type");
+    typeInfo = typeInfo.ensureNewTypes(); // Make sure to get rid of old names (INTEGER...)
 
     // Warn about description mismatch or add new
     if (keyDataHash.contains(key)) {
-        InfoKeyData keyData = keyDataHash.value(key);
-
-        if (type != "" && keyData.type != type)
-            contextWarning() << F_XML << key << "already has type declared -" << keyData.type;
-
-        if (doc != "" && keyData.doc != doc)
-            contextWarning() << F_XML << key << "already has doc declared -" << keyData.doc;
+        if (typeInfo.name() != "" || doc != "")
+            contextWarning() << F_XML << key << ": redeclarations can't specify type or doc";
     } else {
         InfoKeyData keyData;
         keyData.name = key;
-        keyData.type = type;
+        keyData.typeInfo = typeInfo;
         keyData.doc = doc;
 
-        contextDebug() << F_XML << "Adding new key" << key << "with type:" << keyData.type;
+        contextDebug() << F_XML << "Adding new key" << key << "with type:" << keyData.typeInfo.name();
         keyDataHash.insert(key, keyData);
     }
 
@@ -296,8 +268,8 @@ void InfoXmlBackend::parseKey(const QVariant &keyTree, const QVariant &providerT
 
     // Suport old-style XML...
     if (providerInfo.plugin == "") {
-        QString currentProvider = NanoXml::keyValue("service", providerTree).toString();
-        QString currentBus = NanoXml::keyValue("bus", providerTree).toString();
+        QString currentProvider = providerTree.value("service").toString();
+        QString currentBus = providerTree.value("bus").toString();
 
         if (currentBus != "" && currentProvider != "") {
             providerInfo.plugin = "contextkit-dbus";
@@ -328,10 +300,10 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
 {
     contextDebug() << F_XML << "Reading keys from" << path;
 
-    NanoXml nano(path);
+    NanoXml parser(path);
 
     // Check if format is all ok
-    if (nano.didFail()) {
+    if (parser.didFail()) {
         contextWarning() << F_XML << "Reading" << path << "failed, parsing error.";
         return;
     }
@@ -344,23 +316,34 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     }
     */
 
-    if (nano.root().toList().at(0).toString() == "provider" ||
-        nano.root().toList().at(0).toString() == "properties") {
+    AssocTree rootTree = parser.result();
+
+    if (rootTree.toList().at(0).toString() == "provider" ||
+        rootTree.toList().at(0).toString() == "properties") {
         // One provider. Iterate over each key.
-        foreach (QVariant keyTree, nano.keyValues("key")) {
-            parseKey(keyTree, nano.root());
+        foreach (AssocTree keyTree, rootTree.nodes()) {
+            if (keyTree.name() == "key")
+                parseKey(keyTree, rootTree);
         }
     } else {
         // Multiple providers... iterate over providers and keys
-        foreach (QVariant providerTree, nano.keyValues("provider")) {
-           foreach (QVariant keyTree, NanoXml::keyValues("key", providerTree)) {
-               parseKey(keyTree, providerTree);
-           }
-        }
+        foreach (AssocTree providerTree, rootTree.nodes())
+            if (providerTree.name() == "provider")
+                foreach (AssocTree keyTree, providerTree.nodes())
+                    if (keyTree.name() == "key")
+                        parseKey(keyTree, providerTree);
     }
 }
 
 const QList<ContextProviderInfo> InfoXmlBackend::providersForKey(QString key) const
 {
     return keyProvidersHash.value(key);
+}
+
+ContextTypeInfo InfoXmlBackend::typeInfoForKey(QString key) const
+{
+    if (! keyDataHash.contains(key))
+        return ContextTypeInfo();
+
+    return keyDataHash.value(key).typeInfo;
 }

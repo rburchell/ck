@@ -1,7 +1,7 @@
 check_PROGRAMS = contextpropertyinfounittest
 
 # your test's sources
-contextpropertyinfounittest_SOURCES = contextpropertyinfounittest.cpp infobackend.h
+contextpropertyinfounittest_SOURCES = contextpropertyinfounittest.cpp infobackend.h contexttyperegistryinfo.h
 
 COVERAGE_FILES = contextpropertyinfo.cpp
 EXTRA_DIST =
@@ -15,7 +15,11 @@ AM_LDFLAGS = $(CDB_LIBS) $(QtXml_LIBS)
 FROM_SOURCE = contextpropertyinfo.cpp                   \
               contextpropertyinfo.h                     \
               loggingfeatures.h                         \
-              contextproviderinfo.h
+              contextproviderinfo.h                     \
+              contexttypeinfo.h				\
+	      contexttypeinfo.cpp			\
+	      assoctree.cpp				\
+	      assoctree.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD = 

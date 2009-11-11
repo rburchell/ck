@@ -1,7 +1,7 @@
 check_PROGRAMS = infobackendunittest
 
 # your test's sources
-infobackendunittest_SOURCES = infobackendunittest.cpp
+infobackendunittest_SOURCES = infobackendunittest.cpp contexttyperegistryinfo.h
 
 COVERAGE_FILES = infobackend.cpp
 EXTRA_DIST = 
@@ -23,7 +23,11 @@ FROM_SOURCE = 							\
 	loggingfeatures.h                                       \
         nanoxml.cpp                                             \
         nanoxml.h                                               \
-        contextproviderinfo.h
+        contextproviderinfo.h					\
+	contexttypeinfo.h					\
+	contexttypeinfo.cpp					\
+	assoctree.cpp						\
+	assoctree.h
 
 FROM_SOURCE_DIR = $(srcdir)/../../src
 LDADD =
