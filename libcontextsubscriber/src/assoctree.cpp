@@ -49,10 +49,11 @@ QString AssocTree::dump(int level) const
 /// Returns the name of this tree.
 QString AssocTree::name() const
 {
-    if (type() != QVariant::List)
-        return QString();
+    if (type() == QVariant::String)
+        return toString();
 
-    if (toList().size() == 0)
+    if (type() != QVariant::List
+        || toList().size() < 1)
         return QString();
 
     return toList().at(0).toString();
