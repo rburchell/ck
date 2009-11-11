@@ -45,6 +45,11 @@ sub car {
     return @{$nano}[0];
 }
 
+sub cadr {
+    my ($nano) = @_;
+    return @{$nano}[1];
+}
+
 sub cdr {
     my ($nano) = @_;
     # XXX - one free beer if you can express this array slices.
@@ -126,7 +131,7 @@ sub type_link {
     my $type = shift;
 
     my $name = type_name ($type);
-    return "link:context-types.html#type-${name}[${name}]";
+    return "link:core-types.html#type-${name}[${name}]";
 }
     
 sub type_short_desc {
@@ -168,15 +173,14 @@ sub print_type_long_desc {
         print "--\n";
     } elsif ($name eq "map") {
         print "+\n--\nPossible map keys: \n[horizontal]\n";
-        my $keys = nano_assoc ($parms, 'keys');
-        foreach (@{$keys}) {
+         foreach (@{$parms}) {
             print car ($_) . ":: " . nano_ref (cdr ($_), 'doc') . "\n";
         }
         print "--\n";
     } else {
-        print "+\n--\nType: " . type_name ($type) . "\n[horizontal]\n";
+        print "+\n--\nType parameters: \n[horizontal]\n";
         foreach (@{$parms}) {
-            print car ($_) . " :: " . nano_ref (cdr ($_), 'doc') . "\n";
+            print car ($_) . " :: " . cadr ($_) . "\n";
         }
         print "--\n";
     }
@@ -219,6 +223,7 @@ sub output_typedef {
     my $base = nano_ref ($typedef, 'base');
     if ($base) {
         print "Base: " . type_short_desc ($base) . "\n";
+        print_type_long_desc ($base);
     }
 }
 

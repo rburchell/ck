@@ -1,7 +1,7 @@
 dist_noinst_DATA = context.valid.stamp $(INTROSPECT)
 
 htmldir = $(datadir)/doc/contextkit/html/
-dist_html_DATA = context-properties.html context-types.html contextkit.html context-provider-schema.html
+dist_html_DATA = context-properties.html core-types.html contextkit.html context-provider-schema.html
 
 contextdir = $(datadir)/contextkit/
 dist_context_DATA = core.context core.types
@@ -45,7 +45,7 @@ context.valid.stamp: context.xsd core.context
 context-properties.html: core.context context2asciidoc.pl
 	$(srcdir)/context2asciidoc.pl < $< | asciidoc -f $(srcdir)/myfilter.conf -o $@ -
 
-context-types.html: core.types  context2asciidoc.pl
+core-types.html: core.types  context2asciidoc.pl
 	$(srcdir)/context2asciidoc.pl < $< | asciidoc -f $(srcdir)/myfilter.conf -o $@ -
 
 # Creating docs from a DbusSpec
@@ -69,7 +69,7 @@ MAINTAINERCLEANFILES = \
 	$(INTROSPECT) \
 	context.valid.stamp \
         context-properties.html \
-        context-types.html \
+        core-types.html \
         contextkit.html \
         context-provider-schema.html
 
