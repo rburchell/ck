@@ -154,6 +154,9 @@ For example, a 64 bit signed integer is represented in GConf as a
 "int" if it fits, and as a "double" if not.  It will always fit into a
 double, but it might mean chopping off some low bits.
 
+What we are defining then is nothing more than the rules for
+converting values between different representations.
+
 - null
 +
 The null value.
@@ -287,28 +290,111 @@ Mapping from strings to values, with no duplicated keys.
   Python:     dict
   CL:	      alist
 
+Association trees
+-----------------
+
+A map (or dictionary, or hashtable) is a useful data structure, and by
+nesting them you can express a lot of interesting things.  Two things
+are missing however: maps do not preserve the order of their entries,
+and they don't allow duplicate keys.  These two things are often
+necessary.
+
+So, we like to use lists insteads of maps and define a couple of
+conventions how to express associations between things with them.  The
+resulting values are called "association trees".
+
+An association tree always has a name (which is always a string), and
+has either a single value, or a list of subordinate association trees.
+
+An association tree is represented as a list.  The first element is
+the name.  If the association tree is of the first form, then the list
+always has a second element, which is the value.  In the second form,
+the remaining elements of the list after the name are the subordinate
+association trees.
+
+A couple of example will hopefully show that this is all very simple:
+
+- The first form, essentially a key/value pair:
+
+  [ 'foo', 12 ]
+
+- The second form, with two sub-trees:
+
+  [ 'foo', [ 'bar', 42 ], [ 'baz', 'quux' ]]
+
+The second example can be interpreted as mapping the "key path"
+foo/bar to 12, and the path foo/baz to 'quux'.
+
+As you can see, the two forms of a assocation tree can not be reliably
+distinguished from each other just by looking at them.  This tree
+
+  [ 'foo', [ 'bar', 12 ]]
+
+can be interpreted both as mapping foo to the value [ 'bar', 12 ], and
+as mapping foo/bar to 12.  You have to know what is intended and use
+the right interpretation.
+
+As a special case, a association tree with an empty list of sub-trees
+can be expressed just with a string, which is the name of the tree.
+Thus, the following two lines are equivalent:
+
+  [ 'foo ' ]
+  'foo'
+
+Language bindings for association trees usually offer the following
+operations:
+
+  name (tree):       returns the name of the tree (which is either the first
+                     element of tree if it is a list, or tree itself if
+                     it isn't)
+
+  value (tree):      returns the value of the tree (which is the second
+                     element of tree, which must be a list)
+
+  node (tree, name): returns the first sub-tree with the given name of tree.
+
+Usually, convenience functions are provided as well that make
+accessing values and nodes at the end of a key path less verbose:
+
+  value (tree, name1)        == value (node (tree, name1))
+  value (tree, name1, name2) == value (node (node (tree, name1), name2))
+  ..etc..
+
+  node (tree, name1, name2)  == node (node (tree, name1), name2))
+  ..etc..
+
+Of course, association trees are one of the pre-defined intentional
+types.
+
+Association trees are very useful.  This Desktop Types system uses
+them for type definitions, for example, and also for type references.
+
 A Nano-DOM
 ----------
 
-The representational types can be used as a Nano-DOM for a subset of
+Association trees (see above) can be used to represent a subset of
 XML.  This is useful when the small subset suffices but you still want
 to be enterprise ready.  Intentional type definitions use this subset,
 for example, and are thus easily handled at run-time.
+
+Association trees tht are used to represent XML are called Nano-DOM
+here, since they can fulfill the role of a document object model.
 
 Converting a piece of XML into its Nano-DOM representation proceeds
 according to simple rules:
 
  - First, all attributes of elements are converted to child elements,
    in order and at the beginning.  Thus, the following XML fragments
-   are quivalent:
+   are equivalent:
 
      <bar size="12">...</bar>
 
      <bar><size>12</size>...</bar>
 
  - Then, text is turned into strings, and elements are turned into
-   lists with the first element being a string with the name of the
-   element.  For example, this XML
+   association trees with the name of the tree being the name of the
+   element, and the remaining elements of the association tree list
+   being the children of the element.  For example, this XML
 
      <foo>hello</foo>
 
@@ -338,7 +424,7 @@ More examples:
 
   <key name="Example.Random">
     <type>
-      <uniform-list type="number"/>
+      <list type="number"/>
     </type>
   </key>
 
@@ -347,7 +433,7 @@ More examples:
   ['key',
      ['name', 'Example.Random' ],
      ['type',
-       ['uniform-list', ['type', 'number' ] ]
+       ['list', ['type', 'number' ] ]
      ]
   ]
 
@@ -405,8 +491,7 @@ single UI widget could be written for "int-enum" that is then
 (automatically) parameterized at run-time with the concrete set of
 choices.  The "int-enum" type is defined so that its parameters
 include the text to use for each enumeration choice, and the UI widget
-will get access to these parameters at run-time (as a map,
-incidentally).
+will get access to these parameters at run-time.
 
 A intentional type definition can specify a "base" type for itself, by
 referring to another intentional type.  This base can be used to make
@@ -417,19 +502,52 @@ numbers are "int32"s; it would just declare its base to be "int32".
 Even better, it sould say that it's actually a "int-enum" and specify
 the concrete values.
 
+To recap: when referring to a type, you need to specify its name and
+you can optionally specify values for some or all of its parameters.
+Such a type reference is expressed as a association tree: the name of
+the tree gives the name of the referenced type, and the sub-trees give
+values for parameters.  Of course, the name of such a sub-tree names
+the parameter, and the value of the sub-tree usually gives the value
+of that parameter.
 
-In a context where a type is expected:
+Formally, however, it is up to the type definiton to say how a
+association tree that refers to it is being interpreted.  The
+"string-enum" type, for example, does not define any parameters for
+itself; instead, it specifies that the sub-trees in a reference to it
+should be interpreted as naming the possible enumeration choices.  (If
+that sounds too obscure, just ignore it for now.  It will become
+clear.)
 
-  NAME                          - refers to type named NAME
-  <NAME>PARM...</NAME>          - refers to type named NAME, specialized
-                                  with PARM...
+Type references are written in XML by following the Nano-DOM rules, of
+course.
 
-Attributes for type definitions:
+A type definition is also expressed as an association tree.  The name
+of such a tree is always the string "type", to identify it as a type
+definition.  The following key paths can be used in a type definition:
 
-  name  - the name (string)
-  parms - valid paramaters (map from parm name to map of ...)
-  doc   - documentation (either string, or a map language code -> string)
-  base  - the base type (type)
+  - type/name (string)
+  The symbolic name of the type.  Don't use too fancy characters here.
+
+  - type/doc (string)
+  The documentation for the type.
+
+  - type/base (type)
+  The base type for this type.  All values that are valid for this
+  type are valid for the base type, and if a piece of code does not
+  understand this type, it is allowed to use the base type instead.
+
+  - type/parms (node)
+  The parameters of this type, one per sub-tree of this node.  If you
+  want to specify special rules for interpreting association trees
+  that refer to this type, just omit the type/parms node in the
+  definition.
+
+  - type/parms/<p>/doc (string)
+  The documentation for parameter <p>.
+
+  - type/parms/<p>/type (type)
+  The type for parameter <p>.
+  XXX - this doesn't really work since XML can only express association trees.
 
 As an example, consider a hypothetical XML schema for describing
 key-value pairs.  Let's also assume that this schema follows our
@@ -463,371 +581,11 @@ pre-defined generic types.
        doc="The current temperature">
     <type>
       <string-enum>
-        <low doc="Brrrr"/>
+        <low    doc="Brrrr"/>
 	<medium doc="Comfy."/>
-	<high doc="Siesta!"/>
+	<high   doc="Siesta!"/>
       </string-enum>
     </type>
   </key>
 
-The common intentional types are defined in XML, as a list of "type"
-elements that have "name", "parms", "doc", and "base" child elements,
-as expected.
-
-In the following, we give the type definitions verbatim, as XML, as an
-extended example (and because the real XML definition of the types
-does not exist yet).  In the future, this part of the document will be
-generated from the type definitions and will look nicer.
-
-Fundamental types
-~~~~~~~~~~~~~~~~~
-
-  <typedef name="int32">
-    <doc>
-      A int32 value.
-    </doc>
-  </type>
-
-  <type name="int64">
-    <doc>
-      A int64 value.
-    </doc>
-  </type>
-
-  <type name="uint32">
-    <doc>
-      A uint32 value within the given limits.
-    </doc>
-  </type>
-
-  <type name="uint64">
-    <params>
-      <min doc="Minimum value"/>
-      <max doc="Maximum value"/>
-    <params>
-    <doc>
-      A uint64 value within the given limits.
-    </doc>
-  </type>
-
-  <type name="double">
-    <params>
-      <min doc="Minimum value"/>
-      <max doc="Maximum value"/>
-    <params>
-    <doc>
-      A double value within the given limits.
-    </doc>
-  </type>
-
-  <type name="string">
-    <parms>
-      <must-match doc="Regular expression that must match"/>
-    </parms>
-    <doc>
-      A string value that matches the given regular expression.
-    </doc>
-  </type>
-
-  <type name="list">
-    <params>
-      <min doc="Minimum length"/>
-      <max doc="Maximum length"/>
-    <params>
-    <doc>
-      A list of arbitrary values, with the minimum and maximum 
-      length given by the "min" and "max" parameters, respectively.
-    </doc>
-  </type>
-
-  <type name="map">
-    <params>
-      <keys doc="Allowed keys"/>
-    </params>
-    <doc>
-      A map.  If given, the "keys" parameter determines which keys are
-      allowed.  The "keys" parameter should be a map itself, from key
-      names to a map with the attributes of the key.  Attributes of a
-      key are "doc" and "type".
-    </doc>
-  </type>
-
-Generic types
-~~~~~~~~~~~~~
-
-  <type name="value">
-    <doc>
-      Any representable value.
-    </doc>
-  </type>
-
-  <type name="number" base="value">
-    <doc>
-      A number, represented as either a "int32", "uint32", "int64", "uint64", or "double".
-    </doc>
-  </type>
-
-  <type name="integer" base="number">
-    <params>
-      <min doc="Lower bound"/>
-      <max doc="Upper bound"/>
-    </params>
-    <doc>
-      A integer, represented as any of the numeric types.  If the value 
-      is a "double", it is rounded to an integer, but not necessarily to
-      the nearest.  The "min" and "max" parameters, when given, constrain 
-      the range of the integer.
-    </doc>
-  </type>
-
-  <type name="uniform-list" base="list">
-    <params>
-      <min doc="Minimum length"/>
-      <max doc="Maximum length"/>
-      <type doc="Type of the elements"/>
-    </params>
-    <doc>
-      A list of values of the given type, with the 
-      minimum and maximum length given by the "min" and "max" parameters.
-      The type of all elements is given by the "type" parameter.
-    </doc>
-  </type>
-
-  <type name="string-enum" base="string">
-    <parms>
-      <rest doc="The possible values">
-    </parms>
-    <doc>
-      This is the base type for enumerations of fixed strings.  The
-      parameters describe the possible values.  Each parameter is one
-      of the choices: the name of the parameter is the string for the choice
-      itself and the value of the parameter is a map with further 
-      information of that choice, such as a "doc" entry.
-    </doc>
-  </type>
-
-  <type name="int-enum" base="int32">
-    <parms>
-      <rest doc="The possible values">
-    </parms>
-    <doc>
-      This is the base type for enumerations of fixed integers.  The
-      parameters describe the possible values.  Each parameter is one
-      of the choices: the name of the parameter is the symbolic name
-      for the choice itself and the value of the parameter is a map
-      with further information of that choice, such as a "val" entry
-      for the numerical value for that choice, and a "doc" entry.
-    </doc>
-  </type>
-
-Specific types
-~~~~~~~~~~~~~~
-
-  <type name="type">
-    <doc>
-      A type, represented as a map.  The map is the one you get as the Nano-DOM 
-      for the type definiton.  E.g., it will have "doc" mapped to a string,
-      and "base" mapped to either a string or another map, etc.
-    </doc>
-    <base>
-      <map>
-        <allowed-keys>
-	  <name/>
-	  <parms/>
-	  <doc/>
-          <base/>
-	</allowed-keys>
-      </map>
-    </base>
-  </type>
-    
-  <type name="geoloc">
-    <doc>
-      A list of two or three doubles giving a geographical location.
-      The first number is latitude, the second longitude, both in degrees.
-      If a third number is present, it is the altitude in meters.
-    </doc>
-    <base>
-      <uniform-list min="2" max="3" type="double"/>
-    </base>
-  </type>
-
-  <type name="temperature"
-        base="double"
-	doc="A temperature in Kelvin."/>
-
-  <type name="screen-edge">
-    <doc>
-      Indicates an edge of a rectangular screen, relative to
-      the natural orientation of the video hardware driving it.
-      It can be one of the four strings "top", "left", "right",
-      and "bottom".
-    </doc>
-    <base>
-      <string-enum>
-	<top/> <left/> <right/> <bottom/>
-      </string-enum>
-    </base>
-  </type>
-
-  <type name="screen-edge-ints">
-    <doc>
-      Indicates an edge of a rectangular screen, relative to
-      the natural orientation of the video hardware driving it.
-      It can be one of the four values "top", "left", "right",
-      and "bottom", encoded as an integer.
-    </doc>
-    <base>
-      <int-enum>
-	<top val="0"/> <left val="1"/> <right val="2"/> <bottom val="3"/>
-      </string-enum>
-    </base>
-  </type>
-
-  <type name="energy" base="double">
-    <doc>
-      An amount of energy, in Joule.
-    </doc>
-  </type>
-
-  <type name="power" base="double">
-    <doc>
-      A power, in Watt.
-    </doc>
-  </type>
-
-  <type name="time" base="int64">
-    <doc>
-      A point in time, represented as the number of nano-seconds since
-      00:00 January 1, 1970, UTC.
-    </doc>
-  </type>
-
-  <type name="duration" base="uint64">
-    <doc>
-      A time duration, in nano-seconds.
-    </doc>
-  </type>
-
-  <type name="percentage" base="int32">
-    <doc>
-      A percentage.
-    </doc>
-  </type>
-
-
-Intentional types and static languages
---------------------------------------
-
-The normal use of intentional types is as follows: while programming
-in some language, you read some API documentation and find out that
-some argument to a function is of type "geoloc"; you then go to the
-documentation of "geoloc" and read how a "geoloc" works in your
-language.
-
-For C++ with QVariants, say, a geoloc could simply remain a list of
-two or three doubles, or it could be a QVariant::RectF with the height
-being abused as the altitude, a new QMetaType could be invented, or a
-completely new class could be defined that can be converted to and
-from a QVariant (together with an appropriate QMetaType).  In any
-case, there will be a QVariant involved in there somewhere.
-
-In other words, we need C++ language bindings for the intentional
-types.  These language bindings are maintained together with the
-intentional types.
-
-At the language boundaries, such as when marshalling and unmarshalling
-values for a D-Bus message, a geoloc value needs to be converted to
-and from a list of doubles.  This conversion code is also maintained
-together with the language bindings.  In any case, the types are well
-enough documented that the necessary code can be written manually if
-needed.
-
-
-C with GVariant
-~~~~~~~~~~~~~~~
-
-- geoloc
-
-  typedef struct {
-    double latitude;
-    double longitude;
-    double altitude; // NaN if unknown.
-  } DGeoLoc;
-
-Rest is done with inheritance:
-
-- duration
-
-  typedef int64_t DDuration;
-
-- screen-edge
-
-  typedef char *DScreenEdge;
-
-- screen-edge-ints
-
-  typedef int DScreenEdgeInts;
-  #define D_SCREEN_EDGE_TOP    0
-  #define D_SCREEN_EDGE_LEFT   1
-  #define D_SCREEN_EDGE_RIGHT  2
-  #define D_SCREEN_EDGE_BOTTOM 3
-
-- percentage
-
-  typedef int DPercentage;
-
-- type
-
-  typedef GVariant DGType;
-
-These definitions are in libdesktoptypes, built from the desktop-types
-source package, which includes everything else as well, such as this
-document, bindings for C++ with QVariant, etc.
-
-There is also g_variant_from_geoloc, etc.
-
-Then, libcontextprovider has context_provider_set_geoloc,
-context_provider_set_duration, etc, probably as macros using
-g_variant_from_geoloc.  Maybe we can have support for doing this
-automatically.
-
-C++ with QVariant
-~~~~~~~~~~~~~~~~~
-
-Types should be compatible with C and have the same names.
-
-- geoloc
-+
-  struct DGeoLoc {
-    double latitude;
-    double longitude;
-    double altitude; // NaN if unknown.
-
-    DGeoLoc();
-    DGeoLoc(double, double);
-    DGeoLoc(double, double, double);
-
-    DGeoLoc (QVariant);
-    operator QVariant ();
-  };
-+
-Registered as "DGeoLoc" with QMetaType.
-
-- rest identical with C, except "type", hmm...
-
-This is in libdesktoptypes-qt, built from the same desktop-types as
-the C bindings.
-
-
-Run-time introspection for intentional types
---------------------------------------------
-
-libdesktoptypes contains an API for reading a type definition
-repository, in /usr/share/desktop-types/.  It can lookup DType values
-given a name.
-
-A DType contains name, doc, parms, and base, of course.
-
-Existing introspection APIs need to be extended to return DTypes, as
-well.
+The common intentional types are defined link:core-types.html[here].
