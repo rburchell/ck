@@ -42,9 +42,9 @@ ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
     return registryInstance;
 }
 
-NanoTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
+AssocTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
 {
-    return ContextTypeInfo();
+    return AssocTree();
 }
 
 /* Mocked infobackend */
