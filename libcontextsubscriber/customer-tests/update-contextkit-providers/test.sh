@@ -30,9 +30,6 @@ function dotest {
     querydb "KEYS" "KEYS"
     compare "KEYS.expected" "KEYS.actual"
 
-    querydb "Battery.Charging:KEYTYPE" "Battery.Charging_KEYTYPE"
-    compare "Battery.Charging_KEYTYPE.expected" "Battery.Charging_KEYTYPE.actual"
-
     querydb "Battery.Charging:KEYDOC" "Battery.Charging_KEYDOC"
     compare "Battery.Charging_KEYDOC.expected" "Battery.Charging_KEYDOC.actual"
 
