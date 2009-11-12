@@ -97,8 +97,12 @@ class CLTool:
         """Writes STRING to the standard input of the child."""
         with self.iolock:
             self.io.append((time.time(), CLTool.STDIN, string))
-        print >>self.process.stdin, string
-        self.process.stdin.flush()
+        try:
+            print >>self.process.stdin, string
+            self.process.stdin.flush()
+        except:
+            self.printio()
+            raise
 
     def _return_event(self, wantdump):
         with self.iolock:
