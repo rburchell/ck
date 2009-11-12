@@ -23,10 +23,29 @@
 #include <QtCore>
 #include "contextpropertyinfo.h"
 #include "infobackend.h"
+#include "contexttyperegistryinfo.h"
 
 QMap <QString, ContextProviderInfo> providerMap;
-QMap <QString, QString> typeMap;
+QMap <QString, ContextTypeInfo> typeInfoMap;
 QMap <QString, QString> docMap;
+
+/* Mocked ContextTypeRegistryInfo */
+
+ContextTypeRegistryInfo* ContextTypeRegistryInfo::registryInstance = new ContextTypeRegistryInfo();
+
+ContextTypeRegistryInfo::ContextTypeRegistryInfo()
+{
+}
+
+ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
+{
+    return registryInstance;
+}
+
+AssocTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
+{
+    return AssocTree();
+}
 
 /* Mocked infobackend */
 
@@ -42,12 +61,13 @@ InfoBackend* InfoBackend::instance(const QString &backendName)
     }
 }
 
-QString InfoBackend::typeForKey(QString key) const
+ContextTypeInfo InfoBackend::typeInfoForKey(QString key) const
 {
-     if (typeMap.contains(key))
-        return typeMap.value(key);
+
+    if (typeInfoMap.contains(key))
+        return typeInfoMap.value(key);
     else
-        return QString();
+        return ContextTypeInfo();
 }
 
 QString InfoBackend::docForKey(QString key) const
@@ -60,7 +80,7 @@ QString InfoBackend::docForKey(QString key) const
 
 bool InfoBackend::keyDeclared(QString key) const
 {
-    if (typeMap.contains(key))
+    if (typeInfoMap.contains(key))
         return true;
     else
         return false;
@@ -140,9 +160,9 @@ void ContextPropertyInfoUnitTest::initTestCase()
     ContextProviderInfo info2("contextkit-dbus", "session:com.nokia.musicplayer");
     providerMap.insert("Media.NowPlaying", info2);
 
-    typeMap.clear();
-    typeMap.insert("Battery.Charging", "TRUTH");
-    typeMap.insert("Media.NowPlaying", "STRING");
+    typeInfoMap.clear();
+    typeInfoMap.insert("Battery.Charging", ContextTypeInfo(QString("bool")));
+    typeInfoMap.insert("Media.NowPlaying", ContextTypeInfo(QString("string")));
 
     docMap.clear();
     docMap.insert("Battery.Charging", "Battery.Charging doc");
@@ -271,7 +291,7 @@ void ContextPropertyInfoUnitTest::typeChanged()
     QCOMPARE(spy.count(), 1);
     spy.takeFirst();
 
-    typeMap.insert("Battery.Charging", "INT");
+    typeInfoMap.insert("Battery.Charging", ContextTypeInfo(QString("int64")));
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy.count(), 1);

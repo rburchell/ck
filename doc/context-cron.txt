@@ -22,21 +22,31 @@ Input to the expression can come from various sources:
 
   - and the current time.
 
-There are two options for writing expressions, and we should select
-one of them:
+Expressions are written in a language that is a simple extension of
+SPARQL.  The extensions are as follows:
 
- - All input could be mapped into RDF and SPARQL would be used to
-   write the expressions.
+  - additional functions that give access to ContextKit properties,
+    GConf settings, and time.
 
- - SPARQL is extended so that context, settings, and time can be used
-   as parameters in places where SparQL allows literals.
+  - a additonal "VALUE" query that just computes the value of an
+    expression.
 
-The latter appears to allow more natural expressions.  Mapping the
-rich values of context properties into RDF leads to covoluted graphs
-that are tedious to query.
+  - some syntactic sugar might be added to make common functions
+    easier to write.
 
-In general, it is not wrong to say that the Context Cron adds rich
-life queries to the Content Framework.
+The Context Cron has its own interpretor for this extended version of
+SPARQL that is designed to allow efficient life queries.  The
+interpreter conceptually walks an evaluation graph for an expression
+and caches the most recently computed values in each node.  When the
+graph is evaluated from the leafs towards the root, evaluation only
+continues when the new value differs from the old.  Some nodes
+corresponding to special functions may have more magical behavior,
+such as only passing on the evaluation once every minute.
+
+[ Initially, this evaluation graph will be contstructed explicitly in
+  C++ and/or maybe Python.  A parser will only be implemented once
+  enough experience has been gathered, if ever.
+]
 
 When ever the result of a expression changes, Context Cron triggers
 the associated actions.  Actions can be:
@@ -53,54 +63,13 @@ values from stdin, in a number of formats.
 
 Actions are specified in a ad-hoc syntax, maybe XML.
 
-Queries can be 'armed' or 'unarmed'.  A action only triggers when it
-is armed, and triggering a action unarms it.  You need to explicitly
+Queries can be 'armed' or 'unarmed'.  An action only triggers when it
+is armed, and triggering an action unarms it.  You need to explicitly
 arm it again once the action is done, or more generally, once you are
 ready for the next trigger.
 
+Actions that drive a ContextKit property are only armed when someone
+is subscribed to that property, naturally.
+
 Queries can be added to Context Cron by dropping files into a
 well-known location, or via a D-Bus interface.
-
-Context and Settings Ontology
------------------------------
-
-Context properties and settings are key/value pairs.  The values range
-over the "representational types" described in the Desktop Types
-document.  That document also describes how the values map into RDF
-triples.
-
-Context properties are mapped into RDF as triples of the form
-
-   "context"  <key>  <value>
-
-Settings are also key/value pairs with the same value range as context
-properties.  They are mapped into triples like so:
-
-   "setting"  <key>  <value>
-
-[ XXX - do this properly, using Turtle and namespace and everything. 
-]
-
-In addition to this generic ontology that makes all context properties
-and all setings available to SparQL, there might also be specific
-context ontology that is better integrated with Nepomuk.
-
-For example, there is a node "CurrentLocation" with predicates
-"nlo:latitude" and "nlo:longitude".
-
-Examples
---------
-
-Create a new context property Location.NearPOIs whose value is a list
-of the currently near points of interest, sorted from closest to
-farthest.  "Near" is defined to mean "can be reached in less than 1
-minute with the current velocity."
-
-  SELECT ?poi
-  WHERE
-  {
-    ?poi nlo:latitude ?lat;
-         nlo:longitude ?lon.
-    context Location.Latitude ?curlat;
-            Location.Longitude ?curlon.
-  }

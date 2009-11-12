@@ -1,10 +1,10 @@
 dist_noinst_DATA = context.valid.stamp $(INTROSPECT)
 
 htmldir = $(datadir)/doc/contextkit/html/
-dist_html_DATA = context-properties.html contextkit.html context-provider-schema.html
+dist_html_DATA = context-properties.html core-types.html contextkit.html context-provider-schema.html
 
 contextdir = $(datadir)/contextkit/
-dist_context_DATA = core.context
+dist_context_DATA = core.context core.types
 
 XSLTPROC = xsltproc --xinclude --nonet
 DROP_NAMESPACE = perl -pe '$$hash = chr(35); s{xmlns:tp="http://telepathy\.freedesktop\.org/wiki/DbusSpec$${hash}extensions-v0"}{}g'
@@ -46,6 +46,9 @@ context.valid.stamp: context.xsd core.context
 context-properties.html: core.context context2asciidoc.pl
 	$(srcdir)/context2asciidoc.pl < $< | asciidoc -f $(srcdir)/myfilter.conf -o $@ -
 
+core-types.html: core.types  context2asciidoc.pl
+	$(srcdir)/context2asciidoc.pl < $< | asciidoc -f $(srcdir)/myfilter.conf -o $@ -
+
 # Creating docs from a DbusSpec
 
 contextkit.html: all.xml $(SPEC_FILES) doc-generator.xsl
@@ -68,6 +71,7 @@ MAINTAINERCLEANFILES = \
 	$(INTROSPECT) \
 	context.valid.stamp \
         context-properties.html \
+        core-types.html \
         contextkit.html \
         context-provider-schema.html
 

@@ -131,7 +131,7 @@ int main(int argc, char **argv)
         writer.add("KEYS", key);
 
         // Write type
-        writer.replace(key + ":KEYTYPE", keyInfo.type());
+        writer.replace(key + ":KEYTYPEINFO", QVariant(keyInfo.typeInfo()));
 
         // Write doc
         writer.replace(key + ":KEYDOC", keyInfo.doc());

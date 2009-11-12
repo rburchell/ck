@@ -208,7 +208,7 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
         sconnect(infoBackend, SIGNAL(keyChanged(QString)),
                  this, SLOT(onKeyChanged(QString)));
 
-        cachedType = infoBackend->typeForKey(keyName);
+        cachedTypeInfo = infoBackend->typeInfoForKey(keyName);
         cachedDoc = infoBackend->docForKey(keyName);
         cachedDeclared = infoBackend->keyDeclared(keyName);
         cachedProviders = infoBackend->providersForKey(keyName);
@@ -229,11 +229,33 @@ QString ContextPropertyInfo::doc() const
     return cachedDoc;
 }
 
-/// Returns the type name for the introspected key.
+/// Returns the old-style type name for the introspected key. To be deprecated soon.
 QString ContextPropertyInfo::type() const
 {
     QMutexLocker lock(&cacheLock);
-    return cachedType;
+
+    QString typeInfoName = cachedTypeInfo.name();
+    if (typeInfoName == "int64")
+        return "INT";
+    else if (typeInfoName == "int32")
+        return "INT";
+    else if (typeInfoName == "uint32")
+        return "INT";
+    else if (typeInfoName == "uint64")
+        return "INT";
+    else if (typeInfoName == "bool")
+        return "TRUTH";
+    else if (typeInfoName == "string")
+        return "STRING";
+    else
+        return "";
+}
+
+/// Returns the advanced type info for the introspected key.
+ContextTypeInfo ContextPropertyInfo::typeInfo() const
+{
+    QMutexLocker lock(&cacheLock);
+    return cachedTypeInfo;
 }
 
 /// DEPRECATED Returns true if the key exists in the registry.
@@ -362,7 +384,7 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
         return;
 
     // Update caches
-    QString cachedType = InfoBackend::instance()->typeForKey(keyName);
+    cachedTypeInfo = InfoBackend::instance()->typeInfoForKey(keyName);
     cachedDoc = InfoBackend::instance()->docForKey(keyName);
     cachedDeclared = InfoBackend::instance()->keyDeclared(keyName);
     cachedProviders = InfoBackend::instance()->providersForKey(keyName);
@@ -374,7 +396,7 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
 
     // Emit the needed signals
     emit changed(keyName);
-    emit typeChanged(cachedType);
+    emit typeChanged(type());
     emit existsChanged(cachedDeclared);
     emit providedChanged((cachedProviders.size() > 0));
 

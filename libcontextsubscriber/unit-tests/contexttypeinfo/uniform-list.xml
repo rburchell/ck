@@ -1,0 +1,12 @@
+<type name="uniform-list" base="list">
+  <params>
+    <min doc="Minimum length"/>
+    <max doc="Maximum length"/>
+    <type doc="Type of the elements">double</type>
+  </params>
+  <doc>
+    A list of values of the given type, with the
+    minimum and maximum length given by the "min" and "max" parameters.
+    The type of all elements is given by the "type" parameter.
+  </doc>
+</type>

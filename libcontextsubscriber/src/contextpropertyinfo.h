@@ -28,6 +28,7 @@
 #include <QDBusConnection>
 #include <QMutex>
 #include "contextproviderinfo.h"
+#include "contexttypeinfo.h"
 
 class ContextPropertyInfo : public QObject
 {
@@ -44,6 +45,7 @@ public:
     QString key() const;
     QString doc() const;
     QString type() const;
+    ContextTypeInfo typeInfo() const;
     bool exists() const;
     bool declared() const;
     bool provided() const;
@@ -62,7 +64,7 @@ protected:
 private:
     QString keyName; ///< The name of the key his ContextPropertyInfo represents.
     QString cachedDoc; ///< Cached documentation of the key.
-    QString cachedType; ///< Cached (stored) type of the key.
+    ContextTypeInfo cachedTypeInfo; ///< Cached (stored) type info of the key.
     bool cachedDeclared; ///< Cached state of the key (existance).
     QList<ContextProviderInfo> cachedProviders; ///< Cached list of providers for this key.
     mutable QMutex cacheLock; ///< Lock for the cache.
@@ -125,7 +127,7 @@ signals:
     /// This is not a strict signal - it might be emitted even when
     /// no actual change happened.
     void changed(QString key);
-    
+
     friend class ContextPropertyInfoUnitTest;
 };
 
