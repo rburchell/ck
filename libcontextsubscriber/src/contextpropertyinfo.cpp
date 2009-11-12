@@ -239,6 +239,8 @@ QString ContextPropertyInfo::type() const
         return "INT";
     else if (typeInfoName == "int32")
         return "INT";
+    else if (typeInfoName == "integer")
+        return "INT";
     else if (typeInfoName == "uint32")
         return "INT";
     else if (typeInfoName == "uint64")
@@ -247,6 +249,8 @@ QString ContextPropertyInfo::type() const
         return "TRUTH";
     else if (typeInfoName == "string")
         return "STRING";
+    else if (typeInfoName == "double")
+        return "DOUBLE";
     else
         return "";
 }
