@@ -48,6 +48,9 @@ class CommanderDisabled(unittest.TestCase):
         listen = CLTool("context-listen", "test.int")
         self.assert_(listen.expect(wanted("test.int", "int", "42")),
                      "Provider provided value is wrong")
+        listen.wait()
+        commander.wait()
+        provider.wait()
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderDisabled)

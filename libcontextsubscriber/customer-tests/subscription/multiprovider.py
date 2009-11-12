@@ -69,14 +69,14 @@ class MultiProvider(unittest.TestCase):
         provider_y.expect("Setting key")
         self.assert_(client.expect(wanted("test.prop", "int", "99")))
 
-        provider_y.close()
+        provider_y.wait()
         os.unlink("y.context")
         self.assert_(client.expect(wanted("test.prop", "int", "55")))
 
-        provider_x.close()
+        provider_x.wait()
         os.unlink("x.context")
         self.assert_(client.expect(wantedUnknown("test.prop")))
-        client.close()
+        client.wait()
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(MultiProvider)

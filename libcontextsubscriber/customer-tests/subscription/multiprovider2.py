@@ -71,9 +71,9 @@ class MultiProvider(unittest.TestCase):
 
         client.send("value test.prop")
         self.assert_(client.expect("\nvalue: int:22\n"))
-        client.close()
-        provider_x.close()
-        provider_y.close()
+        client.wait()
+        provider_y.wait()
+        provider_y.wait()
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(MultiProvider)

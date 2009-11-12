@@ -62,6 +62,7 @@ class Subscription(unittest.TestCase):
 
                 # Expect value coming from plugin libcontextsubscribertime2
                 self.assert_(self.context_client.expect("Test.Time = QString:Time2:"))
+		self.context_client.wait()
 
 if __name__ == "__main__":
         sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)

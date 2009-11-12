@@ -65,6 +65,9 @@ class CommanderNonExistent(unittest.TestCase):
                 self.assert_(listen.expect(wanted("test.string", "int", "42")),
                              "Non-existent property's type couldn't be overwritten")
 
+		commander.wait()
+		listen.wait()
+		provider.wait()
 def runTests():
         suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderNonExistent)
         result = unittest.TextTestRunner(verbosity=2).run(suiteInstallation)

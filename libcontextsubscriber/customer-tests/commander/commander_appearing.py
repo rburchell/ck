@@ -68,10 +68,12 @@ class CommanderAppearing(unittest.TestCase):
         self.assert_(listen.expect(wanted("test.int", "int", "1235")),
                      "Value after commander has changed it is wrong, wanted 1235")
 
-        commander.close()
+        commander.wait()
         listen.comment("Commander killed")
         self.assert_(listen.expect(wanted("test.int", "int", "42")),
                      "Value after killing the commander is wrong, wanted 42")
+        listen.wait()
+        provider.wait()
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(CommanderAppearing)
