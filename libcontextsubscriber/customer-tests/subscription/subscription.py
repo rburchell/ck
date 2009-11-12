@@ -102,8 +102,11 @@ class Subscription(unittest.TestCase):
                         listen.expect("^key: test.int$"),
                         "Key command returned wrong value")
 
-                provider.close()
-                listen.close()
+                # Because of a python threading / process / CLTool
+                # issue, processes need to be waited for in the
+                # opposite order as they are started.
+                listen.wait()
+                provider.wait()
 
         def testInfos(self):
                 """
@@ -153,8 +156,8 @@ class Subscription(unittest.TestCase):
                 self.assert_(
                         listen.expect("^type: DOUBLE$"),
                         "type didn't work")
-                provider.close()
-                listen.close()
+                listen.wait()
+                provider.wait()
 
         def testTypes(self):
                 provider = CLTool("context-provide", "--v2", "com.nokia.test",
@@ -192,8 +195,8 @@ class Subscription(unittest.TestCase):
                 self.assert_(
                         listen.expect("^type:$"))
 
-                provider.close()
-                listen.close()
+                listen.wait()
+                provider.wait()
 
         def testProviders(self):
                 provider = CLTool("context-provide", "--v2", "com.nokia.test",
@@ -218,8 +221,8 @@ class Subscription(unittest.TestCase):
                 listen.send("providers test.fake")
                 self.assert_(
                         listen.expect("^providers:$"))
-                provider.close()
-                listen.close()
+                listen.wait()
+                provider.wait()
 
         def testAllDataTypes(self):
                 """
@@ -256,8 +259,8 @@ class Subscription(unittest.TestCase):
                                           "^test.string = QString:foobar$",
                                           "^test.truth = bool:true$"]),
                         "Actual key values pairs do not match expected")
-                provider.close()
-                listen.close()
+                listen.wait()
+                provider.wait()
 
         def testTruthTypePermutations(self):
                 """
@@ -299,8 +302,8 @@ class Subscription(unittest.TestCase):
                 self.assert_(
                         listen.expect("^test.truth = bool:true$"),
                         "setting to true didn't work")
-                provider.close()
-                listen.close()
+                listen.wait()
+                provider.wait()
 
         def testStringTypePermutations(self):
                 """
@@ -342,8 +345,8 @@ class Subscription(unittest.TestCase):
                         listen.expect("^test.string is Unknown$"),
                         "setting to null didn't work")
 
-                provider.close()
-                listen.close()
+                listen.wait()
+                provider.wait()
 
 class MultipleSubscribers(unittest.TestCase):
         def setUp(self):
@@ -361,12 +364,11 @@ class MultipleSubscribers(unittest.TestCase):
                 self.context_client4 = CLTool("context-listen","test.int","test.double","test.string")
 
         def tearDown(self):
-                self.flexiprovider.send("exit")
-                self.flexiprovider.close()
-                self.context_client1.close()
-                self.context_client2.close()
-                self.context_client3.close()
-                self.context_client4.close()
+                self.context_client4.wait()
+                self.context_client3.wait()
+                self.context_client2.wait()
+                self.context_client1.wait()
+                self.flexiprovider.wait()
                 os.unlink('./context-provide.context')
 
         def testInitialSubscription(self):
@@ -497,14 +499,14 @@ class MultipleProviders(unittest.TestCase):
 
                 self.assert_(
                         listen.expect("^test.truth = bool:false$"))
-                provider1.close()
-                provider2.close()
-                listen.close()
+                listen.wait()
+                provider2.wait()
+                provider1.wait()
 
 class SubscriptionPause (unittest.TestCase):
         def tearDown(self):
-                self.provider.close()
-                self.listen.close()
+                self.listen.wait()
+                self.provider.wait()
                 os.unlink('context-provide.context')
 
         def testPause(self):
@@ -620,7 +622,7 @@ class SubscriptionWaitError (unittest.TestCase):
 
                 self.assert_(context_client.expect("wait finished for test.nonexistent"),
                              "Wait for subscription is probably in a dead state")
-                context_client.close()
+                context_client.wait()
 
 if __name__ == "__main__":
         sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
