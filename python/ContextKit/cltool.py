@@ -66,7 +66,7 @@ class CLTool:
 
     def __init__(self, *cline):
         self.process = Popen(cline, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
-                             preexec_fn=self._preexec)
+                             preexec_fn=self._preexec, close_fds=True)
         self.io = []
         self.iolock = Lock()
         self.reader = Reader(self)
@@ -97,8 +97,12 @@ class CLTool:
         """Writes STRING to the standard input of the child."""
         with self.iolock:
             self.io.append((time.time(), CLTool.STDIN, string))
-        print >>self.process.stdin, string
-        self.process.stdin.flush()
+        try:
+            print >>self.process.stdin, string
+            self.process.stdin.flush()
+        except:
+            self.printio()
+            raise
 
     def _return_event(self, wantdump):
         with self.iolock:

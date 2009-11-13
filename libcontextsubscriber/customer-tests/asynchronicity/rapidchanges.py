@@ -78,8 +78,8 @@ class RapidChanges(unittest.TestCase):
         self.assertFalse(context_client.expect("test.fast =", wantdump = False, timeout=1),
                          "expected a single valueChanged")
 
-        provider_fast.close()
-        context_client.close()
+        context_client.wait()
+        provider_fast.wait()
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(RapidChanges)

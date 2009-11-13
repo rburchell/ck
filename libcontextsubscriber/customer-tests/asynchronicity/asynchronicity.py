@@ -93,9 +93,9 @@ class Asynchronous(unittest.TestCase):
                          "The arrival time of the fast and slow property is not far enough from each other")
 
         # context_client.printio()
-        context_client.close()
-        provider_slow.close()
-        provider_fast.close()
+        context_client.wait()
+        provider_fast.wait()
+        provider_slow.wait()
 
 def runTests():
     suiteInstallation = unittest.TestLoader().loadTestsFromTestCase(Asynchronous)

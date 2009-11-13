@@ -8,7 +8,6 @@ export CONTEXT_CORE_DECLARATIONS=.
 ../../update-contextkit-providers/update-contextkit-providers .
 
 regendb "KEYS" "KEYS"
-regendb "Battery.Charging:KEYTYPE" "Battery.Charging_KEYTYPE"
 regendb "Battery.Charging:KEYDOC" "Battery.Charging_KEYDOC"
 regendb "Battery.Charging:PROVIDERS" "Battery.Charging_PROVIDERS"
 echo "Regen succeeded!"

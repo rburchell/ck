@@ -42,7 +42,8 @@ class PrintInfoRunning(unittest.TestCase):
 
         returnValue = info_client.wait()
         self.assertEqual(returnValue, 0, "context-ls exited with return value != 0")
-        provider.close()
+        info_client.wait()
+        provider.wait()
 
 class PrintingProperties(unittest.TestCase):
     def tearDown(self):
@@ -66,7 +67,9 @@ class PrintingProperties(unittest.TestCase):
                                          "^Documentation: A phony but very flexible property.$"]),
                      "Bad introspection result from context-ls")
 
-        provider.close()
+        info_client.wait()
+        provider.wait()
+
 
 def runTests():
     suitePrintInfoRunning = unittest.TestLoader().loadTestsFromTestCase(PrintInfoRunning)
