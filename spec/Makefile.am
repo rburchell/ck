@@ -4,7 +4,10 @@ htmldir = $(datadir)/doc/contextkit/html/
 dist_html_DATA = context-properties.html core-types.html contextkit.html context-provider-schema.html
 
 contextdir = $(datadir)/contextkit/
-dist_context_DATA = core.context core.types
+dist_context_DATA = core.context
+
+contexttypesdir = $(contextdir)/types/
+dist_contexttypes_DATA = core.types
 
 XSLTPROC = xsltproc --xinclude --nonet
 DROP_NAMESPACE = perl -pe '$$hash = chr(35); s{xmlns:tp="http://telepathy\.freedesktop\.org/wiki/DbusSpec$${hash}extensions-v0"}{}g'
