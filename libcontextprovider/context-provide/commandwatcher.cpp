@@ -158,18 +158,6 @@ void CommandWatcher::interpret(const QString& command)
     out.flush();
 }
 
-QString CommandWatcher::unquote(const QString& str)
-{
-    QString m = str;
-    if (m.startsWith('"'))
-        m = m.right(m.length() - 1);
-
-    if (m.endsWith('"'))
-        m = m.left(m.length() - 1);
-
-    return m;
-}
-
 void CommandWatcher::addCommand(const QStringList& args)
 {
     if (args.count() < 2) {
@@ -177,8 +165,8 @@ void CommandWatcher::addCommand(const QStringList& args)
         return;
     }
 
-    QString keyType = unquote(args.at(0)).toUpper();
-    const QString keyName = unquote(args.at(1));
+    QString keyType = args.at(0).toUpper();
+    const QString keyName = args.at(1);
 
     if (keyType != "ANY" && keyType != "INT" && keyType != "STRING" &&
         keyType != "DOUBLE" && keyType != "TRUTH" && keyType != "BOOL") {
@@ -219,7 +207,7 @@ void CommandWatcher::delCommand(const QStringList &args)
         return;
     }
 
-    const QString keyName = unquote(args.at(0));
+    const QString keyName = args.at(0);
 
     types.remove(keyName);
     delete properties.take(keyName);
@@ -274,7 +262,7 @@ void CommandWatcher::sleepCommand(const QStringList& args)
         return;
     }
 
-    int interval = unquote(args.at(0)).toInt();
+    int interval = args.at(0).toInt();
     out << "Sleeping " << interval << " seconds" << endl;
     out.flush();
     sleep(interval);
@@ -332,7 +320,7 @@ void CommandWatcher::dumpCommand(const QStringList &args)
 
 void CommandWatcher::setCommand(const QString& command)
 {
-    const QString keyName = unquote(command.left(command.indexOf('=')).trimmed());
+    const QString keyName = command.left(command.indexOf('=')).trimmed();
     QString value = command.mid(command.indexOf('=')+1).trimmed();
 
     if (! types.contains(keyName)) {
@@ -345,7 +333,7 @@ void CommandWatcher::setCommand(const QString& command)
     QVariant v;
 
     if (keyType != "ANY")
-        value = unquote(value);
+        value = value;
 
     if (keyType == "INT")
         v = QVariant(value.toInt());
@@ -383,7 +371,7 @@ void CommandWatcher::unsetCommand(const QStringList& args)
         return;
     }
 
-    QString keyName = unquote(args[0].trimmed());
+    QString keyName = args[0].trimmed();
 
     if (! types.contains(keyName)) {
         qDebug() << "ERROR: key" << keyName << "not known/added";
