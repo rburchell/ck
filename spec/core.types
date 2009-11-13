@@ -234,6 +234,7 @@ Specific types
         <satellite/>
         <wlan/>
         <cellular/>
+        <timezone/>
       </string-enum>
     </base>
     <doc>
