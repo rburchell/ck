@@ -68,7 +68,7 @@ appliciable to the current location, they will be unavailable.
   </key>
   <key name="Location.Coordinates">
     <type>
-      <uniform-list type="number"/>
+      <list type="number"/>
     </type>
     <doc>
 The coordinates of the current position as a list of two or three
@@ -133,7 +133,7 @@ a Tracker object inside the Content Framework.)
   </key>
   <key name="Location.NearbyContacts">
     <type>
-      <uniform-list type="string"/>
+      <list type="tracker-uri"/>
     </type>
     <doc>
 A list of URIs for contacts that are physically nearby.
