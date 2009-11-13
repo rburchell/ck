@@ -66,7 +66,7 @@ class CLTool:
 
     def __init__(self, *cline):
         self.process = Popen(cline, stdin=PIPE, stdout=PIPE, stderr=STDOUT,
-                             preexec_fn=self._preexec)
+                             preexec_fn=self._preexec, close_fds=True)
         self.io = []
         self.iolock = Lock()
         self.reader = Reader(self)
