@@ -235,15 +235,7 @@ QString ContextPropertyInfo::type() const
     QMutexLocker lock(&cacheLock);
 
     QString typeInfoName = cachedTypeInfo.name();
-    if (typeInfoName == "int64")
-        return "INT";
-    else if (typeInfoName == "int32")
-        return "INT";
-    else if (typeInfoName == "integer")
-        return "INT";
-    else if (typeInfoName == "uint32")
-        return "INT";
-    else if (typeInfoName == "uint64")
+    if (typeInfoName == "integer")
         return "INT";
     else if (typeInfoName == "bool")
         return "TRUTH";
