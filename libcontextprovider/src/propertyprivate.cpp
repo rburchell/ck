@@ -65,7 +65,9 @@ void PropertyPrivate::setValue(const QVariant& v)
     value = v;
 
     // The provider is setting a different value than it has previously.
-    if (value != emittedValue || value.isNull() != emittedValue.isNull()) {
+    if (value != emittedValue ||
+        value.isNull() != emittedValue.isNull() ||
+        value.type() != emittedValue.type()) {
         emitValue();
         return;
     }
@@ -85,8 +87,10 @@ void PropertyPrivate::emitValue()
 {
     // No difference between intention and emitted value, nothing
     // happens
-    if (emittedTimestamp == timestamp && emittedValue == value
-        && emittedValue.isNull() == value.isNull())
+    if (emittedTimestamp == timestamp &&
+        emittedValue == value &&
+        emittedValue.isNull() == value.isNull() &&
+        emittedValue.type() == value.type())
         return;
 
     emittedValue = value;

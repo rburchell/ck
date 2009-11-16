@@ -1,5 +1,6 @@
 #!/bin/sh -e
 
+cd $(dirname $0)
 DIRS="subscription value-changes types c-api service"
 
 make -C client
@@ -19,8 +20,11 @@ do
 	make -C $i check-customer
 done
 
+. ./env.sh
 echo "Running multiproviders customer check"
-cd multiprovider; . ./env.sh; ./test.sh ; cd ..
+cd multiprovider; python2.5 multiprovider.py ; cd ..
+echo "Running types customer check"
+cd types; python2.5 types.py ; cd ..
 
 if [ -n "$COVERAGE" ]
 then
