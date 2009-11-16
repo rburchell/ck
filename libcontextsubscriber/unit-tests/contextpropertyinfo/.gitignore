@@ -7,3 +7,5 @@ contextpropertyinfo.h
 contextpropertyinfounittest
 loggingfeatures.h
 contextproviderinfo.h
+assoctree.cpp
+assoctree.h

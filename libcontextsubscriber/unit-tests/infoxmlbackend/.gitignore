@@ -21,3 +21,5 @@ nanotree.cpp
 nanotree.h
 contexttypeinfo.h
 contexttypeinfo.cpp
+assoctree.cpp
+assoctree.h
