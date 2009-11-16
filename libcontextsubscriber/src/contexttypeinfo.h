@@ -35,6 +35,7 @@ public:
     ContextTypeInfo () { }
 
     ContextTypeInfo ensureNewTypes();
+    bool typeCheck(const QVariant &value) const;
 
     QString name() const { return AssocTree::name(); }
     QVariantList parameters() const { return nodes(); }
