@@ -69,14 +69,22 @@
 /// the object you should check the didFail to see if parsing succeded.
 NanoXml::NanoXml(const QString& path)
 {
-    current = NULL;
-
     QFile f(path);
-    QXmlInputSource source (&f);
-    QXmlSimpleReader reader;
+    initAndParse(&f);
+}
 
+NanoXml::NanoXml(QIODevice *ioDevice)
+{
+    initAndParse(ioDevice);
+}
+
+void NanoXml::initAndParse(QIODevice *ioDevice)
+{
+    current = NULL;
+    QXmlInputSource source(ioDevice);
+    QXmlSimpleReader reader;
     reader.setContentHandler(this);
-    failed = ! reader.parse(source);
+    failed = !reader.parse(source);
 }
 
 /// Destructor.

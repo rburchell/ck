@@ -33,6 +33,7 @@ class NanoXml : public QXmlDefaultHandler
 {
 public:
     NanoXml(const QString& path);
+    NanoXml(QIODevice *ioDevice);
     ~NanoXml();
     const QString namespaceUri();
     bool didFail();
@@ -47,6 +48,7 @@ private:
     void pushList();
     void addValue(const QString& v);
     void popList();
+    void initAndParse(QIODevice *ioDevice);
 
 public:
     bool startElement(const QString&, const QString&, const QString &name, const QXmlAttributes &attrs);
