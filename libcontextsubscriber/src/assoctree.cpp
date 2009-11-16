@@ -46,6 +46,31 @@ QString AssocTree::dump(int level) const
     return s;
 }
 
+/// Serializes the tree in NanoXml format.
+QString AssocTree::dumpXML(int level) const
+{
+    QString s;
+    for (int i = 0; i < level; i++)
+        s += "  ";
+
+    if (type() == QVariant::String)
+        s += toString() + '\n';
+    else if (type() == QVariant::List) {
+        const QVariantList &children = nodes();
+        if (children.size() == 0) {
+            s += "<" + name() + "/>\n";
+        } else {
+            s += "<" + name() + ">\n";
+            foreach(QVariant v, children)
+                s += AssocTree(v).dumpXML(level + 1);
+            for (int i = 0; i < level; i++)
+                s += "  ";
+            s += "</" + name() + ">\n";
+        }
+    }
+    return s;
+}
+
 /// Returns the name of this association tree.
 QString AssocTree::name() const
 {
