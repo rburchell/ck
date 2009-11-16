@@ -6,3 +6,5 @@ nanotree.cpp
 nanotree.h
 nanoxml.cpp
 nanoxml.h
+assoctree.cpp
+assoctree.h
