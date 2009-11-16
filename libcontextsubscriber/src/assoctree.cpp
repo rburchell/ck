@@ -122,7 +122,7 @@ AssocTree AssocTree::node(const QString &name1,
                           const QString &name3,
                           const QString &name4) const
 {
-    return node(name1).node(name2).node(name3),node(name4);
+    return node(name1).node(name2).node(name3).node(name4);
 }
 
 AssocTree AssocTree::node(const QString &name1,
@@ -131,7 +131,7 @@ AssocTree AssocTree::node(const QString &name1,
                           const QString &name4,
                           const QString &name5) const
 {
-    return node(name1).node(name2).node(name3),node(name4).node(name5);
+    return node(name1).node(name2).node(name3).node(name4).node(name5);
 }
 
 /// Returns the value of this tree.
