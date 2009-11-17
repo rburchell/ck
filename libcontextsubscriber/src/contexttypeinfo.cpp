@@ -88,10 +88,20 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
 {
     QString me = name();
 
-    // First check against base type.
-    ContextTypeInfo b = base();
-    if (!b.isNull() && !b.typeCheck(value))
-        return false;
+    // First check against the parametrized base type.
+    ContextTypeInfo baseType(base());
+    if (!baseType.isNull()) {
+        // Combine type instance parameters with default parameters of the
+        // base type.  (Suboptimal.)
+        if (baseType.type() != QVariant::List)
+            baseType = AssocTree(QVariantList() << baseType.name());
+        foreach (AssocTree p, parameters()) {
+            baseType = baseType.filterOut(p.name());
+            baseType = AssocTree(baseType.toList() << p);
+        }
+        if (!baseType.typeCheck(value))
+            return false;
+    }
 
     // Now let's see our hardwired knowledge about our types.
     QVariant::Type vtype = value.type();
@@ -99,12 +109,16 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
         return true;
     }
     else if (me == "bool") {
-        bool ok = vtype != QVariant::Bool;
+        bool ok = vtype == QVariant::Bool;
         if (!ok)
             contextWarning() << F_TYPES << value << "is not a bool";
         return ok;
     }
     else if (me == "number") {
+        if (!value.canConvert(QVariant::Double)) {
+            contextWarning() << F_TYPES << value << "is not a number";
+            return false;
+        }
         QVariant min = parameterValue("min");
         QVariant max = parameterValue("max");
         double v = value.toDouble();
@@ -128,8 +142,7 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
         return ok;
     }
     else if (me == "string") {
-        bool ok = (vtype == QVariant::String ||
-                   vtype == QVariant::ByteArray);
+        bool ok = vtype == QVariant::String;
         if (!ok)
             contextWarning() << F_TYPES << value << "is not a string";
         return ok;
@@ -169,12 +182,14 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
         bool othersAllowed = false;
         foreach (ContextTypeInfo keyInfo, parameters()) {
             QString keyname = keyInfo.name();
-            if (keyname == "allow-other-keys")
+            if (keyname == "allow-other-keys") {
                 othersAllowed = true;
+                continue;
+            }
             allowedKeys.insert(keyname, keyInfo.parameterValue("type"));
         }
         if (allowedKeys.size() == 0)
-            othersAllowed = true;
+            return true;
         QMapIterator<QString, QVariant> it(value.toMap());
         while (it.hasNext()) {
             it.next();
@@ -214,7 +229,7 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
             contextWarning() << F_TYPES << value << "is not valid in this int-enum";
         return ok;
     }
-    return false;
+    return true;
 }
 
 /// Returns the AssocTree with the type definition for this type.

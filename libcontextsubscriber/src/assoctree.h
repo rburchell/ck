@@ -73,6 +73,7 @@ public:
                    const QString &name5) const;
 
     const QVariantList nodes() const;
+    AssocTree filterOut(const QString &name) const;
 };
 
 #endif // ASSOCTREE_H

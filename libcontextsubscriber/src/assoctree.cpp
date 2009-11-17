@@ -92,7 +92,7 @@ AssocTree AssocTree::node(const QString &name) const
     if (type() != QVariant::List)
         return AssocTree();
 
-    foreach(const QVariant &child, toList())
+    foreach(const QVariant &child, nodes())
     {
         if (child.type() == QVariant::List
             && child.toList().count() >= 1
@@ -189,4 +189,26 @@ const QVariantList AssocTree::nodes() const
         return toList().mid(1);
     else
         return QVariantList();
+}
+
+/// Returns a new AssocTree without nodes named \a name.
+AssocTree AssocTree::filterOut(const QString &name) const
+{
+    if (type() != QVariant::List)
+        return *this;
+
+     const QVariant nameVariant(name);
+     QVariantList newTree;
+     newTree << this->name();
+     foreach (QVariant node, nodes()) {
+         if (node.type() == QVariant::String &&
+             node == nameVariant)
+             continue;
+         if (node.type() == QVariant::List &&
+             node.toList().count() >= 1 &&
+             node.toList().at(0) == nameVariant)
+             continue;
+         newTree << node;
+     }
+     return AssocTree(newTree);
 }
