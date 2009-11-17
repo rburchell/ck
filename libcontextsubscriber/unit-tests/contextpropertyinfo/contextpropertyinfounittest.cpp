@@ -291,11 +291,12 @@ void ContextPropertyInfoUnitTest::typeChanged()
     QCOMPARE(spy.count(), 1);
     spy.takeFirst();
 
-    typeInfoMap.insert("Battery.Charging", ContextTypeInfo(QString("int64")));
+    typeInfoMap.insert("Battery.Charging", ContextTypeInfo(QString("integer")));
     currentBackend->fireKeyChanged(QString("Battery.Charging"));
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
+
     QCOMPARE(args.at(0).toString(), QString("INT"));
 }
 
