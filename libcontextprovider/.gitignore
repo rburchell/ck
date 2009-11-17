@@ -1,4 +1,8 @@
 mocs.cpp
 contextprovider-1.0.pc
+contextprovider-1.0-uninstalled.pc
 /customer-tests/coverage-build/Makefile.coverage
 coverage/
+
+# Symlink
+/src/context

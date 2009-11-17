@@ -14,6 +14,8 @@ typestests_LDADD = ../../src/libcontextprovider.la
 	$(MAKE) -C ../../src libcontextprovider.la
 .PHONY: FORCE
 
+EXTRA_DIST = types.py
+
 # moccing
 nodist_typestests_SOURCES = mocs.cpp
 QT_TOMOC = $(filter %.h, $(typestests_SOURCES))

@@ -37,6 +37,8 @@ $(top_builddir)/common/libcommon.la: FORCE
 
 .PHONY: FORCE
 
+DISTCLEANFILES = context
+
 # moccing
 nodist_libcontextprovider_la_SOURCES = mocs.cpp
 QT_TOMOC = $(filter %.h, $(libcontextprovider_la_SOURCES))

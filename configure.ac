@@ -29,6 +29,8 @@ AC_PROG_QT_RCC
 AC_CHECK_LIB([cdb], [cdb_make_start], [CDB_LIBS=-lcdb], [AC_MSG_ERROR([Can't find cdb library])])
 AC_SUBST([CDB_LIBS])
 
+AC_PROG_LN_S
+
 # tools for documentation
 AX_FEATURE_DISABLEABLE([doc], [BUILD_DOCS], [disable building of documentation])
 AX_DISABLE_FEATURE_ON_PROG([Dot drawing tool], [BUILD_DOCS], [DOT], [dot])
@@ -53,6 +55,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/cli/Makefile
         libcontextsubscriber/cls/Makefile
         libcontextsubscriber/contextsubscriber-1.0.pc
+        libcontextsubscriber/contextsubscriber-1.0-uninstalled.pc
         libcontextsubscriber/customer-tests/Makefile
         libcontextsubscriber/customer-tests/update-contextkit-providers/Makefile
         libcontextsubscriber/customer-tests/testplugins/Makefile
@@ -79,6 +82,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/update-contextkit-providers/Makefile
         libcontextsubscriber/propertymonitor/Makefile
         libcontextprovider/contextprovider-1.0.pc
+        libcontextprovider/contextprovider-1.0-uninstalled.pc
         libcontextprovider/Makefile
         libcontextprovider/doc/Makefile
         libcontextprovider/src/Makefile
@@ -110,3 +114,5 @@ AX_FEATURE_SUMMARIZE([BUILD_DOCS],
 AX_FEATURE_SUMMARIZE([COVERAGE],
              [Unit testing coverage support is enabled],
              [Coverage won't be supported during unit testing])
+
+$LN_S . libcontextprovider/src/context
