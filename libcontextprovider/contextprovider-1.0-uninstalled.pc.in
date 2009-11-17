@@ -1,11 +1,11 @@
 prefix=
 exec_prefix=
 libdir=${pcfiledir}/src
-includedir=${pcfiledir}/src
+includedir=@abs_srcdir@/src
 
 Name: contextprovider
 Description: ContextKit Context Provider library
 Version: uninstalled
 Requires: QtCore QtDBus dbus-1
 Libs: -L${libdir} -lcontextprovider
-Cflags: -I${includedir}
+Cflags: -I${includedir} -I${pcfiledir}/src
