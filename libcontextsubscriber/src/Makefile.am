@@ -12,17 +12,16 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	handlesignalrouter.h queuedinvoker.cpp queuedinvoker.h		\
 	loggingfeatures.h contextkitplugin.h contextkitplugin.cpp	\
 	iproviderplugin.h contextproviderinfo.h nanoxml.h nanoxml.cpp	\
-	asyncdbusinterface.cpp timedvalue.h nanotree.h nanotree.cpp	\
-	contexttypeinfo.cpp contexttypeinfo.h				\
-	contexttyperegistryinfo.cpp contexttyperegistryinfo.h		\
-	assoctree.h assoctree.cpp
+	asyncdbusinterface.cpp timedvalue.h contexttypeinfo.cpp		\
+	contexttypeinfo.h contexttyperegistryinfo.cpp			\
+	contexttyperegistryinfo.h assoctree.h assoctree.cpp
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h			\
 	contextpropertyinfo.h contextregistryinfo.h iproviderplugin.h	\
 	contextproviderinfo.h asyncdbusinterface.h timedvalue.h		\
 	contexttypeinfo.h contexttypeinfo.cpp				\
-	contexttyperegistryinfo.h nanotree.h assoctree.h
+	contexttyperegistryinfo.h assoctree.h
 
 AM_CXXFLAGS = -I$(top_srcdir)/common \
 	      $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
