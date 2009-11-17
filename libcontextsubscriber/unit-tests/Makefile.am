@@ -9,7 +9,6 @@ SUBDIRSTESTS =                                                          \
         contextpropertyinfo						\
 	infobackend                                                     \
         nanoxml								\
-	nanotree							\
 	assoctree							\
 	contexttypeinfo							\
 	contexttyperegistryinfo
