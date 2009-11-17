@@ -12,6 +12,7 @@ Makefile
 
 # Auto-generated
 contextsubscriber-1.0.pc
+contextsubscriber-1.0-uninstalled.pc
 
 # Ignore resource forks
 ._*
