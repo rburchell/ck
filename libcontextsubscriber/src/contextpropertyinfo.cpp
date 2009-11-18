@@ -249,7 +249,7 @@ QString ContextPropertyInfo::type() const
         return "TRUTH";
     else if (typeInfoName == "string")
         return "STRING";
-    else if (typeInfoName == "double")
+    else if (typeInfoName == "number")
         return "DOUBLE";
     else
         return "";

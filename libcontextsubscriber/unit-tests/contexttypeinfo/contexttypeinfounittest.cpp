@@ -104,7 +104,7 @@ void ContextTypeInfoUnitTest::ensureNewTypes()
     QCOMPARE(ContextTypeInfo(QString("STRING")).ensureNewTypes().name(),
              QString("string"));
     QCOMPARE(ContextTypeInfo(QString("DOUBLE")).ensureNewTypes().name(),
-             QString("double"));
+             QString("number"));
     QCOMPARE(ContextTypeInfo(QString("bool")).ensureNewTypes().name(),
              QString("bool"));
 }

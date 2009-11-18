@@ -75,7 +75,7 @@ ContextTypeInfo ContextTypeInfo::ensureNewTypes()
     else if (oldName == "STRING")
         newName = "string";
     else if (oldName == "DOUBLE")
-        newName = "double";
+        newName = "number";
     else
         return *this;
 
