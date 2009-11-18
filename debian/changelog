@@ -1,8 +1,9 @@
 contextkit (0.5.1~unreleased) unstable; urgency=low
 
   * Added introspection for types.
+  * context-provide uses JSon for input.
 
- -- Gergely Risko <gergely+context@risko.hu>  Mon, 09 Nov 2009 15:47:28 +0200
+ -- Akos PASZTORY <ext-akos.pasztory@nokia.com>  Wed, 18 Nov 2009 14:14:14 +0200
 
 contextkit (0.5) unstable; urgency=low
 
