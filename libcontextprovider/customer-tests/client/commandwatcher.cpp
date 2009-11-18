@@ -268,10 +268,6 @@ QString CommandWatcher::describeValue(QList<QVariant> value, quint64 timestamp)
 QString CommandWatcher::describeQVariant(QVariant value)
 {
     QVariant::Type type = value.type();
-    if (type == QVariant::Bool || type == QVariant::Int || type == QVariant::Double || type == QVariant::String) {
-        // Automatic conversion is OK
-        return value.toString();
-    }
     if (type == QVariant::StringList) {
         return value.toStringList().join("/");
     }
@@ -288,7 +284,8 @@ QString CommandWatcher::describeQVariant(QVariant value)
         But how do we find out what type to expect?
         */
     }
-    return "";
+    // Automatic conversion is OK
+    return value.toString();
 }
 
 QDBusConnection CommandWatcher::getConnection(const QString& busType)

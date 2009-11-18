@@ -204,6 +204,8 @@ class CLTool:
 
 def wanted(name, type, value):
     """Construct an expect() regexp expecting a context property with VALUE."""
+    # XXX: rewrite tests then remove this below.
+    if type == "int": type = "qu?longlong"
     return "^%s = %s:%s$" % (name, type, value)
 
 def wantedUnknown(name):

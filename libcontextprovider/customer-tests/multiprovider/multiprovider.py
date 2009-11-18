@@ -76,26 +76,26 @@ class MultiProvider(unittest.TestCase):
                 client.expect("Assigned providerB")
 
                 client.send("subscribe providerA test.int")
-                self.assert_(client.expect("Subscribe returned: int:1"))
+                self.assert_(client.expect("Subscribe returned: qulonglong:1"))
 
                 client.send("subscribe providerB test.int")
-                self.assert_(client.expect("Subscribe returned: int:2"))
+                self.assert_(client.expect("Subscribe returned: qulonglong:2"))
 
                 provider_a.send("test.int = 2")
                 client.send("waitforchanged 1000")
-                self.assert_(client.expect("ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/int int:2"))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/int qulonglong:2"))
 
                 provider_b.send("test.int = 1")
                 client.send("waitforchanged 1000")
-                self.assert_(client.expect("ValueChanged: com.nokia.test.b /org/maemo/contextkit/test/int int:1"))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.b /org/maemo/contextkit/test/int qulonglong:1"))
 
                 provider_a.send("test.int = 1")
                 client.send("waitforchanged 1000")
-                self.assert_(client.expect("ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/int int:1"))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.a /org/maemo/contextkit/test/int qulonglong:1"))
 
                 provider_b.send("test.int = 2")
                 client.send("waitforchanged 1000")
-                self.assert_(client.expect("ValueChanged: com.nokia.test.b /org/maemo/contextkit/test/int int:2"))
+                self.assert_(client.expect("ValueChanged: com.nokia.test.b /org/maemo/contextkit/test/int qulonglong:2"))
 
                 client.close()
                 provider_a.close()

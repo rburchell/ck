@@ -51,7 +51,7 @@ class CommanderNonExistent(unittest.TestCase):
                 # check type-check
                 commander.send("add string test.int foobar")
                 commander.expect("Added key: test.int")
-                self.assert_(listen.expect('Provider error, bad type for  "test.int" wanted: "INT" got: QString'),
+                self.assert_(listen.expect("Type check failed for \"test.int\""),
                              "Type check didn't work")
 
                 # check the non-existent property
