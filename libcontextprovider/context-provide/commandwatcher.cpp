@@ -115,7 +115,7 @@ void CommandWatcher::help()
     qDebug() << "  list                            - same as calling info for all known keys";
     qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
     qDebug() << "  dump [FILENAME]                 - dump the xml content of the defined props";
-    qDebug() << "  start                           - (re)register everything on D-Bus";
+    qDebug() << "  restart                         - reregister everything on D-Bus";
     qDebug() << "  exit                            - quit this program";
     qDebug() << "Any unique prefix of a command can be used as an abbreviation";
 }
@@ -148,8 +148,8 @@ void CommandWatcher::interpret(const QString& command)
             exit(0);
         } else if (QString("dump").startsWith(commandName)) {
             dumpCommand(args);
-        } else if (QString("start").startsWith(commandName)) {
-            startCommand();
+        } else if (QString("restart").startsWith(commandName)) {
+            restartCommand();
         } else if (QString("unset").startsWith(commandName)) {
             unsetCommand(args);
         } else
@@ -196,8 +196,8 @@ void CommandWatcher::addCommand(const QStringList& args)
     // If service is already started then it has to be restarted after
     // a property is added.  In commander mode if the property is
     // already provided with a proxy, then no restart is necessary.
-    if (started && (busName != CommandWatcher::commanderBusName || !proxies.contains(keyName)))
-        startCommand();
+    if (started && (busName != commanderBusName || !proxies.contains(keyName)))
+        restartCommand();
 }
 
 void CommandWatcher::delCommand(const QStringList &args)
@@ -384,7 +384,7 @@ void CommandWatcher::unsetCommand(const QStringList& args)
     prop->unsetValue();
 }
 
-void CommandWatcher::startCommand()
+void CommandWatcher::restartCommand()
 {
     Service service(busType, busName);
     service.stop(); // this is harmless if we are not started yet, but useful if we are

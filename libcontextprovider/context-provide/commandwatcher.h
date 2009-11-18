@@ -43,7 +43,7 @@ public:
     CommandWatcher(QString busName, QDBusConnection::BusType busType, int commandfd, QObject *parent = 0);
     ~CommandWatcher();
     void addCommand(const QStringList& args);
-    void startCommand();
+    void restartCommand();
     static const QString commanderBusName;
 
 private:
