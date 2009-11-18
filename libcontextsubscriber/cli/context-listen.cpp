@@ -45,15 +45,12 @@ int main(int argc, char **argv)
     if (args.count() <= 1)
         qWarning() << "Started without properties, if you want properties at startup, pass them as arguments";
 
-    QMap<QString, ContextProperty*> properties;
+    QMap<QString, PropertyListener*> properties;
 
     args.pop_front();
-    foreach (QString key, args) {
-        if (properties[key] == 0) {
-            properties[key] = new ContextProperty(key, QCoreApplication::instance());
-            new PropertyListener(properties[key]);
-        }
-    }
+    foreach (QString key, args)
+        if (!properties.contains(key))
+            properties.insert(key, new PropertyListener(key));
 
     new CommandWatcher(STDIN_FILENO, &properties, QCoreApplication::instance());
 

@@ -24,8 +24,13 @@
 #include "sconnect.h"
 #include <contextpropertyinfo.h>
 #include <contextregistryinfo.h>
+#include <contexttyperegistryinfo.h>
+#include <nanoxml.h>
+#include <contexttypeinfo.h>
 #include <service.h>
 
+#include <QByteArray>
+#include <QBuffer>
 #include <QTextStream>
 #include <QFile>
 #include <QSocketNotifier>
@@ -38,6 +43,7 @@
 #include <QMap>
 #include <QDir>
 #include <QSet>
+#include <qjson/parser.h>
 
 const QString CommandWatcher::commanderBusName = "org.freedesktop.ContextKit.Commander";
 
@@ -107,6 +113,7 @@ void CommandWatcher::help()
 {
     qDebug() << "Available commands:\n";
     qDebug() << "  add TYPE KEY [VALUE]            - create new key with the given type";
+    qDebug() << "  settype KEY TYPE                - set the type of KEY";
     qDebug() << "  KEY=VALUE                       - set KEY to the given VALUE";
     qDebug() << "  info KEY                        - prints the real (proxied) value of KEY";
     qDebug() << "  unset KEY                       - sets KEY to unknown";
@@ -114,7 +121,7 @@ void CommandWatcher::help()
     qDebug() << "  list                            - same as calling info for all known keys";
     qDebug() << "  sleep INTERVAL                  - sleep the INTERVAL amount of seconds";
     qDebug() << "  dump [FILENAME]                 - dump the xml content of the defined props";
-    qDebug() << "  start                           - (re)register everything on D-Bus";
+    qDebug() << "  restart                         - reregister everything on D-Bus";
     qDebug() << "  exit                            - quit this program";
     qDebug() << "Any unique prefix of a command can be used as an abbreviation";
 }
@@ -135,6 +142,8 @@ void CommandWatcher::interpret(const QString& command)
         // Interpret commands
         if (QString("add").startsWith(commandName)) {
             addCommand(args);
+        } else if (QString("settype").startsWith(commandName)) {
+            setTypeCommand(args);
         } else if (QString("del").startsWith(commandName)) {
             delCommand(args);
         } else if (QString("info").startsWith(commandName)) {
@@ -147,26 +156,14 @@ void CommandWatcher::interpret(const QString& command)
             exit(0);
         } else if (QString("dump").startsWith(commandName)) {
             dumpCommand(args);
-        } else if (QString("start").startsWith(commandName)) {
-            startCommand();
+        } else if (QString("restart").startsWith(commandName)) {
+            restartCommand();
         } else if (QString("unset").startsWith(commandName)) {
             unsetCommand(args);
         } else
             help();
     }
     out.flush();
-}
-
-QString CommandWatcher::unquote(const QString& str)
-{
-    QString m = str;
-    if (m.startsWith('"'))
-        m = m.right(m.length() - 1);
-
-    if (m.endsWith('"'))
-        m = m.left(m.length() - 1);
-
-    return m;
 }
 
 void CommandWatcher::addCommand(const QStringList& args)
@@ -176,21 +173,39 @@ void CommandWatcher::addCommand(const QStringList& args)
         return;
     }
 
-    QString keyType = unquote(args.at(0)).toUpper();
-    const QString keyName = unquote(args.at(1));
+    QString keyType = args.at(0);
+    const QString &keyName = args.at(1);
 
-    if (keyType != "INT" && keyType != "STRING" &&
-        keyType != "DOUBLE" && keyType != "TRUTH" && keyType != "BOOL") {
-        qDebug() << "ERROR: Unknown type (has to be: INT, STRING, DOUBLE, BOOL or TRUTH)";
-        return;
+    // Because of the lameness of the command parser, you cannot specify
+    // arbitrary NanoXML fragments to describe a full type instance here.
+    // Give something parameterless (like "value") then later change the type
+    // with `settype'.
+
+    keyType = keyType.toLower();
+    // Legacy types that don't exist in core.types (INT, DOUBLE, TRUTH) are
+    // converted to the corresponding new type.
+    bool legacy = (keyType == "int" ||
+                   keyType == "double" ||
+                   keyType == "truth");
+    if (keyType == "truth") keyType = "bool";
+    if (keyType == "int") keyType = "integer";
+    if (keyType == "double") keyType = "number";
+
+    // The type, if not a legacy one, must exist in the type registry.
+    if (!legacy) {
+        AssocTree typeDef =
+            ContextTypeRegistryInfo::instance()->typeDefinitionForName(keyType);
+        if (typeDef.isNull()) {
+            qDebug() << "type" << keyType << "doesn't exist in the type registry";
+            return;
+        }
     }
-    if (keyType == "BOOL") keyType = "TRUTH";
+    // Assign a "parameterless instance" of keyType as the type of keyName.
+    types.insert(keyName, ContextTypeInfo(QVariant(keyType)));
 
     if (properties.contains(keyName)) {
         qDebug() << "Already existing key, changing the type and value of it";
-        types[keyName] = keyType;
     } else {
-        types.insert(keyName, keyType);
         properties.insert(keyName, new Property(keyName));
         if (busName == commanderBusName && proxies.contains(keyName))
             proxies[keyName]->enable(false);
@@ -200,15 +215,45 @@ void CommandWatcher::addCommand(const QStringList& args)
 
     // handle default value
     if (args.count() > 2)
-        setCommand(keyName + "=\"" + QStringList(args.mid(2)).join(" ") + "\"");
+        setCommand(keyName + "=" + QStringList(args.mid(2)).join(" "));
     else
         unsetCommand(QStringList(keyName));
 
     // If service is already started then it has to be restarted after
     // a property is added.  In commander mode if the property is
     // already provided with a proxy, then no restart is necessary.
-    if (started && (busName != CommandWatcher::commanderBusName || !proxies.contains(keyName)))
-        startCommand();
+    if (started && (busName != commanderBusName || !proxies.contains(keyName)))
+        restartCommand();
+}
+
+void CommandWatcher::setTypeCommand(QStringList &args)
+{
+    if (args.size() < 2) {
+        qDebug() << "ERROR: need to specify KEY and TYPE";
+        return;
+    }
+    QString key = args.takeFirst();
+    if (!properties.contains(key)) {
+        qDebug() << "unknown key" << key;
+        return;
+    }
+    QByteArray tba = args.join(" ").trimmed().toLocal8Bit();
+    // Allow barewords, treating them as parameterless type.
+    if (!tba.startsWith('<'))
+        tba.prepend('<').append("/>");
+    QBuffer typefrag(&tba);
+    ContextTypeInfo typeInfo = NanoXml(&typefrag).result();
+    if (typeInfo.definition().isNull()) {
+        qDebug() << typeInfo.name() << "doesn't exist in the type registry";
+        return;
+    }
+    types.insert(key, typeInfo);
+
+    // If service is already started then it has to be restarted after
+    // a property is added.  In commander mode if the property is
+    // already provided with a proxy, then no restart is necessary.
+    if (started && (busName != commanderBusName || !proxies.contains(key)))
+        restartCommand();
 }
 
 void CommandWatcher::delCommand(const QStringList &args)
@@ -218,7 +263,7 @@ void CommandWatcher::delCommand(const QStringList &args)
         return;
     }
 
-    const QString keyName = unquote(args.at(0));
+    const QString keyName = args.at(0);
 
     types.remove(keyName);
     delete properties.take(keyName);
@@ -244,25 +289,26 @@ void CommandWatcher::infoCommand(const QStringList &args)
     }
     QString keyName = args.at(0);
     if (properties.contains(keyName)) {
-        out << types[keyName] << " " << keyName;
+        out << types[keyName].name() << " " << keyName;
         if (properties[keyName]->value().isNull())
             out << " is Unknown" << endl;
         else
             out << " = " << properties[keyName]->value().toString() << endl;
     } else if (busName != commanderBusName) {
-        qDebug() << "ERROR:" << keyName << "not addd";
+        qDebug() << "ERROR:" << keyName << "not added";
     }
     if (busName == commanderBusName) {
-        if (!proxies.contains(keyName))
-            qDebug() << "ERROR:" << keyName << "not known";
-        else {
-            out << "real: " << proxies[keyName]->type() << " "
-                << keyName;
-            if (proxies[keyName]->realValue().isNull())
-                out << " is Unknown" << endl;
-            else
-                out << " = " << proxies[keyName]->realValue().toString() << endl;
+        if (!proxies.contains(keyName)) {
+            if (!properties.contains(keyName))
+                qDebug() << keyName << "is not known";
+            return;
         }
+        out << "real: " << proxies[keyName]->type() << " "
+            << keyName;
+        if (proxies[keyName]->realValue().isNull())
+            out << " is Unknown" << endl;
+        else
+            out << " = " << proxies[keyName]->realValue().toString() << endl;
     }
 }
 
@@ -273,7 +319,7 @@ void CommandWatcher::sleepCommand(const QStringList& args)
         return;
     }
 
-    int interval = unquote(args.at(0)).toInt();
+    int interval = args.at(0).toInt();
     out << "Sleeping " << interval << " seconds" << endl;
     out.flush();
     sleep(interval);
@@ -309,10 +355,11 @@ void CommandWatcher::dumpCommand(const QStringList &args)
     QString bType = (busType == QDBusConnection::SystemBus) ? "system" : "session";
     xml << "<?xml version=\"1.0\"?>\n";
     xml << QString("<provider bus=\"%1\" service=\"%2\">\n").arg(bType).arg(busName);
-
     foreach(QString key, properties.keys()) {
         xml << QString("  <key name=\"%1\">\n").arg(key);
-        xml << QString("    <type>%1</type>\n").arg(types.value(key));
+        xml <<         "    <type>\n";
+        xml << types[key].dumpXML(3);
+        xml <<         "    </type>\n";
         xml << QString("    <doc>A phony but very flexible property.</doc>\n");
         xml << QString("  </key>\n");
     }
@@ -331,32 +378,37 @@ void CommandWatcher::dumpCommand(const QStringList &args)
 
 void CommandWatcher::setCommand(const QString& command)
 {
-    const QString keyName = unquote(command.left(command.indexOf('=')).trimmed());
-    const QString value = unquote(command.mid(command.indexOf('=')+1).trimmed());
+    const QString keyName = command.left(command.indexOf('=')).trimmed();
+    QString value = command.mid(command.indexOf('=')+1).trimmed();
 
-    if (! types.contains(keyName)) {
+    if (!properties.contains(keyName)) {
         qDebug() << "ERROR: key" << keyName << "not known/added";
         return;
     }
 
-    Property *prop = properties.value(keyName);
-    const QString keyType = types.value(keyName);
-    QVariant v;
+    Property *prop = properties[keyName];
+    QString keyType = types[keyName].name();
 
-    if (keyType == "INT")
-        v = QVariant(value.toInt());
-    else if (keyType == "STRING")
-        v = QVariant(value);
-    else if (keyType == "DOUBLE")
-        v = QVariant(value.toDouble());
-    else if (keyType == "TRUTH") {
-        if (value == "True" || value == "true" || value == "1")
-            v = QVariant(true);
-        else
-            v = QVariant(false);
+    // Backward compatibility hacks:
+    // ... for people using unquoted strings.
+    if (keyType == "string" && !value.startsWith("\""))
+        value.prepend('"').append('"');
+    // ... for people using 1, true or True as booleans.
+    if (keyType == "bool")
+        value = (value.toLower() == "true" || value == "1") ? "true" : "false";
+
+    // Now all input is treated as JSon.
+    QJson::Parser parser;
+    bool ok;
+    QVariant v = parser.parse(value.toUtf8(), &ok);
+    if (!ok) {
+        qDebug() << "An error occurred during parsing";
+        return;
     }
 
-    out << "Setting key: " << keyName << " to value: " << v.toString() << endl;
+    QString vstr;
+    QDebug(&vstr) << v; 
+    out << "Setting key: " << keyName << " to value: " << vstr << endl;
     out.flush();
     prop->setValue(v);
 }
@@ -368,9 +420,9 @@ void CommandWatcher::unsetCommand(const QStringList& args)
         return;
     }
 
-    QString keyName = unquote(args[0].trimmed());
+    QString keyName = args[0].trimmed();
 
-    if (! types.contains(keyName)) {
+    if (!properties.contains(keyName)) {
         qDebug() << "ERROR: key" << keyName << "not known/added";
         return;
     }
@@ -381,7 +433,7 @@ void CommandWatcher::unsetCommand(const QStringList& args)
     prop->unsetValue();
 }
 
-void CommandWatcher::startCommand()
+void CommandWatcher::restartCommand()
 {
     Service service(busType, busName);
     service.stop(); // this is harmless if we are not started yet, but useful if we are

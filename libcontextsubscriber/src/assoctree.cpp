@@ -46,6 +46,31 @@ QString AssocTree::dump(int level) const
     return s;
 }
 
+/// Serializes the tree in NanoXml format.
+QString AssocTree::dumpXML(int level) const
+{
+    QString s;
+    for (int i = 0; i < level; i++)
+        s += "  ";
+
+    if (type() == QVariant::String)
+        s += toString() + '\n';
+    else if (type() == QVariant::List) {
+        const QVariantList &children = nodes();
+        if (children.size() == 0) {
+            s += "<" + name() + "/>\n";
+        } else {
+            s += "<" + name() + ">\n";
+            foreach(QVariant v, children)
+                s += AssocTree(v).dumpXML(level + 1);
+            for (int i = 0; i < level; i++)
+                s += "  ";
+            s += "</" + name() + ">\n";
+        }
+    }
+    return s;
+}
+
 /// Returns the name of this association tree.
 QString AssocTree::name() const
 {
@@ -67,7 +92,7 @@ AssocTree AssocTree::node(const QString &name) const
     if (type() != QVariant::List)
         return AssocTree();
 
-    foreach(const QVariant &child, toList())
+    foreach(const QVariant &child, nodes())
     {
         if (child.type() == QVariant::List
             && child.toList().count() >= 1
@@ -164,4 +189,26 @@ const QVariantList AssocTree::nodes() const
         return toList().mid(1);
     else
         return QVariantList();
+}
+
+/// Returns a new AssocTree without nodes named \a name.
+AssocTree AssocTree::filterOut(const QString &name) const
+{
+    if (type() != QVariant::List)
+        return *this;
+
+     const QVariant nameVariant(name);
+     QVariantList newTree;
+     newTree << this->name();
+     foreach (QVariant node, nodes()) {
+         if (node.type() == QVariant::String &&
+             node == nameVariant)
+             continue;
+         if (node.type() == QVariant::List &&
+             node.toList().count() >= 1 &&
+             node.toList().at(0) == nameVariant)
+             continue;
+         newTree << node;
+     }
+     return AssocTree(newTree);
 }

@@ -97,7 +97,7 @@ int main(int argc, char **argv)
     for (int i=2; i < args.count(); i+=3)
         commandWatcher.addCommand(args.mid(i, 3));
 
-    commandWatcher.startCommand();
+    commandWatcher.restartCommand();
 
     return app.exec();
 }

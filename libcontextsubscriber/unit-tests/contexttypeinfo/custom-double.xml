@@ -1,9 +1,0 @@
-<type name="custom-double">
-  <params>
-    <min doc="Minimum value">1</min>
-    <max doc="Maximum value">666</max>
-  </params>
-  <doc>
-    A double value that represents the level of hell in you.
-  </doc>
-</type>

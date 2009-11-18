@@ -1,22 +1,14 @@
-.TH context-provide-v2 1 Sep-27-2009
+.TH context-provide 1 Nov-18-2009
 
 .SH NAME
-context-provide-v2
-- A tool to provide ContextKit properties to debug and inspect applictions
+context-provide
+- A tool to provide ContextKit properties to debug and inspect applications
 
 .SH SYNOPSIS
-.B context-provide \fI--v2\fR [\fI--session\fR | \fI--system\fR] \fR[\fIBUSNAME\fR] [\fITYPE\fR \fINAME\fR \fIINITVALUE\fR]...
-
-.SH IMPORTANT USAGE NOTE
-Please note that you have to use this program as \fBcontext-provide
---v2\fR for now, where \fB--v2\fR is really mandatory.  When the
-transition from old
-.BR context-provide (1)
-is over, this limitation will
-be relaxed, and it will be possible to just call \fBcontext-provide\fR.
+.B context-provide [\fI--session\fR | \fI--system\fR] \fR[\fIBUSNAME\fR] [\fITYPE\fR \fINAME\fR \fIINITVALUE\fR]...
 
 .SH DESCRIPTION
-\fBcontext-provide --v2\fR is an interactive tool to set (provide)
+\fBcontext-provide\fR is an interactive tool to set (provide)
 properties of the ContextKit.  It can be used to simulate an actual
 provider to debug applications using the ContextKit.  When launched,
 the tool presents a simple console where commands can be issued to
@@ -25,17 +17,21 @@ provide new keys and set their values.
 Properties can also be provided on the command line with \fITYPE\fR
 \fINAME\fR \fIINITVALUE\fR triplets.
 
-If at least one property is specified on the command line the service
-is autostarted and will start providing the properties right away,
-otherwise you have to use the \fB`start'\fR command after all of the
-properties have been added by \fB`add'\fR invocations.  In both cases
-the service name registered for the service on D-Bus will be \fIBUSNAME\fR.
+When ran, the tool automatically claims the specified \fIBUSNAME\fR and if
+there were properties specified on the command line, it will provide them
+right away.  To add new properties, use the \fB`add'\fR command.
 
 If no \fIBUSNAME\fR is given the tool acts as a Commander, taking control of
 all subscribers in the system.  This mode by default proxies the real values
 of all properties.  To control a property you have to \fB`add'\fR the
 property, which stops forwarding the corresponding property.  You can undo
 this via the \fB`del'\fR command.
+
+Values are input using JSon notation (http://json.org/) relaxed to allow other
+top-level elements than objects (ie. you can write `"some text"' or `23.1'
+directly).  As an executive summary, the allowed data types are \fBstrings\fR
+("soylent green"), \fBnumbers\fR (2, 6.9), heterogeneous \fBlists\fR ([1, 1.5,
+3, "foo"]) and \fBdictionaries\fR with string keys ({"foo": 1, "bar": 2}).
 
 .SH OPTIONS
 .TP
@@ -48,65 +44,90 @@ Use the session bus (the default).
 .SH COMMANDS
 .TP
 \fBadd\fR \fITYPE\FR \fIKEY\fR [\fIINITVALUE\fR]
-adds a key named \fIKEY\fR with the given \fITYPE\fR to the list of
-provided properties.  The initial value will be \fIINITVALUE\fR if
-specified, otherwise unset (null).  This has to be called before an
-attempt is made to set a key value.  \fITYPE\fR can be: STRING, INT,
-BOOL, DOUBLE.  Example: "add INT Battery.Status 20".
 
-In \fICommander\fR mode it also ceases proxying the real property.
+Adds a key named \fIKEY\fR with the given \fITYPE\fR to the list of provided
+properties.  The initial value will be \fIINITVALUE\fR if specified, otherwise
+unset (null).  This has to be called before an attempt is made to set a key
+value.  \fITYPE\fR can be any type described in the \fBtype registry\fR
+(located in /usr/share/contextkit/core.types, overridden by the
+CONTEXT_CORE_TYPES environment variable).  Some examples are: value, bool,
+number, integer, string, list, map.  For backward compatibility, INT, BOOL,
+and DOUBLE may also be used as type.
+
+Example: "add integer Battery.Status 20".
+
+In \fICommander mode\fR it also stops proxying the real property.
+.TP
+\fBsettype\fR \fIKEY\fR \fITYPE FRAGMENT\fR
+
+Sets the type of \fIKEY\fR to the NanoXML fragment.  For convenience, "type"
+is interpreted as "<type/>".  See
+/usr/share/doc/contextkit/html/context-types.html for more information.
 .TP
 \fBdel\fR \fIKEY\fR
-makes context-provide forget \fIKEY\fR.  In \fICommander\fR mode, restores
+
+Makes context-provide forget \fIKEY\fR.  In \fICommander mode\fR, restores
 proxying of the real property.
 .TP
 \fIKEY\fB=\fIVALUE\fR
-sets the given \fIKEY\fR value to the new \fIVALUE\fR. Example: "Battery.Status=99".
+
+Sets the given \fIKEY\fR value to the new \fIVALUE\fR, which has to be in JSon
+format (see above).  For backward compatibility, if the type of the property
+is \fBstring\fR, the value is accepted without quotes.
+
+Example: "Battery.Status=99".
+
 .TP
 \fBunset\fR \fIKEY\fR
-sets the given \fIKEY\fR to non specified (null).
+
+Sets the given \fIKEY\fR to non specified (null).
 .TP
 \fBinfo\fR \fIKEY\fR
-prints the type, name and current value of \fIKEY\fR.  In \fICommander\fR
-mode the real value (from the original provider) is printed as well.
+
+Prints the type, name and current value of \fIKEY\fR.  In \fICommander mode\fR
+the real value (from the original provider) is printed as well.
 .TP
 \fBlist\fR
-same as calling `info' for all known keys (both proxied and added ones)
+
+Same as calling `info' for all known keys (both proxied and added ones).
 .TP
 \fBsleep\fR \fIINTERVAL\fR
-sleeps and blocks the main loop for the given amount of seconds.  Used
-mainly for internal testing purposes.  Example: "sleep 10".
+
+Sleeps and blocks the main loop for the given amount of seconds.  Used mainly
+for internal testing purposes.  Example: "sleep 10".
 .TP
 \fBdump\fR [\fIFILENAME\fR]
-dumps the currently added properties to an XML .context file defined
-by the \fIFILENAME\fR, the default is 'context-provide.context' in the
-current directory.
+
+Dumps the currently added properties to an XML .context file defined by the
+\fIFILENAME\fR (the default is 'context-provide.context' in the current
+directory).
 .TP
-\fBstart\fR
-try to (re)publish the \fIBUSNAME\fR of the provider on D-Bus, exit if it fails.
+\fBrestart\fR
+
+Tries to republish the \fIBUSNAME\fR of the provider on D-Bus, exit if it
+fails.
 .TP
 \fBexit\fR
-exit from the program.
+
+Exits the program.
 
 .SH EXAMPLE SESSIONS
 Starts up a provider, initially having a single integer property named
 an.example with the default value of 42.
 
-  ./context-provide dbus.service.name int an.example 42
+  ./context-provide dbus.service.name integer an.example 42
 
 Starts up the provider on the system bus without any properties, then
-add some through the command line interface, note that in this case
-you have to use the \fBstart\fR command after the properties have been
-specified:
+add some through the command line interface.
 
   ./context-provide --system org.bottomdrawer.kit2000
-    add INT example.int 33
-    add STRING example.string
-    start
+    add integer example.int 33
+    add string example.string
     example.string = value1
     example.string = value2
     unset example.int
 
 .SH SEE ALSO
-.BR context-listen (1),
-.BR context-provide (1)
+.BR context-listen (1)
+.BR context-ls (1)
+.BR /usr/share/doc/contextkit/html/*.html

@@ -67,34 +67,34 @@ class Subscription(unittest.TestCase):
                 provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth")
                 self.assert_(
-                        listen.expect(["^test.double = double:2.5$",
-                                          "^test.int = int:1$",
-                                          "^test.string = QString:foobar$",
-                                          "^test.truth = bool:true$"]),
+                        listen.expect([wanted("test.double", "double", "2.5"),
+                                          wanted("test.int", "int", "1"),
+                                          wanted("test.string", "QString", "\"foobar\""),
+                                          wanted("test.truth", "bool", "true")]),
                         "Actual key values pairs do not match expected")
 
                 provider.send("test.int = 100")
-                listen.expect("int:100") # wait for it
+                listen.expect(wanted("test.int", "int", "100")) # wait for it
                 listen.send("value test.int")
                 self.assert_(
-                        listen.expect("^value: int:100$"),
+                        listen.expect("^value: qulonglong:100$"),
                         "Value command returned wrong value")
 
-                listen.send("value test.int defaultValue")
+                listen.send("value test.int \"defaultValue\"")
                 self.assert_(
-                        listen.expect("^value: int:100$"),
+                        listen.expect("^value: qulonglong:100$"),
                         "Value command returned wrong value")
 
                 provider.send("unset test.int")
                 listen.expect("Unknown") # wait for it
                 listen.send("value test.int")
                 self.assert_(
-                        listen.expect("^value is Unknown$"),
+                        listen.expect("^value: Unknown$"),
                         "Value command returned wrong value")
 
-                listen.send("value test.int defaultValue")
+                listen.send("value test.int \"defaultValue\"")
                 self.assert_(
-                        listen.expect("^value: QString:defaultValue$"),
+                        listen.expect("^value: QString:\"defaultValue\"$"),
                         "Value command returned wrong value")
 
                 listen.send("key test.int")
@@ -137,10 +137,10 @@ class Subscription(unittest.TestCase):
                 provider.send("dump")
                 provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth")
-                listen.expect(["^test.double = double:2.5$",
-                                  "^test.int = int:1$",
-                                  "^test.string = QString:foobar$",
-                                  "^test.truth = bool:true$"]) # wait for it
+                listen.expect([wanted("test.double", "double", "2.5"),
+                                  wanted("test.int", "int", "1"),
+                                  wanted("test.string", "QString", "\"foobar\""),
+                                  wanted("test.truth", "bool", "true")]) # wait for it
                 listen.send("ikey test.int")
 
                 self.assert_(
@@ -152,9 +152,9 @@ class Subscription(unittest.TestCase):
                         listen.expect("^man: A phony but very flexible property.$"),
                         "man didn't work")
 
-                listen.send("type test.double")
+                listen.send("type test.truth")
                 self.assert_(
-                        listen.expect("^type: DOUBLE$"),
+                        listen.expect("^type: TRUTH$"),
                         "type didn't work")
                 listen.wait()
                 provider.wait()
@@ -169,19 +169,15 @@ class Subscription(unittest.TestCase):
                 provider.send("dump")
                 provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth", "test.fake")
-                listen.expect(["^test.double = double:2.5$",
-                                  "^test.int = int:1$",
-                                  "^test.string = QString:foobar$",
-                                  "^test.truth = bool:true$"]) # wait for it
+                listen.expect([wanted("test.double", "double", "2.5"),
+                                  wanted("test.int", "int", "1"),
+                                  wanted("test.string", "QString", "\"foobar\""),
+                                  wanted("test.truth", "bool", "true")]) # wait for it
 
                 # test querying the type of all properties
                 listen.send("type test.int")
                 self.assert_(
                         listen.expect("^type: INT$"))
-
-                listen.send("type test.double")
-                self.assert_(
-                        listen.expect("^type: DOUBLE$"))
 
                 listen.send("type test.truth")
                 self.assert_(
@@ -208,10 +204,10 @@ class Subscription(unittest.TestCase):
                 provider.send("dump")
                 provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth", "test.fake")
-                listen.expect(["^test.double = double:2.5$",
-                                  "^test.int = int:1$",
-                                  "^test.string = QString:foobar$",
-                                  "^test.truth = bool:true$"]) # wait for it
+                listen.expect([wanted("test.double", "double", "2.5"),
+                                  wanted("test.int", "int", "1"),
+                                  wanted("test.string", "QString", "\"foobar\""),
+                                  wanted("test.truth", "bool", "true")]) # wait for it
 
                 # test querying the provider(s)
                 listen.send("providers test.int")
@@ -254,10 +250,10 @@ class Subscription(unittest.TestCase):
                 provider.expect("Wrote") # wait for it
                 listen = CLTool("context-listen", "test.double", "test.string", "test.int", "test.truth")
                 self.assert_(
-                        listen.expect(["^test.double = double:2.5$",
-                                          "^test.int = int:1$",
-                                          "^test.string = QString:foobar$",
-                                          "^test.truth = bool:true$"]),
+                        listen.expect([wanted("test.double", "double", "2.5"),
+                                          wanted("test.int", "int", "1"),
+                                          wanted("test.string", "QString", "\"foobar\""),
+                                          wanted("test.truth", "bool", "true")]),
                         "Actual key values pairs do not match expected")
                 listen.wait()
                 provider.wait()
@@ -290,17 +286,17 @@ class Subscription(unittest.TestCase):
                 provider.expect("Setting") # wait for it
                 listen = CLTool("context-listen", "test.truth")
                 self.assert_(
-                        listen.expect("^test.truth = bool:false$"),
+                        listen.expect(wanted("test.truth", "bool", "false")),
                         "setting to false didn't work")
 
                 provider.send("unset test.truth")
                 self.assert_(
-                        listen.expect("^test.truth is Unknown$"),
+                        listen.expect(wantedUnknown("test.truth")),
                         "setting to unknown didn't work")
 
                 provider.send("test.truth = True")
                 self.assert_(
-                        listen.expect("^test.truth = bool:true$"),
+                        listen.expect(wanted("test.truth", "bool", "true")),
                         "setting to true didn't work")
                 listen.wait()
                 provider.wait()
@@ -332,17 +328,17 @@ class Subscription(unittest.TestCase):
                 listen = CLTool("context-listen", "test.string")
 
                 self.assert_(
-                        listen.expect("^test.string = QString:something$"),
+                        listen.expect("^test.string = QString:\"something\"$"),
                         "setting to 'something' didn't work")
 
                 provider.send('test.string = ""')
                 self.assert_(
-                        listen.expect("^test.string = QString:$"),
+                        listen.expect("^test.string = QString:\"\"$"),
                         "setting to empty string didn't work")
 
                 provider.send('unset test.string')
                 self.assert_(
-                        listen.expect("^test.string is Unknown$"),
+                        listen.expect(wantedUnknown("test.string")),
                         "setting to null didn't work")
 
                 listen.wait()
@@ -391,18 +387,18 @@ class MultipleSubscribers(unittest.TestCase):
                         None
                 """
 
-                client1_expected = ["^test.double = double:2.5$",
-                                    "^test.int = int:1$",
-                                    "^test.string = QString:foobar$",
-                                    "^test.truth = bool:true$"]
-                client2_expected = ["^test.double = double:2.5$",
-                                    "^test.int = int:1$"]
-                client3_expected = ["^test.int = int:1$",
-                                    "^test.string = QString:foobar$",
-                                    "^test.truth = bool:true$"]
-                client4_expected = ["^test.double = double:2.5$",
-                                    "^test.int = int:1$",
-                                    "^test.string = QString:foobar$"]
+                client1_expected = [wanted("test.double", "double", "2.5"),
+                                    wanted("test.int", "int", "1"),
+                                    wanted("test.string", "QString", "\"foobar\""),
+                                    wanted("test.truth", "bool", "true")]
+                client2_expected = [wanted("test.double", "double", "2.5"),
+                                    wanted("test.int", "int", "1")]
+                client3_expected = [wanted("test.int", "int", "1"),
+                                    wanted("test.string", "QString", "\"foobar\""),
+                                    wanted("test.truth", "bool", "true")]
+                client4_expected = [wanted("test.double", "double", "2.5"),
+                                    wanted("test.int", "int", "1"),
+                                    wanted("test.string", "QString", "\"foobar\"")]
 
                 self.assert_(self.context_client1.expect(client1_expected), "Actual key values pairs do not match expected")
                 self.assert_(self.context_client2.expect(client2_expected), "Actual key values pairs do not match expected")
@@ -429,18 +425,18 @@ class MultipleSubscribers(unittest.TestCase):
                 References
                         None
                 """
-                client1_expected = ["^test.double = double:2.5$",
-                                    "^test.int = int:1$",
-                                    "^test.string = QString:foobar$",
-                                    "^test.truth = bool:true$"]
-                client2_expected = ["^test.double = double:2.5$",
-                                    "^test.int = int:1$"]
-                client3_expected = ["^test.int = int:1$",
-                                    "^test.string = QString:foobar$",
-                                    "^test.truth = bool:true$"]
-                client4_expected = ["^test.double = double:2.5$",
-                                    "^test.int = int:1$",
-                                    "^test.string = QString:foobar$"]
+                client1_expected = [wanted("test.double", "double", "2.5"),
+                                    wanted("test.int", "int", "1"),
+                                    wanted("test.string", "QString", "\"foobar\""),
+                                    wanted("test.truth", "bool", "true")]
+                client2_expected = [wanted("test.double", "double", "2.5"),
+                                    wanted("test.int", "int", "1")]
+                client3_expected = [wanted("test.int", "int", "1"),
+                                    wanted("test.string", "QString", "\"foobar\""),
+                                    wanted("test.truth", "bool", "true")]
+                client4_expected = [wanted("test.double", "double", "2.5"),
+                                    wanted("test.int", "int", "1"),
+                                    wanted("test.string", "QString", "\"foobar\"")]
 
                 self.assert_(self.context_client1.expect(client1_expected), "Actual key values pairs do not match expected")
                 self.assert_(self.context_client2.expect(client2_expected), "Actual key values pairs do not match expected")
@@ -448,9 +444,9 @@ class MultipleSubscribers(unittest.TestCase):
                 self.assert_(self.context_client4.expect(client4_expected), "Actual key values pairs do not match expected")
 
                 self.flexiprovider.send("test.double = -5.3")
-                client1_expected = "^test.double = double:-5.3$"
-                client2_expected = "^test.double = double:-5.3$"
-                client4_expected = "^test.double = double:-5.3$"
+                client1_expected = wanted("test.double", "double", "-5.3")
+                client2_expected = wanted("test.double", "double", "-5.3")
+                client4_expected = wanted("test.double", "double", "-5.3")
 
                 self.assert_(self.context_client1.expect(client1_expected), "Actual key values pairs do not match expected")
                 self.assert_(self.context_client2.expect(client2_expected), "Actual key values pairs do not match expected")
@@ -463,8 +459,8 @@ class MultipleSubscribers(unittest.TestCase):
                 self.assert_(self.context_client3.expect(client3_expected), "Actual key values pairs do not match expected")
 
                 self.flexiprovider.send("unset test.truth")
-                client1_expected = "^test.truth is Unknown$"
-                client3_expected = "^test.truth is Unknown$"
+                client1_expected = wantedUnknown("test.truth")
+                client3_expected = wantedUnknown("test.truth")
 
                 self.assert_(self.context_client1.expect(client1_expected), "Actual key values pairs do not match expected")
                 self.assert_(self.context_client3.expect(client3_expected), "Actual key values pairs do not match expected")
@@ -493,12 +489,12 @@ class MultipleProviders(unittest.TestCase):
                 provider2.send("test.int = -68")
 
                 self.assert_(
-                        listen.expect("^test.int = int:-68$"))
+                        listen.expect(wanted("test.int", "int", "-68")))
 
                 provider1.send("test.truth = False")
 
                 self.assert_(
-                        listen.expect("^test.truth = bool:false$"))
+                        listen.expect(wanted("test.truth", "bool", "false")))
                 listen.wait()
                 provider2.wait()
                 provider1.wait()
@@ -541,24 +537,24 @@ class SubscriptionPause (unittest.TestCase):
                 self.listen = CLTool("context-listen","test.int")
 
                 self.assert_(
-                        self.listen.expect("^test.int = int:1$"))
+                        self.listen.expect(wanted("test.int", "int", "1")))
 
                 self.provider.send("test.int = -5")
                 self.assert_(
-                        self.listen.expect("^test.int = int:-5$"))
+                        self.listen.expect(wanted("test.int", "int", "-5")))
 
                 self.listen.send("unsubscribe test.int")
                 self.provider.send("test.int = 3")
                 self.assertFalse(
-                        self.listen.expect("^test.int = int:3$", wantdump = False))
+                        self.listen.expect(wanted("test.int", "int", "3"), wantdump=False))
 
                 self.listen.send("subscribe test.int")
                 self.assert_(
-                        self.listen.expect("^test.int = int:3$"))
+                        self.listen.expect(wanted("test.int", "int", "3")))
 
                 self.provider.send("test.int = 6")
                 self.assert_(
-                        self.listen.expect("^test.int = int:6$"))
+                        self.listen.expect(wanted("test.int", "int", "6")))
 
         def testWaitForSubscribe(self):
                 """
@@ -592,7 +588,7 @@ class SubscriptionPause (unittest.TestCase):
                 self.listen.send("new test.int")
                 self.listen.send("waitforsubscription test.int")
 
-                expected = ["^test.int = int:1$",
+                expected = [wanted("test.int", "int", "1"),
                             "^wait finished for test.int$"]
 
                 # I don't get it quickly

@@ -24,22 +24,41 @@
 #include "sconnect.h"
 #include <QDebug>
 #include <QVariant>
+#include <QCoreApplication>
+#include <QDBusArgument>
+#include <qjson/serializer.h>
+#include <qjson/parser.h>
 
-PropertyListener::PropertyListener(ContextProperty *prop) :
-    QObject(prop), prop(prop)
+PropertyListener::PropertyListener(const QString &key):
+    QObject(QCoreApplication::instance()), prop(new ContextProperty(key, this))
 {
     sconnect(prop, SIGNAL(valueChanged()), this, SLOT(onValueChanged()));
     qDebug() << prop->key() << " subscribtion started";
 }
 
+QString PropertyListener::valueToString(QString defaultValue) const
+{
+    QVariant value;
+    if (!defaultValue.isEmpty()) {
+        bool isOk;
+        QVariant def = QJson::Parser().parse(defaultValue.toUtf8(), &isOk);
+        if (!isOk)
+            qWarning() << "failed to parse default value as json:" << defaultValue;
+        value = prop->value(def);
+    } else {
+        value = prop->value();
+    }
+    QString result;
+    if (value.isNull())
+        return result += "Unknown";
+    result += value.typeName();
+    result += ':';
+    result += QJson::Serializer().serialize(value);
+    return result;
+}
+
 void PropertyListener::onValueChanged()
 {
     QTextStream out(stdout);
-    out << prop->key();
-    if (prop->value().isNull()) {
-        out << " is Unknown";
-    } else {
-        out << " = " << prop->value().typeName() << ":" << prop->value().toString();
-    }
-    out << endl;
+    out << prop->key() << " = " << valueToString() << endl;
 }

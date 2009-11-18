@@ -35,6 +35,7 @@ public:
     AssocTree(const QVariant &root) : QVariant(root) {};
 
     QString dump(int level = 0) const;
+    QString dumpXML(int level = 0) const;
 
     QString name() const;
     QVariant value() const;
@@ -72,6 +73,7 @@ public:
                    const QString &name5) const;
 
     const QVariantList nodes() const;
+    AssocTree filterOut(const QString &name) const;
 };
 
 #endif // ASSOCTREE_H

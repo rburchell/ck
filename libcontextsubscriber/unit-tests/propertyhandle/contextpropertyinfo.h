@@ -29,6 +29,7 @@
 #include <QObject>
 #include <QDBusConnection>
 #include "contextproviderinfo.h"
+#include "contexttypeinfo.h"
 
 class ContextPropertyInfo : public QObject
 {
@@ -38,6 +39,7 @@ public:
     explicit ContextPropertyInfo(const QString &key, QObject *parent = 0);
 
     QString type() const;
+    ContextTypeInfo typeInfo() const;
 
     bool provided() const;
     bool declared() const;

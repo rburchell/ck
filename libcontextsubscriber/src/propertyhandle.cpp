@@ -23,6 +23,7 @@
 #include "provider.h"
 #include "sconnect.h"
 #include "contextpropertyinfo.h"
+#include "contexttypeinfo.h"
 #include "contextregistryinfo.h"
 #include "contextproviderinfo.h"
 #include "dbusnamelistener.h"
@@ -242,25 +243,11 @@ void PropertyHandle::onValueChanged()
     if (found)
         newValue = latest.value;
 
-    if (typeCheckEnabled // type checks enabled
-        && !newValue.isNull() // variable is non-null
-        && myInfo->type() != "") { // the type is found in the registry
-
-        bool checked = false;
-        QString myType = myInfo->type();
-        if (myType == "STRING") {
-            checked = (QVariant::String == newValue.type());
-        } else if (myType == "TRUTH") {
-            checked = (QVariant::Bool == newValue.type());
-        } else if (myType == "DOUBLE") {
-            checked = (QVariant::Double == newValue.type());
-        } else if (myType == "INT") {
-            checked = (QVariant::Int == newValue.type());
-        }
-
-        if (!checked) {
-             contextCritical() << "Provider error, bad type for " << myKey <<
-                "wanted:" << myType << "got:" << newValue.typeName();
+    if (typeCheckEnabled && !newValue.isNull()) {
+        ContextTypeInfo typeInfo = myInfo->typeInfo();
+        if (!typeInfo.typeCheck(newValue)) {
+            contextCritical() << F_TYPES << "Type check failed for" << myKey
+                              << "wanted:" << typeInfo.name();
             return;
         }
     }

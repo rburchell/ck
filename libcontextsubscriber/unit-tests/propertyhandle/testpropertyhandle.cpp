@@ -52,6 +52,14 @@ QString ContextPropertyInfo::type() const
     return myType;
 }
 
+// set this to simulate failure/success of type matches
+bool ContextTypeInfo::fail = false;
+
+ContextTypeInfo ContextPropertyInfo::typeInfo() const
+{
+    return ContextTypeInfo();
+}
+
 bool ContextPropertyInfo::provided() const
 {
     return true;
@@ -574,38 +582,7 @@ void PropertyHandleUnitTests::onValueChangedWithTypeCheckAndCorrectTypes()
 
     // Setup:
     spy.clear();
-    // Set the type to DOUBLE
-    mockContextPropertyInfo->myType = "DOUBLE";
-
-    // Test:
-    // Command the PropertyHandle to change its value
-    // The new value is a double
-    Provider::setValue(key, QVariant(1.4));
-
-    // Expected results:
-    // The valueChanged signal was emitted
-    QCOMPARE(spy.count(), 1);
-    // The new value is now accessible
-    QCOMPARE(propertyHandle->value(), QVariant(1.4));
-
-    // Test:
-    spy.clear();
-    // Command the PropertyHandle to change its value
-    // The new value is a null
-    Provider::setValue(key, QVariant());
-
-    // Expected results:
-    // The NULL value is always accepcted (not depending on the type)
-    // The valueChanged signal was emitted
-    QCOMPARE(spy.count(), 1);
-    // The new value is now accessible
-    QCOMPARE(propertyHandle->value(), QVariant());
-    QCOMPARE(propertyHandle->value().isNull(), true);
-
-    // Setup:
-    spy.clear();
-    // Set the type to INT
-    mockContextPropertyInfo->myType = "INT";
+    ContextTypeInfo::fail = false;
 
     // Test:
     // Command the PropertyHandle to change its value
@@ -632,69 +609,6 @@ void PropertyHandleUnitTests::onValueChangedWithTypeCheckAndCorrectTypes()
     // The new value is now accessible
     QCOMPARE(propertyHandle->value(), QVariant());
     QCOMPARE(propertyHandle->value().isNull(), true);
-
-    // Setup:
-    spy.clear();
-    // Set the type to STRING
-    mockContextPropertyInfo->myType = "STRING";
-
-    // Test:
-    // Command the PropertyHandle to change its value
-    // The new value is a string
-    Provider::setValue(key, QVariant("myValue"));
-
-    // Expected results:
-    // The valueChanged signal was emitted
-    QCOMPARE(spy.count(), 1);
-    // The new value is now accessible
-    QCOMPARE(propertyHandle->value(), QVariant("myValue"));
-    QCOMPARE(propertyHandle->value().isNull(), false);
-
-    // Test:
-    spy.clear();
-    // Command the PropertyHandle to change its value
-    // The new value is a null
-    Provider::setValue(key, QVariant());
-
-    // Expected results:
-    // The NULL value is always accepcted (not depending on the type)
-    // The valueChanged signal was emitted
-    QCOMPARE(spy.count(), 1);
-    // The new value is now accessible
-    QCOMPARE(propertyHandle->value(), QVariant());
-    QCOMPARE(propertyHandle->value().isNull(), true);
-
-    // Setup:
-    spy.clear();
-    // Set the type to TRUTH
-    mockContextPropertyInfo->myType = "TRUTH";
-
-    // Test:
-    // Command the PropertyHandle to change its value
-    // The new value is a boolean
-    Provider::setValue(key, QVariant(true));
-
-    // Expected results:
-    // The valueChanged signal was emitted
-    QCOMPARE(spy.count(), 1);
-    // The new value is now accessible
-    QCOMPARE(propertyHandle->value(), QVariant(true));
-    QCOMPARE(propertyHandle->value().isNull(), false);
-
-    // Test:
-    spy.clear();
-    // Command the PropertyHandle to change its value
-    // The new value is a null
-    Provider::setValue(key, QVariant());
-
-    // Expected results:
-    // The NULL value is always accepcted (not depending on the type)
-    // The valueChanged signal was emitted
-    QCOMPARE(spy.count(), 1);
-    // The new value is now accessible
-    QCOMPARE(propertyHandle->value(), QVariant());
-    QCOMPARE(propertyHandle->value().isNull(), true);
-
 }
 
 void PropertyHandleUnitTests::onValueChangedWithTypeCheckAndIncorrectTypes()
@@ -713,8 +627,6 @@ void PropertyHandleUnitTests::onValueChangedWithTypeCheckAndIncorrectTypes()
     QSignalSpy spy(propertyHandle, SIGNAL(valueChanged()));
 
     // Setup:
-    // Set the type to DOUBLE
-    mockContextPropertyInfo->myType = "DOUBLE";
     // Set an initial value
     Provider::setValue(key, QVariant(4.2));
     spy.clear();
@@ -722,75 +634,17 @@ void PropertyHandleUnitTests::onValueChangedWithTypeCheckAndIncorrectTypes()
     // Test:
     // Command the PropertyHandle to change its value multiple times but with
     // incorrect types.
+    ContextTypeInfo::fail = true;
     Provider::setValue(key, QVariant(5));
     Provider::setValue(key, QVariant("string"));
     Provider::setValue(key, QVariant(false));
+    ContextTypeInfo::fail = false;
 
     // Expected results:
     // The valueChanged signal was not emitted
     QCOMPARE(spy.count(), 0);
     // The value is still the old value
     QCOMPARE(propertyHandle->value(), QVariant(4.2));
-
-    // Setup:
-    // Set the type to INT
-    mockContextPropertyInfo->myType = "INT";
-    // Set an initial value
-    Provider::setValue(key, QVariant(22));
-    spy.clear();
-
-    // Test:
-    // Command the PropertyHandle to change its value multiple times but with
-    // incorrect types.
-    Provider::setValue(key, QVariant(5.6));
-    Provider::setValue(key, QVariant("string"));
-    Provider::setValue(key, QVariant(false));
-
-    // Expected results:
-    // The valueChanged signal was not emitted
-    QCOMPARE(spy.count(), 0);
-    // The value is still the old value
-    QCOMPARE(propertyHandle->value(), QVariant(22));
-
-    // Setup:
-    // Set the type to STRING
-    mockContextPropertyInfo->myType = "STRING";
-    // Set an initial value
-    Provider::setValue(key, QVariant("myString"));
-    spy.clear();
-
-    // Test:
-    // Command the PropertyHandle to change its value multiple times but with
-    // incorrect types.
-    Provider::setValue(key, QVariant(5.4));
-    Provider::setValue(key, QVariant(-8));
-    Provider::setValue(key, QVariant(false));
-
-    // Expected results:
-    // The valueChanged signal was not emitted
-    QCOMPARE(spy.count(), 0);
-    // The value is still the old value
-    QCOMPARE(propertyHandle->value(), QVariant("myString"));
-
-    // Setup:
-    // Set the type to TRUTH
-    mockContextPropertyInfo->myType = "TRUTH";
-    // Set an initial value
-    Provider::setValue(key, QVariant(false));
-    spy.clear();
-
-    // Test:
-    // Command the PropertyHandle to change its value multiple times but with
-    // incorrect types.
-    Provider::setValue(key, QVariant(5.4));
-    Provider::setValue(key, QVariant(-8));
-    Provider::setValue(key, QVariant("string"));
-
-    // Expected results:
-    // The valueChanged signal was not emitted
-    QCOMPARE(spy.count(), 0);
-    // The value is still the old value
-    QCOMPARE(propertyHandle->value(), QVariant(false));
 }
 
 void PropertyHandleUnitTests::commanderAppearsAndDisappears()

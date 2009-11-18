@@ -70,7 +70,7 @@ class MultiProvider(unittest.TestCase):
         time.sleep(4)
 
         client.send("value test.prop")
-        self.assert_(client.expect("\nvalue: int:22\n"))
+        self.assert_(client.expect("^value: qulonglong:22$"))
         client.wait()
         provider_y.wait()
         provider_y.wait()

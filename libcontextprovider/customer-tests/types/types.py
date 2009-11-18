@@ -51,9 +51,9 @@ class Types(unittest.TestCase):
                 client.expect("Assigned commander")
 
                 client.send("subscribe commander test.prop")
-                self.assert_(client.expect("Subscribe returned: int:42"))
+                self.assert_(client.expect("Subscribe returned: qulonglong:42"))
 
-                provider.send("add double test.prop 42")
+                provider.send("add double test.prop 42.0")
                 provider.expect("Setting key")
 
                 client.send("waitforchanged 5000")

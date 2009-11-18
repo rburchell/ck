@@ -52,7 +52,7 @@ QString utilPathForLocalDir()
 
 void utilSetEnv(QString env, QString val)
 {
-    setenv(env.toUtf8().constData(), val.toUtf8().constData(), 0);
+    setenv(env.toUtf8().constData(), val.toUtf8().constData(), 1);
 }
 
 void utilCopyLocalWithRemove(QString src, QString dest, int waitPeriod = DEFAULT_WAIT_PERIOD)

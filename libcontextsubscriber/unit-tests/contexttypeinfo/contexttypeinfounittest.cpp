@@ -21,79 +21,16 @@
 
 #include <QtTest/QtTest>
 #include <QtCore>
-#include "nanoxml.h"
 #include "fileutils.h"
 #include "contexttypeinfo.h"
 #include "contexttyperegistryinfo.h"
-
-ContextTypeRegistryInfo* ContextTypeRegistryInfo::registryInstance = new ContextTypeRegistryInfo();
-
-/* Mocked ContextTypeRegistryInfo */
-
-ContextTypeRegistryInfo::ContextTypeRegistryInfo()
-{
-}
-
-ContextTypeRegistryInfo* ContextTypeRegistryInfo::instance()
-{
-    return registryInstance;
-}
-
-AssocTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
-{
-    if (name == "double") {
-        QVariantList tree;
-        QVariantList doc;
-        QVariantList name;
-        name << QVariant("name");
-        name << QVariant("double");
-        doc << QVariant("doc");
-        doc << QVariant("double doc");
-        tree << QVariant("type");
-        tree << QVariant(name);
-        tree << QVariant(doc);
-        return ContextTypeInfo(QVariant(tree));
-    } else if (name == "complex") {
-        QVariantList tree;
-        QVariantList doc;
-        QVariantList base;
-        QVariantList name;
-        QVariantList params;
-        QVariantList p1;
-        QVariantList p1Doc;
-
-        name << QVariant("name");
-        name << QVariant("complex");
-
-        doc << QVariant("doc");
-        doc << QVariant("complex doc");
-
-        base << QVariant("base");
-        base << QVariant("double");
-
-        p1 << QVariant("p1");
-        p1Doc << QVariant("doc");
-        p1Doc << QVariant("p1 doc");
-        p1 << QVariant(p1Doc);
-        params << QVariant("params");
-        params << QVariant(p1);
-
-        tree << QVariant("type");
-        tree << QVariant(name);
-        tree << QVariant(params);
-        tree << QVariant(doc);
-        tree << QVariant(base);
-        return ContextTypeInfo(QVariant(tree));
-    } else
-        return ContextTypeInfo();
-}
-
 
 class ContextTypeInfoUnitTest : public QObject
 {
     Q_OBJECT
 
 private slots:
+    void initTestCase();
     void name();
     void doc();
     void base();
@@ -104,7 +41,14 @@ private slots:
     void parameterValue();
     void parameterNode();
     void parameters();
+    void typeCheck();
 };
+
+void ContextTypeInfoUnitTest::initTestCase()
+{
+    utilSetEnv("CONTEXT_CORE_TYPES",
+               utilPathForLocalFile("types.xml"));
+}
 
 void ContextTypeInfoUnitTest::name()
 {
@@ -118,7 +62,7 @@ void ContextTypeInfoUnitTest::name()
 
 void ContextTypeInfoUnitTest::doc()
 {
-    QCOMPARE(ContextTypeInfo(QString("double")).doc(), QString("double doc"));
+    QCOMPARE(ContextTypeInfo(QString("bool")).doc(), QString("A boolean."));
 }
 
 void ContextTypeInfoUnitTest::empty()
@@ -131,33 +75,38 @@ void ContextTypeInfoUnitTest::empty()
 
 void ContextTypeInfoUnitTest::definition()
 {
-    AssocTree def = ContextTypeInfo(QString("double")).definition();
-    QCOMPARE(def.value("name").toString(), QString("double"));
-    QCOMPARE(def.value("doc").toString(), QString("double doc"));
+    AssocTree def = ContextTypeInfo(QString("string")).definition();
+    QCOMPARE(def.value("name").toString(), QString("string"));
+    QCOMPARE(def.value("doc").toString(), QString("A string."));
 }
 
 void ContextTypeInfoUnitTest::base()
 {
-    ContextTypeInfo base = ContextTypeInfo(QString("complex")).base();
-    QCOMPARE(base.name(), QString("double"));
-    QCOMPARE(base.doc(), QString("double doc"));
+    ContextTypeInfo base = ContextTypeInfo(QString("integer")).base();
+    QCOMPARE(base.name(), QString("number"));
 }
 
 void ContextTypeInfoUnitTest::parameterDoc()
 {
-    ContextTypeInfo typeInfo = ContextTypeInfo(QString("complex"));
-    QCOMPARE(typeInfo.parameterDoc("p1"), QString("p1 doc"));
-
+    ContextTypeInfo typeInfo = ContextTypeInfo(QString("number"));
+    QCOMPARE(typeInfo.parameterDoc("min"), QString("Lower bound"));
+    QCOMPARE(typeInfo.parameterDoc("max"), QString("Upper bound"));
 }
 
 void ContextTypeInfoUnitTest::ensureNewTypes()
 {
-    QCOMPARE(ContextTypeInfo(QString("INTEGER")).ensureNewTypes().name(), QString("integer"));
-    QCOMPARE(ContextTypeInfo(QString("INT")).ensureNewTypes().name(), QString("integer"));
-    QCOMPARE(ContextTypeInfo(QString("TRUTH")).ensureNewTypes().name(), QString("bool"));
-    QCOMPARE(ContextTypeInfo(QString("STRING")).ensureNewTypes().name(), QString("string"));
-    QCOMPARE(ContextTypeInfo(QString("DOUBLE")).ensureNewTypes().name(), QString("double"));
-    QCOMPARE(ContextTypeInfo(QString("bool")).ensureNewTypes().name(), QString("bool"));
+    QCOMPARE(ContextTypeInfo(QString("INTEGER")).ensureNewTypes().name(),
+             QString("integer"));
+    QCOMPARE(ContextTypeInfo(QString("INT")).ensureNewTypes().name(),
+             QString("integer"));
+    QCOMPARE(ContextTypeInfo(QString("TRUTH")).ensureNewTypes().name(),
+             QString("bool"));
+    QCOMPARE(ContextTypeInfo(QString("STRING")).ensureNewTypes().name(),
+             QString("string"));
+    QCOMPARE(ContextTypeInfo(QString("DOUBLE")).ensureNewTypes().name(),
+             QString("number"));
+    QCOMPARE(ContextTypeInfo(QString("bool")).ensureNewTypes().name(),
+             QString("bool"));
 }
 
 void ContextTypeInfoUnitTest::parameterValue()
@@ -206,6 +155,90 @@ void ContextTypeInfoUnitTest::parameters()
     QVariant variant("double");
     QVERIFY(ContextTypeInfo(variant).parameters().size() == 0);
 }
+
+#define LIST(args) QVariant(QVariantList() << args)
+#define TI ContextTypeInfo
+
+void ContextTypeInfoUnitTest::typeCheck()
+{
+    {
+        QVariant v(23);
+        TI t("number");
+        QVERIFY(t.typeCheck(v));
+    }
+
+    {
+        QVariant v(151.211);
+        TI t("number");
+        QVERIFY(t.typeCheck(v));
+    }
+
+    {
+        QVariant v;
+        TI t(LIST("number" <<
+                  LIST("min" << "100") <<
+                  LIST("max" << "200")));
+
+        v = 55;
+        QVERIFY(!t.typeCheck(v));
+        v = 134.11;
+        QVERIFY(t.typeCheck(v));
+        v = 250;
+        QVERIFY(!t.typeCheck(v));
+    }
+
+    {
+        QVariant v;
+        TI t(LIST("list" <<
+                  LIST("min" << "2") <<
+                  LIST("type" <<
+                       LIST("integer" <<
+                            LIST("min" << "2")))));
+
+        v = QVariantList() << 2 << 2 << 3;
+        QVERIFY(t.typeCheck(v));
+        v = QVariantList() << 1 << 2 << 3;
+        QVERIFY(!t.typeCheck(v));
+        v = QVariantList() << 4 << 2.2 << 3;
+        QVERIFY(!t.typeCheck(v));
+        v = QVariantList() << 4;
+        QVERIFY(!t.typeCheck(v));
+    }
+
+    {
+        TI t(LIST("map" <<
+                  LIST("foo") <<
+                  LIST("bar")));
+
+        QVariantMap v = QVariantMap();
+        v.insert("foo", 23);
+        v.insert("bar", 11);
+        QVERIFY(t.typeCheck(v));
+        v.insert("jaj", "nana");
+        QVERIFY(!t.typeCheck(v));
+    }
+
+    {
+        TI t(LIST("map" <<
+                  LIST("foo") <<
+                  LIST("bar" <<
+                       LIST("type" << "string")) <<
+                  LIST("allow-other-keys")));
+
+        QVariantMap v = QVariantMap();
+        v.insert("foo", 23);
+        QVERIFY(t.typeCheck(v));
+        v.insert("bar", 11);
+        QVERIFY(!t.typeCheck(v));
+        v.insert("bar", "is a string");
+        QVERIFY(t.typeCheck(v));
+        v.insert("jaj", "nana");
+        QVERIFY(t.typeCheck(v));
+    }
+}
+
+#undef TI
+#undef LIST
 
 #include "contexttypeinfounittest.moc"
 QTEST_MAIN(ContextTypeInfoUnitTest);

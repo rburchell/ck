@@ -21,6 +21,7 @@
 
 #include "contexttypeinfo.h"
 #include "logging.h"
+#include "loggingfeatures.h"
 #include "contexttyperegistryinfo.h"
 
 /* Public */
@@ -74,11 +75,161 @@ ContextTypeInfo ContextTypeInfo::ensureNewTypes()
     else if (oldName == "STRING")
         newName = "string";
     else if (oldName == "DOUBLE")
-        newName = "double";
+        newName = "number";
     else
         return *this;
 
     return ContextTypeInfo(QVariant(newName));
+}
+
+/// Verifies if \a value is acceptable as a representative of the type that
+/// this ContextTypeInfo object describes.
+bool ContextTypeInfo::typeCheck(const QVariant &value) const
+{
+    QString me = name();
+
+    // First check against the parametrized base type.
+    ContextTypeInfo baseType(base());
+    if (!baseType.isNull()) {
+        // Combine type instance parameters with default parameters of the
+        // base type.  (Suboptimal.)
+        if (baseType.type() != QVariant::List)
+            baseType = AssocTree(QVariantList() << baseType.name());
+        foreach (AssocTree p, parameters()) {
+            baseType = baseType.filterOut(p.name());
+            baseType = AssocTree(baseType.toList() << p);
+        }
+        if (!baseType.typeCheck(value))
+            return false;
+    }
+
+    // Now let's see our hardwired knowledge about our types.
+    QVariant::Type vtype = value.type();
+    if (me == "value") {
+        return true;
+    }
+    else if (me == "bool") {
+        bool ok = vtype == QVariant::Bool;
+        if (!ok)
+            contextWarning() << F_TYPES << value << "is not a bool";
+        return ok;
+    }
+    else if (me == "number") {
+        if (!value.canConvert(QVariant::Double)) {
+            contextWarning() << F_TYPES << value << "is not a number";
+            return false;
+        }
+        QVariant min = parameterValue("min");
+        QVariant max = parameterValue("max");
+        double v = value.toDouble();
+        if (!min.isNull() && v < min.toDouble()) {
+            contextWarning() << F_TYPES << v << "below minimum:" << min.toDouble();
+            return false;
+        }
+        if (!max.isNull() && max.toDouble() < v) {
+            contextWarning() << F_TYPES << v << "above maximum:" << max.toDouble();
+            return false;
+        }
+        return true;
+    }
+    else if (me == "integer") {
+        bool ok = (vtype == QVariant::Int ||
+                   vtype == QVariant::UInt ||
+                   vtype == QVariant::LongLong ||
+                   vtype == QVariant::ULongLong);
+        if (!ok)
+            contextWarning() << F_TYPES << value << "is not an integer type";
+        return ok;
+    }
+    else if (me == "string") {
+        bool ok = vtype == QVariant::String;
+        if (!ok)
+            contextWarning() << F_TYPES << value << "is not a string";
+        return ok;
+    }
+    else if (me == "list") {
+        if (vtype != QVariant::List) {
+            contextWarning() << F_TYPES << value << "is not a list";
+            return false;
+        }
+        QVariant minlen = parameterValue("min");
+        QVariant maxlen = parameterValue("max");
+        ContextTypeInfo eltype = parameterValue("type");
+        QVariantList vl = value.toList();
+        if (!minlen.isNull() && vl.size() < minlen.toInt()) {
+            contextWarning() << F_TYPES << value << "shorter than minimum";
+            return false;
+        }
+        if (!maxlen.isNull() && vl.size() > maxlen.toInt()) {
+            contextWarning() << F_TYPES << value << "length over maximum";
+            return false;
+        }
+        if (!eltype.isNull())
+            foreach (QVariant el, vl)
+                if (!eltype.typeCheck(el)) {
+                    contextWarning() << F_TYPES << "element" << el
+                                     << "is of incorrect type";
+                    return false;
+                }
+        return true;
+    }
+    else if (me == "map") {
+        if (vtype != QVariant::Map) {
+            contextWarning() << F_TYPES << value << "is not a map";
+            return false;
+        }
+        QHash<QString, ContextTypeInfo> allowedKeys;
+        bool othersAllowed = false;
+        foreach (ContextTypeInfo keyInfo, parameters()) {
+            QString keyname = keyInfo.name();
+            if (keyname == "allow-other-keys") {
+                othersAllowed = true;
+                continue;
+            }
+            allowedKeys.insert(keyname, keyInfo.parameterValue("type"));
+        }
+        if (allowedKeys.size() == 0)
+            return true;
+        QMapIterator<QString, QVariant> it(value.toMap());
+        while (it.hasNext()) {
+            it.next();
+            QString key = it.key();
+            if (allowedKeys.contains(key)) {
+                if (allowedKeys[key].isNull())
+                    continue;
+                if (!allowedKeys[key].typeCheck(it.value())) {
+                    contextWarning() << F_TYPES << "value for" << key
+                                     << "(" << it.value() << ")"
+                                     << "is of incorrect type";
+                    return false;
+                }
+            } else if (!othersAllowed) {
+                contextWarning() << F_TYPES << "unknown key" << key;
+                return false;
+            }
+        }
+        return true;
+    }
+    else if (me == "string-enum") {
+        QSet<QString> enumerators;
+        foreach (AssocTree enumerator, parameters())
+            enumerators.insert(enumerator.name());
+        bool ok = enumerators.contains(value.toString());
+        if (!ok)
+            contextWarning() << F_TYPES
+                             << value << "is not valid in this string-enum";
+        return ok;
+    }
+    else if (me == "int-enum") {
+        QSet<int> enumerators;
+        foreach (AssocTree enumerator, parameters())
+            enumerators.insert(enumerator.value("value").toInt());
+        bool ok = enumerators.contains(value.toInt());
+        if (!ok)
+            contextWarning() << F_TYPES << value << "is not valid in this int-enum";
+        return ok;
+    }
+    return true;
 }
 
 /// Returns the AssocTree with the type definition for this type.

@@ -22,9 +22,10 @@
 #ifndef COMMANDWATCHER_H
 #define COMMANDWATCHER_H
 
+#include <contexttypeinfo.h>
+#include "property.h"
 #include <QObject>
 #include <QTextStream>
-#include "property.h"
 
 using namespace ContextProvider;
 
@@ -43,12 +44,13 @@ public:
     CommandWatcher(QString busName, QDBusConnection::BusType busType, int commandfd, QObject *parent = 0);
     ~CommandWatcher();
     void addCommand(const QStringList& args);
-    void startCommand();
+    void restartCommand();
     static const QString commanderBusName;
 
 private:
     void interpret(const QString& command);
     void help();
+    void setTypeCommand(QStringList &args);
     void unsetCommand(const QStringList& args);
     void setCommand(const QString& command);
     void sleepCommand(const QStringList& args);
@@ -61,7 +63,7 @@ private:
 
     int commandfd;
     QSocketNotifier *commandNotifier;
-    QMap <QString, QString> types;          // key -> type
+    QMap <QString, ContextTypeInfo> types;  // key -> typeinfo
     QMap <QString, Property*> properties;   // property index
     QMap <QString, PropertyProxy*> proxies;
     ContextRegistryInfo *registryInfo;

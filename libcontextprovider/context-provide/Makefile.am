@@ -4,9 +4,9 @@ context_provide_SOURCES = context-provide.cpp		\
 	commandwatcher.cpp commandwatcher.h propertyproxy.h	\
 	propertyproxy.cpp
 
-AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) \
+AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(QJson_CFLAGS) \
 	        '-DCONTEXT_LOG_MODULE_NAME="context-provide"'
-LIBS += $(QtCore_LIBS)
+LIBS += $(QtCore_LIBS) $(QJson_LIBS)
 
 # library dependency hack for seamless make
 AM_CXXFLAGS += -I$(srcdir)/../src \
