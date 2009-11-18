@@ -14,6 +14,9 @@
       <case name="types" description="Properties of different types" requirement="" timeout="50">
         <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/lib/libcontextprovider-tests/;./typestests</step>
       </case>
+      <case name="typeschange" description="Type change should be enough to emit a valuechanged" requirement="" timeout="50">
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/types/types.py</step>
+      </case>
       <case name="valuechanges" description="Clients getting value change notifications" requirement="" timeout="50">
         <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/lib/libcontextprovider-tests/;./valuechangestests</step>
       </case>

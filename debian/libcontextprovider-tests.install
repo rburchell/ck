@@ -7,3 +7,4 @@ usr/lib/libcontextprovider-tests/typestests
 usr/lib/libcontextprovider-tests/valuechangestests
 usr/lib/libcontextprovider-tests/servicetest
 usr/share/libcontextprovider-tests/multiprovider
+usr/share/libcontextprovider-tests/types
