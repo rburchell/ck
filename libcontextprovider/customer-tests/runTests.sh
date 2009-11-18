@@ -20,6 +20,8 @@ do
 	make -C $i check-customer
 done
 
+make -C ../../libcontextsubscriber/src
+
 . ./env.sh
 echo "Running multiproviders customer check"
 cd multiprovider; python2.5 multiprovider.py ; cd ..
