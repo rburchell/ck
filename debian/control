@@ -10,7 +10,7 @@ Build-Depends: debhelper (>= 5),
                libcdb-dev,
                libglib2.0-dev (>= 2.12.0),
                libdbus-1-dev,
-               libqjson-dev (>= 0.6.3-6),
+               libqjson-dev,
                xsltproc,
                doxygen
 XS-Python-Version: all
@@ -95,7 +95,7 @@ Description: Python bindings for ContextKit APIs
 Package: contextkit-utils
 Section: utils
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqjson
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Command line utilities for ContextKit
  This package contains the context-provide and context-listen
  tools. You can use context-provide to quickly provide context
