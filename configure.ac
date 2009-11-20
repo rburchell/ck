@@ -38,6 +38,8 @@ AX_DISABLE_FEATURE_ON_PROG([source-highlight], [BUILD_DOCS], [SOURCE_HIGHLIGHT],
 AX_DISABLE_FEATURE_ON_PROG([xsltproc], [BUILD_DOCS], [XSLTPROC], [xsltproc])
 AX_DISABLE_FEATURE_ON_PROG([xmllint], [BUILD_DOCS], [XMLLINT], [xmllint])
 AX_DISABLE_FEATURE_ON_PROG([doxygen], [BUILD_DOCS], [DOXYGEN], [doxygen])
+AX_PROG_PERL_MODULES([XML::DOM], ,
+  [missing_deps_BUILD_DOCS="$missing_deps_BUILD_DOCS, libxml-dom-perl"])
 AM_CONDITIONAL([CONTEXTKIT_BUILD_DOCS], [test "$missing_deps_BUILD_DOCS" = ""])
 
 # coverage tools
@@ -104,6 +106,17 @@ AC_CONFIG_FILES([
         spec/Makefile
         tools/Makefile
 ])
+
+# The user only needs to have the documentation tools (asciidoc, etc.)
+# if she checked out the master Git branch, instead of using a release
+# tag or a release tarball, as she should.
+if test "$missing_deps_BUILD_DOCS" != "" -a \! -f spec/context-properties.html
+then
+	missing_deps=`echo $missing_deps_BUILD_DOCS | cut -c3-`
+	AC_MSG_FAILURE([
+Building from Git, but not all of the required doctools are available: $missing_deps
+Please use a release tag instead or install the required tools!])
+fi
 
 AC_OUTPUT
 

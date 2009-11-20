@@ -32,6 +32,7 @@ INTROSPECT = $(INTERFACES:%.xml=introspect/%.xml)
 
 tools_dir = $(top_srcdir)/tools
 
+if CONTEXTKIT_BUILD_DOCS
 # Generating introspection files
 
 $(INTROSPECT): introspect/%.xml: %.xml spec-to-introspect.xsl
@@ -45,12 +46,18 @@ context.valid.stamp: context.xsd core.context
 	touch $@
 
 # Creating docs from a property declaration file
+context-properties.txt: core.context context2asciidoc.pl
+	$(srcdir)/context2asciidoc.pl <$< >$@.tmp || { rm $@.tmp; false; }
+	mv $@.tmp $@
+context-properties.html: context-properties.txt
+	asciidoc -f $(srcdir)/myfilter.conf -o $@ $<
 
-context-properties.html: core.context context2asciidoc.pl
-	$(srcdir)/context2asciidoc.pl < $< | asciidoc -f $(srcdir)/myfilter.conf -o $@ -
-
-core-types.html: core.types  context2asciidoc.pl
-	$(srcdir)/context2asciidoc.pl < $< | asciidoc -f $(srcdir)/myfilter.conf -o $@ -
+# Creating type docs from a type declaration file
+core-types.txt: core.types context2asciidoc.pl
+	$(srcdir)/context2asciidoc.pl <$< >$@.tmp || { rm $@.tmp; false; }
+	mv $@.tmp $@
+core-types.html: core-types.txt
+	asciidoc -f $(srcdir)/myfilter.conf -o $@ $<
 
 # Creating docs from a DbusSpec
 
@@ -61,6 +68,7 @@ contextkit.html: all.xml $(SPEC_FILES) doc-generator.xsl
 
 context-provider-schema.html: context.xsd
 	xsltproc --nonet --output $@ xs3p/xs3p.xsl $<
+endif
 
 EXTRA_DIST = \
 	$(SPEC_FILES) \
