@@ -51,8 +51,10 @@ public:
 private:
     QFileSystemWatcher watcher; ///< A watched object obsering the database file. Delivers synced notifications.
     CDBReader reader; ///< The cdb reader object used to access the cdb database.
+    bool databaseCompatible; ///< If the currently open database is compatible (versions match).
     void watch();
     static QStringList variantListToStringList(const QVariantList &l);
+    void checkCompatibility();
 
 private slots:
     void onDatabaseFileChanged(const QString &path);

@@ -95,6 +95,14 @@
 	    requirement="" timeout="20">
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/subscription; python multiprovider2.py</step>
       </case>
+      <case name="libsub020" description="CDB database generation"
+	    requirement="" timeout="20">
+        <step expected_result="0">cd /usr/share/libcontextsubscriber-tests/update-contextkit-providers ; ./test.sh ;</step>
+      </case>
+      <case name="libsub021" description="Forward compatibility"
+	    requirement="" timeout="20">
+        <step expected_result="0">cd /usr/share/libcontextsubscriber-tests/forward-compatible ; ./test.sh ;</step>
+      </case>
       <environments>
         <scratchbox>false</scratchbox>
         <hardware>true</hardware>

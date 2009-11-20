@@ -51,6 +51,7 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
     watch();
+    checkCompatibility();
 }
 
 /// Returns 'cdb'.
@@ -70,17 +71,25 @@ QStringList InfoCdbBackend::variantListToStringList(const QVariantList &l)
 
 QStringList InfoCdbBackend::listKeys() const
 {
-    return variantListToStringList(reader.valuesForKey("KEYS"));
+    if (databaseCompatible)
+        return variantListToStringList(reader.valuesForKey("KEYS"));
+    else
+        return QStringList();
 }
 
 QString InfoCdbBackend::docForKey(QString key) const
 {
-    return reader.valueForKey(key + ":KEYDOC").toString();
+    if (databaseCompatible)
+        return reader.valueForKey(key + ":KEYDOC").toString();
+    else
+        return QString();
 }
 
 bool InfoCdbBackend::keyDeclared(QString key) const
 {
-    if (reader.valuesForKey("KEYS").contains(key))
+    if (!databaseCompatible)
+        return false;
+    else if (reader.valuesForKey("KEYS").contains(key))
         return true;
     else
         return false;
@@ -117,6 +126,23 @@ QString InfoCdbBackend::databaseDirectory()
 
 /* Private */
 
+/// Update the database compatibility field.
+void InfoCdbBackend::checkCompatibility()
+{
+    if (!reader.isReadable())
+        databaseCompatible = false;
+    else {
+        QString version = reader.valueForKey("VERSION").toString();
+        if (version != "" && version != BACKEND_COMPATIBILITY_NAMESPACE) {
+            databaseCompatible = false;
+            contextWarning() << F_CDB << "Incompatible database version:" << version;
+        } else
+            databaseCompatible = true;
+    }
+}
+
+/// Start watching directory and database path IF we're not watching
+/// it already and IF the directory/file exists.
 void InfoCdbBackend::watch()
 {
     if (! watcher.directories().contains(InfoCdbBackend::databaseDirectory()) &&
@@ -139,6 +165,10 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
 
     reader.reopen();
     watch();
+
+    // Check the version
+    if (reader.isReadable())
+        checkCompatibility();
 
     // If nobody is watching us anyways, drop out now and skip
     // the further processing. This could be made more granular
@@ -170,6 +200,9 @@ const QList<ContextProviderInfo> InfoCdbBackend::providersForKey(QString key) co
 {
     QVariant providers = reader.valueForKey(key + ":PROVIDERS");
     QList<ContextProviderInfo> lst;
+
+    if (!databaseCompatible)
+        return lst;
 
     foreach (QVariant variant, providers.toList())
         lst << ContextProviderInfo(variant.toHash().value("plugin").toString(),

@@ -27,6 +27,7 @@
 #include "contextproviderinfo.h"
 #include "cdbwriter.h"
 #include "fcntl.h"
+#include "infobackend.h"
 
 /*!
    \page UpdatingContextProviders
@@ -123,6 +124,9 @@ int main(int argc, char **argv)
         printf("ERROR: %s is not writable. No permissions?\n", templ.constData());
         exit(128);
     }
+
+    // Write the compatibility string
+    writer.add("VERSION", BACKEND_COMPATIBILITY_NAMESPACE);
 
     foreach(const QString& key, context->listKeys()) {
         ContextPropertyInfo keyInfo(key);

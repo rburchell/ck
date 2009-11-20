@@ -4,7 +4,7 @@ check_PROGRAMS = infoxmlbackendunittest
 infoxmlbackendunittest_SOURCES = infoxmlbackendunittest.cpp contexttyperegistryinfo.h
 
 COVERAGE_FILES = infoxmlbackend.cpp
-EXTRA_DIST = providers1.src providers2v1.src providers2v2.src providers3.src providers4.src providers5.src
+EXTRA_DIST = providers1.src providers2v1.src providers2v2.src providers3.src providers4.src providers5.src providers6.src
 
 # do the testing, coverage, etc. stuff
 # tests.am is using +=, so we have to set a value here for these four always

@@ -1,4 +1,4 @@
-SUBDIRS = update-contextkit-providers testplugins
+SUBDIRS = update-contextkit-providers testplugins forward-compatible
 
 libcontextsubscribertestsdir = $(datadir)/libcontextsubscriber-tests
 dist_libcontextsubscribertests_DATA = tests.xml

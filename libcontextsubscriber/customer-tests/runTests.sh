@@ -40,6 +40,9 @@ fi
 echo "Running update-contextkit-providers customer check"
 cd update-contextkit-providers ; ./test.sh ; cd ..
 
+echo "Running forward-compatible customer check"
+cd forward-compatible ; ./test.sh ; cd ..
+
 if [ -n "$COVERAGE" ]
 then
     echo "computing coverage"

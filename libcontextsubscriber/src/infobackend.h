@@ -28,6 +28,8 @@
 #include "contextproviderinfo.h"
 #include "contexttypeinfo.h"
 
+#define BACKEND_COMPATIBILITY_NAMESPACE "http://contextkit.freedesktop.org/Provider"
+
 class InfoBackend : public QObject
 {
     Q_OBJECT

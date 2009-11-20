@@ -308,13 +308,11 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
         return;
     }
 
-    // FIXME: Check the format, for forward-compatibility branch
-    /*
-    if (nano.namespaceUri() != "" && nano.namespaceUri() != BACKEND_COMPATIBILITY_NAMESPACE) {
-        contextWarning() << F_XML << "Reading" << path << "failed, invalid format";
+    // Check the version of the file
+    if (parser.namespaceUri() != "" && parser.namespaceUri() != BACKEND_COMPATIBILITY_NAMESPACE) {
+        contextWarning() << F_XML << "Reading" << path << "failed, invalid version:" << parser.namespaceUri();
         return;
     }
-    */
 
     AssocTree rootTree = parser.result();
 
