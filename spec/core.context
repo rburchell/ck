@@ -154,19 +154,18 @@ Information about the physical position of the device.
   <key name="Position.Stable"
        type="bool">
     <doc>
-A boolean indicating whether or not the position is stable, i.e., the
-device does not move.
+A boolean indicating whether or not the position of the device is
+stable, i.e., the device does not move.
     </doc>
   </key>
   <key name="Position.Shaky"
        type="bool">
     <doc>
-A boolean indicating whether or not the position is shaky, i.e., the
-device is moving rapidly. Not necessarily the opposite of
-Position.Stable; both may be false simultaneously.
+A boolean indicating whether or not the device is moving rapidly. Not
+necessarily the opposite of Position.Stable; both may be false
+simultaneously.
     </doc>
   </key>
-
   <doc>
 Battery
 -------
