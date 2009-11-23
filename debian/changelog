@@ -1,3 +1,10 @@
+contextkit (0.5.2~unreleased) unstable; urgency=low
+
+  * libcontextprovider c-api gained functions for manipulating list and
+    map valued properties
+
+ -- Akos PASZTORY <ext-akos.pasztory@nokia.com>  Tue, 24 Nov 2009 09:54:48 +0200
+
 contextkit (0.5.1) unstable; urgency=low
 
   * Added introspection for types.

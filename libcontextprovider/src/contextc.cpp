@@ -235,3 +235,150 @@ void context_provider_set_null (const char* key)
     if (cService)
         cService->setValue(key, QVariant());
 }
+
+/// Sets the value of \a key to the specified \a map.  If \a free_map is TRUE,
+/// frees the map, which becomes invalid afterwards.
+///
+/// \sa context_provider_map_new, context_provider_map_set_*
+void context_provider_set_map (const char* key, void* map, int free_map)
+{
+    QVariantMap *qvm = reinterpret_cast<QVariantMap *>(map);
+    cService->setValue(key, QVariant(*qvm));
+    if (free_map)
+        delete qvm;
+}
+
+/// Creates an opaque map for use with the context_provider_map_set_* family
+/// of functions.  Free it with context_provider_map_free().
+void *context_provider_map_new ()
+{
+    return new QVariantMap();
+}
+
+/// Free the \a map created by context_provider_map_new().
+void context_provider_map_free (void* map)
+{
+    delete reinterpret_cast<QVariantMap *>(map);
+}
+
+/// Sets \a key to the integer \a value in \a map.
+void context_provider_map_set_integer(void* map, const char* key, int value)
+{
+    QVariantMap *qvm = reinterpret_cast<QVariantMap *>(map);
+    qvm->insert(key, QVariant(value));
+}
+
+/// Sets \a key to the double \a value in \a map.
+void context_provider_map_set_double (void* map, const char* key, double value)
+{
+    QVariantMap *qvm = reinterpret_cast<QVariantMap *>(map);
+    qvm->insert(key, QVariant(value));
+}
+
+/// Sets \a key to the boolean \a value in \a map.
+void context_provider_map_set_boolean(void* map, const char* key, int value)
+{
+    QVariantMap *qvm = reinterpret_cast<QVariantMap *>(map);
+    qvm->insert(key, QVariant(value != 0));
+}
+
+/// Sets \a key to the string \a value in \a map.
+void context_provider_map_set_string (void* map, const char* key, const char* value)
+{
+    QVariantMap *qvm = reinterpret_cast<QVariantMap *>(map);
+    qvm->insert(key, QVariant(value));
+}
+
+/// Sets \a key to the map \a value in \a map.  NOTE: \a value is freed, and
+/// becomes invalid after this call.
+void context_provider_map_set_map (void* map, const char* key, void* value)
+{
+    QVariantMap *qvm = reinterpret_cast<QVariantMap *>(map);
+    QVariantMap *other = reinterpret_cast<QVariantMap *>(value);
+    qvm->insert(key, QVariant(*other));
+    delete other;
+}
+
+/// Sets \a key to the list \a value in \a map.  NOTE: \a value is freed, and
+/// becomes invalid after this call.
+void context_provider_map_set_list(void* map, const char* key, void* value)
+{
+    QVariantMap *qvm = reinterpret_cast<QVariantMap *>(map);
+    QVariantList *list = reinterpret_cast<QVariantList *>(value);
+    qvm->insert(key, QVariant(*list));
+    delete list;
+}
+
+/// Sets the value of \a key to the specified \a list.  If \a free_list is
+/// TRUE, the list is freed.
+///
+/// \sa context_provider_list_new, context_provider_list_add_*
+void context_provider_set_list(const char* key, void* list, int free_list)
+{
+    QVariantList *qvl = reinterpret_cast<QVariantList *>(list);
+    cService->setValue(key, QVariant(*qvl));
+    if (free_list)
+        delete qvl;
+}
+
+/// Creates an opaque list for use with the context_provider_list_add_* family
+/// of functions.  Free it with context_provider_list_free().
+void *context_provider_list_new()
+{
+    return new QVariantList();
+}
+
+/// Frees the list created by context_provider_list_new().  Use
+/// context_provider_list_free() to free it.
+void context_provider_list_free(void* list)
+{
+    delete reinterpret_cast<QVariantList *>(list);
+}
+
+/// Appends the integer \a value to \a list.
+void context_provider_list_add_integer(void* list, int value)
+{
+    QVariantList *qvl = reinterpret_cast<QVariantList *>(list);
+    qvl->append(QVariant(value));
+}
+
+/// Appends the double \a value to \a list.
+void context_provider_list_add_double(void* list, double value)
+{
+    QVariantList *qvl = reinterpret_cast<QVariantList *>(list);
+    qvl->append(QVariant(value));
+}
+
+/// Appends the boolean \a value to \a list.
+void context_provider_list_add_boolean(void* list, int value)
+{
+    QVariantList *qvl = reinterpret_cast<QVariantList *>(list);
+    qvl->append(QVariant(value != 0));
+}
+
+/// Appends the string \a value to \a list.
+void context_provider_list_add_string(void* list, const char* value)
+{
+    QVariantList *qvl = reinterpret_cast<QVariantList *>(list);
+    qvl->append(QVariant(value));
+}
+
+/// Appends the specified map (\a value) to \a list.  NOTE: \a value is freed
+/// and becomes invalid after this call.
+void context_provider_list_add_map(void* list, void* value)
+{
+    QVariantList *qvl = reinterpret_cast<QVariantList *>(list);
+    QVariantMap *qvm = reinterpret_cast<QVariantMap *>(value);
+    qvl->append(QVariant(*qvm));
+    delete qvm;
+}
+
+/// Appends the specified list \a value to \a list.  NOTE: \a value is freed,
+/// and becomes invalid after this call.
+void context_provider_list_add_list(void* list, void* value)
+{
+    QVariantList *qvl = reinterpret_cast<QVariantList *>(list);
+    QVariantList *vl = reinterpret_cast<QVariantList *>(value);
+    qvl->append(QVariant(*vl));
+    delete vl;
+}

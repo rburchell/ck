@@ -195,6 +195,10 @@ private slots:
     void setBoolean();
     void setString();
     void setDouble();
+    void setMap();
+    void setList();
+    void testMapList1();
+    void testMapList2();
     void clearKeyOnSubscribeKey();
     void clearKeyOnSubscribeGroup();
 };
@@ -293,6 +297,68 @@ void ContextCUnitTest::setDouble()
     context_provider_install_key("Battery.OnBattery", 0, MagicCallback, this);
     context_provider_set_double("Battery.OnBattery", 1.23);
     QCOMPARE(*lastVariantSet, QVariant(1.23));
+}
+
+void ContextCUnitTest::setMap()
+{
+    context_provider_install_key("Something.Big", 0, MagicCallback, this);
+    void *map = context_provider_map_new();
+    context_provider_map_set_integer(map, "i_am_int", 123123);
+    context_provider_map_set_double(map, "i_are_baboon", 8.54);
+    context_provider_map_set_boolean(map, "i_am_weasel", false);
+    context_provider_map_set_string(map, "i_am_string", "crime and punishment");
+    context_provider_set_map("Something.Big", map, TRUE);
+    QVariantMap expected;
+    expected.insert("i_am_int", QVariant(123123));
+    expected.insert("i_are_baboon", QVariant(8.54));
+    expected.insert("i_am_weasel", QVariant(false));
+    expected.insert("i_am_string", QVariant("crime and punishment"));
+    QCOMPARE(*lastVariantSet, QVariant(expected));
+}
+
+void ContextCUnitTest::setList()
+{
+    context_provider_install_key("Something.Long", 0, MagicCallback, this);
+    void *list = context_provider_list_new();
+    context_provider_list_add_integer(list, 543);
+    context_provider_list_add_double(list, 1.4142);
+    context_provider_list_add_boolean(list, true);
+    context_provider_list_add_string(list, "catcher in the rye");
+    context_provider_set_list("Something.Long", list, TRUE);
+    QVariantList expected;
+    expected << 543 << 1.4142 << true << "catcher in the rye";
+    QCOMPARE(*lastVariantSet, QVariant(expected));
+}
+
+void ContextCUnitTest::testMapList1()
+{
+    context_provider_install_key("Anything.You.Desire", 0, MagicCallback, this);
+    void *list = context_provider_list_new();
+    context_provider_list_add_integer(list, 144);
+    void *map = context_provider_map_new();
+    context_provider_map_set_string(map, "peach", "puff");
+    context_provider_map_set_list(map, "numbers", list);
+    context_provider_set_map("Anything.You.Desire", map, TRUE);
+    QVariantMap expected;
+    expected.insert("peach", "puff");
+    expected.insert("numbers", QVariantList() << 144);
+    QCOMPARE(*lastVariantSet, QVariant(expected));
+}
+
+void ContextCUnitTest::testMapList2()
+{
+    context_provider_install_key("Copy.Paste", 0, MagicCallback, this);
+    void *map = context_provider_map_new();
+    context_provider_map_set_string(map, "peach", "puff");
+    void *list = context_provider_list_new();
+    context_provider_list_add_integer(list, 144);
+    context_provider_list_add_map(list, map);
+    context_provider_set_list("Copy.Paste", list, TRUE);
+    QVariantList expected;
+    QVariantMap emap;
+    emap.insert("peach", "puff");
+    expected << 144 << emap;
+    QCOMPARE(*lastVariantSet, QVariant(expected));
 }
 
 void ContextCUnitTest::clearKeyOnSubscribeKey()
