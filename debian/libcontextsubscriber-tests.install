@@ -1,5 +1,7 @@
 usr/share/libcontextsubscriber-tests/*.xml
 usr/share/libcontextsubscriber-tests/waitforsilence
+usr/share/libcontextsubscriber-tests/update-contextkit-providers
+usr/share/libcontextsubscriber-tests/forward-compatible
 usr/share/libcontextsubscriber-tests/commander/*.py
 usr/share/libcontextsubscriber-tests/subscription/*.py
 usr/share/libcontextsubscriber-tests/asynchronicity/*.py
@@ -8,3 +10,4 @@ usr/share/libcontextsubscriber-tests/registry/*.py
 usr/share/libcontextsubscriber-tests/pluginchanging/pluginchanging.py
 usr/share/libcontextsubscriber-tests/pluginchanging/time*.context.temp
 usr/lib/contextkit/subscriber-test-plugins/contextsubscribertime*.so
+usr/bin/check-version usr/lib/contextkit/subscriber-check-version

@@ -9,97 +9,97 @@
         <step expected_result="0">/usr/share/libcontextsubscriber-tests/waitforsilence</step>
       </pre_steps>
       <!-- At least one case per set, name mandatory, description mandatory, other optional -->
-      <case name="libsub001" description="This test verifies that the asynchronicity of the subscriber library" requirement="" timeout="20">
+      <case name="async" description="This test verifies that the asynchronicity of the subscriber library" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user; export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/asynchronicity;python /usr/share/libcontextsubscriber-tests/asynchronicity/asynchronicity.py</step>
       </case>
       <!-- At least one case per set, name mandatory, description mandatory, other optional -->
-      <case name="libsub002" description="This test verifies that properties are overriden by commander" requirement="" timeout="20">
+      <case name="commander-appearing" description="This test verifies that properties are overriden by commander" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/commander;python /usr/share/libcontextsubscriber-tests/commander/commander_appearing.py</step>
       </case>
       <!-- At least one case per set, name mandatory, description mandatory, other optional -->
-      <case name="libsub003" description="This test verifies that nonexistent properties are handled by commander" requirement="" timeout="20">
+      <case name="commander-nonexistent" description="This test verifies that nonexistent properties are handled by commander" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/commander;python /usr/share/libcontextsubscriber-tests/commander/commander_nonexistent.py</step>
       </case>
       <!-- At least one case per set, name mandatory, description mandatory, other optional -->
-      <case name="libsub004" description="This test verifies that disabling commander restore actual properties values" requirement="" timeout="20">
+      <case name="commander-disabled" description="This test verifies that disabling commander restore actual properties values" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/commander;python /usr/share/libcontextsubscriber-tests/commander/commander_disabled.py</step>
       </case>
       <!-- At least one case per set, name mandatory, description mandatory, other optional -->
-      <case name="libsub005" description="getting info from introspection API" requirement="" timeout="20">
+      <case name="registry" description="getting info from introspection API" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/registry;python /usr/share/libcontextsubscriber-tests/registry/registry.py</step>
       </case>
-      <case name="libsub006" description="This test verifies that subscription to properties" requirement="" timeout="20">
+      <case name="subscription1" description="This test verifies that subscription to properties" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py Subscription.testValue</step>
       </case>
-      <case name="libsub007" description="This test verifies that subscription to properties" requirement="" timeout="20">
+      <case name="subscription2" description="This test verifies that subscription to properties" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py Subscription.testInfos</step>
       </case>
-      <case name="libsub007b" description="Reading the type information from introspection" requirement="" timeout="20">
+      <case name="subscription3" description="Reading the type information from introspection" requirement="" timeout="20">
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py Subscription.testTypes</step>
       </case>
-      <case name="libsub007c" description="Reading the provider information from introspection" requirement="" timeout="20">
+      <case name="subscription4" description="Reading the provider information from introspection" requirement="" timeout="20">
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py Subscription.testProviders</step>
       </case>
-      <case name="libsub008" description="This test verifies that subscription to properties" requirement="" timeout="20">
+      <case name="subscription5" description="This test verifies that subscription to properties" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py Subscription.testAllDataTypes</step>
       </case>
       <!-- Environments optional - tells where the tests are run -->
-      <case name="libsub009" description="This test verifies that subscription to properties" requirement="" timeout="20">
+      <case name="subscription6" description="This test verifies that subscription to properties" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py Subscription.testTruthTypePermutations</step>
       </case>
-      <case name="libsub010" description="This test verifies that subscription to properties" requirement="" timeout="20">
+      <case name="subscription7" description="This test verifies that subscription to properties" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py Subscription.testStringTypePermutations</step>
       </case>
-      <case name="libsub011" description="This test verifies that subscription to properties" requirement="" timeout="20">
+      <case name="subscription8" description="This test verifies that subscription to properties" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py MultipleSubscribers.testInitialSubscription</step>
       </case>
-      <case name="libsub012" description="This test verifies that subscription to properties" requirement="" timeout="20">
+      <case name="subscription9" description="This test verifies that subscription to properties" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py MultipleSubscribers.testValueChanged</step>
       </case>
-      <case name="libsub013" description="This test verifies that subscription to properties" requirement="" timeout="20">
+      <case name="subscription10" description="This test verifies that subscription to properties" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py MultipleProviders.testTwoProviders</step>
       </case>
-      <case name="libsub014" description="This test verifies that subscription to properties" requirement="" timeout="20">
+      <case name="subscription11" description="This test verifies that subscription to properties" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py SubscriptionPause.testPause</step>
       </case>
-      <case name="libsub015" description="This test verifies that subscription to properties" requirement="" timeout="20">
+      <case name="subscription12" description="This test verifies that subscription to properties" requirement="" timeout="20">
         <!-- At least one step per test, expected_result optional - tells which return code is considered passed -->
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.;cd /usr/share/libcontextsubscriber-tests/subscription;python /usr/share/libcontextsubscriber-tests/subscription/subscription.py SubscriptionPause.testWaitForSubscribe</step>
       </case>
-      <case name="libsub016" description="Plugin loading of libcontextsubscriber" requirement="" timeout="20">
+      <case name="plugin" description="Plugin loading of libcontextsubscriber" requirement="" timeout="20">
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/pluginchanging;python /usr/share/libcontextsubscriber-tests/pluginchanging/pluginchanging.py</step>
       </case>
-      <case name="libsub017" description="Multiple providers"
+      <case name="multiprovider" description="Multiple providers"
 	    requirement="" timeout="20">
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/subscription; python multiprovider.py</step>
       </case>
-      <case name="libsub018" description="Rapid changes"
-	    requirement="" timeout="20">
-        <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/asynchronicity; python rapidchanges.py</step>
-      </case>
-      <case name="libsub019" description="Multiprovider timestamp"
+      <case name="multiprovider2" description="Multiprovider timestamp"
 	    requirement="" timeout="20">
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/subscription; python multiprovider2.py</step>
       </case>
-      <case name="libsub020" description="CDB database generation"
+      <case name="rapidchanges" description="Rapid changes"
+	    requirement="" timeout="20">
+        <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=.; cd /usr/share/libcontextsubscriber-tests/asynchronicity; python rapidchanges.py</step>
+      </case>
+      <case name="update-contextkit-providers" description="CDB database generation"
 	    requirement="" timeout="20">
         <step expected_result="0">cd /usr/share/libcontextsubscriber-tests/update-contextkit-providers ; ./test.sh ;</step>
       </case>
-      <case name="libsub021" description="Forward compatibility"
+      <case name="forward-compatible" description="Forward compatibility"
 	    requirement="" timeout="20">
         <step expected_result="0">cd /usr/share/libcontextsubscriber-tests/forward-compatible ; ./test.sh ;</step>
       </case>

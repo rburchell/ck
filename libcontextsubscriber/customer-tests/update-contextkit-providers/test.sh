@@ -1,17 +1,17 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 export CONTEXT_CORE_DECLARATIONS=/dev/null
 export CONTEXT_PROVIDERS=./
 
 # Remove all temp files
-function clean {
+clean() {
     `rm -f *.actual`
     `rm -f *.cdb`
 }
 
-# Compare file $1 to $2 and display diff if different
-function compare {
-    f=`diff -u "$1" "$2"`
+# compare file $1 to $2 and display diff if different
+compare() {
+    f=`cmp "$1" "$2"`
     if [ $? != 0 ] ; then
         echo "$1 and $2 differ!"
         echo "$f"
@@ -21,12 +21,12 @@ function compare {
 }
 
 # Query the database $1 using the cdb tool and echo results to $1.actual
-function querydb {
+querydb() {
     cdb -q "cache.cdb" "$1" > "$2.actual"
 }
 
 # Check the keys in the existing cache.cdb database
-function dotest {
+dotest() {
     querydb "KEYS" "KEYS"
     compare "KEYS.expected" "KEYS.actual"
 
@@ -38,27 +38,28 @@ function dotest {
 }
 
 # Ensure that the cache file permissions are ok
-function checkperm {
-    perms=`stat -c %a cache.cdb`
-    if [ "$perms" != "644" ] ; then
-        echo "Permissions of cache.db are not 644!"
+checkperm() {
+    if [ "-rw-r--r--" != "`ls -l cache.cdb | cut -c 1-10`" ] ; then
+        echo "Permissions of cache.db are not 0644!"
+        ls -l cache.cdb
         clean
         exit 128
     fi
 }
 
 BASEDIR=`dirname $0`
+PATH=../../update-contextkit-providers/.libs/:$PATH
 
 # Test using command line param
 export CONTEXT_PROVIDERS="/tmp/wrong/path"
-../../update-contextkit-providers/.libs/update-contextkit-providers "./"
+update-contextkit-providers "./"
 dotest
 checkperm
 clean
 
 # Test using env var 
 export CONTEXT_PROVIDERS="./"
-../../update-contextkit-providers/.libs/update-contextkit-providers
+update-contextkit-providers
 dotest
 checkperm
 clean
