@@ -108,6 +108,12 @@ neighborhood or campus, as a localized string.
        type="string">
     <doc>The ISO 3166 two letter country code of the country which contains the location of the device.</doc>
   </key>
+  <key name="Location.Heading"
+       type="number">
+    <doc>
+      The deviation, in degrees (0-360), from the geographical north.
+    </doc>
+  </key>
   <key name="Location.Timezone"
        type="string">
     <doc>TBD</doc>
@@ -148,9 +154,19 @@ Information about the physical position of the device.
   <key name="Position.Stable"
        type="bool">
     <doc>
-A boolean indicating whether or not the position is stable, i.e., the device does not move.
+A boolean indicating whether or not the position is stable, i.e., the
+device does not move.
     </doc>
   </key>
+  <key name="Position.Shaky"
+       type="bool">
+    <doc>
+A boolean indicating whether or not the position is shaky, i.e., the
+device is moving rapidly. Not necessarily the opposite of
+Position.Stable; both may be false simultaneously.
+    </doc>
+  </key>
+
   <doc>
 Battery
 -------
