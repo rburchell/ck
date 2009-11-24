@@ -45,7 +45,8 @@ int main(int argc, char **argv)
 
         ContextRegistryInfo *regInfo = ContextRegistryInfo::instance(backendName);
         QStringList keys = regInfo->listKeys();
-     
+        keys.sort();
+
         QRegExp rx(filter, Qt::CaseSensitive, QRegExp::Wildcard);
         QTextStream out(stdout);
         foreach (QString key, keys) {
@@ -55,9 +56,13 @@ int main(int argc, char **argv)
             if (provided && !info.provided())
                 continue;
             if (longListing) {
+                // Print the key and the type even if we don't have providers
+                if (info.providers().size() == 0)
+                    out << key << "\t" << info.typeInfo().name() << endl;
+
                 for (int i = 0; i < info.providers().size(); i++ )
-                    out << key << "\t" << info.type() << "\t" << info.providers()[i].plugin << "\t"
-                        << info.providers()[i].constructionString << "\n";
+                    out << key << "\t" << info.typeInfo().name() << "\t" << info.providers()[i].plugin << "\t"
+                        << info.providers()[i].constructionString << endl;
             } else
                 out << key << "\n";
             if (doc) {
