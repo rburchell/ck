@@ -91,7 +91,7 @@ facilities and GConf schemas need to be extended to support our
 intentional types.  Thus, purely declarative languages like these are
 also included in our list of supported languages.
 
-[source,C]
+[C]
 ----
 /* Witty example here. */
 ----

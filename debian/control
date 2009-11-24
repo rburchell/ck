@@ -3,7 +3,8 @@ Section: misc
 Priority: optional
 Maintainer: Marius Vollmer <marius.vollmer@nokia.com>
 Build-Depends: debhelper (>= 5),
-               automake1.9,
+               automake (>= 1:1.11),
+               autoconf (>= 2.63),
                python,
                python-central,
                libqt4-dev,
@@ -12,7 +13,11 @@ Build-Depends: debhelper (>= 5),
                libdbus-1-dev,
                libqjson-dev,
                xsltproc,
-               doxygen
+               doxygen,
+               pkg-config,
+               libtool (>= 2.2.6),
+               grep (>= 2.5.3),
+               asciidoc (>= 8.2.7)
 XS-Python-Version: all
 Standards-Version: 3.8.0
 

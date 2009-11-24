@@ -35,7 +35,7 @@ The property declaration file contains XML and must follow
 link:context-provider-schema.html[this XML schema].  A simple example
 for the +Example.Random+ property looks like this:
 
-[source,xml]
+[xml]
 ------------------
 <?xml version="1.0"?>
 <provider bus="session"
@@ -97,7 +97,7 @@ conforms to the Desktop Type System.
 For example, a property that is a enumeration would be declared like
 this:
 
-[source,xml]
+[xml]
 ------------------
 <key name="Economy">
   <type>
@@ -155,7 +155,7 @@ will be used to fill in the missing details.
 For example, a property declaration file for core properties could
 look like this:
 
-[source,xml]
+[xml]
 ------------------
 <?xml version="1.0"?>
 <provider bus="session"
