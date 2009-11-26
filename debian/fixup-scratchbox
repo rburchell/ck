@@ -1,0 +1,30 @@
+#! /bin/sh
+
+# XXX - this needs to run under fakeroot...
+
+if [ -e debian/fixup-scratchbox.stamp ]; then
+  exit 0;
+fi
+
+export SBOX_REDIRECT_TO_DIRS=
+export PATH=/scratchbox/compilers/bin:/bin:/usr/bin::/sbin:/usr/sbin:/scratchbox/tools/bin
+
+# prevent bash from killing the system
+rm -f /var/lib/bash/provide-sh
+
+# give tetex-bin something to remove with update-alternatives.
+# bug in dpkg.
+update-alternatives --install /usr/bin/oxdvi.bin oxdvi.bin /bin/true 0
+
+# How low can you go?
+if [ $(sb-conf show -t) != "none" -a ! -f /usr/bin/man.qemu ]; then
+  mv /usr/bin/man /usr/bin/man.qemu
+  cat >/usr/bin/man <<EOF
+#! /bin/sh
+exec /scratchbox/devkits/cputransp/bin/qemu-arm-cvs-m /usr/bin/man.qemu "\$@"
+EOF
+  chmod a+x /usr/bin/man
+fi
+
+# We can't create the stamp here since it would end up in the source package
+# touch debian/fixup-scratchbox.stamp

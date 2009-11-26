@@ -7,6 +7,13 @@
 ifneq (,$(wildcard /targets))
    export SBOX_REDIRECT_TO_DIRS=
    export PATH=/scratchbox/compilers/bin:/bin:/usr/bin:/scratchbox/tools/bin
+   rc:=$(shell debian/fixup-scratchbox >&2)
+   ifneq (,$(FAKEROOTKEY))
+     ifneq (/usr/lib/libfakeroot/libfakeroot-sysv.so,$(LD_PRELOAD))
+       export FAKEROOTKEY=$(shell /usr/bin/faked-sysv | cut -d: -f1)
+       export LD_PRELOAD=/usr/lib/libfakeroot/libfakeroot-sysv.so
+     endif
+   endif
 endif
 
 LDFLAGS+=-Wl,--as-needed
