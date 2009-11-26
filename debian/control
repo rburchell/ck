@@ -17,7 +17,9 @@ Build-Depends: debhelper (>= 5),
                pkg-config,
                libtool (>= 2.2.6),
                grep (>= 2.5.3),
-               asciidoc (>= 8.2.7)
+               asciidoc (>= 8.2.7),
+               libxml2-utils (>= 2.6),
+               libxml-dom-perl
 XS-Python-Version: all
 Standards-Version: 3.8.0
 

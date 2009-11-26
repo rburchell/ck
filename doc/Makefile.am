@@ -5,12 +5,12 @@ html_ASCIIDOCS = context-intro.txt context-providers.txt context-types.txt conte
 
 html_DATA = $(html_EXTRA) \
 	    $(html_ASCIIDOCS:.txt=.html) \
-            $(shell sed -n '/^\[dotty,/ { s/^.*,// ; s/].*// ; p }' $(html_ASCIIDOCS:%=$(srcdir)/%))
+	    fig3.png fig4.png
 
 html-local: $(html_EXTRA) $(html_ASCIIDOCS:.txt=.html)
 
 if CONTEXTKIT_BUILD_DOCS
-context-arch.html fig3.png fig4.png: context-arch.txt
+context-arch.html: context-arch.txt
 
 %.html: %.txt
 	asciidoc -a toc --unsafe -f myfilter.conf $^
