@@ -24,4 +24,5 @@ EXTRA_DIST = $(html_ASCIIDOCS) \
              protocol-suggestion.txt \
              lgpl-2.1.txt
 
-MAINTAINERCLEANFILES = $(html_DATA)
+MAINTAINERCLEANFILES =  $(html_EXTRA) \
+			$(html_ASCIIDOCS:.txt=.html)
