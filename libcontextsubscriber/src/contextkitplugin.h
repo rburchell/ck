@@ -116,6 +116,7 @@ private:
     static const QString corePrefix; ///< /org/maemo/contextkit/
 };
 
+QVariant demarshallValue(const QVariant &v);
 
 }
 

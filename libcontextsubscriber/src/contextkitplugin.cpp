@@ -266,7 +266,7 @@ void ContextKitPlugin::onDBusValuesChanged(QMap<QString, QVariant> values)
 // QDBus doesn't unmarshall non-basic types inside QVariants (since it cannot
 // know the intention), but leaves them as QDBusArguments.  Here we walk the
 // structure and unpack lists and maps.
-static QVariant demarshallValue(const QVariant &v)
+QVariant demarshallValue(const QVariant &v)
 {
     if (v.userType() != qMetaTypeId<QDBusArgument>())
         return v;

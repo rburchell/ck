@@ -47,6 +47,7 @@
 #include "safedbuspendingcallwatcher.h"
 #include "sconnect.h"
 #include "logging.h"
+#include "contextkitplugin.h"
 #include <QDebug>
 #include <QDBusConnection>
 #include <QDBusPendingReply>
@@ -106,7 +107,12 @@ void SubscriberInterface::unsubscribe(QSet<QString> keys)
 /// Processes the results of the Changed signal which comes over DBus.
 void SubscriberInterface::onChanged(const QMap<QString, QVariant> &values, const QStringList& unknownKeys)
 {
-    QMap<QString, QVariant> copy = values;
+    QMapIterator<QString, QVariant> it(values);
+    QMap<QString, QVariant> copy;
+    while (it.hasNext()) {
+        it.next();
+        copy.insert(it.key(), demarshallValue(it.value()));
+    }
     emit valuesChanged(mergeNullsWithMap(copy, unknownKeys));
 }
 
