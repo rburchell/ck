@@ -2,6 +2,7 @@ SUBDIRS = src unit-tests customer-tests cli cls update-contextkit-providers doc 
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextsubscriber-1.0.pc
+noinst_DATA = contextsubscriber-1.0-uninstalled.pc
 
 check-sum:
 	$(MAKE) -C unit-tests check-sum

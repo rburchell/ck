@@ -8,5 +8,5 @@ Description: ContextKit Context Subscriber library
 Version: uninstalled
 Requires: QtCore
 Requires.private: QtDBus QtXml
-Libs: -L${libdir} -lcontextsubscriber
+Libs: -L${libdir} -L${libdir}/.libs -lcontextsubscriber
 Cflags: -I${includedir}
