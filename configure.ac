@@ -31,7 +31,7 @@ AC_CHECK_LIB([cdb], [cdb_make_start], [CDB_LIBS=-lcdb], [AC_MSG_ERROR([Can't fin
 AC_SUBST([CDB_LIBS])
 
 # tools for documentation
-AX_FEATURE_DISABLEABLE([doc], [BUILD_DOCS], [disable building of documentation])
+AX_FEATURE_OPTIONAL([doc], [BUILD_DOCS], [disable building of documentation])
 AX_DISABLE_FEATURE_ON_PROG([Asciidoc], [BUILD_DOCS], [ASCIIDOC], [asciidoc], [8.2.7])
 AX_DISABLE_FEATURE_ON_PROG([xsltproc], [BUILD_DOCS], [XSLTPROC], [xsltproc])
 AX_DISABLE_FEATURE_ON_PROG([xmllint], [BUILD_DOCS], [XMLLINT], [xmllint])
@@ -41,7 +41,7 @@ AX_PROG_PERL_MODULES([XML::DOM], ,
 AM_CONDITIONAL([CONTEXTKIT_BUILD_DOCS], [test "$missing_deps_BUILD_DOCS" = ""])
 
 # coverage tools
-AX_FEATURE_DISABLEABLE([coverage], [COVERAGE], [disable unittests' coverage support])
+AX_FEATURE_OPTIONAL([coverage], [COVERAGE], [disable unittests' coverage support])
 AX_DISABLE_FEATURE_ON_PROG([GCov coverage recording tool], [COVERAGE], [GCOV], [gcov])
 AX_DISABLE_FEATURE_ON_PROG([LCov coverage visualization tool], [COVERAGE], [LCOV], [lcov])
 AM_CONDITIONAL([CONTEXTKIT_COVERAGE], [test "$missing_deps_COVERAGE" = ""])

@@ -10,8 +10,8 @@ dnl Creates a command line parameter --disable-OPTIONNAME, which if
 dnl specified by the user adds a fake dependency to
 dnl missing_deps_CONDITIONALFEATURE.
 dnl
-dnl Usage: AX_FEATURE_DISABLEABLE([$1=option name], [$2=conditional feature], [$3=description])
-AC_DEFUN([AX_FEATURE_DISABLEABLE], [
+dnl Usage: AX_FEATURE_OPTIONAL([$1=option name], [$2=conditional feature], [$3=description])
+AC_DEFUN([AX_FEATURE_OPTIONAL], [
 AC_ARG_ENABLE([$1],
      AS_HELP_STRING([--disable-$1],
                     [$3 [[default=no]]]),,
