@@ -162,7 +162,7 @@ Description: libcontextsubscriber automated customer tests
 Package: propertymonitor-tests
 Section: devel
 Architecture: any
-Depends: contextkit-utils, python (>= 2.5)
+Depends: contextkit-utils, python (>= 2.5), python-contextkit
 XB-Maemo-CI-Stage: staging, validation
 Description: Property monitor
  This package contains an automated test suite for monitoring which Context FW properties are provided.
