@@ -168,6 +168,13 @@ void ContextKitPlugin::onDBusGetSubscriberFinished(QDBusObjectPath objectPath)
 
 void ContextKitPlugin::onDBusGetSubscriberFailed(QDBusError err)
 {
+    if (err.type() != QDBusError::UnknownObject) {
+        contextWarning() <<
+            "D-Bus failed for: " + busName + ", error: " +
+            err.message();
+        emit failed("D-Bus error while trying old protocol " + busName);
+        return;
+    }
     contextWarning() <<
         "Trying new protocol, old failed for: " + busName + ", error: " +
         err.message();
