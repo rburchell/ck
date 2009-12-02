@@ -248,12 +248,6 @@ void CommandWatcher::setTypeCommand(QStringList &args)
         return;
     }
     types.insert(key, typeInfo);
-
-    // If service is already started then it has to be restarted after
-    // a property is added.  In commander mode if the property is
-    // already provided with a proxy, then no restart is necessary.
-    if (started && (busName != commanderBusName || !proxies.contains(key)))
-        restartCommand();
 }
 
 void CommandWatcher::delCommand(const QStringList &args)
