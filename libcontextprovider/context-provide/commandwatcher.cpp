@@ -435,8 +435,8 @@ void CommandWatcher::unsetCommand(const QStringList& args)
 
 void CommandWatcher::restartCommand()
 {
-    Service service(busType, busName);
-    service.stop(); // this is harmless if we are not started yet, but useful if we are
+    Service service(busType, busName, false);
+    if (started) service.stop();
     if (!service.start()) {
         qDebug() << "Starting service failed, no D-Bus or the service name is already taken";
         exit(2);
