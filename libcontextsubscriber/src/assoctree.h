@@ -23,10 +23,7 @@
 #define ASSOCTREE_H
 
 #include <QVariant>
-#include <QStringList>
 #include <QObject>
-#include <QXmlDefaultHandler>
-#include <QStack>
 
 class AssocTree : public QVariant
 {
