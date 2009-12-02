@@ -309,7 +309,9 @@ ContextRealLogger::ContextRealLogger(int type, const char *module, const char *f
 
     // Add timestamp
     if (! hideTimestamps && ! vanilla)
-        *this << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss").toLocal8Bit().data();
+        *this << QDateTime::currentDateTime().toString("yyyy-MM-dd").toLocal8Bit().data();
+    if (! hideTimestamps)
+        *this << QDateTime::currentDateTime().toString("hh:mm:ss").toLocal8Bit().data();
 
     // Module name
     if (! vanilla)
