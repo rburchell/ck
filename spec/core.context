@@ -52,10 +52,11 @@ Location
 Best effort location information. If any of the keys are not
 appliciable to the current location, they will be unavailable.
   </doc>
-  <key name="Location.CurrentSource"
-       type="location-source">
+  <key name="Location.SatPositioningOn"
+       type="bool">
     <doc>
-      The current source of location information as an enumeration of strings.
+      A boolean indicating whether or not the location information is provided by
+      satellite positioning system e.g. GPS.
     </doc>
   </key>
   <key name="Location.ActiveSources">
@@ -64,6 +65,12 @@ appliciable to the current location, they will be unavailable.
     </type>
     <doc>
       List of active sources of location information.
+    </doc>
+  </key>
+  <key name="Location.Accuracy"
+       type="distance">
+    <doc>
+      Accuracy of the location information, in meters.
     </doc>
   </key>
   <key name="Location.Coordinates">
