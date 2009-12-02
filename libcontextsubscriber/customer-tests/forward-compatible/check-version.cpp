@@ -61,8 +61,9 @@ int main(int argc, char **argv)
         fail();
     }
 
-    for (int i = 0; i < 1000; i++)
-        app.processEvents();
+    sleep(1);
+
+    app.processEvents(QEventLoop::AllEvents | QEventLoop::WaitForMoreEvents, 1000);
 
     ContextPropertyInfo info2("Battery.OnBattery");
     if (info2.provided() == true) {
