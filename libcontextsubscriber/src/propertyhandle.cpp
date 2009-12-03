@@ -42,7 +42,7 @@ namespace ContextSubscriber {
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
 static const QString commanderDBusName = "org.freedesktop.ContextKit.Commander";
-static const ContextProviderInfo commanderInfo("contextkit-dbus", "session:org.freedesktop.ContextKit.Commander");
+const ContextProviderInfo PropertyHandle::commanderInfo("contextkit-dbus", "session:org.freedesktop.ContextKit.Commander");
 
 DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusType, commanderDBusName);
 bool PropertyHandle::commandingEnabled = true;

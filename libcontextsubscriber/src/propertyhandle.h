@@ -30,6 +30,7 @@
 #include <QMutex>
 
 class ContextPropertyInfo;
+class ContextProviderInfo;
 
 namespace ContextSubscriber {
 
@@ -50,6 +51,7 @@ public:
     const ContextPropertyInfo* info() const;
 
     static PropertyHandle* instance(const QString& key);
+    static const ContextProviderInfo commanderInfo;
 
     void onValueChanged();
     void setSubscribeFinished(Provider *provider);
@@ -65,7 +67,7 @@ private slots:
 private:
     PropertyHandle(const QString& key);
 
-	QSet<Provider*> pendingSubscriptions; ///< Providers pending subscription
+        QSet<Provider*> pendingSubscriptions; ///< Providers pending subscription
     QList<Provider*> myProviders; ///< Providers of this property
     ContextPropertyInfo *myInfo; ///< Metadata for this property
     unsigned int subscribeCount; ///< Number of subscribed ContextProperty objects subscribed to this property

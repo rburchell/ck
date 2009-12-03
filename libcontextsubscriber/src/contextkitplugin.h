@@ -69,6 +69,7 @@ public:
     ContextKitPlugin(const QDBusConnection bus, const QString& busName);
     void subscribe(QSet<QString> keys);
     void unsubscribe(QSet<QString> keys);
+    void setDefaultNewProtocol(bool s);
 
 signals:
 #ifdef DOXYGEN_ONLY
@@ -97,6 +98,7 @@ private:
     static QString pathToKey(QString key);
 
     void reset();
+    void useNewProtocol();
 
     QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
 
@@ -107,7 +109,8 @@ private:
     QDBusConnection *connection; ///< The connection to DBus
     QString busName; ///< The D-Bus service name of the ContextKit provider connected to
 
-    bool newProtocol; ///< The provider on D-Bus speaks the new protocol only.
+    bool newProtocol; ///< The current provider on D-Bus speaks the new protocol only.
+    bool defaultNewProtocol; ///< Let's only try the new protocol to talk with the provider.
 
     static const QString managerIName; ///< org.freedesktop.ContextKit.Manager
     static const QString subscriberIName; ///< org.freedesktop.ContextKit.Subscriber

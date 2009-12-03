@@ -23,6 +23,7 @@
 #include "logging.h"
 #include "subscriberinterface.h"
 #include "sconnect.h"
+#include "propertyhandle.h"
 #include <QStringList>
 #include <QDBusPendingCall>
 #include <QTimer>
@@ -37,9 +38,13 @@ ContextSubscriber::IProviderPlugin* contextKitPluginFactory(QString construction
         contextCritical() << "Bad syntax for contextkit-dbus plugin:" << constructionString;
         return 0;
     }
-    if (constr[0] == "session")
-        return new ContextSubscriber::ContextKitPlugin(QDBusConnection::sessionBus(), constr[1]);
-    else if (constr[0] == "system")
+    if (constr[0] == "session") {
+        ContextSubscriber::ContextKitPlugin* ret =
+            new ContextSubscriber::ContextKitPlugin(QDBusConnection::sessionBus(), constr[1]);
+        if (constructionString == ContextSubscriber::PropertyHandle::commanderInfo.constructionString)
+            ret->setDefaultNewProtocol(false);
+        return ret;
+    } else if (constr[0] == "system")
         return new ContextSubscriber::ContextKitPlugin(QDBusConnection::systemBus(), constr[1]);
 
     contextCritical() << "Unknown bus type: " << constructionString;
@@ -92,7 +97,8 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
       subscriberInterface(0),
       managerInterface(0),
       connection(new QDBusConnection(bus)),
-      busName(busName)
+      busName(busName),
+      defaultNewProtocol(true)
 {
     reset();
     // Notice if the provider on the dbus comes and goes
@@ -106,6 +112,10 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
     // the provider at startup, whether it's present or not.
     providerListener->startListening(false);
     QMetaObject::invokeMethod(this, "onProviderAppeared", Qt::QueuedConnection);
+}
+
+void ContextKitPlugin::setDefaultNewProtocol(bool s) {
+    defaultNewProtocol = s;
 }
 
 void ContextKitPlugin::reset()
@@ -126,6 +136,10 @@ void ContextKitPlugin::onProviderAppeared()
     contextDebug() << "Provider appeared:" << busName;
 
     reset();
+    if (defaultNewProtocol) {
+        useNewProtocol();
+        return;
+    }
     managerInterface = new AsyncDBusInterface(busName, managerPath, managerIName, *connection, this);
     if (!managerInterface->callWithCallback("GetSubscriber",
                                             QList<QVariant>(),
@@ -179,6 +193,11 @@ void ContextKitPlugin::onDBusGetSubscriberFailed(QDBusError err)
         "Trying new protocol, old failed for: " + busName + ", error: " +
         err.message();
     reset();
+    useNewProtocol();
+}
+
+void ContextKitPlugin::useNewProtocol()
+{
     newProtocol = true;
 
     // connect to dbus value changes too!
