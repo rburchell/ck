@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <testdefinition version="0.1">
   <!-- Test suite, name mandatory - the same as test package name -->
-  <suite name="libcontextsubscriber-tests">
+  <suite name="libcontextsubscriber-tests" domain="Application Framework">
     <!-- At least one set per suite, name and description mandatory -->
-    <set name="libcontextsubscriber suite" description="libcontextsubscriber tests">
+    <set name="libcontextsubscriber-suite" description="libcontextsubscriber tests">
       <!-- Possibly some pre-steps to execute before running the test cases -->
       <pre_steps>
         <step expected_result="0">/usr/share/libcontextsubscriber-tests/waitforsilence</step>
