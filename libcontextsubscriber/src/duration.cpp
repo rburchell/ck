@@ -68,6 +68,8 @@ Duration::Duration(const QString &duration)
         qint64 nanosec_min = list.at(4).toLongLong()*NANOSECS_PER_MIN;
         qint64 nanosec_sec = list.at(5).toLongLong()*NANOSECS_PER_SEC;
         *this = Duration(nanosec_year+nanosec_week+nanosec_day+nanosec_hour+nanosec_min+nanosec_sec);
+    } else {
+        totalNanoSecs_p = 0;
     }
 }
 
