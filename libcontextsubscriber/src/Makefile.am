@@ -22,7 +22,7 @@ includecontextsubscriber_HEADERS = contextproperty.h			\
 	contextpropertyinfo.h contextregistryinfo.h iproviderplugin.h	\
 	contextproviderinfo.h asyncdbusinterface.h timedvalue.h		\
 	contexttypeinfo.h contexttypeinfo.cpp				\
-	contexttyperegistryinfo.h assoctree.h duration.h
+	contexttyperegistryinfo.h assoctree.h duration.h contextjson.h
 
 AM_CXXFLAGS = -I$(top_srcdir)/common \
 	      $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\

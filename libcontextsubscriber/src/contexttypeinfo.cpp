@@ -244,7 +244,8 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
     return true;
 }
 
-bool ContextTypeInfo::hasBase(QString wanted, int depth) const {
+bool ContextTypeInfo::hasBase(QString wanted, int depth) const
+{
     if (name() == wanted)
         return true;
 

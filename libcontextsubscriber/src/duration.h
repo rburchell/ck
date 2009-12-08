@@ -30,9 +30,7 @@ class Duration
 
 public:
     Duration();
-    Duration(const Duration &val);
     Duration(qint64 nanoSecs);
-    ~Duration();
 
     int nanoSecs() const;
     int seconds() const;

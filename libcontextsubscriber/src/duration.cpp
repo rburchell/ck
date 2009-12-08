@@ -56,22 +56,6 @@ Duration::Duration()
     totalNanoSecs_p = -1;
 }
 
-Duration::Duration(const Duration &val)
-{
-    totalNanoSecs_p = val.totalNanoSecs_p;
-    nanoSecs_p = val.nanoSecs_p;
-    seconds_p = val.seconds_p;
-    minutes_p = val.minutes_p;
-    hours_p = val.hours_p;
-    days_p = val.days_p;
-    weeks_p = val.weeks_p;
-    years_p = val.years_p;
-}
-
-Duration::~Duration()
-{
-}
-
 int Duration::nanoSecs() const
 {
     return totalNanoSecs_p%(NANOSECS_PER_SEC);

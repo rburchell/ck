@@ -1,0 +1,44 @@
+/*
+ * Copyright (C) 2008, 2009 Nokia Corporation.
+ *
+ * Contact: Marius Vollmer <marius.vollmer@nokia.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * version 2.1 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA
+ *
+ */
+
+#include <QString>
+#include <QVariant>
+#include <qjson/serializer.h>
+namespace ContextSubscriber {
+
+// Please note that it is intentional that this header file contains
+// implementation.  This way libcontextsubscriber doesn't have to link
+// against libqjson (this would be one more extra dependency), but
+// only relatively rare users of this feature have to.
+
+/// Dumps a QVariant into a QString in JSON format.  This is very
+/// useful if the value is quite complex (list of maps of lists) and
+/// you would like to see it for debugging reasons.
+///
+/// If you use this function, you have to add libqjson to the list of
+/// libraries you link against.
+
+QString qVariantToJSON(const QVariant &v) {
+    QJson::Serializer serializer;
+    return serializer.serialize(v);
+}
+
+} // namespace

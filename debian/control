@@ -129,6 +129,7 @@ Description: Helper library for subscribers of context properties
 
 Package: libcontextsubscriber-dev
 Section: libdevel
+Suggests: libqjson-dev
 Architecture: any
 Depends: libcontextsubscriber0 (= ${binary:Version}), libqt4-dev
 Description: Helper library for subscribers of context properties
