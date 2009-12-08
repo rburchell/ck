@@ -1,6 +1,9 @@
 contextkit (0.5.3~unreleased) unstable; urgency=low
 
-  * 
+  * deprecated the old D-Bus protocol on the subscriber side, now it is
+    only tried for talking to the commander, not for regular providers.
+  
+  Implemented: Swp#CntFr-386
 
  -- Gergely Risko <gergely+context@risko.hu>  Fri, 27 Nov 2009 12:04:30 +0200
 
