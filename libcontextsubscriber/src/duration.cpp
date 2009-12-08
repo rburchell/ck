@@ -37,7 +37,7 @@ const qint64 Duration::SECS_PER_DAY;
 const qint64 Duration::DAYS_PER_YEAR;
 const qint64 Duration::DAYS_PER_WEEK;
 
-Duration::Duration(qint64 nanoSecs) : totalNanoSecs_p(nanoSecs)
+Duration::Duration(quint64 nanoSecs) : totalNanoSecs_p(nanoSecs)
 {
     QTime reftime = QTime().addMSecs((nanoSecs/NANOSECS_PER_MSEC)% MSECS_PER_DAY);
     quint64 days = nanoSecs/NANOSECS_PER_DAY;
@@ -51,9 +51,33 @@ Duration::Duration(qint64 nanoSecs) : totalNanoSecs_p(nanoSecs)
     years_p = days/DAYS_PER_YEAR;
 }
 
+Duration::Duration(const QString &duration)
+{
+    QRegExp re("(?:(\\d+)Y)?\\s*(?:(\\d+)W)?\\s*(?:(\\d+)D)?\\s*(?:(\\d+)H)?\\s*(?:(\\d+)M)?\\s*(?:(\\d+)S)?");
+    re.setCaseSensitivity(Qt::CaseInsensitive);
+
+    if (re.exactMatch(duration.simplified()) && re.matchedLength()){
+        QStringList list;
+        list = re.capturedTexts();
+        list.removeFirst();
+
+        qint64 nanosec_year = list.at(0).toLongLong()*(52*NANOSECS_PER_WEEK+NANOSECS_PER_DAY);
+        qint64 nanosec_week = list.at(1).toLongLong()*NANOSECS_PER_WEEK;
+        qint64 nanosec_day = list.at(2).toLongLong()*NANOSECS_PER_DAY;
+        qint64 nanosec_hour = list.at(3).toLongLong()*NANOSECS_PER_HOUR;
+        qint64 nanosec_min = list.at(4).toLongLong()*NANOSECS_PER_MIN;
+        qint64 nanosec_sec = list.at(5).toLongLong()*NANOSECS_PER_SEC;
+        *this = Duration(nanosec_year+nanosec_week+nanosec_day+nanosec_hour+nanosec_min+nanosec_sec);
+    }
+}
+
+bool Duration::operator==(const Duration &other) const {
+    return (totalNanoSecs_p == other.totalNanoSecs_p);
+}
+
 Duration::Duration()
 {
-    totalNanoSecs_p = -1;
+    totalNanoSecs_p = 0;
 }
 
 int Duration::nanoSecs() const
@@ -128,30 +152,9 @@ QString Duration::toString() const
     return retval.simplified();
 }
 
-Duration Duration::fromString(const QString &duration)
-{
-    QRegExp re("(?:(\\d+)Y)?\\s*(?:(\\d+)W)?\\s*(?:(\\d+)D)?\\s*(?:(\\d+)H)?\\s*(?:(\\d+)M)?\\s*(?:(\\d+)S)?");
-    re.setCaseSensitivity(Qt::CaseInsensitive);
-
-    if (re.exactMatch(duration.simplified()) && re.matchedLength()){
-        QStringList list;
-        list = re.capturedTexts();
-        list.removeFirst();
-
-        qint64 nanosec_year = list.at(0).toLongLong()*(52*NANOSECS_PER_WEEK+NANOSECS_PER_DAY);
-        qint64 nanosec_week = list.at(1).toLongLong()*NANOSECS_PER_WEEK;
-        qint64 nanosec_day = list.at(2).toLongLong()*NANOSECS_PER_DAY;
-        qint64 nanosec_hour = list.at(3).toLongLong()*NANOSECS_PER_HOUR;
-        qint64 nanosec_min = list.at(4).toLongLong()*NANOSECS_PER_MIN;
-        qint64 nanosec_sec = list.at(5).toLongLong()*NANOSECS_PER_SEC;
-        return Duration(nanosec_year+nanosec_week+nanosec_day+nanosec_hour+nanosec_min+nanosec_sec);
-    }
-    else return Duration();
-}
-
 bool Duration::isNull() const
 {
-    return totalNanoSecs_p == -1;
+    return totalNanoSecs_p == 0;
 }
 
 bool Duration::isValid() const
@@ -159,7 +162,7 @@ bool Duration::isValid() const
     return !isNull();
 }
 
-qint64 Duration::toNanoSeconds() const
+quint64 Duration::toNanoSeconds() const
 {
     return totalNanoSecs_p;
 }

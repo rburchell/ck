@@ -30,7 +30,8 @@ class Duration
 
 public:
     Duration();
-    Duration(qint64 nanoSecs);
+    Duration(quint64 nanoSecs);
+    Duration(const QString &duration);
 
     int nanoSecs() const;
     int seconds() const;
@@ -39,13 +40,13 @@ public:
     int days() const;
     int weeks() const;
     int years() const;
-    static Duration fromString(const QString &duration);
     QString toString() const;
     bool isNull() const;
     bool isValid() const;
-    qint64 toNanoSeconds() const;
-    static bool isDuration(const QString &duration);
+    quint64 toNanoSeconds() const;
+    bool operator==(const Duration &other) const;
 
+    static bool isDuration(const QString &duration);
     static const qint64 NANOSECS_PER_MSEC = Q_INT64_C(1000000);
     static const qint64 NANOSECS_PER_SEC = 1000*NANOSECS_PER_MSEC;
     static const qint64 NANOSECS_PER_MIN = 60*NANOSECS_PER_SEC;
@@ -58,7 +59,7 @@ public:
     static const qint64 DAYS_PER_WEEK = 7;
 
 private:
-    qint64 totalNanoSecs_p;
+    quint64 totalNanoSecs_p;
     int nanoSecs_p;
     int seconds_p;
     int minutes_p;
