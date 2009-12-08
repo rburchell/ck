@@ -41,8 +41,6 @@ public:
     int weeks() const;
     int years() const;
     QString toString() const;
-    bool isNull() const;
-    bool isValid() const;
     quint64 toNanoSeconds() const;
     bool operator==(const Duration &other) const;
 

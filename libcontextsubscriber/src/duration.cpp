@@ -61,7 +61,7 @@ const qint64 Duration::SECS_PER_DAY;
 const qint64 Duration::DAYS_PER_YEAR;
 const qint64 Duration::DAYS_PER_WEEK;
 
-/// Constructs a null Duration. A null Duration is invalid.
+/// Constructs a Duration with an initial value of 0
 Duration::Duration()
 {
     totalNanoSecs_p = 0;
@@ -187,17 +187,6 @@ QString Duration::toString() const
         retval.append(QString("0S"));
     }
     return retval.simplified();
-}
-
-/// Returns true if the Duration is null. A null Duration is invalid.
-bool Duration::isNull() const
-{
-    return totalNanoSecs_p == 0;
-}
-/// Returns true if the Duration is not valid.
-bool Duration::isValid() const
-{
-    return !isNull();
 }
 
 /// Returns the Duration expressed in nanoseconds
