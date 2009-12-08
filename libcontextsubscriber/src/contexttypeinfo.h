@@ -37,7 +37,18 @@ public:
     ContextTypeInfo ensureNewTypes();
     bool typeCheck(const QVariant &value) const;
 
-    QString name() const { return AssocTree::name(); }
+    bool hasBase(QString wanted, int depth = 10) const {
+        if (name() == wanted)
+            return true;
+
+        if (base() == AssocTree())
+            return false;
+
+        if (depth == 0)
+            return false;
+
+        return base().hasBase(wanted, depth-1);
+    }
     QVariantList parameters() const { return nodes(); }
     QVariant parameterValue(QString p) const { return value(p); }
     AssocTree parameterNode(QString p) const { return node(p); }
