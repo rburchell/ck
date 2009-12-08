@@ -14,14 +14,15 @@ libcontextsubscriber_la_SOURCES = contextproperty.cpp			\
 	iproviderplugin.h contextproviderinfo.h nanoxml.h nanoxml.cpp	\
 	asyncdbusinterface.cpp timedvalue.h contexttypeinfo.cpp		\
 	contexttypeinfo.h contexttyperegistryinfo.cpp			\
-	contexttyperegistryinfo.h assoctree.h assoctree.cpp
+	contexttyperegistryinfo.h assoctree.h assoctree.cpp duration.h  \
+	duration.cpp
 
 includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h			\
 	contextpropertyinfo.h contextregistryinfo.h iproviderplugin.h	\
 	contextproviderinfo.h asyncdbusinterface.h timedvalue.h		\
 	contexttypeinfo.h contexttypeinfo.cpp				\
-	contexttyperegistryinfo.h assoctree.h
+	contexttyperegistryinfo.h assoctree.h duration.h
 
 AM_CXXFLAGS = -I$(top_srcdir)/common \
 	      $(QtCore_CFLAGS) $(QtXml_CFLAGS) $(QtDBus_CFLAGS)	\
