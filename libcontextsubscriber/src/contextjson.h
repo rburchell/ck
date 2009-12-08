@@ -19,9 +19,14 @@
  *
  */
 
+#ifndef CONTEXTJSON_H
+#define CONTEXTJSON_H
+
 #include <QString>
 #include <QVariant>
 #include <qjson/serializer.h>
+#include <qjson/parser.h>
+
 namespace ContextSubscriber {
 
 // Please note that it is intentional that this header file contains
@@ -35,10 +40,22 @@ namespace ContextSubscriber {
 ///
 /// If you use this function, you have to add libqjson to the list of
 /// libraries you link against.
-
-QString qVariantToJSON(const QVariant &v) {
+static QString qVariantToJSON(const QVariant &v) {
     QJson::Serializer serializer;
     return serializer.serialize(v);
 }
 
+/// Loads json data into a QVariant.  On parse error it returns QVariant().
+static QVariant jsonToQVariant(const QString &s) {
+    QJson::Parser parser;
+    bool ok;
+    QVariant v = parser.parse(s.toUtf8(), &ok);
+    if (ok)
+        return QVariant(v);
+    else
+        return QVariant();
+}
+
 } // namespace
+
+#endif
