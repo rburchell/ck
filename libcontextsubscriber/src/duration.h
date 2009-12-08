@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2008,2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -59,14 +59,14 @@ public:
     static const qint64 DAYS_PER_WEEK = 7;
 
 private:
-    quint64 totalNanoSecs_p;
-    int nanoSecs_p;
-    int seconds_p;
-    int minutes_p;
-    int hours_p;
-    int days_p;
-    int weeks_p;
-    int years_p;
+    quint64 totalNanoSecs_p;///the duration expressed in nanoseconds
+    int nanoSecs_p;///the number of nanoseconds in the duration
+    int seconds_p;///the number of seconds in the duration
+    int minutes_p;///the number of minutes in the duration
+    int hours_p;///the number of hours in the duration
+    int days_p;///the number of days in the duration
+    int weeks_p;///the number of weeks in the duration
+    int years_p;///the number of years in the duration
 
 };
 Q_DECLARE_METATYPE(Duration)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2008,2009 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -26,6 +26,30 @@
 
 #include "duration.h"
 
+/*!
+  \class Duration
+
+  \brief The Duration class represents a period of elapsed time between two events.
+
+  A Duration object is created either by giving the number of nanoseconds explicitly or a string representation of a Duration.
+
+  The Duration object assumes the following definitions:
+
+  A year   = 52 weeks and 1 day OR 365 days
+
+  A week   = 7 days
+
+  A day    = 24 hours
+
+  A hour   = 60 minutes
+
+  A minute = 60 seconds
+
+  A second = 10e9 nanoseconds
+
+*/
+
+///Convenient time conversions
 const qint64 Duration::NANOSECS_PER_MSEC;
 const qint64 Duration::NANOSECS_PER_SEC;
 const qint64 Duration::NANOSECS_PER_MIN;
@@ -37,6 +61,13 @@ const qint64 Duration::SECS_PER_DAY;
 const qint64 Duration::DAYS_PER_YEAR;
 const qint64 Duration::DAYS_PER_WEEK;
 
+/// Constructs a null Duration. A null Duration is invalid.
+Duration::Duration()
+{
+    totalNanoSecs_p = 0;
+}
+
+/// Constructs a Duration with the given number of nanoseconds
 Duration::Duration(quint64 nanoSecs) : totalNanoSecs_p(nanoSecs)
 {
     QTime reftime = QTime().addMSecs((nanoSecs/NANOSECS_PER_MSEC)% MSECS_PER_DAY);
@@ -51,6 +82,7 @@ Duration::Duration(quint64 nanoSecs) : totalNanoSecs_p(nanoSecs)
     years_p = days/DAYS_PER_YEAR;
 }
 
+/// Constructs a copy of the other Duration.
 Duration::Duration(const QString &duration)
 {
     QRegExp re("(?:(\\d+)Y)?\\s*(?:(\\d+)W)?\\s*(?:(\\d+)D)?\\s*(?:(\\d+)H)?\\s*(?:(\\d+)M)?\\s*(?:(\\d+)S)?");
@@ -72,51 +104,54 @@ Duration::Duration(const QString &duration)
         totalNanoSecs_p = 0;
     }
 }
-
+/// Returns true if this Duration is equal to the other Duration
 bool Duration::operator==(const Duration &other) const {
     return (totalNanoSecs_p == other.totalNanoSecs_p);
 }
 
-Duration::Duration()
-{
-    totalNanoSecs_p = 0;
-}
-
+/// Returns the number of nanoseconds in the duration
 int Duration::nanoSecs() const
 {
     return totalNanoSecs_p%(NANOSECS_PER_SEC);
 }
 
+/// Returns the number of seconds in the duration
 int Duration::seconds() const
 {
     return seconds_p;
 }
 
+/// Returns the number of minutes in the duration
 int Duration::minutes() const
 {
     return minutes_p;
 }
 
+/// Returns the number of hours in the duration
 int Duration::hours() const
 {
     return hours_p;
 }
 
+/// Returns the number of days in the duration
 int Duration::days() const
 {
     return days_p;
 }
 
+/// Returns the number of weeks in the duration
 int Duration::weeks() const
 {
     return weeks_p;
 }
 
+/// Returns the number of years in the duration
 int Duration::years() const
 {
     return years_p;
 }
-
+/// Returns a string representation of the duration
+/// using the following format: Y W D H M S
 QString Duration::toString() const
 {
     QString retval;
@@ -154,21 +189,24 @@ QString Duration::toString() const
     return retval.simplified();
 }
 
+/// Returns true if the Duration is null. A null Duration is invalid.
 bool Duration::isNull() const
 {
     return totalNanoSecs_p == 0;
 }
-
+/// Returns true if the Duration is not valid.
 bool Duration::isValid() const
 {
     return !isNull();
 }
 
+/// Returns the Duration expressed in nanoseconds
 quint64 Duration::toNanoSeconds() const
 {
     return totalNanoSecs_p;
 }
 
+/// Returns true if the string format used to represent the Duration is valid i.e. Y W D H M S , each being optional
 bool Duration::isDuration(const QString &duration)
 {
     QRegExp re("(?:(\\d+)Y)?\\s*(?:(\\d+)W)?\\s*(?:(\\d+)D)?\\s*(?:(\\d+)H)?\\s*(?:(\\d+)M)?\\s*(?:(\\d+)S)?");
