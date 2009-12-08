@@ -15,7 +15,7 @@ Fundamental types
       Any representable value.
     </doc>
   </type>
-  
+
   <type name="bool" base="value">
     <doc>
       A boolean.
@@ -33,7 +33,7 @@ Fundamental types
       "int32", "uint32", "int64", "uint64", or "double".
     </doc>
   </type>
-  
+
   <type name="integer" base="number">
     <params>
       <min doc="Lower bound" type="number"/>
@@ -46,13 +46,13 @@ Fundamental types
       the range of the integer.
     </doc>
   </type>
-  
+
   <type name="string" base="value">
     <doc>
       A string.
     </doc>
   </type>
-  
+
   <type name="list" base="value">
     <params>
       <min  doc="Minimum length" type="integer"/>
@@ -68,7 +68,7 @@ Fundamental types
       "value".
     </doc>
   </type>
-  
+
   <type name="map" base="value">
     <params>
       <rest doc="The allowed keys"/>
@@ -88,7 +88,7 @@ Fundamental types
       When no parameters are given, all keys are allowed.
     </doc>
   </type>
-  
+
   <doc>
 Generic types
 -------------
@@ -182,28 +182,28 @@ Specific types
       of the association tree are the parameters.
     </doc>
   </type>
-  
+
   <type name="temperature"
         doc="A temperature in Kelvin.">
     <base>
       <number min="0"/>
     </base>
   </type>
-  
+
   <type name="energy"
         base="number">
     <doc>
       An amount of energy, in Joule.
     </doc>
   </type>
-  
+
   <type name="power"
         base="number">
     <doc>
       A power, in Watt.
     </doc>
   </type>
-  
+
   <type name="time"
         base="integer">
     <doc>
@@ -211,14 +211,21 @@ Specific types
       00:00 January 1, 1970, UTC.
     </doc>
   </type>
-  
+
+  <type name="distance"
+        base="integer">
+    <doc>
+      A physical length between two points, in meters.
+    </doc>
+  </type>
+
   <type name="duration"
         base="integer">
     <doc>
       A time duration, in nano-seconds.
     </doc>
   </type>
-  
+
   <type name="percentage">
     <base>
       <integer min="0" max="100"/>
