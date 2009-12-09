@@ -1,3 +1,9 @@
+contextkit (0.5.4~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 09 Dec 2009 11:49:06 +0200
+
 contextkit (0.5.3) unstable; urgency=low
 
   * deprecated the old D-Bus protocol on the subscriber side, now it is
