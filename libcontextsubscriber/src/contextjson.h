@@ -27,6 +27,13 @@
 #include <qjson/serializer.h>
 #include <qjson/parser.h>
 
+// stolen from glib
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+#define CKIT_GNUC_UNUSED __attribute__((__unused__))
+#else
+#define CKIT_GNUC_UNUSED
+#endif
+
 namespace ContextSubscriber {
 
 // Please note that it is intentional that this header file contains
@@ -40,12 +47,14 @@ namespace ContextSubscriber {
 ///
 /// If you use this function, you have to add libqjson to the list of
 /// libraries you link against.
+CKIT_GNUC_UNUSED
 static QString qVariantToJSON(const QVariant &v) {
     QJson::Serializer serializer;
     return serializer.serialize(v);
 }
 
 /// Loads json data into a QVariant.  On parse error it returns QVariant().
+CKIT_GNUC_UNUSED
 static QVariant jsonToQVariant(const QString &s) {
     QJson::Parser parser;
     bool ok;
