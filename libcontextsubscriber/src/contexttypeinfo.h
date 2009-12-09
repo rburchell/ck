@@ -38,6 +38,7 @@ public:
     bool typeCheck(const QVariant &value) const;
 
     bool hasBase(QString wanted, int depth = 10) const;
+    ContextTypeInfo getBase(QString wanted, int depth = 10) const;
     QVariantList parameters() const;
     QVariant parameterValue(QString p) const;
     AssocTree parameterNode(QString p) const;

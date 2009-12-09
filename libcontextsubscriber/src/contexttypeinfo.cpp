@@ -258,6 +258,20 @@ bool ContextTypeInfo::hasBase(QString wanted, int depth) const
     return base().hasBase(wanted, depth-1);
 }
 
+ContextTypeInfo ContextTypeInfo::getBase(QString wanted, int depth) const
+{
+    if (name() == wanted)
+        return *this;
+
+    if (base() == AssocTree())
+        return ContextTypeInfo();
+
+    if (depth == 0)
+        return ContextTypeInfo();
+
+    return base().getBase(wanted, depth-1);
+}
+
 QVariantList ContextTypeInfo::parameters() const
 {
     return nodes();
