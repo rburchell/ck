@@ -1,8 +1,11 @@
-contextkit (0.5.4~unreleased) unstable; urgency=low
+contextkit (0.5.4) unstable; urgency=low
 
-  * 
+  * Added accessors to handle Base type
+  * libcontextsubscriber gained a Duration helper class
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 09 Dec 2009 11:49:06 +0200
+  Implemented: SWP#CntFr-356
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 10 Dec 2009 16:45:38 +0200
 
 contextkit (0.5.3) unstable; urgency=low
 
