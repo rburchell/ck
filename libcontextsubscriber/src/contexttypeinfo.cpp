@@ -59,6 +59,18 @@
    i.e., you can use it when the list of parameters is empty.
 */
 
+ContextTypeInfo::ContextTypeInfo(const AssocTree &tree) : AssocTree (tree)
+{
+}
+
+ContextTypeInfo::ContextTypeInfo(const QVariant &tree) : AssocTree (tree)
+{
+}
+
+ContextTypeInfo::ContextTypeInfo()
+{
+}
+
 /// Returns a ContexTypeInfo where old-style type names (INTEGER,
 /// STRING, BOOL) are replaced with new-style type names (integer,
 /// string, bool). Returns self if the ContextTypeInfo is already
@@ -232,6 +244,64 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
     return true;
 }
 
+bool ContextTypeInfo::hasBase(QString wanted, int depth) const
+{
+    if (name() == wanted)
+        return true;
+
+    if (base() == AssocTree())
+        return false;
+
+    if (depth == 0)
+        return false;
+
+    return base().hasBase(wanted, depth-1);
+}
+
+ContextTypeInfo ContextTypeInfo::getBase(QString wanted, int depth) const
+{
+    if (name() == wanted)
+        return *this;
+
+    if (base() == AssocTree())
+        return ContextTypeInfo();
+
+    if (depth == 0)
+        return ContextTypeInfo();
+
+    return base().getBase(wanted, depth-1);
+}
+
+QVariantList ContextTypeInfo::parameters() const
+{
+    return nodes();
+}
+
+QVariant ContextTypeInfo::parameterValue(QString p) const
+{
+    return value(p);
+}
+
+AssocTree ContextTypeInfo::parameterNode(QString p) const
+{
+    return node(p);
+}
+
+QString ContextTypeInfo::parameterDoc(QString p) const
+{
+    return definition().value("params", p, "doc").toString();
+}
+
+QString ContextTypeInfo::doc() const
+{
+    return definition().value("doc").toString();
+}
+
+ContextTypeInfo ContextTypeInfo::base() const
+{
+    return ContextTypeInfo(definition().value("base"));
+}
+
 /// Returns the AssocTree with the type definition for this type.
 AssocTree ContextTypeInfo::definition() const
 {
@@ -241,6 +311,15 @@ AssocTree ContextTypeInfo::definition() const
 /* ContextStringEnumInfo
  */
 
+ContextStringEnumInfo::ContextStringEnumInfo(const ContextTypeInfo &info) : ContextTypeInfo (info)
+{
+}
+
+QString ContextStringEnumInfo::choiceDoc(const QString &choice) const
+{
+    return value (choice, "doc").toString();
+}
+
 QStringList ContextStringEnumInfo::choices() const
 {
     QStringList result;
@@ -248,4 +327,13 @@ QStringList ContextStringEnumInfo::choices() const
         result.append (p.name());
     }
     return result;
+}
+
+ContextListInfo::ContextListInfo(const ContextTypeInfo &info) : ContextTypeInfo (info)
+{
+}
+
+ContextTypeInfo ContextListInfo::type()
+{
+    return ContextTypeInfo(parameterValue("type"));
 }

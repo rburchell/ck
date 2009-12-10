@@ -11,6 +11,7 @@ SUBDIRSTESTS =                                                          \
         nanoxml								\
 	assoctree							\
 	contexttypeinfo							\
+	duration							\
 	contexttyperegistryinfo
 
 SUBDIRS = $(SUBDIRSTESTS) util
