@@ -68,7 +68,7 @@ context_provider_set_null       (const char* key);
 void
 context_provider_set_map        (const char* key, void* map, int free_map);
 void *
-context_provider_map_new        ();
+context_provider_map_new        (void);
 void
 context_provider_map_free       (void* map);
 void
@@ -87,7 +87,7 @@ context_provider_map_set_list   (void* map, const char* key, void* value);
 void
 context_provider_set_list       (const char* key, void* list, int free_list);
 void *
-context_provider_list_new       ();
+context_provider_list_new       (void);
 void
 context_provider_list_free      (void* list);
 void
