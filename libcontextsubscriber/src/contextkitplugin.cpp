@@ -75,7 +75,7 @@ QString ContextKitPlugin::keyToPath(QString key)
     if (key.startsWith("/"))
         return key;
 
-    return corePrefix + key.replace('.', '/').replace(QRegExp("[^A-Za-z0-9_/]"), "_");
+    return corePrefix + key.replace('.', '/');
 }
 
 /// Inverse of \c keyToPath.

@@ -150,10 +150,10 @@ void PropertyAdaptor::onServiceOwnerChanged(const QString &name, const QString &
 QString PropertyAdaptor::objectPath() const
 {
     if (propertyPrivate->key.startsWith("/"))
-        return QString(propertyPrivate->key);
+        return propertyPrivate->key;
 
     return QString("/org/maemo/contextkit/") +
-            QString(propertyPrivate->key).replace(".", "/").replace(QRegExp("[^A-Za-z0-9_/]"), "_");
+        QString(propertyPrivate->key).replace(".", "/");
 
 }
 

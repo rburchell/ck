@@ -261,6 +261,11 @@ void ContextProperty::subscribe() const
     if (priv->subscribed)
         return;
 
+    if (!QRegExp("[A-Za-z0-9_/.]+").exactMatch(key())) {
+        contextCritical() <<  "Invalid key name:" << key() << ". Should match [A-Za-z0-9_/.]+";
+        return;
+    }
+
     // We create a queued connection, because otherwise we run
     // the users' valueChanged() handlers with locks and if they do
     // something fancy (for example unsubscribe) it can cause a
