@@ -1,4 +1,4 @@
-htmldir = $(datadir)/doc/contextkit/html/
+htmldir = $(datadir)/doc/contextkit-doc/html/
 html_ASCIIDOCS = context-intro.txt context-providers.txt context-types.txt context-arch.txt use-cases.txt
 
 # Support for html_ASCIIDOCS and html_EXTRA
