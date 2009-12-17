@@ -1,6 +1,6 @@
 contextkit (0.5.5~unreleased) unstable; urgency=low
 
-  *
+  * Fixes: NB#150990 (special characters in property names)
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 10 Dec 2009 16:54:44 +0200
 
