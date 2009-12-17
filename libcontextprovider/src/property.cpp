@@ -44,7 +44,7 @@ namespace ContextProvider {
 
 /// Create a Property object on \a service for the key \a k.
 Property::Property(Service &service, const QString &k, QObject* parent)
-    : QObject(parent), priv(NULL)
+    : QObject(parent)
 {
     init(service.backend, k);
 }
@@ -52,7 +52,7 @@ Property::Property(Service &service, const QString &k, QObject* parent)
 /// Create a Property object on the default service for the key \a k.
 /// The default service can be set with Service::setAsDefault().
 Property::Property(const QString &k, QObject* parent)
-    : QObject(parent), priv(NULL)
+    : QObject(parent)
 {
     if (ServiceBackend::defaultServiceBackend == NULL) {
         contextCritical() << "No default service set.";
@@ -68,10 +68,6 @@ Property::Property(const QString &k, QObject* parent)
 void Property::init(ServiceBackend *serviceBackend, const QString &key)
 {
     contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
-    if (!QRegExp("[A-Za-z0-9_/.]+").exactMatch(key)) {
-        contextCritical() <<  "Invalid key name:" << key << ". Should match [A-Za-z0-9_/.]+";
-        abort();
-    }
 
     QPair<ServiceBackend*, QString> lookup(serviceBackend, key);
 
