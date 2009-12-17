@@ -23,7 +23,7 @@ declaration file.
 
 The only supported way right now to implement the
 +org.freedesktop.ContextKit+ interface is to use the
-link:libcontextprovider[+libcontextprovider+] library.
+link:../../libcontextprovider-doc/html/index.html[+libcontextprovider+] library.
 
 The name of the property declaration file must be
 "__bus-name__++.context++".

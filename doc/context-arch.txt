@@ -311,13 +311,13 @@ Provided Interfaces
 
 A C++ API for listening to context properties.
 
-link:libcontextsubscriber[Documentation]
+link:../../libcontextsubscriber-doc/html/index.html[Documentation]
 
 .+libcontextprovider+
 
 A C++ and C API for providing values of context properties.
 
-link:libcontextprovider[Documentation]
+link:../../libcontextprovider-doc/html/index.html[Documentation]
 
 .+context-properties+
 

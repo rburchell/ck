@@ -6,7 +6,8 @@ context properties of the device.
 
 Please follow the links for more details:
 
-- link:libcontextsubscriber[Documention of the high level API for clients]
+- link:../../libcontextsubscriber-doc/html/index.html[Documention of the high level API for clients]
+- link:../../libcontextprovider-doc/html/index.html[Documention of the high level API for providers]
 - link:context-properties.html[Documentation of context properties]
 - link:context-providers.html[Documentation for providers of context properties]
 - link:context-arch.html[Architecture description]
