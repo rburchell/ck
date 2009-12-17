@@ -89,7 +89,6 @@ void CommandWatcher::help()
 void CommandWatcher::interpret(const QString& command) const
 {
     QTextStream out(stdout);
-    QTextStream err(stderr);
     QStringList args = command.split(" ");
     QString commandName = args[0];
     args.pop_front();

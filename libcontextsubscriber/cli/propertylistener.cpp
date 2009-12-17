@@ -21,8 +21,8 @@
 
 #include "propertylistener.h"
 #include "contextproperty.h"
+#include "contextpropertyinfo.h"
 #include "sconnect.h"
-#include <QDebug>
 #include <QVariant>
 #include <QCoreApplication>
 #include <QDBusArgument>
@@ -33,7 +33,11 @@ PropertyListener::PropertyListener(const QString &key):
     QObject(QCoreApplication::instance()), prop(new ContextProperty(key, this))
 {
     sconnect(prop, SIGNAL(valueChanged()), this, SLOT(onValueChanged()));
-    qDebug() << prop->key() << " subscribtion started";
+    if (!prop->info()->declared())
+        QTextStream(stdout) << "Key doesn't exists: " + prop->key() << endl;
+    else if (!prop->info()->provided())
+        QTextStream(stdout) << "Key not provided: " + prop->key() << endl;
+    QTextStream(stdout) << prop->key() << " subscribtion started" << endl;
 }
 
 QString PropertyListener::valueToString(QString defaultValue) const

@@ -45,14 +45,23 @@ int main(int argc, char **argv)
     if (args.count() <= 1)
         qWarning() << "Started without properties, if you want properties at startup, pass them as arguments";
 
-    QMap<QString, PropertyListener*> properties;
+    QSet<QString> propertiesToCreate;
 
     args.pop_front();
-    foreach (QString key, args)
-        if (!properties.contains(key))
-            properties.insert(key, new PropertyListener(key));
+    foreach (QString key, args) {
+        if (key.startsWith("-")) {
+            QTextStream(stdout) << "Usage: " << argv[0] << " [KEYNAME]..." << endl;
+            exit(1);
+        }
+        propertiesToCreate.insert(key);
+    }
 
+    QMap<QString, PropertyListener*> properties;
     new CommandWatcher(STDIN_FILENO, &properties, QCoreApplication::instance());
+
+    foreach (QString key, propertiesToCreate)
+        properties.insert(key, new PropertyListener(key));
+
 
     return app.exec();
 }
