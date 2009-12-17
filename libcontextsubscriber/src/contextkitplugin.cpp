@@ -78,17 +78,6 @@ QString ContextKitPlugin::keyToPath(QString key)
     return corePrefix + key.replace('.', '/').replace(QRegExp("[^A-Za-z0-9_/]"), "_");
 }
 
-/// Inverse of \c keyToPath.
-QString ContextKitPlugin::pathToKey(QString path)
-{
-    if (path.startsWith(corePrefix)) {
-        QString key = path.mid(corePrefix.size());
-        return key.replace('/', '.');
-    }
-
-    return path;
-}
-
 /// Creates subscriber and manager interface, tries to get a
 /// subscriber instance from the manager and starts listening for
 /// provider appearing and disappearing on D-Bus.
@@ -248,8 +237,14 @@ void ContextKitPlugin::subscribe(QSet<QString> keys)
 
 void ContextKitPlugin::newSubscribe(const QString& key)
 {
+    QString objectPath = keyToPath(key);
+    // Store the "object path -> key" mapping so that we can transform
+    // back when a valueChanged signal comes over D-Bus. (Note the
+    // special character transformation.)
+    objectPathToKey[objectPath] = key;
+
     QDBusPendingCall pc = connection->asyncCall(QDBusMessage::createMethodCall(busName,
-                                                                               keyToPath(key),
+                                                                               objectPath,
                                                                                propertyIName,
                                                                                "Subscribe"));
     PendingSubscribeWatcher *psw = new PendingSubscribeWatcher(pc, key, this);
@@ -273,8 +268,10 @@ void ContextKitPlugin::unsubscribe(QSet<QString> keys)
 {
     if (newProtocol)
         foreach (QString key, keys) {
+            QString objectPath = keyToPath(key);
+            objectPathToKey.remove(objectPath);
             connection->asyncCall(QDBusMessage::createMethodCall(busName,
-                                                                 keyToPath(key),
+                                                                 objectPath,
                                                                  propertyIName,
                                                                  "Unsubscribe"));
         }
@@ -346,8 +343,13 @@ void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,
                                          quint64 timestamp,
                                          QDBusMessage message)
 {
-    emit valueChanged(pathToKey(message.path()), createTimedValue(value,
-                                                                  timestamp));
+    if (objectPathToKey.contains(message.path())) {
+        emit valueChanged(objectPathToKey[message.path()],
+                          createTimedValue(value, timestamp));
+    }
+    else {
+        contextWarning() << "Unrecognized key" << message.path();
+    }
 }
 
 PendingSubscribeWatcher::PendingSubscribeWatcher(const QDBusPendingCall &call,

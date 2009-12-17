@@ -68,6 +68,9 @@ Property::Property(const QString &k, QObject* parent)
 void Property::init(ServiceBackend *serviceBackend, const QString &key)
 {
     contextDebug() << F_PROPERTY << "Creating new Property for key:" << key;
+    if (!QRegExp("[A-Za-z0-9_/.]+").exactMatch(key)) {
+        contextWarning() <<  "Context property name should match [A-Za-z0-9_/.]+, this doesn't:" << key;
+    }
 
     QPair<ServiceBackend*, QString> lookup(serviceBackend, key);
 

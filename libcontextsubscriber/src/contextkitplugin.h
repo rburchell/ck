@@ -35,6 +35,7 @@
 #include <QSet>
 #include <QVariant>
 #include <QMap>
+#include <QHash>
 
 extern "C" {
     ContextSubscriber::IProviderPlugin* contextKitPluginFactory(QString constructionString);
@@ -95,7 +96,6 @@ private slots:
 
 private:
     static QString keyToPath(QString key);
-    static QString pathToKey(QString key);
 
     void reset();
     void useNewProtocol();
@@ -112,11 +112,14 @@ private:
     bool newProtocol; ///< The current provider on D-Bus speaks the new protocol only.
     bool defaultNewProtocol; ///< Let's only try the new protocol to talk with the provider.
 
+    QHash<QString, QString> objectPathToKey;
+
     static const QString managerIName; ///< org.freedesktop.ContextKit.Manager
     static const QString subscriberIName; ///< org.freedesktop.ContextKit.Subscriber
     static const QString managerPath; ///< /org/freedesktop/ContextKit/Manager
     static const QString propertyIName; ///< org.maemo.contextkit.Property
     static const QString corePrefix; ///< /org/maemo/contextkit/
+
 };
 
 QVariant demarshallValue(const QVariant &v);
