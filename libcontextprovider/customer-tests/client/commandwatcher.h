@@ -36,7 +36,7 @@ private:
     bool listenToChanged(const QString& name);
     QString keyToPath(QString key);
 
-private slots:
+private Q_SLOTS:
     void onActivated();
     void onValueChanged(QList<QVariant> value, quint64 timestamp, QDBusMessage msg);
 

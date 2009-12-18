@@ -48,7 +48,7 @@ public:
     void fireKeysRemoved(const QStringList& keys);
     void fireKeyChanged(const QString& key);
 
-signals:
+Q_SIGNALS:
     void keysChanged(const QStringList& currentKeys);
     void keysAdded(const QStringList& newKeys);
     void keysRemoved(const QStringList& removedKeys);

@@ -45,7 +45,7 @@ public:
 
     ServicePresence isServicePresent() const;
 
-private slots:
+private Q_SLOTS:
     void onServiceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
     void onNameHasOwnerFinished(QDBusPendingCallWatcher* watcher);
 
@@ -59,7 +59,7 @@ private:
     void setServicePresent();
     void setServiceGone();
 
-signals:
+Q_SIGNALS:
     void nameAppeared();
     void nameDisappeared();
 };

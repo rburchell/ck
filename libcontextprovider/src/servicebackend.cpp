@@ -139,7 +139,7 @@ bool ServiceBackend::start()
     contextDebug() << F_SERVICE_BACKEND << "Starting service for bus:" << busName;
 
     // Re-register existing Property objects on D-Bus
-    foreach (const QString& key, properties.keys()) {
+    Q_FOREACH (const QString& key, properties.keys()) {
         contextDebug() << F_SERVICE_BACKEND << "Re-registering" << key;
         if (!registerProperty(key, properties[key])) {
             return false;
@@ -173,7 +173,7 @@ void ServiceBackend::stop()
     // PropertyAdaptor objects to forget their subscriptions (if the
     // service is started again, clients will resubscribe).
 
-    foreach (PropertyAdaptor* adaptor, createdAdaptors) {
+    Q_FOREACH (PropertyAdaptor* adaptor, createdAdaptors) {
         adaptor->forgetClients();
         connection.unregisterObject(adaptor->objectPath());
     }

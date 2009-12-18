@@ -73,7 +73,7 @@ private:
     QDBusConnection::BusType busType;
     bool started;
 
-private slots:
+private Q_SLOTS:
     void onActivated();
     void onRegistryChanged();
 };

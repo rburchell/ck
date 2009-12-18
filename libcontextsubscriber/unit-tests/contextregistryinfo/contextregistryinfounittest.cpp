@@ -70,22 +70,22 @@ const QList<ContextProviderInfo> InfoBackend::providersForKey(QString key)
 
 void InfoBackend::fireKeysChanged(const QStringList& keys)
 {
-    emit keysChanged(keys);
+    Q_EMIT keysChanged(keys);
 }
 
 void InfoBackend::fireKeysAdded(const QStringList& keys)
 {
-    emit keysAdded(keys);
+    Q_EMIT keysAdded(keys);
 }
 
 void InfoBackend::fireKeysRemoved(const QStringList& keys)
 {
-    emit keysRemoved(keys);
+    Q_EMIT keysRemoved(keys);
 }
 
 void InfoBackend::fireListChanged()
 {
-    emit listChanged();
+    Q_EMIT listChanged();
 }
 
 /* ContextRegistryInfoUnitTest */
@@ -97,7 +97,7 @@ class ContextRegistryInfoUnitTest : public QObject
 private:
     ContextRegistryInfo *registry;
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void listKeys();
     void listKeysForPlugin();

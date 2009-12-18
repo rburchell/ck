@@ -55,7 +55,7 @@ class PropertyUnitTest : public QObject
     Property* battery_voltage;
     Property* battery_is_charging;
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void init();
     void cleanup();
@@ -97,13 +97,13 @@ void PropertyUnitTest::checkSignals()
     QSignalSpy spy2(battery_voltage, SIGNAL(lastSubscriberDisappeared(QString)));
 
     QVERIFY(battery_voltage->priv);
-    emit battery_voltage->priv->firstSubscriberAppeared("Battery.Voltage");
+    Q_EMIT battery_voltage->priv->firstSubscriberAppeared("Battery.Voltage");
 
     QCOMPARE(spy1.count(), 1);
     QList<QVariant> args1 = spy1.takeFirst();
     QCOMPARE(args1.at(0).toString(), QString("Battery.Voltage"));
 
-    emit battery_voltage->priv->lastSubscriberDisappeared("Battery.Voltage");
+    Q_EMIT battery_voltage->priv->lastSubscriberDisappeared("Battery.Voltage");
 
     QCOMPARE(spy2.count(), 1);
     QList<QVariant> args2 = spy2.takeFirst();

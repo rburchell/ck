@@ -52,7 +52,7 @@ public:
     inline Group &operator<<(const Property *prop)
     { add(*prop); return *this; }
 
-signals:
+Q_SIGNALS:
     void firstSubscriberAppeared();
     void lastSubscriberDisappeared();
 

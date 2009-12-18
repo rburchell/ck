@@ -249,14 +249,14 @@ void ContextRealLogger::initialize()
     // Check feature enablers (showFeatures)
     const char *showFeaturesStr = getenv("CONTEXT_LOG_SHOW_FEATURES");
     if (showFeaturesStr) {
-        foreach (QString f, QString(showFeaturesStr).split(','))
+        Q_FOREACH (QString f, QString(showFeaturesStr).split(','))
             showFeatures << f.trimmed();
     }
 
     // Check feature hide (hideFeatures)
     const char *hideFeaturesStr = getenv("CONTEXT_LOG_HIDE_FEATURES");
     if (hideFeaturesStr) {
-        foreach (QString f, QString(hideFeaturesStr).split(','))
+        Q_FOREACH (QString f, QString(hideFeaturesStr).split(','))
             hideFeatures << f.trimmed();
     }
 
@@ -363,13 +363,13 @@ bool ContextRealLogger::shouldPrint()
         return false;
 
     // Now try to eliminate by feature name
-    foreach(QString feature, features) {
+    Q_FOREACH(QString feature, features) {
         if (hideFeatures.contains(feature))
             return false;
     }
 
     if (showFeatures.length() > 0) {
-        foreach(QString feature, showFeatures) {
+        Q_FOREACH(QString feature, showFeatures) {
             if (features.contains(feature))
                 return true;
         }

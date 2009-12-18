@@ -45,7 +45,7 @@ public:
     void subscribe(QSet<QString> keys);
     void unsubscribe(QSet<QString> keys);
 
-signals:
+Q_SIGNALS:
     void ready();
     void failed(QString error);
     void subscribeFinished(QString key);

@@ -36,7 +36,7 @@ class HandleSignalRouter : public QObject
 public:
     static HandleSignalRouter* instance();
 
-public slots:
+public Q_SLOTS:
     void onValueChanged(QString key);
     void onSubscribeFinished(Provider *provider, QString key);
 

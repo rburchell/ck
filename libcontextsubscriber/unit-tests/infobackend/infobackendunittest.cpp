@@ -93,7 +93,7 @@ class InfoBackendUnitTest : public QObject
 
     InfoBackend *backend;
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void checkAndEmitKeysAdded();
     void checkAndEmitKeysRemoved();

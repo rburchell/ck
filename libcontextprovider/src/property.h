@@ -56,7 +56,7 @@ private:
     PropertyPrivate *priv; ///< Private implementation
     void init(ServiceBackend *serviceBackend, const QString &key);
 
-signals:
+Q_SIGNALS:
     /// This is emitted when the first subscriber appears for this
     /// Property.  It can be used e.g. to start the actual process of
     /// harvesting the data needed for this Property.

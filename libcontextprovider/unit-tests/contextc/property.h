@@ -52,7 +52,7 @@ public:
     void fakeFirst();
     void fakeLast();
 
-signals:
+Q_SIGNALS:
     void firstSubscriberAppeared(const QString &key); 
     void lastSubscriberDisappeared(const QString &key);
 

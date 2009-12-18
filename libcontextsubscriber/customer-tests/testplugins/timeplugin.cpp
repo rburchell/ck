@@ -48,8 +48,8 @@ TimePlugin::TimePlugin()
 void TimePlugin::subscribe(QSet<QString> keys)
 {
     contextDebug() << keys;
-    foreach(const QString& key, keys) {
-        emit subscribeFinished(key);
+    Q_FOREACH(const QString& key, keys) {
+        Q_EMIT subscribeFinished(key);
     }
     timer.start();
 }
@@ -62,7 +62,7 @@ void TimePlugin::unsubscribe(QSet<QString> keys)
 void TimePlugin::onTimeout()
 {
     contextDebug() << "Timeout";
-    emit valueChanged("Test.Time", QDateTime::currentDateTime().toString().prepend(prefix));
+    Q_EMIT valueChanged("Test.Time", QDateTime::currentDateTime().toString().prepend(prefix));
 }
 
 } // end namespace

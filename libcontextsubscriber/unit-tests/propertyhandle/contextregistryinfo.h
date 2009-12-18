@@ -35,7 +35,7 @@ class ContextRegistryInfo : public QObject
 public:
     static ContextRegistryInfo* instance(const QString &backendName = "");
 
-signals:
+Q_SIGNALS:
     void keysChanged(QStringList currentKeys);
     void keysAdded(QStringList newKeys);
     void keysRemoved(QStringList removedKeys);

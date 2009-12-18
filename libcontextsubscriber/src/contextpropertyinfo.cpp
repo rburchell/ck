@@ -391,14 +391,14 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
     lock.unlock();
 
     // Emit the needed signals
-    emit changed(keyName);
-    emit typeChanged(type());
-    emit existsChanged(cachedDeclared);
-    emit providedChanged((cachedProviders.size() > 0));
+    Q_EMIT changed(keyName);
+    Q_EMIT typeChanged(type());
+    Q_EMIT existsChanged(cachedDeclared);
+    Q_EMIT providedChanged((cachedProviders.size() > 0));
 
-    emit providerChanged(providerDBusName_i());
-    emit providerDBusTypeChanged(providerDBusType_i());
-    emit pluginChanged(plugin_i(), constructionString_i());
+    Q_EMIT providerChanged(providerDBusName_i());
+    Q_EMIT providerDBusTypeChanged(providerDBusType_i());
+    Q_EMIT pluginChanged(plugin_i(), constructionString_i());
 }
 
 /// Returns a list of providers that provide this key.

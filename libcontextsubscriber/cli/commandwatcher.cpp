@@ -58,7 +58,7 @@ void CommandWatcher::onActivated()
     while ((nextSeparator = commandBuffer.indexOf('\n')) != -1) {
         // split lines to separate commands by semicolons
         QStringList commands = QString::fromUtf8(commandBuffer.constData()).left(nextSeparator).split(";");
-        foreach (QString command, commands)
+        Q_FOREACH (QString command, commands)
             interpret(command.trimmed());
         commandBuffer.remove(0, nextSeparator + 1);
     }
@@ -94,32 +94,32 @@ void CommandWatcher::interpret(const QString& command) const
     args.pop_front();
 
     if (QString("new").startsWith(commandName)) {
-        foreach (QString key, args)
+        Q_FOREACH (QString key, args)
             if (properties->contains(key))
                 qDebug() << "key already exists: " << key;
             else
                 properties->insert(key, new PropertyListener(key));
     } else if (QString("delete").startsWith(commandName)) {
-        foreach (QString key, args)
+        Q_FOREACH (QString key, args)
             if (properties->contains(key))
                 delete properties->take(key);
             else
                 qDebug() << "no such key:" << key;
     } else if (QString("subscribe").startsWith(commandName)) {
-        foreach (QString key, args)
+        Q_FOREACH (QString key, args)
             if (properties->contains(key))
                 properties->value(key)->prop->subscribe();
             else
                 qDebug() << "no such key:" << key;
     } else if (QString("waitforsubscription").startsWith(commandName)) {
-        foreach (QString key, args)
+        Q_FOREACH (QString key, args)
             if (properties->contains(key)) {
                 properties->value(key)->prop->waitForSubscription();
                 out << "wait finished for " << key << endl;
             } else
                 qDebug() << "no such key:" << key;
     } else if (QString("unsubscribe").startsWith(commandName)) {
-        foreach (QString key, args)
+        Q_FOREACH (QString key, args)
             if (properties->contains(key))
                 properties->value(key)->prop->unsubscribe();
             else
@@ -184,7 +184,7 @@ void CommandWatcher::interpret(const QString& command) const
             out << "providers: ";
             QList<ContextProviderInfo> providers = properties->value(key)->prop->info()->providers();
 
-            foreach(ContextProviderInfo info, providers)
+            Q_FOREACH(ContextProviderInfo info, providers)
                 out << info.constructionString << "@" << info.plugin << " ";
 
             out << endl;

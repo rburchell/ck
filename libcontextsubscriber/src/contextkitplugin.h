@@ -50,10 +50,10 @@ public:
     PendingSubscribeWatcher(const QDBusPendingCall &call,
                             const QString &key,
                             QObject * parent = 0);
-private slots:
+private Q_SLOTS:
     void onFinished();
 
-signals:
+Q_SIGNALS:
     void subscribeFailed(QString, QString);
     void valueChanged(QString, TimedValue);
     void subscribeFinished(QString);
@@ -72,7 +72,7 @@ public:
     void unsubscribe(QSet<QString> keys);
     void setDefaultNewProtocol(bool s);
 
-signals:
+Q_SIGNALS:
 #ifdef DOXYGEN_ONLY
     void ready(); ///< Emitted when the GetSubscriber call returns successfully.
     void failed(QString error); ///< Emitted when the GetSubscriber call fails or provider not on D-Bus at all.
@@ -81,7 +81,7 @@ signals:
     void valueChanged(QString key, QVariant value); ///< Emitted when ValueChanged signal comes on D-Bus
 #endif
 
-private slots:
+private Q_SLOTS:
     void onNewValueChanged(QList<QVariant> value,
                            quint64 timestamp,
                            QDBusMessage message);

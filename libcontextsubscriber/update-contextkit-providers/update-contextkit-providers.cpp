@@ -128,7 +128,7 @@ int main(int argc, char **argv)
     // Write the compatibility string
     writer.add("VERSION", BACKEND_COMPATIBILITY_NAMESPACE);
 
-    foreach(const QString& key, context->listKeys()) {
+    Q_FOREACH(const QString& key, context->listKeys()) {
         ContextPropertyInfo keyInfo(key);
 
         // Write value to list key
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 
         // Write the providers
         QVariantList providers;
-        foreach(const ContextProviderInfo info, keyInfo.providers()) {
+        Q_FOREACH(const ContextProviderInfo info, keyInfo.providers()) {
             QHash <QString, QVariant> provider;
             provider.insert("plugin", info.plugin);
             provider.insert("constructionString", info.constructionString);

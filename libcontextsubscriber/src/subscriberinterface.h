@@ -44,13 +44,13 @@ public:
     void subscribe(QSet<QString> keys);
     void unsubscribe(QSet<QString> keys);
 
-signals:
+Q_SIGNALS:
     void valuesChanged(QMap<QString, QVariant> values);
     void subscribeFinished(QList<QString> keys);
     void subscribeFailed(QList<QString> keys, QString error);
     void Changed(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);
 
-private slots:
+private Q_SLOTS:
     void onSubscribeFinished(QDBusPendingCallWatcher* watcher);
     void onChanged(const QMap<QString, QVariant> &values, const QStringList &unknownKeys);
 

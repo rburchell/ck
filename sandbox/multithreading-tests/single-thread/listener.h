@@ -18,7 +18,7 @@ public:
 
     ContextProperty* cp;
 
-public slots:
+public Q_SLOTS:
     void onValueChanged()
         {
             qDebug() << "Listener::valueChanged()";

@@ -11,7 +11,7 @@ class ServiceTest : public QObject
     QProcess *client;
     bool isReadyToRead;
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
     void init();
@@ -23,7 +23,7 @@ private slots:
     void defaultService();
     void recreateProperty();
 
-public slots:
+public Q_SLOTS:
     void readStandardOutput();
 
 private:

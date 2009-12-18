@@ -200,7 +200,7 @@ void ProviderUnitTests::pluginReadyHandled()
     QCOMPARE(pluginInstances[conStr]->subscribeRequested, QSet<QString>()); // nothing yet
 
     // but after ready, the pending subscriptions are requested from the plugin
-    emit pluginInstances[conStr]->ready();
+    Q_EMIT pluginInstances[conStr]->ready();
     provider->callAllMethodsInQueue();
     QCOMPARE(pluginInstances[conStr]->subscribeRequested, QSet<QString>() << "test.key1" << "test.key3");
 }
@@ -221,7 +221,7 @@ void ProviderUnitTests::pluginFailedHandled()
     QCOMPARE(pluginInstances[conStr]->subscribeRequested, QSet<QString>()); // nothing yet
 
     // but after ready, the pending subscriptions are requested from the plugin
-    emit pluginInstances[conStr]->failed("error");
+    Q_EMIT pluginInstances[conStr]->failed("error");
     provider->callAllMethodsInQueue();
     QCOMPARE(pluginInstances[conStr]->subscribeRequested, QSet<QString>()); // we failed, no requests
 }
@@ -245,7 +245,7 @@ void ProviderUnitTests::unsubscribe()
     QString conStr = "session:Fake.Bus.Name." + QString(__FUNCTION__);
     Provider *provider = Provider::instance(ContextProviderInfo("contextkit-dbus", conStr));
     provider->callAllMethodsInQueue();
-    emit pluginInstances[conStr]->ready(); // set the plugin to ready
+    Q_EMIT pluginInstances[conStr]->ready(); // set the plugin to ready
     provider->callAllMethodsInQueue();
 
     provider->subscribe("test.key1");
@@ -280,15 +280,15 @@ void ProviderUnitTests::pluginSubscriptionFinishes()
     QString conStr = "session:Fake.Bus.Name." + QString(__FUNCTION__);
     Provider *provider = Provider::instance(ContextProviderInfo("contextkit-dbus", conStr));
     provider->callAllMethodsInQueue();
-    emit pluginInstances[conStr]->ready(); // set the plugin to ready
+    Q_EMIT pluginInstances[conStr]->ready(); // set the plugin to ready
     provider->callAllMethodsInQueue();
 
     QSignalSpy spy(provider, SIGNAL(subscribeFinished(Provider *, QString)));
     provider->subscribe("test.key1");
     provider->subscribe("test.key2");
     provider->callAllMethodsInQueue();
-    emit pluginInstances[conStr]->subscribeFinished("test.key1");
-    emit pluginInstances[conStr]->subscribeFailed("test.key2", "error");
+    Q_EMIT pluginInstances[conStr]->subscribeFinished("test.key1");
+    Q_EMIT pluginInstances[conStr]->subscribeFailed("test.key2", "error");
     QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents); // signal delivery is queued
     QCOMPARE(spy.size(), 2);
     QCOMPARE(spy[0].size(), 2);
@@ -308,17 +308,17 @@ void ProviderUnitTests::pluginValueChanges()
     QString conStr = "session:Fake.Bus.Name." + QString(__FUNCTION__);
     Provider *provider = Provider::instance(ContextProviderInfo("contextkit-dbus", conStr));
     provider->callAllMethodsInQueue();
-    emit pluginInstances[conStr]->ready(); // set the plugin to ready
+    Q_EMIT pluginInstances[conStr]->ready(); // set the plugin to ready
     provider->callAllMethodsInQueue();
 
     provider->subscribe("test.key1");
     provider->callAllMethodsInQueue();
-    emit pluginInstances[conStr]->subscribeFinished("test.key1");
+    Q_EMIT pluginInstances[conStr]->subscribeFinished("test.key1");
     QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents); // signal delivery is queued
 
     QSignalSpy spy(provider, SIGNAL(valueChanged(QString)));
-    emit pluginInstances[conStr]->valueChanged("test.key1", QVariant(42));
-    emit pluginInstances[conStr]->valueChanged("test.key2", QVariant(4242));
+    Q_EMIT pluginInstances[conStr]->valueChanged("test.key1", QVariant(42));
+    Q_EMIT pluginInstances[conStr]->valueChanged("test.key2", QVariant(4242));
 
     QCOMPARE(spy.size(), 1);
     QCOMPARE(spy.at(0).size(), 1);

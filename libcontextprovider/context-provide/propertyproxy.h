@@ -33,7 +33,7 @@ public:
     void enable(bool enable);
     QVariant realValue() const;
     QString type() const;
-private slots:
+private Q_SLOTS:
     void onValueChanged();
 private:
     ContextProvider::Property *provider;

@@ -64,19 +64,19 @@ CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int comm
 
 CommandWatcher::~CommandWatcher()
 {
-    foreach(Property *p, properties)
+    Q_FOREACH(Property *p, properties)
         delete p;
-    foreach(PropertyProxy *p, proxies)
+    Q_FOREACH(PropertyProxy *p, proxies)
         delete p;
 }
 
 void CommandWatcher::onRegistryChanged()
 {
-    foreach (PropertyProxy *p, proxies)
+    Q_FOREACH (PropertyProxy *p, proxies)
         delete p;
     proxies.clear();
     // (Re)create the proxies and restore the user's will of overriding.
-    foreach (QString key, registryInfo->listKeys()) {
+    Q_FOREACH (QString key, registryInfo->listKeys()) {
         if (ContextPropertyInfo(key).provided()) {
             qDebug() << "creating proxy for" << key;
             proxies.insert(key, new PropertyProxy(key, !properties.contains(key),
@@ -100,7 +100,7 @@ void CommandWatcher::onActivated()
     while ((nextSeparator = commandBuffer.indexOf('\n')) != -1) {
         // split lines to separate commands by semicolons
         QStringList commands = QString::fromUtf8(commandBuffer.constData()).left(nextSeparator).split(";");
-        foreach (QString command, commands)
+        Q_FOREACH (QString command, commands)
             interpret(command.trimmed());
         commandBuffer.remove(0, nextSeparator + 1);
     }
@@ -269,7 +269,7 @@ void CommandWatcher::delCommand(const QStringList &args)
 
 void CommandWatcher::listCommand()
 {
-    foreach (QString key,
+    Q_FOREACH (QString key,
              QSet<QString>::fromList(properties.keys()) +
              QSet<QString>::fromList(proxies.keys()))
         infoCommand(QStringList(key));
@@ -349,7 +349,7 @@ void CommandWatcher::dumpCommand(const QStringList &args)
     QString bType = (busType == QDBusConnection::SystemBus) ? "system" : "session";
     xml << "<?xml version=\"1.0\"?>\n";
     xml << QString("<provider bus=\"%1\" service=\"%2\">\n").arg(bType).arg(busName);
-    foreach(QString key, properties.keys()) {
+    Q_FOREACH(QString key, properties.keys()) {
         xml << QString("  <key name=\"%1\">\n").arg(key);
         xml <<         "    <type>\n";
         xml << types[key].dumpXML(3);

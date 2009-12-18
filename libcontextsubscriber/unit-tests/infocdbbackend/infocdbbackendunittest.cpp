@@ -55,7 +55,7 @@ private:
     void createAlternateDatabase(QString path);
     void createIncompatibleDatabase(QString path);
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void name();
     void databaseExists();
@@ -208,7 +208,7 @@ void InfoCdbBackendUnitTest::docForKey()
 
 void InfoCdbBackendUnitTest::keyDeclared()
 {
-    foreach (QString key, backend->listKeys())
+    Q_FOREACH (QString key, backend->listKeys())
         QCOMPARE(backend->keyDeclared(key), true);
 
     QCOMPARE(backend->keyDeclared("Does.Not.Exist"), false);

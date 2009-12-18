@@ -34,7 +34,7 @@ QString AssocTree::dump(int level) const
     else if (type() == QVariant::List) {
         s += "[\n";
 
-        foreach(QVariant v, toList())
+        Q_FOREACH(QVariant v, toList())
             s += AssocTree(v).dump(level + 1);
 
         for (int i = 0; i < level; i++)
@@ -61,7 +61,7 @@ QString AssocTree::dumpXML(int level) const
             s += "<" + name() + "/>\n";
         } else {
             s += "<" + name() + ">\n";
-            foreach(QVariant v, children)
+            Q_FOREACH(QVariant v, children)
                 s += AssocTree(v).dumpXML(level + 1);
             for (int i = 0; i < level; i++)
                 s += "  ";
@@ -92,7 +92,7 @@ AssocTree AssocTree::node(const QString &name) const
     if (type() != QVariant::List)
         return AssocTree();
 
-    foreach(const QVariant &child, nodes())
+    Q_FOREACH(const QVariant &child, nodes())
     {
         if (child.type() == QVariant::List
             && child.toList().count() >= 1
@@ -200,7 +200,7 @@ AssocTree AssocTree::filterOut(const QString &name) const
      const QVariant nameVariant(name);
      QVariantList newTree;
      newTree << this->name();
-     foreach (QVariant node, nodes()) {
+     Q_FOREACH (QVariant node, nodes()) {
          if (node.type() == QVariant::String &&
              node == nameVariant)
              continue;

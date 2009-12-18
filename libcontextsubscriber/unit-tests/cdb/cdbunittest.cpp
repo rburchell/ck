@@ -30,7 +30,7 @@ class CDBUnitTest : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void creation();
     void cleanupTestCase();
     void writingToBad();

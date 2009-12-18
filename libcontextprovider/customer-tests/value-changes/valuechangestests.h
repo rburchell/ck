@@ -23,7 +23,7 @@ private:
 
     QString writeToClient(const char* input);
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
     void init();
@@ -37,7 +37,7 @@ private slots:
 
     void changesBetweenZeroAndUnknown();
 
-public slots:
+public Q_SLOTS:
     void readStandardOutput();
 };
 

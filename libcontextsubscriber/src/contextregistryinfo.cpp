@@ -90,8 +90,8 @@ QStringList ContextRegistryInfo::listKeys(QString providerName) const
 
     QSet<QString> keys;
 
-    foreach (QString key, listKeys()) {
-        foreach (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
+    Q_FOREACH (QString key, listKeys()) {
+        Q_FOREACH (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
             if (info.plugin == "contextkit-dbus" &&
                 info.constructionString.split(":").last() == providerName) {
                 keys.insert(key);
@@ -109,8 +109,8 @@ QStringList ContextRegistryInfo::listKeysForPlugin(QString plugin) const
 
     QSet<QString> keys;
 
-    foreach (QString key, listKeys()) {
-        foreach (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
+    Q_FOREACH (QString key, listKeys()) {
+        Q_FOREACH (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
             if (info.plugin == plugin) {
                 keys.insert(key);
             }
@@ -129,8 +129,8 @@ QStringList ContextRegistryInfo::listProviders() const
 
     QSet<QString> providers;
 
-    foreach (QString key, listKeys()) {
-        foreach (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
+    Q_FOREACH (QString key, listKeys()) {
+        Q_FOREACH (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
             if (info.plugin == "contextkit-dbus") {
                 providers.insert(info.constructionString.split(":").last());
             }
@@ -147,8 +147,8 @@ QStringList ContextRegistryInfo::listPlugins() const
 
     QSet<QString> plugins;
 
-    foreach (QString key, listKeys()) {
-        foreach (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
+    Q_FOREACH (QString key, listKeys()) {
+        Q_FOREACH (ContextProviderInfo info, InfoBackend::instance()->providersForKey(key)) {
             plugins.insert(info.plugin);
         }
     }
@@ -168,21 +168,21 @@ QString ContextRegistryInfo::backendName() const
 /// Will be removed when deprecated keysChanged() signal is removed.
 void ContextRegistryInfo::onKeysChanged(const QStringList& currentKeys)
 {
-    emit(keysChanged(currentKeys));
+    Q_EMIT keysChanged(currentKeys);
 }
 
 /// This is connected to the \a keysAdded of the actual info backend instance.
 /// Will be removed when deprecated keysAdded() signal is removed.
 void ContextRegistryInfo::onKeysAdded(const QStringList& newKeys)
 {
-    emit(keysAdded(newKeys));
+    Q_EMIT keysAdded(newKeys);
 }
 
 /// This is connected to the \a keysRemoved of the actual info backend instance.
 /// Will be removed when deprecated keysRemoved() signal is removed.
 void ContextRegistryInfo::onKeysRemoved(const QStringList& removedKeys)
 {
-    emit(keysRemoved(removedKeys));
+    Q_EMIT keysRemoved(removedKeys);
 }
 
 /// Called when people connect to signals. Used to emit deprecation warnings
@@ -203,5 +203,5 @@ void ContextRegistryInfo::connectNotify(const char *signal)
 /// Gets called when the list of keys changes.
 void ContextRegistryInfo::onListChanged()
 {
-    emit changed();
+    Q_EMIT changed();
 }

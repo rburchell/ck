@@ -28,7 +28,7 @@ private:
     QProcess *client;
     bool isReadyToRead;
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
     void init();
@@ -37,7 +37,7 @@ private slots:
     void typesInReturnValueOfSubscribe();
     void typesInChangeSignal();
 
-public slots:
+public Q_SLOTS:
     void readStandardOutput();
 
 private:

@@ -75,12 +75,12 @@ PropertyHandle::PropertyHandle(const QString& key)
 
 void PropertyHandle::onValueChanged()
 {
-    emit onValueChangedCalled(myKey);
+    Q_EMIT onValueChangedCalled(myKey);
 }
 
 void PropertyHandle::setSubscribeFinished(Provider *prov)
 {
-    emit setSubscribeFinishedCalled(prov, myKey);
+    Q_EMIT setSubscribeFinishedCalled(prov, myKey);
 }
 
 PropertyHandle* PropertyHandle::instance(const QString& key)

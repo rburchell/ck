@@ -50,7 +50,7 @@ public:
     static QString registryPath();
     static QString coreDeclPath();
 
-private slots:
+private Q_SLOTS:
     void onDirectoryChanged(const QString &path);
     void onFileChanged(const QString &path);
 

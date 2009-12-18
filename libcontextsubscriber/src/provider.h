@@ -52,11 +52,11 @@ public:
     TimedValue get(const QString &key) const;
     void clearValues();
 
-signals:
+Q_SIGNALS:
     void subscribeFinished(Provider *provider, QString key);
     void valueChanged(QString key);
 
-private slots:
+private Q_SLOTS:
     void onPluginReady();
     void onPluginFailed(QString error);
     void onPluginSubscribeFinished(QString key);

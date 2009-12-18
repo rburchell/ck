@@ -105,22 +105,22 @@ void InfoBackend::disconnectNotify(const char *signal)
 
 void InfoBackend::fireKeysChanged(const QStringList& keys)
 {
-    emit keysChanged(keys);
+    Q_EMIT keysChanged(keys);
 }
 
 void InfoBackend::fireKeysAdded(const QStringList& keys)
 {
-    emit keysAdded(keys);
+    Q_EMIT keysAdded(keys);
 }
 
 void InfoBackend::fireKeysRemoved(const QStringList& keys)
 {
-    emit keysRemoved(keys);
+    Q_EMIT keysRemoved(keys);
 }
 
 void InfoBackend::fireKeyChanged(const QString& key)
 {
-    emit keyChanged(key);
+    Q_EMIT keyChanged(key);
 }
 
 /* ContextRegistryInfoUnitTest */
@@ -129,7 +129,7 @@ class ContextPropertyInfoUnitTest : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void key();
     void doc();

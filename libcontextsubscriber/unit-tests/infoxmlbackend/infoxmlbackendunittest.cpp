@@ -51,7 +51,7 @@ class InfoXmlBackendUnitTest : public QObject
 private:
     bool inSpyHasOneInList(QSignalSpy &spy, const QString &v);
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void paths();
     void name();
@@ -71,7 +71,7 @@ bool InfoXmlBackendUnitTest::inSpyHasOneInList(QSignalSpy &spy, const QString &v
 
     while (spy.count() > 0) {
         QList<QVariant> args = spy.takeFirst();
-        foreach (QString s, args.at(0).toStringList()) {
+        Q_FOREACH (QString s, args.at(0).toStringList()) {
             if (s == v)
                 return true;
         }
@@ -148,7 +148,7 @@ void InfoXmlBackendUnitTest::docForKey()
 
 void InfoXmlBackendUnitTest::keyDeclared()
 {
-    foreach (QString key, backend->listKeys())
+    Q_FOREACH (QString key, backend->listKeys())
         QCOMPARE(backend->keyDeclared(key), true);
 
     QCOMPARE(backend->keyDeclared("Does.Not.Exist"), false);

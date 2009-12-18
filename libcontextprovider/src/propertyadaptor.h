@@ -44,15 +44,15 @@ public:
     QString objectPath() const;
     void forgetClients();
 
-public slots:
+public Q_SLOTS:
     void Subscribe(const QDBusMessage& msg, QVariantList& values, quint64& timestamp);
     void Unsubscribe(const QDBusMessage& msg);
     void Get(QVariantList& values, quint64& timestamp);
 
-signals:
+Q_SIGNALS:
     void ValueChanged(const QVariantList &values, const quint64& timestamp);
 
-private slots:
+private Q_SLOTS:
     void onServiceOwnerChanged(const QString&, const QString&, const QString&);
     void onValueChanged(QVariantList values, quint64 timestamp);
 

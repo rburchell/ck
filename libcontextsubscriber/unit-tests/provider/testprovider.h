@@ -33,7 +33,7 @@ class ProviderUnitTests : public QObject
 
 private:
     // Tests
-private slots:
+private Q_SLOTS:
     // Init and cleanup helper functions
     void initTestCase();
     void cleanupTestCase();

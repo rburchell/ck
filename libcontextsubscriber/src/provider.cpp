@@ -242,7 +242,7 @@ void Provider::signalSubscribeFinished(QString key)
 {
     QMutexLocker lock(&subscribeLock);
     if (subscribedKeys.contains(key))
-        emit subscribeFinished(this, key);
+        Q_EMIT subscribeFinished(this, key);
 }
 
 /// Forwards the call to \c signalSubscribeFinished.
@@ -337,8 +337,8 @@ void Provider::handleSubscribes()
         // it failed for good.
         contextDebug() << "Plugin init has failed";
         if (toSubscribe.size() > 0)
-            foreach (QString key, toSubscribe)
-                emit subscribeFinished(this, key);
+            Q_FOREACH (QString key, toSubscribe)
+                Q_EMIT subscribeFinished(this, key);
         toSubscribe.clear();
         toUnsubscribe.clear();
         break;
@@ -358,7 +358,7 @@ void Provider::onPluginValueChanged(QString key, TimedValue newValue)
     if (subscribedKeys.contains(key)) {
         // FIXME: try out if everything works with lock.unlock() here
         values.insert(key, newValue);
-        emit valueChanged(key);
+        Q_EMIT valueChanged(key);
     }
     else
         contextWarning() << "Received a property not subscribed to:" << key;
@@ -373,7 +373,7 @@ void Provider::onPluginValueChanged(QString key, QVariant newValue)
     if (subscribedKeys.contains(key)) {
         // FIXME: try out if everything works with lock.unlock() here
         values.insert(key, TimedValue(newValue));
-        emit valueChanged(key);
+        Q_EMIT valueChanged(key);
     }
     else
         contextWarning() << "Received a property not subscribed to:" << key;

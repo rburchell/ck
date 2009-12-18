@@ -17,7 +17,7 @@ public:
             start(10000);
             setSingleShot(true);
         }
-public slots:
+public Q_SLOTS:
     void timedout()
         {
             qDebug() << "timed out, wake up everyone";
@@ -35,7 +35,7 @@ public:
                     this, SLOT(timedout()));
             start(0);
         }
-public slots:
+public Q_SLOTS:
     void timedout()
         {
             qDebug() << "timed out, so starting to wait";

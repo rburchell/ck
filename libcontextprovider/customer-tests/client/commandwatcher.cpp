@@ -38,7 +38,7 @@ void CommandWatcher::onActivated()
     while ((nextSeparator = commandBuffer.indexOf('\n')) != -1) {
         // split lines to separate commands by semicolons
         QStringList commands = QString::fromUtf8(commandBuffer.constData()).left(nextSeparator).split(";");
-        foreach (QString command, commands)
+        Q_FOREACH (QString command, commands)
             interpret(command.trimmed());
         commandBuffer.remove(0, nextSeparator + 1);
     }
@@ -230,7 +230,7 @@ void CommandWatcher::waitForChanged(int timeout)
 
     if (changedSignalReceived) {
         out << "ValueChanged: ";
-        foreach (QString param, changedSignalParameters)
+        Q_FOREACH (QString param, changedSignalParameters)
             out << param << " ";
         out << endl;
     }
@@ -245,7 +245,7 @@ void CommandWatcher::onValueChanged(QList<QVariant> value, quint64 timestamp, QD
 {
     changedSignalReceived = true;
     QPair<QString, QString> connData;
-    foreach (connData, connectionMap)
+    Q_FOREACH (connData, connectionMap)
     {
         QDBusReply<QString> reply = QDBusConnection::sessionBus().interface()->serviceOwner(connData.second);
         if (reply.value() == msg.service())
