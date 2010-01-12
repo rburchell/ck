@@ -1,3 +1,9 @@
+contextkit (0.5.7~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 12 Jan 2010 11:42:05 +0200
+
 contextkit (0.5.6) unstable; urgency=low
 
   * Revert scratchbox sanitization 
