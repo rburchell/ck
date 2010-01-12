@@ -1,3 +1,9 @@
+contextkit (0.5.8) unstable; urgency=low
+
+  *
+
+ -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Tue, 12 Jan 2010 14:22:15 +0200
+
 contextkit (0.5.7) unstable; urgency=low
 
   * Allcaps macros for Qt (signals -> Q_SIGNALS, slots -> Q_SLOTS)
