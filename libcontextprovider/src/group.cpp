@@ -102,7 +102,7 @@ void Group::onFirstSubscriberAppeared()
     ++(priv->propertiesSubscribedTo);
     if (priv->propertiesSubscribedTo == 1) {
         contextDebug() << F_GROUP << F_SIGNALS << "First subscriber appeared for group";
-        emit firstSubscriberAppeared();
+        Q_EMIT firstSubscriberAppeared();
     }
 }
 
@@ -112,7 +112,7 @@ void Group::onLastSubscriberDisappeared()
     --(priv->propertiesSubscribedTo);
     if (priv->propertiesSubscribedTo == 0) {
         contextDebug() << F_GROUP << F_SIGNALS << "Last subscriber gone for group";
-        emit lastSubscriberDisappeared();
+        Q_EMIT lastSubscriberDisappeared();
     }
 }
 

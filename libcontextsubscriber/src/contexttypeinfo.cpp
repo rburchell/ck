@@ -107,7 +107,7 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
         // base type.  (Suboptimal.)
         if (baseType.type() != QVariant::List)
             baseType = AssocTree(QVariantList() << baseType.name());
-        foreach (AssocTree p, parameters()) {
+        Q_FOREACH (AssocTree p, parameters()) {
             baseType = baseType.filterOut(p.name());
             baseType = AssocTree(baseType.toList() << p);
         }
@@ -177,7 +177,7 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
             return false;
         }
         if (!eltype.isNull())
-            foreach (QVariant el, vl)
+            Q_FOREACH (QVariant el, vl)
                 if (!eltype.typeCheck(el)) {
                     contextWarning() << F_TYPES << "element" << el
                                      << "is of incorrect type";
@@ -192,7 +192,7 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
         }
         QHash<QString, ContextTypeInfo> allowedKeys;
         bool othersAllowed = false;
-        foreach (ContextTypeInfo keyInfo, parameters()) {
+        Q_FOREACH (ContextTypeInfo keyInfo, parameters()) {
             QString keyname = keyInfo.name();
             if (keyname == "allow-other-keys") {
                 othersAllowed = true;
@@ -224,7 +224,7 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
     }
     else if (me == "string-enum") {
         QSet<QString> enumerators;
-        foreach (AssocTree enumerator, parameters())
+        Q_FOREACH (AssocTree enumerator, parameters())
             enumerators.insert(enumerator.name());
         bool ok = enumerators.contains(value.toString());
         if (!ok)
@@ -234,7 +234,7 @@ bool ContextTypeInfo::typeCheck(const QVariant &value) const
     }
     else if (me == "int-enum") {
         QSet<int> enumerators;
-        foreach (AssocTree enumerator, parameters())
+        Q_FOREACH (AssocTree enumerator, parameters())
             enumerators.insert(enumerator.value("value").toInt());
         bool ok = enumerators.contains(value.toInt());
         if (!ok)
@@ -323,7 +323,7 @@ QString ContextStringEnumInfo::choiceDoc(const QString &choice) const
 QStringList ContextStringEnumInfo::choices() const
 {
     QStringList result;
-    foreach (const AssocTree &p, parameters()) {
+    Q_FOREACH (const AssocTree &p, parameters()) {
         result.append (p.name());
     }
     return result;

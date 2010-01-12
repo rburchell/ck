@@ -114,7 +114,7 @@ AssocTree ContextTypeRegistryInfo::typeDefinitionForName(QString name)
         return typeCache.value(name);
 
     // No type in cache? Find it in the assoc tree and put in cache.
-    foreach (AssocTree typeTree, coreTree.nodes()) {
+    Q_FOREACH (AssocTree typeTree, coreTree.nodes()) {
         if (typeTree.name() == "type" && typeTree.value("name") == name) {
             typeCache.insert(name, typeTree);
             return typeTree;

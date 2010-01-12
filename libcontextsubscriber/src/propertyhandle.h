@@ -58,10 +58,10 @@ public:
     static void ignoreCommander();
     static void setTypeCheck(bool typeCheck);
 
-signals:
+Q_SIGNALS:
     void valueChanged();
 
-private slots:
+private Q_SLOTS:
     void updateProvider();
 
 private:

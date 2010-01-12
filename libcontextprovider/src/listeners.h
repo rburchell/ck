@@ -44,7 +44,7 @@ class Listener : public QObject
 public:
     Listener(bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt);
 
-private slots:
+private Q_SLOTS:
     void onFirstSubscriberAppeared();
     void onLastSubscriberDisappeared();
 

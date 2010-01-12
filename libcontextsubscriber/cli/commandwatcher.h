@@ -43,7 +43,7 @@ private:
     QMap<QString, PropertyListener*> *properties;
     static void help();
 
-private slots:
+private Q_SLOTS:
     void onActivated();
 };
 #endif

@@ -32,7 +32,7 @@ private:
     AssocTree buildComplex();
     AssocTree buildMulti();
 
-private slots:
+private Q_SLOTS:
     void dump();
     void value1();
     void value2();
@@ -159,7 +159,7 @@ void AssocTreeUnitTest::nodes()
     AssocTree tree1 = buildBasic();
     
     int i = 0;
-    foreach (QVariant sub, tree1.nodes())
+    Q_FOREACH (QVariant sub, tree1.nodes())
     {
         QVERIFY(i < 2);
         switch (i) {

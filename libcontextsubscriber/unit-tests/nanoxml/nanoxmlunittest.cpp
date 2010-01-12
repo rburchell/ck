@@ -28,7 +28,7 @@ class NanoXmlUnitTest : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void broken();
     void doesNotExist();
     void test1();

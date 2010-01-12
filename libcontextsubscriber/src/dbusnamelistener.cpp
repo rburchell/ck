@@ -130,7 +130,7 @@ void DBusNameListener::setServicePresent()
 {
     if (servicePresent != Present) {
         servicePresent = Present;
-        emit nameAppeared();
+        Q_EMIT nameAppeared();
     }
 }
 
@@ -138,7 +138,7 @@ void DBusNameListener::setServiceGone()
 {
     if (servicePresent != NotPresent) {
         servicePresent = NotPresent;
-        emit nameDisappeared();
+        Q_EMIT nameDisappeared();
     }
 }
 

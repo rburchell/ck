@@ -139,16 +139,16 @@ void PropertyHandle::updateProvider()
         // The myInfo object doesn't have to be re-created, because it
         // just routes the function calls to a registry backend.
 
-        foreach (ContextProviderInfo info, myInfo->providers())
+        Q_FOREACH (ContextProviderInfo info, myInfo->providers())
             newProviders << Provider::instance(info);
         contextDebug() << newProviders.size() << "providers for" << myKey;
     }
     if (subscribeCount > 0) {
         // Unsubscribe from old providers and subscribe to the new ones.
-        foreach (Provider *oldprovider, myProviders)
+        Q_FOREACH (Provider *oldprovider, myProviders)
             oldprovider->unsubscribe(myKey);
         pendingSubscriptions.clear();
-        foreach (Provider *newprovider, newProviders)
+        Q_FOREACH (Provider *newprovider, newProviders)
             if (newprovider->subscribe(myKey))
                 pendingSubscriptions << newprovider;
     }
@@ -176,7 +176,7 @@ void PropertyHandle::subscribe()
     ++subscribeCount;
     if (subscribeCount == 1) {
         pendingSubscriptions.clear();
-        foreach (Provider *provider, myProviders)
+        Q_FOREACH (Provider *provider, myProviders)
             if (provider->subscribe(myKey))
                 pendingSubscriptions << provider;
     }
@@ -191,7 +191,7 @@ void PropertyHandle::unsubscribe()
     --subscribeCount;
     if (subscribeCount == 0) {
         pendingSubscriptions.clear();
-        foreach (Provider *provider, myProviders)
+        Q_FOREACH (Provider *provider, myProviders)
             provider->unsubscribe(myKey);
     }
 }
@@ -229,7 +229,7 @@ void PropertyHandle::onValueChanged()
     bool found = false;
     TimedValue latest = QVariant();
 
-    foreach (Provider *provider, myProviders) {
+    Q_FOREACH (Provider *provider, myProviders) {
         TimedValue current = provider->get(myKey);
         if (current.value.isNull())
             continue;
@@ -261,7 +261,7 @@ void PropertyHandle::onValueChanged()
         myValue.type() != newValue.type())
     {
         myValue = newValue;
-        emit valueChanged();
+        Q_EMIT valueChanged();
     }
 }
 

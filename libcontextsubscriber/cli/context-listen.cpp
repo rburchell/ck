@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     QSet<QString> propertiesToCreate;
 
     args.pop_front();
-    foreach (QString key, args) {
+    Q_FOREACH (QString key, args) {
         if (key.startsWith("-")) {
             QTextStream(stdout) << "Usage: " << argv[0] << " [KEYNAME]..." << endl;
             exit(1);
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     QMap<QString, PropertyListener*> properties;
     new CommandWatcher(STDIN_FILENO, &properties, QCoreApplication::instance());
 
-    foreach (QString key, propertiesToCreate)
+    Q_FOREACH (QString key, propertiesToCreate)
         properties.insert(key, new PropertyListener(key));
 
 

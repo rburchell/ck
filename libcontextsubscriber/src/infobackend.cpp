@@ -85,13 +85,13 @@ void InfoBackend::checkAndEmitKeysAdded(const QStringList &currentKeys,
                                         const QStringList &oldKeys)
 {
     QStringList addedKeys;
-    foreach (QString key, currentKeys) {
+    Q_FOREACH (QString key, currentKeys) {
         if (! oldKeys.contains(key))
             addedKeys << key;
     }
 
     if (addedKeys.size() > 0)
-        emit keysAdded(addedKeys);
+        Q_EMIT keysAdded(addedKeys);
 }
 
 /// Given the \a currentKeys list of keys and the \a oldKeys list of keys,
@@ -101,13 +101,13 @@ void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys,
                                           const QStringList &oldKeys)
 {
     QStringList removedKeys;
-    foreach (QString key, oldKeys) {
+    Q_FOREACH (QString key, oldKeys) {
         if (! currentKeys.contains(key))
             removedKeys << key;
     }
 
     if (removedKeys.size() > 0)
-        emit keysRemoved(removedKeys);
+        Q_EMIT keysRemoved(removedKeys);
 }
 
 /// Given the \a currentKeys list of keys and the \a oldKeys list of keys,
@@ -115,13 +115,13 @@ void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys,
 void InfoBackend::checkAndEmitKeyChanged(const QStringList &currentKeys,
                                          const QStringList &oldKeys)
 {
-    foreach(QString key, oldKeys) {
-        emit keyChanged(key);
+    Q_FOREACH(QString key, oldKeys) {
+        Q_EMIT keyChanged(key);
     }
 
-    foreach(QString key, currentKeys) {
+    Q_FOREACH(QString key, currentKeys) {
         if (! oldKeys.contains(key))
-            emit keyChanged(key);
+            Q_EMIT keyChanged(key);
     }
 }
 

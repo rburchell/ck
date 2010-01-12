@@ -52,7 +52,7 @@ public:
     inline Group &operator<<(const Property *prop)
     { add(*prop); return *this; }
 
-signals:
+Q_SIGNALS:
     /// Emitted when the group of Context objects is subscribed
     /// to. I.e., when none of them were subscribed to and now some of
     /// them were subscribed to.
@@ -63,7 +63,7 @@ signals:
     /// them were unsubscribed from.
     void lastSubscriberDisappeared();
     
-private slots:
+private Q_SLOTS:
     void onFirstSubscriberAppeared();
     void onLastSubscriberDisappeared();
 

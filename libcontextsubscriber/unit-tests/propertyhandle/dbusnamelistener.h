@@ -45,7 +45,7 @@ public:
     ServicePresence isServicePresent() const;
     void startListening(bool nameHasOwnerCheck);
 
-signals:
+Q_SIGNALS:
     void nameAppeared();
     void nameDisappeared();
 

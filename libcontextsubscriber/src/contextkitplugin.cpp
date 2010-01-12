@@ -144,7 +144,7 @@ void ContextKitPlugin::onProviderDisappeared()
 {
     contextDebug() << "Provider disappeared:" << busName;
     reset();
-    emit failed("Provider went away " + busName);
+    Q_EMIT failed("Provider went away " + busName);
 }
 
 /// Starts using the fresh subscriber interface when it is returned by
@@ -166,7 +166,7 @@ void ContextKitPlugin::onDBusGetSubscriberFinished(QDBusObjectPath objectPath)
              this,
              SLOT(onDBusSubscribeFailed(QList<QString>, QString)));
 
-    emit ready();
+    Q_EMIT ready();
 }
 
 void ContextKitPlugin::onDBusGetSubscriberFailed(QDBusError err)
@@ -175,7 +175,7 @@ void ContextKitPlugin::onDBusGetSubscriberFailed(QDBusError err)
         contextWarning() <<
             "D-Bus failed for: " + busName + ", error: " +
             err.message();
-        emit failed("D-Bus error while trying old protocol " + busName);
+        Q_EMIT failed("D-Bus error while trying old protocol " + busName);
         return;
     }
     contextWarning() <<
@@ -199,28 +199,28 @@ void ContextKitPlugin::useNewProtocol()
 
     // Ready to try out new protocol. Ready should not be queued,
     // because otherwise ready and failed might get reordered.
-    emit ready();
+    Q_EMIT ready();
 }
 
 /// Signals the Provider that the subscribe is finished.
 void ContextKitPlugin::onDBusSubscribeFinished(QList<QString> keys)
 {
-    foreach (const QString& key, keys)
-        emit subscribeFinished(key);
+    Q_FOREACH (const QString& key, keys)
+        Q_EMIT subscribeFinished(key);
 }
 
 /// Signals the Provider that the subscribe is failed.
 void ContextKitPlugin::onDBusSubscribeFailed(QList<QString> keys, QString error)
 {
-    foreach (const QString& key, keys)
-        emit subscribeFailed(key, error);
+    Q_FOREACH (const QString& key, keys)
+        Q_EMIT subscribeFailed(key, error);
 }
 
 /// Forwards the subscribe request to the wire.
 void ContextKitPlugin::subscribe(QSet<QString> keys)
 {
     if (newProtocol)
-        foreach (const QString& key, keys) {
+        Q_FOREACH (const QString& key, keys) {
             // Queue calling the Subscribe asynchronously. Don't
             // create the async call here: Qt will deadlock if we
             // create an async call while handling the results of the
@@ -267,7 +267,7 @@ void ContextKitPlugin::newSubscribe(const QString& key)
 void ContextKitPlugin::unsubscribe(QSet<QString> keys)
 {
     if (newProtocol)
-        foreach (QString key, keys) {
+        Q_FOREACH (QString key, keys) {
             QString objectPath = keyToPath(key);
             objectPathToKey.remove(objectPath);
             connection->asyncCall(QDBusMessage::createMethodCall(busName,
@@ -282,8 +282,8 @@ void ContextKitPlugin::unsubscribe(QSet<QString> keys)
 /// Forwards value changes from the wire to the upper layer (Provider).
 void ContextKitPlugin::onDBusValuesChanged(QMap<QString, QVariant> values)
 {
-    foreach (const QString& key, values.keys())
-        emit valueChanged(key, values[key]);
+    Q_FOREACH (const QString& key, values.keys())
+        Q_EMIT valueChanged(key, values[key]);
 }
 
 // QDBus doesn't unmarshall non-basic types inside QVariants (since it cannot
@@ -344,7 +344,7 @@ void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,
                                          QDBusMessage message)
 {
     if (objectPathToKey.contains(message.path())) {
-        emit valueChanged(objectPathToKey[message.path()],
+        Q_EMIT valueChanged(objectPathToKey[message.path()],
                           createTimedValue(value, timestamp));
     }
     else {
@@ -367,13 +367,13 @@ void PendingSubscribeWatcher::onFinished()
 {
     QDBusPendingReply<QList<QVariant>, quint64> reply = *this;
     if (reply.isError()) {
-        emit subscribeFailed(key, reply.error().message());
+        Q_EMIT subscribeFailed(key, reply.error().message());
         return;
     }
 
-    emit valueChanged(key, createTimedValue(reply.argumentAt<0>(),
+    Q_EMIT valueChanged(key, createTimedValue(reply.argumentAt<0>(),
                                             reply.argumentAt<1>()));
-    emit subscribeFinished(key);
+    Q_EMIT subscribeFinished(key);
 }
 
 }

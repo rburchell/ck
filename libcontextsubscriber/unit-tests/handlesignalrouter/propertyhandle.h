@@ -42,7 +42,7 @@ public:
     void onValueChanged();
     void setSubscribeFinished(Provider *);
 
-signals:
+Q_SIGNALS:
     // For tests
     void onValueChangedCalled(QString);
     void setSubscribeFinishedCalled(Provider *,QString);

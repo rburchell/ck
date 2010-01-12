@@ -74,10 +74,10 @@ private:
     QString plugin_i() const;
     QString constructionString_i() const;
 
-private slots:
+private Q_SLOTS:
     void onKeyChanged(const QString& key);
 
-signals:
+Q_SIGNALS:
     /// DEPRECATED, use changed() signal.
     /// Emitted when the provider of the key changes. The \a newProvider
     /// contains the name of the new provider. This is a strict signal -

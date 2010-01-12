@@ -33,7 +33,7 @@ class ContextTypeRegistryInfoUnitTest : public QObject
 private:
     ContextTypeRegistryInfo *registry;
 
-private slots:
+private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
     void stringDef();

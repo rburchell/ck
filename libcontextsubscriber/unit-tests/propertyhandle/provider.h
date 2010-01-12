@@ -45,7 +45,7 @@ public:
     TimedValue get(const QString &key) const;
     void clearValues();
 
-signals:
+Q_SIGNALS:
     void subscribeFinished(QString key);
     void valueChanged(QString key);
 

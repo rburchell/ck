@@ -249,7 +249,7 @@ void ContextProperty::onValueChanged()
         priv->value.type() != newValue.type())
     {
         priv->value = newValue;
-        emit valueChanged();
+        Q_EMIT valueChanged();
     }
 }
 

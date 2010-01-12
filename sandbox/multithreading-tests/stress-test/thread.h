@@ -122,7 +122,7 @@ public:
         t->start();
     }
 
-public slots:
+public Q_SLOTS:
     void onThreadFinished() {
         Thread* t = (Thread*) QObject::sender();
         if (threads.remove(t)) {

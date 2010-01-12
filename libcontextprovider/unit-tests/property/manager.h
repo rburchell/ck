@@ -50,7 +50,7 @@ public:
     void fakeLast(const QString &key);
     QStringList getKeys();
 
-signals:
+Q_SIGNALS:
     void firstSubscriberAppeared(const QString &key);
     void lastSubscriberDisappeared(const QString &key);
 

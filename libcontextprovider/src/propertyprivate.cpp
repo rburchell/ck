@@ -107,7 +107,7 @@ void PropertyPrivate::emitValue()
     if (value.isNull() == false) {
         values << value;
     }
-    emit valueChanged(values, timestamp);
+    Q_EMIT valueChanged(values, timestamp);
 }
 
 /// Set the PropertyPrivate to subscribed state. If it was in the
@@ -117,7 +117,7 @@ void PropertyPrivate::setSubscribed()
 {
     if (subscribed == false) {
         subscribed = true;
-        emit firstSubscriberAppeared(key);
+        Q_EMIT firstSubscriberAppeared(key);
     }
 }
 
@@ -128,7 +128,7 @@ void PropertyPrivate::setUnsubscribed()
 {
     if (subscribed == true) {
       subscribed = false;
-      emit lastSubscriberDisappeared(key);
+      Q_EMIT lastSubscriberDisappeared(key);
     }
 }
 

@@ -36,10 +36,10 @@ class QueuedInvoker : public QObject
 public:
     QueuedInvoker();
 
-private slots:
+private Q_SLOTS:
     void onQueuedCall(const char *method);
 
-signals:
+Q_SIGNALS:
     void queuedCall(const char *method);
 
 protected:

@@ -22,7 +22,7 @@ int main(int argc, char **argv)
         QString filter = "*";
 
         args.pop_front();
-        foreach (QString arg, args) {
+        Q_FOREACH (QString arg, args) {
             if (arg == "--xml" || arg == "-x") {
                 backendName = "xml";
             } else if (arg == "--cdb" || arg == "-c") {
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 
         QRegExp rx(filter, Qt::CaseSensitive, QRegExp::Wildcard);
         QTextStream out(stdout);
-        foreach (QString key, keys) {
+        Q_FOREACH (QString key, keys) {
             if (!rx.exactMatch(key))
                 continue;
             ContextPropertyInfo info(key);

@@ -29,7 +29,7 @@ void QueuedInvoker::queueOnce(const char *method)
 {
     QMutexLocker locker(&callQueueLock);
     if (!callQueue.contains(method)) {
-        emit queuedCall(method);
+        Q_EMIT queuedCall(method);
         callQueue.insert(method);
     }
 }

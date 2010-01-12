@@ -47,7 +47,7 @@ public:
     virtual void subscribe(QSet<QString> keys);
     virtual void unsubscribe(QSet<QString> keys);
 
-private slots:
+private Q_SLOTS:
     void onTimeout();
 
 private:

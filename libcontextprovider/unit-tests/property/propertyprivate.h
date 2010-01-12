@@ -45,7 +45,7 @@ public:
     void setSubscribed();
     void setUnsubscribed();
 
-signals:
+Q_SIGNALS:
     void valueChanged(const QVariantList& values, const qlonglong& timestamp);
     void firstSubscriberAppeared(const QString& key);
     void lastSubscriberDisappeared(const QString& key);

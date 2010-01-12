@@ -63,7 +63,7 @@ QString InfoCdbBackend::name() const
 QStringList InfoCdbBackend::variantListToStringList(const QVariantList &l)
 {
     QStringList ret;
-    foreach (QVariant v, l)
+    Q_FOREACH (QVariant v, l)
         ret << v.toString();
 
     return ret;
@@ -182,9 +182,9 @@ void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
     // Emissions
     checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
     checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
-    emit keysChanged(listKeys()); // DEPRECATED emission
+    Q_EMIT keysChanged(listKeys()); // DEPRECATED emission
 
-    emit listChanged();
+    Q_EMIT listChanged();
     checkAndEmitKeyChanged(currentKeys, oldKeys);
 }
 
@@ -204,7 +204,7 @@ const QList<ContextProviderInfo> InfoCdbBackend::providersForKey(QString key) co
     if (!databaseCompatible)
         return lst;
 
-    foreach (QVariant variant, providers.toList())
+    Q_FOREACH (QVariant variant, providers.toList())
         lst << ContextProviderInfo(variant.toHash().value("plugin").toString(),
                                    variant.toHash().value("constructionString").toString());
 

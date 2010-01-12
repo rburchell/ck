@@ -665,7 +665,7 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
     // Test:
     // Command the DBusNameListener to tell that the Commander has appeared
     mockDBusNameListener->servicePresent = DBusNameListener::Present;
-    emit mockDBusNameListener->nameAppeared();
+    Q_EMIT mockDBusNameListener->nameAppeared();
 
     // Expected results:
     // The handle unsubscribes from the real provider
@@ -684,7 +684,7 @@ void PropertyHandleUnitTests::commanderAppearsAndDisappears()
     // Test:
     // Command the DBusNameListener to tell that the Commander has disappeared
     mockDBusNameListener->servicePresent = DBusNameListener::NotPresent;
-    emit mockDBusNameListener->nameDisappeared();
+    Q_EMIT mockDBusNameListener->nameDisappeared();
 
     // Expected results:
     // The PropertyHandle unsubscribes from the commander
@@ -718,7 +718,7 @@ void PropertyHandleUnitTests::commandingDisabled()
 
     // Command the DBusNameListener to tell that the Commander has appeared
     mockDBusNameListener->servicePresent = DBusNameListener::Present;
-    emit mockDBusNameListener->nameAppeared();
+    Q_EMIT mockDBusNameListener->nameAppeared();
 
     // Expected results:
     // The PropertyHandle unsubscribes from and resubscribes to the same key,
@@ -735,7 +735,7 @@ void PropertyHandleUnitTests::commandingDisabled()
     // Test:
     // Command the DBusNameListener to tell that the Commander has disappeared
     mockDBusNameListener->servicePresent = DBusNameListener::NotPresent;
-    emit mockDBusNameListener->nameDisappeared();
+    Q_EMIT mockDBusNameListener->nameDisappeared();
 
     // Expected results:
     // Same thing as above.

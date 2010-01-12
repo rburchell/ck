@@ -53,13 +53,13 @@ private:
 protected:
     void connectNotify(const char *signal);
 
-private slots:
+private Q_SLOTS:
     void onKeysChanged(const QStringList& currentKeys);
     void onKeysAdded(const QStringList& newKeys);
     void onKeysRemoved(const QStringList& removedKeys);
     void onListChanged();
 
-signals:
+Q_SIGNALS:
     /// DEPRECATED use changed signal instead.
     /// Emitted when the registry changes. For performance reasons
     /// this is not a strict signal - it's emitted also even when no actual

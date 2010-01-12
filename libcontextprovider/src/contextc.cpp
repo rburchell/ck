@@ -130,7 +130,7 @@ void context_provider_stop (void)
 
         // Delete all listeners
         if (listeners) {
-            foreach (Listener *listener, *listeners)
+            Q_FOREACH (Listener *listener, *listeners)
                 delete listener;
         }
         delete listeners; listeners = NULL;

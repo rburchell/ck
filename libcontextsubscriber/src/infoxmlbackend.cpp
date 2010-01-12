@@ -78,7 +78,7 @@ QStringList InfoXmlBackend::listKeys() const
     QStringList list;
 
     // FIXME Hmm, we could return just the keyDataHash.keys itself here...
-    foreach (QString key, keyDataHash.keys()) {
+    Q_FOREACH (QString key, keyDataHash.keys()) {
         list << keyDataHash.value(key).name;
     }
 
@@ -145,9 +145,9 @@ void InfoXmlBackend::onFileChanged(const QString &path)
     // Emissions
     checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
     checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
-    emit keysChanged(listKeys()); // DEPRECATED emission
+    Q_EMIT keysChanged(listKeys()); // DEPRECATED emission
 
-    emit listChanged();
+    Q_EMIT listChanged();
     checkAndEmitKeyChanged(currentKeys, oldKeys);
 }
 
@@ -182,9 +182,9 @@ void InfoXmlBackend::onDirectoryChanged(const QString &path)
     // Emissions
     checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
     checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
-    emit keysChanged(listKeys()); // DEPRECATED emission
+    Q_EMIT keysChanged(listKeys()); // DEPRECATED emission
 
-    emit listChanged();
+    Q_EMIT listChanged();
     checkAndEmitKeyChanged(currentKeys, oldKeys);
 }
 
@@ -319,15 +319,15 @@ void InfoXmlBackend::readKeyDataFromXml(const QString &path)
     if (rootTree.toList().at(0).toString() == "provider" ||
         rootTree.toList().at(0).toString() == "properties") {
         // One provider. Iterate over each key.
-        foreach (AssocTree keyTree, rootTree.nodes()) {
+        Q_FOREACH (AssocTree keyTree, rootTree.nodes()) {
             if (keyTree.name() == "key")
                 parseKey(keyTree, rootTree);
         }
     } else {
         // Multiple providers... iterate over providers and keys
-        foreach (AssocTree providerTree, rootTree.nodes())
+        Q_FOREACH (AssocTree providerTree, rootTree.nodes())
             if (providerTree.name() == "provider")
-                foreach (AssocTree keyTree, providerTree.nodes())
+                Q_FOREACH (AssocTree keyTree, providerTree.nodes())
                     if (keyTree.name() == "key")
                         parseKey(keyTree, providerTree);
     }

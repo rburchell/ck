@@ -61,7 +61,7 @@ GroupListener::GroupListener(Service &service, const QStringList &keys,
                              bool clears, ContextProviderSubscriptionChangedCallback cb, void *dt)
     : Listener(clears, cb, dt)
 {
-    foreach (const QString &key, keys)
+    Q_FOREACH (const QString &key, keys)
         group << new Property(service, key, this);
     sconnect(&group, SIGNAL(firstSubscriberAppeared()), this, SLOT(onFirstSubscriberAppeared()));
     sconnect(&group, SIGNAL(lastSubscriberDisappeared()), this, SLOT(onLastSubscriberDisappeared()));
@@ -69,7 +69,7 @@ GroupListener::GroupListener(Service &service, const QStringList &keys,
 
 void GroupListener::clear()
 {
-    foreach(const Property *p, group.getProperties())
+    Q_FOREACH(const Property *p, group.getProperties())
         ((Property *)p)->unsetValue();
 }
 

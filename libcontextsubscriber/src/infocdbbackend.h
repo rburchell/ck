@@ -56,7 +56,7 @@ private:
     static QStringList variantListToStringList(const QVariantList &l);
     void checkCompatibility();
 
-private slots:
+private Q_SLOTS:
     void onDatabaseFileChanged(const QString &path);
     void onDatabaseDirectoryChanged(const QString &path);
 };

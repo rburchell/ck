@@ -64,12 +64,12 @@ QSet<const Property *> Group::getProperties()
 
 void Group::fakeFirst()
 {
-    emit firstSubscriberAppeared();
+    Q_EMIT firstSubscriberAppeared();
 }
 
 void Group::fakeLast()
 {
-    emit lastSubscriberDisappeared();
+    Q_EMIT lastSubscriberDisappeared();
 }
 
 /* Mocked implementation of Property */
@@ -82,12 +82,12 @@ void resetVariants()
 
 void emitFirstOn(const QString &k)
 {
-    foreach (Property* c, propertyList) {
+    Q_FOREACH (Property* c, propertyList) {
         if (c->getKey() == k)
             c->fakeFirst();
     }
 
-    foreach (Group* cg, groupList) {
+    Q_FOREACH (Group* cg, groupList) {
         if (cg->keyList.contains(k))
             cg->fakeFirst();
     }
@@ -95,12 +95,12 @@ void emitFirstOn(const QString &k)
 
 void emitLastOn(const QString &k)
 {
-    foreach (Property* c, propertyList) {
+    Q_FOREACH (Property* c, propertyList) {
         if (c->getKey() == k)
             c->fakeLast();
     }
 
-    foreach (Group* cg, groupList) {
+    Q_FOREACH (Group* cg, groupList) {
         if (cg->keyList.contains(k))
             cg->fakeLast();
     }
@@ -174,19 +174,19 @@ const QString Property::getKey() const
 
 void Property::fakeFirst()
 {
-    emit firstSubscriberAppeared(key);
+    Q_EMIT firstSubscriberAppeared(key);
 }
 
 void Property::fakeLast()
 {
-    emit lastSubscriberDisappeared(key);
+    Q_EMIT lastSubscriberDisappeared(key);
 }
 
 class ContextCUnitTest : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void init();
     void startStopStart();
     void installKey();
