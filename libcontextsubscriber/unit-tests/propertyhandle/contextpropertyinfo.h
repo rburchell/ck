@@ -43,6 +43,7 @@ public:
 
     bool provided() const;
     bool declared() const;
+    bool deprecated() const;
     QList<ContextProviderInfo> providers() const;
 
 Q_SIGNALS:

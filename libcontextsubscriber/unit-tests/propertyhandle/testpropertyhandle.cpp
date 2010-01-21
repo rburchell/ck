@@ -65,6 +65,11 @@ bool ContextPropertyInfo::provided() const
     return true;
 }
 
+bool ContextPropertyInfo::deprecated() const
+{
+    return false;
+}
+
 QList<ContextProviderInfo> ContextPropertyInfo::providers() const
 {
     return QList<ContextProviderInfo>() << ContextProviderInfo("fakeplugin", "fakeconstructionstring");
