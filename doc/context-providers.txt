@@ -86,10 +86,6 @@ without any additional markup.
 Types
 ~~~~~
 
-*NOTE:* This is preview of things that might come, or not.  For now,
-just use a +type+ attribute in your +key+ elements with one of
-+"TRUTH"+, +"STRING"+, +"INT"+, or +"DOUBLE"+ as the value.
-
 ContextKit uses the experimental link:context-types.html[Desktop Type
 System].  A property declaration should have a +type+ element that
 conforms to the Desktop Type System.
@@ -109,6 +105,28 @@ this:
   </type>
   <doc>
     The current economic trend, as an enumerated value.
+  </doc>
+</key>
+------------------
+
+Deprecating properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+You can add a +deprecated+ element to your property declaration to
+mark it as deprecated.  Run-time warnings will be emitted when
+applications connect to a deprecated property, and documentation that
+is generated from your property declarations will mark them as
+deprecated.
+
+Example:
+
+[xml]
+------------------
+<key name="SoundedLikeAGoodIdea"
+     type="string">
+  <deprecated/>
+  <doc>
+    Don't use this property, use ABetterIdeaByFar instead.
   </doc>
 </key>
 ------------------
