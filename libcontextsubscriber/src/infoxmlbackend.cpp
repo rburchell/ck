@@ -101,6 +101,11 @@ bool InfoXmlBackend::keyDeclared(QString key) const
         return false;
 }
 
+bool InfoXmlBackend::keyDeprecated(QString key) const
+{
+    return false;
+}
+
 /// Returns the full path to the registry directory. Takes the
 /// \c CONTEXT_PROVIDERS env variable into account.
 QString InfoXmlBackend::registryPath()

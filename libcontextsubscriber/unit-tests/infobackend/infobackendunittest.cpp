@@ -81,6 +81,11 @@ public:
         return false;
     }
 
+    bool keyDeprecated(QString key) const
+    {
+        return false;
+    }
+
     const QList<ContextProviderInfo> providersForKey(QString key) const
     {
         return QList<ContextProviderInfo> ();

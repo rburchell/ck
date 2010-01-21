@@ -278,6 +278,13 @@ bool ContextPropertyInfo::provided() const
     return (cachedProviders.size() > 0);
 }
 
+/// Returns true if the key is deprecated.
+bool ContextPropertyInfo::deprecated() const
+{
+    InfoBackend* infoBackend = InfoBackend::instance();
+    return infoBackend->keyDeprecated(keyName);
+}
+
 /// DEPRECATED Returns the name of the plugin supplying this property.
 /// This function is deprecated, use providers() instead.
 QString ContextPropertyInfo::plugin() const

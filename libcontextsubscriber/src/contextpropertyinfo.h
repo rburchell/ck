@@ -49,6 +49,7 @@ public:
     bool exists() const;
     bool declared() const;
     bool provided() const;
+    bool deprecated() const;
 
     QString providerDBusName() const;
     QDBusConnection::BusType providerDBusType() const;
