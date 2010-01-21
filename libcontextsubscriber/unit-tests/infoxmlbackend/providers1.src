@@ -17,4 +17,7 @@
         <double min="0" max="10"/>
     </type>
   </key>
+  <key name="Key.Deprecated" type="string">
+    <deprecated/>
+  </key>
 </provider>
