@@ -140,6 +140,9 @@ int main(int argc, char **argv)
         // Write doc
         writer.replace(key + ":KEYDOC", keyInfo.doc());
 
+        // Write deprecated
+        writer.replace(key + ":KEYDEPRECATED", keyInfo.deprecated());
+
         // Write the providers
         QVariantList providers;
         Q_FOREACH(const ContextProviderInfo info, keyInfo.providers()) {
