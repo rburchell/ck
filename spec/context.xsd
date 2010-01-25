@@ -116,6 +116,7 @@
 	<element minOccurs="0" ref="provider:doc"/>
 	<element minOccurs="0" ref="provider:type"/>
 	<element minOccurs="0" ref="provider:typedoc"/>
+	<element minOccurs="0" ref="provider:deprecated"/>
       </all>
       <attribute name="name" use="required" type="token">
 	<annotation><documentation>
@@ -130,6 +131,11 @@
       <attribute name="typedoc" use="optional" type="token">
 	<annotation><documentation>
 	  The type of this key, if it is a simple string.
+	</documentation></annotation>
+      </attribute>
+      <attribute name="deprecated" use="optional" type="token">
+	<annotation><documentation>
+	  Whether or not the key is dperecated.
 	</documentation></annotation>
       </attribute>
     </complexType>
@@ -150,6 +156,18 @@
   <element name="typedoc">
     <annotation><documentation>
       The type of this key.
+    </documentation></annotation>
+    <!-- XXX - not very strict -->
+    <complexType mixed="true">
+      <sequence>
+        <any minOccurs="0" processContents="lax"/>
+      </sequence>
+    </complexType>
+  </element>
+
+  <element name="deprecated">
+    <annotation><documentation>
+        Whether or not the key is dperecated.
     </documentation></annotation>
     <!-- XXX - not very strict -->
     <complexType mixed="true">
