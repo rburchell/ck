@@ -52,7 +52,7 @@ sub cadr {
 
 sub cdr {
     my ($nano) = @_;
-    # XXX - one free beer if you can express this array slices.
+    # XXX - one free beer if you can express this with array slices.
     my $res = [];
     for ($i = 1; $i < @{$nano}; $i++) {
         push (@{$res}, $nano->[$i]);
@@ -192,6 +192,9 @@ sub output_key {
 
     print "\n";
     print "*" . nano_ref ($key, 'name') . "* (" . type_short_desc ($type) . ")::\n";
+    if (nano_assoc ($key, 'deprecated') != nil) {
+        print "[red]#Deprecated.#\n+\n";
+    }
     print nano_ref ($key, 'doc') . "\n";
     print_type_long_desc ($type);
 }

@@ -101,6 +101,14 @@ bool InfoXmlBackend::keyDeclared(QString key) const
         return false;
 }
 
+bool InfoXmlBackend::keyDeprecated(QString key) const
+{
+    if (! keyDataHash.contains(key))
+        return false;
+
+    return keyDataHash.value(key).deprecated;
+}
+
 /// Returns the full path to the registry directory. Takes the
 /// \c CONTEXT_PROVIDERS env variable into account.
 QString InfoXmlBackend::registryPath()
@@ -245,6 +253,7 @@ void InfoXmlBackend::parseKey(const AssocTree &keyTree, const AssocTree &provide
     QString plugin = providerTree.value("plugin").toString();
     QString constructionString = providerTree.value("constructionString").toString();
     QString doc = keyTree.value("doc").toString();
+    QVariant deprecated_node = keyTree.node("deprecated");
 
     ContextTypeInfo typeInfo = keyTree.value("type");
     typeInfo = typeInfo.ensureNewTypes(); // Make sure to get rid of old names (INTEGER...)
@@ -258,6 +267,7 @@ void InfoXmlBackend::parseKey(const AssocTree &keyTree, const AssocTree &provide
         keyData.name = key;
         keyData.typeInfo = typeInfo;
         keyData.doc = doc;
+        keyData.deprecated = deprecated_node.isValid();
 
         contextDebug() << F_XML << "Adding new key" << key << "with type:" << keyData.typeInfo.name();
         keyDataHash.insert(key, keyData);

@@ -579,6 +579,7 @@ than one situation might be active at the same time.
     </doc>
     </key>
   <key name="Use.Mode">
+    <deprecated/>
     <doc>
 The current main usage mode of the device.
     </doc>

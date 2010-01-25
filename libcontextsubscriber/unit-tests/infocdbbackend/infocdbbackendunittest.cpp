@@ -64,6 +64,7 @@ private Q_SLOTS:
     void typeInfoForKey();
     void docForKey();
     void keyDeclared();
+    void keyDeprecated();
     void providersForKey();
     void dynamics();
     void removed();
@@ -80,9 +81,11 @@ void InfoCdbBackendUnitTest::createBaseDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Internet.BytesOut");
+    writer.add("KEYS", "Key.Deprecated");
     writer.add("Battery.Charging:KEYTYPEINFO", ContextTypeInfo(QString("bool")));
     writer.add("Internet.BytesOut:KEYTYPEINFO", ContextTypeInfo(QString("int64")));
     writer.add("Battery.Charging:KEYDOC", "doc1");
+    writer.add("Key.Deprecated:KEYDEPRECATED", true);
 
     QVariantList providers1;
     QHash <QString, QVariant> provider1;
@@ -110,10 +113,12 @@ void InfoCdbBackendUnitTest::createAlternateDatabase(QString path)
 
     writer.add("KEYS", "Battery.Charging");
     writer.add("KEYS", "Battery.Capacity");
+    writer.add("KEYS", "Key.Deprecated");
     writer.add("Battery.Charging:KEYTYPEINFO", ContextTypeInfo(QString("int64")));
     writer.add("Battery.Charging:KEYDOC", "doc1");
     writer.add("Battery.Capacity:KEYTYPEINFO", ContextTypeInfo(QString("int64")));
     writer.add("Battery.Capacity:KEYDOC", "doc3");
+    writer.add("Key.Deprecated:KEYDEPRECATED", true);
 
     QVariantList providers1;
     QHash <QString, QVariant> provider1;
@@ -187,9 +192,10 @@ void InfoCdbBackendUnitTest::databaseExists()
 void InfoCdbBackendUnitTest::listKeys()
 {
     QStringList keys = backend->listKeys();
-    QCOMPARE(keys.count(), 2);
+    QCOMPARE(keys.count(), 3);
     QVERIFY(keys.contains("Battery.Charging"));
     QVERIFY(keys.contains("Internet.BytesOut"));
+    QVERIFY(keys.contains("Key.Deprecated"));
 }
 
 void InfoCdbBackendUnitTest::typeInfoForKey()
@@ -213,6 +219,13 @@ void InfoCdbBackendUnitTest::keyDeclared()
 
     QCOMPARE(backend->keyDeclared("Does.Not.Exist"), false);
     QCOMPARE(backend->keyDeclared("Battery.Charging"), true);
+}
+
+void InfoCdbBackendUnitTest::keyDeprecated()
+{
+    QCOMPARE(backend->keyDeprecated("Battery.Charging"), false);
+    QCOMPARE(backend->keyDeprecated("Key.does.not.exist"), false);
+    QCOMPARE(backend->keyDeprecated("Key.Deprecated"), true);
 }
 
 void InfoCdbBackendUnitTest::providersForKey()
@@ -243,7 +256,7 @@ void InfoCdbBackendUnitTest::dynamics()
 
     // Test the new values
     QCOMPARE(backend->databaseExists(), true);
-    QCOMPARE(backend->listKeys().count(), 2);
+    QCOMPARE(backend->listKeys().count(), 3);
     QVERIFY(backend->listKeys().contains("Battery.Charging"));
     QVERIFY(backend->listKeys().contains("Battery.Capacity"));
     QCOMPARE(backend->typeInfoForKey("Battery.Charging").name(), QString("int64"));
@@ -269,11 +282,11 @@ void InfoCdbBackendUnitTest::dynamics()
 
     QCOMPARE(spy2.count(), 1);
     QList<QVariant> args2 = spy2.takeFirst();
-    QCOMPARE(args2.at(0).toList().size(), 2);
+    QCOMPARE(args2.at(0).toList().size(), 3);
     QCOMPARE(args2.at(0).toStringList().at(0), QString("Battery.Charging"));
     QCOMPARE(args2.at(0).toStringList().at(1), QString("Battery.Capacity"));
 
-    QCOMPARE(spy3.count(), 3);
+    QCOMPARE(spy3.count(), 4);
 
     QCOMPARE(spy4.count(), 1);
     QList<QVariant> args4 = spy4.takeFirst();
@@ -294,7 +307,7 @@ void InfoCdbBackendUnitTest::removed()
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
-    QCOMPARE(args.at(0).toList().size(), 2);
+    QCOMPARE(args.at(0).toList().size(), 3);
 
     backend->disconnectNotify("-"); // Fake it. Spy does something fishy here.
 }

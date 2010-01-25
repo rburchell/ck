@@ -39,6 +39,7 @@ struct InfoKeyData
     QString name; ///< Name of the we're storing data for.
     ContextTypeInfo typeInfo; ///< Type information of the key.
     QString doc; ///< Doc for the key.
+    bool deprecated; ///< Whether the key is deprecated.
 };
 
 #endif // INFOKEYDATA_H

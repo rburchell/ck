@@ -59,6 +59,7 @@ private Q_SLOTS:
     void typeInfoForKey();
     void docForKey();
     void keyDeclared();
+    void keyDeprecated();
     void providersForKey();
     void dynamics();
     void cleanupTestCase();
@@ -96,7 +97,7 @@ void InfoXmlBackendUnitTest::listKeys()
 
     QVERIFY(! keys.contains("System.ProcessingData"));
 
-    QCOMPARE(keys.count(), 10);
+    QCOMPARE(keys.count(), 11);
     QVERIFY(keys.contains("Battery.ChargePercentage"));
     QVERIFY(keys.contains("Battery.LowBattery"));
     QVERIFY(keys.contains("Key.With.Attribute"));
@@ -105,6 +106,7 @@ void InfoXmlBackendUnitTest::listKeys()
     QVERIFY(keys.contains("Key.With.string"));
     QVERIFY(keys.contains("Key.With.double"));
     QVERIFY(keys.contains("Key.With.complex"));
+    QVERIFY(keys.contains("Key.Deprecated"));
     QVERIFY(keys.contains("Battery.Charging"));
     QVERIFY(keys.contains("Battery.Voltage"));
 }
@@ -155,6 +157,13 @@ void InfoXmlBackendUnitTest::keyDeclared()
     QCOMPARE(backend->keyDeclared("Battery.Charging"), true);
 }
 
+void InfoXmlBackendUnitTest::keyDeprecated()
+{
+    QCOMPARE(backend->keyDeprecated("Key.With.bool"), false);
+    QCOMPARE(backend->keyDeprecated("Key.does.not.exist"), false);
+    QCOMPARE(backend->keyDeprecated("Key.Deprecated"), true);
+}
+
 void InfoXmlBackendUnitTest::paths()
 {
     QVERIFY(InfoXmlBackend::registryPath() == QString("./") ||
@@ -177,7 +186,7 @@ void InfoXmlBackendUnitTest::dynamics()
 {
     // Sanity check
     QStringList keys = backend->listKeys();
-    QCOMPARE(keys.count(), 10);
+    QCOMPARE(keys.count(), 11);
     QVERIFY(keys.contains("Battery.Charging"));
     QCOMPARE(backend->keyDeclared("System.Active"), false);
 

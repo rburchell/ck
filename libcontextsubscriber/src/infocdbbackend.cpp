@@ -95,6 +95,14 @@ bool InfoCdbBackend::keyDeclared(QString key) const
         return false;
 }
 
+bool InfoCdbBackend::keyDeprecated(QString key) const
+{
+    if (databaseCompatible)
+        return reader.valueForKey(key + ":KEYDEPRECATED").toBool();
+    else
+        return false;
+}
+
 /// Returns true if the database file is present.
 bool InfoCdbBackend::databaseExists()
 {

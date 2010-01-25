@@ -80,6 +80,9 @@ PropertyHandle::PropertyHandle(const QString& key)
     // done before calling updateProvider.
     myInfo = new ContextPropertyInfo(myKey, this);
 
+    if (myInfo->deprecated())
+        contextWarning() << F_DEPRECATION << "Property is deprecated:" << myKey;
+
     // Start listening to changes in property introspection (e.g., added to registry, plugin changes)
     sconnect(myInfo, SIGNAL(changed(QString)),
              this, SLOT(updateProvider()));
