@@ -1,3 +1,9 @@
+contextkit (0.5.9~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 26 Jan 2010 13:03:51 +0200
+
 contextkit (0.5.8) unstable; urgency=low
 
   * Print warnings and tag documentation for deprecated context properties
