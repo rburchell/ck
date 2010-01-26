@@ -1,8 +1,10 @@
-contextkit (0.5.8~unreleased) unstable; urgency=low
+contextkit (0.5.8) unstable; urgency=low
 
-  *
+  * Print warnings and tag documentation for deprecated context properties
 
- -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Tue, 12 Jan 2010 14:22:15 +0200
+  Implemented: Swp#CntFr-399
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Mon, 25 Jan 2010 17:27:53 +0200
 
 contextkit (0.5.7) unstable; urgency=low
 
