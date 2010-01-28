@@ -21,7 +21,7 @@ includecontextsubscriberdir=$(includedir)/contextsubscriber
 includecontextsubscriber_HEADERS = contextproperty.h			\
 	contextpropertyinfo.h contextregistryinfo.h iproviderplugin.h	\
 	contextproviderinfo.h asyncdbusinterface.h timedvalue.h		\
-	contexttypeinfo.h contexttypeinfo.cpp				\
+	contexttypeinfo.h 						\
 	contexttyperegistryinfo.h assoctree.h duration.h contextjson.h
 
 AM_CXXFLAGS = -I$(top_srcdir)/common \
