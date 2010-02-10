@@ -382,6 +382,12 @@ The currently used Radio Access Technology for data transfer.
 The current cellular network registration status.
     </doc>
   </key>
+  <key name="Cellular.CellName"
+       type="string">
+    <doc>
+The broadcast name of the current cell.
+    </doc>
+  </key>
   <doc>
 User alarms
 -----------
