@@ -260,8 +260,8 @@ void InfoXmlBackend::parseKey(const AssocTree &keyTree, const AssocTree &provide
 
     // Warn about description mismatch or add new
     if (keyDataHash.contains(key)) {
-        if (typeInfo.name() != "" || doc != "")
-            contextWarning() << F_XML << key << ": redeclarations can't specify type or doc";
+        if (typeInfo.name() != "" && typeInfo != keyDataHash[key].typeInfo)
+            contextWarning() << F_XML << key << ": type mismatch in core property list and provider property list";
     } else {
         InfoKeyData keyData;
         keyData.name = key;

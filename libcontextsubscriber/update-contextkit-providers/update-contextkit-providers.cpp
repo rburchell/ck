@@ -106,6 +106,9 @@ int main(int argc, char **argv)
     else
         path = QString(DEFAULT_CONTEXT_PROVIDERS);
 
+    // Make warnings less verbose
+    setenv("CONTEXT_LOG_HIDE_TIMESTAMPS", "1", 0);
+
     printf("Updating from: '%s'\n", path.toUtf8().constData());
 
     // Force the xml backend
