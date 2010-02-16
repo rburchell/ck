@@ -34,7 +34,7 @@ PropertyListener::PropertyListener(const QString &key):
 {
     sconnect(prop, SIGNAL(valueChanged()), this, SLOT(onValueChanged()));
     if (!prop->info()->declared())
-        QTextStream(stdout) << "Key doesn't exists: " + prop->key() << endl;
+        QTextStream(stdout) << "Key doesn't exist: " + prop->key() << endl;
     else if (!prop->info()->provided())
         QTextStream(stdout) << "Key not provided: " + prop->key() << endl;
     QTextStream(stdout) << prop->key() << " subscribtion started" << endl;
