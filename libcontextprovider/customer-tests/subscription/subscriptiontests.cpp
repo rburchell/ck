@@ -286,6 +286,37 @@ void SubscriptionTests::illegalUnsubscribe()
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 
+void SubscriptionTests::clientExits()
+{
+    // Check that the initialization went well.
+    // Doing this only in init() is not enough; doesn't stop the test case.
+    QVERIFY(clientStarted);
+
+    QSignalSpy intItemFirst(test_int, SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy intItemLast(test_int, SIGNAL(lastSubscriberDisappeared(const QString&)));
+
+    // Test: ask the client to call Subscribe
+    writeToClient("subscribe service1 Test.Int\n");
+
+    // Expected result: we get a notification that the key was subscribed
+    QCOMPARE(intItemFirst.count(), 1);
+    QCOMPARE(intItemLast.count(), 0);
+
+    // Test: kill the client
+    client->kill();
+    client->waitForFinished();
+    clientStarted = false;
+
+    // It takes some time and event processing until we get the signal
+    int i = 0;
+    while (intItemLast.count() == 0 && i++ < 100)
+        QCoreApplication::processEvents(QEventLoop::AllEvents);
+
+    // Expected result: we get a notification that the key was unsubscribed
+    QCOMPARE(intItemFirst.count(), 1);
+    QCOMPARE(intItemLast.count(), 1);
+}
+
 } // end namespace
 
 QTEST_MAIN(ContextProvider::SubscriptionTests);

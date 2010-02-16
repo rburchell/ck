@@ -37,6 +37,8 @@ private Q_SLOTS:
     void multiSubscribe();
     void illegalUnsubscribe();
 
+    void clientExits();
+
 public Q_SLOTS:
     void readStandardOutput();
 
