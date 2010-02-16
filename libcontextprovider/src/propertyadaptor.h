@@ -28,6 +28,7 @@
 #include <QDBusConnection>
 #include <QSet>
 #include <QString>
+#include <QDBusServiceWatcher>
 #define DBUS_INTERFACE "org.maemo.contextkit.Property"
 
 namespace ContextProvider {
@@ -53,13 +54,14 @@ Q_SIGNALS:
     void ValueChanged(const QVariantList &values, const quint64& timestamp);
 
 private Q_SLOTS:
-    void onServiceOwnerChanged(const QString&, const QString&, const QString&);
+    void onClientExited(const QString&);
     void onValueChanged(QVariantList values, quint64 timestamp);
 
 private:
     PropertyPrivate *propertyPrivate; ///< The managed object.
     QDBusConnection *connection; ///< The connection to operate on.
-    QSet<QString> clientServiceNames; ///< How many times each client (recognized by D-Bus service name) has subscribed
+    QSet<QString> clientServiceNames; ///< List of all subscribed clients (recognized by D-Bus service name)
+    QDBusServiceWatcher serviceWatcher; ///< For watching clients exiting D-Bus
 
 };
 

@@ -44,11 +44,11 @@ namespace ContextProvider {
 PropertyAdaptor::PropertyAdaptor(PropertyPrivate* propertyPrivate, QDBusConnection *conn)
     : QDBusAbstractAdaptor(propertyPrivate), propertyPrivate(propertyPrivate), connection(conn)
 {
-    // Start listening to the NameOwnerChanged D-Bus signal, to know
-    // when our client has exited.
-    sconnect((QObject*) connection->interface(),
-             SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
-             this, SLOT(onServiceOwnerChanged(const QString &, const QString&, const QString&)));
+    // Start listening to the QDBusServiceWathcer, to know when our client has
+    // exited.
+    sconnect(&serviceWatcher, SIGNAL(serviceUnregistered(const QString&)),
+             this, SLOT(onClientExited(const QString&)));
+    serviceWatcher.setConnection(*conn);
 
     sconnect(propertyPrivate, SIGNAL(valueChanged(const QVariantList&, const quint64&)),
              this, SIGNAL(ValueChanged(const QVariantList&, const quint64&)));
@@ -74,6 +74,7 @@ void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, q
         if (clientServiceNames.size() == 1) {
             propertyPrivate->setSubscribed();
         }
+        serviceWatcher.addWatchedService(client);
     }
     else {
         contextWarning() << "Client" << client << "subscribed to property" << propertyPrivate->key << "multiple times";
@@ -92,11 +93,11 @@ void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
     contextDebug() << "Unsubscribe called";
     QString client = msg.service();
 
-    if (clientServiceNames.contains(client)) {
-        clientServiceNames.remove(client);
+    if (clientServiceNames.remove(client)) {
         if (clientServiceNames.size() == 0) {
             propertyPrivate->setUnsubscribed();
         }
+        serviceWatcher.removeWatchedService(client);
     }
     else {
         contextWarning() << "Client" << client << "unsubscribed from property" <<
@@ -125,20 +126,12 @@ void PropertyAdaptor::onValueChanged(QVariantList values, quint64 timestamp)
     propertyPrivate->updateOverheardValue(values, timestamp);
 }
 
-/// Called when a NameOwnerChanged signal is broadcast on D-Bus. If
-/// one of our clients has disappeared from D-Bus, update the client
-/// list.
-void PropertyAdaptor::onServiceOwnerChanged(const QString &name, const QString &oldName, const QString &newName)
-
+/// Called when the DBusServiceWatcher signals that one of our clients has
+/// exited D-Bus.
+void PropertyAdaptor::onClientExited(const QString& busName)
 {
-    if (newName == "") {
-        if (clientServiceNames.contains(name)) {
-            // It was one of our clients
-            clientServiceNames.remove(name);
-            if (clientServiceNames.size() == 0) {
-                propertyPrivate->setUnsubscribed();
-            }
-        }
+    if (clientServiceNames.remove(busName) && clientServiceNames.size() == 0) {
+        propertyPrivate->setUnsubscribed();
     }
 }
 
@@ -163,6 +156,8 @@ QString PropertyAdaptor::objectPath() const
 /// the clients when the service is stopped.
 void PropertyAdaptor::forgetClients()
 {
+    foreach(const QString& client, clientServiceNames)
+        serviceWatcher.removeWatchedService(client);
     clientServiceNames.clear();
     propertyPrivate->setUnsubscribed();
 }
