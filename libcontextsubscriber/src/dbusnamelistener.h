@@ -25,13 +25,13 @@
 #include <QObject>
 #include <QString>
 #include <QDBusConnection>
+#include <QDBusServiceWatcher>
 
 class QDBusPendingCallWatcher;
 
 namespace ContextSubscriber {
 
-
-class DBusNameListener : public QObject
+class DBusNameListener : public QDBusServiceWatcher
 {
     Q_OBJECT
 public:
@@ -46,18 +46,17 @@ public:
     ServicePresence isServicePresent() const;
 
 private Q_SLOTS:
-    void onServiceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner);
     void onNameHasOwnerFinished(QDBusPendingCallWatcher* watcher);
+    void setServicePresent();
+    void setServiceGone();
 
 private:
+    void init();
     ServicePresence servicePresent; ///< Our current understanding about the service name's state
     QDBusConnection::BusType busType; ///< The service bus type we are interested in
     QString busName; ///< The service name we are interested in
     bool listeningStarted;
     QDBusConnection* connection;
-
-    void setServicePresent();
-    void setServiceGone();
 
 Q_SIGNALS:
     void nameAppeared();

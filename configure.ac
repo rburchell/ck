@@ -17,7 +17,7 @@ AM_PATH_PYTHON
 # check for libraries
 PKG_CHECK_MODULES_SUBST([QtTest], [QtTest])
 PKG_CHECK_MODULES_SUBST([QtCore], [QtCore])
-PKG_CHECK_MODULES_SUBST([QtDBus], [QtDBus])
+PKG_CHECK_MODULES_SUBST([QtDBus], [QtDBus >= 4.6])
 PKG_CHECK_MODULES_SUBST([QtXml], [QtXml])
 PKG_CHECK_MODULES_SUBST([QJson], [QJson])
 # only for compiling c code

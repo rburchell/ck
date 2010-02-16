@@ -33,14 +33,15 @@ namespace ContextSubscriber {
 
 /*! \class DBusNameListener
 
-  \brief Listens for changes in a specific service name on a D-Bus bus,
-  optionally gets the initial state of the service name.
+  \brief Extends the QDBusServiceWatcher; adds the possibility to do an
+  initial check of the service status (asyncronously) and to query the status
+  of the service any time.
 
   When you create an instance of this class, it won't open any D-Bus
-  connections. When startListening is called, the instance connects to
-  the NameOwnerChanged D-Bus signal.  It can also check the current
-  status of the service by executing an asynchronous NameHasOwner
-  call.
+  connections. When startListening is called, the instance starts using the
+  QDBusServiceWatcher to get updates when the service is registered or
+  unregistered.  It can also check the current status of the service by
+  executing an asynchronous NameHasOwner call.
 
   If the specified service appears on D-Bus, it will emit the \c
   nameAppeared() signal, if disappears, then the nameDisappeared()
@@ -54,16 +55,32 @@ namespace ContextSubscriber {
   is present.
 */
 DBusNameListener::DBusNameListener(QDBusConnection::BusType busType, const QString &busName, QObject *parent) :
-    QObject(parent), servicePresent(Unknown), busType(busType), busName(busName), listeningStarted(false), connection(0)
+    QDBusServiceWatcher(parent),
+    servicePresent(Unknown), busType(busType), busName(busName), listeningStarted(false), connection(0)
 {
-    // Don't do anything, until the user initiates the listening by calling startListening.
+    // Don't do anything, until the user initiates the listening by calling
+    // startListening.
+    init();
 }
 
 DBusNameListener::DBusNameListener(const QDBusConnection bus, const QString &busName, QObject *parent) :
-    QObject(parent), servicePresent(Unknown), busName(busName), listeningStarted(false), connection(0)
+    QDBusServiceWatcher(parent),
+    servicePresent(Unknown), busName(busName), listeningStarted(false), connection(0)
 {
     // we copy the connection so we can safely delete it in the destructor
     connection = new QDBusConnection(bus);
+    init();
+}
+
+/// Initializes the QDBusServiceWatcher base part and connects the signals
+/// from it.
+void DBusNameListener::init()
+{
+    addWatchedService(busName);
+    sconnect(this, SIGNAL(serviceRegistered(const QString&)),
+             this, SLOT(setServicePresent()));
+    sconnect(this, SIGNAL(serviceUnregistered(const QString&)),
+             this, SLOT(setServiceGone()));
 }
 
 DBusNameListener::~DBusNameListener()
@@ -72,9 +89,9 @@ DBusNameListener::~DBusNameListener()
     connection = 0;
 }
 
-/// Start listening to the NameOwnerChanged signal over D-Bus. If \a
-/// nameHasOwnerCheck is true, also send a NameHasOwner query to D-Bus
-/// (asyncronously).
+/// Start listening to the service registration / unregistration over
+/// D-Bus. If \a nameHasOwnerCheck is true, also send a NameHasOwner query to
+/// D-Bus (asyncronously).
 void DBusNameListener::startListening(bool nameHasOwnerCheck)
 {
     if (listeningStarted) return;
@@ -92,11 +109,9 @@ void DBusNameListener::startListening(bool nameHasOwnerCheck)
             return;
         }
     }
-
-    sconnect(connection->interface(),
-             SIGNAL(serviceOwnerChanged(const QString&, const QString&, const QString&)),
-             this,
-             SLOT(onServiceOwnerChanged(const QString&, const QString&, const QString&)));
+    // set the connection + watched service name to the QDBusServiceWatcher
+    // base object; now it will start to watch
+    setConnection(*connection);
 
     // Check if the service is already there
     if (nameHasOwnerCheck) {
@@ -107,22 +122,6 @@ void DBusNameListener::startListening(bool nameHasOwnerCheck)
         SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(nameHasOwnerCall, this);
         sconnect(watcher, SIGNAL(finished(QDBusPendingCallWatcher *)),
                  this, SLOT(onNameHasOwnerFinished(QDBusPendingCallWatcher *)));
-    }
-}
-
-/// This slot is called when DBusNameOwnerChanged signal arrives and
-/// it just filters the name and if we are interested in the name it
-/// emits the <tt>nameAppeared()</tt> or <tt>nameDisappeared()</tt>
-/// signal.
-void DBusNameListener::onServiceOwnerChanged(const QString &name, const QString &oldOwner, const QString &newOwner)
-{
-    contextDebug() << "name owner change" << name << oldOwner << newOwner;
-    if (name == busName) {
-        if (oldOwner == "") {
-            setServicePresent();
-        } else if (newOwner == "") {
-            setServiceGone();
-        }
     }
 }
 
