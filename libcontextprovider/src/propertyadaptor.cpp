@@ -133,6 +133,9 @@ void PropertyAdaptor::onClientExited(const QString& busName)
     if (clientServiceNames.remove(busName) && clientServiceNames.size() == 0) {
         propertyPrivate->setUnsubscribed();
     }
+    // The client is expected to re-subscribe if it comes back. Then we will
+    // start watching it again.
+    serviceWatcher.removeWatchedService(busName);
 }
 
 /// Object path where the corresponding PropertyPrivate object should
