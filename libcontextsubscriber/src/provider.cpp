@@ -72,7 +72,9 @@ namespace ContextSubscriber {
   subscribed.
 
   Subscription failures or successes can be signaled with emitting \c
-  subscribeFailed and \c subscribeFinished.
+  subscribeFailed and \c subscribeFinished. When the upper layer has called
+  subscribe(), the plugin must eventually emit \c subscribeFinished or \c
+  subscribeFailed for all the subscribed keys, or emit \c failed.
 
   At last, but not least, the plugin can emit \c valueChanged, when it
   has a new value for any property.  It is not required to only signal
@@ -361,7 +363,9 @@ void Provider::onPluginValueChanged(QString key, TimedValue newValue)
         Q_EMIT valueChanged(key);
     }
     else
-        contextWarning() << "Received a property not subscribed to:" << key;
+        // Plugins are allowed to send values which are not subscribed to, but
+        // only if they get them for free.
+        contextDebug() << "Received a property not subscribed to:" << key;
 }
 
 /// Deprecated: plugins should use the variant taking a TimedValue.
