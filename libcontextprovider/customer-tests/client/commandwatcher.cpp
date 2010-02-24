@@ -262,7 +262,6 @@ QString CommandWatcher::describeValue(QList<QVariant> value, quint64 timestamp)
     else {
         return value[0].typeName() + QString(":") + describeQVariant(value[0]);
     }
-    return "";
 }
 
 QString CommandWatcher::describeQVariant(QVariant value)

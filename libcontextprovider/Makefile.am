@@ -10,6 +10,9 @@ check-sum:
 coverage: covoptioncheck
 	$(MAKE) -C unit-tests coverage
 	$(MAKE) -C customer-tests coverage
+	mkdir -p coverage
+	lcov -a unit-tests/coverage/sedded.cov -a customer-tests/coverage/src.cov -o coverage/all.cov
+	genhtml -o coverage/ coverage/all.cov
 
 check-customer:
 	$(MAKE) -C customer-tests check-customer
