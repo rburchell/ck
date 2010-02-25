@@ -1,3 +1,9 @@
+contextkit (0.5.10~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 25 Feb 2010 16:02:16 +0200
+
 contextkit (0.5.9) unstable; urgency=low
 
   * update-contextkit-providers less verbose
