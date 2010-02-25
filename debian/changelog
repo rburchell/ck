@@ -1,8 +1,9 @@
-contextkit (0.5.9~unreleased) unstable; urgency=low
+contextkit (0.5.9) unstable; urgency=low
 
-  * 
+  * update-contextkit-providers less verbose
+  * replacing serviceOwnerChanged by qdbusservicewatcher
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 26 Jan 2010 13:03:51 +0200
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 25 Feb 2010 09:28:52 +0200
 
 contextkit (0.5.8) unstable; urgency=low
 
