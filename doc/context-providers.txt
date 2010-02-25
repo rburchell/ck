@@ -138,20 +138,20 @@ Guidelines for property providers
 Names
 ~~~~~
 
-Context property names can contain any character except "/".
+Context FW maintains a list of core properties. If you are providing a core property, you need to name it as it is described in the core property list (e.g., Screen.TopEdge).
+Only core property names are allowed to start with a capital ASCII letter ("A" to "Z").
 
-Only core property names are allowed to start with a capital ASCII
-letter ("A" to "Z").
+If you want to provide a non-core property, its name must be a valid name for a D-Bus object path (e.g., /com/mycompany/screen/topedge). A valid D-Bus object path starts with "/" and contains zero or more elements separated by "/" . Each element must only contain the following characters: [A-Z][a-z][0-9]_
 
 When defining a new non-core property, you need to choose a unique
 prefix.  Start with a reversed fully qualified domainname that you
-control, such as "com.nokia."  or "org.gnome.".  Then, if the first
-component is "org" and the second component is not a top-level domain,
+control, such as "/com/nokia/"  or "/org/gnome/".  Then, if the first
+component is "org" and the second component is not a top-level domain (e.g. fi, com),
 drop "org".  Then convert the first character of the prefix to
 lower-case if it is one of "A" to "Z".
 
-For example, the GNOME project can use "gnome." as their prefix, KDE
-can use "kde.", and Nokia can use "com.nokia.".
+For example, the GNOME project can use "/gnome/" as their prefix, KDE
+can use "/kde/", and Nokia can use "/com/nokia/".
 
 Providing core properties
 -------------------------
