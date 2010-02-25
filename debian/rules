@@ -3,9 +3,25 @@
 
 #export DH_VERBOSE=1
 
+# Sanitize build environment when running inside Scratchbox 1
+ifneq (,$(wildcard /targets))
+   export SBOX_REDIRECT_TO_DIRS=
+   export PATH=/scratchbox/compilers/bin:/bin:/usr/bin:/scratchbox/tools/bin
+   rc:=$(shell debian/fixup-scratchbox >&2)
+   ifneq (,$(FAKEROOTKEY))
+     ifneq (/usr/lib/libfakeroot/libfakeroot-sysv.so,$(LD_PRELOAD))
+       export FAKEROOTKEY=$(shell /usr/bin/faked-sysv | cut -d: -f1)
+       export LD_PRELOAD=/usr/lib/libfakeroot/libfakeroot-sysv.so
+     endif
+   endif
+endif
+
 LDFLAGS+=-Wl,--as-needed
 
-Makefile:
+configure:
+	./autogen.sh --no-configure
+
+Makefile: configure
 	./configure --prefix /usr --sysconfdir=/etc --disable-coverage
 
 build: build-stamp
@@ -14,11 +30,11 @@ build-stamp: Makefile
 	$(MAKE) LDFLAGS='$(LDFLAGS)' all
 	touch build-stamp
 
-clean:  Makefile
+clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp 
-	$(MAKE) distclean
+	[ -f Makefile ] && $(MAKE) distclean || true
 	dh_clean
 
 install:
