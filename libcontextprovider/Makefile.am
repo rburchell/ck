@@ -3,6 +3,8 @@ SUBDIRS = src unit-tests doc customer-tests context-provide
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = contextprovider-1.0.pc
 noinst_DATA = contextprovider-1.0-uninstalled.pc
+dbusconfdir = $(sysconfdir)/dbus-1/system.d
+dist_dbusconf_DATA = libcontextprovider0.conf
 
 check-sum:
 	$(MAKE) -C unit-tests check-sum
