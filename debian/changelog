@@ -1,8 +1,9 @@
-contextkit (0.5.10~unreleased) unstable; urgency=low
+contextkit (0.5.10) unstable; urgency=low
 
-  * 
+  * Added DBus policy.
+    Fixes: NB#159306
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 25 Feb 2010 16:02:16 +0200
+ -- Akos PASZTORY <ext-akos.pasztory@nokia.com>  Tue, 09 Mar 2010 11:55:50 +0200
 
 contextkit (0.5.9) unstable; urgency=low
 
