@@ -1,8 +1,8 @@
-contextkit (0.5.11~unreleased) unstable; urgency=low
+contextkit (0.5.11) unstable; urgency=low
 
-  * 
+  * Small fix for too visible variables.
 
- -- Akos PASZTORY <ext-akos.pasztory@nokia.com>  Tue, 09 Mar 2010 17:27:53 +0200
+ -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Fri, 26 Mar 2010 09:40:56 +0200
 
 contextkit (0.5.10) unstable; urgency=low
 
