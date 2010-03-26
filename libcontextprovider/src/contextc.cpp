@@ -85,13 +85,7 @@ using namespace ContextProvider;
 */
 
 static Service *cService;
-
-QList<Listener*> *listeners = NULL;
-
-char argv[] = "libcontextprovider";
-char* p= argv;
-int argc = 1;
-QCoreApplication* app = 0;
+static QList<Listener*> *listeners = NULL;
 
 /// Initializes and starts the service with a given \a bus_type and a \a bus_name.
 /// The \a bus_type can be DBUS_BUS_SESSION or DBUS_BUS_SYSTEM. This function can be
@@ -100,6 +94,11 @@ int context_provider_init (DBusBusType bus_type, const char* bus_name)
 {
     contextDebug() << F_C << bus_name;
 
+    static char arg[] = "libcontextprovider";
+    static char* p = arg;
+    static int argc = 1;
+    static QCoreApplication* app = 0;
+
     if (QCoreApplication::instance() == 0) {
         // No QCoreApplication created, so crate one.
         // This will also create an event dispatcher (QEventDispatcherGlibPrivate.)
@@ -107,7 +106,7 @@ int context_provider_init (DBusBusType bus_type, const char* bus_name)
     }
 
     if (cService != NULL) {
-        contextCritical() << "Service already initialize. You can only initialize one service with C API";
+        contextCritical() << "Service already initialized. You can only initialize one service with C API";
         return 0;
     }
 
@@ -138,7 +137,8 @@ void context_provider_stop (void)
         delete cService;
         cService = NULL;
     }
-    // FIXME: Do we need to do something with the QCoreApplication we might have constructed?
+    // We cannot destroy the QCoreApplication we might have created; it must
+    // be kept alive in case the provider calls init again.
 }
 
 /// Installs (adds) a \a key to be provided by the service. The callback function \a
