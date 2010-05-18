@@ -25,6 +25,8 @@
 #include <QStringList>
 #include <QObject>
 #include <QString>
+#include <QDateTime>
+#include <QFileInfo>
 #include <QFileSystemWatcher>
 #include "cdbreader.h"
 #include "infobackend.h"
@@ -53,12 +55,12 @@ private:
     QFileSystemWatcher watcher; ///< A watched object obsering the database file. Delivers synced notifications.
     CDBReader reader; ///< The cdb reader object used to access the cdb database.
     bool databaseCompatible; ///< If the currently open database is compatible (versions match).
+    QDateTime timestamp;
     void watch();
     static QStringList variantListToStringList(const QVariantList &l);
     void checkCompatibility();
 
 private Q_SLOTS:
-    void onDatabaseFileChanged(const QString &path);
     void onDatabaseDirectoryChanged(const QString &path);
 };
 

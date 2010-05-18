@@ -44,11 +44,10 @@
 */
 
 InfoCdbBackend::InfoCdbBackend(QObject *parent)
-    : InfoBackend(parent), reader(InfoCdbBackend::databasePath())
+    : InfoBackend(parent), reader(InfoCdbBackend::databasePath()), timestamp(QDateTime())
 {
     contextDebug() << F_CDB << "Initializing cdb backend with database:" << InfoCdbBackend::databasePath();
 
-    sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onDatabaseFileChanged(QString)));
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
     watch();
     checkCompatibility();
@@ -156,52 +155,50 @@ void InfoCdbBackend::watch()
     if (! watcher.directories().contains(InfoCdbBackend::databaseDirectory()) &&
         QDir(InfoCdbBackend::databaseDirectory()).exists(InfoCdbBackend::databaseDirectory()))
         watcher.addPath(InfoCdbBackend::databaseDirectory());
-    if (! watcher.files().contains(InfoCdbBackend::databasePath()) &&
-        QFile::exists(InfoCdbBackend::databasePath()))
-        watcher.addPath(InfoCdbBackend::databasePath());
 }
 
 /* Slots */
 
 /// Called when the database changes. Reopens the database and emits
 /// the change signals. If database does not exist it bails out but keeps observing.
-void InfoCdbBackend::onDatabaseFileChanged(const QString &path)
-{
-    QStringList oldKeys = listKeys();
-
-    contextDebug() << F_CDB << InfoCdbBackend::databasePath() << "changed, re-opening database.";
-
-    reader.reopen();
-    watch();
-
-    // Check the version
-    if (reader.isReadable())
-        checkCompatibility();
-
-    // If nobody is watching us anyways, drop out now and skip
-    // the further processing. This could be made more granular
-    // (ie. in many cases nobody will be watching on added/removed)
-    // but will be watching on changed.
-    if (connectCount == 0)
-        return;
-
-    QStringList currentKeys = listKeys();
-
-    // Emissions
-    checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
-    checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
-    Q_EMIT keysChanged(listKeys()); // DEPRECATED emission
-
-    Q_EMIT listChanged();
-    checkAndEmitKeyChanged(currentKeys, oldKeys);
-}
-
-/// Called when the directory with cache.db chanes. We start to observe this
-/// directory only when we don't have the cache.db in the first place.
 void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
 {
-    if (reader.isReadable() != QFile::exists(InfoCdbBackend::databasePath()))
-        onDatabaseFileChanged(path);
+    contextDebug() << F_CDB << InfoCdbBackend::databaseDirectory() << "Directory changed.";
+
+    QDateTime readTimeStamp = QFileInfo(InfoCdbBackend::databasePath()).lastModified();
+
+    if (timestamp != readTimeStamp) {
+        timestamp = readTimeStamp;
+
+        QStringList oldKeys = listKeys();
+
+        contextDebug() << F_CDB << InfoCdbBackend::databasePath() << "File changed, re-opening database.";
+
+        reader.reopen();
+        watch();
+
+        // Check the version
+        if (reader.isReadable())
+            checkCompatibility();
+
+        // If nobody is watching us anyways, drop out now and skip
+        // the further processing. This could be made more granular
+        // (ie. in many cases nobody will be watching on added/removed)
+        // but will be watching on changed.
+        if (connectCount == 0)
+            return;
+
+        QStringList currentKeys = listKeys();
+        // Emissions
+
+        checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
+        checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
+        Q_EMIT keysChanged(listKeys()); // DEPRECATED emission
+
+        Q_EMIT listChanged();
+        checkAndEmitKeyChanged(currentKeys, oldKeys);
+    }
+
 }
 
 const QList<ContextProviderInfo> InfoCdbBackend::providersForKey(QString key) const
