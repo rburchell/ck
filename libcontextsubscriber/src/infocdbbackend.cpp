@@ -19,12 +19,12 @@
  *
  */
 
-#include <QFileInfo>
 #include <QDir>
 #include <QDebug>
 #include <QFile>
-#include <stdlib.h>
 #include <QHash>
+#include <sys/stat.h>
+#include <stdlib.h>
 #include "sconnect.h"
 #include "infocdbbackend.h"
 #include "logging.h"
@@ -44,13 +44,21 @@
 */
 
 InfoCdbBackend::InfoCdbBackend(QObject *parent)
-    : InfoBackend(parent), reader(InfoCdbBackend::databasePath()), timestamp(QDateTime())
+    : InfoBackend(parent), reader(InfoCdbBackend::databasePath()), lastInode(0)
 {
     contextDebug() << F_CDB << "Initializing cdb backend with database:" << InfoCdbBackend::databasePath();
 
     sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
-    watch();
+
+    watcher.addPath(InfoCdbBackend::databaseDirectory());
+
     checkCompatibility();
+
+    struct stat buffer;
+    if (!stat(InfoCdbBackend::databasePath().toAscii(), &buffer))
+        lastInode = buffer.st_ino;
+    else
+        lastInode = 0;
 }
 
 /// Returns 'cdb'.
@@ -148,34 +156,30 @@ void InfoCdbBackend::checkCompatibility()
     }
 }
 
-/// Start watching directory and database path IF we're not watching
-/// it already and IF the directory/file exists.
-void InfoCdbBackend::watch()
-{
-    if (! watcher.directories().contains(InfoCdbBackend::databaseDirectory()) &&
-        QDir(InfoCdbBackend::databaseDirectory()).exists(InfoCdbBackend::databaseDirectory()))
-        watcher.addPath(InfoCdbBackend::databaseDirectory());
-}
-
 /* Slots */
 
-/// Called when the database changes. Reopens the database and emits
-/// the change signals. If database does not exist it bails out but keeps observing.
+/// Called when the database directory changes. Reopens the database and emits
+/// the change signal if the inode of the database has been modified.
 void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
 {
     contextDebug() << F_CDB << InfoCdbBackend::databaseDirectory() << "Directory changed.";
 
-    QDateTime readTimeStamp = QFileInfo(InfoCdbBackend::databasePath()).lastModified();
+    struct stat buffer;
+    quint64 inode;
 
-    if (timestamp != readTimeStamp) {
-        timestamp = readTimeStamp;
+    if (!stat(InfoCdbBackend::databasePath().toAscii(), &buffer))
+        inode = buffer.st_ino;
+    else
+        inode = 0;
+
+    if (lastInode != inode) {
+        lastInode = inode;
 
         QStringList oldKeys = listKeys();
 
         contextDebug() << F_CDB << InfoCdbBackend::databasePath() << "File changed, re-opening database.";
 
         reader.reopen();
-        watch();
 
         // Check the version
         if (reader.isReadable())
@@ -190,7 +194,6 @@ void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
 
         QStringList currentKeys = listKeys();
         // Emissions
-
         checkAndEmitKeysAdded(currentKeys, oldKeys); // DEPRECATED emission
         checkAndEmitKeysRemoved(currentKeys, oldKeys); // DEPRECATED emission
         Q_EMIT keysChanged(listKeys()); // DEPRECATED emission

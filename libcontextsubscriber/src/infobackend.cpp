@@ -100,12 +100,12 @@ void InfoBackend::checkAndEmitKeysAdded(const QStringList &currentKeys,
 void InfoBackend::checkAndEmitKeysRemoved(const QStringList &currentKeys,
                                           const QStringList &oldKeys)
 {
+
     QStringList removedKeys;
     Q_FOREACH (QString key, oldKeys) {
         if (! currentKeys.contains(key))
             removedKeys << key;
     }
-
     if (removedKeys.size() > 0)
         Q_EMIT keysRemoved(removedKeys);
 }
