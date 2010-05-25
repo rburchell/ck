@@ -10,7 +10,7 @@ platform.
 This document is maintained as part of the +contextkit+ package.
 Please report change requests as bugs against the +contextkit+
 package.
- 
+
 *NOTE:* Most of these properties are unstable and their definition will
 change for some time still.  Only the ones explicitly marked as stable
 should be used for now.
@@ -52,25 +52,17 @@ Location
 Best effort location information. If any of the keys are not
 appliciable to the current location, they will be unavailable.
   </doc>
-  <key name="Location.SatPositioningOn"
-       type="bool">
-    <doc>
-      A boolean indicating whether or not the location information is provided by
-      satellite positioning system e.g. GPS.
-    </doc>
-  </key>
-  <key name="Location.ActiveSources">
+  <key name="Location.SatPositioningState">
     <type>
-      <list type="location-source"/>
+      <string-enum>
+        <off/>
+        <search/>
+        <on/>
+      </string-enum>
     </type>
     <doc>
-      List of active sources of location information.
-    </doc>
-  </key>
-  <key name="Location.Accuracy"
-       type="distance">
-    <doc>
-      Accuracy of the location information, in meters.
+      Status of the connection to a satellite positioning
+      system e.g. GPS.
     </doc>
   </key>
   <key name="Location.Coordinates">
@@ -84,72 +76,10 @@ respectivly, in degrees.  The third element, when present, is the
 altitude in meter.
     </doc>
   </key>
-  <key name="Location.Street"
-       type="string">
-    <doc>The street nearest the location of the device, as a localized string.</doc>
-  </key>
-  <key name="Location.PostalCode"
-       type="string">
-    <doc>The postcode of the location of the device, as a localized string.</doc>
-  </key>
-  <key name="Location.Area"
-       type="string">
-    <doc>
-The name of the local area where the device is, for example a
-neighborhood or campus, as a localized string.
-    </doc>
-  </key>
-  <key name="Location.Locality"
-       type="string">
-    <doc>The name of the village, town or city where the device is, as a localized string.</doc>
-  </key>
-  <key name="Location.Region"
-       type="string">
-    <doc>The administrative region which contains the location of the device, as a localized string.</doc>
-  </key>
-  <key name="Location.Country"
-       type="string">
-    <doc>The country which contains the location of the device, as a localized string.</doc>
-  </key>
-  <key name="Location.CountryCode"
-       type="string">
-    <doc>The ISO 3166 two letter country code of the country which contains the location of the device.</doc>
-  </key>
   <key name="Location.Heading"
        type="number">
     <doc>
       The deviation, in degrees (0-360), from the geographical north.
-    </doc>
-  </key>
-  <key name="Location.Timezone"
-       type="string">
-    <doc>TBD</doc>
-  </key>
-  <key name="Location.TimezoneOffset"
-       type="duration">
-    <doc>TBD</doc>
-  </key>
-  <key name="Location.Continent"
-       type="string">
-    <doc>The name of the current continent, as a localized string.</doc>
-  </key>
-  <key name="Location.Planet"
-       type="string">
-    <doc>The name of the current planet (or dwarf planet), as a localized string.</doc>
-  </key>
-  <key name="Location.PointOfInterest"
-       type="tracker-uri">
-    <doc>
-The URI of the current point of interest, if any.  (The URI points to
-a Tracker object inside the Content Framework.)
-    </doc>
-  </key>
-  <key name="Location.NearbyContacts">
-    <type>
-      <list type="tracker-uri"/>
-    </type>
-    <doc>
-A list of URIs for contacts that are physically nearby.
     </doc>
   </key>
   <doc>
@@ -182,7 +112,7 @@ Information about the batteries of the device.
   <key name="Battery.ChargePercentage"
        type="percentage">
     <doc>
-The average charge level of the currently connected batteries. 
+The average charge level of the currently connected batteries.
 Expressed as percentage of the maximum charge level.
     </doc>
   </key>
@@ -197,7 +127,7 @@ i.e., whether at least one of its batteries is currently discharging.
        type="bool">
     <doc>
 Whether or not the device is currently running on low battery power.
-True if OnBattery is true and the charge levels of all 
+True if OnBattery is true and the charge levels of all
 batteries are below 10%.
     </doc>
   </key>
@@ -210,7 +140,7 @@ Whether or not the device is currently charging at least one of its batteries.
   <key name="Battery.TimeUntilLow"
        type="duration">
     <doc>
-Estimates the time that the device can run on battery before the property 
+Estimates the time that the device can run on battery before the property
 OnLowBattery becomes true. In seconds.
     </doc>
   </key>
@@ -226,19 +156,14 @@ System
 
 Information about the current state of the device.
   </doc>
-  <key name="System.MemoryPressure">
-    <type>
-      <int-enum>
-        <normal   value="0"/>
-        <high     value="1"/>
-        <critical value="2"/>
-      </int-enum>
-    </type>
+  <key name="System.PowerSaveMode"
+       type="bool">
     <doc>
-Current memory load. Possible values: 0 (normal), 1 (high; low watermark exceeded), 2 (critical; high watermark exceeded).
+      A boolean indicating whether or not power save mode is enabled.
     </doc>
   </key>
   <doc>
+
 Internet connectivity
 ---------------------
 
@@ -247,16 +172,16 @@ Information about the connection of the devide to the Internet.
   <key name="Internet.NetworkType">
     <type>
       <string-enum>
-        <wifi/>
+        <WLAN/>
         <wimax/>
-        <cellular/>
+        <GPRS/>
         <bluetooth/>
         <ethernet/>
       </string-enum>
     </type>
     <doc>
 The type of the current connection to the Internet.  This is one of
-the strings "wifi", "wimax", "cellular", "bluetooth", "ethernet", or
+the strings "WLAN", "wimax", "GPRS", "bluetooth", "ethernet", or
 "usb".  (From ConnMan.  New types might be defined in the future, of
 course.)
     </doc>
@@ -282,7 +207,7 @@ course.)
       "disconnected", and "connecting".
     </doc>
   </key>
-  
+
   <key name="Internet.SignalStrength"
        type="percentage">
     <doc>
@@ -311,7 +236,7 @@ percent of the maximum possible rate.
 Bluetooth
 ---------
 
-Information about Bluetooth related things.      
+Information about Bluetooth related things.
   </doc>
   <key name="Bluetooth.Enabled"
        type="bool">
@@ -327,6 +252,15 @@ Bluetooth devices when they search for others.
     </doc>
   </key>
   <doc>
+  <key name="Bluetooth.Connected"
+       type="bool">
+    <doc>
+A boolean indicating whether or not the device is connected to a
+Bluetooth device. At least one remote device is connected.
+    </doc>
+  </key>
+  <doc>
+
 Cellular
 --------
 
@@ -396,40 +330,19 @@ Information about the alams set by the user. We assume, that the user
 can disable or enable all the alarms. In addition, the user can enable
 or disable each alarm individually.
   </doc>
-  <key name="UserAlarm.Present"
+  <key name="Alarm.Present"
        type="bool">
     <doc>
-Indicates whether there is an upcoming alarm set by the user. Can be
-true even if alarms are disabled.
+      Indicates whether there is an upcoming alarm set by the user. Can be
+      true even if alarms are disabled.
     </doc>
   </key>
-  <key name="UserAlarm.Enabled"
-       type="bool">
+  <key name="Alarm.Trigger"
+       type="map">
     <doc>
-Indicates whether the alarms are enabled or disabled by the user. If
-there are no alarms, UserAlarm.Enabled is true.
-    </doc>
-  </key>
-  <key name="UserAlarm.NextTime"
-       type="time">
-    <doc>
-The time of the next (enabled) alarm, in Unix time (the number of
-seconds since January 1.1.1970 00:00 UTC). If no alarms are present,
-the value is Unknown.
-    </doc>
-  </key>
-  <key name="UserAlarm.NextDescription"
-       type="string">
-    <doc>
-The description of the next (enabled) alarm. If no alarms are present,
-the value is Unknown.
-    </doc>
-  </key>
-  <key name="UserAlarm.NextCookie"
-       type="integer">
-    <doc>
-The cookie of the next (enabled) alarm. The cookie can be used for
-referring to the alarm when communicating with timed.
+      Trigger time of all alarm events. The keys of the map are decimal
+      representations of the alarm cookies. A value is the next trigger time of
+      the event in nano-seconds from the UNIX epoch.
     </doc>
   </key>
   <doc>
@@ -438,118 +351,6 @@ Environment
 
 Information about the environment the device is in.
   </doc>
-  <key name="Environment.SunRise"
-       type="time">
-    <doc>
-The time of sun rise.
-    </doc>
-  </key>
-  <key name="Environment.SunSet"
-       type="time">
-    <doc>
-The time of sun set.
-    </doc>
-  </key>
-  <key name="Environment.Weather">
-    <type>
-       <map>
-         <Condition type="string">
-           <doc>
-The current weather condition, as a localized, human readable string.
-Examples are "Cloudy", "Raining", etc.
-           </doc>
-         </Condition>
-         <ConditionCode>
-           <type>
-             <string-enum>
-               <cloudy/>
-               <sunny/>
-             </string-enum>
-           </type>
-           <doc>
-The current weather condition, as a symbolic string.  The set of
-symbols is to be defined, but it will be fixed and quite small so that
-you can provide an icon for each of them, etc.
-           </doc>
-         </ConditionCode>
-         <Humidity type="percentage">
-           <doc>
-The relative humidity in percent.
-           </doc>
-         </Humidity>
-         <Temperature type="string">
-           <doc>
-The temperature as a localized string.  This string represents the
-temperature in the way preferred by the user.  Most often this means
-either degrees Celsius or degrees Fahrenheit, but it could be some
-other unit entirely.
-           </doc>
-         </Temperature>
-         <TemperatureK type="temperature">
-           <doc>
-The temperature in Kelvin.
-           </doc>
-         </TemperatureK>
-         <ApparentTemperature type="string">
-           <doc>
-The felt temperature as a localized string, analogous to Temperature.
-           </doc>
-         </ApparentTemperature>
-         <ApparentTemperatureK type="temperature">
-           <doc>
-The felt temperature in Kelvin.
-           </doc>
-         </ApparentTemperatureK>
-         <DewPoint type="string">
-           <doc>
-The dew point as a localized string, analogous to Temperature.
-           </doc>
-         </DewPoint>
-         <DewPointK type="temperature">
-           <doc>
-The dew point in Kelvin.
-           </doc>
-         </DewPointK>
-         <Pressure type="number">
-           <doc>
-The atmospheric pressure in milli bar.
-           </doc>
-         </Pressure>
-         <Precipitation type="number">
-           <doc>
-The rain or snow fall in millimeter per square meter per hour (or some
-other more common unit).
-           </doc>
-         </Precipitation>
-         <Visibility type="number">
-           <doc>
-The visibility in meter.
-           </doc>
-         </Visibility>
-         <WindSpeed type="number">
-           <doc>
-The wind speed in meters per second.
-           </doc>
-         </WindSpeed>
-         <WindDirection type="string">
-           <doc>
-The wind direction as a localized string.  The direction is given in
-compass terms: North, South-West, etc.
-           </doc>
-         </WindDirection>
-         <WindDirectionD type="number">
-           <doc>
-The wind direction in degrees.  North is 0, east is 90, etc.
-           </doc>
-         </WindDirectionD>
-       </map>
-    </type>
-    <doc>
-The current weather.  See http://www.ominous-valve.com/wx_codes.txt for
-more information about codifying weather conditions.  We should lift
-something from there, if just for extra geek points.
-    </doc>
-  </key>
   <key name="Environment.IsDark"
        type="bool">
     <doc>Whether or not it is especially dark.</doc>
@@ -557,197 +358,6 @@ something from there, if just for extra geek points.
   <key name="Environment.IsBright"
        type="bool">
     <doc>Whether or not it is especially bright.</doc>
-  </key>
-  <key name="Environment.IsLoud"
-       type="bool">
-    <doc>Whether or not it is especially loud.</doc>
-  </key>
-  <doc>
-Use
----
-
-Information about the current usage context of the device.
-
-Situations are a UI concept similar to Profiles that allows the user
-to have different customizations for his/her device and
-automatically/explcicitly switch between them.  Typical Situations are
-"AtHome", "AtWork", "InMeeting" etc.  Some of them are probably
-pre-defined, others can be defined by the user.  Situations might form
-a hierarchy: InMeeting includes AtWork.
-
-Not much is known about all this right now.
-  </doc>
-  <key name="Use.Situations"
-       type="string-list">
-    <doc>
-The symbolic names of the currently active Situations.  Note that more
-than one situation might be active at the same time.
-    </doc>
-    </key>
-  <key name="Use.Mode">
-    <deprecated/>
-    <doc>
-The current main usage mode of the device.
-    </doc>
-    <type>
-      <string-enum>
-	<editing>
-          <doc>
-The user is interacting closely with the device and is creating new
-content, such as when composing a email message or creating any other
-kind of document.
-          </doc>
-	</editing>
-	<recording>
-          <doc>
-The user is taking pictures, or recording video or audio.
-          </doc>
-	</recording>
-	<browsing>
-          <doc>
-The user is interacting closely with the device without
-creating new content, such as when browsing search results, or
-browsing through his/her music collection.
-          </doc>
-	</browsing>
-	<watching>
-          <doc>
-The user is watching a video, without closely interacting with the
-device.
-          </doc>
-	</watching>
-	<listening>
-          <doc>
-The user is listening to audio, without closely interacting with the
-device.
-          </doc>
-	</listening>
-        <reading>
-          <doc>
-The user is reading a document, such as when reading a article on the
-web or a e-book.
-          </doc>
-        </reading>
-	<chatting>
-          <doc>
-The user is involved in a real-time, text-based dialog with external
-parties.
-          </doc>
-	</chatting>
-	<gaming>
-          <doc>
-The user is interacting closely with the device, for entertainment.
-          </doc>
-	</gaming>
-	<calling>
-          <doc>
-The user is involved in a real-time, audio- or video-based dialog with
-external parties.
-          </doc>
-	</calling>
-	<active>
-          <doc>
-The user interacting closely with the device, for an activity that
-doesn't fit into any of the above categories.
-          </doc>
-	</active>
-	<idle>
-          <doc>
-The device is not being used.
-          </doc>
-	</idle>
-        <maintenance>
-          <doc>
-The user is doing system-wide maintenance work such as restoring a
-backup or upgrading the OS software.
-          </doc>
-        </maintenance>
-      </string-enum>
-    </type>
-  </key>
-  <key name="Use.ConnectedContacts">
-    <type>
-      <list type="tracker-uri"/>
-    </type>
-    <doc>
-A list of URIs for contacts that the user is currently engaged in
-conversations with.  (The URIs point to Tracker objects.)
-    </doc>
-  </key>    
-  <key name="Use.RecentDocuments">
-    <type>
-      <list type="tracker-uri"/>
-    </type>
-    <doc>
-A list of URIs for recently used documents, at most ten elements long.
-(The URIs point to Tracker objects.)
-    </doc>
-  </key>    
-  <key name="Use.Keyboarding"
-       type="bool">
-    <doc>
-Whether or not the user is ready to use the keyboard.  This property
-is true when a slideout keyboard has been slided out, for example, or
-when a transformer laptop with a tablet mode is in "laptop mode".
-    </doc>
-  </key>
-  <key name="Use.Phoning"
-       type="bool">
-    <doc>
-Whether or not the user is using the device as a telephone handset,
-holding it next to ear and mouth.
-    </doc>
-  </key>
-  <doc>
-Events
-------
-
-Information about current and upcoming calendar entries.
-  </doc>
-  <key name="Event.Current">
-    <type>
-      <list type="tracker-uri"/>
-    </type>
-    <doc>
-The currently active events, as a list of Tracker URIs.  The list
-contains all events whose start time is earlier than or equal to the
-current time, and whose end time is later.
-    </doc>
-  </key>
-  <key name="Event.CurrentStart"
-       type="time">
-    <doc>
-The earliest start time of the events in Events.Current.
-    </doc>
-  </key>
-  <key name="Event.CurrentEnd"
-       type="time">
-    <doc>
-The latest end time of the events in Events.Current.
-    </doc>
-  </key>
-  <key name="Event.Next">
-    <type>
-      <list type="tracker-uri"/>
-    </type>
-    <doc>
-The upcoming events, as a list of Tracker URIs.  The list contains
-those events whose start time is later than the current time and
-closest to now.  If there are multiple events in the list, they all
-start at exactly the same time.
-    </doc>
-  </key>
-  <key name="Event.NextStart"
-       type="time">
-    <doc>
-The earliest start time of the events in Events.Next.
-    </doc>
-  </key>
-  <key name="Event.NextEnd"
-       type="time">
-    <doc>
-The latest end time of the events in Events.Next.
-    </doc>
   </key>
   <doc>
 Profiles
@@ -764,6 +374,52 @@ displayed as a reminder to the user.
     </doc>
   </key>
   <doc>
+Presence
+---------------------
+
+Information about the end-user presence.
+  </doc>
+  <key name="Presence.State">
+    <type>
+      <string-enum>
+        <busy/>
+        <available/>
+        <away/>
+        <offline/>
+      </string-enum>
+    </type>
+    <doc>
+      The most meaningful presence status for the user throughout the services.
+    </doc>
+  </key>
+  <doc>
+Phone
+---------------------
+
+Information about the phone states.
+  </doc>
+  <key name="Phone.Call">
+    <type>
+      <string-enum>
+        <inactive/>
+        <ringing/>
+        <active/>
+        <knocking/>
+      </string-enum>
+    </type>
+    <doc>
+      A string indicaiting the telephony state on the device.
+      It covers various telephony technologies e.g. VoIP.
+    </doc>
+  </key>
+  <key name="Phone.Muted"
+       type="bool">
+    <doc>
+      A boolean indicating whether or not inputs are muted.
+    </doc>
+  </key>
+  <doc>
+
 Session
 -------
 
