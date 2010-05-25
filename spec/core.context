@@ -55,9 +55,9 @@ appliciable to the current location, they will be unavailable.
   <key name="Location.SatPositioningState">
     <type>
       <string-enum>
+        <on/>
         <off/>
         <search/>
-        <on/>
       </string-enum>
     </type>
     <doc>
@@ -251,7 +251,6 @@ A boolean indicating whether or not the device is visible to other
 Bluetooth devices when they search for others.
     </doc>
   </key>
-  <doc>
   <key name="Bluetooth.Connected"
        type="bool">
     <doc>
