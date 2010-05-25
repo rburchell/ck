@@ -1,8 +1,9 @@
-contextkit (0.5.12~unreleased) unstable; urgency=low
+contextkit (0.5.12) unstable; urgency=low
 
+  * Updated core properites list
   * Fixes: NB#162936 - Unable to receive valueChanged() signal from ContextProperty
 
- -- Marja Hassinen <ext-marja.2.hassinen@nokia.com>  Fri, 26 Mar 2010 10:50:46 +0200
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 25 May 2010 17:39:14 +0300
 
 contextkit (0.5.11) unstable; urgency=low
 
