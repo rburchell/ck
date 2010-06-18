@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 cd $(dirname $0)
-autoreconf -i -f -v
+/usr/bin/autoreconf -i -f -v
 
 # Autoreconf overwrites INSTALL, but we have our own version of it.
 cp INSTALL.real INSTALL

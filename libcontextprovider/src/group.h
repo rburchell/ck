@@ -36,7 +36,7 @@ class GroupPrivate;
 class Group : public QObject
 {
     Q_OBJECT
-    
+
 public:
     explicit Group(QObject* parent = 0);
     ~Group();
@@ -57,12 +57,12 @@ Q_SIGNALS:
     /// to. I.e., when none of them were subscribed to and now some of
     /// them were subscribed to.
     void firstSubscriberAppeared();
-    
+
     /// Emitted when the group of Context objects is unsubscribed
     /// from. I.e., when some of them were subscribed to and now all of
     /// them were unsubscribed from.
     void lastSubscriberDisappeared();
-    
+
 private Q_SLOTS:
     void onFirstSubscriberAppeared();
     void onLastSubscriberDisappeared();
