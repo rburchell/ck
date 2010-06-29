@@ -15,7 +15,7 @@
         <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/lib/libcontextprovider-tests/;./typestests</step>
       </case>
       <case name="typeschange" description="Type change should be enough to emit a valuechanged" requirement="" timeout="50">
-        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/types/types.py</step>
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python2.5 /usr/share/libcontextprovider-tests/types/types.py</step>
       </case>
       <case name="valuechanges" description="Clients getting value change notifications" requirement="" timeout="50">
         <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/lib/libcontextprovider-tests/;./valuechangestests</step>
@@ -24,13 +24,13 @@
         <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:.;cd /usr/lib/libcontextprovider-tests/;./servicetest</step>
       </case>
       <case name="multiprovider1" description="Scenarios involving many providers">
-        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py MultiProvider.testPingPong</step>
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python2.5 /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py MultiProvider.testPingPong</step>
       </case>
       <case name="multiprovider2" description="Scenarios involving many providers">
-        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py MultiProvider.testOverheardValues</step>
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python2.5 /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py MultiProvider.testOverheardValues</step>
       </case>
       <case name="multiprovider3" description="Scenarios involving many providers">
-        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py MultiProvider.testBothProvidersSameValue</step>
+        <step expected_result="0">. /tmp/session_bus_address.user;export PATH=$PATH:/usr/lib/libcontextprovider-tests:.;cd /usr/share/libcontextprovider-tests/multiprovider;python2.5 /usr/share/libcontextprovider-tests/multiprovider/multiprovider.py MultiProvider.testBothProvidersSameValue</step>
       </case>
       <environments>
         <scratchbox>false</scratchbox>
