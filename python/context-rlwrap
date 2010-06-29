@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2.5
 """context-rlwrap -- a simple readline wrapper
 
 Usage: context-rlwrap [some other program and args]

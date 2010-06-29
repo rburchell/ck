@@ -73,7 +73,7 @@ Description: Helper library for providers of context properties
 Package: libcontextprovider-tests
 Section: devel
 Architecture: any
-Depends: libcontextprovider0, contextkit-utils, python-contextkit, ${shlibs:Depends}, python (>= 2.5)
+Depends: libcontextprovider0, contextkit-utils, python-contextkit, ${shlibs:Depends}, python2.5
 XB-Maemo-CI-Packages: libcontextprovider0
 XB-Maemo-CI-Stage: staging, acceptance
 Description: libcontextprovider automated customer tests
@@ -150,7 +150,7 @@ Description: Helper library for subscribers of context properties
 Package: libcontextsubscriber-tests
 Section: devel
 Architecture: any
-Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit, ${shlibs:Depends}, python (>= 2.5), tinycdb
+Depends: libcontextprovider0, libcontextsubscriber0, contextkit-utils, python-contextkit, ${shlibs:Depends}, python2.5, tinycdb
 XB-Maemo-CI-Packages: libcontextsubscriber0, libcontextprovider0
 XB-Maemo-CI-Stage: staging, acceptance
 Description: libcontextsubscriber automated customer tests
@@ -163,7 +163,7 @@ Description: libcontextsubscriber automated customer tests
 Package: propertymonitor-tests
 Section: devel
 Architecture: any
-Depends: contextkit-utils, python (>= 2.5), python-contextkit
+Depends: contextkit-utils, python2.5, python-contextkit
 XB-Maemo-CI-Stage: staging, validation
 Description: Property monitor
  This package contains an automated test suite for monitoring which Context FW properties are provided.

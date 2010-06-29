@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2.5
 """A more complex provider with a horroristic theme."""
 
 from ContextKit.flexiprovider import *
