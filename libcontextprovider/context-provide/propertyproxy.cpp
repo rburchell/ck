@@ -8,8 +8,13 @@
 PropertyProxy::PropertyProxy(QString key, bool enabled, QObject *parent) :
     QObject(parent), enabled(enabled)
 {
-    subscriber = new ContextProperty(key, this);
     provider = new ContextProvider::Property(key, this);
+    subscriber = new ContextProperty(key, this);
+    subscriber->unsubscribe();
+    sconnect(provider, SIGNAL(firstSubscriberAppeared(QString)),
+             this, SLOT(onFirstSubscriber(QString)));
+    sconnect(provider, SIGNAL(lastSubscriberDisappeared(QString)),
+             this, SLOT(onLastSubscriber()));
     sconnect(subscriber, SIGNAL(valueChanged()),
              this, SLOT(onValueChanged()));
     enable(enabled);
@@ -18,7 +23,7 @@ PropertyProxy::PropertyProxy(QString key, bool enabled, QObject *parent) :
 void PropertyProxy::enable(bool enable)
 {
     qDebug() << (const char *)(enable ? "enabled" : "disabled") <<
-        "proxying" << subscriber->key();
+        "proxying" << provider->key();
     enabled = enable;
     if (enable)
         provider->setValue(value);
@@ -32,6 +37,19 @@ QVariant PropertyProxy::realValue() const
 QString PropertyProxy::type() const
 {
     return subscriber->info()->type();
+}
+
+void PropertyProxy::onFirstSubscriber(const QString &key)
+{
+    contextDebug() << "First client subscription received, commander subscribes to provider" << subscriber->key();
+    subscriber->subscribe();
+    subscriber->waitForSubscription();
+}
+
+void PropertyProxy::onLastSubscriber()
+{
+    contextDebug() << "Last client unsubscribed, commander unsubscribes from provider" << subscriber->key();
+    subscriber->unsubscribe();
 }
 
 void PropertyProxy::onValueChanged()

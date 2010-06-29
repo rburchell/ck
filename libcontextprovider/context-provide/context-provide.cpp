@@ -40,8 +40,6 @@ int main(int argc, char **argv)
     QDBusConnection::BusType busType = QDBusConnection::SessionBus;
     QTextStream out(stdout);
 
-    // I hate libtool
-
     if (args.contains("--help") || args.contains("-h")) {
         // Help? Show it and be gone.
         out << "Usage: " << argv[0] << " [--session | --system] [BUSNAME]\n";

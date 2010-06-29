@@ -35,6 +35,9 @@ public:
     QString type() const;
 private Q_SLOTS:
     void onValueChanged();
+    void onFirstSubscriber(const QString &key);
+    void onLastSubscriber();
+
 private:
     ContextProvider::Property *provider;
     ContextProperty *subscriber;

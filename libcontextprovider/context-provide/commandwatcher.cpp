@@ -22,13 +22,13 @@
 #include "commandwatcher.h"
 #include "propertyproxy.h"
 #include "sconnect.h"
+
 #include <contextpropertyinfo.h>
 #include <contextregistryinfo.h>
 #include <contexttyperegistryinfo.h>
 #include <nanoxml.h>
 #include <contexttypeinfo.h>
 #include <service.h>
-
 #include <QByteArray>
 #include <QBuffer>
 #include <QTextStream>
