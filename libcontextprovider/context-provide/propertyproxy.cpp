@@ -43,7 +43,6 @@ void PropertyProxy::onFirstSubscriber(const QString &key)
 {
     contextDebug() << "First client subscription received, commander subscribes to provider" << subscriber->key();
     subscriber->subscribe();
-    subscriber->waitForSubscription();
 }
 
 void PropertyProxy::onLastSubscriber()

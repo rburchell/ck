@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2.5
 """
 A very simple example of the Flexiprovider.  Exports three properties
 initially.

@@ -1,8 +1,8 @@
-contextkit (0.5.14~unreleased) unstable; urgency=low
+contextkit (0.5.14) unstable; urgency=low
 
-  * 
+  * Strictly uses python2.5
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 30 Jun 2010 00:35:18 +0300
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 30 Jun 2010 00:34:27 +0300
 
 contextkit (0.5.13) unstable; urgency=low
 

@@ -12,12 +12,12 @@
 	<case requirement="" timeout="20">
 	  <xsl:attribute name="name"><xsl:value-of select="@name"/>-provider</xsl:attribute>
 	  <xsl:attribute name="description">Provider for <xsl:value-of select="@name"/></xsl:attribute>
-          <step expected_result="0">. /tmp/session_bus_address.user;cd /usr/share/propertymonitor-tests;python /usr/share/propertymonitor-tests/has_provider.py <xsl:value-of select="@name"/></step>
+          <step expected_result="0">. /tmp/session_bus_address.user;cd /usr/share/propertymonitor-tests;python2.5 /usr/share/propertymonitor-tests/has_provider.py <xsl:value-of select="@name"/></step>
 	</case>
 	<case requirement="" timeout="20">
 	  <xsl:attribute name="name"> <xsl:value-of select="@name"/>-value</xsl:attribute>
 	  <xsl:attribute name="description">Value for <xsl:value-of select="@name"/></xsl:attribute>
-          <step expected_result="0">. /tmp/session_bus_address.user;cd /usr/share/propertymonitor-tests;python /usr/share/propertymonitor-tests/has_value.py <xsl:value-of select="@name"/></step>
+          <step expected_result="0">. /tmp/session_bus_address.user;cd /usr/share/propertymonitor-tests;python2.5 /usr/share/propertymonitor-tests/has_value.py <xsl:value-of select="@name"/></step>
 	</case>
       </xsl:for-each>
       <environments>
