@@ -1,3 +1,9 @@
+contextkit (0.5.15~unreleased) karmic; urgency=low
+
+  * 
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 06 Jul 2010 15:40:38 +0300
+
 contextkit (0.5.14) unstable; urgency=low
 
   * Strictly uses python2.5
