@@ -1,3 +1,9 @@
+contextkit (0.5.14) unstable; urgency=low
+
+  * Strictly uses python2.5
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 30 Jun 2010 00:34:27 +0300
+
 contextkit (0.5.13) unstable; urgency=low
 
   * context-provide: in commander mode, a property proxy will subscribe to registered
