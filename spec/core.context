@@ -374,7 +374,7 @@ displayed as a reminder to the user.
   </key>
   <doc>
 Presence
----------------------
+--------
 
 Information about the end-user presence.
   </doc>
@@ -393,7 +393,7 @@ Information about the end-user presence.
   </key>
   <doc>
 Phone
----------------------
+-----
 
 Information about the phone states.
   </doc>
