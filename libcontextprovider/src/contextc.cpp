@@ -220,12 +220,12 @@ void context_provider_set_boolean (const char* key, int value)
         cService->setValue(key, (value != 0));
 }
 
-/// Sets the \a key to a specified string \a value.
+/// Sets the \a key to a specified string \a value. \a value should be UTF-8.
 void context_provider_set_string (const char* key, const char* value)
 {
     contextDebug() << F_C << key << value;
     if (cService)
-        cService->setValue(key, value);
+        cService->setValue(key, QString::fromUtf8(value));
 }
 
 /// Sets the \a key to NULL. In other words - unsets the key.
