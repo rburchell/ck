@@ -1,10 +1,10 @@
-contextkit (0.5.15~unreleased) unstable; urgency=low
+contextkit (0.5.15) unstable; urgency=low
 
   * context_provider_set_string (in C API) assumes that the given string is UTF-8
   * Fixes: NB#172741 - Operator name shown in garbage in status bar / in chinese
     chars in settings
 
- -- Marja Hassinen <marja.hassinen@nokia.com>  Fri, 09 Jul 2010 10:47:10 +0300
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 09 Jul 2010 14:00:58 +0300
 
 contextkit (0.5.14) unstable; urgency=low
 
