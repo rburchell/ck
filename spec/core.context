@@ -116,11 +116,13 @@ The average charge level of the currently connected batteries.
 Expressed as percentage of the maximum charge level.
     </doc>
   </key>
-  <key name="Battery.ChargingBarsRatio"
-       type="percentage">
+  <key name="Battery.ChargeBars">
+    <type>
+      <list type="number"/>
+    </type>
     <doc>
-The ratio of the current number of bars of the currently connected batteries.
-Expressed as percentage of the maximum number of bars.
+The charge bars property is a list of two integers.  The first is the remaining
+capacity as number of bars, the second is the maximum number of battery bars.
     </doc>
   </key>
   <key name="Battery.OnBattery"
