@@ -1,3 +1,9 @@
+contextkit (0.5.16~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Marja Hassinen <marja.hassinen@nokia.com>  Mon, 12 Jul 2010 12:08:27 +0300
+
 contextkit (0.5.15) unstable; urgency=low
 
   * context_provider_set_string (in C API) assumes that the given string is UTF-8
