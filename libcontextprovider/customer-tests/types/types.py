@@ -58,7 +58,10 @@ class Types(unittest.TestCase):
                 provider.expect("Setting key")
 
                 client.send("waitforchanged 5000")
-                self.assert_(client.expect("ValueChanged: org.freedesktop.ContextKit.Commander /org/maemo/contextkit/test/prop double:42"))
+		# a fix: don't assert "ValueChanged: ..." since commander might
+		# send other values in the same message (depending on which real
+		# providers are running in the system).
+                self.assert_(client.expect("org.freedesktop.ContextKit.Commander /org/maemo/contextkit/test/prop double:42"))
 
                 client.close()
                 provider.close()
