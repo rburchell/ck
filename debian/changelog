@@ -1,6 +1,6 @@
 contextkit (0.5.16~unreleased) unstable; urgency=low
 
-  * 
+  * UTF-8 fix also for context_provider_map_set_string and _list_add_string.
 
  -- Marja Hassinen <marja.hassinen@nokia.com>  Mon, 12 Jul 2010 12:08:27 +0300
 
