@@ -286,7 +286,7 @@ void context_provider_map_set_boolean(void* map, const char* key, int value)
 void context_provider_map_set_string (void* map, const char* key, const char* value)
 {
     QVariantMap *qvm = reinterpret_cast<QVariantMap *>(map);
-    qvm->insert(key, QVariant(value));
+    qvm->insert(key, QVariant(QString::fromUtf8(value)));
 }
 
 /// Sets \a key to the map \a value in \a map.  NOTE: \a value is freed, and
@@ -360,7 +360,7 @@ void context_provider_list_add_boolean(void* list, int value)
 void context_provider_list_add_string(void* list, const char* value)
 {
     QVariantList *qvl = reinterpret_cast<QVariantList *>(list);
-    qvl->append(QVariant(value));
+    qvl->append(QVariant(QString::fromUtf8(value)));
 }
 
 /// Appends the specified map (\a value) to \a list.  NOTE: \a value is freed
