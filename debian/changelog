@@ -1,8 +1,11 @@
-contextkit (0.5.16~unreleased) unstable; urgency=low
+contextkit (0.5.16) unstable; urgency=low
 
   * UTF-8 fix also for context_provider_map_set_string and _list_add_string.
+  * Added API file.
+  * Phone.Call enumeration value "Ringing" changed to "Alerting"
+  * Cellular.SignalBars property added
 
- -- Marja Hassinen <marja.hassinen@nokia.com>  Mon, 12 Jul 2010 12:08:27 +0300
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 18 Aug 2010 11:42:05 +0300
 
 contextkit (0.5.15) unstable; urgency=low
 

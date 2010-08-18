@@ -286,6 +286,16 @@ The name of the cellular network.
 The signal strength at the cellular radio, in percent of the maximum.
     </doc>
   </key>
+  <key name="Cellular.SignalBars">
+    <type>
+      <base>
+      <integer min="0" max="5"/>
+      </base>
+    </type>
+    <doc>
+      The signal strength at the cellular radio, in bars.
+    </doc>
+  </key>
   <key name="Cellular.Technology">
     <type>
       <string-enum>
@@ -410,7 +420,7 @@ Information about the phone states.
     <type>
       <string-enum>
         <inactive/>
-        <ringing/>
+        <alerting/>
         <active/>
         <knocking/>
       </string-enum>
