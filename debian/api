@@ -3,7 +3,7 @@ type: library
 scope: Platform
 state: stable
 libs-pkg: libcontextprovider0
-dev-pkg: libcontextporvider-dev
+dev-pkg: libcontextprovider-dev
 
 interface: libcontextsubscriber
 type: library
