@@ -278,6 +278,14 @@ Information about the cellular radio.
        type="string">
     <doc>
 The name of the cellular network.
+
+Depending on SIM cards configuration,  the NetworkName can consist of both
+the service provider name from the SIM and the current serving network name.
+
+The format is in that case:
+
+"service_provider  (current_serving_network_name)"
+
     </doc>
   </key>
   <key name="Cellular.SignalStrength"
@@ -340,6 +348,12 @@ The current cellular network registration status.
 The broadcast name of the current cell.
     </doc>
   </key>
+  <key name="Cellular.PacketData"
+       type="bool">
+    <doc>
+A boolean indicating whether or not packet data are being transfered..
+    </doc>
+  </key>
   <doc>
 User alarms
 -----------
@@ -400,10 +414,9 @@ Information about the end-user presence.
   <key name="Presence.State">
     <type>
       <string-enum>
-        <busy/>
-        <available/>
-        <away/>
         <offline/>
+        <away/>
+        <available/>
       </string-enum>
     </type>
     <doc>
