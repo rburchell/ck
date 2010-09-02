@@ -1,6 +1,8 @@
-contextkit (0.5.17~unreleased) unstable; urgency=low
+contextkit (0.5.17) unstable; urgency=low
 
-  * 
+  * debian: API file fixed typo
+  * Cellular.PacketData property added
+  * Presence.State enumeration modified    
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Mon, 23 Aug 2010 13:46:11 +0300
 
