@@ -151,26 +151,6 @@
     contextDebug() << contextFeature("threads") << "Some message..." << contextFeature("another");
     \endcode
 
-    There are two enviornment variables that control the output of messages vs. features: \b
-    CONTEXT_LOG_SHOW_FEATURES and \b CONTEXT_LOG_HIDE_FEATURES. Both take a comma-separated
-    list of features.
-
-    If you specify CONTEXT_LOG_SHOW_FEATURES only messages with given features will be printed to
-    the screen. If you specify \b CONTEXT_LOG_HIDE_FEATURES, messages with the specified features
-    will be hidden (not displayed). For example:
-
-    \code
-    CONTEXT_LOG_SHOW_FEATURES="threads,util" ./some-binary
-    \endcode
-
-    ...will make \b only the messages belonging to "threads" or "util" features displayed.
-
-    \code
-    CONTEXT_LOG_HIDE_FEATURES="threads,util" ./some-binary
-    \endcode
-
-    ...will hide all logging messages belonging to "threads" and "util" feature groups.
-
     \section vanilla Vanilla
 
     If the default logging output is too much for you, it's possible to set a CONTEXT_LOG_VANILLA
@@ -230,8 +210,6 @@ char* ContextRealLogger::showModule = NULL;
 char* ContextRealLogger::hideModule = NULL;
 bool ContextRealLogger::initialized = false;
 bool ContextRealLogger::vanilla = false;
-QStringList ContextRealLogger::showFeatures = QStringList();
-QStringList ContextRealLogger::hideFeatures = QStringList();
 
 /// Initialize the class by checking the enviornment variables and setting
 /// the message output params. The log level is set from \c CONTEXT_LOG_VERBOSITY
@@ -245,20 +223,6 @@ void ContextRealLogger::initialize()
 
     if (getenv("CONTEXT_LOG_USE_COLOR") != NULL)
         useColor = true;
-
-    // Check feature enablers (showFeatures)
-    const char *showFeaturesStr = getenv("CONTEXT_LOG_SHOW_FEATURES");
-    if (showFeaturesStr) {
-        Q_FOREACH (QString f, QString(showFeaturesStr).split(','))
-            showFeatures << f.trimmed();
-    }
-
-    // Check feature hide (hideFeatures)
-    const char *hideFeaturesStr = getenv("CONTEXT_LOG_HIDE_FEATURES");
-    if (hideFeaturesStr) {
-        Q_FOREACH (QString f, QString(hideFeaturesStr).split(','))
-            hideFeatures << f.trimmed();
-    }
 
     // Show/hide given module
     showModule = getenv("CONTEXT_LOG_SHOW_MODULE");
@@ -361,20 +325,6 @@ bool ContextRealLogger::shouldPrint()
 
     if (hideModule && strcmp(hideModule, moduleName) == 0)
         return false;
-
-    // Now try to eliminate by feature name
-    Q_FOREACH(QString feature, features) {
-        if (hideFeatures.contains(feature))
-            return false;
-    }
-
-    if (showFeatures.length() > 0) {
-        Q_FOREACH(QString feature, showFeatures) {
-            if (features.contains(feature))
-                return true;
-        }
-        return false;
-    }
 
     return true;
 }
