@@ -80,7 +80,6 @@ CDBWriter::CDBWriter(int fdd, QObject *parent)
 /// Destroys the object closing the file beforehand.
 CDBWriter::~CDBWriter()
 {
-    contextDebug() << F_CDB << F_DESTROY << "CDBWriter::~CDBWriter";
     close();
 }
 

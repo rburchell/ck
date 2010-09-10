@@ -211,7 +211,6 @@ ContextProperty::ContextProperty(const QString &key, QObject* parent)
 /// Unsubscribes from the ContextProperty and destroys it.
 ContextProperty::~ContextProperty()
 {
-    contextDebug() << F_DESTROY << "ContextProperty::~ContextProperty";
     unsubscribe();
     delete priv;
 }

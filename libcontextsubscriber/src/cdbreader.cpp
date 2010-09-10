@@ -60,7 +60,6 @@ CDBReader::CDBReader(const QString &dbpath, QObject *parent)
 /// Destroys the object automatically closing the database and file.
 CDBReader::~CDBReader()
 {
-    contextDebug() << F_CDB << F_DESTROY << "CDBReader::~CDBReader, dbpath:" << path;
     close();
 }
 
