@@ -37,6 +37,7 @@ class InfoBackend : public QObject
 public:
 
     static InfoBackend* instance(const QString &backendName = "");
+    static void destroyInstance();
 
     /// Returns the name of the backend, ie: 'xml'.
     virtual QString name() const = 0;
@@ -95,7 +96,6 @@ private:
     InfoBackend& operator=(const InfoBackend&);
 
     static InfoBackend* backendInstance; ///< Holds a pointer to the instance of the singelton.
-    static void destroyInstance();
 
     friend class InfoXmlBackend;
     friend class InfoCdbBackend;

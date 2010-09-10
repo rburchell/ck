@@ -72,6 +72,15 @@ InfoBackend* InfoBackend::instance(const QString &backendName)
         // Move the backend to the main thread
         backendInstance->moveToThread(QCoreApplication::instance()->thread());
 
+        // We must ensure that:
+        // 1) QFileSystemWatcher is deleted before QCoreApplication.
+        // 2) libcontextsubscriber can be unloaded successfully
+        // (QCoreApplication cannot have a post routine that is inside a library
+        // that has been unloaded.)
+
+        // For 1), we add a post routine to QCoreApplication for deleting the
+        // QFileSystemWathcer, for 2) we remove the post routine and delete the
+        // QFileSystemWatcher when the library is unloaded.
         qAddPostRoutine(destroyInstance);
     }
 
@@ -149,6 +158,14 @@ void InfoBackend::disconnectNotify(const char *signal)
 void InfoBackend::destroyInstance()
 {
     delete backendInstance;
-    backendInstance = NULL;
+    backendInstance = 0;
 }
 
+/// This will be called when the library is unloaded.
+void __attribute__((destructor)) library_dtor()
+{
+    // It seems to be ok to call qRemovePostRoutine even if QCoreApplication
+    // doesn't exist any more.
+    qRemovePostRoutine(InfoBackend::destroyInstance);
+    InfoBackend::destroyInstance();
+}
