@@ -63,8 +63,6 @@ public:
     static bool useColor; ///< Use simple colors for output (yellow for warnings, red for criticals)
     static char *showModule; ///< Show messages \b only from the specified module
     static char *hideModule; ///< Hide messages from the specified module
-    static QStringList showFeatures; ///< Show messages with \b only the specified features
-    static QStringList hideFeatures; ///< Hide messages with the specified features
     static bool vanilla; ///< Use vanilla (stripped-down) logging
 
     static void initialize();
