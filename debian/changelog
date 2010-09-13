@@ -1,10 +1,9 @@
 contextkit (0.5.18~unreleased) unstable; urgency=low
 
   * Fixes: NB#190684 - <MemLeak> Memory leaks observed in ContextKitPlugin of 
-    libcontextsubscriber - Operator name shown in garbage in status bar / in chinese
-    chars in settings
+    libcontextsubscriber
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Mon, 13 Sep 2010 13:30:22 +0300
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Mon, 13 Sep 2010 16:55:10 +0300
 
 contextkit (0.5.17) unstable; urgency=low
 
