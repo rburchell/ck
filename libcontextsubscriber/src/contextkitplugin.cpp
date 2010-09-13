@@ -58,10 +58,11 @@ namespace ContextSubscriber {
   \brief Implementation of the ContextKit D-Bus protocol.
 */
 
-const QString ContextKitPlugin::managerPath = "/org/freedesktop/ContextKit/Manager";
-const QString ContextKitPlugin::managerIName = "org.freedesktop.ContextKit.Manager";
-const QString ContextKitPlugin::propertyIName = "org.maemo.contextkit.Property";
-const QString ContextKitPlugin::corePrefix = "/org/maemo/contextkit/";
+static const char managerIName[] = "org.freedesktop.ContextKit.Manager";
+static const char subscriberIName[] = "org.freedesktop.ContextKit.Subscriber";
+static const char managerPath[] = "/org/freedesktop/ContextKit/Manager";
+static const char propertyIName[] = "org.maemo.contextkit.Property";
+static const char corePrefix[] = "/org/maemo/contextkit/";
 
 /// Converts a key name to a protocol level object path.  There is a
 /// distinction, because core properties have the form

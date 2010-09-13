@@ -114,12 +114,6 @@ private:
 
     QHash<QString, QString> objectPathToKey;
 
-    static const QString managerIName; ///< org.freedesktop.ContextKit.Manager
-    static const QString subscriberIName; ///< org.freedesktop.ContextKit.Subscriber
-    static const QString managerPath; ///< /org/freedesktop/ContextKit/Manager
-    static const QString propertyIName; ///< org.maemo.contextkit.Property
-    static const QString corePrefix; ///< /org/maemo/contextkit/
-
 };
 
 QVariant demarshallValue(const QVariant &v);
