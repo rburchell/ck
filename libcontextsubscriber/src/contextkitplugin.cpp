@@ -320,6 +320,7 @@ QVariant demarshallValue(const QVariant &v)
             v = demarshallValue(v);
             vm.insert(k, v);
         }
+        dba.endMap();
         return QVariant(vm);
         break;
     }
