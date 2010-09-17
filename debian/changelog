@@ -1,4 +1,4 @@
-contextkit (0.5.18~unreleased) unstable; urgency=low
+contextkit (0.5.18) unstable; urgency=low
 
   * Fixes: NB#190684 - <MemLeak> Memory leaks observed in ContextKitPlugin of 
     libcontextsubscriber
