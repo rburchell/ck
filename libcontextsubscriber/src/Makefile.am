@@ -31,7 +31,8 @@ AM_CXXFLAGS = -I$(top_srcdir)/common \
 	      '-DDEFAULT_CONTEXT_CORE_DECLARATIONS="@datadir@/contextkit/core.context"' \
 	      '-DDEFAULT_CONTEXT_TYPES="@datadir@/contextkit/types/"' \
 	      '-DDEFAULT_CONTEXT_CORE_TYPES="@datadir@/contextkit/types/core.types"' \
-	      '-DCONTEXT_LOG_MODULE_NAME="libcontextsubscriber"'
+	      '-DCONTEXT_LOG_MODULE_NAME="libcontextsubscriber"' \
+	      '-DCONTEXT_LOG_HIDE_DEBUG'
 
 $(top_builddir)/common/libcommon.la: FORCE
 	$(MAKE) -C $(top_builddir)/common libcommon.la

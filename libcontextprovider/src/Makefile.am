@@ -27,7 +27,8 @@ includecontextprovidercontext_HEADERS = service.h property.h group.h
 
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtDBus_CFLAGS) $(DBUS_CFLAGS) \
 	      -I$(top_srcdir)/common			       \
-              '-DCONTEXT_LOG_MODULE_NAME="libcontextprovider"'
+              '-DCONTEXT_LOG_MODULE_NAME="libcontextprovider"' \
+              '-DCONTEXT_LOG_HIDE_DEBUG'
 
 LIBS += $(QtCore_LIBS) $(QtDBus_LIBS)
 libcontextprovider_la_LIBADD=$(top_builddir)/common/libcommon.la
