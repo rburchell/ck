@@ -1,9 +1,9 @@
-contextkit (0.5.19~unreleased) unstable; urgency=low
+contextkit (0.5.19) unstable; urgency=low
 
   * Fix: if plugin loading failed, waitForSubscription hanged.
   * Fixes: NB# 192678
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 17 Sep 2010 07:04:32 +0300
+ -- Marja Hassinen <marja.hassinen@nokia.com>  Mon, 20 Sep 2010 17:43:14 +0300
 
 contextkit (0.5.18) unstable; urgency=low
 
