@@ -164,6 +164,12 @@ void Provider::constructPlugin()
         contextCritical() << "Illegal plugin name" << providerInfo.plugin << ", doesn't start with /";
     }
 
+    // Connect the subscribeFinished signal early enough; if plugin loading has
+    // failed, we still need to send it.
+    HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
+    sconnect(this, SIGNAL(subscribeFinished(Provider *,QString)),
+             handleSignalRouter, SLOT(onSubscribeFinished(Provider *,QString)));
+
     if (plugin == 0) {
         pluginState = FAILED;
         handleSubscribes();
@@ -171,7 +177,6 @@ void Provider::constructPlugin()
     }
 
     // Connect the signal of changing values to the class who handles it
-    HandleSignalRouter* handleSignalRouter = HandleSignalRouter::instance();
     sconnect(plugin, SIGNAL(valueChanged(QString, TimedValue)),
              this, SLOT(onPluginValueChanged(QString, TimedValue)));
     sconnect(plugin, SIGNAL(valueChanged(QString, QVariant)),
@@ -197,8 +202,6 @@ void Provider::constructPlugin()
              this, SLOT(onPluginSubscribeFinished(QString)), Qt::QueuedConnection);
     sconnect(plugin, SIGNAL(subscribeFailed(QString, QString)),
              this, SLOT(onPluginSubscribeFailed(QString, QString)), Qt::QueuedConnection);
-    sconnect(this, SIGNAL(subscribeFinished(Provider *,QString)),
-             handleSignalRouter, SLOT(onSubscribeFinished(Provider *,QString)));
 }
 
 /// Updates \c pluginState to \c READY and requests subscription for
