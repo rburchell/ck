@@ -60,9 +60,6 @@ public:
     /// Returns a list of providers for the given key.
     virtual const QList<ContextProviderInfo> providersForKey(QString key) const = 0;
 
-    /// To make sure the subclasses are freed properly
-    virtual ~InfoBackend();
-
 Q_SIGNALS:
     /// Emitted when key list changes. ContextRegistryInfo listens on that.
     void keysChanged(const QStringList& currentKeys);

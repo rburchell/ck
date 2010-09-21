@@ -40,16 +40,12 @@
     used by ContextRegistryInfo and ContextPropertyInfo classes.
 */
 
-InfoBackend* InfoBackend::backendInstance = 0;
+InfoBackend* InfoBackend::backendInstance = NULL;
 
 /// Constructs the object. The \a connectCount is 0 on start.
 InfoBackend::InfoBackend(QObject *parent) : QObject(parent)
 {
     connectCount = 0;
-}
-
-InfoBackend::~InfoBackend()
-{
 }
 
 /// Returns the actual singleton instance, creates it on first access. Mutex-protected.
