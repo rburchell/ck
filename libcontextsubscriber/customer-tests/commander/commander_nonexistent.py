@@ -36,6 +36,9 @@ import unittest
 from ContextKit.cltool import CLTool, wanted
 
 class CommanderNonExistent(unittest.TestCase):
+	def setUp(self):
+		os.environ['CONTEXT_COMMANDING'] = '1'
+
         def tearDown(self):
                 os.unlink('context-provide.context')
 

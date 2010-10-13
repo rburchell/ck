@@ -1,8 +1,8 @@
 contextkit (0.5.20~unreleased) unstable; urgency=low
 
-  *
+  * Commanding is only allowed if the env var CONTEXT_COMMANDING is set.
 
- -- Marja Hassinen <marja.hassinen@nokia.com>  Tue, 21 Sep 2010 09:28:44 +0300
+ -- Marja Hassinen <marja.hassinen@nokia.com>  Wed, 13 Oct 2010 10:14:11 +0300
 
 contextkit (0.5.19) unstable; urgency=low
 

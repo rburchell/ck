@@ -35,6 +35,8 @@
 #include <QDebug>
 #include <QDBusConnection>
 
+#include <stdlib.h>
+
 ContextRegistryInfo* mockContextRegistryInfo;
 ContextPropertyInfo* mockContextPropertyInfo;
 
@@ -221,6 +223,9 @@ void DBusNameListener::startListening(bool nameHasOwnerCheck)
 void PropertyHandleUnitTests::initTestCase()
 {
     qInstallMsgHandler(myMessageOutput);
+    // Either all PropertyHandle objects are commandable or none of them is;
+    // this needs to be set before creating the first PropertyHandle object.
+    setenv("CONTEXT_COMMANDING", "1", 0);
 }
 
 // After all tests

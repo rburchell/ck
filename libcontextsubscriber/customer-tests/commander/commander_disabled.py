@@ -36,7 +36,28 @@ class CommanderDisabled(unittest.TestCase):
     def tearDown(self):
         os.unlink('context-provide.context')
 
-    def testCommanderFunctionality(self):
+    def testIgnoreCommander(self):
+        # CONTEXT_COMMANDING is set but ContextProperty::ignoreCommander is
+        # called
+        os.environ['CONTEXT_COMMANDING'] = '1'
+        provider = CLTool("context-provide", "--v2", "contextkit.test", "int", "test.int", "42")
+        provider.send("dump")
+        provider.expect("Wrote") # wait for it
+        commander = CLTool("context-provide", "--v2")
+        commander.send("add int test.int 4242")
+        commander.send("start")
+        commander.expect("Added") # wait for it
+        os.environ["CONTEXT_CLI_IGNORE_COMMANDER"] = ""
+        listen = CLTool("context-listen", "test.int")
+        self.assert_(listen.expect(wanted("test.int", "int", "42")),
+                     "Provider provided value is wrong")
+        listen.wait()
+        commander.wait()
+        provider.wait()
+
+    def testNoCommanding(self):
+        # CONTEXT_COMMANDING is not set
+        del os.environ['CONTEXT_COMMANDING']
         provider = CLTool("context-provide", "--v2", "contextkit.test", "int", "test.int", "42")
         provider.send("dump")
         provider.expect("Wrote") # wait for it
