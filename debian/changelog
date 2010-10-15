@@ -1,4 +1,4 @@
-contextkit (0.5.20~unreleased) unstable; urgency=low
+contextkit (0.5.20) unstable; urgency=low
 
   * Commanding is only allowed if the env var CONTEXT_COMMANDING is set.
 
