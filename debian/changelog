@@ -1,4 +1,4 @@
-contextkit (0.5.19.1~unreleased) unstable; urgency=low
+contextkit (0.5.19.1) unstable; urgency=low
 
   * Fixes: NB#198630
 
