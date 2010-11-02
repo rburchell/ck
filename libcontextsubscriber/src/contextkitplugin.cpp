@@ -115,6 +115,7 @@ void ContextKitPlugin::reset()
     delete(managerInterface);
     managerInterface = 0;
     newProtocol = false;
+    // Disconnect the ValueChanged signal for all keys (object paths)
     connection->disconnect(busName, "", propertyIName, "ValueChanged",
                            this, SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
 }
@@ -190,11 +191,6 @@ void ContextKitPlugin::useNewProtocol()
 {
     newProtocol = true;
 
-    // connect to dbus value changes too!
-    connection->connect(busName, "", propertyIName, "ValueChanged",
-                        this, SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
-
-
     if (providerListener->isServicePresent() == DBusNameListener::NotPresent)
         return;
 
@@ -248,6 +244,12 @@ void ContextKitPlugin::newSubscribe(const QString& key)
                                                                                objectPath,
                                                                                propertyIName,
                                                                                "Subscribe"));
+
+    // connect to dbus value changes too, but only for this key
+    connection->connect(busName, objectPath, propertyIName, "ValueChanged",
+                        this,
+                        SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
+
     PendingSubscribeWatcher *psw = new PendingSubscribeWatcher(pc, key, this);
     sconnect(psw,
              SIGNAL(subscribeFinished(QString)),
@@ -275,6 +277,12 @@ void ContextKitPlugin::unsubscribe(QSet<QString> keys)
                                                                  objectPath,
                                                                  propertyIName,
                                                                  "Unsubscribe"));
+            // disconnect the ValueChanged signal for this key
+            connection->disconnect(busName, objectPath,
+                                   propertyIName, "ValueChanged",
+                                   this,
+                                   SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
+
         }
     else
         subscriberInterface->unsubscribe(keys);

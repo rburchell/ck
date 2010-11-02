@@ -1,9 +1,8 @@
 contextkit (0.5.19.2~unreleased) unstable; urgency=low
 
-  * Replace this version with 0.5.21 (0.5.19.1 and 0.5.20 merged together)
-    if no more parallel bugfix releases are needed.
+    * Fixes: NB#200325
 
- -- Marja Hassinen <marja.hassinen@nokia.com>  Mon, 18 Oct 2010 13:03:20 +0300
+ -- Marja Hassinen <marja.hassinen@nokia.com>  Tue, 02 Nov 2010 14:14:39 +0200
 
 contextkit (0.5.19.1) unstable; urgency=low
 
