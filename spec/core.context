@@ -171,6 +171,12 @@ Information about the current state of the device.
       A boolean indicating whether or not power save mode is enabled.
     </doc>
   </key>
+  <key name="System.OfflineMode"
+       type="bool">
+    <doc>
+      A boolean indicating whether or not cellular radio is enabled.
+    </doc>
+  </key>
   <doc>
 
 Internet connectivity
@@ -296,9 +302,7 @@ The signal strength at the cellular radio, in percent of the maximum.
   </key>
   <key name="Cellular.SignalBars">
     <type>
-      <base>
       <integer min="0" max="5"/>
-      </base>
     </type>
     <doc>
       The signal strength at the cellular radio, in bars.

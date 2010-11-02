@@ -124,7 +124,7 @@ Generic types
       [ "foo" ]
     </doc>
   </type>
-  
+
   <type name="association-list">
     <base>
       <list type="association-tree"/>
@@ -133,7 +133,7 @@ Generic types
       A list of association trees.
     </doc>
   </type>
-  
+
   <type name="string-enum" base="string">
     <params>
       <rest doc="The possible values"/>
@@ -148,7 +148,7 @@ Generic types
       tree can have a "doc" attribute for that choice.
     </doc>
   </type>
-  
+
   <type name="int-enum" base="integer">
     <params>
       <rest doc="The possible values"/>
@@ -165,7 +165,7 @@ Generic types
       also have a "doc" attribute, of course.
     </doc>
   </type>
-  
+
   <doc>
 Specific types
 --------------
