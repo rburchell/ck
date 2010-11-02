@@ -1,8 +1,9 @@
-contextkit (0.5.19.2~unreleased) unstable; urgency=low
+contextkit (0.5.19.2) unstable; urgency=low
 
-    * Fixes: NB#200325
+  * Fixes: NB#200325 -  Creating ContextProperty object causes unnecessary wakeups
+  * New core property: System.OfflineMode
 
- -- Marja Hassinen <marja.hassinen@nokia.com>  Tue, 02 Nov 2010 14:14:39 +0200
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 02 Nov 2010 19:20:14 +0200
 
 contextkit (0.5.19.1) unstable; urgency=low
 
