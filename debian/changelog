@@ -1,3 +1,9 @@
+contextkit (0.5.19.3~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 03 Nov 2010 10:32:03 +0200
+
 contextkit (0.5.19.2) unstable; urgency=low
 
   * Fixes: NB#200325 -  Creating ContextProperty object causes unnecessary wakeups
