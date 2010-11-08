@@ -38,6 +38,9 @@ import unittest
 from ContextKit.cltool import CLTool, wanted, wantedUnknown
 
 class CommanderAppearing(unittest.TestCase):
+    def setUp(self):
+        os.environ['CONTEXT_COMMANDING'] = '1'
+
     def tearDown(self):
         os.unlink('context-provide.context')
 

@@ -38,6 +38,8 @@
 #include <QReadLocker>
 #include <QWriteLocker>
 
+#include <stdlib.h>
+
 namespace ContextSubscriber {
 
 static const QDBusConnection::BusType commanderDBusType = QDBusConnection::SessionBus;
@@ -87,29 +89,44 @@ PropertyHandle::PropertyHandle(const QString& key)
     sconnect(myInfo, SIGNAL(changed(QString)),
              this, SLOT(updateProvider()));
 
-    // Start listening for the context commander, and also initiate a
-    // NameHasOwner check.
+    // Check whether we should listen to commander at all.  This extra if just
+    // optimizes away getenv in case we've already checked it and noticed
+    // commanding is not enabled.
+    if (commandingEnabled) {
+        const char *commanding = getenv("CONTEXT_COMMANDING");
+        if (!commanding)
+            commandingEnabled = false;
+    }
 
-    // Because of the waitForSubscription() feature, we immediately need to
-    // subscribe to the real providers when the commander presence becomes
-    // known.  So, these connect()s need to be synchronous (not queued).
-    sconnect(commanderListener, SIGNAL(nameAppeared()),
-             this, SLOT(updateProvider()));
-    sconnect(commanderListener, SIGNAL(nameDisappeared()),
-             this, SLOT(updateProvider()));
+    if (commandingEnabled) {
+        // Start listening for the context commander, and also initiate a
+        // NameHasOwner check.
 
-    commanderListener->startListening(true);
+        // Because of the waitForSubscription() feature, we immediately need to
+        // subscribe to the real providers when the commander presence becomes
+        // known.  So, these connect()s need to be synchronous (not queued).
+        sconnect(commanderListener, SIGNAL(nameAppeared()),
+                 this, SLOT(updateProvider()));
+        sconnect(commanderListener, SIGNAL(nameDisappeared()),
+                 this, SLOT(updateProvider()));
 
-    // Check if commander is already there:
-    DBusNameListener::ServicePresence commanderPresence = commanderListener->isServicePresent();
-    if (commanderPresence != DBusNameListener::Unknown) {
-        // The status of the commander is known, so we can connect to
-        // the provider (or commander) immediately.
+        commanderListener->startListening(true);
+
+        // Check if commander is already there:
+        DBusNameListener::ServicePresence commanderPresence = commanderListener->isServicePresent();
+        if (commanderPresence != DBusNameListener::Unknown) {
+            // The status of the commander is known, so we can connect to
+            // the provider (or commander) immediately.
+            updateProvider();
+        }
+        // Otherwise, delay connecting to the provider until we know
+        // whether commander is present.
+    }
+    else {
+        // Don't wait for the commander; just connect to the real provider
+        // immediately.
         updateProvider();
     }
-    // Otherwise, delay connecting to the provider until we know
-    // whether commander is present.
-
 
     // Move the PropertyHandle (and all children) to main thread.
     moveToThread(QCoreApplication::instance()->thread());
@@ -213,7 +230,8 @@ QVariant PropertyHandle::value() const
 bool PropertyHandle::isSubscribePending() const
 {
     // We wait until commander presence is unknown ...
-    if (commanderListener->isServicePresent() == DBusNameListener::Unknown)
+    if (commandingEnabled &&
+        commanderListener->isServicePresent() == DBusNameListener::Unknown)
         return true;
     // ... or until we get some value ...
     if (!myValue.isNull())
