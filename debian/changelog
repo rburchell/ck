@@ -1,9 +1,10 @@
-contextkit (0.5.21~unreleased) unstable; urgency=low
+contextkit (0.5.21) unstable; urgency=low
 
   * Commanding is only allowed if the env var CONTEXT_COMMANDING is set.
+  * Fixes: NB#194538
   * 0.5.20 is skipped because this release merges 2 separate release branches
 
- -- Marja Hassinen <marja.hassinen@nokia.com>  Mon, 08 Nov 2010 09:45:11 +0200
+ -- Marja Hassinen <marja.hassinen@nokia.com>  Mon, 08 Nov 2010 09:53:06 +0200
 
 contextkit (0.5.19.2) unstable; urgency=low
 
