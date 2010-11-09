@@ -103,6 +103,11 @@ necessarily the opposite of Position.Stable; both may be false
 simultaneously.
     </doc>
   </key>
+  <key name="Position.IsFlat" type="bool">
+    <doc>
+A boolean indicating whether or not the device is in a flat position.
+    </doc>
+  </key>
   <doc>
 Battery
 -------
