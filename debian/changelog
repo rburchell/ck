@@ -1,6 +1,6 @@
-contextkit (0.5.22~unreleased) unstable; urgency=low
+contextkit (0.5.22) unstable; urgency=low
 
-  *
+  * Add Position.IsFlat of type boolean
 
  -- Marja Hassinen <marja.hassinen@nokia.com>  Mon, 08 Nov 2010 15:48:26 +0200
 
