@@ -1,3 +1,9 @@
+contextkit (0.5.23~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 09 Nov 2010 20:31:22 +0200
+
 contextkit (0.5.22) unstable; urgency=low
 
   * Add Position.IsFlat of type boolean
