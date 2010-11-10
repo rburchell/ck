@@ -383,7 +383,9 @@ void Provider::onPluginValueChanged(QString key, QVariant newValue)
         Q_EMIT valueChanged(key);
     }
     else
-        contextWarning() << "Received a property not subscribed to:" << key;
+        // Plugins are allowed to send values which are not subscribed to, but
+        // only if they get them for free.
+        contextDebug() << "Received a property not subscribed to:" << key;
 }
 
 TimedValue Provider::get(const QString &key) const

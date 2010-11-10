@@ -141,11 +141,14 @@ void context_provider_stop (void)
     // be kept alive in case the provider calls init again.
 }
 
-/// Installs (adds) a \a key to be provided by the service. The callback function \a
-/// subscription_changed_cb will be called with the passed user data \a subscription_changed_cb_target
-/// when the status of the subscription changes -- when the first subscriber appears or the
-/// last subscriber disappears. The \a clear_values_on_subscribe when enabled will automatically
-/// clear (set to null/undetermined) the group keys on first subscribe.
+/// Installs (adds) a \a key to be provided by the service.  The callback
+/// function \a subscription_changed_cb will be called with the passed user data
+/// \a subscription_changed_cb_target when the status of the subscription
+/// changes -- when the first subscriber appears or the last subscriber
+/// disappears.  The \a clear_values_on_subscribe when enabled will
+/// automatically clear (set to null/undetermined) the group keys on first
+/// subscribe.  This function must be called after context_provider_init but
+/// before entering the main loop.
 void context_provider_install_key (const char* key,
                                    int clear_values_on_subscribe,
                                    ContextProviderSubscriptionChangedCallback subscription_changed_cb,
@@ -161,14 +164,25 @@ void context_provider_install_key (const char* key,
     listeners->append(new PropertyListener(*cService, key,
                                            clear_values_on_subscribe,
                                            subscription_changed_cb, subscription_changed_cb_target));
-    cService->restart();
+
+    // Creating the PropertyListener will cause creation of PropertyPrivate,
+    // which will in turn register the corresponding D-Bus object.  We don't
+    // restart the service here, but add objects to the already opened
+    // connection (which has also a bus name registered).  This can only work if
+    // the provider doesn't go to the main loop between the bus name
+    // registration (done by context_provider_init or the provider program) and
+    // calling this function.
 }
 
-/// Installs (adds) a \a key_group to be provided by the service. The \a key_group is a NULL-terminated
-/// array containing the keys. The callback function \a subscription_changed_cb will be called with the
-/// passed user data \a subscription_changed_cb_target when the status of the subscription changes --
-/// when the first subscriber appears or the last subscriber disappears. The \a clear_values_on_subscribe
-/// when enabled will automatically clear (set to null/undetermined) the group keys on first subscribe.
+/// Installs (adds) a \a key_group to be provided by the service.  The \a
+/// key_group is a NULL-terminated array containing the keys.  The callback
+/// function \a subscription_changed_cb will be called with the passed user data
+/// \a subscription_changed_cb_target when the status of the subscription
+/// changes -- when the first subscriber appears or the last subscriber
+/// disappears.  The \a clear_values_on_subscribe when enabled will
+/// automatically clear (set to null/undetermined) the group keys on first
+/// subscribe.  This function must be called after context_provider_init but
+/// before entering the main loop.
 void context_provider_install_group (char* const * key_group,
                                      int clear_values_on_subscribe,
                                      ContextProviderSubscriptionChangedCallback subscription_changed_cb,
@@ -193,7 +207,13 @@ void context_provider_install_group (char* const * key_group,
     listeners->append(new GroupListener(*cService, keys,
                                         clear_values_on_subscribe,
                                         subscription_changed_cb, subscription_changed_cb_target));
-    cService->restart();
+    // Creating the PropertyListener will cause creation of PropertyPrivate,
+    // which will in turn register the corresponding D-Bus object.  We don't
+    // restart the service here, but add objects to the already opened
+    // connection (which has also a bus name registered).  This can only work if
+    // the provider doesn't go to the main loop between the bus name
+    // registration (done by context_provider_init or the provider program) and
+    // calling this function.
 }
 
 /// Sets the \a key to a specified integer \a value.
