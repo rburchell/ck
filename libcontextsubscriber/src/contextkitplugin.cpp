@@ -124,6 +124,14 @@ void ContextKitPlugin::reset()
 /// appears.
 void ContextKitPlugin::onProviderAppeared()
 {
+    // It is possible that this function is called and we have a Subscribe call
+    // in progress.  This happens when things happen in the following order:
+    // 1. the subscriber is started
+    // 2. the subscriber optimistically sends the Subscribe call
+    // 3. the provider is started (quick enough to handle the Subscribe call)
+    // 4. providerListener notices that the provider was started
+    // In this case, the plugin is in "ready" state already.
+
     contextDebug() << "Provider appeared:" << busName;
 
     reset();
@@ -199,14 +207,14 @@ void ContextKitPlugin::useNewProtocol()
     Q_EMIT ready();
 }
 
-/// Signals the Provider that the subscribe is finished.
+/// Signals the Provider that the Subscribe call (old protocol) is finished.
 void ContextKitPlugin::onDBusSubscribeFinished(QList<QString> keys)
 {
     Q_FOREACH (const QString& key, keys)
         Q_EMIT subscribeFinished(key);
 }
 
-/// Signals the Provider that the subscribe is failed.
+/// Signals the Provider that the Subscribe call (old protocol) has failed.
 void ContextKitPlugin::onDBusSubscribeFailed(QList<QString> keys, QString error)
 {
     Q_FOREACH (const QString& key, keys)
