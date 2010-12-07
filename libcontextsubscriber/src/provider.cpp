@@ -269,7 +269,11 @@ void Provider::onPluginSubscribeFinished(QString key)
 /// warning.
 void Provider::onPluginSubscribeFailed(QString key, QString error)
 {
-    contextWarning() << key << error;
+    // Don't print a warning here; under some circumstances it is normal that
+    // the provider is not running (e.g., during boot, subscribers might start
+    // before providers).  When the provider really starts, contextkit recovers
+    // from the situation gracefully.
+    contextDebug() << key << error;
 
     signalSubscribeFinished(key);
 }
