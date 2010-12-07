@@ -179,13 +179,24 @@ void ServiceTest::multiStart()
     QString expected = "Subscribe returned: Unknown";
     QCOMPARE(actual.simplified(), expected.simplified());
 
+    // Start listening to signals (we already have one subscriber)
+    QSignalSpy firstSpy(property,
+                        SIGNAL(firstSubscriberAppeared(const QString&)));
+    QSignalSpy lastSpy(property,
+                        SIGNAL(firstSubscriberAppeared(const QString&)));
+
     // Test: start the service again (even though it's started)
     service->start();
 
     // Expected result: the service is still there, and remembers the client
     actual = writeToClient("subscribe service Test.Property\n");
-    expected = "Subscribe error: org.maemo.contextkit.Error.MultipleSubscribe";
+    expected = "Subscribe returned: Unknown";
     QCOMPARE(actual.simplified(), expected.simplified());
+
+    // (so we don't get a signal)
+    QTest::qWait(1000);
+    QCOMPARE(firstSpy.count(), 0);
+    QCOMPARE(lastSpy.count(), 0);
 
     delete service;
     delete property;

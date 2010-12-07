@@ -258,16 +258,19 @@ void SubscriptionTests::multiSubscribe()
     // Doing this only in init() is not enough; doesn't stop the test case.
     QVERIFY(clientStarted);
 
+    test_int->setValue(567);
+
     // Ask the client to call Subscribe for a property twice. The
-    // property exists and is currently unknown since we haven't set a
-    // value for it.
-    writeToClient("subscribe service1 Test.Int\n");
+    // property exists and has a value.
+    QString actual1 = writeToClient("subscribe service1 Test.Int\n");
 
-    QString actual = writeToClient("subscribe service1 Test.Int\n");
+    QString actual2 = writeToClient("subscribe service1 Test.Int\n");
 
-    // Expected result: Unsubscribe returns a D-Bus error
-    QString expected("Subscribe error: org.maemo.contextkit.Error.MultipleSubscribe");
-    QCOMPARE(actual.simplified(), expected.simplified());
+    // Expected result: both Subscribes return the same value.
+    QString expected("Subscribe returned: int:567");
+
+    QCOMPARE(actual1.simplified(), expected.simplified());
+    QCOMPARE(actual2.simplified(), expected.simplified());
 }
 
 void SubscriptionTests::illegalUnsubscribe()
@@ -281,8 +284,8 @@ void SubscriptionTests::illegalUnsubscribe()
     // since we haven't set a value for it.
     QString actual = writeToClient("unsubscribe service1 Test.Int\n");
 
-    // Expected result: Unsubscribe returns a D-Bus error
-    QString expected("Unsubscribe error: org.maemo.contextkit.Error.IllegalUnsubscribe");
+    // Expected result: Unsubscribe succeeds.
+    QString expected("Unsubscribe called");
     QCOMPARE(actual.simplified(), expected.simplified());
 }
 

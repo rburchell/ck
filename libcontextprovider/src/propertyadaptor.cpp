@@ -65,8 +65,8 @@ void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, q
 {
     contextDebug() << "Subscribe called";
 
-    // Store the information of the subscription. For each client, we
-    // record how many times the client has subscribed.
+    // Store the information of the subscription. For each property, we record
+    // which clients have subscribed.
     QString client = msg.service();
 
     if (clientServiceNames.contains(client) == false) {
@@ -77,11 +77,12 @@ void PropertyAdaptor::Subscribe(const QDBusMessage &msg, QVariantList& values, q
         serviceWatcher.addWatchedService(client);
     }
     else {
-        contextWarning() << "Client" << client << "subscribed to property" << propertyPrivate->key << "multiple times";
-        QDBusMessage error = msg.createErrorReply("org.maemo.contextkit.Error.MultipleSubscribe",
-                             "Subscribing to " + propertyPrivate->key + " multiple times");
-        connection->send(error);
+        contextDebug() << "Client" << client << "subscribed to property" << propertyPrivate->key << "multiple times";
     }
+    // Don't treat the "client sends 2 Subscribe calls" as an error.  When the
+    // provider is not running (e.g., during boot), the subscriber might send 2
+    // Subscribe calls: one of them before the provider is running, and the
+    // other when it notices that the provider has started.
 
     // Construct the return values
     Get(values, timestamp);
@@ -100,12 +101,11 @@ void PropertyAdaptor::Unsubscribe(const QDBusMessage &msg)
         serviceWatcher.removeWatchedService(client);
     }
     else {
-        contextWarning() << "Client" << client << "unsubscribed from property" <<
+        contextDebug() << "Client" << client << "unsubscribed from property" <<
             propertyPrivate->key << "without subscribing";
-        QDBusMessage error = msg.createErrorReply("org.maemo.contextkit.Error.IllegalUnsubscribe",
-                                                  "Unsubscribing from a non-subscribed property "
-                                                  + propertyPrivate->key);
-        connection->send(error);
+        // Don't treat the "client sends Unsubscribe for a non-subscribed
+        // property" as an error.  The intention of the client is to not be
+        // subscribed, so there's nothing to do.
     }
 }
 
