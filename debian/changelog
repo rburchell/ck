@@ -1,9 +1,9 @@
-contextkit (0.5.24~unreleased) unstable; urgency=low
+contextkit (0.5.24) unstable; urgency=low
 
   * Fixes: NB#205697
   * Fixes: NB#207875
 
- -- Marja Hassinen <marja.hassinen@nokia.com>  Wed, 10 Nov 2010 17:33:04 +0200
+ -- Marja Hassinen <marja.hassinen@nokia.com>  Wed, 08 Dec 2010 12:22:50 +0200
 
 contextkit (0.5.23) unstable; urgency=low
 
