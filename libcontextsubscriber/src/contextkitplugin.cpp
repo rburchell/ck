@@ -233,7 +233,7 @@ void ContextKitPlugin::subscribe(QSet<QString> keys)
             // previous async call. (We emit "ready" when handling
             // GetSubscriber. "Ready" is not queued, and the above
             // layer can call subscribe when handling it.)
-
+            pendingKeys.insert(key);
             QMetaObject::invokeMethod(this, "newSubscribe", Qt::QueuedConnection, Q_ARG(QString, key));
         }
     else {
@@ -243,6 +243,13 @@ void ContextKitPlugin::subscribe(QSet<QString> keys)
 
 void ContextKitPlugin::newSubscribe(const QString& key)
 {
+    if (pendingKeys.contains(key) == false) {
+        // this key was already handled, probably because
+        // waitForSubscriptionAndBlock forced the subscription to happen.
+        return;
+    }
+    pendingKeys.remove(key);
+
     QString objectPath = keyToPath(key);
     // Store the "object path -> key" mapping so that we can transform
     // back when a valueChanged signal comes over D-Bus. (Note the
@@ -382,8 +389,14 @@ void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,
 
 void ContextKitPlugin::waitForSubscriptionAndBlock(const QString& key)
 {
-    if (pendingWatchers.contains(key))
+    // Force the subscriptions (that were scheduled) to happen now
+    while (newProtocol && pendingKeys.size() > 0) {
+        QString key = *(pendingKeys.constBegin());
+        newSubscribe(key);
+    }
+    if (pendingWatchers.contains(key)) {
         pendingWatchers.value(key)->waitForFinished();
+    }
 }
 
 void ContextKitPlugin::removePendingWatcher(const QString& key)

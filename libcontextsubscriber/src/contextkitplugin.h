@@ -117,6 +117,7 @@ private:
     QHash<QString, QString> objectPathToKey;
 
     QHash<QString, PendingSubscribeWatcher*> pendingWatchers;
+    QSet<QString> pendingKeys;
 };
 
 QVariant demarshallValue(const QVariant &v);
