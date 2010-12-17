@@ -40,6 +40,7 @@ class IProviderPlugin : public QObject
 public:
     virtual void subscribe(QSet<QString> keys) = 0;
     virtual void unsubscribe(QSet<QString> keys) = 0;
+    virtual void waitForSubscriptionAndBlock(const QString& key) = 0;
 
 Q_SIGNALS:
     void ready();

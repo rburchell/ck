@@ -52,6 +52,8 @@ public:
     TimedValue get(const QString &key) const;
     void clearValues();
 
+    void waitForSubscriptionAndBlock(const QString& key);
+
 Q_SIGNALS:
     void subscribeFinished(Provider *provider, QString key);
     void valueChanged(QString key);

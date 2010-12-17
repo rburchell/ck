@@ -286,6 +286,16 @@ void PropertyHandle::onValueChanged()
     }
 }
 
+void PropertyHandle::waitForSubscriptionAndBlock()
+{
+    // Don't Q_FOREACH over pendingSubscriptions; when we order the provider to
+    // block, it will cause it to be removed from pendingSubscriptions.
+    while (pendingSubscriptions.size() > 0) {
+        Provider* provider = *(pendingSubscriptions.constBegin());
+        provider->waitForSubscriptionAndBlock(myKey);
+    }
+}
+
 const ContextPropertyInfo* PropertyHandle::info() const
 {
     return myInfo;

@@ -44,6 +44,7 @@ class ContextKitPlugin : public IProviderPlugin
 public:
     void subscribe(QSet<QString> keys);
     void unsubscribe(QSet<QString> keys);
+    void waitForSubscriptionAndBlock(const QString& key);
 
 Q_SIGNALS:
     void ready();

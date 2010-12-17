@@ -392,6 +392,11 @@ void Provider::onPluginValueChanged(QString key, QVariant newValue)
         contextDebug() << "Received a property not subscribed to:" << key;
 }
 
+void Provider::waitForSubscriptionAndBlock(const QString& key)
+{
+    plugin->waitForSubscriptionAndBlock(key);
+}
+
 TimedValue Provider::get(const QString &key) const
 {
     return values.value(key, TimedValue(QVariant()));

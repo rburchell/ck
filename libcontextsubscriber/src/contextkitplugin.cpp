@@ -259,6 +259,7 @@ void ContextKitPlugin::newSubscribe(const QString& key)
                         SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
 
     PendingSubscribeWatcher *psw = new PendingSubscribeWatcher(pc, key, this);
+    pendingWatchers.insert(key, psw);
     sconnect(psw,
              SIGNAL(subscribeFinished(QString)),
              this,
@@ -271,6 +272,14 @@ void ContextKitPlugin::newSubscribe(const QString& key)
              SIGNAL(valueChanged(QString,TimedValue)),
              this,
              SIGNAL(valueChanged(QString,TimedValue)));
+    sconnect(psw,
+             SIGNAL(subscribeFinished(QString)),
+             this,
+             SLOT(removePendingWatcher(const QString&)));
+    sconnect(psw,
+             SIGNAL(subscribeFailed(QString,QString)),
+             this,
+             SLOT(removePendingWatcher(const QString&)));
 }
 
 
@@ -368,6 +377,17 @@ void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,
     else {
         contextWarning() << "Unrecognized key" << message.path();
     }
+}
+
+void ContextKitPlugin::waitForSubscriptionAndBlock(const QString& key)
+{
+    if (pendingWatchers.contains(key))
+        pendingWatchers.value(key)->waitForFinished();
+}
+
+void ContextKitPlugin::removePendingWatcher(const QString& key)
+{
+    pendingWatchers.remove(key);
 }
 
 PendingSubscribeWatcher::PendingSubscribeWatcher(const QDBusPendingCall &call,

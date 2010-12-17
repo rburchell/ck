@@ -133,6 +133,10 @@ void ContextKitPlugin::unsubscribe(QSet<QString> keys)
     unsubscribeRequested += keys;
 }
 
+void ContextKitPlugin::waitForSubscriptionAndBlock(const QString& key)
+{
+}
+
 //
 // Definition of testcases
 //

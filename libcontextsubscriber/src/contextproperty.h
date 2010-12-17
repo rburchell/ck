@@ -48,6 +48,7 @@ public:
     void unsubscribe () const;
 
     void waitForSubscription () const;
+    void waitForSubscriptionAndBlock () const;
 
     static void ignoreCommander();
     static void setTypeCheck(bool typeCheck);
