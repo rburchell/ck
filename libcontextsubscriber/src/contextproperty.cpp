@@ -311,7 +311,9 @@ void ContextProperty::waitForSubscription() const
 /// for this context property.  This will e.g. block on a socket, so your events
 /// will not be processed.  Calling this function while the subscription is not
 /// in progress (because it has completed already or because the property is
-/// currently unsubscribed) does nothing.
+/// currently unsubscribed) does nothing.  Calling this function is only allowed
+/// for ContextProperty objects associated with the main thread, and calling
+/// this function is only allowed in the main thread.
 void ContextProperty::waitForSubscriptionAndBlock() const
 {
     if (!priv->subscribed)

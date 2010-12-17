@@ -88,7 +88,8 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
       managerInterface(0),
       connection(new QDBusConnection(bus)),
       busName(busName),
-      defaultNewProtocol(true)
+      defaultNewProtocol(true),
+      newProtocol(true)
 {
     reset();
     // Notice if the provider on the dbus comes and goes
@@ -114,7 +115,7 @@ void ContextKitPlugin::reset()
     subscriberInterface = 0;
     delete(managerInterface);
     managerInterface = 0;
-    newProtocol = false;
+    newProtocol = defaultNewProtocol;
     // Disconnect the ValueChanged signal for all keys (object paths)
     connection->disconnect(busName, "", propertyIName, "ValueChanged",
                            this, SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));

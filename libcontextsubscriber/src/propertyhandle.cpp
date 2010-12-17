@@ -288,11 +288,16 @@ void PropertyHandle::onValueChanged()
 
 void PropertyHandle::waitForSubscriptionAndBlock()
 {
-    // Don't Q_FOREACH over pendingSubscriptions; when we order the provider to
-    // block, it will cause it to be removed from pendingSubscriptions.
-    while (pendingSubscriptions.size() > 0) {
-        Provider* provider = *(pendingSubscriptions.constBegin());
+    // Call waitForSubscriptionAndBlock once per each provider in
+    // pendingSubscriptions.  Making the call might or might not result in
+    // removing the provider from pendingSubscriptions (depending on whether
+    // some events on the way are queued or not), so make no assumptions on
+    // that.
+    QSet<Provider*> pendingSubscriptionsCopy = pendingSubscriptions;
+    while (pendingSubscriptionsCopy.size() > 0) {
+        Provider* provider = *(pendingSubscriptionsCopy.constBegin());
         provider->waitForSubscriptionAndBlock(myKey);
+        pendingSubscriptionsCopy.remove(provider);
     }
 }
 

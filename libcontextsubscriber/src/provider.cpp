@@ -125,6 +125,11 @@ Provider::Provider(const ContextProviderInfo& providerInfo)
 /// up with the name of the function).
 void Provider::constructPlugin()
 {
+    static bool pluginConstructed = false;
+    if (pluginConstructed)
+        return;
+    pluginConstructed = true;
+
     contextDebug() << F_PLUGINS;
     if (providerInfo.plugin == "contextkit-dbus") {
         plugin = contextKitPluginFactory(providerInfo.constructionString);
@@ -394,6 +399,28 @@ void Provider::onPluginValueChanged(QString key, QVariant newValue)
 
 void Provider::waitForSubscriptionAndBlock(const QString& key)
 {
+    // This function might be called before the plugin is constructed (since
+    // it's constructed in a queued way).  If so, construct it now.
+    constructPlugin();
+
+    if (plugin == 0) // we couldn't construct a plugin
+    {
+        return;
+    }
+
+    // Maybe the plugin hasn't had time to emit ready() yet.  Force the plugin
+    // to be ready, then.
+
+    // This would be more elegant:
+    //plugin->waitUntilReadyAndBlock();
+
+    // But for now we do:
+    if (pluginState == INITIALIZING)
+        pluginState = READY;
+
+    // Also, it might be that the key is only scheduled to be subscribed to, but
+    // the real subscription is not yet processed.  Do that now.
+    handleSubscribes();
     plugin->waitForSubscriptionAndBlock(key);
 }
 
