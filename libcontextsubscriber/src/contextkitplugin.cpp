@@ -402,8 +402,9 @@ void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,
 
 void ContextKitPlugin::waitUntilReadyAndBlock()
 {
+    bool setSkip = providerAppearedQueued; // save this value
     onProviderAppeared();
-    if (providerAppearedQueued) {
+    if (setSkip) {
         // Calling onProviderAppeared was already scheduled but we already
         // called it now.  Arrange so that the scheduled call is skipped when
         // the event is processed.
