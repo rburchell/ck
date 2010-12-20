@@ -1,6 +1,9 @@
 testdir = $(libdir)/libcontextsubscriber-tests
 test_PROGRAMS = waitforsubscriptiontests
 
+testdatadir = $(datadir)/libcontextsubscriber-tests/waitforsubscription
+testdata_DATA = context-provide.context
+
 waitforsubscriptiontests_SOURCES = \
 	testwaitforsubscription.cpp \
 	testwaitforsubscription.h

@@ -156,8 +156,12 @@ void WaitForSubscriptionTests::waitAndBlockSubscribed()
     ContextProperty prop("Test.Prop3");
 
     // Wait until the property has a value...
-    while (prop.value().isNull())
+    QTime timer;
+    timer.start();
+    while (prop.value().isNull() && timer.elapsed() < 5000)
         QTest::qWait(100);
+
+    QCOMPARE(prop.value(), QVariant(QString("thirdValue")));
 
     Helper h;
     QTimer::singleShot(0, &h, SLOT(onTimeout()));
@@ -182,8 +186,12 @@ void WaitForSubscriptionTests::waitAndSpinSubscribed()
     ContextProperty prop("Test.Prop4");
 
     // Wait until the property has a value...
-    while (prop.value().isNull())
+    QTime timer;
+    timer.start();
+    while (prop.value().isNull() && timer.elapsed() < 5000)
         QTest::qWait(100);
+
+    QCOMPARE(prop.value(), QVariant(QString("fourthValue")));
 
     Helper h;
     QTimer::singleShot(0, &h, SLOT(onTimeout()));
@@ -193,8 +201,6 @@ void WaitForSubscriptionTests::waitAndSpinSubscribed()
     // The event loop hasn't spinned since the property was already subscribed
     QVERIFY(!h.processed);
 
-    // And the property should have a value
-    QCOMPARE(prop.value(), QVariant(QString("fourthValue")));
 
     // For test sanity; check that we *did* schedule the event correctly
     QTest::qWait(100);

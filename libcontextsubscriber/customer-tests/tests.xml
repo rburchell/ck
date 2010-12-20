@@ -103,6 +103,9 @@
 	    requirement="" timeout="20">
         <step expected_result="0">cd /usr/share/libcontextsubscriber-tests/forward-compatible ; ./test.sh ;</step>
       </case>
+      <case name="waitforsubscription" description="waitForSubscription[AndBlock] functionalities" requirement="" timeout="50">
+        <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=/usr/share/libcontextsubscriber-tests/waitforsubscription/ ;cd /usr/lib/libcontextsubscriber-tests/;./waitforsubscriptiontests</step>
+      </case>
       <environments>
         <scratchbox>false</scratchbox>
         <hardware>true</hardware>
