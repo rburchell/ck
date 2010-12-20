@@ -133,11 +133,11 @@ void ContextKitPlugin::unsubscribe(QSet<QString> keys)
     unsubscribeRequested += keys;
 }
 
-void ContextKitPlugin::waitForSubscriptionAndBlock(const QString& key)
+void ContextKitPlugin::blockUntilSubscribed(const QString& key)
 {
 }
 
-void ContextKitPlugin::waitUntilReadyAndBlock()
+void ContextKitPlugin::blockUntilReady()
 {
 }
 

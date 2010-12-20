@@ -162,7 +162,7 @@ void Provider::unsubscribe(const QString& key)
     unsubscribeProviderNames << myName;
 }
 
-void Provider::waitForSubscriptionAndBlock(const QString& key)
+void Provider::blockUntilSubscribed(const QString& key)
 {
 }
 

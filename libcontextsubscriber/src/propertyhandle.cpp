@@ -286,17 +286,16 @@ void PropertyHandle::onValueChanged()
     }
 }
 
-void PropertyHandle::waitForSubscriptionAndBlock()
+void PropertyHandle::blockUntilSubscribed()
 {
-    // Call waitForSubscriptionAndBlock once per each provider in
-    // pendingSubscriptions.  Making the call might or might not result in
-    // removing the provider from pendingSubscriptions (depending on whether
-    // some events on the way are queued or not), so make no assumptions on
-    // that.
+    // Call blockUntilSubscribed once per each provider in pendingSubscriptions.
+    // Making the call might or might not result in removing the provider from
+    // pendingSubscriptions (depending on whether some events on the way are
+    // queued or not), so make no assumptions on that.
     QSet<Provider*> pendingSubscriptionsCopy = pendingSubscriptions;
     while (pendingSubscriptionsCopy.size() > 0) {
         Provider* provider = *(pendingSubscriptionsCopy.constBegin());
-        provider->waitForSubscriptionAndBlock(myKey);
+        provider->blockUntilSubscribed(myKey);
         pendingSubscriptionsCopy.remove(provider);
     }
 }

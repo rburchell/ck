@@ -400,7 +400,7 @@ void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,
     }
 }
 
-void ContextKitPlugin::waitUntilReadyAndBlock()
+void ContextKitPlugin::blockUntilReady()
 {
     bool setSkip = providerAppearedQueued; // save this value
     onProviderAppeared();
@@ -412,7 +412,7 @@ void ContextKitPlugin::waitUntilReadyAndBlock()
     }
 }
 
-void ContextKitPlugin::waitForSubscriptionAndBlock(const QString& key)
+void ContextKitPlugin::blockUntilSubscribed(const QString& key)
 {
     // Force the subscriptions (that were scheduled) to happen now
     while (newProtocol && pendingKeys.size() > 0) {

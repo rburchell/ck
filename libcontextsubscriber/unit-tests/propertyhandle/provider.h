@@ -44,7 +44,7 @@ public:
     void unsubscribe(const QString &key);
     TimedValue get(const QString &key) const;
     void clearValues();
-    void waitForSubscriptionAndBlock(const QString& key);
+    void blockUntilSubscribed(const QString& key);
 
 Q_SIGNALS:
     void subscribeFinished(QString key);

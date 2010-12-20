@@ -46,8 +46,8 @@ public:
     explicit TimePlugin();
     virtual void subscribe(QSet<QString> keys);
     virtual void unsubscribe(QSet<QString> keys);
-    virtual void waitUntilReadyAndBlock();
-    virtual void waitForSubscriptionAndBlock(const QString& key);
+    virtual void blockUntilReady();
+    virtual void blockUntilSubscribed(const QString& key);
 
 private Q_SLOTS:
     void onTimeout();

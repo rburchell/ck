@@ -74,7 +74,7 @@ void WaitForSubscriptionTests::waitAndBlockExisting()
     Helper h;
     QTimer::singleShot(0, &h, SLOT(onTimeout()));
 
-    prop.waitForSubscriptionAndBlock();
+    prop.waitForSubscription(true);
 
     // The event loop hasn't spinned...
     QVERIFY(!h.processed);
@@ -95,7 +95,7 @@ void WaitForSubscriptionTests::waitAndBlockNonExisting()
     Helper h;
     QTimer::singleShot(0, &h, SLOT(onTimeout()));
 
-    prop.waitForSubscriptionAndBlock();
+    prop.waitForSubscription(true);
 
     // The event loop hasn't spinned...
     QVERIFY(!h.processed);
@@ -166,7 +166,7 @@ void WaitForSubscriptionTests::waitAndBlockSubscribed()
     Helper h;
     QTimer::singleShot(0, &h, SLOT(onTimeout()));
 
-    prop.waitForSubscriptionAndBlock();
+    prop.waitForSubscription(true);
 
     // The event loop hasn't spinned...
     QVERIFY(!h.processed);

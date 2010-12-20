@@ -397,7 +397,7 @@ void Provider::onPluginValueChanged(QString key, QVariant newValue)
         contextDebug() << "Received a property not subscribed to:" << key;
 }
 
-void Provider::waitForSubscriptionAndBlock(const QString& key)
+void Provider::blockUntilSubscribed(const QString& key)
 {
     // This function might be called before the plugin is constructed (since
     // it's constructed in a queued way).  If so, construct it now.
@@ -414,11 +414,11 @@ void Provider::waitForSubscriptionAndBlock(const QString& key)
     // When this is called, the plugin waits until it's ready, and emits the
     // ready() signal (the connection is not queued).  As a result, we
     // handleSubscribes().
-    plugin->waitUntilReadyAndBlock();
+    plugin->blockUntilReady();
 
     // And tell the plugin to block until the subscription of this key is
     // complete.
-    plugin->waitForSubscriptionAndBlock(key);
+    plugin->blockUntilSubscribed(key);
 }
 
 TimedValue Provider::get(const QString &key) const

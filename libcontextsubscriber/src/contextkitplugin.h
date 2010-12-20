@@ -71,8 +71,8 @@ public:
     void subscribe(QSet<QString> keys);
     void unsubscribe(QSet<QString> keys);
     void setDefaultNewProtocol(bool s);
-    void waitUntilReadyAndBlock();
-    void waitForSubscriptionAndBlock(const QString& key);
+    void blockUntilReady();
+    void blockUntilSubscribed(const QString& key);
 
 Q_SIGNALS:
 #ifdef DOXYGEN_ONLY
