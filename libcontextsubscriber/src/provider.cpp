@@ -110,7 +110,8 @@ namespace ContextSubscriber {
 /// Stores the passed plugin name and construction paramater, then
 /// moves into the main thread and queues a constructPlugin call.
 Provider::Provider(const ContextProviderInfo& providerInfo)
-    : plugin(0), pluginState(INITIALIZING), providerInfo(providerInfo)
+    : plugin(0), pluginState(INITIALIZING), providerInfo(providerInfo),
+      pluginConstructed(false)
 {
     // Move the PropertyHandle (and all children) to main thread.
     moveToThread(QCoreApplication::instance()->thread());
@@ -125,7 +126,6 @@ Provider::Provider(const ContextProviderInfo& providerInfo)
 /// up with the name of the function).
 void Provider::constructPlugin()
 {
-    static bool pluginConstructed = false;
     if (pluginConstructed)
         return;
     pluginConstructed = true;
@@ -411,16 +411,13 @@ void Provider::waitForSubscriptionAndBlock(const QString& key)
     // Maybe the plugin hasn't had time to emit ready() yet.  Force the plugin
     // to be ready, then.
 
-    // This would be more elegant:
-    //plugin->waitUntilReadyAndBlock();
+    // When this is called, the plugin waits until it's ready, and emits the
+    // ready() signal (the connection is not queued).  As a result, we
+    // handleSubscribes().
+    plugin->waitUntilReadyAndBlock();
 
-    // But for now we do:
-    if (pluginState == INITIALIZING)
-        pluginState = READY;
-
-    // Also, it might be that the key is only scheduled to be subscribed to, but
-    // the real subscription is not yet processed.  Do that now.
-    handleSubscribes();
+    // And tell the plugin to block until the subscription of this key is
+    // complete.
     plugin->waitForSubscriptionAndBlock(key);
 }
 

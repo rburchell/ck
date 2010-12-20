@@ -86,6 +86,7 @@ private:
     QSet<QString> subscribedKeys; ///< The keys that should be currently subscribed to
 
     QMap<QString, TimedValue> values; ///< A cache of values already received from the plugin
+    bool pluginConstructed;
 };
 
 } // end namespace
