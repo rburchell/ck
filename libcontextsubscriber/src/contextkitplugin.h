@@ -71,6 +71,7 @@ public:
     void subscribe(QSet<QString> keys);
     void unsubscribe(QSet<QString> keys);
     void setDefaultNewProtocol(bool s);
+    void waitUntilReadyAndBlock();
     void waitForSubscriptionAndBlock(const QString& key);
 
 Q_SIGNALS:
@@ -118,6 +119,9 @@ private:
 
     QHash<QString, PendingSubscribeWatcher*> pendingWatchers;
     QSet<QString> pendingKeys;
+
+    bool providerAppearedQueued;
+    bool providerAppearedSkip;
 };
 
 QVariant demarshallValue(const QVariant &v);

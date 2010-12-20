@@ -137,6 +137,10 @@ void ContextKitPlugin::waitForSubscriptionAndBlock(const QString& key)
 {
 }
 
+void ContextKitPlugin::waitUntilReadyAndBlock()
+{
+}
+
 //
 // Definition of testcases
 //

@@ -88,8 +88,10 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
       managerInterface(0),
       connection(new QDBusConnection(bus)),
       busName(busName),
+      newProtocol(true),
       defaultNewProtocol(true),
-      newProtocol(true)
+      providerAppearedQueued(false),
+      providerAppearedSkip(false)
 {
     reset();
     // Notice if the provider on the dbus comes and goes
@@ -103,6 +105,7 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
     // the provider at startup, whether it's present or not.
     providerListener->startListening(false);
     QMetaObject::invokeMethod(this, "onProviderAppeared", Qt::QueuedConnection);
+    providerAppearedQueued = true;
 }
 
 void ContextKitPlugin::setDefaultNewProtocol(bool s) {
@@ -132,6 +135,16 @@ void ContextKitPlugin::onProviderAppeared()
     // 3. the provider is started (quick enough to handle the Subscribe call)
     // 4. providerListener notices that the provider was started
     // In this case, the plugin is in "ready" state already.
+
+    providerAppearedQueued = false;
+
+    if (providerAppearedSkip) {
+        // Now we had queued this function to be called, but before it was
+        // called, waitUntilReadyAndBlock called it.  Skip the scheduled call
+        // (but not the later calls).
+        providerAppearedSkip = false;
+        return;
+    }
 
     contextDebug() << "Provider appeared:" << busName;
 
@@ -384,6 +397,17 @@ void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,
     }
     else {
         contextWarning() << "Unrecognized key" << message.path();
+    }
+}
+
+void ContextKitPlugin::waitUntilReadyAndBlock()
+{
+    onProviderAppeared();
+    if (providerAppearedQueued) {
+        // Calling onProviderAppeared was already scheduled but we already
+        // called it now.  Arrange so that the scheduled call is skipped when
+        // the event is processed.
+        providerAppearedSkip = true;
     }
 }
 
