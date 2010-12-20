@@ -9,7 +9,7 @@ waitforsubscriptiontests_SOURCES = \
 	testwaitforsubscription.h
 
 check-customer: $(test_PROGRAMS)
-	PATH=../../libcontextprovider/context-provide:$$PATH ./.libs/waitforsubscriptiontests
+	./.libs/waitforsubscriptiontests
 
 AM_CXXFLAGS = $(QtCore_CFLAGS) $(QtTest_CFLAGS) -I$(srcdir)/../../src \
 	      -I$(top_srcdir)/common
