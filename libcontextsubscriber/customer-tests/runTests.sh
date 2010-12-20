@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
 cd $(dirname $0)
-DIRS="commander subscription asynchronicity registry pluginchanging"
+DIRS_PYTHON="commander subscription asynchronicity registry pluginchanging"
+DIRS_CHECK="waitforsubs"
 . ./env.sh
 
 make -C ../../libcontextprovider/src
@@ -24,13 +25,17 @@ make -C testplugins
 
 if pkg-config contextprovider-1.0 || [ -e ../../libcontextprovider/src/.libs/libcontextprovider.so ]
 then
-	for dir in $DIRS; do
+	for dir in $DIRS_PYTHON; do
 		echo "Running tests in $dir"
 		cd $dir
 		for file in *.py; do
 			python2.5 $file
 		done
 		cd ..
+	done
+	for dir in $DIRS_CHECK; do
+		echo "Running tests in $dir"
+		make -C $dir check-customer
 	done
 else
 	echo "libcontextprovider is not installed nor built"

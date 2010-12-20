@@ -61,6 +61,7 @@ AC_CONFIG_FILES([
         libcontextsubscriber/customer-tests/testplugins/timeplugin1/Makefile
         libcontextsubscriber/customer-tests/testplugins/timeplugin2/Makefile
         libcontextsubscriber/customer-tests/forward-compatible/Makefile
+        libcontextsubscriber/customer-tests/waitforsubs/Makefile
         libcontextsubscriber/doc/Makefile
         libcontextsubscriber/man/Makefile
         libcontextsubscriber/src/Makefile
