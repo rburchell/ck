@@ -215,6 +215,10 @@ void Provider::onPluginReady()
 {
     contextDebug();
 
+    // Ignore the signal if the plugin is already in the ready state.
+    if (pluginState == READY)
+        return;
+
     QMutexLocker lock(&subscribeLock);
     // Renew the subscriptions (if any).
     // Renewing happens when a provider has disappeared and now it appeared again.

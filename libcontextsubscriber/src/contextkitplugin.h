@@ -119,9 +119,6 @@ private:
 
     QHash<QString, PendingSubscribeWatcher*> pendingWatchers;
     QSet<QString> pendingKeys;
-
-    bool providerAppearedQueued;
-    bool providerAppearedSkip;
 };
 
 QVariant demarshallValue(const QVariant &v);

@@ -89,9 +89,7 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
       connection(new QDBusConnection(bus)),
       busName(busName),
       newProtocol(true),
-      defaultNewProtocol(true),
-      providerAppearedQueued(false),
-      providerAppearedSkip(false)
+      defaultNewProtocol(true)
 {
     reset();
     // Notice if the provider on the dbus comes and goes
@@ -105,7 +103,6 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
     // the provider at startup, whether it's present or not.
     providerListener->startListening(false);
     QMetaObject::invokeMethod(this, "onProviderAppeared", Qt::QueuedConnection);
-    providerAppearedQueued = true;
 }
 
 void ContextKitPlugin::setDefaultNewProtocol(bool s) {
@@ -128,24 +125,6 @@ void ContextKitPlugin::reset()
 /// appears.
 void ContextKitPlugin::onProviderAppeared()
 {
-    // It is possible that this function is called and we have a Subscribe call
-    // in progress.  This happens when things happen in the following order:
-    // 1. the subscriber is started
-    // 2. the subscriber optimistically sends the Subscribe call
-    // 3. the provider is started (quick enough to handle the Subscribe call)
-    // 4. providerListener notices that the provider was started
-    // In this case, the plugin is in "ready" state already.
-
-    providerAppearedQueued = false;
-
-    if (providerAppearedSkip) {
-        // Now we had queued this function to be called, but before it was
-        // called, waitUntilReadyAndBlock called it.  Skip the scheduled call
-        // (but not the later calls).
-        providerAppearedSkip = false;
-        return;
-    }
-
     contextDebug() << "Provider appeared:" << busName;
 
     reset();
@@ -402,14 +381,10 @@ void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,
 
 void ContextKitPlugin::blockUntilReady()
 {
-    bool setSkip = providerAppearedQueued; // save this value
+    // This will result in emitting ready() immediately; we don't really block.
+    // This optimistic plugin is in "ready" state even if it's not sure whether
+    // the provider is running.
     onProviderAppeared();
-    if (setSkip) {
-        // Calling onProviderAppeared was already scheduled but we already
-        // called it now.  Arrange so that the scheduled call is skipped when
-        // the event is processed.
-        providerAppearedSkip = true;
-    }
 }
 
 void ContextKitPlugin::blockUntilSubscribed(const QString& key)
