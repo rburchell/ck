@@ -322,7 +322,6 @@ void ProviderUnitTests::pluginValueChanges()
     provider->subscribe("test.key1");
     provider->callAllMethodsInQueue();
     Q_EMIT pluginInstances[conStr]->subscribeFinished("test.key1");
-    QCoreApplication::processEvents(QEventLoop::WaitForMoreEvents); // signal delivery is queued
 
     QSignalSpy spy(provider, SIGNAL(valueChanged(QString)));
     Q_EMIT pluginInstances[conStr]->valueChanged("test.key1", QVariant(42));
