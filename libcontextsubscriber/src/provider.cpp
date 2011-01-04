@@ -111,7 +111,7 @@ namespace ContextSubscriber {
 /// moves into the main thread and queues a constructPlugin call.
 Provider::Provider(const ContextProviderInfo& providerInfo)
     : plugin(0), pluginState(INITIALIZING), providerInfo(providerInfo),
-      pluginConstructed(false)
+      subscribeLock(QMutex::Recursive), pluginConstructed(false)
 {
     // Move the PropertyHandle (and all children) to main thread.
     moveToThread(QCoreApplication::instance()->thread());
@@ -197,16 +197,16 @@ void Provider::constructPlugin()
     sconnect(plugin, SIGNAL(failed(QString)),
              this, SLOT(onPluginFailed(QString)));
 
-    // The following signals are queued, because a plugin might emit
-    // subscribeFinished() right in the subscribe() call.
+    // The following signals (as well as valueChanged) can be emitted in
+    // subscribe() of the plugin.  Here we utilize the fact that our mutexes are
+    // recursive.
     qRegisterMetaType<TimedValue>("TimedValue");
     sconnect(plugin, SIGNAL(subscribeFinished(QString, TimedValue)),
-             this, SLOT(onPluginSubscribeFinished(QString, TimedValue)),
-             Qt::QueuedConnection);
+             this, SLOT(onPluginSubscribeFinished(QString, TimedValue)));
     sconnect(plugin, SIGNAL(subscribeFinished(QString)),
-             this, SLOT(onPluginSubscribeFinished(QString)), Qt::QueuedConnection);
+             this, SLOT(onPluginSubscribeFinished(QString)));
     sconnect(plugin, SIGNAL(subscribeFailed(QString, QString)),
-             this, SLOT(onPluginSubscribeFailed(QString, QString)), Qt::QueuedConnection);
+             this, SLOT(onPluginSubscribeFailed(QString, QString)));
 }
 
 /// Updates \c pluginState to \c READY and requests subscription for
