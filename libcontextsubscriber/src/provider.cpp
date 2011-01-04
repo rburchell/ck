@@ -417,12 +417,15 @@ void Provider::blockUntilSubscribed(const QString& key)
 
     // When this is called, the plugin waits until it's ready, and emits the
     // ready() signal (the connection is not queued).  As a result, we
-    // handleSubscribes().
+    // handleSubscribes() and that calls subscribe().  Or, the plugin emits
+    // failed(), we handleSubscribes(), and don't call anything.
     plugin->blockUntilReady();
 
-    // And tell the plugin to block until the subscription of this key is
-    // complete.
-    plugin->blockUntilSubscribed(key);
+    if (pluginState == READY) {
+        // And tell the plugin to block until the subscription of this key is
+        // complete.
+        plugin->blockUntilSubscribed(key);
+    }
 }
 
 TimedValue Provider::get(const QString &key) const
