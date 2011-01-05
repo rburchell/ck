@@ -59,6 +59,14 @@ void TimePlugin::unsubscribe(QSet<QString> keys)
     timer.stop();
 }
 
+void TimePlugin::blockUntilReady()
+{
+}
+
+void TimePlugin::blockUntilSubscribed(const QString& key)
+{
+}
+
 void TimePlugin::onTimeout()
 {
     contextDebug() << "Timeout";

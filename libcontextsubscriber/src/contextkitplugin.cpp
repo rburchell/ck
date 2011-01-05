@@ -88,6 +88,7 @@ ContextKitPlugin::ContextKitPlugin(const QDBusConnection bus, const QString& bus
       managerInterface(0),
       connection(new QDBusConnection(bus)),
       busName(busName),
+      newProtocol(true),
       defaultNewProtocol(true)
 {
     reset();
@@ -114,7 +115,7 @@ void ContextKitPlugin::reset()
     subscriberInterface = 0;
     delete(managerInterface);
     managerInterface = 0;
-    newProtocol = false;
+    newProtocol = defaultNewProtocol;
     // Disconnect the ValueChanged signal for all keys (object paths)
     connection->disconnect(busName, "", propertyIName, "ValueChanged",
                            this, SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
@@ -124,14 +125,6 @@ void ContextKitPlugin::reset()
 /// appears.
 void ContextKitPlugin::onProviderAppeared()
 {
-    // It is possible that this function is called and we have a Subscribe call
-    // in progress.  This happens when things happen in the following order:
-    // 1. the subscriber is started
-    // 2. the subscriber optimistically sends the Subscribe call
-    // 3. the provider is started (quick enough to handle the Subscribe call)
-    // 4. providerListener notices that the provider was started
-    // In this case, the plugin is in "ready" state already.
-
     contextDebug() << "Provider appeared:" << busName;
 
     reset();
@@ -232,7 +225,7 @@ void ContextKitPlugin::subscribe(QSet<QString> keys)
             // previous async call. (We emit "ready" when handling
             // GetSubscriber. "Ready" is not queued, and the above
             // layer can call subscribe when handling it.)
-
+            pendingKeys.insert(key);
             QMetaObject::invokeMethod(this, "newSubscribe", Qt::QueuedConnection, Q_ARG(QString, key));
         }
     else {
@@ -242,6 +235,13 @@ void ContextKitPlugin::subscribe(QSet<QString> keys)
 
 void ContextKitPlugin::newSubscribe(const QString& key)
 {
+    if (pendingKeys.contains(key) == false) {
+        // this key was already handled, probably because
+        // waitForSubscriptionAndBlock forced the subscription to happen.
+        return;
+    }
+    pendingKeys.remove(key);
+
     QString objectPath = keyToPath(key);
     // Store the "object path -> key" mapping so that we can transform
     // back when a valueChanged signal comes over D-Bus. (Note the
@@ -259,6 +259,7 @@ void ContextKitPlugin::newSubscribe(const QString& key)
                         SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
 
     PendingSubscribeWatcher *psw = new PendingSubscribeWatcher(pc, key, this);
+    pendingWatchers.insert(key, psw);
     sconnect(psw,
              SIGNAL(subscribeFinished(QString)),
              this,
@@ -271,6 +272,14 @@ void ContextKitPlugin::newSubscribe(const QString& key)
              SIGNAL(valueChanged(QString,TimedValue)),
              this,
              SIGNAL(valueChanged(QString,TimedValue)));
+    sconnect(psw,
+             SIGNAL(subscribeFinished(QString)),
+             this,
+             SLOT(removePendingWatcher(const QString&)));
+    sconnect(psw,
+             SIGNAL(subscribeFailed(QString,QString)),
+             this,
+             SLOT(removePendingWatcher(const QString&)));
 }
 
 
@@ -368,6 +377,31 @@ void ContextKitPlugin::onNewValueChanged(QList<QVariant> value,
     else {
         contextWarning() << "Unrecognized key" << message.path();
     }
+}
+
+void ContextKitPlugin::blockUntilReady()
+{
+    // This will result in emitting ready() immediately; we don't really block.
+    // This optimistic plugin is in "ready" state even if it's not sure whether
+    // the provider is running.
+    onProviderAppeared();
+}
+
+void ContextKitPlugin::blockUntilSubscribed(const QString& key)
+{
+    // Force the subscriptions (that were scheduled) to happen now
+    while (newProtocol && pendingKeys.size() > 0) {
+        QString key = *(pendingKeys.constBegin());
+        newSubscribe(key);
+    }
+    if (pendingWatchers.contains(key)) {
+        pendingWatchers.value(key)->waitForFinished();
+    }
+}
+
+void ContextKitPlugin::removePendingWatcher(const QString& key)
+{
+    pendingWatchers.remove(key);
 }
 
 PendingSubscribeWatcher::PendingSubscribeWatcher(const QDBusPendingCall &call,

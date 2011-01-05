@@ -58,6 +58,8 @@ public:
     static void ignoreCommander();
     static void setTypeCheck(bool typeCheck);
 
+    void blockUntilSubscribed();
+
 Q_SIGNALS:
     void valueChanged();
 

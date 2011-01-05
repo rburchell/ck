@@ -286,6 +286,20 @@ void PropertyHandle::onValueChanged()
     }
 }
 
+void PropertyHandle::blockUntilSubscribed()
+{
+    // Call blockUntilSubscribed once per each provider in pendingSubscriptions.
+    // Making the call might or might not result in removing the provider from
+    // pendingSubscriptions (depending on whether some events on the way are
+    // queued or not), so make no assumptions on that.
+    QSet<Provider*> pendingSubscriptionsCopy = pendingSubscriptions;
+    while (pendingSubscriptionsCopy.size() > 0) {
+        Provider* provider = *(pendingSubscriptionsCopy.constBegin());
+        provider->blockUntilSubscribed(myKey);
+        pendingSubscriptionsCopy.remove(provider);
+    }
+}
+
 const ContextPropertyInfo* PropertyHandle::info() const
 {
     return myInfo;

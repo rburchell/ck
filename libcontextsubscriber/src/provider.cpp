@@ -110,7 +110,8 @@ namespace ContextSubscriber {
 /// Stores the passed plugin name and construction paramater, then
 /// moves into the main thread and queues a constructPlugin call.
 Provider::Provider(const ContextProviderInfo& providerInfo)
-    : plugin(0), pluginState(INITIALIZING), providerInfo(providerInfo)
+    : plugin(0), pluginState(INITIALIZING), providerInfo(providerInfo),
+      subscribeLock(QMutex::Recursive), pluginConstructed(false)
 {
     // Move the PropertyHandle (and all children) to main thread.
     moveToThread(QCoreApplication::instance()->thread());
@@ -125,6 +126,10 @@ Provider::Provider(const ContextProviderInfo& providerInfo)
 /// up with the name of the function).
 void Provider::constructPlugin()
 {
+    if (pluginConstructed)
+        return;
+    pluginConstructed = true;
+
     contextDebug() << F_PLUGINS;
     if (providerInfo.plugin == "contextkit-dbus") {
         plugin = contextKitPluginFactory(providerInfo.constructionString);
@@ -192,16 +197,16 @@ void Provider::constructPlugin()
     sconnect(plugin, SIGNAL(failed(QString)),
              this, SLOT(onPluginFailed(QString)));
 
-    // The following signals are queued, because a plugin might emit
-    // subscribeFinished() right in the subscribe() call.
+    // The following signals (as well as valueChanged) can be emitted in
+    // subscribe() of the plugin.  Here we utilize the fact that our mutexes are
+    // recursive.
     qRegisterMetaType<TimedValue>("TimedValue");
     sconnect(plugin, SIGNAL(subscribeFinished(QString, TimedValue)),
-             this, SLOT(onPluginSubscribeFinished(QString, TimedValue)),
-             Qt::QueuedConnection);
+             this, SLOT(onPluginSubscribeFinished(QString, TimedValue)));
     sconnect(plugin, SIGNAL(subscribeFinished(QString)),
-             this, SLOT(onPluginSubscribeFinished(QString)), Qt::QueuedConnection);
+             this, SLOT(onPluginSubscribeFinished(QString)));
     sconnect(plugin, SIGNAL(subscribeFailed(QString, QString)),
-             this, SLOT(onPluginSubscribeFailed(QString, QString)), Qt::QueuedConnection);
+             this, SLOT(onPluginSubscribeFailed(QString, QString)));
 }
 
 /// Updates \c pluginState to \c READY and requests subscription for
@@ -209,6 +214,10 @@ void Provider::constructPlugin()
 void Provider::onPluginReady()
 {
     contextDebug();
+
+    // Ignore the signal if the plugin is already in the ready state.
+    if (pluginState == READY)
+        return;
 
     QMutexLocker lock(&subscribeLock);
     // Renew the subscriptions (if any).
@@ -390,6 +399,33 @@ void Provider::onPluginValueChanged(QString key, QVariant newValue)
         // Plugins are allowed to send values which are not subscribed to, but
         // only if they get them for free.
         contextDebug() << "Received a property not subscribed to:" << key;
+}
+
+void Provider::blockUntilSubscribed(const QString& key)
+{
+    // This function might be called before the plugin is constructed (since
+    // it's constructed in a queued way).  If so, construct it now.
+    constructPlugin();
+
+    if (plugin == 0) // we couldn't construct a plugin
+    {
+        return;
+    }
+
+    // Maybe the plugin hasn't had time to emit ready() yet.  Force the plugin
+    // to be ready, then.
+
+    // When this is called, the plugin waits until it's ready, and emits the
+    // ready() signal (the connection is not queued).  As a result, we
+    // handleSubscribes() and that calls subscribe().  Or, the plugin emits
+    // failed(), we handleSubscribes(), and don't call anything.
+    plugin->blockUntilReady();
+
+    if (pluginState == READY) {
+        // And tell the plugin to block until the subscription of this key is
+        // complete.
+        plugin->blockUntilSubscribed(key);
+    }
 }
 
 TimedValue Provider::get(const QString &key) const

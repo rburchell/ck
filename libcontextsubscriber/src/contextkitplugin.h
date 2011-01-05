@@ -71,6 +71,8 @@ public:
     void subscribe(QSet<QString> keys);
     void unsubscribe(QSet<QString> keys);
     void setDefaultNewProtocol(bool s);
+    void blockUntilReady();
+    void blockUntilSubscribed(const QString& key);
 
 Q_SIGNALS:
 #ifdef DOXYGEN_ONLY
@@ -93,6 +95,7 @@ private Q_SLOTS:
     void onProviderAppeared();
     void onProviderDisappeared();
     void newSubscribe(const QString& key);
+    void removePendingWatcher(const QString& key);
 
 private:
     static QString keyToPath(QString key);
@@ -114,6 +117,8 @@ private:
 
     QHash<QString, QString> objectPathToKey;
 
+    QHash<QString, PendingSubscribeWatcher*> pendingWatchers;
+    QSet<QString> pendingKeys;
 };
 
 QVariant demarshallValue(const QVariant &v);

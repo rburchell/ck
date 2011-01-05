@@ -162,6 +162,10 @@ void Provider::unsubscribe(const QString& key)
     unsubscribeProviderNames << myName;
 }
 
+void Provider::blockUntilSubscribed(const QString& key)
+{
+}
+
 void Provider::clearValues()
 {
     cachedValue = TimedValue(QVariant());

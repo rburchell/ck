@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Nokia Corporation.
+ * Copyright (C) 2008-2010 Nokia Corporation.
  *
  * Contact: Marius Vollmer <marius.vollmer@nokia.com>
  *
@@ -19,43 +19,50 @@
  *
  */
 
-/*
-This is a test plugin for customer tests.
-*/
+#include <QObject>
 
-#ifndef TIMEPLUGIN_H
-#define TIMEPLUGIN_H
+class QProcess;
 
-#include "iproviderplugin.h" // For IProviderPlugin definition
-#include <QTimer>
-
-using ContextSubscriber::IProviderPlugin;
-
-extern "C" {
-    IProviderPlugin* pluginFactory(QString constructionString);
-}
-
-namespace ContextSubscriberTime
-{
-
-class TimePlugin : public IProviderPlugin
+class WaitForSubscriptionTests : public QObject
 {
     Q_OBJECT
 
-public:
-    explicit TimePlugin();
-    virtual void subscribe(QSet<QString> keys);
-    virtual void unsubscribe(QSet<QString> keys);
-    virtual void blockUntilReady();
-    virtual void blockUntilSubscribed(const QString& key);
+    public:
+    WaitForSubscriptionTests();
+public Q_SLOTS:
+    void readStandardOutput();
 
 private Q_SLOTS:
-    void onTimeout();
+    void initTestCase();
+    void cleanupTestCase();
+
+    void waitAndBlockExisting();
+    void waitAndBlockNonExisting();
+
+    void waitAndSpinExisting();
+    void waitAndSpinNonExisting();
+
+    void waitAndBlockSubscribed();
+    void waitAndSpinSubscribed();
 
 private:
-    QTimer timer;
-    QString prefix;
+    QProcess* provider;
+    bool providerStarted;
+    bool isReadyToRead;
 };
-}
 
-#endif
+class Helper : public QObject
+{
+    Q_OBJECT
+public:
+    bool processed;
+    Helper() : processed(false)
+    {
+    }
+
+public Q_SLOTS:
+    void onTimeout()
+    {
+        processed = true;
+    }
+};

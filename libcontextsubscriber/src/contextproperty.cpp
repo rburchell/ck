@@ -307,6 +307,25 @@ void ContextProperty::waitForSubscription() const
     }
 }
 
+/// Suspends the execution of the current thread until subcription is complete
+/// for this context property.  Spins the event loop if \a block is false, and
+/// blocks (e.g., select / poll with a socket) if \a block is true. Calling this
+/// function while the subscription is not in progress (because it has completed
+/// already or because the property is currently unsubscribed) does nothing.
+/// Calling this function with \a block = true is only allowed for
+/// ContextProperty objects associated with the main thread, and calling this
+/// function is only allowed in the main thread.
+void ContextProperty::waitForSubscription(bool block) const
+{
+    if (!block) {
+        waitForSubscription();
+        return;
+    }
+    if (!priv->subscribed)
+        return;
+    priv->handle->blockUntilSubscribed();
+}
+
 /// Sets all of the ContextProperty instances immune to 'external
 /// commanding'.  This is only intended to be used by the Context
 /// Commander itself, so that it can use ContextProperties without

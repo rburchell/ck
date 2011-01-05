@@ -52,6 +52,8 @@ public:
     TimedValue get(const QString &key) const;
     void clearValues();
 
+    void blockUntilSubscribed(const QString& key);
+
 Q_SIGNALS:
     void subscribeFinished(Provider *provider, QString key);
     void valueChanged(QString key);
@@ -84,6 +86,7 @@ private:
     QSet<QString> subscribedKeys; ///< The keys that should be currently subscribed to
 
     QMap<QString, TimedValue> values; ///< A cache of values already received from the plugin
+    bool pluginConstructed;
 };
 
 } // end namespace
