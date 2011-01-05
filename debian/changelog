@@ -1,8 +1,14 @@
+contextkit (0.5.26~unreleased) unstable; urgency=low
+
+  *
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 05 Jan 2011 17:35:27 +0200
+
 contextkit (0.5.25) unstable; urgency=low
 
   * Fixes: NB#213302 - [TASK] Request for truely blocking version of
     ContextProperty::waitForSubscription
-  * lcs: Getting rid of the "cannot emit certain signals inside plugin's 
+  * lcs: Getting rid of the "cannot emit certain signals inside plugin's
     subscribe()"
   * API addition: ContextProperty::waitForSubscriptionAndBlock
 
@@ -57,7 +63,7 @@ contextkit (0.5.19) unstable; urgency=low
 
 contextkit (0.5.18) unstable; urgency=low
 
-  * Fixes: NB#190684 - <MemLeak> Memory leaks observed in ContextKitPlugin of 
+  * Fixes: NB#190684 - <MemLeak> Memory leaks observed in ContextKitPlugin of
     libcontextsubscriber
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Mon, 13 Sep 2010 16:55:10 +0300
@@ -66,7 +72,7 @@ contextkit (0.5.17) unstable; urgency=low
 
   * debian: API file fixed typo
   * Cellular.PacketData property added
-  * Presence.State enumeration modified    
+  * Presence.State enumeration modified
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Mon, 23 Aug 2010 13:46:11 +0300
 
@@ -97,8 +103,8 @@ contextkit (0.5.13) unstable; urgency=low
 
   * context-provide: in commander mode, a property proxy will subscribe to registered
     provider upon client subscription.
-  * Fixes: NB#173827 qtn_lockfw_posnotice notice dialog comes up when I use 
-    context-provide command tool 
+  * Fixes: NB#173827 qtn_lockfw_posnotice notice dialog comes up when I use
+    context-provide command tool
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 29 Jun 2010 18:28:16 +0300
 
@@ -145,7 +151,7 @@ contextkit (0.5.7) unstable; urgency=low
 
 contextkit (0.5.6) unstable; urgency=low
 
-  * Revert scratchbox sanitization 
+  * Revert scratchbox sanitization
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 12 Jan 2010 11:21:11 +0200
 
@@ -169,7 +175,7 @@ contextkit (0.5.3) unstable; urgency=low
 
   * deprecated the old D-Bus protocol on the subscriber side, now it is
     only tried for talking to the commander, not for regular providers.
-  
+
   Implemented: Swp#CntFr-386
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 09 Dec 2009 11:45:29 +0200
@@ -279,7 +285,7 @@ contextkit (0.3.7) unstable; urgency=low
     libraries are in Requires.private now.
   * Lintian fixes, and a lintian override for libcontextsubscriber-tests
   * Maemo CI support
-  * Fixes: NB#141008 - subscriber cannot subscribe to a provider if provider 
+  * Fixes: NB#141008 - subscriber cannot subscribe to a provider if provider
     is started after subscriber
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 30 Sep 2009 10:29:46 +0300
@@ -308,7 +314,7 @@ contextkit (0.3.4) unstable; urgency=low
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 18 Sep 2009 16:09:44 +0300
 
 contextkit (0.3.3) unstable; urgency=low
-  
+
   * Fixed dependencies of libcontextsubscriber0-dbg.
   * Fixes: NB#133849 -libcontextsubscriber0 fails to upgrade in sb2.
   * Refactored libcontextsubscriber for future possibility to handle
@@ -336,15 +342,15 @@ contextkit (0.3) unstable; urgency=low
   * Rewrote libcontextprovider in C++ and added C++ API for it.  The old C
     API is still there and this version is binary and source compatible
     with previous versions.
-  
+
   * The context daemon is in its own source package now.  This makes this
     source package more platform independent, removing the Maemo specific
     bits.
-  
+
   * Removed the fake-provider.  Instead, the core property declarations
     are installed by the libcontextsubscriber package and are always
     available.
-  
+
     If you are a provider for core properties, you now no longer need to
     include type declarations and documentation for them in your property
     declaration XML file.  Just the names of the properties you provide
@@ -370,7 +376,7 @@ contextkit (0.2.11) unstable; urgency=low
 
 contextkit (0.2.10) unstable; urgency=low
 
-  * Fixes: NB#126195 - Context Commander won't start if latest 
+  * Fixes: NB#126195 - Context Commander won't start if latest
     libcontextsubscriber is installed.
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Fri, 03 Jul 2009 14:51:02 +0300
@@ -405,7 +411,7 @@ contextkit (0.2.6) unstable; urgency=low
     that they don't collide with like-named classes in libduivaluespace.
 
   (0.2.5 was never successfully released.)
-  
+
  -- Gergely Risko <gergely+context@risko.hu>  Tue, 09 Jun 2009 17:11:48 +0300
 
 contextkit (0.2.4) unstable; urgency=low
