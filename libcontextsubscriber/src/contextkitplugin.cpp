@@ -184,6 +184,8 @@ void ContextKitPlugin::onDBusGetSubscriberFailed(QDBusError err)
     contextWarning() <<
         "Trying new protocol, old failed for: " + busName + ", error: " +
         err.message();
+    // Don't ever try the old protocol again.
+    defaultNewProtocol = true;
     reset();
     useNewProtocol();
 }
