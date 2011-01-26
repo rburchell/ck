@@ -62,6 +62,12 @@ int main(int argc, char **argv)
         args.removeAll("--system");
     }
 
+    bool readInput = true;
+    if (args.contains("--no-input")) {
+        args.removeAll("--no-input");
+        readInput = false;
+    }
+
     if (args.count() < 2) {
         // No arguments at all? Use commander by default.
         args.push_back(CommandWatcher::commanderBusName);
@@ -90,7 +96,8 @@ int main(int argc, char **argv)
     qDebug() << "Service:" << busName.toLocal8Bit().data() << "on" <<
         ((busType == QDBusConnection::SessionBus) ? "session" : "system");
 
-    CommandWatcher commandWatcher(busName, busType, STDIN_FILENO, QCoreApplication::instance());
+    CommandWatcher commandWatcher(busName, busType, STDIN_FILENO, readInput,
+                                  QCoreApplication::instance());
 
     for (int i=2; i < args.count(); i+=3)
         commandWatcher.addCommand(args.mid(i, 3));

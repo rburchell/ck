@@ -47,13 +47,18 @@
 
 const QString CommandWatcher::commanderBusName = "org.freedesktop.ContextKit.Commander";
 
-CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt, int commandfd, QObject *parent) :
+CommandWatcher::CommandWatcher(QString bn, QDBusConnection::BusType bt,
+                               int commandfd, bool readInput, QObject *parent) :
     QObject(parent), commandfd(commandfd),
     registryInfo(ContextRegistryInfo::instance()),
     out(stdout), busName(bn), busType(bt), started(false)
 {
-    commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
-    sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
+    if (readInput) {
+        commandNotifier = new QSocketNotifier(commandfd, QSocketNotifier::Read, this);
+        sconnect(commandNotifier, SIGNAL(activated(int)), this, SLOT(onActivated()));
+    }
+    // Otherwise, just stay running, don't read anything from commandfd
+    // (especially, we won't get an eof and quit).
     if (busName == commanderBusName) {
         ContextProperty::ignoreCommander();
         ContextProperty::setTypeCheck(true);

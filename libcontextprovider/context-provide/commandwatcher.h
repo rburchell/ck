@@ -41,7 +41,8 @@ class CommandWatcher : public QObject
     Q_OBJECT
 
 public:
-    CommandWatcher(QString busName, QDBusConnection::BusType busType, int commandfd, QObject *parent = 0);
+    CommandWatcher(QString busName, QDBusConnection::BusType busType,
+                   int commandfd, bool readInput, QObject *parent = 0);
     ~CommandWatcher();
     void addCommand(const QStringList& args);
     void restartCommand();
