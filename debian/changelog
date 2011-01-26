@@ -1,6 +1,6 @@
 contextkit (0.5.26~unreleased) unstable; urgency=low
 
-  *
+  * Fixes: NB#221751
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 05 Jan 2011 17:35:27 +0200
 
