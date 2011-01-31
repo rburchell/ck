@@ -279,7 +279,7 @@ void ContextProperty::unsubscribe() const
     if (!priv->subscribed)
         return;
 
-    QObject::disconnect(priv->handle, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()));
+    QObject::disconnect(priv->handle, SIGNAL(valueChanged()), this, SLOT(onValueChanged()));
     priv->handle->unsubscribe();
     priv->subscribed = false;
 }
