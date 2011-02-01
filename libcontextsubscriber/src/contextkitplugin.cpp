@@ -147,7 +147,7 @@ void ContextKitPlugin::onProviderDisappeared()
 {
     contextDebug() << "Provider disappeared:" << busName;
     reset();
-    Q_EMIT failed("Provider went away " + busName);
+    Q_EMIT failed("Provider not present: " + busName);
 }
 
 /// Starts using the fresh subscriber interface when it is returned by
@@ -282,6 +282,11 @@ void ContextKitPlugin::newSubscribe(const QString& key)
              SIGNAL(subscribeFailed(QString,QString)),
              this,
              SLOT(removePendingWatcher(const QString&)));
+    sconnect(psw,
+             SIGNAL(providerNotPresent()),
+             this,
+             SLOT(onProviderDisappeared()));
+
 }
 
 
@@ -422,6 +427,11 @@ void PendingSubscribeWatcher::onFinished()
     QDBusPendingReply<QList<QVariant>, quint64> reply = *this;
     if (reply.isError()) {
         Q_EMIT subscribeFailed(key, reply.error().message());
+        if (reply.error().type() == QDBusError::ServiceUnknown) {
+            // We need to distinguish this case, so that the plugin can emit
+            // failed(), and become ready again when the provider appears.
+            Q_EMIT providerNotPresent();
+        }
         return;
     }
 

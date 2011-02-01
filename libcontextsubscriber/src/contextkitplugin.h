@@ -57,6 +57,7 @@ Q_SIGNALS:
     void subscribeFailed(QString, QString);
     void valueChanged(QString, TimedValue);
     void subscribeFinished(QString);
+    void providerNotPresent();
 
 private:
     QString key;

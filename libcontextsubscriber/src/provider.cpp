@@ -241,7 +241,16 @@ void Provider::clearValues()
 /// for keys we are trying to subscribe to.
 void Provider::onPluginFailed(QString error)
 {
-    contextWarning() << error;
+    // This function is called during "normal operation" when the subscriber is
+    // started before the provider. Contextkit recovers from that. Hence, don't
+    // print out a warning in that case.
+    if (error.startsWith("Provider not present"))
+        contextDebug() << error;
+    else
+        // but do print out the interesting warnings
+        contextWarning() << error;
+    // TODO: startsWith is ugly, but we don't have error numbers to make this
+    // more elegant.
 
     QMutexLocker lock(&subscribeLock);
     pluginState = FAILED;
