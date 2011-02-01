@@ -620,6 +620,38 @@ class SubscriptionWaitError (unittest.TestCase):
                              "Wait for subscription is probably in a dead state")
                 context_client.wait()
 
+class Cornercases(unittest.TestCase):
+        def tearDown(self):
+                os.unlink('./context-provide.context')
+                self.provider.wait()
+                self.listen.wait()
+        def testSubscriberStartedFirst(self):
+                # first dump the context declaration file
+                temp_provider = CLTool("context-provide", "--v2","com.nokia.test",
+                                       "int","test.int","1")
+                temp_provider.expect("Setting key: test.int") # wait for it
+                temp_provider.send("dump")
+                temp_provider.expect("Wrote") # wait for it
+                # kill the provider
+                temp_provider.wait()
+
+                # start the listener
+                self.listen = CLTool("context-listen")
+                self.listen.send("new test.int")
+                self.assert_(
+                        # note a typo here, but if we correct context-listen, something might break..
+                        self.listen.expect("^test.int subscribtion started$"),
+                        "Unable to start listener")
+
+                # and then the provider
+                self.provider = CLTool("context-provide", "--v2","com.nokia.test",
+                                       "int","test.int","1")
+                self.provider.expect("Setting key: test.int") # wait for it
+
+                # assert that the listener got the value
+                self.assert_(
+                        self.listen.expect(wanted("test.int", "int", "1")))
+
 if __name__ == "__main__":
         sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 1)
         unittest.main()
