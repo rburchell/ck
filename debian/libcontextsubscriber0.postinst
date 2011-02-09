@@ -3,12 +3,10 @@
 set -e
 
 if [ -x /scratchbox/tools/bin/strace ]; then
-  echo
-  echo "The following output hopefully helps to debug some strange intermittent failures."
-  echo "It will go away once we find the bug or decide to give up."
-  echo
+  log=/tmp/log.$$
+  strace -o $log -f update-contextkit-providers || cat $log
+  rm -f $log
   set -x
-  # strace -f update-contextkit-providers
 else
   update-contextkit-providers
 fi
