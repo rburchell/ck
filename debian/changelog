@@ -1,3 +1,9 @@
+contextkit (0.5.31~unreleased) unstable; urgency=low
+
+  * 
+
+ -- Marius Vollmer <marius.vollmer@nokia.com>  Wed, 09 Feb 2011 11:07:59 +0200
+
 contextkit (0.5.30) unstable; urgency=low
 
   * Only output strace log when update-context-providers actually fails.
