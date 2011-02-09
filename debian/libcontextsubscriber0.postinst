@@ -2,6 +2,15 @@
 
 set -e
 
-update-contextkit-providers
+if [ -x /scratchbox/tools/bin/strace ]; then
+  echo
+  echo "The following output hopefully helps to debug some strange intermittent failures."
+  echo "It will go away once we find the bug or decide to give up."
+  echo
+  set -x
+  # strace -f update-contextkit-providers
+else
+  update-contextkit-providers
+fi
 
 #DEBHELPER#
