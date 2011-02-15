@@ -318,6 +318,7 @@ The signal strength at the cellular radio, in percent of the maximum.
       <string-enum>
         <gsm/>
         <umts/>
+	<lte/>
       </string-enum>
     </type>
     <doc>
@@ -331,6 +332,7 @@ The currently used Radio Access Technology.
         <egprs/>
         <umts/>
         <hspa/>
+	<lte/>
       </string-enum>
     </type>
     <doc>
