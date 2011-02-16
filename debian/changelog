@@ -1,3 +1,9 @@
+contextkit (0.5.32~unreleased) unstable; urgency=low
+
+  *
+
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 15 Feb 2011 16:01:31 +0200
+
 contextkit (0.5.31) unstable; urgency=low
 
   * Added patch for two Cellular properties
