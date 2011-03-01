@@ -299,6 +299,12 @@ The format is in that case:
 
     </doc>
   </key>
+  <key name="Cellular.ExtendedNetworkName"
+       type="string">
+    <doc>
+Current cellular network operator name using local charset (if available).
+    </doc>
+  </key>
   <key name="Cellular.SignalStrength"
        type="percentage">
     <doc>
@@ -356,13 +362,25 @@ The current cellular network registration status.
   <key name="Cellular.CellName"
        type="string">
     <doc>
-The broadcast name of the current cell.
+The broadcast name of the current base station.
     </doc>
   </key>
   <key name="Cellular.PacketData"
        type="bool">
     <doc>
-A boolean indicating whether or not packet data are being transfered..
+A boolean indicating whether or not packet data are being transfered.
+    </doc>
+  </key>
+  <key name="Cellular.CellNameDisplayEnabled"
+       type="bool">
+    <doc>
+Setting for base station name display.
+    </doc>
+  </key>
+  <key name="Cellular.GSMBand"
+       type="string">
+    <doc>
+GSM frequency bands in use.
     </doc>
   </key>
   <doc>
