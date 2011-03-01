@@ -22,6 +22,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include "contextregistryinfo.h"
 #include "contextpropertyinfo.h"
 #include "contextproviderinfo.h"

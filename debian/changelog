@@ -1,6 +1,6 @@
 contextkit (0.5.32~unreleased) unstable; urgency=low
 
-  *
+  * Fixes: NB#228811 - contextkit fails to build with gcc-4.5
 
  -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 15 Feb 2011 16:01:31 +0200
 
