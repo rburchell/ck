@@ -114,17 +114,23 @@ QVariantList CDBReader::valuesForKey(const QString &key) const
     struct cdb_find cdbf;
     cdb_findinit(&cdbf, (struct cdb*) cdb, kval, klen);
 
+    QVariant valVariant;
+    char* val;
+    QByteArray valArray;
+    QDataStream ds;
+    QBuffer buffer;
+    ds.setDevice(&buffer);
+
     while(cdb_findnext(&cdbf) > 0) {
         unsigned int vpos = cdb_datapos((struct cdb*) cdb);
         unsigned int vlen = cdb_datalen((struct cdb*) cdb);
-        char *val = (char *) malloc(vlen);
-        cdb_read((struct cdb*) cdb, val, vlen, vpos);
-        QByteArray valArray(val, vlen);
-        QDataStream ds(&valArray, QIODevice::ReadOnly);
-        QVariant valVariant;
+        val = (char*) cdb_get((struct cdb*) cdb, vlen, vpos);
+        buffer.close();
+        valArray.setRawData(val, vlen);
+        buffer.setBuffer(&valArray);
+        buffer.open(QBuffer::ReadOnly);
         ds >> valVariant;
         list << valVariant;
-        free(val);
     }
 
     return list;
