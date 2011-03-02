@@ -64,6 +64,10 @@ protected:
 
 private:
     QString keyName; ///< The name of the key his ContextPropertyInfo represents.
+    QString cachedDoc; ///< Only for binary compatibility; this member cannot be removed.
+    ContextTypeInfo cachedTypeInfo; ///< Only for binary compatibility; this member cannot be removed.
+    bool cachedDeclared; ///< Only for binary compatibility; this member cannot be removed.
+
     QList<ContextProviderInfo> cachedProviders; ///< Cached list of providers for this key.
     mutable QMutex cacheLock; ///< Lock for the cache.
 
