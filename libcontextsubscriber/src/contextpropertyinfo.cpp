@@ -208,9 +208,7 @@ ContextPropertyInfo::ContextPropertyInfo(const QString &key, QObject *parent)
         sconnect(infoBackend, SIGNAL(keyChanged(QString)),
                  this, SLOT(onKeyChanged(QString)));
 
-        cachedTypeInfo = infoBackend->typeInfoForKey(keyName);
-        cachedDoc = infoBackend->docForKey(keyName);
-        cachedDeclared = infoBackend->keyDeclared(keyName);
+        // Cache only the provider information; that is always needed.
         cachedProviders = infoBackend->providersForKey(keyName);
     }
 }
@@ -226,15 +224,16 @@ QString ContextPropertyInfo::key() const
 QString ContextPropertyInfo::doc() const
 {
     QMutexLocker lock(&cacheLock);
-    return cachedDoc;
+    return InfoBackend::instance()->docForKey(keyName);
 }
 
 /// Returns the old-style type name for the introspected key. To be deprecated soon.
 QString ContextPropertyInfo::type() const
 {
     QMutexLocker lock(&cacheLock);
+    ContextTypeInfo typeInfo = InfoBackend::instance()->typeInfoForKey(keyName);
 
-    QString typeInfoName = cachedTypeInfo.name();
+    QString typeInfoName = typeInfo.name();
     if (typeInfoName == "integer")
         return "INT";
     else if (typeInfoName == "bool")
@@ -251,7 +250,7 @@ QString ContextPropertyInfo::type() const
 ContextTypeInfo ContextPropertyInfo::typeInfo() const
 {
     QMutexLocker lock(&cacheLock);
-    return cachedTypeInfo;
+    return InfoBackend::instance()->typeInfoForKey(keyName);
 }
 
 /// DEPRECATED Returns true if the key exists in the registry.
@@ -260,7 +259,7 @@ bool ContextPropertyInfo::exists() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::exists() is deprecated.";
     QMutexLocker lock(&cacheLock);
-    return cachedDeclared;
+    return InfoBackend::instance()->keyDeclared(keyName);
 }
 
 /// Returns true if the key is declared in the registry
@@ -268,7 +267,7 @@ bool ContextPropertyInfo::exists() const
 bool ContextPropertyInfo::declared() const
 {
     QMutexLocker lock(&cacheLock);
-    return cachedDeclared;
+    return InfoBackend::instance()->keyDeclared(keyName);
 }
 
 /// Returns true if the key is provided by someone.
@@ -387,9 +386,6 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
         return;
 
     // Update caches
-    cachedTypeInfo = InfoBackend::instance()->typeInfoForKey(keyName);
-    cachedDoc = InfoBackend::instance()->docForKey(keyName);
-    cachedDeclared = InfoBackend::instance()->keyDeclared(keyName);
     cachedProviders = InfoBackend::instance()->providersForKey(keyName);
 
     // Release the lock before emitting the signals; otherwise
@@ -400,7 +396,7 @@ void ContextPropertyInfo::onKeyChanged(const QString& key)
     // Emit the needed signals
     Q_EMIT changed(keyName);
     Q_EMIT typeChanged(type());
-    Q_EMIT existsChanged(cachedDeclared);
+    Q_EMIT existsChanged(declared());
     Q_EMIT providedChanged((cachedProviders.size() > 0));
 
     Q_EMIT providerChanged(providerDBusName_i());

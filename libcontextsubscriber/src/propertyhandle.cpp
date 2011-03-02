@@ -48,6 +48,9 @@ const ContextProviderInfo PropertyHandle::commanderInfo("contextkit-dbus", "sess
 
 DBusNameListener* PropertyHandle::commanderListener = new DBusNameListener(commanderDBusType, commanderDBusName);
 bool PropertyHandle::commandingEnabled = true;
+
+// If type check is ever enabled by default, the ContextPropertyInfo needs to be
+// changed so that the type info is cached.
 bool PropertyHandle::typeCheckEnabled = false;
 
 /*!

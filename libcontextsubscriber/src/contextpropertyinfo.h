@@ -64,9 +64,6 @@ protected:
 
 private:
     QString keyName; ///< The name of the key his ContextPropertyInfo represents.
-    QString cachedDoc; ///< Cached documentation of the key.
-    ContextTypeInfo cachedTypeInfo; ///< Cached (stored) type info of the key.
-    bool cachedDeclared; ///< Cached state of the key (existance).
     QList<ContextProviderInfo> cachedProviders; ///< Cached list of providers for this key.
     mutable QMutex cacheLock; ///< Lock for the cache.
 
