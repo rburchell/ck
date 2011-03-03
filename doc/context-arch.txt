@@ -9,20 +9,17 @@ Context Framework Subsystem Architecture Description
 |Approver | Olli Finni
 |================================
 
-Copyright (C) Nokia.  All rights reserved.
+Copyright (C) 2011 Nokia Corporation.
 
-This material, including documentation and any related computer
-programs, is protected by copyright controlled by Nokia. All rights
-are reserved. Copying, including reproducing, storing, adapting or
-translating, any or all of this material requires the prior written
-consent of Nokia. This material also contains confidential
-information, which may not be disclosed to others without the prior
-written consent of Nokia.
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts,
+and with no Back-Cover Texts.  A copy of the license is included in
+the section entitled "GNU Free Documentation License".
 
-Nokia is a registered trademark of Nokia. Other company and product
-names mentioned herein may be trademarks or tradenames of their
-respective owners.
-
+The complete text of the GNU Free Documentation License can be found
+in http://www.gnu.org/licenses/fdl.html
 
 Introduction
 ------------
@@ -245,7 +242,7 @@ digraph G {
     app [label="<<process>>\n\napplication"];
   }
 
-  subgraph cluster0 { 
+  subgraph cluster0 {
     label="Context Framework"
 
     registry [label="<<XML documents>>\n\n/usr/share/context-providers/"];
@@ -304,7 +301,7 @@ context framework:
   (needs agreeement), possibly Telephony subsystem (needs agreement)
 
 
-Provided Interfaces 
+Provided Interfaces
 ~~~~~~~~~~~~~~~~~~~
 
 .+libcontextsubscriber+
@@ -398,7 +395,7 @@ Languages:: C, C++
 
 License:: LGPL 2.1
 
-Provided interfaces:: libcontextsubscriber, libcontextprovider, context-providers, context-properties, 
+Provided interfaces:: libcontextsubscriber, libcontextprovider, context-providers, context-properties,
 
 Used interfaces:: libdbus, libgee, libglib, libcdb, libqt4-dbus, libqt4-xml, libqtcore4
 

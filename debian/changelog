@@ -1,8 +1,9 @@
 contextkit (0.5.33~unreleased) unstable; urgency=low
 
   * Fixes: NB#232009
+  * Fixes:NB#205806 - Faulty License
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 01 Mar 2011 17:09:09 +0200
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 02 Mar 2011 15:33:53 +0200
 
 contextkit (0.5.32) unstable; urgency=low
   
