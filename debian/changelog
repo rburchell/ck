@@ -1,6 +1,6 @@
 contextkit (0.5.34~unreleased) unstable; urgency=low
 
-  *
+  * Fixes: NB#205806 - Faulty License
 
  -- Marja Hölttä <marja.holtta@nokia.com>  Thu, 03 Mar 2011 11:35:04 +0200
 
