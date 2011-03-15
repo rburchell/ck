@@ -1,4 +1,4 @@
-contextkit (0.5.34~unreleased) unstable; urgency=low
+contextkit (0.5.34) unstable; urgency=low
 
   * Fixes: NB#205806 - Faulty License
 
