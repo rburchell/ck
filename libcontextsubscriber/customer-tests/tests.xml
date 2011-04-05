@@ -106,6 +106,9 @@
       <case name="waitforsubscription" description="waitForSubscription[AndBlock] functionalities" requirement="" timeout="50">
         <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=/usr/share/libcontextsubscriber-tests/waitforsubscription/ ;cd /usr/lib/libcontextsubscriber-tests/;./waitforsubscriptiontests</step>
       </case>
+      <case name="regression" description="regression tests" requirement="">
+        <step expected_result="0">. /tmp/session_bus_address.user;export CONTEXT_PROVIDERS=/usr/share/libcontextsubscriber-tests/regression/ ;cd /usr/lib/libcontextsubscriber-tests/;./regressiontests</step>
+      </case>
       <environments>
         <scratchbox>false</scratchbox>
         <hardware>true</hardware>

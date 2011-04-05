@@ -119,7 +119,9 @@ struct ContextPropertyPrivate
     bool subscribed; ///< True, if we are subscribed to the handle behind us
     QVariant value; ///< Our knowledge of the value.  Needed because several
                     /// valueChanged signals might be emitted (queued) by the
-                    /// PropertyHandle, without us handling them.
+                    /// PropertyHandle before we handle the first one of them,
+                    /// and we need to emit only one valueChanged signal in this
+                    /// class.
 };
 
 /*!
@@ -139,8 +141,7 @@ struct ContextPropertyPrivate
    keeps its last value.  This is not guaranteed however: more than
    one ContextProperty might exist in your process for the same key,
    and as long as one of them is subscribed, all of them might receive
-   new values.  The valueChanged() signal is never emitted if the
-   property is unsubscribed.
+   new values.  Also the valueChanged() signal is emitted in this case.
 
    A ContextProperty is generally asynchronous and relies on a running
    event loop.  Subscriptions and unsubcriptions are only handled and
@@ -205,6 +206,17 @@ ContextProperty::ContextProperty(const QString &key, QObject* parent)
     priv->handle = PropertyHandle::instance(key);
     priv->subscribed = false;
 
+    // We keep the signal from PropertyHandle connected all the time, to update
+    // our cache (priv->value) and emit the valueChanged signal even if this
+    // ContextProperty is not subscribed.
+
+    // We create a queued connection, because otherwise we run
+    // the users' valueChanged() handlers with locks and if they do
+    // something fancy (for example unsubscribe) it can cause a
+    // deadlock.
+    sconnect(priv->handle, SIGNAL(valueChanged()), this, SLOT(onValueChanged()),
+             Qt::QueuedConnection);
+
     subscribe();
 }
 
@@ -242,12 +254,19 @@ QVariant ContextProperty::value(const QVariant &def) const
 // ContextPropertyPrivate::value.
 void ContextProperty::onValueChanged()
 {
-    QVariant newValue = priv->handle->value();
-    if (priv->value != newValue ||
-        priv->value.isNull() != newValue.isNull() ||
-        priv->value.type() != newValue.type())
+    QVariant oldValue = priv->value;
+
+    // Always update our value cache, even if we're not going to emit the
+    // signal.  The API docs of ContextProperty and
+    // ContextProperty::unsubscribe() document this obscure behaviour.
+    priv->value = priv->handle->value();
+
+    // Emit the valueChanged signal if we haven't emitted a signal for the same
+    // value before.
+    if (priv->value != oldValue ||
+        priv->value.isNull() != oldValue.isNull() ||
+        priv->value.type() != oldValue.type())
     {
-        priv->value = newValue;
         Q_EMIT valueChanged();
     }
 }
@@ -260,11 +279,6 @@ void ContextProperty::subscribe() const
     if (priv->subscribed)
         return;
 
-    // We create a queued connection, because otherwise we run
-    // the users' valueChanged() handlers with locks and if they do
-    // something fancy (for example unsubscribe) it can cause a
-    // deadlock.
-    sconnect(priv->handle, SIGNAL(valueChanged()), this, SLOT(onValueChanged()), Qt::QueuedConnection);
     priv->handle->subscribe();
     priv->subscribed = true;
 }
@@ -273,13 +287,12 @@ void ContextProperty::subscribe() const
 /// subscribed. Unsubscribing informs the rest of the system that no
 /// effort needs to be spent to keep the value up-to-date.  However,
 /// the value might still change when it can happen 'for free'.  In
-/// this case the valueChanged() signal won't be emitted.
+/// this case the valueChanged() signal will be emitted, too.
 void ContextProperty::unsubscribe() const
 {
     if (!priv->subscribed)
         return;
 
-    QObject::disconnect(priv->handle, SIGNAL(valueChanged()), this, SLOT(onValueChanged()));
     priv->handle->unsubscribe();
     priv->subscribed = false;
 }

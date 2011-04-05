@@ -40,6 +40,7 @@ coverage/
 /customer-tests/testplugins/contextsubscribertime1.so
 /customer-tests/testplugins/contextsubscribertime2.so
 /customer-tests/waitforsubs/waitforsubscriptiontests
+/customer-tests/regression/regressiontests
 /customer-tests/coverage-build/Makefile.coverage
 
 # Other binaries

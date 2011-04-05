@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<provider bus="session" service="com.nokia.test">
+  <key name="Test.Prop">
+    <type>
+      string
+    </type>
+  </key>
+</provider>

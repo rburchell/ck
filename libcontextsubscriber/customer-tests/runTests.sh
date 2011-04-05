@@ -2,7 +2,7 @@
 
 cd $(dirname $0)
 DIRS_PYTHON="commander subscription asynchronicity registry pluginchanging"
-DIRS_CHECK="waitforsubs"
+DIRS_CHECK="waitforsubs regression"
 . ./env.sh
 
 make -C ../../libcontextprovider/src

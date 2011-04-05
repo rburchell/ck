@@ -10,6 +10,8 @@ usr/share/libcontextsubscriber-tests/registry/*.py
 usr/share/libcontextsubscriber-tests/pluginchanging/pluginchanging.py
 usr/share/libcontextsubscriber-tests/pluginchanging/time*.context.temp
 usr/share/libcontextsubscriber-tests/waitforsubscription/context-provide.context
+usr/share/libcontextsubscriber-tests/regression/context-provide.context
 usr/lib/contextkit/subscriber-test-plugins/contextsubscribertime*.so
 usr/lib/libcontextsubscriber-tests/waitforsubscriptiontests
+usr/lib/libcontextsubscriber-tests/regressiontests
 usr/bin/check-version usr/lib/contextkit/subscriber-check-version
