@@ -255,10 +255,6 @@ QVariant ContextProperty::value(const QVariant &def) const
 void ContextProperty::onValueChanged()
 {
     QVariant oldValue = priv->value;
-
-    // Always update our value cache, even if we're not going to emit the
-    // signal.  The API docs of ContextProperty and
-    // ContextProperty::unsubscribe() document this obscure behaviour.
     priv->value = priv->handle->value();
 
     // Emit the valueChanged signal if we haven't emitted a signal for the same
