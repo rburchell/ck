@@ -22,7 +22,8 @@ EXTRA_DIST = $(html_ASCIIDOCS) \
              context-cron.txt \
              context-talk.txt \
              protocol-suggestion.txt \
-             lgpl-2.1.txt
+             lgpl-2.1.txt \
+             fdl-1.3.txt
 
 MAINTAINERCLEANFILES =  $(html_EXTRA) \
 			$(html_ASCIIDOCS:.txt=.html)
