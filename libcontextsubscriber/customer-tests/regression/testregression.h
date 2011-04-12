@@ -35,8 +35,11 @@ public Q_SLOTS:
 private Q_SLOTS:
     void initTestCase();
     void cleanupTestCase();
+    void init();
+    void cleanup();
 
     void twoContextProperties();
+    void waitForSubscriptionWhenPluginReady();
 
 private:
     QString writeToProvider(const char* input);

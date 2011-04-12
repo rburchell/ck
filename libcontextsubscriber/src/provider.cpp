@@ -430,6 +430,14 @@ void Provider::blockUntilSubscribed(const QString& key)
     // failed(), we handleSubscribes(), and don't call anything.
     plugin->blockUntilReady();
 
+    // Force handleSubscribes().  If the plugin emits ready() and it was already
+    // ready, onPluginReady ignores it.  That's correct behaviour, since we
+    // don't want to renew the subscriptions ( toSubscribe += subscribedKeys ).
+    // But we want to tell the provider to subscribe immediately, otherwise only
+    // the Provider knows that this key should be subscribed, but Plugin doesn't
+    // know it yet.
+    handleSubscribes();
+
     if (pluginState == READY) {
         // And tell the plugin to block until the subscription of this key is
         // complete.

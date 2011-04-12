@@ -38,6 +38,10 @@ RegressionTests::RegressionTests()
 void RegressionTests::initTestCase()
 {
     setenv("CONTEXT_PROVIDERS", ".", 0);
+}
+
+void RegressionTests::init()
+{
     provider = new QProcess();
     provider->start("context-provide",
                     QStringList() << "--session"
@@ -62,6 +66,10 @@ void RegressionTests::initTestCase()
 }
 
 void RegressionTests::cleanupTestCase()
+{
+}
+
+void RegressionTests::cleanup()
 {
     if (providerStarted) {
         provider->kill();
@@ -141,6 +149,35 @@ void RegressionTests::twoContextProperties()
 
     QCOMPARE(prop1.value(), QVariant("firstValue"));
     QCOMPARE(prop2.value(), QVariant("firstValue"));
+}
+
+void RegressionTests::waitForSubscriptionWhenPluginReady()
+{
+    // Regression test for bug NB#242089
+    QVERIFY(providerStarted);
+
+    ContextProperty prop("Test.Prop");
+    prop.waitForSubscription(true);
+    QCOMPARE(prop.value(), QVariant("firstValue"));
+
+    // unsubscribe and spin the event loop so that it really happens
+    prop.unsubscribe();
+    QTest::qWait(2000);
+
+    // the value changes while we're unsubscribed
+    writeToProvider("Test.Prop=\"newValue\"\n");
+    QTest::qWait(2000);
+
+    // our value doesn't change, since we're unsubscribed
+    QCOMPARE(prop.value(), QVariant("firstValue"));
+
+    // then we subscribe again, and do waitForSubscription
+    prop.subscribe();
+    prop.waitForSubscription(true);
+
+    // We should really get the new value here.  The bug was that
+    // waitForSubscription didn't really do anything.
+    QCOMPARE(prop.value(), QVariant("newValue"));
 }
 
 QString RegressionTests::writeToProvider(const char* input)
