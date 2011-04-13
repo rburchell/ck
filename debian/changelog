@@ -1,9 +1,9 @@
-contextkit (0.5.36~unreleased) unstable; urgency=low
+contextkit (0.5.36) unstable; urgency=low
 
   * Fixes: NB#242089
   * Fix: waitForSubscription did nothing when re-subscribing to a property.
 
- -- Marja Hölttä <marja.holtta@nokia.com>  Wed, 06 Apr 2011 13:41:24 +0300
+ -- Marja Hölttä <marja.holtta@nokia.com>  Wed, 13 Apr 2011 10:24:41 +0300
 
 contextkit (0.5.35) unstable; urgency=low
 
