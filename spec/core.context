@@ -45,6 +45,15 @@ seen by the user.  This might mean that the device is laying face down
 on a table, or that its lid is closed if it has one.  _(stable)_
     </doc>
   </key>
+  <key name="Screen.Blanked"
+       type="bool">
+    <doc>
+The session goes to the "blanked" state when the user stops
+interacting with it and the the screen is blanked.  In general, there
+is no point in trying to interact with the user when the session is
+blanked.
+    </doc>
+  </key>
   <doc>
 Location
 --------
