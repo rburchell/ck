@@ -338,7 +338,7 @@ QString ContextPropertyInfo::providerDBusName_i() const
 
 /// DEPRECATED Returns the dbus name of the provider supplying this
 /// property/key. This function is maintained for backwards
-/// compatibility. Use listProviders() instead.
+/// compatibility. Use providers() instead.
 QString ContextPropertyInfo::providerDBusName() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusName() is deprecated.";
@@ -365,7 +365,7 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType_i() const
 
 /// DEPRECATED Returns the bus type of the provider supplying this property/key.
 /// Ie. if it's a session bus or a system bus. This function is
-/// maintained for backwards compatibility. Use listProviders() instead.
+/// maintained for backwards compatibility. Use providers() instead.
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
     contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusType() is deprecated.";
