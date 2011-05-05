@@ -297,15 +297,19 @@ void ContextKitPlugin::unsubscribe(QSet<QString> keys)
         Q_FOREACH (QString key, keys) {
             QString objectPath = keyToPath(key);
             objectPathToKey.remove(objectPath);
-            connection->asyncCall(QDBusMessage::createMethodCall(busName,
+	    QDBusPendingCall unsubscribeCall = connection->asyncCall(QDBusMessage::createMethodCall(busName,
                                                                  objectPath,
                                                                  propertyIName,
                                                                  "Unsubscribe"));
+
+	    SafeDBusPendingCallWatcher *watcher = new SafeDBusPendingCallWatcher(unsubscribeCall, this);
+
             // disconnect the ValueChanged signal for this key
             connection->disconnect(busName, objectPath,
                                    propertyIName, "ValueChanged",
                                    this,
                                    SLOT(onNewValueChanged(QList<QVariant>,quint64,QDBusMessage)));
+
 
         }
     else
