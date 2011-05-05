@@ -341,7 +341,9 @@ QString ContextPropertyInfo::providerDBusName_i() const
 /// compatibility. Use providers() instead.
 QString ContextPropertyInfo::providerDBusName() const
 {
-    contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusName() is deprecated.";
+    // Removing temporarily deprecation warnings until we nullify the ContextProperty value
+    // when the providers go away see #251998
+    //contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusName() is deprecated.";
     return providerDBusName_i();
 }
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType_i() const
@@ -368,7 +370,9 @@ QDBusConnection::BusType ContextPropertyInfo::providerDBusType_i() const
 /// maintained for backwards compatibility. Use providers() instead.
 QDBusConnection::BusType ContextPropertyInfo::providerDBusType() const
 {
-    contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusType() is deprecated.";
+    // Removing temporarily deprecation warnings until we nullify the ContextProperty value
+    // when the providers go away see #251998
+    //contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerDBusType() is deprecated.";
     return providerDBusType_i();
 }
 

@@ -24,6 +24,7 @@
 #include "subscriberinterface.h"
 #include "sconnect.h"
 #include "propertyhandle.h"
+#include "safedbuspendingcallwatcher.h"
 #include <QStringList>
 #include <QDBusPendingCall>
 #include <QTimer>
