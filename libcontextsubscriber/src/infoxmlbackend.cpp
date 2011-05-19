@@ -18,7 +18,7 @@
  * 02110-1301 USA
  *
  */
-
+#include <QCoreApplication>
 #include <QFileInfo>
 #include <QDir>
 #include <QMutex>
@@ -51,7 +51,7 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
 {
     /* Thinking about locking... the watcher notifications are delivered synced,
        so asuming the changes in the dir are atomic this is all we need. */
-
+    watcher = new QFileSystemWatcher();
     contextDebug() << F_XML << "Initializing xml backend with path:" << InfoXmlBackend::registryPath();
 
     QDir dir = QDir(InfoXmlBackend::registryPath());
@@ -59,12 +59,18 @@ InfoXmlBackend::InfoXmlBackend(QObject *parent)
         contextWarning() << "Registry path" << InfoXmlBackend::registryPath()
                          << "is not a directory or is not readable!";
     } else {
-        watcher.addPath(InfoXmlBackend::registryPath());
-        sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
-        sconnect(&watcher, SIGNAL(fileChanged(QString)), this, SLOT(onFileChanged(QString)));
+        watcher->addPath(InfoXmlBackend::registryPath());
+        sconnect(watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDirectoryChanged(QString)));
+        sconnect(watcher, SIGNAL(fileChanged(QString)), this, SLOT(onFileChanged(QString)));
     }
 
     regenerateKeyDataList();
+}
+
+InfoXmlBackend::~InfoXmlBackend()
+{
+    if (QCoreApplication::instance() != 0)
+	delete(watcher);
 }
 
 /// Returns 'xml'.
@@ -207,9 +213,9 @@ void InfoXmlBackend::regenerateKeyDataList()
     countOfFilesInLastParse = 0;
 
     // Stop watching all files. We do keep wathching the dir though.
-    QStringList watchedFiles = watcher.files();
+    QStringList watchedFiles = watcher->files();
     if (watchedFiles.size() > 0)
-        watcher.removePaths(watchedFiles);
+        watcher->removePaths(watchedFiles);
 
     if (QFile(InfoXmlBackend::coreDeclPath()).exists()) {
         contextDebug() << F_XML << "Reading core declarations from:" << InfoXmlBackend::coreDeclPath();
@@ -239,8 +245,8 @@ void InfoXmlBackend::regenerateKeyDataList()
         QFileInfo f = list.at(i);
         readKeyDataFromXml(f.filePath());
 
-        if (! watcher.files().contains(f.filePath()))
-            watcher.addPath(f.filePath());
+        if (! watcher->files().contains(f.filePath()))
+            watcher->addPath(f.filePath());
 
         countOfFilesInLastParse++;
     }

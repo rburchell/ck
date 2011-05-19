@@ -18,7 +18,7 @@
  * 02110-1301 USA
  *
  */
-
+#include <QCoreApplication>
 #include <QDir>
 #include <QDebug>
 #include <QFile>
@@ -46,11 +46,12 @@
 InfoCdbBackend::InfoCdbBackend(QObject *parent)
     : InfoBackend(parent), reader(InfoCdbBackend::databasePath()), lastInode(0)
 {
+    watcher = new QFileSystemWatcher();
     contextDebug() << F_CDB << "Initializing cdb backend with database:" << InfoCdbBackend::databasePath();
 
-    sconnect(&watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
+    sconnect(watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onDatabaseDirectoryChanged(QString)));
 
-    watcher.addPath(InfoCdbBackend::databaseDirectory());
+    watcher->addPath(InfoCdbBackend::databaseDirectory());
 
     checkCompatibility();
 
@@ -59,6 +60,12 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
         lastInode = buffer.st_ino;
     else
         lastInode = 0;
+}
+
+InfoCdbBackend::~InfoCdbBackend()
+{
+    if (QCoreApplication::instance() != 0)
+	delete(watcher);
 }
 
 /// Returns 'cdb'.

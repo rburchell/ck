@@ -22,10 +22,10 @@
 #ifndef INFOCDBBACKEND_H
 #define INFOCDBBACKEND_H
 
+#include <QFileSystemWatcher>
 #include <QStringList>
 #include <QObject>
 #include <QString>
-#include <QFileSystemWatcher>
 #include "cdbreader.h"
 #include "infobackend.h"
 #include "contextproviderinfo.h"
@@ -36,7 +36,7 @@ class InfoCdbBackend : public InfoBackend
 
 public:
     explicit InfoCdbBackend(QObject *parent = 0);
-
+    ~InfoCdbBackend();
     virtual QString name() const;
     virtual QStringList listKeys() const;
     virtual QString docForKey(QString key) const;
@@ -50,7 +50,7 @@ public:
     static bool databaseExists();
 
 private:
-    QFileSystemWatcher watcher; ///< A watched object obsering the database file. Delivers synced notifications.
+    QFileSystemWatcher *watcher; ///< A watched object obsering the database file. Delivers synced notifications.
     CDBReader reader; ///< The cdb reader object used to access the cdb database.
     bool databaseCompatible; ///< If the currently open database is compatible (versions match).
     quint64 lastInode;

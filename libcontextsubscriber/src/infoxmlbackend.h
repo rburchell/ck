@@ -22,12 +22,12 @@
 #ifndef INFOXMLBACKEND_H
 #define INFOXMLBACKEND_H
 
+#include <QFileSystemWatcher>
 #include <QStringList>
 #include <QObject>
 #include <QFileInfo>
 #include <QString>
 #include <QHash>
-#include <QFileSystemWatcher>
 #include "infobackend.h"
 #include "infokeydata.h"
 #include "contextproviderinfo.h"
@@ -39,6 +39,7 @@ class InfoXmlBackend : public InfoBackend
 
 public:
     explicit InfoXmlBackend(QObject *parent = 0);
+    ~InfoXmlBackend();
 
     virtual QString name() const;
     virtual QStringList listKeys() const;
@@ -56,7 +57,7 @@ private Q_SLOTS:
     void onFileChanged(const QString &path);
 
 private:
-    QFileSystemWatcher watcher; ///< A watched object obsering the database file. Delivers synced notifications.
+    QFileSystemWatcher *watcher; ///< A watched object obsering the database file. Delivers synced notifications.
     QHash <QString, InfoKeyData> keyDataHash; ///< This hash contains the full state of registry in memory.
     QHash <QString, QList<ContextProviderInfo> > keyProvidersHash; ///< This hash contains providers for keys.
     int countOfFilesInLastParse; ///< The number of xml files we parsed in last registry update.

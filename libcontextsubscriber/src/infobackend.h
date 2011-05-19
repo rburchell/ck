@@ -95,7 +95,7 @@ private:
     /// Private operator. Do not use.
     InfoBackend& operator=(const InfoBackend&);
 
-    static InfoBackend* backendInstance; ///< Holds a pointer to the instance of the singelton.
+    static InfoBackend* backendInstance; ///< Holds a pointer to the instance of the singleton.
 
     friend class InfoXmlBackend;
     friend class InfoCdbBackend;
