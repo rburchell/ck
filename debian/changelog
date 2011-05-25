@@ -1,8 +1,8 @@
-contextkit (0.5.38~unreleased) unstable; urgency=low
+contextkit (0.5.38) unstable; urgency=low
 
-  *
+  * Fixes: NB#249829, COREWEB: applications crashing for 'InfoCdbBackend::~InfoCdbBackend'
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Tue, 24 May 2011 08:46:58 +0300
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 25 May 2011 12:44:06 +0300
 
 contextkit (0.5.37) unstable; urgency=low
 
