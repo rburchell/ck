@@ -1,8 +1,8 @@
-contextkit (0.5.39~unreleased) unstable; urgency=low
+contextkit (0.5.39) unstable; urgency=low
 
-  * 
+  * Fixes: NB#275018 - add Cellular.ServiceStatus to core.context 
 
- -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Wed, 25 May 2011 17:23:15 +0300
+ -- Jean-Luc Lamadon <jean-luc.lamadon@nokia.com>  Thu, 04 Aug 2011 13:59:18 +0300
 
 contextkit (0.5.38) unstable; urgency=low
 
