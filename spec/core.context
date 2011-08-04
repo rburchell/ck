@@ -362,10 +362,23 @@ The currently used Radio Access Technology for data transfer.
         <no-sim    doc="No SIM card is present"/>
         <offline   doc="Cellular radio is powered off"/>
         <forbidden doc="Cellular access is denied, e.g., because of invalid SIM"/>
+	<need-pin doc="PIN needed"/>
       </string-enum>
     </type>
     <doc>
 The current cellular network registration status.
+    </doc>
+  </key>
+  <key name="Cellular.ServiceStatus">
+    <type>
+      <string-enum>
+        <full-service/>
+        <limited-service/>
+        <no-coverage/>
+      </string-enum>
+    </type>
+    <doc>
+      The current cellular service status.
     </doc>
   </key>
   <key name="Cellular.CellName"
