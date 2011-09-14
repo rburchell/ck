@@ -1,8 +1,9 @@
-contextkit (0.5.40~unreleased) unstable; urgency=low
+contextkit (0.5.40) unstable; urgency=low
 
-  *
+  * Fixes: NB#263861, Status area should show indication of presence going to online
+  * Modified Presence.State enum: added "connecting"
 
- -- James Thomas <james.thomas@codethink.co.uk>  Web, 14 Sep 2011 10:48:00 +0300
+ -- James Thomas <james.thomas@codethink.co.uk>  Wed, 14 Sep 2011 11:55:00 +0300
 
 contextkit (0.5.39) unstable; urgency=low
 
