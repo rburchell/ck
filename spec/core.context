@@ -466,6 +466,7 @@ Information about the end-user presence.
     <type>
       <string-enum>
         <offline/>
+        <connecting/>
         <busy/>
         <available/>
       </string-enum>
