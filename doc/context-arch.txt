@@ -205,23 +205,6 @@ providers.
 
 [dotty,fig3.png]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-digraph G {
-
-  graph [size="7,100"];
-  node [shape=box, style=filled, fontsize=11];
-  edge [fontsize=11];
-
-
-  "Direct UI Framework" -> "Context Framework"
-  "Policy Engine" -> "Context Framework"
-  "Sensor" -> "Context Framework"
-  "Content Framework" -> "Context Framework" [dir="both"]
-
-  "Context Framework" -> "Internet Connectivity" [dir="back"]
-  "Context Framework" -> "Location Framework"
-  "Context Framework" -> "Freedesktop Essentials"
-
-}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Structural view
@@ -232,55 +215,6 @@ Framework.
 
 [dotty,fig4.png]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-digraph G {
-
-  graph [size="7,100"];
-  node [shape=box, style=filled, fontsize=11];
-  edge [fontsize=11];
-
-  { rank=source
-    app [label="<<process>>\n\napplication"];
-  }
-
-  subgraph cluster0 {
-    label="Context Framework"
-
-    registry [label="<<XML documents>>\n\n/usr/share/context-providers/"];
-    cache [label="<<CDB file>>\n\ncache.cdb"];
-    libsub [label="<<library>>\n\nlibcontextsubscriber"];
-    update [label="<<utility>>\n\nupdate-context-providers"];
-    libprov [label="<<library>>\n\nlibcontextprovider"];
-    contextd [label="<<process>>\n\ncontextd"];
-
-    commander [label="<<utility>>\n\ncontext-commander"];
-    corepros [label="<<XML document>>\n\ncore context\nproperty declarations", shape=note];
-
-    // update -> registry [label="<<read>>"]
-    // update -> cache [label="<<write>>"]
-    registry -> update [label="<<read>>", dir="back"]
-    cache -> update [label="<<write>>", dir="back"]
-
-    libsub -> libprov [label="<<D-Bus>>"]
-    libsub -> registry [label="<<read>>"]
-    libsub -> cache [label="<<read>>"]
-    libprov -> contextd [label="<<link>>", dir="back"]
-  }
-
-  {
-    rank=sink
-    props [label="<<XML document>>\n\nicd2-props.xml", shape=note];
-    icd2 [label="<<process>>\n\nicd2"];
-    libgeo [label="<<library>>\n\nlibgeo"];
-    libhal [label="<<library>>\n\nlibhal"];
-  }
-
-  app -> libsub [label="<<link>>"]
-
-  registry -> props [dir="back"]
-  contextd -> libgeo [label="<<link>>"]
-  contextd -> libhal [label="<<link>>"]
-  libprov -> icd2 [label="<<link>>", dir="back"]
-}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are two fundamental options for exporting information via the
@@ -404,7 +338,7 @@ Binary packages::
  libcontextprovider0, libcontextprovider0-dbg, libcontextprovider-dev, libcontextprovider-doc,
  contextkit, contextkit-doc, context-dbg
 
-Sources:: https://dvcs.projects.maemo.org/git/?p=ContextKit
+Sources:: http://maemo.gitorious.org/maemo-af/contextkit
 
 .+context-commander+
 
@@ -418,7 +352,7 @@ Used interfaces:: libcontextsubscriber, libqt4-dbus, libqt4-gui, libqt4-core
 
 Binary packages:: context-commander
 
-Sources:: https://dvcs.projects.maemo.org/git/?p=ContextCommander
+Sources:: http://maemo.gitorious.org/maemo-af/context-commander
 
 .+context-provider-example+
 
@@ -432,7 +366,7 @@ Used interfaces:: libcontextprovider, sysfs files for accelerometer and ambient 
 
 Binary packages:: context-provider-example
 
-Sources:: https://dvcs.projects.maemo.org/git/?p=ContextProviderExample
+Sources:: http://maemo.gitorious.org/maemo-af/contextkit-provider-example
 
 .+context-subscriber-example+
 
@@ -446,7 +380,7 @@ Used interfaces:: Context.Example.* properties, libcontextsubscriber, libqt4-gui
 
 Binary packages:: context-subscriber-example
 
-Sources:: https://dvcs.projects.maemo.org/git/?p=ContextSubscriberExample
+Sources:: http://maemo.gitorious.org/maemo-af/contextkit-subscriber-example
 
 Performance
 -----------
