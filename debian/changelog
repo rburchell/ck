@@ -1,8 +1,8 @@
 contextkit (0.5.41~unreleased) unstable; urgency=low
 
-  *
+  * Fixes NB#269830 - contextkit public api documentation points to internal links
 
- -- James Thomas <james.thomas@codethink.co.uk>  Thu, 10 Nov 2011 12:49:00 +0000
+ -- James Thomas <james.thomas@codethink.co.uk>  Fri, 09 Nov 2011 14:58:00 +0000
 
 contextkit (0.5.40) unstable; urgency=low
 
