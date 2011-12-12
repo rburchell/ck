@@ -1,5 +1,5 @@
 AC_PREREQ([2.61])
-AC_INIT([ContextKit], [0.5.41], [james.thomas@codethink.co.uk], ContextKit)
+AC_INIT([ContextKit], [0.5.42~unreleased], [james.thomas@codethink.co.uk], ContextKit)
 
 AC_CONFIG_SRCDIR([Makefile.am])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign dist-bzip2 tar-ustar 1.9])
