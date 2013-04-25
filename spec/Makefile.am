@@ -1,7 +1,7 @@
-dist_noinst_DATA = context.valid.stamp $(INTROSPECT)
+#dist_noinst_DATA = context.valid.stamp $(INTROSPECT)
 
-htmldir = $(datadir)/doc/contextkit-doc/html/
-dist_html_DATA = context-properties.html core-types.html contextkit.html context-provider-schema.html
+#htmldir = $(datadir)/doc/contextkit-doc/html/
+#dist_html_DATA = context-properties.html core-types.html contextkit.html context-provider-schema.html
 
 contextdir = $(datadir)/contextkit/
 dist_context_DATA = core.context

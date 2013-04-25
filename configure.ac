@@ -111,13 +111,13 @@ AC_CONFIG_FILES([
 # The user only needs to have the documentation tools (asciidoc, etc.)
 # if she checked out the master Git branch, instead of using a release
 # tag or a release tarball, as she should.
-if test "$missing_deps_BUILD_DOCS" != "" -a \! -f ${srcdir}/spec/context-properties.html
-then
-	missing_deps=`echo $missing_deps_BUILD_DOCS | cut -c3-`
-	AC_MSG_FAILURE([
-Building from Git, but not all of the required doctools are available: $missing_deps
-Please use a release tag instead or install the required tools!])
-fi
+#if test "$missing_deps_BUILD_DOCS" != "" -a \! -f ${srcdir}/spec/context-properties.html
+#then
+#	missing_deps=`echo $missing_deps_BUILD_DOCS | cut -c3-`
+#	AC_MSG_FAILURE([
+#Building from Git, but not all of the required doctools are available: $missing_deps
+#Please use a release tag instead or install the required tools!])
+#fi
 
 AC_OUTPUT
 

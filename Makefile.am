@@ -7,7 +7,6 @@ SUBDIRS = \
 	libcontextprovider \
 	libcontextsubscriber \
 	spec \
-	doc \
 	python \
 	tools \
 	common
