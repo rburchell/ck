@@ -29,6 +29,7 @@
 #include "cdbwriter.h"
 #include "fcntl.h"
 #include "infobackend.h"
+#include <sys/stat.h>
 
 /*!
    \page UpdatingContextProviders
