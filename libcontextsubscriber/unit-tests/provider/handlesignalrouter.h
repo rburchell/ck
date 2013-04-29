@@ -28,6 +28,8 @@
 #include <QString>
 #include <QVariant>
 
+#include <provider.h>
+
 namespace ContextSubscriber {
 
 class HandleSignalRouter : public QObject

@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/contextsubscriber
+
+Name: contextsubscriber
+Description: ContextKit Context Subscriber library
+Version: @VERSION@
+Requires: QtCore
+Requires.private: QtDBus QtXml
+Libs: -L${libdir} -lcontextsubscriber
+Libs.private: -lcdb
+Cflags: -I${includedir}/contextsubscriber

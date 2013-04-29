@@ -20,6 +20,7 @@
  */
 
 // Header file of the tests
+#include "queuedinvoker.h"
 #include "testprovider.h"
 
 // Mock header files

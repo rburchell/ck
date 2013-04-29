@@ -29,6 +29,8 @@
 #include <QHash>
 #include <QVariant>
 
+#include "service.h"
+
 namespace ContextProvider {
 
 class Manager;

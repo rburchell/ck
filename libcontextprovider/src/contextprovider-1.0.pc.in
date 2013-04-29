@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/contextprovider
+
+Name: contextprovider
+Description: ContextKit Context Provider library
+Version: @VERSION@
+Requires: QtCore QtDBus dbus-1
+Libs: -L${libdir} -lcontextprovider
+Cflags: -I${includedir}/contextprovider

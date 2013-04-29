@@ -23,8 +23,9 @@
 #define PROPERTY_H
 
 // This is a mock implementation
-
 #include <QObject>
+
+#include "service.h"
 
 namespace ContextProvider {
 
