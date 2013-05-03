@@ -1,0 +1,27 @@
+* Thu Sep 29 2011 Marko Saukko <marko.saukko@cybercom.com> - 0.5.39
+- Updated to contextkit to latest upstream.
+- Removed dependencies for documentation.
+
+* Mon Jan 31 2011 Fathi Boudra <fathi.boudra@nokia.com> - 0.5.27
+- Update to 0.5.27 (BMC#13153)
+- Drop remove-docs-build.patch
+- Split into more packages: doc, python and tests (BMC#6349)
+- Fix upstream URL
+- Move the files list from the spec file the yaml file
+- Fix rpmlint non-executable-script warning
+
+* Thu Jul 15 2010 Kaitlin Rupert <kaitlin.rupert@intel.com> - 0.5.15
+- Update to release tag 0.5.15
+
+* Sun Jul 11 2010 Anas Nashif <anas.nashif@intel.com> - 0.5.8
+- Fixed build with new compiler/glibc
+
+* Sun Mar 14 2010 Anas Nashif <anas.nashif@intel.com> - 0.5.8
+- Use spectacle
+- Fixed all rpmlint errors
+
+* Wed Feb 17 2010 Rusty Lynch <rusty.lynch@intel.com> - 0.5.8
+- release 0.5.8
+
+* Mon Nov 23 2009 Rusty Lynch <rusty.lynch> - 0.5
+- Initial packaging

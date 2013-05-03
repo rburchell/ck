@@ -1,0 +1,98 @@
+Name: contextkit
+Summary: Contextual information collection framework
+Version: 0.5.39
+Release: 1
+Group: Applications/System
+License: GPLv2
+URL: http://maemo.gitorious.org/maemo-af/%{name}
+Sources:
+    - "%{name}-%{version}.tar.bz2"
+Description: |
+    This is ContextKit, a framework for collecting contextual information from
+    the bowels of the system, cleaning them up and offering them through a simple
+    API.
+
+    The ContextKit consists of:
+    * libcontextprovider, a convenience library to export contextual properties
+      to the rest of the system.
+    * user documentation including a list of standard context properties.
+    * contextd, daemon for combining and refining contextual information.
+    * libcontextsubscriber, a library implementing the simple API for accessing
+      the contextual information.
+PkgBR:
+#    - asciidoc
+#    - doxygen
+    - libxslt
+#    - perl-XML-DOM
+    - python
+PkgConfigBR:
+    - QJson
+    - QtCore
+    - dbus-1
+    - glib-2.0
+    - libcdb
+Builder: qmake
+Files:
+    - "%config %{_sysconfdir}/dbus-1/system.d/libcontextprovider0.conf"
+    - "%{_bindir}/update-%{name}-providers"
+    - "%{_libdir}/libcontextprovider.so.*"
+    - "%{_libdir}/libcontextsubscriber.so.*"
+    - "%{_datadir}/%{name}/core.context"
+    - "%{_datadir}/%{name}/types/core.types"
+SubPackages:
+    - Name: devel
+      Summary: Development files for ContextKit APIs
+      Group: Development/Libraries
+      Description: |
+          Development libraries and headers for building context aware applications.
+      Files:
+          - "%{_includedir}/contextprovider/*"
+          - "%{_includedir}/contextsubscriber/*"
+          - "%{_libdir}/libcontextprovider.so"
+          - "%{_libdir}/libcontextsubscriber.so"
+          - "%{_libdir}/pkgconfig/contextprovider-1.0.pc"
+          - "%{_libdir}/pkgconfig/contextsubscriber-1.0.pc"
+
+#    - Name: doc
+#      Summary: Documentation for ContextKit APIs
+#      Group: Documentation
+#      BuildArch: noarch
+#      Description: |
+#          This package contains the ContextKit documentation.
+#      Files:
+#          - "%doc %{_docdir}/%{name}-doc/html/*.html"
+#          - "%doc %{_docdir}/%{name}-doc/html/*.png"
+
+    - Name: python-%{name}
+      AsWholeName: yes
+      Summary: Python bindings for ContextKit APIs
+      Group: Applications/System
+      Description: |
+          This package contains Python bindings for the libcontextprovider
+          C interface, which helps you writing providers in Python.
+      Files:
+          - "%{_bindir}/context-rlwrap"
+          - "%{py_libdir}/site-packages/ContextKit/*.py"
+          - "%exclude %{py_libdir}/site-packages/ContextKit/*.pyc"
+          - "%exclude %{py_libdir}/site-packages/ContextKit/*.pyo"
+
+    - Name: tests
+      Summary: ContextKit automated customer tests
+      Group: Applications/System
+      Description: |
+          This package contains an automated customer testsuite of the
+          ContextKit libraries.
+      Requires: 
+          - python-%{name} = %{version}-%{release}
+      Files:
+          - "%{_bindir}/check-version"
+          - "%{_bindir}/context-listen"
+          - "%{_bindir}/context-ls"
+          - "%{_bindir}/context-provide"
+          - "%{_libdir}/%{name}/subscriber-test-plugins/contextsubscribertime*.so"
+          - "%{_datadir}/libcontextsubscriber-tests/regression/context-provide.context"
+          - "%{_libdir}/libcontextprovider-tests/*"
+          - "%{_libdir}/libcontextsubscriber-tests/*"
+          - "%{_datadir}/libcontextprovider-tests/tests.xml"
+          - "%{_datadir}/libcontextsubscriber-tests/tests.xml"
+          - "%{_datadir}/libcontextsubscriber-tests/waitforsubscription/context-provide.context"
