@@ -10,4 +10,4 @@ Requires: QtCore
 Requires.private: QtDBus QtXml
 Libs: -L${libdir} -lcontextsubscriber
 Libs.private: -lcdb
-Cflags: -I${includedir}/contextsubscriber
+Cflags: -I${includedir}
