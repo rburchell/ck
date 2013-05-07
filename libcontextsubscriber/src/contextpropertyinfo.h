@@ -27,6 +27,8 @@
 #include <QObject>
 #include <QDBusConnection>
 #include <QMutex>
+#include <QMetaMethod>
+
 #include "contextproviderinfo.h"
 #include "contexttypeinfo.h"
 
@@ -60,7 +62,11 @@ public:
     ResolutionStrategy resolutionStrategy() const;
 
 protected:
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     virtual void connectNotify(const char *signal);
+#else
+    virtual void connectNotify(const QMetaMethod &signal);
+#endif
 
 private:
     QString keyName; ///< The name of the key his ContextPropertyInfo represents.

@@ -38,8 +38,15 @@ Q_DECLARE_METATYPE(QVariant);
 namespace ContextSubscriber {
 
 #define MYLOGLEVEL 2
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 void myMessageOutput(QtMsgType type, const char *msg)
 {
+#else
+void myMessageOutput(QtMsgType type, const QMessageLogContext&, const QString &_msg)
+{
+    const char *msg = _msg.toUtf8();
+#endif
     switch (type) {
     case QtDebugMsg:
         if (MYLOGLEVEL <= 0)
@@ -105,7 +112,11 @@ PropertyHandle* PropertyHandle::instance(const QString& key)
 // Before all tests
 void HandleSignalRouterUnitTests::initTestCase()
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     qInstallMsgHandler(myMessageOutput);
+#else
+    qInstallMessageHandler(myMessageOutput);
+#endif
     // Help the QSignalSpy handle QVariant
     qRegisterMetaType<QVariant>("QVariant");
 }

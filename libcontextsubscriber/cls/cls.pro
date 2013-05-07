@@ -1,5 +1,6 @@
 QT = core dbus
-TARGET = context-ls
+equals(QT_MAJOR_VERSION, 4): TARGET = context-ls
+equals(QT_MAJOR_VERSION, 5): TARGET = context-ls5
 
 SOURCES = context-ls.cpp
 

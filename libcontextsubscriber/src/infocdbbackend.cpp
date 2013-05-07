@@ -56,7 +56,7 @@ InfoCdbBackend::InfoCdbBackend(QObject *parent)
     checkCompatibility();
 
     struct stat buffer;
-    if (!stat(InfoCdbBackend::databasePath().toAscii(), &buffer))
+    if (!stat(InfoCdbBackend::databasePath().toUtf8(), &buffer))
         lastInode = buffer.st_ino;
     else
         lastInode = 0;
@@ -174,7 +174,7 @@ void InfoCdbBackend::onDatabaseDirectoryChanged(const QString &path)
     struct stat buffer;
     quint64 inode;
 
-    if (!stat(InfoCdbBackend::databasePath().toAscii(), &buffer))
+    if (!stat(InfoCdbBackend::databasePath().toUtf8(), &buffer))
         inode = buffer.st_ino;
     else
         inode = 0;

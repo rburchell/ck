@@ -6,3 +6,6 @@ customer-tests.depends = src
 cli.depends = src
 cls.depends = src
 update-contextkit-providers.depends = src
+
+# QT5-TODO
+equals(QT_MAJOR_VERSION, 5): SUBDIRS -= unit-tests customer-tests

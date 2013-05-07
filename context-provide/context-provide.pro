@@ -1,8 +1,9 @@
 QT = core dbus xml
-TARGET = context-provide
+equals(QT_MAJOR_VERSION, 4): TARGET = context-provide
+equals(QT_MAJOR_VERSION, 5): TARGET = context-provide5
 
 CONFIG += link_pkgconfig
-PKGCONFIG += QJson
+equals(QT_MAJOR_VERSION, 4): PKGCONFIG += QJson
 
 DEFINES += CONTEXT_LOG_MODULE_NAME=\\\"context-provide\\\"
 

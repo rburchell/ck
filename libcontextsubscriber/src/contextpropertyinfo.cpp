@@ -417,10 +417,19 @@ const QList<ContextProviderInfo> ContextPropertyInfo::providers() const
 
 /// Called when people connect to signals. Used to emit deprecation warnings
 /// when people connect to deprecated signals.
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 void ContextPropertyInfo::connectNotify(const char *_signal)
+#else
+void ContextPropertyInfo::connectNotify(const QMetaMethod &_signal)
+#endif
 {
     QObject::connectNotify(_signal);
-    QLatin1String signal(_signal);
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    QByteArray signal = _signal;
+#else
+    QByteArray signal = _signal.methodSignature();
+#endif
 
     if (signal == SIGNAL(providerChanged(QString)))
         contextWarning() << F_DEPRECATION << "ContextPropertyInfo::providerChanged signal is deprecated.";

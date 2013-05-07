@@ -155,6 +155,7 @@ void SubscriberInterface::onSubscribeFinished(QDBusPendingCallWatcher* watcher)
     }
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 void SubscriberInterface::connectNotify(const char *signal)
 {
     // only Changed signal should be AddMatch'd on the DBus side
@@ -163,7 +164,18 @@ void SubscriberInterface::connectNotify(const char *signal)
     else
         QObject::connectNotify(signal);
 }
+#else
+void SubscriberInterface::connectNotify(const QMetaMethod &signal)
+{
+    // only Changed signal should be AddMatch'd on the DBus side
+    if (qstrcmp(signal.methodSignature(), SIGNAL(Changed(QMap<QString,QVariant>,QStringList))) == 0)
+        QDBusAbstractInterface::connectNotify(signal);
+    else
+        QObject::connectNotify(signal);
+}
+#endif
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 void SubscriberInterface::disconnectNotify(const char *signal)
 {
     // only Changed signal should be AddMatch'd on the DBus side
@@ -172,5 +184,15 @@ void SubscriberInterface::disconnectNotify(const char *signal)
     else
         QObject::disconnectNotify(signal);
 }
+#else
+void SubscriberInterface::disconnectNotify(const QMetaMethod &signal)
+{
+    // only Changed signal should be AddMatch'd on the DBus side
+    if (qstrcmp(signal.methodSignature(), SIGNAL(Changed(QMap<QString,QVariant>,QStringList))) == 0)
+        QDBusAbstractInterface::disconnectNotify(signal);
+    else
+        QObject::disconnectNotify(signal);
+}
+#endif
 
 } // end namespace

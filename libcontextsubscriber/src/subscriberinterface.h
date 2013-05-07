@@ -27,6 +27,7 @@
 #include <QString>
 #include <QStringList>
 #include <QDBusAbstractInterface>
+#include <QMetaMethod>
 
 class QDBusConnection;
 class QDBusPendingCallWatcher;
@@ -60,8 +61,13 @@ private:
     QMap<QString, QVariant>& mergeNullsWithMap(QMap<QString, QVariant> &map, QStringList nulls) const;
 
 protected:
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     void connectNotify(const char *signal);
     void disconnectNotify(const char *signal);
+#else
+    void connectNotify(const QMetaMethod &signal);
+    void disconnectNotify(const QMetaMethod &signal);
+#endif
 
     static const char* interfaceName;
 };

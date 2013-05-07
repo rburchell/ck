@@ -25,6 +25,7 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
+#include <QMetaMethod>
 
 class ContextRegistryInfo : public QObject
 {
@@ -51,7 +52,11 @@ private:
     static ContextRegistryInfo* registryInstance;
 
 protected:
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     void connectNotify(const char *signal);
+#else
+    void connectNotify(const QMetaMethod &signal);
+#endif
 
 private Q_SLOTS:
     void onKeysChanged(const QStringList& currentKeys);

@@ -26,8 +26,13 @@
 #include <QVariant>
 #include <QCoreApplication>
 #include <QDBusArgument>
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #include <qjson/serializer.h>
 #include <qjson/parser.h>
+#else
+#include <QJsonDocument>
+#endif
 
 PropertyListener::PropertyListener(const QString &key):
     QObject(QCoreApplication::instance()), prop(new ContextProperty(key, this))
@@ -45,7 +50,14 @@ QString PropertyListener::valueToString(QString defaultValue) const
     QVariant value;
     if (!defaultValue.isEmpty()) {
         bool isOk;
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
         QVariant def = QJson::Parser().parse(defaultValue.toUtf8(), &isOk);
+#else
+        QJsonParseError jsonError;
+        QJsonDocument doc = QJsonDocument::fromJson(defaultValue.toUtf8(), &jsonError);
+        isOk = jsonError.error == QJsonParseError::NoError;
+        QVariant def = doc.toVariant();
+#endif
         if (!isOk)
             qWarning() << "failed to parse default value as json:" << defaultValue;
         value = prop->value(def);
@@ -57,7 +69,12 @@ QString PropertyListener::valueToString(QString defaultValue) const
         return result += "Unknown";
     result += value.typeName();
     result += ':';
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     result += QJson::Serializer().serialize(value);
+#else
+    QJsonDocument doc = QJsonDocument::fromVariant(value);
+    result += doc.toJson();
+#endif
     return result;
 }
 

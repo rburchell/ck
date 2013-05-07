@@ -1,4 +1,5 @@
-TARGET = contextprovider
+equals(QT_MAJOR_VERSION, 4): TARGET = contextprovider
+equals(QT_MAJOR_VERSION, 5): TARGET = contextprovider5
 TEMPLATE = lib
 QT = core dbus
 CONFIG += link_pkgconfig
@@ -28,7 +29,8 @@ SOURCES = \
     servicebackend.cpp \
     propertyadaptor.cpp
 
-libcp.path = /usr/include/contextprovider
+equals(QT_MAJOR_VERSION, 4): libcp.path = /usr/include/contextprovider
+equals(QT_MAJOR_VERSION, 5): libcp.path = /usr/include/contextprovider5
 libcp.files = ContextProvider contextc.h context_provider.h
 INSTALLS += libcp
 
@@ -46,9 +48,10 @@ DEFINES += CONTEXT_LOG_HIDE_DEBUG
 
 dbus_policy.path = /etc/dbus-1/system.d
 dbus_policy.files = libcontextprovider0.conf
-INSTALLS += dbus_policy
+equals(QT_MAJOR_VERSION, 4): INSTALLS += dbus_policy
 
-PCFILE=contextprovider-1.0.pc
+equals(QT_MAJOR_VERSION, 4): PCFILE=contextprovider-1.0.pc
+equals(QT_MAJOR_VERSION, 5): PCFILE=contextprovider5.pc
 
 # substitutions
 system(cp $${PCFILE}.in $$PCFILE)

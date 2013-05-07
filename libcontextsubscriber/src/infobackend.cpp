@@ -137,14 +137,22 @@ void InfoBackend::checkAndEmitKeyChanged(const QStringList &currentKeys,
 /* Protected */
 
 /// Called each time we have a signal connection. Increases the connect count.
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 void InfoBackend::connectNotify(const char *signal)
+#else
+void InfoBackend::connectNotify(const QMetaMethod &signal)
+#endif
 {
     QObject::connectNotify(signal);
     connectCount++;
 }
 
 /// Called each time we have a signal disconnection. Decreases the connect count.
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 void InfoBackend::disconnectNotify(const char *signal)
+#else
+void InfoBackend::disconnectNotify(const QMetaMethod &signal)
+#endif
 {
     QObject::disconnectNotify(signal);
     connectCount--;

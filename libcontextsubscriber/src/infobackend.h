@@ -25,6 +25,8 @@
 #include <QVariant>
 #include <QStringList>
 #include <QObject>
+#include <QMetaMethod>
+
 #include "contextproviderinfo.h"
 #include "contexttypeinfo.h"
 
@@ -77,8 +79,13 @@ Q_SIGNALS:
     void listChanged();
 
 protected:
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     virtual void connectNotify(const char *signal);
     virtual void disconnectNotify(const char *signal);
+#else
+    virtual void connectNotify(const QMetaMethod &signal);
+    virtual void disconnectNotify(const QMetaMethod &signal);
+#endif
 
 private:
     int connectCount; ///< Number of connections to signals. Used to optimized signal emission when 0.

@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/contextsubscriber5
+
+Name: contextsubscriber5
+Description: ContextKit Context Subscriber library
+Version: @VERSION@
+Requires: Qt5Core
+Requires.private: Qt5DBus Qt5Xml
+Libs: -L${libdir} -lcontextsubscriber5
+Libs.private: -lcdb
+Cflags: -I${includedir}
